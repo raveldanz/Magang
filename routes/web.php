@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController; 
 use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
+use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,6 +34,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
     Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show');
     Route::patch('/admin/applications/{id}/status', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus');
+
+    // Logbook Mahasiswa
+    Route::get('/student/logbook', [StudentLogbookController::class, 'index'])->name('student.logbook.index');
+    Route::post('/student/logbook', [StudentLogbookController::class, 'store'])->name('student.logbook.store');
 });
 
 require __DIR__.'/auth.php';
