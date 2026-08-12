@@ -28,26 +28,29 @@ class ApplicationController extends Controller
     // Update status pengajuan (Verifikasi / Seleksi)
     public function updateStatus(Request $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:verified,accepted,rejected',
-            'rejection_note' => 'nullable|string',
-            'pembimbing_id' => 'nullable|exists:users,id',
-        ]);
+        $statusInput = strtolower($request->status);
+    $request->merge(['status' => $statusInput]);
 
-        $application = Application::findOrFail($id);
-        $application->update([
-            'status' => $request->status,
-            'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
-        ]);
+    $request->validate([
+        'status' => 'required|in:pending,verified,accepted,rejected',
+        'rejection_note' => 'nullable|string',
+        'pembimbing_id' => 'nullable|exists:users,id',
+    ]);
 
-        // Jika status disetujui (Accepted), otomatis buatkan record Penempatan (Placement)
-        if ($request->status === 'accepted') {
-            Placement::updateOrCreate(
-                ['application_id' => $application->id],
-                ['pembimbing_id' => $request->pembimbing_id]
-            );
-        }
+    $application = Application::findOrFail($id);
+    
+    $application->update([
+        'status' => $request->status,
+        'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
+    ]);
 
-        return redirect()->back()->with('success', 'Status pengajuan berhasil diperbarui!');
+    if ($request->status === 'accepted' && $request->pembimbing_id) {
+        Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['pembimbing_id' => $request->pembimbing_id]
+        );
     }
+
+    return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan berhasil diperbarui!');
+}
 }

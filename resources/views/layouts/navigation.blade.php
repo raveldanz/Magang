@@ -12,32 +12,38 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+
+                    <!-- 1. MENU UNTUK MAHASISWA -->
+                    @if (Auth::user()->role === 'mahasiswa')
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('student.application.create')"
+                            :active="request()->routeIs('student.application.*')">
+                            {{ __('Pengajuan Magang') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('student.logbook.index')"
+                            :active="request()->routeIs('student.logbook.*')">
+                            {{ __('Logbook Magang') }}
+                        </x-nav-link>
+                    @endif
+
+                    <!-- 2. MENU UNTUK PEMBIMBING -->
+                    @if (Auth::user()->role === 'pembimbing')
+                        <x-nav-link :href="route('pembimbing.dashboard')" :active="request()->routeIs('pembimbing.*')">
+                            {{ __('Dashboard Pembimbing') }}
+                        </x-nav-link>
+                    @endif
+
+                    <!-- 3. MENU UNTUK ADMIN -->
+                    @if (Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.applications.index')"
+                            :active="request()->routeIs('admin.applications.*')">
+                            {{ __('Verifikasi Pengajuan (Admin)') }}
+                        </x-nav-link>
+                    @endif
+
                 </div>
-                <!-- Menu Mahasiswa -->
-                <x-nav-link :href="route('student.profile.edit')" :active="request()->routeIs('student.profile.*')">
-                    {{ __('Profil Saya') }}
-                </x-nav-link>
-
-                <x-nav-link :href="route('student.application.create')"
-                    :active="request()->routeIs('student.application.*')">
-                    {{ __('Pengajuan Magang') }}
-                </x-nav-link>
-
-                <x-nav-link :href="route('student.logbook.index')" 
-                    :active="request()->routeIs('student.logbook.*')">
-                    {{ __('Logbook Magang') }}
-                </x-nav-link>
-
-                <!-- Menu Admin (Tampil Jika Admin) -->
-                @if (Auth::user()->role === 'admin')
-                    <x-nav-link :href="route('admin.applications.index')"
-                        :active="request()->routeIs('admin.applications.*')">
-                        {{ __('Verifikasi Magang (Admin)') }}
-                    </x-nav-link>
-                @endif
 
             </div>
 

@@ -16,6 +16,31 @@
                 </div>
             @endif
 
+            <!-- ALERT PENOLAKAN DARI ADMIN (JIKA PENGAJUAN TERAKHIR REJECTED) -->
+            @if ($applicationHistory->first() && $applicationHistory->first()->status === 'rejected')
+                <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 8 0 100-16 8 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-bold text-red-800">Mohon Maaf, Pengajuan Magang Anda Ditolak</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p class="font-semibold">Catatan / Alasan dari Admin:</p>
+                                <p class="mt-1 italic bg-white p-3 rounded border border-red-200 font-mono text-gray-800">
+                                    "{{ $applicationHistory->first()->rejection_note ?? 'Tidak ada catatan spesifik dari admin.' }}"
+                                </p>
+                            </div>
+                            <p class="mt-3 text-xs text-red-600">
+                                *Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- 1. FORM PENGAJUAN BARU -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Form Buat Pengajuan Magang</h3>
@@ -72,15 +97,17 @@
                             <x-text-input id="transkrip" name="transkrip" type="file" accept=".pdf" class="mt-1 block w-full border p-2 rounded-md" required />
                         </div>
 
-                        <x-primary-button class="mt-4">
-                            {{ __('Kirim Pengajuan Magang') }}
-                        </x-primary-button>
+                        <div class="flex items-center space-x-3 pt-2">
+                            <x-primary-button>
+                                {{ __('Kirim Pengajuan Magang') }}
+                            </x-primary-button>
 
-                        <a href="{{ route('dashboard') }}">
-                            <x-secondary-button>
-                                {{ __('Kembali') }}
-                            </x-secondary-button>
-                        </a>
+                            <a href="{{ route('dashboard') }}">
+                                <x-secondary-button type="button">
+                                    {{ __('Kembali') }}
+                                </x-secondary-button>
+                            </a>
+                        </div>
                     </form>
                 @endif
             </div>
@@ -97,7 +124,7 @@
                                 <th class="p-3">Unit Instansi</th>
                                 <th class="p-3">Periode Magang</th>
                                 <th class="p-3">Status</th>
-                                <th class="p-3">Catatan Admin</th>
+                                <th class="p-3">Catatan / Alasan Admin</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y">
@@ -115,8 +142,14 @@
                                             {{ strtoupper($app->status) }}
                                         </span>
                                     </td>
-                                    <td class="p-3 text-gray-600">
-                                        {{ $app->rejection_note ?? '-' }}
+                                    <td class="p-3">
+                                        @if ($app->status === 'rejected')
+                                            <span class="text-red-600 font-medium bg-red-50 px-2 py-1 rounded border border-red-200 inline-block">
+                                                {{ $app->rejection_note ?? 'Tidak ada catatan' }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-500">-</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
