@@ -28,7 +28,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        if ($user->role == 'admin') {
+            return redirect()->intended(route('admin.applications.index'));
+        }
+
+        if ($user->role === 'pembimbing') {
+            return redirect()->intended(route('pembimbing.dashboard'));
+        }
+
+        if ($user->role === 'mahasiswa' && !$user->studentProfile) {
+            return redirect()->route('student.profile.edit')->with('warning', 'Silakan lengkapi profil Anda terlebih dahulu');
+        }
+
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

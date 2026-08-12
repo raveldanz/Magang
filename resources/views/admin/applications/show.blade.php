@@ -49,55 +49,76 @@
             <!-- Form Verifikasi Admin -->
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-bold mb-4">Aksi Verifikasi & Seleksi</h3>
-                <form action="{{ route('admin.applications.updateStatus', $application->id) }}" method="POST"
-                    class="space-y-4">
+                <form action="{{ route('admin.applications.updateStatus', $application->id) }}" method="POST">
                     @csrf
-                    @method('PATCH')
+                    @method('PUT')
 
-                    <div>
-                        <x-input-label for="status" value="Ubah Status Pengajuan" />
-                        <select id="status" name="status"
-                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                    <!-- Dropdown Status -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Status Pengajuan</label>
+                        <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md">
                             <option value="pending" {{ $application->status == 'pending' ? 'selected' : '' }}>PENDING
                             </option>
                             <option value="verified" {{ $application->status == 'verified' ? 'selected' : '' }}>VERIFIED
-                                (Lolos Berkas)</option>
+                            </option>
                             <option value="accepted" {{ $application->status == 'accepted' ? 'selected' : '' }}>ACCEPTED
-                                (Diterima Magang)</option>
+                            </option>
                             <option value="rejected" {{ $application->status == 'rejected' ? 'selected' : '' }}>REJECTED
-                                (Ditolak)</option>
+                            </option>
                         </select>
                     </div>
 
-                    <div>
-                        <x-input-label for="pembimbing_id" value="Plot Pembimbing Lapangan (Opsional saat Accepted)" />
-                        <select id="pembimbing_id" name="pembimbing_id"
-                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                    <!-- Dropdown Pembimbing (Tampil kalau Accepted/Verified) -->
+                    <div id="pembimbing-box" class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
+                        <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md">
                             <option value="">-- Pilih Pembimbing --</option>
-                            @foreach ($pembimbings as $p)
-                                <option value="{{ $p->id }}" {{ (optional($application->placement)->pembimbing_id == $p->id) ? 'selected' : '' }}>
-                                    {{ $p->name }}
+                            @foreach ($pembimbings as $pembimbing)
+                                <option value="{{ $pembimbing->id }}" {{ optional($application->placement)->pembimbing_id == $pembimbing->id ? 'selected' : '' }}>
+                                    {{ $pembimbing->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div>
-                        <x-input-label for="rejection_note" value="Catatan Penolakan (Jika Ditolak)" />
-                        <textarea id="rejection_note" name="rejection_note"
-                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ $application->rejection_note }}</textarea>
+                    <!-- Field Alasan Penolakan (Tampil KHUSUS kalau REJECTED) -->
+                    <div id="rejection-box" class="mb-4 {{ $application->status == 'rejected' ? '' : 'hidden' }}">
+                        <label class="block text-sm font-medium text-red-700 font-bold">Alasan Penolakan</label>
+                        <textarea name="rejection_note" rows="3" placeholder="Tuliskan alasan pengajuan ditolak..."
+                            class="w-full mt-1 border-red-300 rounded-md focus:ring-red-500 focus:border-red-500">{{ $application->rejection_note }}</textarea>
                     </div>
 
-                    <x-primary-button>
-                        {{ __('Simpan Perubahan Status') }}
-                    </x-primary-button>
+                    <div class="mt-4 flex items-center space-x-3">
+                        <x-primary-button type="submit">
+                            {{ __('Simpan Perubahan Status') }}
+                        </x-primary-button>
 
-                    <a href="{{ url('admin/applications') }}">
-                        <x-secondary-button>
-                            {{ __('Kembali') }}
-                        </x-secondary-button>
-                    </a>
+                        <a href="{{ route('admin.applications.index') }}">
+                            <x-secondary-button type="button">
+                                {{ __('Kembali') }}
+                            </x-secondary-button>
+                        </a>
+                    </div>
+                </form>
 
+                <!-- JavaScript Otomatis Tampil/Sembunyi Input -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const statusSelect = document.getElementById('status-select');
+                        const rejectionBox = document.getElementById('rejection-box');
+
+                        function toggleFields() {
+                            if (statusSelect.value === 'rejected') {
+                                rejectionBox.classList.remove('hidden');
+                            } else {
+                                rejectionBox.classList.add('hidden');
+                            }
+                        }
+
+                        statusSelect.addEventListener('change', toggleFields);
+                        toggleFields(); // Jalankan saat awal load
+                    });
+                </script>
             </div>
         </div>
 </x-app-layout>
