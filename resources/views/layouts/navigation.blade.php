@@ -50,6 +50,11 @@
                                 {{ __('Review Logbook (Admin)') }}
                             </x-nav-link>
                         @endif
+
+                        <x-nav-link :href="route('admin.certificates.index')"
+                            :active="request()->routeIs('admin.certificates.*')">
+                            {{ __('Manajemen Sertifikat') }}
+                        </x-nav-link>
                     @endif
 
                 </div>
