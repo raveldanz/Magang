@@ -44,9 +44,30 @@ class DatabaseSeeder extends Seeder
 
 
 
-        // 4. Seed Unit Instansi Awal
-        Unit::create(['name' => 'Bidang Aptika & E-Government', 'quota' => 5]);
-        Unit::create(['name' => 'Bidang Informasi & Komunikasi Publik', 'quota' => 3]);
-        Unit::create(['name' => 'Sekretariat & Keuangan', 'quota' => 2]);
+        // 4. Seed Unit Instansi (Dengan Variasi Kuota & Deskripsi)
+        Unit::firstOrCreate(
+            ['name' => 'Bidang Aptika & E-Government'], 
+            ['description' => 'Pengembangan aplikasi dan tata kelola e-government', 'quota' => 5]
+        );
+        Unit::firstOrCreate(
+            ['name' => 'Bidang Informasi & Komunikasi Publik'], 
+            ['description' => 'Manajemen kehumasan dan saluran informasi publik', 'quota' => 3]
+        );
+        Unit::firstOrCreate(
+            ['name' => 'Sekretariat & Keuangan'], 
+            ['description' => 'Pengelolaan administrasi dan keuangan instansi', 'quota' => 2]
+        );
+        Unit::firstOrCreate(
+            ['name' => 'Bidang Infrastruktur & Jaringan'], 
+            ['description' => 'Pemeliharaan jaringan, server, dan infrastruktur IT', 'quota' => 4]
+        );
+        Unit::firstOrCreate(
+            ['name' => 'Bidang Persandian & Keamanan Informasi'], 
+            ['description' => 'Proteksi cyber, enkripsi, dan keamanan data', 'quota' => 1]
+        );
+        Unit::firstOrCreate(
+            ['name' => 'Bidang Statistik & Data Analitik'], 
+            ['description' => 'Pengolahan data statistik dan integrasi sistem data', 'quota' => 0]
+        );
     }
 }
