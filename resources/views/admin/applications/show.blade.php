@@ -84,17 +84,37 @@
                         </select>
                     </div>
 
-                    <!-- Dropdown Pembimbing (Tampil kalau Accepted/Verified) -->
-                    <div id="pembimbing-box" class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
-                        <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md">
-                            <option value="">-- Pilih Pembimbing --</option>
-                            @foreach ($pembimbings as $pembimbing)
-                                <option value="{{ $pembimbing->id }}" {{ optional($application->placement)->pembimbing_id == $pembimbing->id ? 'selected' : '' }}>
-                                    {{ $pembimbing->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <!-- Container Khusus Jika Status = ACCEPTED (Hanya Tampil Saat Diterima) -->
+                    <div id="acceptance-box" class="space-y-4 mb-4 border p-4 rounded-lg bg-green-50/50 border-green-200 {{ $application->status == 'accepted' ? '' : 'hidden' }}">
+                        <h4 class="font-semibold text-green-800 border-b pb-2 text-sm">Data Balasan Penerimaan Magang</h4>
+                        
+                        <!-- Dropdown Pembimbing Lapangan -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
+                            <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">-- Pilih Pembimbing Lapangan --</option>
+                                @foreach ($pembimbings as $pembimbing)
+                                    <option value="{{ $pembimbing->id }}" {{ optional($application->placement)->pembimbing_id == $pembimbing->id ? 'selected' : '' }}>
+                                        {{ $pembimbing->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Grid Nomor Surat & Tanggal Surat -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nomor Surat Balasan Dinas</label>
+                                <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
+                                    placeholder="Contoh: 500/123/APTIKA/2026"
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tanggal Surat Balasan</label>
+                                <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Field Alasan Penolakan (Tampil KHUSUS kalau REJECTED) -->
@@ -109,6 +129,13 @@
                             {{ __('Simpan Perubahan Status') }}
                         </x-primary-button>
 
+                        @if ($application->status === 'accepted')
+                            <a href="{{ route('admin.applications.letter', $application->id) }}" target="_blank" 
+                                class="inline-flex items-center space-x-1 px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 transition shadow-sm">
+                                <span>📄 Pratinjau / Cetak Surat PDF</span>
+                            </a>
+                        @endif
+
                         <a href="{{ route('admin.applications.index') }}">
                             <x-secondary-button type="button">
                                 {{ __('Kembali') }}
@@ -122,12 +149,18 @@
                     document.addEventListener('DOMContentLoaded', function () {
                         const statusSelect = document.getElementById('status-select');
                         const rejectionBox = document.getElementById('rejection-box');
+                        const acceptanceBox = document.getElementById('acceptance-box');
 
                         function toggleFields() {
                             if (statusSelect.value === 'rejected') {
                                 rejectionBox.classList.remove('hidden');
+                                acceptanceBox.classList.add('hidden');
+                            } else if (statusSelect.value === 'accepted') {
+                                acceptanceBox.classList.remove('hidden');
+                                rejectionBox.classList.add('hidden');
                             } else {
                                 rejectionBox.classList.add('hidden');
+                                acceptanceBox.classList.add('hidden');
                             }
                         }
 
