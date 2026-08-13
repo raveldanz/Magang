@@ -72,64 +72,28 @@
                         class="space-y-4">
                         @csrf
 
-                        <!-- Pemilihan Unit (Radio Button Cards) -->
+                        <!-- Pemilihan Unit (Dropdown Simpel) -->
                         <div>
-                            <x-input-label value="Pilih Instansi / Unit Kerja" class="mb-3 text-base font-semibold" />
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach ($units as $unit)
-                                    @php
-                                        $isFull = $unit->remaining_quota <= 0;
-                                        $filledQuota = max(0, $unit->quota - $unit->remaining_quota);
-                                        $percentage = $unit->quota > 0 ? min(100, round(($filledQuota / $unit->quota) * 100)) : 100;
-                                    @endphp
-                                    <label class="relative flex flex-col p-4 border rounded-xl cursor-pointer transition-all duration-200 shadow-sm 
-                                        {{ $isFull 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 opacity-75 cursor-not-allowed' 
-                                            : 'bg-white border-gray-300 hover:border-indigo-500 has-[:checked]:border-indigo-600 has-[:checked]:ring-2 has-[:checked]:ring-indigo-500 has-[:checked]:bg-indigo-50/30 hover:shadow-md' }}">
-                                        
-                                        <div class="flex items-start justify-between mb-2">
-                                            <div class="flex items-center space-x-3 pr-2">
-                                                <input type="radio" name="unit_id" value="{{ $unit->id }}" 
-                                                    class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 disabled:opacity-50"
-                                                    {{ $isFull ? 'disabled' : '' }} {{ old('unit_id') == $unit->id ? 'checked' : '' }} required>
-                                                <span class="font-bold text-sm {{ $isFull ? 'text-gray-500' : 'text-gray-800' }}">
-                                                    {{ $unit->name }}
-                                                </span>
-                                            </div>
+                            <x-input-label for="unit_id" value="Pilih Instansi / Unit Kerja" />
+                            @php
+                                $availableUnits = $units->filter(fn($unit) => $unit->remaining_quota > 0);
+                            @endphp
 
-                                            @if ($isFull)
-                                                <span class="px-2 py-0.5 text-xs font-extrabold rounded-full bg-red-100 text-red-700 border border-red-200 uppercase tracking-wide">
-                                                    PENUH
-                                                </span>
-                                            @else
-                                                <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-700 border border-green-200">
-                                                    Tersedia
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        @if ($unit->description)
-                                            <p class="text-xs text-gray-500 mb-3 line-clamp-2">{{ $unit->description }}</p>
-                                        @endif
-
-                                        <!-- Progress Bar & Kuota -->
-                                        <div class="mt-auto pt-2">
-                                            <div class="flex justify-between items-center text-xs mb-1">
-                                                <span class="font-medium {{ $isFull ? 'text-gray-400' : 'text-gray-600' }}">Sisa Kuota:</span>
-                                                <span class="font-bold {{ $isFull ? 'text-red-500' : 'text-indigo-600' }}">
-                                                    {{ $unit->remaining_quota }} / {{ $unit->quota }} Kursi
-                                                </span>
-                                            </div>
-                                            <!-- Visual Progress Bar -->
-                                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                <div class="h-2 rounded-full transition-all duration-300 {{ $isFull ? 'bg-red-500' : ($percentage > 80 ? 'bg-amber-500' : 'bg-indigo-600') }}"
-                                                    style="width: {{ $percentage }}%">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </label>
-                                @endforeach
-                            </div>
+                            <select id="unit_id" name="unit_id"
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                {{ $availableUnits->isEmpty() ? 'disabled' : '' }} required>
+                                
+                                @if ($availableUnits->isEmpty())
+                                    <option value="" disabled selected>-- Maaf, saat ini seluruh kuota instansi sudah penuh --</option>
+                                @else
+                                    <option value="">-- Pilih Instansi / Unit Kerja --</option>
+                                    @foreach ($availableUnits as $unit)
+                                        <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->name }} (Sisa {{ $unit->remaining_quota }} Kuota)
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
                             @error('unit_id')
                                 <p class="mt-2 text-sm text-red-600 font-semibold">{{ $message }}</p>
                             @enderror
