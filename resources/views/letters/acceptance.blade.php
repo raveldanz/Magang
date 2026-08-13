@@ -17,6 +17,7 @@
             border-bottom: 3px double #000;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            position: relative;
         }
         .kop-surat h2 {
             margin: 0;
@@ -95,20 +96,34 @@
 </head>
 <body>
 
+    @php
+        $agency = \App\Models\AgencyProfile::first();
+        $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
+        $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
+        $address = $agency->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272';
+        $cityName = $agency->city ?? 'Surabaya';
+        $signeeName = $agency->signee_name ?? 'Drs. H. M. NASER, M.Si';
+        $signeeNip = $agency->signee_nip ?? '19700101 199503 1 002';
+        $signeePosition = $agency->signee_position ?? 'Kepala Dinas Komunikasi dan Informatika';
+    @endphp
+
     <div class="no-print">
         <button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan ke PDF</button>
     </div>
 
     <!-- Kop Surat Resmi -->
     <div class="kop-surat">
-        <h2>Pemerintah Kota Surabaya</h2>
-        <h3>Dinas Komunikasi Dan Informatika</h3>
-        <p>Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272</p>
+        @if (!empty($agency->logo))
+            <img src="{{ asset('storage/' . $agency->logo) }}" alt="Logo Instansi" style="height: 70px; position: absolute; left: 10px; top: 0;">
+        @endif
+        <h2>{{ $govName }}</h2>
+        <h3>{{ $agencyName }}</h3>
+        <p>{{ $address }}</p>
     </div>
 
     <!-- Tanggal Surat -->
     <div style="text-align: right; margin-bottom: 15px;">
-        Surabaya, {{ $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->translatedFormat('d F Y') : date('d F Y') }}
+        {{ $cityName }}, {{ $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->translatedFormat('d F Y') : date('d F Y') }}
     </div>
 
     <!-- Nomor & Hal -->
@@ -192,7 +207,7 @@
 
     <!-- Tanda Tangan & QR Code Verification -->
     <div class="signature-section">
-        <p style="margin-bottom: 5px;">Kepala Dinas Komunikasi dan Informatika</p>
+        <p style="margin-bottom: 5px;">{{ $signeePosition }}</p>
 
         @php
             $verifyUrl = route('verify.letter', $application->id);
@@ -203,7 +218,11 @@
         <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi Dokumen" class="qr-code-img">
         <div class="qr-caption">Scan untuk Verifikasi Keaslian Dokumen</div>
 
-        <p style="margin-top: 10px;"><strong><u>Drs. H. M. NASER, M.Si</u></strong><br>NIP. 19700101 199503 1 002</p>
+        <p style="margin-top: 10px;"><strong><u>{{ $signeeName }}</u></strong><br>
+        @if (!empty($signeeNip))
+            NIP. {{ $signeeNip }}
+        @endif
+        </p>
     </div>
 
 </body>
