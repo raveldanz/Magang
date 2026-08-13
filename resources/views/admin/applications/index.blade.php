@@ -22,7 +22,12 @@
                     <tbody>
                         @forelse ($applications as $app)
                             <tr class="border-b">
-                                <td class="p-3 font-semibold">{{ $app->user->name }}</td>
+                                <td class="p-3 font-semibold">
+                                    {{ $app->user->name }}
+                                    @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
+                                        <br><span class="px-2 py-0.5 mt-1 inline-block text-[10px] font-bold bg-purple-100 text-purple-800 rounded-full border border-purple-300">🎉 SIAP CETAK SERTIFIKAT</span>
+                                    @endif
+                                </td>
                                 <td class="p-3">{{ $app->user->studentProfile->universitas ?? '-' }} ({{ $app->user->studentProfile->jurusan ?? '-' }})</td>
                                 <td class="p-3">{{ $app->unit->name ?? '-' }}</td>
                                 <td class="p-3">

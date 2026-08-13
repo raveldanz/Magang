@@ -34,4 +34,9 @@ class Placement extends Model
     {
         return $this->hasOne(FinalReport::class);
     }
+
+    public function evaluation()
+    {
+        return $this->hasOne(Evaluation::class);
+    }
 }
