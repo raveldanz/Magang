@@ -8,6 +8,7 @@ use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Pembimbing\DashboardController as PembimbingDashboardController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Pembimbing\EvaluationController as PembimbingEvaluationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -64,6 +65,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/student/logbook/{id}/edit', [StudentLogbookController::class, 'edit'])->name('student.logbook.edit');
         Route::put('/student/logbook/{id}', [StudentLogbookController::class, 'update'])->name('student.logbook.update');
         Route::delete('/student/logbook/{id}', [StudentLogbookController::class, 'destroy'])->name('student.logbook.destroy');
+
+        Route::get('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'index'])->name('student.final_report.index');
+        Route::post('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'store'])->name('student.final_report.store');
     });
 
     // ==========================================
@@ -80,6 +84,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/logbooks', [AdminLogbookController::class, 'index'])->name('admin.logbooks.index');
         Route::get('/admin/logbooks/{id}', [AdminLogbookController::class, 'show'])->name('admin.logbooks.show');
         Route::patch('/admin/logbooks/{id}/review', [AdminLogbookController::class, 'review'])->name('admin.logbooks.review');
+        
+        // Route Penerbitan Sertifikat
+        Route::get('/admin/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])->name('admin.certificates.index');
+        Route::get('/admin/certificates/{placementId}/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('admin.certificates.generate');
     });
 
     // ==========================================
@@ -89,6 +97,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembimbing/dashboard', [PembimbingDashboardController::class, 'index'])->name('pembimbing.dashboard');
         Route::get('/pembimbing/student/{placementId}', [PembimbingDashboardController::class, 'showStudent'])->name('pembimbing.student.detail');
         Route::put('/pembimbing/logbook/{logbookId}', [PembimbingDashboardController::class, 'updateLogbookStatus'])->name('pembimbing.logbook.updateStatus');
+
+        // Route Monitoring / Penilaian
+        Route::get('/pembimbing/student/{placementId}/evaluation', [PembimbingEvaluationController::class, 'create'])->name('pembimbing.evaluation.create');
+        Route::post('/pembimbing/student/{placementId}/evaluation', [PembimbingEvaluationController::class, 'store'])->name('pembimbing.evaluation.store');
+
+        // Route Verifikasi Laporan Akhir
+        Route::put('/pembimbing/final-report/{reportId}', [PembimbingDashboardController::class, 'updateFinalReportStatus'])->name('pembimbing.final_report.updateStatus');
     });
 
 });
