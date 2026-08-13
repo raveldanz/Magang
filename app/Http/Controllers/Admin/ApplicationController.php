@@ -29,28 +29,42 @@ class ApplicationController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $statusInput = strtolower($request->status);
-    $request->merge(['status' => $statusInput]);
+        $request->merge(['status' => $statusInput]);
 
-    $request->validate([
-        'status' => 'required|in:pending,verified,accepted,rejected',
-        'rejection_note' => 'nullable|string',
-        'pembimbing_id' => 'nullable|exists:users,id',
-    ]);
+        $request->validate([
+            'status' => 'required|in:pending,verified,accepted,rejected',
+            'rejection_note' => 'nullable|string',
+            'pembimbing_id' => 'nullable|exists:users,id',
+            'letter_number' => 'nullable|string|max:100',
+            'letter_date' => 'nullable|date',
+        ]);
 
-    $application = Application::findOrFail($id);
-    
-    $application->update([
-        'status' => $request->status,
-        'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
-    ]);
+        $application = Application::findOrFail($id);
+        
+        $application->update([
+            'status' => $request->status,
+            'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
+            'letter_number' => $request->status === 'accepted' ? $request->letter_number : null,
+            'letter_date' => $request->status === 'accepted' ? $request->letter_date : null,
+        ]);
 
-    if ($request->status === 'accepted' && $request->pembimbing_id) {
-        Placement::updateOrCreate(
-            ['application_id' => $application->id],
-            ['pembimbing_id' => $request->pembimbing_id]
-        );
+        if ($request->status === 'accepted' && $request->pembimbing_id) {
+            Placement::updateOrCreate(
+                ['application_id' => $application->id],
+                ['pembimbing_id' => $request->pembimbing_id]
+            );
+        }
+
+        return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan berhasil diperbarui!');
     }
 
-    return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan berhasil diperbarui!');
-}
+    // Cetak / Pratinjau Surat Balasan Penerimaan untuk Admin
+    public function downloadLetter($id)
+    {
+        $application = Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+            ->where('status', 'accepted')
+            ->findOrFail($id);
+
+        return view('letters.acceptance', compact('application'));
+    }
 }

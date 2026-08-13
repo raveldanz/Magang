@@ -30,6 +30,14 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Route Publik Verifikasi QR Code Surat Balasan (Bisa di-scan oleh siapa saja tanpa login)
+Route::get('/verify-letter/{id}', function ($id) {
+    $application = \App\Models\Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+        ->where('status', 'accepted')
+        ->findOrFail($id);
+    return view('verify_letter', compact('application'));
+})->name('verify.letter');
+
 Route::middleware('auth')->group(function () {
 
     // Route Profile Bawaan Breeze
@@ -48,6 +56,7 @@ Route::middleware('auth')->group(function () {
         // Pengajuan Magang
         Route::get('/student/application', [StudentApplicationController::class, 'create'])->name('student.application.create');
         Route::post('/student/application', [StudentApplicationController::class, 'store'])->name('student.application.store');
+        Route::get('/student/application/{id}/letter', [StudentApplicationController::class, 'downloadLetter'])->name('student.application.letter');
 
         // Logbook Magang
         Route::get('/student/logbook', [StudentLogbookController::class, 'index'])->name('student.logbook.index');
@@ -69,6 +78,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
         Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show');
         Route::match(['put', 'patch'], '/admin/applications/{id}', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus');
+        Route::get('/admin/applications/{id}/letter', [AdminApplicationController::class, 'downloadLetter'])->name('admin.applications.letter');
 
         // Review Logbook Mahasiswa
         Route::get('/admin/logbooks', [AdminLogbookController::class, 'index'])->name('admin.logbooks.index');
