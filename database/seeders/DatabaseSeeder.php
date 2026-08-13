@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Unit;
+use App\Models\AgencyProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,6 +12,22 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // 0. Seed Profil Instansi Default
+        AgencyProfile::firstOrCreate(
+            ['id' => 1],
+            [
+                'government_name' => 'Pemerintah Kota Surabaya',
+                'agency_name' => 'Dinas Komunikasi Dan Informatika',
+                'address' => 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272',
+                'phone' => '(031) 5312144',
+                'email' => 'diskominfo@surabaya.go.id',
+                'website' => 'https://diskominfo.surabaya.go.id',
+                'signee_name' => 'Drs. H. M. NASER, M.Si',
+                'signee_nip' => '19700101 199503 1 002',
+                'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
+                'city' => 'Surabaya',
+            ]
+        );
         // 1. Seed User Admin
         User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
