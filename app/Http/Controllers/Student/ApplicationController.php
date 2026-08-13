@@ -50,6 +50,14 @@ class ApplicationController extends Controller
             'transkrip' => 'required|mimes:pdf|max:2048',
         ]);
 
+        // Cek Sisa Kuota Instansi yang Dipilih
+        $unit = Unit::findOrFail($request->unit_id);
+        if ($unit->remaining_quota <= 0) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['unit_id' => 'Kuota untuk instansi/unit ini sudah penuh. Silakan pilih unit kerja lain.']);
+        }
+
         // 1. Simpan Data Pengajuan
         $application = Application::create([
             'user_id' => Auth::id(),
