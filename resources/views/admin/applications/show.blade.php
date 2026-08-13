@@ -46,6 +46,22 @@
                 </ul>
             </div>
 
+            <!-- Laporan Akhir -->
+            @if ($application->placement && $application->placement->finalreport)
+                <div class="bg-white p-6 shadow sm:rounded-lg">
+                    <h3 class="text-lg font-bold mb-4">Laporan Akhir Mahasiswa</h3>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <p><strong>Status:</strong> <span class="uppercase font-bold text-gray-700">{{ $application->placement->finalreport->status }}</span></p>
+                        </div>
+                        <a href="{{ asset('storage/' . $application->placement->finalreport->file_path) }}" target="_blank"
+                            class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                            📄 Buka Laporan Akhir
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <!-- Form Verifikasi Admin -->
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-bold mb-4">Aksi Verifikasi & Seleksi</h3>

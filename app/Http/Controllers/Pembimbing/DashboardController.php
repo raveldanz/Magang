@@ -50,4 +50,22 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'Status logbook berhasil diperbarui!');
     }
+
+    // Process Approval / Reject Final Report
+    public function updateFinalReportStatus(Request $request, $reportId)
+    {
+        $request->validate([
+            'status' => 'required|in:approved,revision',
+            'feedback' => 'nullable|string',
+        ]);
+
+        $report = \App\Models\FinalReport::findOrFail($reportId);
+        
+        $report->update([
+            'status' => $request->status,
+            'feedback' => $request->feedback,
+        ]);
+
+        return redirect()->back()->with('success', 'Status laporan akhir berhasil diperbarui!');
+    }
 }
