@@ -12,35 +12,43 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed User Admin
-        User::create([
-            'name' => 'Administrator Utama',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Administrator Utama',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ]
+        );
 
         // 2. Seed User Pembimbing Lapangan
-        User::create([
-            'name' => 'Retno Mumpuni, S.Kom., M.Sc',
-            'email' => 'retnomumpuni.if@upnjatim.ac.id',
-            'password' => Hash::make('pembimbing123'),
-            'role' => 'pembimbing',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'retnomumpuni.if@upnjatim.ac.id'],
+            [
+                'name' => 'Retno Mumpuni, S.Kom., M.Sc',
+                'password' => Hash::make('pembimbing123'),
+                'role' => 'pembimbing',
+            ]
+        );
 
         // 3. Seed User Mahasiswa (Contoh)
-        User::create([
-            'name' => 'Raveldo Andyka',
-            'email' => 'mahasiswa@gmail.com',
-            'password' => Hash::make('mahasiswa123'),
-            'role' => 'mahasiswa',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'mahasiswa@gmail.com'],
+            [
+                'name' => 'Raveldo Andyka',
+                'password' => Hash::make('mahasiswa123'),
+                'role' => 'mahasiswa',
+            ]
+        );
 
-        User::create([
-            'name' => 'Dimas Adam',
-            'email' => 'AdamGanteng@gmail.com',
-            'password' => Hash::make('josjis'),
-            'role' => 'mahasiswa',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'AdamGanteng@gmail.com'],
+            [
+                'name' => 'Dimas Adam',
+                'password' => Hash::make('josjis'),
+                'role' => 'mahasiswa',
+            ]
+        );
 
 
 
