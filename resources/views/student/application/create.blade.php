@@ -78,9 +78,11 @@
                             <select id="unit_id" name="unit_id"
                                 class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                 required>
-                                <option value="">-- Pilih Unit --</option>
+                                <option value="">-- Pilih Instansi / Unit Kerja --</option>
                                 @foreach ($units as $unit)
-                                    <option value="{{ $unit->id }}">{{ $unit->name }} (Kuota: {{ $unit->quota }})</option>
+                                    <option value="{{ $unit->id }}" {{ $unit->remaining_quota <= 0 ? 'disabled' : '' }}>
+                                        {{ $unit->name }} — Sisa Kuota: {{ $unit->remaining_quota }} dari {{ $unit->quota }} {{ $unit->remaining_quota <= 0 ? '(PENUH)' : '' }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
