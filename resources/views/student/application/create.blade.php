@@ -89,7 +89,7 @@
                                     <option value="">-- Pilih Instansi / Unit Kerja --</option>
                                     @foreach ($availableUnits as $unit)
                                         <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>
-                                            {{ $unit->name }} (Sisa {{ $unit->remaining_quota }} Kuota)
+                                            {{ $unit->name }} — Sisa Kuota: {{ $unit->remaining_quota }}
                                         </option>
                                     @endforeach
                                 @endif
