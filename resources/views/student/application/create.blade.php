@@ -72,19 +72,31 @@
                         class="space-y-4">
                         @csrf
 
-                        <!-- Pemilihan Unit -->
+                        <!-- Pemilihan Unit (Dropdown Simpel) -->
                         <div>
                             <x-input-label for="unit_id" value="Pilih Instansi / Unit Kerja" />
+                            @php
+                                $availableUnits = $units->filter(fn($unit) => $unit->remaining_quota > 0);
+                            @endphp
+
                             <select id="unit_id" name="unit_id"
                                 class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                required>
-                                <option value="">-- Pilih Instansi / Unit Kerja --</option>
-                                @foreach ($units as $unit)
-                                    <option value="{{ $unit->id }}" {{ $unit->remaining_quota <= 0 ? 'disabled' : '' }}>
-                                        {{ $unit->name }} — Sisa Kuota: {{ $unit->remaining_quota }} dari {{ $unit->quota }} {{ $unit->remaining_quota <= 0 ? '(PENUH)' : '' }}
-                                    </option>
-                                @endforeach
+                                {{ $availableUnits->isEmpty() ? 'disabled' : '' }} required>
+                                
+                                @if ($availableUnits->isEmpty())
+                                    <option value="" disabled selected>-- Maaf, saat ini seluruh kuota instansi sudah penuh --</option>
+                                @else
+                                    <option value="">-- Pilih Instansi / Unit Kerja --</option>
+                                    @foreach ($availableUnits as $unit)
+                                        <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->name }} — Sisa Kuota: {{ $unit->remaining_quota }}
+                                        </option>
+                                    @endforeach
+                                @endif
                             </select>
+                            @error('unit_id')
+                                <p class="mt-2 text-sm text-red-600 font-semibold">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Periode Magang -->
