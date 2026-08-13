@@ -163,6 +163,7 @@
                                 <th class="p-3">Periode Magang</th>
                                 <th class="p-3">Status</th>
                                 <th class="p-3">Catatan / Alasan Admin</th>
+                                <th class="p-3">Surat Penerimaan</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y">
@@ -190,11 +191,20 @@
                                             <span class="text-gray-500">-</span>
                                         @endif
                                     </td>
+                                    <td class="p-3">
+                                        @if ($app->status === 'accepted')
+                                            <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
+                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 shadow-sm transition">
+                                                <span>📄 Download Surat PDF</span>
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400 text-xs italic">Belum tersedia</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="p-4 text-center text-gray-500">Belum ada riwayat pengajuan
-                                        magang.</td>
+                                    <td colspan="6" class="p-4 text-center text-gray-500">Belum ada riwayat pengajuan magang.</td>
                                 </tr>
                             @endforelse
                         </tbody>

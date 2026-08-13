@@ -86,6 +86,17 @@ class ApplicationController extends Controller
         return redirect()->back()->with('success', 'Pengajuan magang dan dokumen berhasil dikirim!');
     }
 
+    // Download / Print Surat Penerimaan Magang untuk Mahasiswa
+    public function downloadLetter($id)
+    {
+        $application = Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+            ->where('user_id', Auth::id())
+            ->where('status', 'accepted')
+            ->findOrFail($id);
+
+        return view('letters.acceptance', compact('application'));
+    }
+
     // Method show: Ambil data placement yang sudah ada
 public function show($id)
 {
