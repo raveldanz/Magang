@@ -8,6 +8,12 @@ class Unit extends Model
 {
     protected $guarded = ['id'];
 
+    // Relasi: Unit milik satu AgencyProfile
+    public function agencyProfile()
+    {
+        return $this->belongsTo(AgencyProfile::class, 'agency_profile_id');
+    }
+
     // Relasi: Satu Unit memiliki banyak pengajuan magang
     public function applications()
     {
