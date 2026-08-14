@@ -39,6 +39,14 @@ Route::get('/verify-letter/{id}', function ($id) {
     return view('verify_letter', compact('application'));
 })->name('verify.letter');
 
+// Route Publik Verifikasi QR Code Sertifikat Magang
+Route::get('/verify-certificate/{id}', function ($id) {
+    $placement = \App\Models\Placement::with(['application.user.studentProfile', 'application.unit', 'evaluation', 'pembimbing'])
+        ->findOrFail($id);
+    $application = $placement->application;
+    return view('verify_letter', compact('application', 'placement'));
+})->name('verify.certificate');
+
 Route::middleware('auth')->group(function () {
 
     // Route Profile Bawaan Breeze
