@@ -10,10 +10,17 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
-    // Menampilkan semua daftar pengajuan magang masuk (dengan Search, Filter, & Paginasi)
+    // Menampilkan semua daftar pengajuan magang masuk (dengan Search, Filter, Eager Loading & Paginasi)
     public function index(Request $request)
     {
-        $query = Application::with(['user.studentProfile', 'unit', 'documents', 'placement.evaluation', 'placement.finalreport'])->latest();
+        $query = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'documents', 
+            'placement.evaluation', 
+            'placement.finalreport',
+            'placement.pembimbing'
+        ])->latest();
 
         // 1. Pencarian berdasarkan Nama Mahasiswa, NIM, atau Universitas
         if ($request->filled('search')) {
@@ -41,7 +48,13 @@ class ApplicationController extends Controller
     // Detail pengajuan magang & dokumen
     public function show($id)
     {
-        $application = Application::with(['user.studentProfile', 'unit', 'documents'])->findOrFail($id);
+        $application = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'documents', 
+            'placement.pembimbing'
+        ])->findOrFail($id);
+        
         $pembimbings = User::where('role', 'pembimbing')->get(); // Untuk dropdown penempatan
         return view('admin.applications.show', compact('application', 'pembimbings'));
     }
@@ -82,7 +95,11 @@ class ApplicationController extends Controller
     // Cetak / Pratinjau Surat Balasan Penerimaan untuk Admin
     public function downloadLetter($id)
     {
-        $application = Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+        $application = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'placement.pembimbing'
+        ])
             ->where('status', 'accepted')
             ->findOrFail($id);
 

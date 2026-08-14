@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AgencyProfileController extends Controller
 {
     // Display the agency profile edit form
-    public function edit()
+    public function edit(Request $request)
     {
+        $agencyId = $request->query('id', 1);
+        
         $profile = AgencyProfile::firstOrCreate(
-            ['id' => 1],
+            ['id' => $agencyId],
             [
                 'government_name' => 'Pemerintah Kota Surabaya',
                 'agency_name' => 'Dinas Komunikasi Dan Informatika',
@@ -27,27 +30,31 @@ class AgencyProfileController extends Controller
             ]
         );
 
-        return view('admin.agency_profile.edit', compact('profile'));
+        $allAgencies = AgencyProfile::all();
+
+        return view('admin.agency_profile.edit', compact('profile', 'allAgencies'));
     }
 
     // Update the agency profile & upload logo
     public function update(Request $request)
     {
         $request->validate([
+            'agency_id'       => 'nullable|exists:agency_profiles,id',
             'government_name' => 'required|string|max:255',
-            'agency_name' => 'required|string|max:255',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:100',
-            'website' => 'nullable|string|max:150',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'signee_name' => 'required|string|max:255',
-            'signee_nip' => 'nullable|string|max:100',
+            'agency_name'     => 'required|string|max:255',
+            'address'         => 'nullable|string',
+            'phone'           => 'nullable|string|max:50',
+            'email'           => 'nullable|email|max:100',
+            'website'         => 'nullable|string|max:150',
+            'logo'            => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'signee_name'     => 'required|string|max:255',
+            'signee_nip'      => 'nullable|string|max:100',
             'signee_position' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
+            'city'            => 'required|string|max:100',
         ]);
 
-        $profile = AgencyProfile::firstOrCreate(['id' => 1]);
+        $agencyId = $request->input('agency_id', 1);
+        $profile = AgencyProfile::firstOrCreate(['id' => $agencyId]);
 
         $data = $request->only([
             'government_name',
@@ -63,6 +70,12 @@ class AgencyProfileController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
+            // Hapus logo lama jika ada pada disk publik
+            if (!empty($profile->logo) && Storage::disk('public')->exists($profile->logo)) {
+                Storage::disk('public')->delete($profile->logo);
+            }
+
+            // Simpan logo baru ke disk publik
             $path = $request->file('logo')->store('images/logos', 'public');
             $data['logo'] = $path;
         }
