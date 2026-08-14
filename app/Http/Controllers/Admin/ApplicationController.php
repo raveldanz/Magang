@@ -10,17 +10,51 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
-    // Menampilkan semua daftar pengajuan magang masuk
-    public function index()
+    // Menampilkan semua daftar pengajuan magang masuk (dengan Search, Filter, Eager Loading & Paginasi)
+    public function index(Request $request)
     {
-        $applications = Application::with(['user.studentProfile', 'unit', 'documents'])->latest()->get();
+        $query = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'documents', 
+            'placement.evaluation', 
+            'placement.finalreport',
+            'placement.pembimbing'
+        ])->latest();
+
+        // 1. Pencarian berdasarkan Nama Mahasiswa, NIM, atau Universitas
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('studentProfile', function ($spQuery) use ($search) {
+                      $spQuery->where('universitas', 'like', "%{$search}%")
+                              ->orWhere('nim', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // 2. Filter Berdasarkan Status Pengajuan
+        if ($request->filled('status')) {
+            $query->where('status', strtolower($request->status));
+        }
+
+        // 3. Paginasi 10 Data Per Halaman
+        $applications = $query->paginate(10)->withQueryString();
+
         return view('admin.applications.index', compact('applications'));
     }
 
     // Detail pengajuan magang & dokumen
     public function show($id)
     {
-        $application = Application::with(['user.studentProfile', 'unit', 'documents'])->findOrFail($id);
+        $application = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'documents', 
+            'placement.pembimbing'
+        ])->findOrFail($id);
+        
         $pembimbings = User::where('role', 'pembimbing')->get(); // Untuk dropdown penempatan
         return view('admin.applications.show', compact('application', 'pembimbings'));
     }
@@ -61,7 +95,11 @@ class ApplicationController extends Controller
     // Cetak / Pratinjau Surat Balasan Penerimaan untuk Admin
     public function downloadLetter($id)
     {
-        $application = Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+        $application = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'placement.pembimbing'
+        ])
             ->where('status', 'accepted')
             ->findOrFail($id);
 

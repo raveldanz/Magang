@@ -55,6 +55,11 @@
                             :active="request()->routeIs('admin.certificates.*')">
                             {{ __('Manajemen Sertifikat') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.agency_profile.edit')"
+                            :active="request()->routeIs('admin.agency_profile.*')">
+                            {{ __('Pengaturan Instansi') }}
+                        </x-nav-link>
                     @endif
 
                 </div>

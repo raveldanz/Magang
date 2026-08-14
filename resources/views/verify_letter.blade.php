@@ -1,11 +1,20 @@
 <x-guest-layout>
+    @php
+        $agency = \App\Models\AgencyProfile::first();
+        $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
+        $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
+    @endphp
+
     <div class="py-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl rounded-2xl p-6 border-t-8 border-green-500">
             
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
-                <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">Pemerintah Kota Surabaya</h2>
-                <h1 class="text-xl font-extrabold text-indigo-900 uppercase">Dinas Komunikasi Dan Informatika</h1>
+                @if(!empty($agency->logo))
+                    <img src="{{ asset('storage/' . $agency->logo) }}" alt="Logo Instansi" class="w-16 h-16 mx-auto mb-2 object-contain">
+                @endif
+                <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
+                <h1 class="text-xl font-extrabold text-indigo-900 uppercase">{{ $agencyName }}</h1>
                 <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Validasi Magang Resmi</p>
             </div>
 
@@ -68,7 +77,7 @@
             <!-- Footer Keamanan -->
             <div class="mt-8 pt-4 border-t text-center text-xs text-gray-400">
                 <p>Halaman ini diterbitkan secara otomatis oleh Sistem Informasi Magang sebagai bentuk keaslian dokumen digital.</p>
-                <p class="mt-1 font-semibold text-gray-500">© {{ date('Y') }} Dinas Komunikasi dan Informatika Kota Surabaya</p>
+                <p class="mt-1 font-semibold text-gray-500">© {{ date('Y') }} {{ $agencyName }} {{ $govName }}</p>
             </div>
 
         </div>
