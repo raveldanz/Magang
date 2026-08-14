@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 1. Seed User Admin
+        // 1. Seed User Admin Utama
         $admin = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
@@ -46,100 +46,151 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Seed User Pembimbing Lapangan
-        $pembimbing = User::firstOrCreate(
-            ['email' => 'retnomumpuni.if@upnjatim.ac.id'],
+        // 2. SEED 6 AKUN PEMBIMBING LAPANGAN (ASN & PRAKTISI RESMI PEMKOT SURABAYA)
+        $pembimbingData = [
             [
                 'name' => 'Retno Mumpuni, S.Kom., M.Sc',
-                'password' => Hash::make('pembimbing123'),
-                'role' => 'pembimbing',
-            ]
-        );
-
-        // 3. Seed Data Unit Kerja Instansi
-        $units = [
-            Unit::firstOrCreate(
-                ['name' => 'Bidang Aptika & E-Government'], 
-                ['description' => 'Pengembangan aplikasi dan tata kelola e-government', 'quota' => 10]
-            ),
-            Unit::firstOrCreate(
-                ['name' => 'Bidang Informasi & Komunikasi Publik'], 
-                ['description' => 'Manajemen kehumasan dan saluran informasi publik', 'quota' => 8]
-            ),
-            Unit::firstOrCreate(
-                ['name' => 'Sekretariat & Keuangan'], 
-                ['description' => 'Pengelolaan administrasi dan keuangan instansi', 'quota' => 6]
-            ),
-            Unit::firstOrCreate(
-                ['name' => 'Bidang Infrastruktur & Jaringan'], 
-                ['description' => 'Pemeliharaan jaringan, server, dan infrastruktur IT', 'quota' => 8]
-            ),
-            Unit::firstOrCreate(
-                ['name' => 'Bidang Persandian & Keamanan Informasi'], 
-                ['description' => 'Proteksi cyber, enkripsi, dan keamanan data', 'quota' => 5]
-            ),
-            Unit::firstOrCreate(
-                ['name' => 'Bidang Statistik & Data Analitik'], 
-                ['description' => 'Pengolahan data statistik dan integrasi sistem data', 'quota' => 6]
-            ),
+                'email' => 'retnomumpuni.if@upnjatim.ac.id',
+            ],
+            [
+                'name' => 'Budi Santoso, S.ST., M.MT',
+                'email' => 'budi.santoso@surabaya.go.id',
+            ],
+            [
+                'name' => 'Ir. Siti Aminah, M.Kom',
+                'email' => 'siti.aminah@surabaya.go.id',
+            ],
+            [
+                'name' => 'Hendra Wijaya, S.Kom., M.Eng',
+                'email' => 'hendra.wijaya@surabaya.go.id',
+            ],
+            [
+                'name' => 'Tri Wahyuni, S.T., M.Sc',
+                'email' => 'tri.wahyuni@surabaya.go.id',
+            ],
+            [
+                'name' => 'M. Arif Rahman, S.Kom., M.MT',
+                'email' => 'arif.rahman@surabaya.go.id',
+            ],
         ];
 
-        // 4. Seed User Mahasiswa Dasar (Contoh Akun Testing)
+        $pembimbings = [];
+        foreach ($pembimbingData as $pData) {
+            $pembimbings[] = User::firstOrCreate(
+                ['email' => $pData['email']],
+                [
+                    'name' => $pData['name'],
+                    'password' => Hash::make('pembimbing123'),
+                    'role' => 'pembimbing',
+                ]
+            );
+        }
+
+        // 3. SEED 6 UNIT KERJA RESMI PEMERINTAH KOTA SURABAYA
+        $unitData = [
+            [
+                'name' => 'Bidang Layanan Informatika & E-Government',
+                'description' => 'Pengembangan arsitektur SPBE, integrasi aplikasi layanan publik Pemkot Surabaya, dan portal WargaKu',
+                'quota' => 10,
+            ],
+            [
+                'name' => 'Bidang Pengelolaan Informasi & Komunikasi Publik',
+                'description' => 'Pengelolaan media komunikasi resmi, saluran pengaduan masyarakat, kehumasan, dan keterbukaan informasi publik (PPID)',
+                'quota' => 8,
+            ],
+            [
+                'name' => 'Bidang Infrastruktur TI & Jaringan Komunikasi',
+                'description' => 'Pemeliharaan jaringan fiber optic intra-pemerintah, Data Center Tier-3 Pemkot, cloud infrastructure, dan free wifi publik',
+                'quota' => 8,
+            ],
+            [
+                'name' => 'Bidang Keamanan Informasi & Persandian (CSIRT Surabaya)',
+                'description' => 'Pusat tanggap insiden siber (CSIRT), implementasi TTE BSrE, enkripsi data, dan audit keamanan sistem informasi',
+                'quota' => 6,
+            ],
+            [
+                'name' => 'Bidang Statistik, Integrasi Sistem & Pengelolaan Data',
+                'description' => 'Implementasi Satu Data Surabaya, visualisasi analitik big data, data warehousing, dan dashboard eksekutif pimpinan',
+                'quota' => 6,
+            ],
+            [
+                'name' => 'Sekretariat, Kepegawaian & Tata Usaha Dinas',
+                'description' => 'Pengelolaan administrasi perkantoran dinas, manajemen SDM, perencanaan program, dan tata naskah dinas',
+                'quota' => 5,
+            ],
+        ];
+
+        $units = [];
+        foreach ($unitData as $uData) {
+            $units[] = Unit::firstOrCreate(
+                ['name' => $uData['name']],
+                [
+                    'description' => $uData['description'],
+                    'quota' => $uData['quota'],
+                ]
+            );
+        }
+
+        // 4. SEED DATA MAHASISWA TESTING TAMBAHAN (PENDING, VERIFIED, REJECTED)
+        // Mahasiswa 1: Raveldo Andyka (PENDING)
         $mhs1 = User::firstOrCreate(
             ['email' => 'mahasiswa@gmail.com'],
-            [
-                'name' => 'Raveldo Andyka',
-                'password' => Hash::make('mahasiswa123'),
-                'role' => 'mahasiswa',
-            ]
+            ['name' => 'Raveldo Andyka', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs1->id],
-            [
-                'nim' => '22081010001',
-                'universitas' => 'UPN Veteran Jawa Timur',
-                'jurusan' => 'Informatika',
-                'phone' => '081234567890',
-            ]
+            ['nim' => '22081010001', 'universitas' => 'UPN Veteran Jawa Timur', 'jurusan' => 'Informatika', 'phone' => '081234567890']
         );
         Application::firstOrCreate(
-            ['user_id' => $mhs1->id, 'unit_id' => $units[0]->id],
+            ['user_id' => $mhs1->id],
             [
+                'unit_id' => $units[0]->id,
                 'start_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
                 'status' => 'pending',
             ]
         );
 
+        // Mahasiswa 2: Dimas Adam (VERIFIED)
         $mhs2 = User::firstOrCreate(
-            ['email' => 'AdamGanteng@gmail.com'],
-            [
-                'name' => 'Dimas Adam',
-                'password' => Hash::make('josjis'),
-                'role' => 'mahasiswa',
-            ]
+            ['email' => 'dimas.adam@mhs.unair.ac.id'],
+            ['name' => 'Dimas Adam', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs2->id],
-            [
-                'nim' => '22081010002',
-                'universitas' => 'Universitas Airlangga',
-                'jurusan' => 'Sistem Informasi',
-                'phone' => '089876543210',
-            ]
+            ['nim' => '22081010002', 'universitas' => 'Universitas Airlangga', 'jurusan' => 'Sistem Informasi', 'phone' => '089876543210']
         );
         Application::firstOrCreate(
-            ['user_id' => $mhs2->id, 'unit_id' => $units[1]->id],
+            ['user_id' => $mhs2->id],
             [
-                'start_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
+                'unit_id' => $units[1]->id,
+                'start_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
-                'status' => 'accepted',
-                'letter_number' => '500.12.2/102/436.7.14/' . date('Y'),
-                'letter_date' => Carbon::now()->format('Y-m-d'),
+                'status' => 'verified',
             ]
         );
 
-        // 5. SEED 10 MAHASISWA BARU YANG TELAH LULUS MAGANG (UNTUK UJI COBA E-SERTIFIKAT)
+        // Mahasiswa 3: Siti Nurhaliza (REJECTED)
+        $mhs3 = User::firstOrCreate(
+            ['email' => 'siti.nurhaliza@mhs.unesa.ac.id'],
+            ['name' => 'Siti Nurhaliza', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
+        );
+        StudentProfile::firstOrCreate(
+            ['user_id' => $mhs3->id],
+            ['nim' => '22081010003', 'universitas' => 'Universitas Negeri Surabaya', 'jurusan' => 'Teknik Informatika', 'phone' => '087654321098']
+        );
+        Application::firstOrCreate(
+            ['user_id' => $mhs3->id],
+            [
+                'unit_id' => $units[3]->id,
+                'start_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
+                'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
+                'status' => 'rejected',
+                'rejection_note' => 'Dokumen Portofolio dan Transkrip Nilai belum terlampir dengan jelas. Silakan ajukan ulang berkas yang lengkap.',
+            ]
+        );
+
+        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT DAN PEMBIMBING BERAGAM
         $graduatedStudents = [
             [
                 'name' => 'Ahmad Fauzi',
@@ -226,6 +277,14 @@ class DatabaseSeeder extends Seeder
         $startDate = Carbon::now()->subMonths(3)->format('Y-m-d');
         $endDate = Carbon::now()->format('Y-m-d');
 
+        $evaluationNotes = [
+            'Sangat memuaskan, proaktif, dan menyelesaikan tugas-tugas magang dengan hasil optimal.',
+            'Disiplin tinggi, komunikasi tim sangat baik, dan menguasai tools teknis unit kerja dengan cepat.',
+            'Inisiatif luar biasa dalam pemecahan masalah serta dokumentasi laporan yang terstruktur rapi.',
+            'Kinerja sangat memuaskan, selalu hadir tepat waktu, dan berkontribusi aktif pada project tim.',
+            'Mampu bekerja mandiri maupun kolaboratif, hasil kerja berkualitas tinggi dan sesuai target.',
+        ];
+
         foreach ($graduatedStudents as $index => $data) {
             // A. Buat User Mahasiswa
             $user = User::firstOrCreate(
@@ -248,8 +307,9 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // C. Pilih unit secara bergantian
+            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan
             $assignedUnit = $units[$index % count($units)];
+            $assignedPembimbing = $pembimbings[$index % count($pembimbings)];
 
             // D. Buat Application Status ACCEPTED dengan rentang waktu 3 bulan lalu s.d. hari ini
             $application = Application::firstOrCreate(
@@ -264,11 +324,11 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // E. Buat Placement dengan Pembimbing Ibu Retno Mumpuni
+            // E. Buat Placement dengan Pembimbing Terdistribusi
             $placement = Placement::firstOrCreate(
                 ['application_id' => $application->id],
                 [
-                    'pembimbing_id' => $pembimbing->id,
+                    'pembimbing_id' => $assignedPembimbing->id,
                 ]
             );
 
@@ -282,10 +342,11 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // G. Buat Penilaian Evaluasi (Nilai 80 - 95)
-            $disiplin = rand(82, 95);
-            $kinerja = rand(85, 95);
-            $laporan = rand(80, 94);
+            // G. Buat Penilaian Evaluasi (Nilai 80 - 98)
+            $disiplin = rand(82, 96);
+            $kinerja = rand(85, 98);
+            $laporan = rand(80, 95);
+            $catatan = $evaluationNotes[$index % count($evaluationNotes)];
 
             Evaluation::firstOrCreate(
                 ['placement_id' => $placement->id],
@@ -293,7 +354,7 @@ class DatabaseSeeder extends Seeder
                     'nilai_disiplin' => $disiplin,
                     'nilai_kinerja' => $kinerja,
                     'nilai_laporan' => $laporan,
-                    'catatan' => 'Sangat memuaskan, proaktif, dan menyelesaikan tugas-tugas magang dengan hasil optimal.',
+                    'catatan' => $catatan,
                 ]
             );
         }
