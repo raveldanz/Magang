@@ -16,7 +16,13 @@ class CertificateController extends Controller
     public function index()
     {
         // Ambil aplikasi yang sudah accepted, punya placement, nilai lengkap, dan laporan disetujui
-        $applications = Application::with(['user.studentProfile', 'unit', 'placement.evaluation', 'placement.finalreport', 'placement.pembimbing'])
+        $applications = Application::with([
+            'user.studentProfile', 
+            'unit.agencyProfile', 
+            'placement.evaluation', 
+            'placement.finalreport', 
+            'placement.pembimbing'
+        ])
             ->where('status', 'accepted')
             ->whereHas('placement', function ($query) {
                 $query->whereHas('evaluation')
@@ -26,23 +32,27 @@ class CertificateController extends Controller
             })
             ->get();
 
-        $agencyProfile = AgencyProfile::first();
-
-        return view('admin.certificates.index', compact('applications', 'agencyProfile'));
+        return view('admin.certificates.index', compact('applications'));
     }
 
     // Generate PDF Sertifikat
     public function generate($placementId)
     {
-        $placement = Placement::with(['application.user.studentProfile', 'application.unit', 'evaluation', 'pembimbing'])
-            ->findOrFail($placementId);
+        $placement = Placement::with([
+            'application.user.studentProfile', 
+            'application.unit.agencyProfile', 
+            'evaluation', 
+            'pembimbing'
+        ])->findOrFail($placementId);
 
         if (!$placement->evaluation) {
             return redirect()->back()->with('error', 'Penilaian belum lengkap!');
         }
 
-        // Ambil data profil instansi untuk TTE & Legalitas
-        $agencyProfile = AgencyProfile::first();
+        // Ambil profil instansi dinamis berdasarkan tempat unit mahasiswa magang
+        $agencyProfile = $placement->application?->unit?->agencyProfile 
+            ?? $placement->agencyProfile 
+            ?? AgencyProfile::first();
 
         $student = $placement->application->user;
         $profile = $student->studentProfile;

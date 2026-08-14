@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Placement extends Model
 {
+    use HasFactory;
 
-   use HasFactory;
     protected $fillable = [
         'application_id',
         'pembimbing_id',
         'status',
-        ];
+    ];
 
     public function application()
-    {return $this->belongsTo(Application::class);
+    {
+        return $this->belongsTo(Application::class);
     }
 
     // Relasi ke User (Pembimbing)
@@ -25,11 +26,12 @@ class Placement extends Model
         return $this->belongsTo(User::class, 'pembimbing_id');
     }
 
-    // Tambahkan relasi Logbooks melalui Application
+    // Tambahkan relasi Logbooks
     public function logbooks()
     {
         return $this->hasMany(Logbook::class, 'placement_id');
     }
+
     public function finalreport()
     {
         return $this->hasOne(FinalReport::class);
@@ -38,5 +40,11 @@ class Placement extends Model
     public function evaluation()
     {
         return $this->hasOne(Evaluation::class);
+    }
+
+    // Accessor untuk mendapatkan AgencyProfile dari unit penempatan
+    public function getAgencyProfileAttribute()
+    {
+        return $this->application?->unit?->agencyProfile ?? AgencyProfile::first();
     }
 }

@@ -312,8 +312,8 @@
 <body>
 
     @php
-        // Mengambil profil instansi dari database
-        $agencyProfile = $agencyProfile ?? \App\Models\AgencyProfile::first();
+        // Mengambil profil instansi dinamis dari unit magang atau default
+        $agencyProfile = $application->unit->agencyProfile ?? $agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya';
         $agencyName = $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika';
         $address = $agencyProfile->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272';

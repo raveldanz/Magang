@@ -18,23 +18,60 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 0. Seed Profil Instansi Default
-        AgencyProfile::firstOrCreate(
-            ['id' => 1],
-            [
-                'government_name' => 'Pemerintah Kota Surabaya',
-                'agency_name' => 'Dinas Komunikasi Dan Informatika',
-                'address' => 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272',
-                'phone' => '(031) 5312144',
-                'email' => 'diskominfo@surabaya.go.id',
-                'website' => 'https://diskominfo.surabaya.go.id',
-                'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
-                'signee_name' => 'Drs. H. M. NASER, M.Si',
-                'signee_nip' => '19700101 199503 1 002',
-                'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
-                'city' => 'Surabaya',
-            ]
-        );
+        // 0. SEED PROFIL MULTI-INSTANSI RESMI PEMERINTAH KOTA SURABAYA
+        $agencies = [
+            // Instansi 1: Diskominfo
+            AgencyProfile::firstOrCreate(
+                ['id' => 1],
+                [
+                    'government_name' => 'Pemerintah Kota Surabaya',
+                    'agency_name' => 'Dinas Komunikasi Dan Informatika',
+                    'address' => 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272',
+                    'phone' => '(031) 5312144',
+                    'email' => 'diskominfo@surabaya.go.id',
+                    'website' => 'https://diskominfo.surabaya.go.id',
+                    'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
+                    'signee_name' => 'Drs. H. M. NASER, M.Si',
+                    'signee_nip' => '19700101 199503 1 002',
+                    'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
+                    'city' => 'Surabaya',
+                ]
+            ),
+            // Instansi 2: Dispusip
+            AgencyProfile::firstOrCreate(
+                ['id' => 2],
+                [
+                    'government_name' => 'Pemerintah Kota Surabaya',
+                    'agency_name' => 'Dinas Perpustakaan Dan Kearsipan',
+                    'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Surabaya 60293',
+                    'phone' => '(031) 8704207',
+                    'email' => 'dispusip@surabaya.go.id',
+                    'website' => 'https://dispusip.surabaya.go.id',
+                    'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
+                    'signee_name' => 'Ir. Mia Santi Dewi, M.Si',
+                    'signee_nip' => '19680812 199403 2 007',
+                    'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
+                    'city' => 'Surabaya',
+                ]
+            ),
+            // Instansi 3: Dispendukcapil
+            AgencyProfile::firstOrCreate(
+                ['id' => 3],
+                [
+                    'government_name' => 'Pemerintah Kota Surabaya',
+                    'agency_name' => 'Dinas Kependudukan Dan Pencatatan Sipil',
+                    'address' => 'Jl. Manyar Kertoarjo No. 1, Manyar Sabrangan, Kec. Mulyorejo, Surabaya 60116',
+                    'phone' => '(031) 5913222',
+                    'email' => 'dispendukcapil@surabaya.go.id',
+                    'website' => 'https://dispendukcapil.surabaya.go.id',
+                    'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
+                    'signee_name' => 'Eddy Christijanto, Drs., M.Si',
+                    'signee_nip' => '19670615 199303 1 005',
+                    'signee_position' => 'Kepala Dinas Kependudukan dan Pencatatan Sipil',
+                    'city' => 'Surabaya',
+                ]
+            ),
+        ];
 
         // 1. Seed User Admin Utama
         $admin = User::firstOrCreate(
@@ -86,36 +123,57 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 3. SEED 6 UNIT KERJA RESMI PEMERINTAH KOTA SURABAYA
+        // 3. SEED UNIT KERJA TERHUBUNG DENGAN AGENCY PROFILE MASING-MASING
         $unitData = [
+            // Unit Diskominfo (Agency ID 1)
             [
+                'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Layanan Informatika & E-Government',
                 'description' => 'Pengembangan arsitektur SPBE, integrasi aplikasi layanan publik Pemkot Surabaya, dan portal WargaKu',
                 'quota' => 10,
             ],
             [
+                'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Pengelolaan Informasi & Komunikasi Publik',
                 'description' => 'Pengelolaan media komunikasi resmi, saluran pengaduan masyarakat, kehumasan, dan keterbukaan informasi publik (PPID)',
                 'quota' => 8,
             ],
             [
+                'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Infrastruktur TI & Jaringan Komunikasi',
                 'description' => 'Pemeliharaan jaringan fiber optic intra-pemerintah, Data Center Tier-3 Pemkot, cloud infrastructure, dan free wifi publik',
                 'quota' => 8,
             ],
             [
+                'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Keamanan Informasi & Persandian (CSIRT Surabaya)',
                 'description' => 'Pusat tanggap insiden siber (CSIRT), implementasi TTE BSrE, enkripsi data, dan audit keamanan sistem informasi',
                 'quota' => 6,
             ],
+            // Unit Dispusip (Agency ID 2)
             [
-                'name' => 'Bidang Statistik, Integrasi Sistem & Pengelolaan Data',
-                'description' => 'Implementasi Satu Data Surabaya, visualisasi analitik big data, data warehousing, dan dashboard eksekutif pimpinan',
+                'agency_profile_id' => $agencies[1]->id,
+                'name' => 'Bidang Pelayanan & Otomasi Perpustakaan Digital (Dispusip)',
+                'description' => 'Digitalisasi koleksi naskah kuno, sistem temu kembali arsip digital, dan otomasi perpustakaan daerah',
                 'quota' => 6,
             ],
             [
-                'name' => 'Sekretariat, Kepegawaian & Tata Usaha Dinas',
-                'description' => 'Pengelolaan administrasi perkantoran dinas, manajemen SDM, perencanaan program, dan tata naskah dinas',
+                'agency_profile_id' => $agencies[1]->id,
+                'name' => 'Bidang Preservasi & Pengelolaan Arsip Statis Elektronik',
+                'description' => 'Pengelolaan arsip digital dinas, alih media dokumen bersejarah Kota Surabaya, dan repositori arsip elektronik',
+                'quota' => 5,
+            ],
+            // Unit Dispendukcapil (Agency ID 3)
+            [
+                'agency_profile_id' => $agencies[2]->id,
+                'name' => 'Bidang Pengelolaan Informasi Administrasi Kependudukan (PIAK)',
+                'description' => 'Integrasi sistem database kependudukan Klampid New Generation (KNG) dan keamanan data kependudukan',
+                'quota' => 6,
+            ],
+            [
+                'agency_profile_id' => $agencies[2]->id,
+                'name' => 'Bidang Pemanfaatan Data & Inovasi Pelayanan Kependudukan',
+                'description' => 'Inovasi integrasi data kependudukan dengan BPJS, Dinsos, dan perbankan daerah untuk percepatan layanan publik',
                 'quota' => 5,
             ],
         ];
@@ -125,6 +183,7 @@ class DatabaseSeeder extends Seeder
             $units[] = Unit::firstOrCreate(
                 ['name' => $uData['name']],
                 [
+                    'agency_profile_id' => $uData['agency_profile_id'],
                     'description' => $uData['description'],
                     'quota' => $uData['quota'],
                 ]
@@ -190,7 +249,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT DAN PEMBIMBING BERAGAM
+        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT DAN PEMBIMBING BERAGAM MULTI-INSTANSI
         $graduatedStudents = [
             [
                 'name' => 'Ahmad Fauzi',
