@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class CertificateController extends Controller
     public function index()
     {
         // Ambil aplikasi yang sudah accepted, punya placement, nilai lengkap, dan laporan disetujui
-        $applications = Application::with(['user.studentProfile', 'unit', 'placement.evaluation', 'placement.finalreport'])
+        $applications = Application::with(['user.studentProfile', 'unit', 'placement.evaluation', 'placement.finalreport', 'placement.pembimbing'])
             ->where('status', 'accepted')
             ->whereHas('placement', function ($query) {
                 $query->whereHas('evaluation')
@@ -25,23 +26,29 @@ class CertificateController extends Controller
             })
             ->get();
 
-        return view('admin.certificates.index', compact('applications'));
+        $agencyProfile = AgencyProfile::first();
+
+        return view('admin.certificates.index', compact('applications', 'agencyProfile'));
     }
 
     // Generate PDF Sertifikat
     public function generate($placementId)
     {
-        $placement = Placement::with(['application.user.studentProfile', 'application.unit', 'evaluation'])
+        $placement = Placement::with(['application.user.studentProfile', 'application.unit', 'evaluation', 'pembimbing'])
             ->findOrFail($placementId);
 
         if (!$placement->evaluation) {
             return redirect()->back()->with('error', 'Penilaian belum lengkap!');
         }
 
+        // Ambil data profil instansi untuk TTE & Legalitas
+        $agencyProfile = AgencyProfile::first();
+
         $student = $placement->application->user;
         $profile = $student->studentProfile;
         $eval = $placement->evaluation;
         $unit = $placement->application->unit;
+        $pembimbing = $placement->pembimbing;
 
         // Hitung rata-rata
         $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
@@ -52,6 +59,8 @@ class CertificateController extends Controller
         elseif ($rataRata >= 70) $grade = 'B';
 
         $data = [
+            'placement' => $placement,
+            'agencyProfile' => $agencyProfile,
             'name' => strtoupper($student->name),
             'nim' => $profile->nim ?? '-',
             'universitas' => strtoupper($profile->universitas ?? '-'),
@@ -61,6 +70,7 @@ class CertificateController extends Controller
             'rataRata' => $rataRata,
             'grade' => $grade,
             'date_issued' => \Carbon\Carbon::now()->translatedFormat('d F Y'),
+            'pembimbing' => $pembimbing,
         ];
 
         // Generate PDF dari view template

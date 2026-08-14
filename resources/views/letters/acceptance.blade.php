@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Balasan Penerimaan Magang - {{ $application->user->name }}</title>
+    <title>Surat Penerimaan Magang - {{ $application->user->name }}</title>
     <style>
         @page {
             size: A4;
@@ -371,7 +371,7 @@
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
     <div class="no-print">
         <div style="font-size: 13px; font-weight: 500;">
-            📄 <strong>Standar Resmi Surat Dinas Pemkot Surabaya (TTE BSrE)</strong> &bull; Surat Balasan Izin Magang
+            📄 Surat Penerimaan Magang - {{ $application->user->name }}
         </div>
         <div class="btn-group">
             <button onclick="window.history.back()" class="btn btn-secondary">
