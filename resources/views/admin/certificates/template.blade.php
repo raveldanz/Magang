@@ -65,11 +65,13 @@
             width: 90px;
         }
         .header-logo img {
-            width: 75px;
+            max-height: 90px;
+            max-width: 85px;
             background: #ffffff;
             padding: 6px;
             border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            object-fit: contain;
         }
 
         .title-area {
@@ -226,20 +228,23 @@
     <div class="curve-br-main"></div>
 
     @php
-        // Logo Utama Instansi
-        $imagePath = public_path('images/logo.png');
-        if(!empty($agencyProfile->logo) && file_exists(public_path('storage/' . $agencyProfile->logo))) {
-            $imagePath = public_path('storage/' . $agencyProfile->logo);
-        }
-        
-        $imageData = '';
-        $mime = 'image/png';
-        if(file_exists($imagePath)) {
-            $imageData = base64_encode(file_get_contents($imagePath));
-            $mime = mime_content_type($imagePath) ?: 'image/png';
+        // 1. Logo Utama Instansi Dinamis Berbasis Base64 (Untuk DOMPDF)
+        $logoPath = null;
+        if (!empty($agencyProfile?->logo) && file_exists(storage_path('app/public/' . $agencyProfile->logo))) {
+            $logoPath = storage_path('app/public/' . $agencyProfile->logo);
+        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path('storage/' . $agencyProfile->logo))) {
+            $logoPath = public_path('storage/' . $agencyProfile->logo);
+        } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
+            $logoPath = public_path('images/logo-surabaya.png');
+        } elseif (file_exists(public_path('images/logo.png'))) {
+            $logoPath = public_path('images/logo.png');
         }
 
-        // QR Code Verifikasi URL
+        $logoData = $logoPath ? @file_get_contents($logoPath) : '';
+        $mime = ($logoPath && function_exists('mime_content_type')) ? (@mime_content_type($logoPath) ?: 'image/png') : 'image/png';
+        $logoSrc = $logoData ? 'data:' . $mime . ';base64,' . base64_encode($logoData) : '';
+
+        // 2. QR Code Verifikasi TTE URL
         $verifyUrl = route('verify.certificate', $placement->id ?? 1);
         $qrBase64 = '';
         if (class_exists('SimpleSoftwareIO\QrCode\Facades\QrCode')) {
@@ -257,8 +262,8 @@
     <!-- HALAMAN 1 : SERTIFIKAT UTAMA -->
     <div class="page-content">
         <div class="header-logo">
-            @if($imageData)
-                <img src="data:{{ $mime }};base64,{{ $imageData }}" alt="Logo Instansi">
+            @if($logoSrc)
+                <img src="{{ $logoSrc }}" alt="Logo Instansi" style="max-height: 90px; object-fit: contain;">
             @else
                 <div style="font-size:12px; color:#999; border:1px solid #ccc; padding:20px; width:80px; background:#fff; border-radius:50%;">[LOGO]</div>
             @endif
@@ -320,8 +325,8 @@
     <div class="page-break"></div>
     
     <div class="page-content">
-        @if($imageData)
-            <img src="data:{{ $mime }};base64,{{ $imageData }}" class="watermark" alt="Watermark Logo">
+        @if($logoSrc)
+            <img src="{{ $logoSrc }}" class="watermark" alt="Watermark Logo">
         @endif
 
         <div class="grade-content">
