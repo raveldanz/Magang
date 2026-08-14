@@ -325,13 +325,21 @@
         $signeeNip = $agencyProfile->signee_nip ?? '19700101 199503 1 002';
         $signeePosition = $agencyProfile->signee_position ?? 'KEPALA DINAS KOMUNIKASI DAN INFORMATIKA';
 
-        // Logo instansi
-        $logoSrc = null;
-        if (!empty($agencyProfile->logo)) {
-            $logoSrc = asset('storage/' . $agencyProfile->logo);
+        // Logo Utama Instansi Dinamis Berbasis Base64 (Untuk Kompatibilitas Tinggi & DOMPDF)
+        $logoPath = null;
+        if (!empty($agencyProfile?->logo) && file_exists(storage_path('app/public/' . $agencyProfile->logo))) {
+            $logoPath = storage_path('app/public/' . $agencyProfile->logo);
+        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path('storage/' . $agencyProfile->logo))) {
+            $logoPath = public_path('storage/' . $agencyProfile->logo);
+        } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
+            $logoPath = public_path('images/logo-surabaya.png');
         } elseif (file_exists(public_path('images/logo.png'))) {
-            $logoSrc = asset('images/logo.png');
+            $logoPath = public_path('images/logo.png');
         }
+
+        $logoData = $logoPath ? @file_get_contents($logoPath) : '';
+        $mime = ($logoPath && function_exists('mime_content_type')) ? (@mime_content_type($logoPath) ?: 'image/png') : 'image/png';
+        $logoSrc = $logoData ? 'data:' . $mime . ';base64,' . base64_encode($logoData) : '';
 
         // Data mahasiswa & permohonan
         $student = $application->user->studentProfile;
@@ -364,8 +372,10 @@
         $verifyUrl = route('verify.letter', $application->id);
         $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
 
-        // Logo BSrE
-        $bsreLogoSrc = file_exists(public_path('images/bsre-logo.png')) ? asset('images/bsre-logo.png') : null;
+        // Logo BSrE Base64
+        $bsreLogoPath = public_path('images/bsre-logo.png');
+        $bsreLogoData = file_exists($bsreLogoPath) ? @file_get_contents($bsreLogoPath) : '';
+        $bsreLogoSrc = $bsreLogoData ? 'data:image/png;base64,' . base64_encode($bsreLogoData) : null;
     @endphp
 
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
@@ -391,7 +401,7 @@
             <tr>
                 <td class="kop-logo">
                     @if($logoSrc)
-                        <img src="{{ $logoSrc }}" alt="Logo Pemkot Surabaya">
+                        <img src="{{ $logoSrc }}" alt="Logo Instansi" style="max-width: 65px; max-height: 80px; width: auto; height: auto; object-fit: contain;">
                     @endif
                 </td>
                 <td class="kop-text">
