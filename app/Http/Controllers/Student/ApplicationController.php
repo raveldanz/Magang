@@ -89,7 +89,7 @@ class ApplicationController extends Controller
     // Download / Print Surat Penerimaan Magang untuk Mahasiswa
     public function downloadLetter($id)
     {
-        $application = Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+        $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
             ->where('user_id', Auth::id())
             ->where('status', 'accepted')
             ->findOrFail($id);
