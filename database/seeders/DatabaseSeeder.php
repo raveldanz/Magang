@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // 3. Seed User Mahasiswa (Contoh)
-        User::firstOrCreate(
+        $mhs1 = User::firstOrCreate(
             ['email' => 'mahasiswa@gmail.com'],
             [
                 'name' => 'Raveldo Andyka',
@@ -57,8 +57,17 @@ class DatabaseSeeder extends Seeder
                 'role' => 'mahasiswa',
             ]
         );
+        \App\Models\StudentProfile::firstOrCreate(
+            ['user_id' => $mhs1->id],
+            [
+                'nim' => '22081010001',
+                'universitas' => 'UPN Veteran Jawa Timur',
+                'jurusan' => 'Informatika',
+                'phone' => '081234567890',
+            ]
+        );
 
-        User::firstOrCreate(
+        $mhs2 = User::firstOrCreate(
             ['email' => 'AdamGanteng@gmail.com'],
             [
                 'name' => 'Dimas Adam',
@@ -66,23 +75,32 @@ class DatabaseSeeder extends Seeder
                 'role' => 'mahasiswa',
             ]
         );
+        \App\Models\StudentProfile::firstOrCreate(
+            ['user_id' => $mhs2->id],
+            [
+                'nim' => '22081010002',
+                'universitas' => 'Universitas Airlangga',
+                'jurusan' => 'Sistem Informasi',
+                'phone' => '089876543210',
+            ]
+        );
 
 
 
         // 4. Seed Unit Instansi (Dengan Variasi Kuota & Deskripsi)
-        Unit::firstOrCreate(
+        $unitAptika = Unit::firstOrCreate(
             ['name' => 'Bidang Aptika & E-Government'], 
             ['description' => 'Pengembangan aplikasi dan tata kelola e-government', 'quota' => 5]
         );
-        Unit::firstOrCreate(
+        $unitIKP = Unit::firstOrCreate(
             ['name' => 'Bidang Informasi & Komunikasi Publik'], 
             ['description' => 'Manajemen kehumasan dan saluran informasi publik', 'quota' => 3]
         );
-        Unit::firstOrCreate(
+        $unitSekretariat = Unit::firstOrCreate(
             ['name' => 'Sekretariat & Keuangan'], 
             ['description' => 'Pengelolaan administrasi dan keuangan instansi', 'quota' => 2]
         );
-        Unit::firstOrCreate(
+        $unitJaringan = Unit::firstOrCreate(
             ['name' => 'Bidang Infrastruktur & Jaringan'], 
             ['description' => 'Pemeliharaan jaringan, server, dan infrastruktur IT', 'quota' => 4]
         );
@@ -93,6 +111,66 @@ class DatabaseSeeder extends Seeder
         Unit::firstOrCreate(
             ['name' => 'Bidang Statistik & Data Analitik'], 
             ['description' => 'Pengolahan data statistik dan integrasi sistem data', 'quota' => 0]
+        );
+
+        // 5. Seed Data Pengajuan Magang Dummy (PENDING, VERIFIED, ACCEPTED, REJECTED)
+        // Pengajuan 1: Raveldo Andyka (PENDING)
+        \App\Models\Application::firstOrCreate(
+            ['user_id' => $mhs1->id, 'unit_id' => $unitAptika->id],
+            [
+                'start_date' => '2026-09-01',
+                'end_date' => '2026-12-01',
+                'status' => 'pending',
+            ]
+        );
+
+        // Pengajuan 2: Dimas Adam (ACCEPTED)
+        \App\Models\Application::firstOrCreate(
+            ['user_id' => $mhs2->id, 'unit_id' => $unitIKP->id],
+            [
+                'start_date' => '2026-09-01',
+                'end_date' => '2026-11-30',
+                'status' => 'accepted',
+                'letter_number' => '500/102/APTIKA/2026',
+                'letter_date' => '2026-08-14',
+            ]
+        );
+
+        // Pengajuan 3: Budi Santoso (VERIFIED)
+        $mhs3 = User::firstOrCreate(
+            ['email' => 'budisantoso@gmail.com'],
+            ['name' => 'Budi Santoso', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
+        );
+        \App\Models\StudentProfile::firstOrCreate(
+            ['user_id' => $mhs3->id],
+            ['nim' => '22081010003', 'universitas' => 'Universitas Brawijaya', 'jurusan' => 'Teknik Informatika', 'phone' => '085678901234']
+        );
+        \App\Models\Application::firstOrCreate(
+            ['user_id' => $mhs3->id, 'unit_id' => $unitSekretariat->id],
+            [
+                'start_date' => '2026-09-15',
+                'end_date' => '2026-12-15',
+                'status' => 'verified',
+            ]
+        );
+
+        // Pengajuan 4: Siti Nurhaliza (REJECTED)
+        $mhs4 = User::firstOrCreate(
+            ['email' => 'sitinurhaliza@gmail.com'],
+            ['name' => 'Siti Nurhaliza', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
+        );
+        \App\Models\StudentProfile::firstOrCreate(
+            ['user_id' => $mhs4->id],
+            ['nim' => '22081010004', 'universitas' => 'ITS Surabaya', 'jurusan' => 'Sistem Informasi', 'phone' => '087654321098']
+        );
+        \App\Models\Application::firstOrCreate(
+            ['user_id' => $mhs4->id, 'unit_id' => $unitJaringan->id],
+            [
+                'start_date' => '2026-09-01',
+                'end_date' => '2026-11-30',
+                'status' => 'rejected',
+                'rejection_note' => 'Dokumen Transkrip Nilai belum terlampir dengan jelas. Silakan ajukan ulang.',
+            ]
         );
     }
 }
