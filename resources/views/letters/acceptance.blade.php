@@ -3,93 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Penerimaan Magang - {{ $application->user->name }}</title>
+    <title>Surat Balasan Penerimaan Magang - {{ $application->user->name }}</title>
     <style>
+        @page {
+            size: A4;
+            margin: 12mm 18mm 12mm 18mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
         body {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 12pt;
-            line-height: 1.6;
-            margin: 40px;
+            font-size: 10.5pt;
+            line-height: 1.36;
             color: #000;
-        }
-        .kop-surat {
-            text-align: center;
-            border-bottom: 3px double #000;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .kop-surat h2 {
+            background-color: #f3f4f6;
             margin: 0;
-            font-size: 14pt;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            padding: 20px 0;
         }
-        .kop-surat h3 {
-            margin: 0;
-            font-size: 16pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .kop-surat p {
-            margin: 0;
-            font-size: 10pt;
-            font-style: italic;
-        }
+
         .no-print {
-            margin-bottom: 20px;
-            text-align: right;
+            max-width: 210mm;
+            margin: 0 auto 16px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: #1e293b;
+            color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-        .btn-print {
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .btn-primary {
             background-color: #2563eb;
             color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-family: sans-serif;
-            font-size: 14px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .btn-print:hover {
+
+        .btn-primary:hover {
             background-color: #1d4ed8;
         }
-        .table-data {
+
+        .btn-secondary {
+            background-color: #475569;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #334155;
+        }
+
+        /* Container Lembar Kertas A4 */
+        .page-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 12mm 18mm 10mm 18mm;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        /* Kop Surat Resmi */
+        .kop-table {
             width: 100%;
-            margin-bottom: 20px;
             border-collapse: collapse;
         }
-        .table-data td {
-            vertical-align: top;
-            padding: 3px 0;
-        }
-        .signature-section {
-            float: right;
-            width: 300px;
+
+        .kop-logo {
+            width: 65px;
+            vertical-align: middle;
             text-align: center;
-            margin-top: 30px;
+            padding-right: 12px;
         }
-        .qr-code-img {
-            width: 110px;
-            height: 110px;
-            margin: 10px auto;
+
+        .kop-logo img {
+            max-width: 65px;
+            max-height: 80px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .kop-text {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .kop-instansi-1 {
+            font-size: 13pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            line-height: 1.15;
+        }
+
+        .kop-instansi-2 {
+            font-size: 14pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 2px 0 0 0;
+            line-height: 1.2;
+        }
+
+        .kop-alamat {
+            font-size: 9pt;
+            margin: 3px 0 0 0;
+            line-height: 1.25;
+        }
+
+        .kop-kontak {
+            font-size: 8.5pt;
+            margin: 1px 0 0 0;
+            line-height: 1.25;
+        }
+
+        /* Garis Ganda Pemisah Kop */
+        .kop-divider {
+            border-top: 2.5px solid #000;
+            border-bottom: 0.75px solid #000;
+            height: 2px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Tabel Atribut Surat */
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 10.5pt;
+        }
+
+        .meta-table td {
+            vertical-align: top;
+            padding: 1px 0;
+        }
+
+        /* Tujuan Surat */
+        .recipient-box {
+            margin-bottom: 9px;
+            font-size: 10.5pt;
+            line-height: 1.3;
+        }
+
+        /* Konten Paragraf */
+        .content-body {
+            font-size: 10.5pt;
+            text-align: justify;
+            line-height: 1.35;
+        }
+
+        .content-body p {
+            margin: 0 0 7px 0;
+        }
+
+        /* Tabel Data Mahasiswa */
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 5px 0 8px 0;
+            font-size: 10pt;
+        }
+
+        .student-table th,
+        .student-table td {
+            border: 1px solid #000;
+            padding: 3px 6px;
+            vertical-align: middle;
+        }
+
+        .student-table th {
+            background-color: #f8fafc;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Box Tanda Tangan Elektronik (TTE) Standar Dispusip / Pemkot */
+        .tte-container {
+            float: right;
+            width: 340px;
+            border: 1px solid #333333;
+            padding: 6px 10px;
+            margin-top: 6px;
+            background-color: #ffffff;
+        }
+
+        .tte-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tte-qr-cell {
+            width: 70px;
+            vertical-align: middle;
+            text-align: center;
+            padding-right: 8px;
+        }
+
+        .tte-qr-img {
+            width: 65px;
+            height: 65px;
             display: block;
+            margin: 0 auto;
         }
-        .qr-caption {
-            font-size: 8pt;
-            font-family: sans-serif;
-            color: #4b5563;
-            margin-top: 2px;
+
+        .tte-text-cell {
+            vertical-align: middle;
+            font-size: 8.5pt;
+            line-height: 1.25;
+            font-family: 'Times New Roman', Times, serif;
         }
+
+        .clear-fix {
+            clear: both;
+        }
+
+        /* Footer Legalitas BSrE Identik */
+        .bsre-footer-wrapper {
+            margin-top: 14px;
+            padding-top: 0;
+        }
+
+        .bsre-divider-line {
+            width: 100%;
+            border-top: 1px solid #000000;
+            margin-bottom: 5px;
+        }
+
+        .bsre-footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bsre-logo-col {
+            width: 135px;
+            vertical-align: middle;
+            padding-right: 10px;
+        }
+
+        .bsre-logo-img {
+            height: 36px;
+            width: auto;
+            max-width: 135px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .bsre-text-col {
+            vertical-align: middle;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 7.5pt;
+            color: #000000;
+            line-height: 1.35;
+        }
+
+        .bsre-quote {
+            padding-left: 8px;
+        }
+
         @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+                margin: 0;
+            }
+
+            .page-container {
+                width: 100%;
+                min-height: auto;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+
             .no-print {
                 display: none !important;
-            }
-            body {
-                margin: 0;
             }
         }
     </style>
@@ -97,132 +312,226 @@
 <body>
 
     @php
-        $agency = \App\Models\AgencyProfile::first();
-        $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
-        $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
-        $address = $agency->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272';
-        $cityName = $agency->city ?? 'Surabaya';
-        $signeeName = $agency->signee_name ?? 'Drs. H. M. NASER, M.Si';
-        $signeeNip = $agency->signee_nip ?? '19700101 199503 1 002';
-        $signeePosition = $agency->signee_position ?? 'Kepala Dinas Komunikasi dan Informatika';
+        // Mengambil profil instansi dari database
+        $agencyProfile = $agencyProfile ?? \App\Models\AgencyProfile::first();
+        $govName = $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya';
+        $agencyName = $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika';
+        $address = $agencyProfile->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272';
+        $phone = $agencyProfile->phone ?? '(031) 5312144';
+        $email = $agencyProfile->email ?? 'diskominfo@surabaya.go.id';
+        $website = $agencyProfile->website ?? 'surabaya.go.id';
+        $cityName = $agencyProfile->city ?? 'Surabaya';
+        $signeeName = $agencyProfile->signee_name ?? 'Drs. H. M. NASER, M.Si';
+        $signeeNip = $agencyProfile->signee_nip ?? '19700101 199503 1 002';
+        $signeePosition = $agencyProfile->signee_position ?? 'KEPALA DINAS KOMUNIKASI DAN INFORMATIKA';
+
+        // Logo instansi
+        $logoSrc = null;
+        if (!empty($agencyProfile->logo)) {
+            $logoSrc = asset('storage/' . $agencyProfile->logo);
+        } elseif (file_exists(public_path('images/logo.png'))) {
+            $logoSrc = asset('images/logo.png');
+        }
+
+        // Data mahasiswa & permohonan
+        $student = $application->user->studentProfile;
+        $fakultas = $student->fakultas ?? 'Fakultas Ilmu Komputer';
+        $universitas = $student->universitas ?? 'Perguruan Tinggi';
+        $nim = $student->nim ?? '-';
+        $jurusan = $student->jurusan ?? '-';
+        $semester = $student->semester ?? '5 (Lima)';
+
+        // Format tanggal
+        \Carbon\Carbon::setLocale('id');
+        $letterDateFormatted = $application->letter_date 
+            ? \Carbon\Carbon::parse($application->letter_date)->translatedFormat('d F Y') 
+            : \Carbon\Carbon::now()->translatedFormat('d F Y');
+
+        $startDateFormatted = $application->start_date 
+            ? \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') 
+            : '-';
+
+        $endDateFormatted = $application->end_date 
+            ? \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') 
+            : '-';
+
+        // Data Pembimbing
+        $pembimbing = optional($application->placement)->pembimbing;
+        $pembimbingName = $pembimbing ? $pembimbing->name : 'Pembimbing Lapangan / Unit Kerja Terkait';
+        $pembimbingPhone = $pembimbing->phone ?? optional($pembimbing->studentProfile)->phone ?? $phone ?? '-';
+
+        // QR Code Verifikasi Dokumen
+        $verifyUrl = route('verify.letter', $application->id);
+        $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
+
+        // Logo BSrE
+        $bsreLogoSrc = file_exists(public_path('images/bsre-logo.png')) ? asset('images/bsre-logo.png') : null;
     @endphp
 
+    <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
     <div class="no-print">
-        <button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan ke PDF</button>
+        <div style="font-size: 13px; font-weight: 500;">
+            📄 <strong>Standar Resmi Surat Dinas Pemkot Surabaya (TTE BSrE)</strong> &bull; Surat Balasan Izin Magang
+        </div>
+        <div class="btn-group">
+            <button onclick="window.history.back()" class="btn btn-secondary">
+                &larr; Kembali
+            </button>
+            <button onclick="window.print()" class="btn btn-primary">
+                🖨️ Cetak / Simpan PDF
+            </button>
+        </div>
     </div>
 
-    <!-- Kop Surat Resmi -->
-    <div class="kop-surat">
-        @if (!empty($agency->logo))
-            <img src="{{ asset('storage/' . $agency->logo) }}" alt="Logo Instansi" style="height: 70px; position: absolute; left: 10px; top: 0;">
-        @endif
-        <h2>{{ $govName }}</h2>
-        <h3>{{ $agencyName }}</h3>
-        <p>{{ $address }}</p>
-    </div>
+    <!-- Lembar Kertas A4 Tunggal -->
+    <div class="page-container">
+        
+        <!-- 1. KOP SURAT RESMI -->
+        <table class="kop-table">
+            <tr>
+                <td class="kop-logo">
+                    @if($logoSrc)
+                        <img src="{{ $logoSrc }}" alt="Logo Pemkot Surabaya">
+                    @endif
+                </td>
+                <td class="kop-text">
+                    <div class="kop-instansi-1">{{ $govName }}</div>
+                    <div class="kop-instansi-2">{{ strtoupper($agencyName) }}</div>
+                    <div class="kop-alamat">{{ $address }}</div>
+                    <div class="kop-kontak">
+                        Telp. {{ $phone }} | Laman: {{ $website }} | Pos-el: {{ $email }}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="kop-divider"></div>
 
-    <!-- Tanggal Surat -->
-    <div style="text-align: right; margin-bottom: 15px;">
-        {{ $cityName }}, {{ $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->translatedFormat('d F Y') : date('d F Y') }}
-    </div>
+        <!-- 2. ATRIBUT HEADER SURAT -->
+        <table class="meta-table">
+            <tr>
+                <td style="width: 58%;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 75px;">Nomor</td>
+                            <td style="width: 10px;">:</td>
+                            <td><strong>{{ $application->letter_number ?? '500.12.2/' . str_pad($application->id, 3, '0', STR_PAD_LEFT) . '/436.7.14/' . date('Y') }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Sifat</td>
+                            <td>:</td>
+                            <td>Biasa / Terbuka</td>
+                        </tr>
+                        <tr>
+                            <td>Lampiran</td>
+                            <td>:</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Hal</td>
+                            <td>:</td>
+                            <td><strong>Balasan Surat Permohonan Izin Praktik Kerja Magang</strong></td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 42%; text-align: right;">
+                    <span>{{ $cityName }}, {{ $letterDateFormatted }}</span>
+                </td>
+            </tr>
+        </table>
 
-    <!-- Nomor & Hal -->
-    <table class="table-data" style="width: 100%;">
-        <tr>
-            <td style="width: 15%;">Nomor</td>
-            <td style="width: 2%;">:</td>
-            <td><strong>{{ $application->letter_number ?? '500/123/APTIKA/' . date('Y') }}</strong></td>
-        </tr>
-        <tr>
-            <td>Sifat</td>
-            <td>:</td>
-            <td>Biasa</td>
-        </tr>
-        <tr>
-            <td>Hal</td>
-            <td>:</td>
-            <td><strong>Persetujuan / Penerimaan Praktik Kerja Magang</strong></td>
-        </tr>
-    </table>
+        <!-- 3. TUJUAN SURAT (FORMAT RESMI DINAS PEMKOT) -->
+        <div class="recipient-box">
+            Yth. Dekan {{ $fakultas }}<br>
+            <div style="padding-left: 26px;">
+                {{ $universitas }}<br>
+                di -<br>
+                <div style="padding-left: 20px; font-weight: bold;">{{ $cityName }}</div>
+            </div>
+        </div>
 
-    <p style="margin-bottom: 15px;">
-        Kepada Yth.<br>
-        <strong>Pimpinan / Dekan {{ $application->user->studentProfile->universitas ?? 'Perguruan Tinggi' }}</strong><br>
-        di Tempat
-    </p>
+        <!-- 4. PARAGRAF PENGANTAR & TABEL IDENTITAS MAHASISWA -->
+        <div class="content-body">
+            <p>
+                Menindaklanjuti surat permohonan izin Praktik Kerja Magang dari Universitas Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima mahasiswa berikut:
+            </p>
 
-    <p style="text-align: justify;">Dengan hormat,</p>
-    <p style="text-align: justify; text-indent: 30px;">
-        Sehubungan dengan surat pengajuan magang yang telah dikirimkan, bersama ini kami sampaikan bahwa mahasiswa berikut:
-    </p>
+            <table class="student-table">
+                <thead>
+                    <tr>
+                        <th style="width: 32px;">No</th>
+                        <th>Nama</th>
+                        <th style="width: 120px;">NIM</th>
+                        <th>Program Studi</th>
+                        <th>Fakultas</th>
+                        <th style="width: 80px;">Semester</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: center;">1</td>
+                        <td style="font-weight: bold;">{{ $application->user->name }}</td>
+                        <td style="text-align: center;">{{ $nim }}</td>
+                        <td>{{ $jurusan }}</td>
+                        <td>{{ $fakultas }}</td>
+                        <td style="text-align: center;">{{ $semester }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-    <table class="table-data" style="margin-left: 30px; width: 90%;">
-        <tr>
-            <td style="width: 180px;">Nama Mahasiswa</td>
-            <td style="width: 10px;">:</td>
-            <td><strong>{{ $application->user->name }}</strong></td>
-        </tr>
-        <tr>
-            <td>NIM / NPM</td>
-            <td>:</td>
-            <td>{{ $application->user->studentProfile->nim ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>Program Studi</td>
-            <td>:</td>
-            <td>{{ $application->user->studentProfile->jurusan ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>Perguruan Tinggi</td>
-            <td>:</td>
-            <td>{{ $application->user->studentProfile->universitas ?? '-' }}</td>
-        </tr>
-    </table>
+            <!-- 5. PARAGRAF PELAKSANAAN & NARAHUBUNG -->
+            <p>
+                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Informasi lebih lanjut dapat menghubungi Sdr. <strong>{{ $pembimbingName }}</strong> dengan Nomor HP. <strong>{{ $pembimbingPhone }}</strong>.
+            </p>
 
-    <p style="text-align: justify;">
-        Dinyatakan <strong>DITERIMA</strong> untuk melaksanakan kegiatan Praktik Kerja Magang pada instansi kami dengan rincian sebagai berikut:
-    </p>
+            <p>
+                Demikian surat pemberitahuan ini disampaikan untuk dapat dipergunakan sebagaimana mestinya. Atas perhatian dan kerja samanya, diucapkan terima kasih.
+            </p>
+        </div>
 
-    <table class="table-data" style="margin-left: 30px; width: 90%;">
-        <tr>
-            <td style="width: 180px;">Unit Kerja / Bidang</td>
-            <td style="width: 10px;">:</td>
-            <td><strong>{{ $application->unit->name ?? '-' }}</strong></td>
-        </tr>
-        <tr>
-            <td>Periode Magang</td>
-            <td>:</td>
-            <td>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}</td>
-        </tr>
-        <tr>
-            <td>Pembimbing Lapangan</td>
-            <td>:</td>
-            <td>{{ optional($application->placement)->pembimbing->name ?? 'Dikerjakan di lokasi unit kerja' }}</td>
-        </tr>
-    </table>
+        <!-- 6. BAGIAN KOTAK TANDA TANGAN ELEKTRONIK (TTE) STANDAR DISPUSIP / PEMKOT -->
+        <div class="tte-container">
+            <table class="tte-table">
+                <tr>
+                    <td class="tte-qr-cell">
+                        <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi TTE" class="tte-qr-img">
+                    </td>
+                    <td class="tte-text-cell">
+                        <div style="font-size: 8pt; color: #111;">Surat ini Ditandatangani Elektronik Oleh :</div>
+                        <div style="font-weight: bold; text-transform: uppercase;">{{ $signeePosition }},</div>
+                        <div style="margin-top: 2px;"><b><u>{{ $signeeName }}</u></b></div>
+                        <div>Pembina Utama Muda / IV/c</div>
+                        @if (!empty($signeeNip))
+                            <div>NIP. {{ $signeeNip }}</div>
+                        @endif
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="clear-fix"></div>
 
-    <p style="text-align: justify; text-indent: 30px;">
-        Demikian surat pemberitahuan penerimaan ini disampaikan untuk dapat dipergunakan sebagaimana mestinya. Atas perhatian dan kerja samanya, kami ucapkan terima kasih.
-    </p>
+        <!-- 7. FOOTER LEGALITAS BSrE RESMI IDENTIK -->
+        <div class="bsre-footer-wrapper">
+            <div class="bsre-divider-line"></div>
+            <table class="bsre-footer-table">
+                <tr>
+                    <td class="bsre-logo-col">
+                        @if($bsreLogoSrc)
+                            <img src="{{ $bsreLogoSrc }}" alt="Balai Besar Sertifikasi Elektronik" class="bsre-logo-img">
+                        @else
+                            <div style="font-family: Arial, sans-serif; font-weight: bold; color: #1ea7e4; font-size: 9pt; line-height: 1.1;">
+                                Balai Besar<br>Sertifikasi<br>Elektronik
+                            </div>
+                        @endif
+                    </td>
+                    <td class="bsre-text-col">
+                        <div>- Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan BSrE</div>
+                        <div>- UU ITE No 11 Tahun 2008 Pasal 5 Ayat 1</div>
+                        <div class="bsre-quote">&quot;Informasi Elektronik dan/atau Dokumen Elektronik dan/atau hasil cetaknya merupakan alat bukti hukum yang sah&quot;</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-    <!-- Tanda Tangan & QR Code Verification -->
-    <div class="signature-section">
-        <p style="margin-bottom: 5px;">{{ $signeePosition }}</p>
-
-        @php
-            $verifyUrl = route('verify.letter', $application->id);
-            $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' . urlencode($verifyUrl);
-        @endphp
-
-        <!-- QR Code Verification Image -->
-        <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi Dokumen" class="qr-code-img">
-        <div class="qr-caption">Scan untuk Verifikasi Keaslian Dokumen</div>
-
-        <p style="margin-top: 10px;"><strong><u>{{ $signeeName }}</u></strong><br>
-        @if (!empty($signeeNip))
-            NIP. {{ $signeeNip }}
-        @endif
-        </p>
     </div>
 
 </body>
