@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Pembimbing\DashboardController as PembimbingDashboardController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Pembimbing\EvaluationController as PembimbingEvaluationController;
+use App\Http\Controllers\Admin\AgencyProfileController as AdminAgencyProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -37,6 +38,14 @@ Route::get('/verify-letter/{id}', function ($id) {
         ->findOrFail($id);
     return view('verify_letter', compact('application'));
 })->name('verify.letter');
+
+// Route Publik Verifikasi QR Code Sertifikat Magang
+Route::get('/verify-certificate/{id}', function ($id) {
+    $placement = \App\Models\Placement::with(['application.user.studentProfile', 'application.unit', 'evaluation', 'pembimbing'])
+        ->findOrFail($id);
+    $application = $placement->application;
+    return view('verify_letter', compact('application', 'placement'));
+})->name('verify.certificate');
 
 Route::middleware('auth')->group(function () {
 
@@ -88,6 +97,10 @@ Route::middleware('auth')->group(function () {
         // Route Penerbitan Sertifikat
         Route::get('/admin/certificates', [\App\Http\Controllers\Admin\CertificateController::class, 'index'])->name('admin.certificates.index');
         Route::get('/admin/certificates/{placementId}/generate', [\App\Http\Controllers\Admin\CertificateController::class, 'generate'])->name('admin.certificates.generate');
+
+        // Pengaturan Profil Instansi & TTD Surat
+        Route::get('/admin/agency-profile', [AdminAgencyProfileController::class, 'edit'])->name('admin.agency_profile.edit');
+        Route::match(['put', 'patch', 'post'], '/admin/agency-profile', [AdminAgencyProfileController::class, 'update'])->name('admin.agency_profile.update');
     });
 
     // ==========================================
