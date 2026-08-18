@@ -12,9 +12,10 @@ class AgencyProfileController extends Controller
     // Display the agency profile edit form
     public function edit(Request $request)
     {
-        $agencyId = $request->query('id', 1);
+        $defaultAgencyId = auth()->user()?->agency_profile_id ?? 1;
+        $agencyId = $request->query('id', $defaultAgencyId);
         
-        $profile = AgencyProfile::firstOrCreate(
+        $profile = AgencyProfile::find($agencyId) ?? AgencyProfile::firstOrCreate(
             ['id' => $agencyId],
             [
                 'government_name' => 'Pemerintah Kota Surabaya',
@@ -23,6 +24,7 @@ class AgencyProfileController extends Controller
                 'phone' => '(031) 5312144',
                 'email' => 'diskominfo@surabaya.go.id',
                 'website' => 'https://diskominfo.surabaya.go.id',
+                'logo' => 'images/logos/diskominfo.png',
                 'signee_name' => 'Drs. H. M. NASER, M.Si',
                 'signee_nip' => '19700101 199503 1 002',
                 'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
@@ -34,6 +36,7 @@ class AgencyProfileController extends Controller
 
         return view('admin.agency_profile.edit', compact('profile', 'allAgencies'));
     }
+
 
     // Update the agency profile & upload logo
     public function update(Request $request)
