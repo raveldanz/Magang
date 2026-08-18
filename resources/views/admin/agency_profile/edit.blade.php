@@ -94,7 +94,7 @@
 
                     <!-- Upload Logo -->
                     <div class="mt-4 pt-4 border-t">
-                        <x-input-label for="logo" value="Logo Resmi Instansi (Untuk Kop Surat)" />
+                        <x-input-label for="logo" value="Logo Resmi Instansi" />
                         <div class="flex items-center space-x-4 mt-2">
                             <img src="{{ ($agencyProfile->logo ?? $profile->logo) ? asset('storage/' . ($agencyProfile->logo ?? $profile->logo)) : asset('images/logo-surabaya.png') }}" 
                                  alt="Logo {{ $agencyProfile->agency_name ?? $profile->agency_name }}" 
