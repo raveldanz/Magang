@@ -80,9 +80,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Administrator Utama',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
-                'agency_profile_id' => $agencies[0]->id,
+                'agency_profile_id' => null,
             ]
         );
+
 
         $adminDiskominfo = User::firstOrCreate(
             ['email' => 'admin.diskominfo@surabaya.go.id'],
