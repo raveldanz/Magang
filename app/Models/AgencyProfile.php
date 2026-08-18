@@ -12,4 +12,10 @@ class AgencyProfile extends Model
     {
         return $this->hasMany(Unit::class, 'agency_profile_id');
     }
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'agency_profile_id');
+    }
 }
+

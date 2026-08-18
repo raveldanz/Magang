@@ -25,9 +25,22 @@
                 </div>
             @endif
 
+            @if(isset($allAgencies) && $allAgencies->count() > 1)
+                <!-- Agency Switcher Tabs -->
+                <div class="flex flex-wrap gap-2 border-b pb-3">
+                    @foreach($allAgencies as $agency)
+                        <a href="{{ route('admin.agency_profile.edit', ['id' => $agency->id]) }}"
+                           class="px-4 py-2 text-sm font-semibold rounded-lg transition-colors {{ $profile->id === $agency->id ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200' }}">
+                            🏛️ {{ $agency->agency_name }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+
             <form action="{{ route('admin.agency_profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="agency_id" value="{{ $profile->id }}">
 
                 <!-- 1. KARTU INFORMASI INSTANSI & KOP SURAT -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
@@ -35,6 +48,7 @@
                         <span>🏛️</span>
                         <span>Identitas Pemerintah & Instansi Kerja</span>
                     </h3>
+
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>

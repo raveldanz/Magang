@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
                     'phone' => '(031) 5312144',
                     'email' => 'diskominfo@surabaya.go.id',
                     'website' => 'https://diskominfo.surabaya.go.id',
-                    'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
+                    'logo' => 'images/logos/diskominfo.png',
                     'signee_name' => 'Drs. H. M. NASER, M.Si',
                     'signee_nip' => '19700101 199503 1 002',
                     'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
                     'phone' => '(031) 8704207',
                     'email' => 'dispusip@surabaya.go.id',
                     'website' => 'https://dispusip.surabaya.go.id',
-                    'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
+                    'logo' => 'images/logos/dispusip.png',
                     'signee_name' => 'Ir. Mia Santi Dewi, M.Si',
                     'signee_nip' => '19680812 199403 2 007',
                     'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
                     'phone' => '(031) 5913222',
                     'email' => 'dispendukcapil@surabaya.go.id',
                     'website' => 'https://dispendukcapil.surabaya.go.id',
-                    'logo' => 'images/logos/7RAcyORc2Ze01RNCwhpqaWWhTYU5Hh3mU06AFGEF.jpg',
+                    'logo' => 'images/logos/dispendukcapil.png',
                     'signee_name' => 'Eddy Christijanto, Drs., M.Si',
                     'signee_nip' => '19670615 199303 1 005',
                     'signee_position' => 'Kepala Dinas Kependudukan dan Pencatatan Sipil',
@@ -73,15 +73,47 @@ class DatabaseSeeder extends Seeder
             ),
         ];
 
-        // 1. Seed User Admin Utama
-        $admin = User::firstOrCreate(
+        // 1. Seed User Admin (Utama & Masing-Masing Instansi Pemkot Surabaya)
+        $adminUtama = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Administrator Utama',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
+                'agency_profile_id' => $agencies[0]->id,
             ]
         );
+
+        $adminDiskominfo = User::firstOrCreate(
+            ['email' => 'admin.diskominfo@surabaya.go.id'],
+            [
+                'name' => 'Admin Diskominfo Surabaya',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'agency_profile_id' => $agencies[0]->id,
+            ]
+        );
+
+        $adminDispusip = User::firstOrCreate(
+            ['email' => 'admin.dispusip@surabaya.go.id'],
+            [
+                'name' => 'Admin Dispusip Surabaya',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'agency_profile_id' => $agencies[1]->id,
+            ]
+        );
+
+        $adminDispendukcapil = User::firstOrCreate(
+            ['email' => 'admin.dispendukcapil@surabaya.go.id'],
+            [
+                'name' => 'Admin Dispendukcapil Surabaya',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'agency_profile_id' => $agencies[2]->id,
+            ]
+        );
+
 
         // 2. SEED 6 AKUN PEMBIMBING LAPANGAN (ASN & PRAKTISI RESMI PEMKOT SURABAYA)
         $pembimbingData = [
