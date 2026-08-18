@@ -234,11 +234,14 @@
             $logoPath = storage_path('app/public/' . $agencyProfile->logo);
         } elseif (!empty($agencyProfile?->logo) && file_exists(public_path('storage/' . $agencyProfile->logo))) {
             $logoPath = public_path('storage/' . $agencyProfile->logo);
+        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path($agencyProfile->logo))) {
+            $logoPath = public_path($agencyProfile->logo);
         } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
             $logoPath = public_path('images/logo-surabaya.png');
         } elseif (file_exists(public_path('images/logo.png'))) {
             $logoPath = public_path('images/logo.png');
         }
+
 
         $logoData = $logoPath ? @file_get_contents($logoPath) : '';
         $mime = ($logoPath && function_exists('mime_content_type')) ? (@mime_content_type($logoPath) ?: 'image/png') : 'image/png';
