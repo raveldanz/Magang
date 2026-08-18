@@ -29,15 +29,24 @@
                             optional(optional($application->placement)->finalreport)->status === 'approved';
             @endphp
 
-            <!-- Banner Kelulusan -->
+            <!-- Banner Kelulusan & Unduh E-Sertifikat -->
             @if ($isPassed)
-            <div class="bg-gradient-to-r from-green-400 to-emerald-600 rounded-lg p-6 text-white shadow-lg flex items-center space-x-4">
-                <div class="p-3 bg-white bg-opacity-20 rounded-full">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="bg-gradient-to-r from-green-500 to-emerald-700 rounded-xl p-6 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-white bg-opacity-20 rounded-full shadow-inner">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold">🎉 Selamat! Anda telah menyelesaikan seluruh rangkaian magang.</h3>
+                        <p class="text-green-100 mt-1 text-sm">Laporan akhir Anda telah disetujui dan penilaian telah lengkap. Anda dapat mengunduh E-Sertifikat resmi.</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-xl font-bold">🎉 Selamat! Anda telah menyelesaikan seluruh rangkaian magang.</h3>
-                    <p class="text-green-100 mt-1">Laporan akhir Anda telah disetujui dan penilaian telah diberikan. Sertifikat kelulusan Anda sedang diproses oleh Admin.</p>
+                <div class="flex-shrink-0">
+                    <a href="{{ route('student.certificate.download', $application->placement->id) }}" 
+                       class="inline-flex items-center space-x-2 px-5 py-2.5 bg-white text-emerald-800 font-extrabold text-sm rounded-lg shadow-md hover:bg-emerald-50 hover:shadow-lg transition transform hover:-translate-y-0.5">
+                        <span>📜</span>
+                        <span>Unduh E-Sertifikat</span>
+                    </a>
                 </div>
             </div>
             @endif

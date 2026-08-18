@@ -33,18 +33,17 @@ Route::get('/dashboard', function () {
 
 // Route Publik Verifikasi QR Code Surat Balasan (Bisa di-scan oleh siapa saja tanpa login)
 Route::get('/verify-letter/{id}', function ($id) {
-    $application = \App\Models\Application::with(['user.studentProfile', 'unit', 'placement.pembimbing'])
+    $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
         ->where('status', 'accepted')
         ->findOrFail($id);
     return view('verify_letter', compact('application'));
 })->name('verify.letter');
 
-// Route Publik Verifikasi QR Code Sertifikat Magang
+// Route Publik Verifikasi QR Code Sertifikat Magang (Bisa di-scan oleh siapa saja tanpa login)
 Route::get('/verify-certificate/{id}', function ($id) {
-    $placement = \App\Models\Placement::with(['application.user.studentProfile', 'application.unit', 'evaluation', 'pembimbing'])
+    $placement = \App\Models\Placement::with(['application.user.studentProfile', 'application.unit.agencyProfile', 'evaluation', 'pembimbing'])
         ->findOrFail($id);
-    $application = $placement->application;
-    return view('verify_letter', compact('application', 'placement'));
+    return view('verify_certificate', compact('placement'));
 })->name('verify.certificate');
 
 Route::middleware('auth')->group(function () {
@@ -75,9 +74,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/student/logbook/{id}', [StudentLogbookController::class, 'update'])->name('student.logbook.update');
         Route::delete('/student/logbook/{id}', [StudentLogbookController::class, 'destroy'])->name('student.logbook.destroy');
 
+        // Laporan Akhir & E-Sertifikat
         Route::get('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'index'])->name('student.final_report.index');
         Route::post('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'store'])->name('student.final_report.store');
+        Route::get('/student/certificate/{placementId}/download', [\App\Http\Controllers\Student\CertificateController::class, 'download'])->name('student.certificate.download');
     });
+
 
     // ==========================================
     // 2. ROUTE KHUSUS ADMIN

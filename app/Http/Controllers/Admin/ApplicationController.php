@@ -7,12 +7,15 @@ use App\Models\Application;
 use App\Models\Placement;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ApplicationController extends Controller
 {
-    // Menampilkan semua daftar pengajuan magang masuk (dengan Search, Filter, Eager Loading & Paginasi)
+    // Menampilkan semua daftar pengajuan magang masuk (dengan Multi-Tenant Scoping, Search, Filter, Eager Loading & Paginasi)
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $query = Application::with([
             'user.studentProfile', 
             'unit.agencyProfile', 
@@ -21,6 +24,13 @@ class ApplicationController extends Controller
             'placement.finalreport',
             'placement.pembimbing'
         ])->latest();
+
+        // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
+        if ($user && $user->agency_profile_id !== null) {
+            $query->whereHas('unit', function ($q) use ($user) {
+                $q->where('agency_profile_id', $user->agency_profile_id);
+            });
+        }
 
         // 1. Pencarian berdasarkan Nama Mahasiswa, NIM, atau Universitas
         if ($request->filled('search')) {
@@ -48,12 +58,19 @@ class ApplicationController extends Controller
     // Detail pengajuan magang & dokumen
     public function show($id)
     {
+        $user = Auth::user();
+
         $application = Application::with([
             'user.studentProfile', 
             'unit.agencyProfile', 
             'documents', 
             'placement.pembimbing'
         ])->findOrFail($id);
+
+        // Multi-Tenant Authorization Check
+        if ($user && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
+        }
         
         $pembimbings = User::where('role', 'pembimbing')->get(); // Untuk dropdown penempatan
         return view('admin.applications.show', compact('application', 'pembimbings'));
@@ -62,6 +79,8 @@ class ApplicationController extends Controller
     // Update status pengajuan (Verifikasi / Seleksi)
     public function updateStatus(Request $request, $id)
     {
+        $user = Auth::user();
+
         $statusInput = strtolower($request->status);
         $request->merge(['status' => $statusInput]);
 
@@ -73,7 +92,12 @@ class ApplicationController extends Controller
             'letter_date' => 'nullable|date',
         ]);
 
-        $application = Application::findOrFail($id);
+        $application = Application::with('unit')->findOrFail($id);
+
+        // Multi-Tenant Authorization Check
+        if ($user && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
+        }
         
         $application->update([
             'status' => $request->status,
@@ -95,6 +119,8 @@ class ApplicationController extends Controller
     // Cetak / Pratinjau Surat Balasan Penerimaan untuk Admin
     public function downloadLetter($id)
     {
+        $user = Auth::user();
+
         $application = Application::with([
             'user.studentProfile', 
             'unit.agencyProfile', 
@@ -102,6 +128,11 @@ class ApplicationController extends Controller
         ])
             ->where('status', 'accepted')
             ->findOrFail($id);
+
+        // Multi-Tenant Authorization Check
+        if ($user && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke surat pengajuan instansi lain.');
+        }
 
         return view('letters.acceptance', compact('application'));
     }

@@ -8,15 +8,18 @@ use App\Models\Application;
 use App\Models\Placement;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
 {
-    // Menampilkan daftar mahasiswa yang siap cetak sertifikat
+    // Menampilkan daftar mahasiswa yang siap cetak sertifikat (Multi-Tenant Scoped)
     public function index()
     {
+        $user = Auth::user();
+
         // Ambil aplikasi yang sudah accepted, punya placement, nilai lengkap, dan laporan disetujui
-        $applications = Application::with([
+        $query = Application::with([
             'user.studentProfile', 
             'unit.agencyProfile', 
             'placement.evaluation', 
@@ -29,8 +32,16 @@ class CertificateController extends Controller
                       ->whereHas('finalreport', function ($subQuery) {
                           $subQuery->where('status', 'approved');
                       });
-            })
-            ->get();
+            });
+
+        // Multi-Tenant Isolation: Admin instansi hanya melihat sertifikat pada unit instansinya sendiri
+        if ($user && $user->agency_profile_id !== null) {
+            $query->whereHas('unit', function ($q) use ($user) {
+                $q->where('agency_profile_id', $user->agency_profile_id);
+            });
+        }
+
+        $applications = $query->get();
 
         return view('admin.certificates.index', compact('applications'));
     }
@@ -38,6 +49,8 @@ class CertificateController extends Controller
     // Pratinjau Sertifikat (HTML view)
     public function show($placementId)
     {
+        $user = Auth::user();
+
         $placement = Placement::with([
             'application.user.studentProfile', 
             'application.unit.agencyProfile', 
@@ -45,11 +58,16 @@ class CertificateController extends Controller
             'pembimbing'
         ])->findOrFail($placementId);
 
+        // Multi-Tenant Authorization Check
+        if ($user && $user->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke data sertifikat instansi lain.');
+        }
+
         if (!$placement->evaluation) {
             return redirect()->back()->with('error', 'Penilaian belum lengkap!');
         }
 
-        // Ambil profil instansi murni dari relasi placement/unit mahasiswa (bukan dari Auth::user())
+        // Ambil profil instansi murni dari relasi placement/unit mahasiswa
         $agencyProfile = $placement->application?->unit?->agencyProfile 
             ?? $placement->agencyProfile 
             ?? AgencyProfile::first();
@@ -89,6 +107,8 @@ class CertificateController extends Controller
     // Generate & Download PDF Sertifikat
     public function generate($placementId)
     {
+        $user = Auth::user();
+
         $placement = Placement::with([
             'application.user.studentProfile', 
             'application.unit.agencyProfile', 
@@ -96,11 +116,16 @@ class CertificateController extends Controller
             'pembimbing'
         ])->findOrFail($placementId);
 
+        // Multi-Tenant Authorization Check
+        if ($user && $user->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengunduh sertifikat instansi lain.');
+        }
+
         if (!$placement->evaluation) {
             return redirect()->back()->with('error', 'Penilaian belum lengkap!');
         }
 
-        // Ambil profil instansi murni dari relasi placement/unit mahasiswa (bukan dari Auth::user())
+        // Ambil profil instansi murni dari relasi placement/unit mahasiswa
         $agencyProfile = $placement->application?->unit?->agencyProfile 
             ?? $placement->agencyProfile 
             ?? AgencyProfile::first();
@@ -142,3 +167,4 @@ class CertificateController extends Controller
         return $pdf->download($filename);
     }
 }
+

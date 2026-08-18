@@ -1,9 +1,10 @@
 <x-guest-layout>
     @php
-        $agency = \App\Models\AgencyProfile::first();
+        $agency = $application->unit?->agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
         $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
     @endphp
+
 
     <div class="py-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl rounded-2xl p-6 border-t-8 border-green-500">
