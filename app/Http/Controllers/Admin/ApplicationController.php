@@ -49,10 +49,26 @@ class ApplicationController extends Controller
             $query->where('status', strtolower($request->status));
         }
 
-        // 3. Paginasi 10 Data Per Halaman
+        // 3. Filter Berdasarkan Unit / Divisi Kerja
+        if ($request->filled('unit_id')) {
+            $query->where('unit_id', $request->unit_id);
+        }
+
+        // Query Unit untuk Filter Dropdown (Scoped per instansi untuk Admin Dinas, atau All untuk Superadmin)
+        if ($user && $user->agency_profile_id !== null) {
+            $units = \App\Models\Unit::where('agency_profile_id', $user->agency_profile_id)->get();
+            $groupedUnits = null;
+        } else {
+            $units = \App\Models\Unit::with('agencyProfile')->get();
+            $groupedUnits = $units->groupBy(function ($u) {
+                return $u->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya';
+            });
+        }
+
+        // 4. Paginasi 10 Data Per Halaman
         $applications = $query->paginate(10)->withQueryString();
 
-        return view('admin.applications.index', compact('applications'));
+        return view('admin.applications.index', compact('applications', 'units', 'groupedUnits'));
     }
 
     // Detail pengajuan magang & dokumen

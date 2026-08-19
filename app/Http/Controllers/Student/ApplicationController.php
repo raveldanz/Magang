@@ -13,30 +13,34 @@ class ApplicationController extends Controller
 {
     // Menampilkan halaman form pengajuan magang
     public function create()
-{
-    $units = Unit::all();
-    $user = Auth::user();
+    {
+        $units = Unit::with('agencyProfile')->get();
+        $groupedUnits = $units->groupBy(function ($unit) {
+            return $unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya';
+        });
 
-    // 1. Cek apakah mahasiswa sudah punya profil
-    if (!$user->studentProfile) {
-        return redirect()->route('student.profile.edit')
-            ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
+        $user = Auth::user();
+
+        // 1. Cek apakah mahasiswa sudah punya profil
+        if (!$user->studentProfile) {
+            return redirect()->route('student.profile.edit')
+                ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
+        }
+
+        // 2. Cek apakah ada pengajuan yang SANGAT AKTIF (masih PENDING)
+        // Jika masih ada yang diproses, mahasiswa tidak boleh buat pengajuan baru dulu
+        $activeApplication = Application::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        // 3. Ambil SELURUH riwayat pengajuan mahasiswa ini (urutkan dari yang terbaru)
+        $applicationHistory = Application::with('unit.agencyProfile')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        return view('student.application.create', compact('units', 'groupedUnits', 'activeApplication', 'applicationHistory'));
     }
-
-    // 2. Cek apakah ada pengajuan yang SANGAT AKTIF (masih PENDING)
-    // Jika masih ada yang diproses, mahasiswa tidak boleh buat pengajuan baru dulu
-    $activeApplication = Application::where('user_id', $user->id)
-        ->where('status', 'pending')
-        ->first();
-
-    // 3. Ambil SELURUH riwayat pengajuan mahasiswa ini (urutkan dari yang terbaru)
-    $applicationHistory = Application::with('unit')
-        ->where('user_id', $user->id)
-        ->latest()
-        ->get();
-
-    return view('student.application.create', compact('units', 'activeApplication', 'applicationHistory'));
-}
 
     // Menyimpan data pengajuan magang & upload dokumen
     public function store(Request $request)

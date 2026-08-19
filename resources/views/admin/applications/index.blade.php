@@ -16,8 +16,31 @@
                             placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-sm" />
                     </div>
 
-                    <div class="w-full md:w-auto flex items-center space-x-3">
-                        <select name="status" class="text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                    <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
+                        <!-- Filter Unit / Divisi -->
+                        <select name="unit_id" class="text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            <option value="">-- Semua Unit/Divisi --</option>
+                            @if (isset($groupedUnits) && $groupedUnits !== null)
+                                @foreach ($groupedUnits as $agencyName => $agencyUnits)
+                                    <optgroup label="🏛️ {{ $agencyName }}">
+                                        @foreach ($agencyUnits as $u)
+                                            <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                                {{ $u->name }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            @elseif(isset($units))
+                                @foreach ($units as $u)
+                                    <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                        {{ $u->name }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+
+                        <!-- Filter Status -->
+                        <select name="status" class="text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                             <option value="">-- Semua Status --</option>
                             <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING</option>
                             <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED</option>
@@ -29,7 +52,7 @@
                             🔍 Filter
                         </x-primary-button>
 
-                        @if(request('search') || request('status'))
+                        @if(request('search') || request('status') || request('unit_id'))
                             <a href="{{ route('admin.applications.index') }}">
                                 <x-secondary-button type="button" class="text-xs">
                                     Reset

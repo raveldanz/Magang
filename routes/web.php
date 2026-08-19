@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController; 
 use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
+use App\Http\Controllers\Admin\UnitController as AdminUnitController;
 use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
@@ -106,6 +107,17 @@ Route::middleware('auth')->group(function () {
         // Pengaturan Profil Instansi & TTD Surat
         Route::get('/admin/agency-profile', [AdminAgencyProfileController::class, 'edit'])->name('admin.agency_profile.edit');
         Route::match(['put', 'patch', 'post'], '/admin/agency-profile', [AdminAgencyProfileController::class, 'update'])->name('admin.agency_profile.update');
+
+        // Manajemen Master Unit & Kuota Magang
+        Route::resource('/admin/units', AdminUnitController::class)->names([
+            'index' => 'admin.units.index',
+            'create' => 'admin.units.create',
+            'store' => 'admin.units.store',
+            'edit' => 'admin.units.edit',
+            'update' => 'admin.units.update',
+            'destroy' => 'admin.units.destroy',
+        ]);
+        Route::patch('/admin/units/{id}/quota', [AdminUnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
     });
 
     // ==========================================
