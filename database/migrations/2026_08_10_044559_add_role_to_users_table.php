@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Tambahkan baris ini untuk membuat kolom role
-            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing'])
+            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor'])
                   ->default('mahasiswa')
                   ->after('email');
         });

@@ -76,7 +76,7 @@
                     </div>
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Pembimbing Lapangan:</span>
-                        <span class="font-semibold text-gray-800">{{ $placement->pembimbing->name ?? '-' }}</span>
+                        <span class="font-semibold text-gray-800">{{ $placement->mentor->name ?? $placement->pembimbing->name ?? '-' }}</span>
                     </div>
                     <div class="flex justify-between py-2">
                         <span class="text-gray-500 font-medium">Pejabat Pengesah:</span>

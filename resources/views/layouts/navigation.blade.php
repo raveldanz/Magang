@@ -32,10 +32,14 @@
                         </x-nav-link>
                     @endif
 
-                    <!-- 2. MENU PEMBIMBING -->
-                    @if (Auth::user()->role === 'pembimbing')
-                        <x-nav-link :href="route('pembimbing.dashboard')" :active="request()->routeIs('pembimbing.*')">
-                            {{ __('Dashboard Pembimbing') }}
+                    <!-- 2. MENU PEMBIMBING LAPANGAN (MENTOR) -->
+                    @if (Auth::user()->role === 'mentor' || Auth::user()->role === 'pembimbing')
+                        <x-nav-link :href="route('mentor.dashboard')" :active="request()->routeIs('mentor.dashboard') || request()->routeIs('mentor.students.*') || request()->routeIs('mentor.evaluations.*')">
+                            {{ __('Portal Pembimbing (Mentor)') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('mentor.logbooks.index')" :active="request()->routeIs('mentor.logbooks.*')">
+                            {{ __('Review Logbook Mahasiswa') }}
                         </x-nav-link>
                     @endif
 
@@ -127,9 +131,12 @@
                 <x-responsive-nav-link :href="route('student.logbook.index')" :active="request()->routeIs('student.logbook.*')">
                     {{ __('Logbook Magang') }}
                 </x-responsive-nav-link>
-            @elseif (Auth::user()->role === 'pembimbing')
-                <x-responsive-nav-link :href="route('pembimbing.dashboard')" :active="request()->routeIs('pembimbing.*')">
-                    {{ __('Dashboard Pembimbing') }}
+            @elseif (Auth::user()->role === 'mentor' || Auth::user()->role === 'pembimbing')
+                <x-responsive-nav-link :href="route('mentor.dashboard')" :active="request()->routeIs('mentor.dashboard') || request()->routeIs('mentor.students.*') || request()->routeIs('mentor.evaluations.*')">
+                    {{ __('Portal Pembimbing (Mentor)') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('mentor.logbooks.index')" :active="request()->routeIs('mentor.logbooks.*')">
+                    {{ __('Review Logbook Mahasiswa') }}
                 </x-responsive-nav-link>
             @elseif (Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
