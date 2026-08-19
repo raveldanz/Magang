@@ -46,12 +46,12 @@
                     <!-- 3. MENU ADMIN -->
                     @if (Auth::user()?->role === 'admin')
                         <x-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
-                            {{ __('Verifikasi Magang (Admin)') }}
+                            {{ __('Verifikasi Magang') }}
                         </x-nav-link>
 
                         @if (Route::has('admin.logbooks.index'))
                             <x-nav-link :href="route('admin.logbooks.index')" :active="request()->routeIs('admin.logbooks.*')">
-                                {{ __('Review Logbook (Admin)') }}
+                                {{ __('Review Logbook') }}
                             </x-nav-link>
                         @endif
 
@@ -163,7 +163,7 @@
                 </x-responsive-nav-link>
             @elseif (Auth::user()?->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
-                    {{ __('Verifikasi Magang (Admin)') }}
+                    {{ __('Verifikasi Magang') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.units.index')" :active="request()->routeIs('admin.units.*')">
                     {{ __('Manajemen Unit & Kuota') }}
