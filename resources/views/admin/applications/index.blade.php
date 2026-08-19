@@ -9,56 +9,65 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 
-                <!-- Form Filter & Search -->
-                <form method="GET" action="{{ route('admin.applications.index') }}" class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <div class="w-full md:w-1/2 flex items-center space-x-2">
-                        <x-text-input type="text" name="search" value="{{ request('search') }}" 
-                            placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-sm" />
-                    </div>
+                <!-- Form Filter & Search (Responsive Single-Row Flex Layout) -->
+                <form method="GET" action="{{ route('admin.applications.index') }}" class="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div class="flex flex-col lg:flex-row items-center gap-3">
+                        <!-- Input Search (flex-1) -->
+                        <div class="flex-1 w-full">
+                            <x-text-input type="text" name="search" value="{{ request('search') }}" 
+                                placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-sm h-10" />
+                        </div>
 
-                    <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
-                        <!-- Filter Unit / Divisi -->
-                        <select name="unit_id" class="text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                            <option value="">-- Semua Unit/Divisi --</option>
-                            @if (isset($groupedUnits) && $groupedUnits !== null)
-                                @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                    <optgroup label="🏛️ {{ $agencyName }}">
-                                        @foreach ($agencyUnits as $u)
-                                            <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
-                                                {{ $u->name }}
-                                            </option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
-                            @elseif(isset($units))
-                                @foreach ($units as $u)
-                                    <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
-                                        {{ $u->name }}
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
+                        <!-- Filter Unit / Divisi (w-64) -->
+                        <div class="w-full lg:w-64">
+                            <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">-- Semua Unit/Divisi --</option>
+                                @if (isset($groupedUnits) && $groupedUnits !== null)
+                                    @foreach ($groupedUnits as $agencyName => $agencyUnits)
+                                        <optgroup label="🏛️ {{ $agencyName }}">
+                                            @foreach ($agencyUnits as $u)
+                                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                                    {{ $u->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                @elseif(isset($units))
+                                    @foreach ($units as $u)
+                                        <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                            {{ $u->name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
 
-                        <!-- Filter Status -->
-                        <select name="status" class="text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                            <option value="">-- Semua Status --</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING</option>
-                            <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED</option>
-                            <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>ACCEPTED</option>
-                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>REJECTED</option>
-                        </select>
+                        <!-- Filter Status (w-44) -->
+                        <div class="w-full lg:w-44">
+                            <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">-- Semua Status --</option>
+                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING</option>
+                                <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED</option>
+                                <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>ACCEPTED</option>
+                                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>REJECTED</option>
+                            </select>
+                        </div>
 
-                        <x-primary-button type="submit" class="text-xs">
-                            🔍 Filter
-                        </x-primary-button>
+                        <!-- Action Buttons (Height 10 uniform) -->
+                        <div class="flex items-center gap-2 w-full lg:w-auto shrink-0">
+                            <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-4 h-10 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition w-full lg:w-auto">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span>Filter</span>
+                            </button>
 
-                        @if(request('search') || request('status') || request('unit_id'))
-                            <a href="{{ route('admin.applications.index') }}">
-                                <x-secondary-button type="button" class="text-xs">
+                            @if(request('search') || request('status') || request('unit_id'))
+                                <a href="{{ route('admin.applications.index') }}" class="inline-flex items-center justify-center px-4 h-10 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-lg shadow-sm transition">
                                     Reset
-                                </x-secondary-button>
-                            </a>
-                        @endif
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </form>
 
@@ -82,9 +91,11 @@
                                         {{ $app->created_at->format('d M Y, H:i') }}
                                     </td>
                                     <td class="p-3 font-semibold text-gray-900">
-                                        {{ $app->user->name }}
+                                        <div class="leading-snug">{{ $app->user->name }}</div>
                                         @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
-                                            <br><span class="px-2 py-0.5 mt-1 inline-block text-[10px] font-bold bg-purple-100 text-purple-800 rounded-full border border-purple-300">🎉 SIAP CETAK SERTIFIKAT</span>
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-purple-100 text-purple-800 border border-purple-200">
+                                                🎉 SIAP CETAK SERTIFIKAT
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="p-3 text-gray-600">{{ $app->user->studentProfile->universitas ?? '-' }} <br><span class="text-xs text-gray-400">({{ $app->user->studentProfile->jurusan ?? '-' }})</span></td>
