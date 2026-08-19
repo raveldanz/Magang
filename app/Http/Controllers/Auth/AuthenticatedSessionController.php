@@ -38,6 +38,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('mentor.dashboard');
         }
 
+        if ($user->role === 'dosen' || $user->role === 'academic_advisor') {
+            return redirect()->route('lecturer.dashboard');
+        }
+
         if ($user->role === 'mahasiswa') {
             if (!$user->studentProfile) {
                 return redirect()->route('student.profile.edit')->with('warning', 'Silakan lengkapi profil Anda terlebih dahulu');
