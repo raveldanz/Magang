@@ -10,6 +10,7 @@ use App\Models\Application;
 use App\Models\Placement;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
+use App\Models\Logbook;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -84,7 +85,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-
         $adminDiskominfo = User::firstOrCreate(
             ['email' => 'admin.diskominfo@surabaya.go.id'],
             [
@@ -115,43 +115,86 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // 2. SEED CONTOH AKUN PEMBIMBING LAPANGAN (MENTOR) RESMI MULTI-INSTANSI
+        $mentorDiskominfo = User::firstOrCreate(
+            ['email' => 'mentor.diskominfo@surabaya.go.id'],
+            [
+                'name' => 'Mentor Diskominfo Surabaya (Retno Mumpuni, S.Kom., M.Sc)',
+                'password' => Hash::make('password'),
+                'role' => 'mentor',
+                'agency_profile_id' => $agencies[0]->id,
+            ]
+        );
 
-        // 2. SEED 6 AKUN PEMBIMBING LAPANGAN (ASN & PRAKTISI RESMI PEMKOT SURABAYA)
+        $mentorDispusip = User::firstOrCreate(
+            ['email' => 'mentor.dispusip@surabaya.go.id'],
+            [
+                'name' => 'Mentor Dispusip Surabaya (Budi Santoso, S.ST., M.MT)',
+                'password' => Hash::make('password'),
+                'role' => 'mentor',
+                'agency_profile_id' => $agencies[1]->id,
+            ]
+        );
+
+        $mentorDispendukcapil = User::firstOrCreate(
+            ['email' => 'mentor.dispendukcapil@surabaya.go.id'],
+            [
+                'name' => 'Mentor Dispendukcapil Surabaya (Hendra Wijaya, S.Kom., M.Eng)',
+                'password' => Hash::make('password'),
+                'role' => 'mentor',
+                'agency_profile_id' => $agencies[2]->id,
+            ]
+        );
+
+        $agencyMentors = [
+            $agencies[0]->id => $mentorDiskominfo,
+            $agencies[1]->id => $mentorDispusip,
+            $agencies[2]->id => $mentorDispendukcapil,
+        ];
+
+        // Seed 6 Akun Pembimbing Lapangan Tambahan
         $pembimbingData = [
             [
                 'name' => 'Retno Mumpuni, S.Kom., M.Sc',
                 'email' => 'retnomumpuni.if@upnjatim.ac.id',
+                'agency_profile_id' => $agencies[0]->id,
             ],
             [
                 'name' => 'Budi Santoso, S.ST., M.MT',
                 'email' => 'budi.santoso@surabaya.go.id',
+                'agency_profile_id' => $agencies[1]->id,
             ],
             [
                 'name' => 'Ir. Siti Aminah, M.Kom',
                 'email' => 'siti.aminah@surabaya.go.id',
+                'agency_profile_id' => $agencies[0]->id,
             ],
             [
                 'name' => 'Hendra Wijaya, S.Kom., M.Eng',
                 'email' => 'hendra.wijaya@surabaya.go.id',
+                'agency_profile_id' => $agencies[2]->id,
             ],
             [
                 'name' => 'Tri Wahyuni, S.T., M.Sc',
                 'email' => 'tri.wahyuni@surabaya.go.id',
+                'agency_profile_id' => $agencies[1]->id,
             ],
             [
                 'name' => 'M. Arif Rahman, S.Kom., M.MT',
                 'email' => 'arif.rahman@surabaya.go.id',
+                'agency_profile_id' => $agencies[2]->id,
             ],
         ];
 
-        $pembimbings = [];
+        $pembimbings = [$mentorDiskominfo, $mentorDispusip, $mentorDispendukcapil];
         foreach ($pembimbingData as $pData) {
             $pembimbings[] = User::firstOrCreate(
                 ['email' => $pData['email']],
                 [
                     'name' => $pData['name'],
                     'password' => Hash::make('pembimbing123'),
-                    'role' => 'pembimbing',
+                    'role' => 'mentor',
+                    'agency_profile_id' => $pData['agency_profile_id'],
                 ]
             );
         }
@@ -416,15 +459,39 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // E. Buat Placement dengan Pembimbing Terdistribusi
+            // E. Buat Placement dengan Pembimbing/Mentor Terdistribusi
             $placement = Placement::firstOrCreate(
                 ['application_id' => $application->id],
                 [
+                    'mentor_id' => $assignedPembimbing->id,
                     'pembimbing_id' => $assignedPembimbing->id,
                 ]
             );
 
-            // F. Buat Laporan Akhir (Approved)
+            // F. Buat Logbook Kegiatan Magang (Untuk sampel review mentor)
+            $logActivities = [
+                'Melakukan perancangan antarmuka pengguna (UI/UX) dan wireframe portal layanan publik.',
+                'Mengembangkan modul otentikasi multi-peran dan integrasi API basis data dinas.',
+                'Melakukan pengujian fungsional modul logbook, verifikasi berkas, dan perbaikan bug.',
+                'Menyusun dokumentasi teknis sistem, standarisasi TTE BSrE, dan arsitektur database.',
+            ];
+
+            foreach ($logActivities as $logIndex => $activityText) {
+                Logbook::firstOrCreate(
+                    [
+                        'placement_id' => $placement->id,
+                        'date' => Carbon::now()->subDays(15 - ($logIndex * 3))->format('Y-m-d'),
+                    ],
+                    [
+                        'activity' => $activityText,
+                        'attachment' => null,
+                        'status' => $logIndex === 0 ? 'approved' : ($logIndex === 3 ? 'pending' : 'approved'),
+                        'feedback' => $logIndex === 0 ? 'Kegiatan terverifikasi dengan sangat baik.' : null,
+                    ]
+                );
+            }
+
+            // G. Buat Laporan Akhir (Approved)
             FinalReport::firstOrCreate(
                 ['placement_id' => $placement->id],
                 [
@@ -434,21 +501,24 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // G. Buat Penilaian Evaluasi (Nilai 80 - 98)
-            $disiplin = rand(82, 96);
-            $kinerja = rand(85, 98);
-            $laporan = rand(80, 95);
-            $catatan = $evaluationNotes[$index % count($evaluationNotes)];
+            // H. Buat Penilaian Evaluasi (Sebagian sudah dinilai, sebagian belum untuk testing)
+            // Biarkan 2 mahasiswa terakhir belum dinilai agar form evaluasi dapat langsung diuji
+            if ($index < 8) {
+                $disiplin = rand(85, 96);
+                $kinerja = rand(88, 98);
+                $laporan = rand(84, 95);
+                $catatan = $evaluationNotes[$index % count($evaluationNotes)];
 
-            Evaluation::firstOrCreate(
-                ['placement_id' => $placement->id],
-                [
-                    'nilai_disiplin' => $disiplin,
-                    'nilai_kinerja' => $kinerja,
-                    'nilai_laporan' => $laporan,
-                    'catatan' => $catatan,
-                ]
-            );
+                Evaluation::firstOrCreate(
+                    ['placement_id' => $placement->id],
+                    [
+                        'nilai_disiplin' => $disiplin,
+                        'nilai_kinerja' => $kinerja,
+                        'nilai_laporan' => $laporan,
+                        'catatan' => $catatan,
+                    ]
+                );
+            }
         }
     }
 }

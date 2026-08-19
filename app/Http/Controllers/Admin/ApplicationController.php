@@ -72,7 +72,15 @@ class ApplicationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
         }
         
-        $pembimbings = User::where('role', 'pembimbing')->get(); // Untuk dropdown penempatan
+        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing']);
+        if ($user && $user->agency_profile_id !== null) {
+            $pembimbingQuery->where(function ($q) use ($user) {
+                $q->where('agency_profile_id', $user->agency_profile_id)
+                  ->orWhereNull('agency_profile_id');
+            });
+        }
+        $pembimbings = $pembimbingQuery->get(); // Untuk dropdown penempatan pembimbing/mentor
+
         return view('admin.applications.show', compact('application', 'pembimbings'));
     }
 
@@ -87,6 +95,7 @@ class ApplicationController extends Controller
         $request->validate([
             'status' => 'required|in:pending,verified,accepted,rejected',
             'rejection_note' => 'nullable|string',
+            'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'letter_number' => 'nullable|string|max:100',
             'letter_date' => 'nullable|date',
@@ -106,10 +115,15 @@ class ApplicationController extends Controller
             'letter_date' => $request->status === 'accepted' ? $request->letter_date : null,
         ]);
 
-        if ($request->status === 'accepted' && $request->pembimbing_id) {
+        $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
+
+        if ($request->status === 'accepted' && $assignedMentorId) {
             Placement::updateOrCreate(
                 ['application_id' => $application->id],
-                ['pembimbing_id' => $request->pembimbing_id]
+                [
+                    'mentor_id' => $assignedMentorId,
+                    'pembimbing_id' => $assignedMentorId,
+                ]
             );
         }
 

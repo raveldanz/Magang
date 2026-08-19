@@ -23,6 +23,7 @@ class CertificateController extends Controller
             'application.unit.agencyProfile',
             'evaluation',
             'finalreport',
+            'mentor',
             'pembimbing'
         ])
             ->where('id', $placementId)
@@ -45,7 +46,7 @@ class CertificateController extends Controller
         $profile = $student->studentProfile;
         $eval = $placement->evaluation;
         $unit = $placement->application->unit;
-        $pembimbing = $placement->pembimbing;
+        $pembimbing = $placement->mentor ?? $placement->pembimbing;
 
         // Hitung rata-rata & grade
         $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
