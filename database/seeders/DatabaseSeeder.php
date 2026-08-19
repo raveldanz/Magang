@@ -186,6 +186,27 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
+        // 2B. SEED AKUN RESMI DOSEN PEMBIMBING LAPANGAN KAMPUS (DPL)
+        $dosenUnitomo = User::firstOrCreate(
+            ['email' => 'dosen.unitomo@unitomo.ac.id'],
+            [
+                'name' => 'Dr. Ir. Bambang Supriyadi, M.Kom (DPL Unitomo)',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university' => 'Universitas Dr. Soetomo',
+            ]
+        );
+
+        $dosenUnesa = User::firstOrCreate(
+            ['email' => 'dosen.unesa@unesa.ac.id'],
+            [
+                'name' => 'Dr. Erina Nur Azizah, S.Kom., M.Cs (DPL Unesa)',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university' => 'Universitas Negeri Surabaya',
+            ]
+        );
+
         $pembimbings = [$mentorDiskominfo, $mentorDispusip, $mentorDispendukcapil];
         foreach ($pembimbingData as $pData) {
             $pembimbings[] = User::firstOrCreate(
@@ -341,39 +362,43 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT DAN PEMBIMBING BERAGAM MULTI-INSTANSI
+        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT, PEMBIMBING DINAS & DOSEN KAMPUS
         $graduatedStudents = [
             [
                 'name' => 'Ahmad Fauzi',
-                'email' => 'ahmad.fauzi@mhs.unair.ac.id',
+                'email' => 'ahmad.fauzi@mhs.unitomo.ac.id',
                 'nim' => '22081010011',
-                'universitas' => 'Universitas Airlangga',
-                'jurusan' => 'Sistem Informasi',
+                'universitas' => 'Universitas Dr. Soetomo',
+                'jurusan' => 'Informatika',
                 'phone' => '081234560011',
+                'dosen' => $dosenUnitomo,
             ],
             [
                 'name' => 'Nabila Putri Pratama',
-                'email' => 'nabila.putri@mhs.upnjatim.ac.id',
+                'email' => 'nabila.putri@mhs.unesa.ac.id',
                 'nim' => '22081010012',
-                'universitas' => 'UPN Veteran Jawa Timur',
-                'jurusan' => 'Informatika',
+                'universitas' => 'Universitas Negeri Surabaya',
+                'jurusan' => 'Sistem Informasi',
                 'phone' => '081234560012',
+                'dosen' => $dosenUnesa,
             ],
             [
                 'name' => 'Rizky Ramadhan',
-                'email' => 'rizky.ramadhan@mhs.its.ac.id',
+                'email' => 'rizky.ramadhan@mhs.unitomo.ac.id',
                 'nim' => '22081010013',
-                'universitas' => 'Institut Teknologi Sepuluh Nopember',
+                'universitas' => 'Universitas Dr. Soetomo',
                 'jurusan' => 'Teknik Informatika',
                 'phone' => '081234560013',
+                'dosen' => $dosenUnitomo,
             ],
             [
                 'name' => 'Anisa Rahmawati',
-                'email' => 'anisa.rahma@mhs.ub.ac.id',
+                'email' => 'anisa.rahma@mhs.unesa.ac.id',
                 'nim' => '22081010014',
-                'universitas' => 'Universitas Brawijaya',
+                'universitas' => 'Universitas Negeri Surabaya',
                 'jurusan' => 'Teknologi Informasi',
                 'phone' => '081234560014',
+                'dosen' => $dosenUnesa,
             ],
             [
                 'name' => 'Fajar Dwi Santoso',
@@ -382,46 +407,52 @@ class DatabaseSeeder extends Seeder
                 'universitas' => 'Universitas Negeri Surabaya',
                 'jurusan' => 'Teknik Informatika',
                 'phone' => '081234560015',
+                'dosen' => $dosenUnesa,
             ],
             [
                 'name' => 'Dewi Anggraini',
-                'email' => 'dewi.anggraini@mhs.dinamika.ac.id',
+                'email' => 'dewi.anggraini@mhs.unitomo.ac.id',
                 'nim' => '22081010016',
-                'universitas' => 'Universitas Dinamika',
+                'universitas' => 'Universitas Dr. Soetomo',
                 'jurusan' => 'Sistem Informasi',
                 'phone' => '081234560016',
+                'dosen' => $dosenUnitomo,
             ],
             [
                 'name' => 'Bagus Tri Wicaksono',
-                'email' => 'bagus.tri@mhs.uinsa.ac.id',
+                'email' => 'bagus.tri@mhs.unitomo.ac.id',
                 'nim' => '22081010017',
-                'universitas' => 'UIN Sunan Ampel Surabaya',
-                'jurusan' => 'Sains Komputer',
+                'universitas' => 'Universitas Dr. Soetomo',
+                'jurusan' => 'Informatika',
                 'phone' => '081234560017',
+                'dosen' => $dosenUnitomo,
             ],
             [
                 'name' => 'Clara Salsabila',
-                'email' => 'clara.salsabila@mhs.uc.ac.id',
+                'email' => 'clara.salsabila@mhs.unesa.ac.id',
                 'nim' => '22081010018',
-                'universitas' => 'Universitas Ciputra',
-                'jurusan' => 'Informatika',
+                'universitas' => 'Universitas Negeri Surabaya',
+                'jurusan' => 'Sistem Informasi',
                 'phone' => '081234560018',
+                'dosen' => $dosenUnesa,
             ],
             [
                 'name' => 'Hafidz Maulana',
-                'email' => 'hafidz.m@mhs.pens.ac.id',
+                'email' => 'hafidz.m@mhs.unitomo.ac.id',
                 'nim' => '22081010019',
-                'universitas' => 'Politeknik Elektronika Negeri Surabaya',
-                'jurusan' => 'Teknik Informatika Terapan',
+                'universitas' => 'Universitas Dr. Soetomo',
+                'jurusan' => 'Teknik Informatika',
                 'phone' => '081234560019',
+                'dosen' => $dosenUnitomo,
             ],
             [
                 'name' => 'Putri Maharani',
-                'email' => 'putri.maharani@mhs.ubaya.ac.id',
+                'email' => 'putri.maharani@mhs.unesa.ac.id',
                 'nim' => '22081010020',
-                'universitas' => 'Universitas Surabaya',
-                'jurusan' => 'Sistem Informasi Bisnis',
+                'universitas' => 'Universitas Negeri Surabaya',
+                'jurusan' => 'Pendidikan Teknologi Informasi',
                 'phone' => '081234560020',
+                'dosen' => $dosenUnesa,
             ],
         ];
 
@@ -429,11 +460,11 @@ class DatabaseSeeder extends Seeder
         $endDate = Carbon::now()->format('Y-m-d');
 
         $evaluationNotes = [
-            'Sangat memuaskan, proaktif, dan menyelesaikan tugas-tugas magang dengan hasil optimal.',
+            'Sangat memuaskan, proaktif, dan menyelesaikan tugas-tugas magang dinas dengan hasil optimal.',
             'Disiplin tinggi, komunikasi tim sangat baik, dan menguasai tools teknis unit kerja dengan cepat.',
             'Inisiatif luar biasa dalam pemecahan masalah serta dokumentasi laporan yang terstruktur rapi.',
             'Kinerja sangat memuaskan, selalu hadir tepat waktu, dan berkontribusi aktif pada project tim.',
-            'Mampu bekerja mandiri maupun kolaboratif, hasil kerja berkualitas tinggi dan sesuai target.',
+            'Mampu bekerja mandiri maupun kolaboratif, hasil kerja berkualitas tinggi dan sesuai target dinas.',
         ];
 
         foreach ($graduatedStudents as $index => $data) {
@@ -444,6 +475,7 @@ class DatabaseSeeder extends Seeder
                     'name' => $data['name'],
                     'password' => Hash::make('mahasiswa123'),
                     'role' => 'mahasiswa',
+                    'university' => $data['universitas'],
                 ]
             );
 
@@ -458,9 +490,10 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan
+            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan Dinas
             $assignedUnit = $units[$index % count($units)];
             $assignedPembimbing = $pembimbings[$index % count($pembimbings)];
+            $assignedDosen = $data['dosen'];
 
             // D. Buat Application Status ACCEPTED dengan rentang waktu 3 bulan lalu s.d. hari ini
             $application = Application::firstOrCreate(
@@ -475,16 +508,17 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // E. Buat Placement dengan Pembimbing/Mentor Terdistribusi
+            // E. Buat Placement dengan Pembimbing Dinas & Dosen Pembimbing Kampus
             $placement = Placement::firstOrCreate(
                 ['application_id' => $application->id],
                 [
                     'mentor_id' => $assignedPembimbing->id,
+                    'academic_advisor_id' => $assignedDosen->id,
                     'pembimbing_id' => $assignedPembimbing->id,
                 ]
             );
 
-            // F. Buat Logbook Kegiatan Magang (Untuk sampel review mentor)
+            // F. Buat Logbook Kegiatan Magang (Untuk sampel review mentor dinas & monitoring dosen)
             $logActivities = [
                 'Melakukan perancangan antarmuka pengguna (UI/UX) dan wireframe portal layanan publik.',
                 'Mengembangkan modul otentikasi multi-peran dan integrasi API basis data dinas.',
@@ -502,7 +536,7 @@ class DatabaseSeeder extends Seeder
                         'activity' => $activityText,
                         'attachment' => null,
                         'status' => $logIndex === 0 ? 'approved' : ($logIndex === 3 ? 'pending' : 'approved'),
-                        'feedback' => $logIndex === 0 ? 'Kegiatan terverifikasi dengan sangat baik.' : null,
+                        'feedback' => $logIndex === 0 ? 'Kegiatan terverifikasi dengan sangat baik oleh Pembimbing Dinas.' : null,
                     ]
                 );
             }
@@ -513,16 +547,16 @@ class DatabaseSeeder extends Seeder
                 [
                     'file_path' => 'documents/applications/5AdFAcelgeprCcoR82Brj5GF2QzWJvqIMPwbrfc2.pdf',
                     'status' => 'approved',
-                    'feedback' => 'Laporan akhir magang telah diperiksa, disetujui, dan memenuhi standar instansi.',
+                    'feedback' => 'Laporan akhir magang telah diperiksa, disetujui, dan memenuhi standar instansi & kampus.',
                 ]
             );
 
             // H. Buat Penilaian Evaluasi (Sebagian sudah dinilai, sebagian belum untuk testing)
-            // Biarkan 2 mahasiswa terakhir belum dinilai agar form evaluasi dapat langsung diuji
             if ($index < 8) {
-                $disiplin = rand(85, 96);
-                $kinerja = rand(88, 98);
-                $laporan = rand(84, 95);
+                $disiplin = rand(88, 96);
+                $kinerja = rand(90, 98);
+                $laporan = rand(86, 95);
+                $akademik = rand(88, 97);
                 $catatan = $evaluationNotes[$index % count($evaluationNotes)];
 
                 Evaluation::firstOrCreate(
@@ -531,7 +565,9 @@ class DatabaseSeeder extends Seeder
                         'nilai_disiplin' => $disiplin,
                         'nilai_kinerja' => $kinerja,
                         'nilai_laporan' => $laporan,
+                        'nilai_akademik' => $akademik,
                         'catatan' => $catatan,
+                        'catatan_dosen' => 'Mahasiswa menunjukkan pemahaman metodologi dan implementasi ilmiah yang sangat komprehensif pada laporan magang.',
                     ]
                 );
             }

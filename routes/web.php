@@ -10,6 +10,9 @@ use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
 use App\Http\Controllers\Mentor\LogbookController as MentorLogbookController;
 use App\Http\Controllers\Mentor\EvaluationController as MentorEvaluationController;
+use App\Http\Controllers\Lecturer\DashboardController as LecturerDashboardController;
+use App\Http\Controllers\Lecturer\MonitoringController as LecturerMonitoringController;
+use App\Http\Controllers\Lecturer\EvaluationController as LecturerEvaluationController;
 use App\Http\Controllers\Pembimbing\DashboardController as PembimbingDashboardController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Pembimbing\EvaluationController as PembimbingEvaluationController;
@@ -30,6 +33,10 @@ Route::get('/dashboard', function () {
 
     if ($user->role === 'mentor' || $user->role === 'pembimbing') {
         return redirect()->route('mentor.dashboard');
+    }
+
+    if ($user->role === 'dosen' || $user->role === 'academic_advisor') {
+        return redirect()->route('lecturer.dashboard');
     }
 
     return view('dashboard');
@@ -139,6 +146,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('pembimbing.evaluation.create');
         Route::post('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('pembimbing.evaluation.store');
         Route::put('/pembimbing/final-report/{reportId}', [MentorDashboardController::class, 'updateFinalReportStatus'])->name('pembimbing.final_report.updateStatus');
+    });
+
+    // ==========================================
+    // 4. ROUTE KHUSUS DOSEN PEMBIMBING LAPANGAN (DPL KAMPUS)
+    // ==========================================
+    Route::middleware(['role:dosen,academic_advisor'])->group(function () {
+        Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index'])->name('lecturer.dashboard');
+        Route::get('/lecturer/students/{placementId}', [LecturerDashboardController::class, 'showStudent'])->name('lecturer.students.show');
+        Route::get('/lecturer/monitoring', [LecturerMonitoringController::class, 'index'])->name('lecturer.monitoring.index');
+        Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
+        Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
     });
 
 });

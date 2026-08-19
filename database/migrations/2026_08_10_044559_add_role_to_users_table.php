@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Tambahkan baris ini untuk membuat kolom role
-            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor'])
+            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor', 'dosen', 'academic_advisor'])
                   ->default('mahasiswa')
                   ->after('email');
+            $table->string('university')->nullable()->after('agency_profile_id');
         });
     }
 

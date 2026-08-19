@@ -14,7 +14,9 @@ class Evaluation extends Model
         'nilai_disiplin',
         'nilai_kinerja',
         'nilai_laporan',
+        'nilai_akademik',
         'catatan',
+        'catatan_dosen',
     ];
 
     public function placement()

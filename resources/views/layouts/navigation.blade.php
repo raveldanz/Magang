@@ -71,6 +71,17 @@
                         </x-nav-link>
                     @endif
 
+                    <!-- 4. MENU DOSEN PEMBIMBING LAPANGAN (DPL KAMPUS) -->
+                    @if (Auth::user()?->role === 'dosen' || Auth::user()?->role === 'academic_advisor')
+                        <x-nav-link :href="route('lecturer.dashboard')" :active="request()->routeIs('lecturer.dashboard') || request()->routeIs('lecturer.students.*') || request()->routeIs('lecturer.evaluations.*')">
+                            {{ __('Portal Dosen (DPL Kampus)') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('lecturer.monitoring.index')" :active="request()->routeIs('lecturer.monitoring.*')">
+                            {{ __('Monitoring Mahasiswa') }}
+                        </x-nav-link>
+                    @endif
+
                 </div>
             </div>
 
@@ -142,6 +153,13 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('mentor.logbooks.index')" :active="request()->routeIs('mentor.logbooks.*')">
                     {{ __('Review Logbook Mahasiswa') }}
+                </x-responsive-nav-link>
+            @elseif (Auth::user()?->role === 'dosen' || Auth::user()?->role === 'academic_advisor')
+                <x-responsive-nav-link :href="route('lecturer.dashboard')" :active="request()->routeIs('lecturer.dashboard') || request()->routeIs('lecturer.students.*') || request()->routeIs('lecturer.evaluations.*')">
+                    {{ __('Portal Dosen (DPL Kampus)') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('lecturer.monitoring.index')" :active="request()->routeIs('lecturer.monitoring.*')">
+                    {{ __('Monitoring Mahasiswa') }}
                 </x-responsive-nav-link>
             @elseif (Auth::user()?->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
