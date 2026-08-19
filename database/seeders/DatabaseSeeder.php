@@ -199,14 +199,20 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 3. SEED UNIT KERJA TERHUBUNG DENGAN AGENCY PROFILE MASING-MASING
+        // 3. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
         $unitData = [
-            // Unit Diskominfo (Agency ID 1)
+            // Instansi 1: Diskominfo (Agency ID 1)
             [
                 'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Layanan Informatika & E-Government',
                 'description' => 'Pengembangan arsitektur SPBE, integrasi aplikasi layanan publik Pemkot Surabaya, dan portal WargaKu',
                 'quota' => 10,
+            ],
+            [
+                'agency_profile_id' => $agencies[0]->id,
+                'name' => 'Bidang Keamanan Informasi & Persandian (CSIRT Surabaya)',
+                'description' => 'Pusat tanggap insiden siber (CSIRT), implementasi TTE BSrE, enkripsi data, dan audit keamanan sistem informasi',
+                'quota' => 6,
             ],
             [
                 'agency_profile_id' => $agencies[0]->id,
@@ -220,16 +226,11 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Pemeliharaan jaringan fiber optic intra-pemerintah, Data Center Tier-3 Pemkot, cloud infrastructure, dan free wifi publik',
                 'quota' => 8,
             ],
-            [
-                'agency_profile_id' => $agencies[0]->id,
-                'name' => 'Bidang Keamanan Informasi & Persandian (CSIRT Surabaya)',
-                'description' => 'Pusat tanggap insiden siber (CSIRT), implementasi TTE BSrE, enkripsi data, dan audit keamanan sistem informasi',
-                'quota' => 6,
-            ],
-            // Unit Dispusip (Agency ID 2)
+
+            // Instansi 2: Dispusip (Agency ID 2)
             [
                 'agency_profile_id' => $agencies[1]->id,
-                'name' => 'Bidang Pelayanan & Otomasi Perpustakaan Digital (Dispusip)',
+                'name' => 'Bidang Pelayanan & Otomasi Perpustakaan Digital',
                 'description' => 'Digitalisasi koleksi naskah kuno, sistem temu kembali arsip digital, dan otomasi perpustakaan daerah',
                 'quota' => 6,
             ],
@@ -239,11 +240,24 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Pengelolaan arsip digital dinas, alih media dokumen bersejarah Kota Surabaya, dan repositori arsip elektronik',
                 'quota' => 5,
             ],
-            // Unit Dispendukcapil (Agency ID 3)
+            [
+                'agency_profile_id' => $agencies[1]->id,
+                'name' => 'Bidang Pembinaan & Pengembangan Minat Baca',
+                'description' => 'Pemberdayaan taman bacaan masyarakat (TBM), mobil perpustakaan keliling, dan program literasi kota',
+                'quota' => 6,
+            ],
+
+            // Instansi 3: Dispendukcapil (Agency ID 3)
             [
                 'agency_profile_id' => $agencies[2]->id,
                 'name' => 'Bidang Pengelolaan Informasi Administrasi Kependudukan (PIAK)',
                 'description' => 'Integrasi sistem database kependudukan Klampid New Generation (KNG) dan keamanan data kependudukan',
+                'quota' => 6,
+            ],
+            [
+                'agency_profile_id' => $agencies[2]->id,
+                'name' => 'Bidang Pelayanan Pendaftaran Penduduk',
+                'description' => 'Pelayanan adminduk terintegrasi di kelurahan, kecamatan, dan mall pelayanan publik (MPP) Siola',
                 'quota' => 6,
             ],
             [
@@ -257,9 +271,11 @@ class DatabaseSeeder extends Seeder
         $units = [];
         foreach ($unitData as $uData) {
             $units[] = Unit::firstOrCreate(
-                ['name' => $uData['name']],
                 [
+                    'name' => $uData['name'],
                     'agency_profile_id' => $uData['agency_profile_id'],
+                ],
+                [
                     'description' => $uData['description'],
                     'quota' => $uData['quota'],
                 ]
