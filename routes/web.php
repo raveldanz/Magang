@@ -146,9 +146,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index'])->name('lecturer.dashboard');
         Route::get('/lecturer/students/{placementId}', [LecturerDashboardController::class, 'showStudent'])->name('lecturer.students.show');
         Route::get('/lecturer/monitoring', [LecturerMonitoringController::class, 'index'])->name('lecturer.monitoring.index');
-        Route::get('/lecturer/logbooks/{id}', [AdminLogbookController::class, 'show'])->name('lecturer.logbooks.show');
+        Route::get('/lecturer/logbooks/{id}', [\App\Http\Controllers\Lecturer\LogbookController::class, 'show'])->name('lecturer.logbooks.show');
         Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
         Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
+    });
+
+    // ==========================================
+    // 5. ROUTE KHUSUS RESMI PERGURUAN TINGGI (UNIVERSITAS)
+    // ==========================================
+    Route::middleware(['role:universitas'])->group(function () {
+        Route::get('/university/dashboard', [\App\Http\Controllers\University\DashboardController::class, 'index'])->name('university.dashboard');
+        Route::get('/university/students/{placementId}', [\App\Http\Controllers\University\DashboardController::class, 'showStudent'])->name('university.students.show');
     });
 
 });

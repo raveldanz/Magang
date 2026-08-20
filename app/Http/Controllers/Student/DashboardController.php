@@ -33,6 +33,10 @@ class DashboardController extends Controller
             return redirect()->route('lecturer.dashboard');
         }
 
+        if ($user->role === 'universitas') {
+            return redirect()->route('university.dashboard');
+        }
+
         $profile = $user->studentProfile;
 
         // Hubungkan university_id jika belum terisi pada user

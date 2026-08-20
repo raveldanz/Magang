@@ -236,7 +236,61 @@ class DatabaseSeeder extends Seeder
 
         $allMentors = array_merge($mentorsDiskominfo, $mentorsDispusip, $mentorsDispendukcapil);
 
-        // 4. SEED 2 AKUN DOSEN PEMBIMBING LAPANGAN (DPL) PER KAMPUS (TOTAL 10 DOSEN)
+        // 4. SEED AKUN RESMI PERGURUAN TINGGI (ROLE: UNIVERSITAS - TANPA KATA 'ADMIN')
+        $univAccounts = [
+            'UNITOMO' => User::firstOrCreate(
+                ['email' => 'unitomo@unitomo.ac.id'],
+                [
+                    'name' => 'Universitas Dr. Soetomo',
+                    'password' => Hash::make('password'),
+                    'role' => 'universitas',
+                    'university_id' => $universities['UNITOMO']->id,
+                    'university' => $universities['UNITOMO']->name,
+                ]
+            ),
+            'UNESA' => User::firstOrCreate(
+                ['email' => 'unesa@unesa.ac.id'],
+                [
+                    'name' => 'Universitas Negeri Surabaya',
+                    'password' => Hash::make('password'),
+                    'role' => 'universitas',
+                    'university_id' => $universities['UNESA']->id,
+                    'university' => $universities['UNESA']->name,
+                ]
+            ),
+            'ITS' => User::firstOrCreate(
+                ['email' => 'its@its.ac.id'],
+                [
+                    'name' => 'Institut Teknologi Sepuluh Nopember',
+                    'password' => Hash::make('password'),
+                    'role' => 'universitas',
+                    'university_id' => $universities['ITS']->id,
+                    'university' => $universities['ITS']->name,
+                ]
+            ),
+            'UNAIR' => User::firstOrCreate(
+                ['email' => 'unair@unair.ac.id'],
+                [
+                    'name' => 'Universitas Airlangga',
+                    'password' => Hash::make('password'),
+                    'role' => 'universitas',
+                    'university_id' => $universities['UNAIR']->id,
+                    'university' => $universities['UNAIR']->name,
+                ]
+            ),
+            'UPN' => User::firstOrCreate(
+                ['email' => 'upnjatim@upnjatim.ac.id'],
+                [
+                    'name' => 'UPN Veteran Jawa Timur',
+                    'password' => Hash::make('password'),
+                    'role' => 'universitas',
+                    'university_id' => $universities['UPN']->id,
+                    'university' => $universities['UPN']->name,
+                ]
+            ),
+        ];
+
+        // 5. SEED 2 AKUN DOSEN PEMBIMBING LAPANGAN (DPL) PER KAMPUS (TOTAL 10 DOSEN)
         // A. Unitomo
         $dosenUnitomo1 = User::firstOrCreate(
             ['email' => 'dosen.unitomo@unitomo.ac.id'],
