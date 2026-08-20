@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="{ openNewDosenModal: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success Message -->
@@ -30,7 +30,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="bg-indigo-900/60 border border-indigo-400/30 text-indigo-100 text-xs font-semibold px-3 py-1.5 rounded-full uppercase">
-                        🎓 Mahasiswa: {{ $profile->universitas ?? Auth::user()->university ?? 'Perguruan Tinggi' }}
+                        🎓 {{ $univName ?? 'Perguruan Tinggi Mahasiswa' }}
                     </span>
                 </div>
             </div>
@@ -79,12 +79,12 @@
                                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
                                     Dosen Pembimbing Lapangan (DPL Kampus)
                                     @if ($academicAdvisor)
-                                        <span class="px-2 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
+                                        <span class="px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
                                             ✅ Terpilih
                                         </span>
                                     @else
-                                        <span class="px-2 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded-full animate-pulse">
-                                            ⚠️ Perlu Dipilih
+                                        <span class="px-2.5 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded-full animate-pulse">
+                                            ⚠️ Perlu Ditentukan
                                         </span>
                                     @endif
                                 </h3>
@@ -93,6 +93,14 @@
                                 </p>
                             </div>
                         </div>
+
+                        <!-- Tombol Modal Input Dosen Baru -->
+                        <button type="button" @click="openNewDosenModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl transition shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Input Dosen Baru</span>
+                        </button>
                     </div>
 
                     @if ($academicAdvisor)
@@ -103,7 +111,7 @@
                                     👨‍🏫 {{ $academicAdvisor->name }}
                                 </div>
                                 <div class="text-xs text-gray-600 mt-1">
-                                    Email: <span class="font-mono text-gray-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ $academicAdvisor->university ?? $univName }}</strong>
+                                    Email: <span class="font-mono text-gray-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ $academicAdvisor->university?->name ?? $academicAdvisor->university ?? $univName }}</strong>
                                 </div>
                             </div>
 
@@ -117,7 +125,7 @@
                             <span class="text-lg">📢</span>
                             <div>
                                 <p class="font-bold">Pengajuan magang Anda telah DITERIMA di {{ $application->unit->name ?? '-' }} ({{ $application->unit->agencyProfile->agency_name ?? '-' }}).</p>
-                                <p class="text-indigo-800 mt-1">Silakan tentukan Dosen Pembimbing dari kampus Anda untuk proses supervisi dan penilaian akhir akademik magang.</p>
+                                <p class="text-indigo-800 mt-1">Silakan pilih Dosen Pembimbing terdaftar di kampus Anda atau klik tombol <strong>"Input Dosen Baru"</strong> jika nama dosen belum tertera pada daftar.</p>
                             </div>
                         </div>
                     @endif
@@ -127,14 +135,19 @@
                         <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-3">
                             @csrf
                             <div>
-                                <label for="academic_advisor_id" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                    Pilih Dosen Pembimbing ({{ $univName ?? 'Kampus' }}):
-                                </label>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label for="academic_advisor_id" class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        Pilih Dosen Terdaftar ({{ $univName ?? 'Kampus Mahasiswa' }}):
+                                    </label>
+                                    <button type="button" @click="openNewDosenModal = true" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold underline">
+                                        Dosen tidak ditemukan? Input Baru
+                                    </button>
+                                </div>
                                 <select id="academic_advisor_id" name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
                                     <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
                                     @foreach ($availableDosens as $dosen)
                                         <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                            {{ $dosen->name }} — {{ $dosen->university ?? 'Dosen' }} ({{ $dosen->email }})
+                                            {{ $dosen->name }} — {{ $dosen->university?->name ?? $dosen->university ?? 'Dosen' }} ({{ $dosen->email }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -154,6 +167,86 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Modal Input Dosen Baru -->
+            <div x-show="openNewDosenModal" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                
+                <!-- Backdrop -->
+                <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-xs transition-opacity" @click="openNewDosenModal = false"></div>
+
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 p-6 space-y-4">
+                        
+                        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="p-2 bg-indigo-100 text-indigo-700 rounded-xl font-bold text-sm">👨‍🏫</span>
+                                <h3 class="text-lg font-bold text-gray-900 leading-6">Input Dosen Pembimbing Baru</h3>
+                            </div>
+                            <button type="button" @click="openNewDosenModal = false" class="text-gray-400 hover:text-gray-600 text-sm">
+                                ✕
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Jika dosen pembimbing Anda belum terdaftar di sistem, silakan isi data di bawah ini. Akun portal dosen akan otomatis dibuatkan dan terhubung ke universitas Anda.
+                        </p>
+
+                        <form action="{{ route('student.create_advisor') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="university_id" value="{{ Auth::user()->university_id }}">
+
+                            <div>
+                                <label for="modal_name" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                    Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" id="modal_name" name="name" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom" 
+                                    class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
+                            </div>
+
+                            <div>
+                                <label for="modal_email" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                    Email Resmi / Kampus Dosen <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="email" id="modal_email" name="email" required placeholder="Contoh: ahmad.sudrajat@kampus.ac.id" 
+                                    class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
+                            </div>
+
+                            <div>
+                                <label for="modal_nidn" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                    NIDN / NIP Dosen (Opsional)
+                                </label>
+                                <input type="text" id="modal_nidn" name="nidn" placeholder="Contoh: 0012345678" 
+                                    class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                    Asal Perguruan Tinggi:
+                                </label>
+                                <input type="text" value="{{ $univName ?? 'Universitas Mahasiswa' }}" disabled 
+                                    class="w-full text-xs bg-gray-100 text-gray-600 border-gray-300 rounded-xl shadow-xs cursor-not-allowed">
+                            </div>
+
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-3">
+                                <button type="button" @click="openNewDosenModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                                    Batal
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                                    Daftarkan & Pilih Sebagai DPL
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
 
             <!-- Status Card Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
