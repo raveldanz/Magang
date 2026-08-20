@@ -271,19 +271,45 @@
                     </a>
                 </div>
 
-                <!-- Card 2: Status Pengajuan -->
+                <!-- Card 2: Status -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 border-l-4 
-                    {{ optional($application)->status === 'accepted' ? 'border-l-emerald-500' : '' }}
-                    {{ optional($application)->status === 'verified' ? 'border-l-blue-500' : '' }}
-                    {{ optional($application)->status === 'pending' ? 'border-l-amber-500' : '' }}
-                    {{ optional($application)->status === 'rejected' ? 'border-l-rose-500' : '' }}
+                    {{ optional($application)->lifecycle_status === 'ACTIVE' ? 'border-l-emerald-500' : '' }}
+                    {{ optional($application)->lifecycle_status === 'COMPLETED' ? 'border-l-purple-500' : '' }}
+                    {{ optional($application)->lifecycle_status === 'ACCEPTED' ? 'border-l-blue-500' : '' }}
+                    {{ optional($application)->lifecycle_status === 'PENDING' ? 'border-l-amber-500' : '' }}
+                    {{ optional($application)->lifecycle_status === 'REJECTED' ? 'border-l-rose-500' : '' }}
                     {{ !$application ? 'border-l-gray-300' : '' }} space-y-3">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase">Status Pengajuan</p>
-                            <p class="text-lg font-black mt-1 text-gray-800">
-                                {{ $application ? strtoupper($application->status) : 'Belum Mengajukan' }}
-                            </p>
+                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">STATUS</div>
+                            <div class="mt-1 flex items-center gap-2">
+                                @if(!$application)
+                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-2.5 py-1 text-sm font-bold text-gray-600 border border-gray-200">
+                                        Belum Mengajukan
+                                    </span>
+                                @elseif($application->lifecycle_status === 'ACTIVE')
+                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-sm font-bold text-emerald-700 border border-emerald-200">
+                                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        ACTIVE (Sedang Magang)
+                                    </span>
+                                @elseif($application->lifecycle_status === 'COMPLETED')
+                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-purple-50 px-2.5 py-1 text-sm font-bold text-purple-700 border border-purple-200">
+                                        COMPLETED (Lulus)
+                                    </span>
+                                @elseif($application->lifecycle_status === 'ACCEPTED')
+                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-sm font-bold text-blue-700 border border-blue-200">
+                                        ACCEPTED (Calon Peserta)
+                                    </span>
+                                @elseif($application->lifecycle_status === 'REJECTED')
+                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-sm font-bold text-rose-700 border border-rose-200">
+                                        REJECTED
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-sm font-bold text-amber-700 border border-amber-200">
+                                        PENDING
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                         <div class="p-3 bg-gray-50 text-gray-600 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,19 +360,34 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
                         <p><span class="text-gray-500">Instansi Penempatan:</span> <strong>{{ $application->unit->agencyProfile->agency_name ?? '-' }}</strong></p>
                         <p><span class="text-gray-500">Unit Kerja:</span> <strong>{{ $application->unit->name ?? '-' }}</strong></p>
-                        <p><span class="text-gray-500">Periode Magang:</span> <strong>{{ $application->start_date }} s/d {{ $application->end_date }}</strong></p>
+                        <p><span class="text-gray-500">Periode Magang:</span> <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</strong></p>
                         <p><span class="text-gray-500">Status Saat Ini:</span> 
-                            <span class="px-2.5 py-0.5 text-xs font-bold rounded-full 
-                                {{ $application->status === 'accepted' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                {{ $application->status === 'verified' ? 'bg-blue-100 text-blue-800' : '' }}
-                                {{ $application->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                {{ $application->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                {{ strtoupper($application->status) }}
-                            </span>
+                            @if($application->lifecycle_status === 'ACTIVE')
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 border border-emerald-200">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    ACTIVE (Sedang Magang)
+                                </span>
+                            @elseif($application->lifecycle_status === 'COMPLETED')
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-bold text-purple-800 border border-purple-200">
+                                    COMPLETED (Lulus)
+                                </span>
+                            @elseif($application->lifecycle_status === 'ACCEPTED')
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 border border-blue-200">
+                                    ACCEPTED (Calon Peserta)
+                                </span>
+                            @elseif($application->lifecycle_status === 'REJECTED')
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
+                                    REJECTED
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800 border border-amber-200">
+                                    PENDING
+                                </span>
+                            @endif
                         </p>
-                        @if ($application->status === 'rejected')
+                        @if ($application->status === 'rejected' || $application->lifecycle_status === 'REJECTED')
                             <div class="col-span-1 md:col-span-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs">
-                                <strong>Catatan Penolakan:</strong> {{ $application->rejection_note }}
+                                <strong>Catatan Penolakan:</strong> {{ $application->rejection_reason ?? $application->rejection_note }}
                             </div>
                         @endif
                     </div>
