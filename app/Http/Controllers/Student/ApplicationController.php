@@ -13,30 +13,34 @@ class ApplicationController extends Controller
 {
     // Menampilkan halaman form pengajuan magang
     public function create()
-{
-    $units = Unit::all();
-    $user = Auth::user();
+    {
+        $units = Unit::with('agencyProfile')->get();
+        $groupedUnits = $units->groupBy(function ($unit) {
+            return $unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya';
+        });
 
-    // 1. Cek apakah mahasiswa sudah punya profil
-    if (!$user->studentProfile) {
-        return redirect()->route('student.profile.edit')
-            ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
+        $user = Auth::user();
+
+        // 1. Cek apakah mahasiswa sudah punya profil
+        if (!$user->studentProfile) {
+            return redirect()->route('student.profile.edit')
+                ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
+        }
+
+        // 2. Cek apakah ada pengajuan yang SANGAT AKTIF (masih PENDING)
+        // Jika masih ada yang diproses, mahasiswa tidak boleh buat pengajuan baru dulu
+        $activeApplication = Application::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        // 3. Ambil SELURUH riwayat pengajuan mahasiswa ini (urutkan dari yang terbaru)
+        $applicationHistory = Application::with('unit.agencyProfile')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        return view('student.application.create', compact('units', 'groupedUnits', 'activeApplication', 'applicationHistory'));
     }
-
-    // 2. Cek apakah ada pengajuan yang SANGAT AKTIF (masih PENDING)
-    // Jika masih ada yang diproses, mahasiswa tidak boleh buat pengajuan baru dulu
-    $activeApplication = Application::where('user_id', $user->id)
-        ->where('status', 'pending')
-        ->first();
-
-    // 3. Ambil SELURUH riwayat pengajuan mahasiswa ini (urutkan dari yang terbaru)
-    $applicationHistory = Application::with('unit')
-        ->where('user_id', $user->id)
-        ->latest()
-        ->get();
-
-    return view('student.application.create', compact('units', 'activeApplication', 'applicationHistory'));
-}
 
     // Menyimpan data pengajuan magang & upload dokumen
     public function store(Request $request)
@@ -49,6 +53,14 @@ class ApplicationController extends Controller
             'cv' => 'required|mimes:pdf|max:2048',
             'transkrip' => 'required|mimes:pdf|max:2048',
         ]);
+
+        // Cek Sisa Kuota Instansi yang Dipilih
+        $unit = Unit::findOrFail($request->unit_id);
+        if ($unit->remaining_quota <= 0) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['unit_id' => 'Kuota untuk instansi/unit ini sudah penuh. Silakan pilih unit kerja lain.']);
+        }
 
         // 1. Simpan Data Pengajuan
         $application = Application::create([
@@ -76,6 +88,17 @@ class ApplicationController extends Controller
         }
 
         return redirect()->back()->with('success', 'Pengajuan magang dan dokumen berhasil dikirim!');
+    }
+
+    // Download / Print Surat Penerimaan Magang untuk Mahasiswa
+    public function downloadLetter($id)
+    {
+        $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
+            ->where('user_id', Auth::id())
+            ->where('status', 'accepted')
+            ->findOrFail($id);
+
+        return view('letters.acceptance', compact('application'));
     }
 
     // Method show: Ambil data placement yang sudah ada
