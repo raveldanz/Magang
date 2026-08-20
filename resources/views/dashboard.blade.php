@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-8" x-data="{ openNewDosenModal: false }">
+    <div class="py-8" x-data="{ openNewDosenModal: false, showCredentialModal: {{ session('new_advisor_credential') ? 'true' : 'false' }}, copied: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success Message -->
@@ -247,6 +247,101 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Popup Kredensial Akun Dosen Baru -->
+            @if (session('new_advisor_credential'))
+                @php
+                    $cred = session('new_advisor_credential');
+                    $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
+                @endphp
+                <div x-show="showCredentialModal" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                    
+                    <!-- Backdrop -->
+                    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-xs transition-opacity" @click="showCredentialModal = false"></div>
+
+                    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5">
+                            
+                            <!-- Header Modal -->
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl shadow-inner">
+                                        🎉
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-black text-gray-900 leading-snug">Akun Dosen Pembimbing Berhasil Dibuat</h3>
+                                        <p class="text-xs text-emerald-600 font-semibold">Tersambung ke {{ $cred['univ_name'] }}</p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="showCredentialModal = false" class="text-gray-400 hover:text-gray-600 text-lg p-1">
+                                    ✕
+                                </button>
+                            </div>
+
+                            <!-- Box Kredensial -->
+                            <div class="rounded-2xl bg-slate-900 text-slate-100 p-5 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                                    <span class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">Kredensial Akses Dosen</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">Aktif</span>
+                                </div>
+                                
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Nama Dosen:</span>
+                                    <span class="col-span-2 font-bold text-white">{{ $cred['name'] }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Email Login:</span>
+                                    <span class="col-span-2 font-bold text-amber-300 select-all">{{ $cred['email'] }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Password Default:</span>
+                                    <span class="col-span-2 font-bold text-emerald-300 select-all">{{ $cred['password'] }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Portal Login:</span>
+                                    <span class="col-span-2 font-bold text-sky-300 break-all select-all">{{ $cred['login_url'] }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Instruksi Mahasiswa -->
+                            <div class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-xs text-amber-900 flex items-start gap-3 leading-relaxed">
+                                <span class="text-base shrink-0">📌</span>
+                                <div>
+                                    <strong class="font-bold">Instruksi Mahasiswa:</strong>
+                                    <p class="mt-1 text-amber-800">Harap simpan dan teruskan kredensial di atas kepada <strong>Dosen Pembimbing Lapangan (DPL)</strong> Anda agar beliau dapat login ke Portal Dosen untuk memonitor logbook mingguan dan memberikan penilaian akhir magang.</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                                <button type="button" 
+                                        @click="navigator.clipboard.writeText(`{{ addslashes($waText) }}`); copied = true; setTimeout(() => copied = false, 3000)"
+                                        class="w-full inline-flex justify-center items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition transform active:scale-98">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    <span x-text="copied ? '✅ Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">Salin Informasi Login</span>
+                                </button>
+
+                                <button type="button" @click="showCredentialModal = false" class="w-full sm:w-auto px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                                    Tutup
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Status Card Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

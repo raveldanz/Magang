@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Http\Controllers\University;
+
+use App\Http\Controllers\Controller;
+use App\Models\University;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+class LecturerController extends Controller
+{
+    /**
+     * Menampilkan daftar dosen pembimbing lapangan kampus (Tenant Scoped per Universitas)
+     */
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university;
+
+        $query = User::whereIn('role', ['dosen', 'academic_advisor'])
+            ->where(function ($q) use ($universityId, $univName) {
+                if ($universityId) {
+                    $q->where('university_id', $universityId);
+                } elseif ($univName) {
+                    $q->where('university', $univName);
+                }
+            })
+            ->with(['academicPlacements.application.user', 'academicPlacements.finalreport', 'academicPlacements.evaluation']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $lecturers = $query->orderBy('name', 'asc')->get();
+
+        // Hitung statistik ringkasan
+        $totalLecturers = $lecturers->count();
+        $totalActiveStudents = 0;
+        $totalCompletedStudents = 0;
+
+        foreach ($lecturers as $lecturer) {
+            $activeCount = $lecturer->academicPlacements->filter(function ($p) {
+                $isAccepted = optional($p->application)->status === 'accepted';
+                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
+                return $isAccepted && !$isPassed;
+            })->count();
+
+            $completedCount = $lecturer->academicPlacements->filter(function ($p) {
+                $isAccepted = optional($p->application)->status === 'accepted';
+                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
+                return $isAccepted && $isPassed;
+            })->count();
+
+            $lecturer->active_students_count = $activeCount;
+            $lecturer->completed_students_count = $completedCount;
+            $lecturer->total_students_count = $activeCount + $completedCount;
+
+            $totalActiveStudents += $activeCount;
+            $totalCompletedStudents += $completedCount;
+        }
+
+        $stats = [
+            'total_lecturers' => $totalLecturers,
+            'total_active_students' => $totalActiveStudents,
+            'total_completed_students' => $totalCompletedStudents,
+            'total_assigned_students' => $totalActiveStudents + $totalCompletedStudents,
+        ];
+
+        return view('university.lecturers.index', compact(
+            'user',
+            'university',
+            'univName',
+            'lecturers',
+            'stats'
+        ));
+    }
+
+    /**
+     * Reset password dosen ke default ('password')
+     */
+    public function resetPassword(Request $request, $id)
+    {
+        $user = Auth::user();
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university;
+
+        $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
+
+        // Tenant Scoping Authorization Check
+        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
+        if (!$isSameUniv && $univName) {
+            $isSameUniv = ($lecturer->university === $univName);
+        }
+
+        if (!$isSameUniv) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mereset password dosen kampus lain.');
+        }
+
+        $lecturer->update([
+            'password' => Hash::make('password'),
+        ]);
+
+        return redirect()->route('university.lecturers.index')
+            ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset ke default ('password')!");
+    }
+}

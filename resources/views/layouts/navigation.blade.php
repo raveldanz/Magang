@@ -88,8 +88,12 @@
 
                     <!-- 5. MENU RESMI PERGURUAN TINGGI (UNIVERSITAS) -->
                     @if (Auth::user()?->role === 'universitas')
-                        <x-nav-link :href="route('university.dashboard')" :active="request()->routeIs('university.*')">
+                        <x-nav-link :href="route('university.dashboard')" :active="request()->routeIs('university.dashboard') || request()->routeIs('university.students.*')">
                             {{ __('Portal Universitas') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('university.lecturers.index')" :active="request()->routeIs('university.lecturers.*')">
+                            {{ __('Daftar Dosen Pembimbing') }}
                         </x-nav-link>
                     @endif
 
@@ -189,8 +193,11 @@
                     {{ __('Pengaturan Instansi') }}
                 </x-responsive-nav-link>
             @elseif (Auth::user()?->role === 'universitas')
-                <x-responsive-nav-link :href="route('university.dashboard')" :active="request()->routeIs('university.*')">
+                <x-responsive-nav-link :href="route('university.dashboard')" :active="request()->routeIs('university.dashboard') || request()->routeIs('university.students.*')">
                     {{ __('Portal Universitas') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('university.lecturers.index')" :active="request()->routeIs('university.lecturers.*')">
+                    {{ __('Daftar Dosen Pembimbing') }}
                 </x-responsive-nav-link>
             @endif
         </div>
