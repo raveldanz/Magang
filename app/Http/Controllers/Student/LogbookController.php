@@ -8,6 +8,7 @@ use App\Models\Logbook;
 use App\Models\Placement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class LogbookController extends Controller
 {
@@ -15,9 +16,8 @@ class LogbookController extends Controller
     {
         $userId = Auth::id();
 
-        // 1. Ambil pengajuan mahasiswa yang disetujui (akomodasi huruf kecil 'accepted' maupun kapital 'ACCEPTED')
+        // 1. Ambil pengajuan terakhir mahasiswa
         $application = Application::where('user_id', $userId)
-            ->whereIn('status', ['accepted', 'ACCEPTED'])
             ->latest()
             ->first();
 
@@ -27,7 +27,7 @@ class LogbookController extends Controller
         if ($application) {
             // 2. Ambil data penempatan (placement)
             $placement = Placement::where('application_id', $application->id)
-                ->with('pembimbing')
+                ->with(['pembimbing', 'mentor', 'academicAdvisor'])
                 ->first();
 
             if ($placement) {
@@ -46,27 +46,36 @@ class LogbookController extends Controller
             'rejected' => $logbooks->where('status', 'rejected')->count(),
         ];
 
-        // Tampilkan view tanpa me-redirect paksa agar alert peringatan/info tetap dapat terbaca
         return view('student.logbook.index', compact('application', 'placement', 'logbooks', 'stats'));
+    }
+
+    public function create()
+    {
+        $application = Application::where('user_id', Auth::id())->latest()->first();
+
+        if (!$application || !$application->is_active_internship) {
+            return redirect()->route('student.logbook.index')
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+        }
+
+        return view('student.logbook.create', compact('application'));
     }
 
     public function store(Request $request)
     {
+        $application = Application::where('user_id', Auth::id())->latest()->first();
+
+        if (!$application || !$application->is_active_internship) {
+            return redirect()->route('student.logbook.index')
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+        }
+
         $request->validate([
             'date'       => 'required|date',
             'activity'   => 'required|string|min:10',
             'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $userId = Auth::id();
-
-        // Cari application yang disetujui
-        $application = Application::where('user_id', $userId)
-            ->whereIn('status', ['accepted', 'ACCEPTED'])
-            ->latest()
-            ->firstOrFail();
-
-        // Ambil placement
         $placement = Placement::where('application_id', $application->id)->firstOrFail();
 
         $filePath = null;
@@ -80,73 +89,83 @@ class LogbookController extends Controller
             'activity'     => $request->activity,
             'attachment'   => $filePath,
             'status'       => 'pending',
+            'lecturer_status' => 'pending',
         ]);
 
         return redirect()->route('student.logbook.index')->with('success', 'Logbook kegiatan berhasil disimpan!');
     }
 
-    // 1. Menampilkan Halaman Form Edit
-public function edit($id)
-{
-    $logbook = Logbook::findOrFail($id);
+    public function edit($id)
+    {
+        $application = Application::where('user_id', Auth::id())->latest()->first();
 
-    // Cek Keamanan: Pastikan logbook milik mahasiswa yang sedang login
-    // Dan hanya status PENDING / REJECTED yang bisa diedit
-    if (strtolower($logbook->status) === 'approved') {
-        return redirect()->route('student.logbook.index')
-            ->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
-    }
-
-    return view('student.logbook.edit', compact('logbook'));
-}
-
-// 2. Memproses Update Data Logbook
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'date'       => 'required|date',
-        'activity'   => 'required|string|min:10',
-        'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-    ]);
-
-    $logbook = Logbook::findOrFail($id);
-
-    // Keamanan: Tolak jika sudah approved
-    if (strtolower($logbook->status) === 'approved') {
-        return redirect()->route('student.logbook.index')
-            ->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
-    }
-
-    // Jika ada file baru yang diunggah
-    if ($request->hasFile('attachment')) {
-        // Hapus file lama jika ada
-        if ($logbook->attachment && \Illuminate\Support\Facades\Storage::disk('public')->exists($logbook->attachment)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($logbook->attachment);
+        if (!$application || !$application->is_active_internship) {
+            return redirect()->route('student.logbook.index')
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
         }
 
-        $logbook->attachment = $request->file('attachment')->store('documents/logbooks', 'public');
+        $logbook = Logbook::findOrFail($id);
+
+        // Pastikan logbook milik penempatan user yang sedang login
+        if ($logbook->placement?->application?->user_id !== Auth::id()) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        // Keamanan: Hanya status PENDING / REJECTED yang bisa diedit
+        if (strtolower($logbook->status) === 'approved') {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
+        }
+
+        return view('student.logbook.edit', compact('logbook', 'application'));
     }
 
-    // Update data utama
-    $logbook->date = $request->date;
-    $logbook->activity = $request->activity;
-    
-    // Jika logbook sebelumnya rejected, kembalikan ke pending agar direview ulang
-    if (strtolower($logbook->status) === 'rejected') {
-        $logbook->status = 'pending';
+    public function update(Request $request, $id)
+    {
+        $application = Application::where('user_id', Auth::id())->latest()->first();
+
+        if (!$application || !$application->is_active_internship) {
+            return redirect()->route('student.logbook.index')
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+        }
+
+        $request->validate([
+            'date'       => 'required|date',
+            'activity'   => 'required|string|min:10',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $logbook = Logbook::findOrFail($id);
+
+        if ($logbook->placement?->application?->user_id !== Auth::id()) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        if (strtolower($logbook->status) === 'approved') {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
+        }
+
+        if ($request->hasFile('attachment')) {
+            if ($logbook->attachment && Storage::disk('public')->exists($logbook->attachment)) {
+                Storage::disk('public')->delete($logbook->attachment);
+            }
+            $logbook->attachment = $request->file('attachment')->store('documents/logbooks', 'public');
+        }
+
+        $logbook->date = $request->date;
+        $logbook->activity = $request->activity;
+        
+        if (strtolower($logbook->status) === 'rejected') {
+            $logbook->status = 'pending';
+        }
+        if (strtolower($logbook->lecturer_status ?? '') === 'rejected') {
+            $logbook->lecturer_status = 'pending';
+        }
+
+        $logbook->save();
+
+        return redirect()->route('student.logbook.index')
+            ->with('success', 'Logbook kegiatan berhasil diperbarui!');
     }
-
-    $logbook->save();
-
-    // REDIRECT KEMBALI KE HALAMAN UTAMA LOGBOOK + KIRIM PESAN SUCCESS
-    return redirect()->route('student.logbook.index')
-        ->with('success', 'Logbook kegiatan berhasil diperbarui!');
-    }
-    // Tambahkan fungsi create ini di dalam LogbookController.php
-public function create()
-{
-    return view('student.logbook.create');
-}
-
-
 }

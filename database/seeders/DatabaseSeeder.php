@@ -626,7 +626,7 @@ class DatabaseSeeder extends Seeder
         // -------------------------------------------------------------------------
         // C. TAHAP DITERIMA BELUM PILIH DPL (Accepted - Need DPL Selection)
         // -------------------------------------------------------------------------
-        // Accepted 1: Diskominfo (UNITOMO)
+        // Accepted 1: Diskominfo (UNITOMO) - Belum pilih DPL
         $mhsAccepted1 = User::firstOrCreate(
             ['email' => 'mhs.accepted1@unitomo.ac.id'],
             [
@@ -659,7 +659,7 @@ class DatabaseSeeder extends Seeder
             ['user_id' => $mhsAccepted1->id],
             [
                 'unit_id' => $units[1]->id, // Diskominfo - CSIRT
-                'start_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
+                'start_date' => Carbon::now()->subDays(5)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
                 'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
                 'cv_path' => 'documents/applications/sample_cv.pdf',
@@ -679,11 +679,11 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Accepted 2: Dispendukcapil (ITS)
+        // Accepted 2: Dispendukcapil (ITS) - DPL ada, tetapi tanggal mulai di masa depan (Proteksi Tanggal)
         $mhsAccepted2 = User::firstOrCreate(
             ['email' => 'mhs.accepted2@its.ac.id'],
             [
-                'name' => 'Nanda Kartika (Accepted No DPL)',
+                'name' => 'Nanda Kartika (Accepted Future Date)',
                 'password' => Hash::make('password'),
                 'role' => 'mahasiswa',
                 'university_id' => $universities['ITS']->id,
@@ -712,8 +712,8 @@ class DatabaseSeeder extends Seeder
             ['user_id' => $mhsAccepted2->id],
             [
                 'unit_id' => $units[7]->id, // Dispendukcapil - PIAK
-                'start_date' => Carbon::now()->addDays(6)->format('Y-m-d'),
-                'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
+                'start_date' => Carbon::now()->addDays(14)->format('Y-m-d'), // 14 hari di masa depan
+                'end_date' => Carbon::now()->addMonths(3)->addDays(14)->format('Y-m-d'),
                 'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
                 'cv_path' => 'documents/applications/sample_cv.pdf',
                 'transcript_path' => 'documents/applications/sample_transkrip.pdf',
@@ -728,7 +728,7 @@ class DatabaseSeeder extends Seeder
             [
                 'mentor_id' => $mentorsDispendukcapil[0]->id,
                 'pembimbing_id' => $mentorsDispendukcapil[0]->id,
-                'academic_advisor_id' => null, // Belum memilih DPL Kampus
+                'academic_advisor_id' => $dosenIts1->id, // DPL sudah ada, tapi tanggal belum mulai
             ]
         );
 
@@ -1025,7 +1025,7 @@ class DatabaseSeeder extends Seeder
         // -------------------------------------------------------------------------
         // E. TAHAP LULUS (Completed - E-Sertifikat Terbit & Nilai Lengkap)
         // -------------------------------------------------------------------------
-        // Lulus 1: Diskominfo (UNITOMO) - Nilai 92.5 (A)
+        // Lulus 1: Diskominfo (UNITOMO) - Nilai 92.67 (A)
         $mhsLulus1 = User::firstOrCreate(
             ['email' => 'mhs.lulus1@unitomo.ac.id'],
             [
@@ -1332,7 +1332,8 @@ class DatabaseSeeder extends Seeder
                 'transcript_path' => 'documents/applications/sample_transkrip.pdf',
                 'id_card_path' => 'documents/applications/sample_ktm.pdf',
                 'status' => 'rejected',
-                'rejection_note' => 'Dokumen Portofolio dan Transkrip Nilai belum terlampir dengan jelas. Silakan ajukan ulang berkas yang lengkap.',
+                'rejection_note' => 'Format proposal dan surat pengantar belum sesuai ketentuan.',
+                'rejection_reason' => 'Format proposal dan surat pengantar belum sesuai ketentuan.',
             ]
         );
 

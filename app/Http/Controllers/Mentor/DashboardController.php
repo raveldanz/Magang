@@ -12,19 +12,20 @@ class DashboardController extends Controller
 {
     /**
      * Halaman Dashboard Utama Pembimbing Lapangan / Mentor
-     * Menampilkan ringkasan metrik dan daftar mahasiswa bimbingan aktif.
+     * Menampilkan metrik dan daftar mahasiswa bimbingan dengan segmentasi lifecycle.
      */
-    public function index()
+    public function index(Request $request)
     {
         $mentor = Auth::user();
 
-        // Ambil data penempatan mahasiswa yang diplot ke mentor ini
+        // Ambil seluruh penempatan yang diplot ke mentor ini
         $query = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
             'logbooks',
             'evaluation',
-            'finalreport'
+            'finalreport',
+            'academicAdvisor'
         ])->where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
               ->orWhere('pembimbing_id', $mentor->id);
@@ -37,26 +38,43 @@ class DashboardController extends Controller
             });
         }
 
-        $placements = $query->get();
+        $allPlacements = $query->latest()->get();
+
+        // Pisahkan data berdasarkan computed lifecycle
+        $activeStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'ACTIVE');
+        $upcomingStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'ACCEPTED');
+        $completedStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'COMPLETED');
+
+        $tab = $request->get('tab', 'active');
+        $placements = match ($tab) {
+            'upcoming' => $upcomingStudents,
+            'completed' => $completedStudents,
+            'all' => $allPlacements,
+            default => $activeStudents,
+        };
 
         // Hitung statistik ringkasan untuk dashboard cards
-        $totalStudents = $placements->count();
-        $pendingLogbooksCount = $placements->sum(function ($placement) {
+        $totalStudents = $allPlacements->count();
+        $activeCount = $activeStudents->count();
+        $pendingLogbooksCount = $allPlacements->sum(function ($placement) {
             return $placement->logbooks->where('status', 'pending')->count();
         });
-        $evaluatedStudentsCount = $placements->filter(function ($placement) {
+        $evaluatedStudentsCount = $allPlacements->filter(function ($placement) {
             return $placement->evaluation !== null;
         })->count();
         $pendingEvaluationsCount = $totalStudents - $evaluatedStudentsCount;
 
         $stats = [
             'total_students' => $totalStudents,
+            'active_students' => $activeCount,
+            'upcoming_students' => $upcomingStudents->count(),
+            'completed_students' => $completedStudents->count(),
             'pending_logbooks' => $pendingLogbooksCount,
             'evaluated_students' => $evaluatedStudentsCount,
             'pending_evaluations' => $pendingEvaluationsCount,
         ];
 
-        return view('mentor.dashboard', compact('placements', 'stats'));
+        return view('mentor.dashboard', compact('placements', 'stats', 'tab'));
     }
 
     /**
@@ -74,6 +92,7 @@ class DashboardController extends Controller
             },
             'evaluation',
             'finalreport',
+            'academicAdvisor'
         ])->where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
               ->orWhere('pembimbing_id', $mentor->id);

@@ -10,104 +10,228 @@
 
             {{-- Flash Messages --}}
             @if (session('success'))
-                <div class="p-4 bg-green-100 text-green-800 rounded-lg text-sm font-semibold">
-                    {{ session('success') }}
+                <div class="p-4 bg-green-100 text-green-800 rounded-lg text-sm font-semibold flex items-center justify-between">
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+            @if (session('warning'))
+                <div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-semibold flex items-center justify-between">
+                    <span>{{ session('warning') }}</span>
                 </div>
             @endif
             @if (session('error'))
-                <div class="p-4 bg-red-100 text-red-800 rounded-lg text-sm font-semibold">
-                    {{ session('error') }}
+                <div class="p-4 bg-red-100 text-red-800 rounded-lg text-sm font-semibold flex items-center justify-between">
+                    <span>{{ session('error') }}</span>
                 </div>
             @endif
 
-            {{-- Cek Penempatan --}}
-            @if (!isset($placement) || !$placement)
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg shadow-sm">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
+            @php
+                $lifecycle = $application?->lifecycle_status ?? 'NONE';
+            @endphp
+
+            {{-- ========================================================================= --}}
+            {{-- 1. ALERT BANNER SESUAI DYNAMIC LIFECYCLE                                  --}}
+            {{-- ========================================================================= --}}
+
+            @if (!$application || $lifecycle === 'NONE')
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">📝</span>
+                            <div>
+                                <h4 class="font-bold text-amber-900 text-sm">Belum Ada Pengajuan Magang Aktif</h4>
+                                <p class="text-xs text-amber-700 mt-0.5">Anda belum mengajukan permohonan magang. Silakan lakukan pendaftaran magang terlebih dahulu untuk membuka fitur logbook.</p>
+                            </div>
                         </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
-                                <strong>Anda belum memiliki penempatan magang.</strong><br>
-                                Logbook hanya bisa diisi setelah pengajuan magang Anda disetujui (status: ACCEPTED) dan ditempatkan oleh Admin.
-                            </p>
+                        <a href="{{ route('student.application.create') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
+                            Ajukan Magang Sekarang &rarr;
+                        </a>
+                    </div>
+                </div>
+
+            @elseif ($lifecycle === 'PENDING')
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">⏳</span>
+                        <div>
+                            <h4 class="font-bold text-amber-900 text-sm">Pengajuan Sedang Diverifikasi</h4>
+                            <p class="text-xs text-amber-700 mt-0.5">Pengajuan magang Anda sedang dalam proses verifikasi dan seleksi oleh instansi kedinasan (<strong>{{ $application->unit->agencyProfile->agency_name ?? 'Pemkot Surabaya' }}</strong>).</p>
                         </div>
                     </div>
                 </div>
-            @else
+
+            @elseif ($lifecycle === 'REJECTED')
+                <div class="bg-rose-50 border-l-4 border-rose-500 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">❌</span>
+                            <div>
+                                <h4 class="font-bold text-rose-900 text-sm">Pengajuan Magang Ditolak</h4>
+                                <p class="text-xs text-rose-700 mt-0.5">
+                                    Catatan: <em>"{{ $application->rejection_reason ?? $application->rejection_note ?? 'Berkas / kualifikasi belum memenuhi kriteria instansi.' }}"</em>
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ route('student.application.create') }}" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
+                            Ajukan Ulang &rarr;
+                        </a>
+                    </div>
+                </div>
+
+            @elseif ($lifecycle === 'ACCEPTED')
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">ℹ️</span>
+                            <div>
+                                <h4 class="font-bold text-blue-900 text-sm">Pengajuan Telah Disetujui (Menunggu Masa Aktif / DPL)</h4>
+                                @if (!$placement || empty($placement->academic_advisor_id))
+                                    <p class="text-xs text-blue-700 mt-0.5">
+                                        Pengajuan Anda telah <strong>DITERIMA</strong>. Silakan tentukan/pilih <strong>Dosen Pembimbing Lapangan (DPL)</strong> pada dashboard untuk mengaktifkan logbook harian.
+                                    </p>
+                                @else
+                                    <p class="text-xs text-blue-700 mt-0.5">
+                                        Pengajuan Anda telah <strong>DITERIMA</strong> dan pembimbing telah lengkap. Logbook harian akan terbuka otomatis saat tanggal mulai magang pada tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong>.
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                        @if (!$placement || empty($placement->academic_advisor_id))
+                            <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
+                                Pilih DPL Sekarang &rarr;
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
+            @elseif ($lifecycle === 'COMPLETED')
+                <div class="bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between flex-wrap gap-3">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🎉</span>
+                            <div>
+                                <h4 class="font-bold text-emerald-900 text-sm">Selamat! Anda Telah Menyelesaikan Magang</h4>
+                                <p class="text-xs text-emerald-700 mt-0.5">
+                                    Seluruh rangkaian kegiatan magang dan evaluasi telah selesai disetujui. Riwayat logbook kini tersimpan rapi dalam mode arsip.
+                                </p>
+                            </div>
+                        </div>
+                        @if ($placement)
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('student.certificate.download', $placement->id) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Unduh E-Sertifikat & Nilai (PDF)
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            {{-- ========================================================================= --}}
+            {{-- 2. INFORMASI PENEMPATAN & STATISTIK JIKA APPLICATION SUDAH ACCEPTED / SELESAI --}}
+            {{-- ========================================================================= --}}
+            @if ($application && in_array($lifecycle, ['ACTIVE', 'ACCEPTED', 'COMPLETED']))
 
                 {{-- Card 1: Informasi Penempatan Magang --}}
-                <div class="bg-indigo-600 rounded-xl p-6 text-white shadow-lg">
-                    <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
-                        📑 Informasi Penempatan Magang
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                        <div>
-                            <p class="text-indigo-200 text-xs uppercase tracking-wider mb-1">Unit Instansi</p>
-                            <p class="font-bold text-lg">{{ $application->unit->name ?? '-' }}</p>
+                <div class="bg-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+                    <div class="flex items-center justify-between mb-4 border-b border-indigo-500 pb-3">
+                        <h3 class="text-base font-bold flex items-center gap-2">
+                            <span>📑</span> Informasi Penempatan Magang
+                        </h3>
+                        <span class="text-xs font-bold px-3 py-1 bg-white/20 text-white rounded-full">
+                            Status: {{ $lifecycle }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Instansi & Unit Kerja</p>
+                            <p class="font-bold text-sm text-white">{{ $application->unit->agencyProfile->agency_name ?? '-' }}</p>
+                            <p class="text-indigo-200 font-medium">{{ $application->unit->name ?? '-' }}</p>
                         </div>
-                        <div>
-                            <p class="text-indigo-200 text-xs uppercase tracking-wider mb-1">Pembimbing Lapangan</p>
-                            <p class="font-bold text-lg">{{ $placement->pembimbing->name ?? 'Belum Diplot' }}</p>
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Mentor Lapangan Dinas</p>
+                            <p class="font-bold text-sm text-white">{{ $placement->mentor->name ?? $placement->pembimbing->name ?? 'Belum Diplot' }}</p>
                         </div>
-                        <div>
-                            <p class="text-indigo-200 text-xs uppercase tracking-wider mb-1">Periode Magang</p>
-                            <p class="font-bold text-lg">{{ $application->start_date }} s/d {{ $application->end_date }}</p>
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing (DPL)</p>
+                            <p class="font-bold text-sm text-white">{{ $placement->academicAdvisor->name ?? 'Belum Ditentukan' }}</p>
+                        </div>
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
+                            <p class="font-bold text-sm text-white">{{ \Carbon\Carbon::parse($application->start_date)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->format('d M Y') }}</p>
                         </div>
                     </div>
                 </div>
 
                 {{-- Card 2: 4 Kartu Statistik Logbook --}}
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-indigo-500">
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-indigo-500">
                         <p class="text-xs text-gray-500 font-medium">Total Logbook</p>
                         <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total'] ?? 0 }}</p>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500">
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-emerald-500">
                         <p class="text-xs text-gray-500 font-medium">Disetujui</p>
-                        <p class="text-3xl font-bold text-green-600 mt-1">{{ $stats['approved'] ?? 0 }}</p>
+                        <p class="text-3xl font-bold text-emerald-600 mt-1">{{ $stats['approved'] ?? 0 }}</p>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-yellow-500">
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-amber-500">
                         <p class="text-xs text-gray-500 font-medium">Menunggu Review</p>
-                        <p class="text-3xl font-bold text-yellow-500 mt-1">{{ $stats['pending'] ?? 0 }}</p>
+                        <p class="text-3xl font-bold text-amber-500 mt-1">{{ $stats['pending'] ?? 0 }}</p>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500">
-                        <p class="text-xs text-gray-500 font-medium">Ditolak</p>
-                        <p class="text-3xl font-bold text-red-600 mt-1">{{ $stats['rejected'] ?? 0 }}</p>
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-rose-500">
+                        <p class="text-xs text-gray-500 font-medium">Ditolak / Revisi</p>
+                        <p class="text-3xl font-bold text-rose-600 mt-1">{{ $stats['rejected'] ?? 0 }}</p>
                     </div>
                 </div>
 
                 {{-- Card 3: Tabel Daftar Logbook Harian --}}
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div class="p-6 flex justify-between items-center border-b border-gray-100">
-                        <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
-                            📒 Daftar Logbook Harian
-                        </h3>
-                        {{-- Tombol Pindah ke Halaman Create --}}
-                        <a href="{{ route('student.logbook.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition">
-                            + TAMBAH LOGBOOK
-                        </a>
+                <div class="bg-white rounded-2xl shadow-xs overflow-hidden border border-gray-200">
+                    <div class="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-100">
+                        <div>
+                            <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                                📒 Daftar Logbook Harian
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Dosen Kampus)</p>
+                        </div>
+
+                        {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
+                        @if ($lifecycle === 'ACTIVE')
+                            <a href="{{ route('student.logbook.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Tambah Aktivitas Logbook
+                            </a>
+                        @elseif ($lifecycle === 'COMPLETED')
+                            <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200">
+                                🔒 Mode Arsip Magang Selesai
+                            </span>
+                        @else
+                            <span class="px-3 py-1.5 bg-gray-100 text-gray-500 text-xs font-bold rounded-xl">
+                                🔒 Logbook Terkunci
+                            </span>
+                        @endif
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-gray-100 text-xs font-semibold text-gray-500">
+                                <tr class="border-b border-gray-100 text-xs font-semibold text-gray-500 bg-gray-50/50">
                                     <th class="p-4">No</th>
                                     <th class="p-4">Tanggal</th>
                                     <th class="p-4">Kegiatan</th>
                                     <th class="p-4">Lampiran</th>
                                     <th class="p-4 text-center">Status Mentor Dinas</th>
                                     <th class="p-4 text-center">Status Dosen Kampus</th>
-                                    <th class="p-4">Aksi</th>
+                                    <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="text-sm divide-y divide-gray-50">
                                 @forelse ($logbooks as $index => $log)
-                                    <tr class="hover:bg-gray-50/50">
+                                    <tr class="hover:bg-gray-50/50 transition">
                                         <td class="p-4 text-gray-500">{{ $index + 1 }}</td>
                                         <td class="p-4 font-semibold text-gray-700 whitespace-nowrap">
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
@@ -117,42 +241,40 @@
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline text-xs font-medium">
-                                                    Lihat File
+                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline text-xs font-medium inline-flex items-center gap-1">
+                                                    <span>📎</span> Lihat File
                                                 </a>
                                             @else
                                                 <span class="text-gray-400 text-xs">-</span>
                                             @endif
                                         </td>
                                         <td class="p-4 text-center">
-                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-md 
-                                                {{ strtolower($log->status) === 'approved' ? 'bg-green-100 text-green-700' : '' }}
-                                                {{ strtolower($log->status) === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                {{ strtolower($log->status) === 'rejected' ? 'bg-red-100 text-red-700' : '' }}">
+                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
+                                                {{ strtolower($log->status) === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
+                                                {{ strtolower($log->status) === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
+                                                {{ strtolower($log->status) === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
                                                 {{ strtoupper($log->status) }}
                                             </span>
                                             @if ($log->feedback)
-                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px]" title="{{ $log->feedback }}">"{{ $log->feedback }}"</p>
+                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px] mx-auto" title="{{ $log->feedback }}">"{{ $log->feedback }}"</p>
                                             @endif
                                         </td>
                                         <td class="p-4 text-center">
-                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-md 
-                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'approved' ? 'bg-green-100 text-green-700' : '' }}
-                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'rejected' ? 'bg-red-100 text-red-700' : '' }}">
+                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
+                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
+                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
+                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
                                                 {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
                                             </span>
                                             @if ($log->lecturer_feedback)
-                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px]" title="{{ $log->lecturer_feedback }}">"{{ $log->lecturer_feedback }}"</p>
+                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px] mx-auto" title="{{ $log->lecturer_feedback }}">"{{ $log->lecturer_feedback }}"</p>
                                             @endif
                                         </td>
-                                        <td class="p-4">
-                                            @if (strtolower($log->status) === 'pending')
-                                                <div class="flex space-x-2">
-                                                    <a href="{{ route('student.logbook.edit', $log->id) }}" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs">
-                                                        Edit
-                                                    </a>
-                                                </div>
+                                        <td class="p-4 text-center">
+                                            @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected'))
+                                                <a href="{{ route('student.logbook.edit', $log->id) }}" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg transition">
+                                                    Edit
+                                                </a>
                                             @else
                                                 <span class="text-gray-400 text-xs">—</span>
                                             @endif
@@ -160,8 +282,12 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="p-8 text-center text-gray-400">
-                                            Belum ada logbook. Klik tombol <strong class="text-gray-700">"+ TAMBAH LOGBOOK"</strong> untuk mulai mencatat.
+                                        <td colspan="7" class="p-8 text-center text-gray-400 text-xs">
+                                            @if ($lifecycle === 'ACTIVE')
+                                                Belum ada catatan logbook. Klik tombol <strong class="text-gray-700">"+ Tambah Aktivitas Logbook"</strong> untuk mulai mencatat.
+                                            @else
+                                                Belum ada catatan logbook yang tersimpan.
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforelse
