@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Unit;
 use App\Models\AgencyProfile;
+use App\Models\University;
 use App\Models\StudentProfile;
 use App\Models\Application;
 use App\Models\Placement;
@@ -19,7 +20,31 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 0. SEED PROFIL MULTI-INSTANSI RESMI PEMERINTAH KOTA SURABAYA
+        // 0. SEED MASTER DATA UNIVERSITAS DI SURABAYA
+        $universities = [
+            'UNITOMO' => University::firstOrCreate(
+                ['code' => 'UNITOMO'],
+                ['name' => 'Universitas Dr. Soetomo']
+            ),
+            'UNESA' => University::firstOrCreate(
+                ['code' => 'UNESA'],
+                ['name' => 'Universitas Negeri Surabaya']
+            ),
+            'ITS' => University::firstOrCreate(
+                ['code' => 'ITS'],
+                ['name' => 'Institut Teknologi Sepuluh Nopember']
+            ),
+            'UNAIR' => University::firstOrCreate(
+                ['code' => 'UNAIR'],
+                ['name' => 'Universitas Airlangga']
+            ),
+            'UPN' => University::firstOrCreate(
+                ['code' => 'UPN'],
+                ['name' => 'UPN Veteran Jawa Timur']
+            ),
+        ];
+
+        // 1. SEED PROFIL MULTI-INSTANSI RESMI PEMERINTAH KOTA SURABAYA
         $agencies = [
             // Instansi 1: Diskominfo
             AgencyProfile::firstOrCreate(
@@ -74,7 +99,7 @@ class DatabaseSeeder extends Seeder
             ),
         ];
 
-        // 1. Seed User Admin (Utama & Masing-Masing Instansi Pemkot Surabaya)
+        // 2. SEED USER ADMIN (Utama & Masing-Masing Instansi Pemkot Surabaya)
         $adminUtama = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
@@ -115,7 +140,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. SEED 3 AKUN MENTOR PER INSTANSI PEMKOT SURABAYA
+        // 3. SEED 3 AKUN MENTOR PER INSTANSI PEMKOT SURABAYA (TOTAL 9 MENTOR)
         // A. Diskominfo (Agency ID 1)
         $mentorsDiskominfo = [
             User::firstOrCreate(
@@ -211,38 +236,118 @@ class DatabaseSeeder extends Seeder
 
         $allMentors = array_merge($mentorsDiskominfo, $mentorsDispusip, $mentorsDispendukcapil);
 
-        // 3. SEED AKUN RESMI DOSEN PEMBIMBING LAPANGAN KAMPUS (DPL)
-        $dosenUnitomo = User::firstOrCreate(
+        // 4. SEED 2 AKUN DOSEN PEMBIMBING LAPANGAN (DPL) PER KAMPUS (TOTAL 10 DOSEN)
+        // A. Unitomo
+        $dosenUnitomo1 = User::firstOrCreate(
             ['email' => 'dosen.unitomo@unitomo.ac.id'],
             [
-                'name' => 'Dr. Ir. Bambang Supriyadi, M.Kom (DPL Unitomo)',
+                'name' => 'Dr. Ir. Bambang Supriyadi, M.Kom',
                 'password' => Hash::make('password'),
                 'role' => 'dosen',
-                'university' => 'Universitas Dr. Soetomo',
+                'university_id' => $universities['UNITOMO']->id,
+                'university' => $universities['UNITOMO']->name,
+            ]
+        );
+        $dosenUnitomo2 = User::firstOrCreate(
+            ['email' => 'dosen.unitomo2@unitomo.ac.id'],
+            [
+                'name' => 'Dr. Sri Rahayu, S.Kom., M.T',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['UNITOMO']->id,
+                'university' => $universities['UNITOMO']->name,
             ]
         );
 
-        $dosenUnesa = User::firstOrCreate(
+        // B. UNESA
+        $dosenUnesa1 = User::firstOrCreate(
             ['email' => 'dosen.unesa@unesa.ac.id'],
             [
-                'name' => 'Dr. Erina Nur Azizah, S.Kom., M.Cs (DPL Unesa)',
+                'name' => 'Dr. Erina Nur Azizah, S.Kom., M.Cs',
                 'password' => Hash::make('password'),
                 'role' => 'dosen',
-                'university' => 'Universitas Negeri Surabaya',
+                'university_id' => $universities['UNESA']->id,
+                'university' => $universities['UNESA']->name,
+            ]
+        );
+        $dosenUnesa2 = User::firstOrCreate(
+            ['email' => 'dosen.unesa2@unesa.ac.id'],
+            [
+                'name' => 'Prof. Dr. Agus Widodo, M.Pd',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['UNESA']->id,
+                'university' => $universities['UNESA']->name,
             ]
         );
 
-        $dosenUpn = User::firstOrCreate(
+        // C. ITS
+        $dosenIts1 = User::firstOrCreate(
+            ['email' => 'dosen.its1@its.ac.id'],
+            [
+                'name' => 'Prof. Dr. Eng. Chastine Fatichah, S.Kom., M.Kom',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['ITS']->id,
+                'university' => $universities['ITS']->name,
+            ]
+        );
+        $dosenIts2 = User::firstOrCreate(
+            ['email' => 'dosen.its2@its.ac.id'],
+            [
+                'name' => 'Dr. R. V. Hari Ginardi, M.Sc',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['ITS']->id,
+                'university' => $universities['ITS']->name,
+            ]
+        );
+
+        // D. UNAIR
+        $dosenUnair1 = User::firstOrCreate(
+            ['email' => 'dosen.unair1@unair.ac.id'],
+            [
+                'name' => 'Dr. Rimuljo Hendradi, S.Si., M.Si',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['UNAIR']->id,
+                'university' => $universities['UNAIR']->name,
+            ]
+        );
+        $dosenUnair2 = User::firstOrCreate(
+            ['email' => 'dosen.unair2@unair.ac.id'],
+            [
+                'name' => 'Ira Puspitasari, S.T., M.T., Ph.D',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['UNAIR']->id,
+                'university' => $universities['UNAIR']->name,
+            ]
+        );
+
+        // E. UPN Veteran Jawa Timur
+        $dosenUpn1 = User::firstOrCreate(
             ['email' => 'dosen.upn@upnjatim.ac.id'],
             [
-                'name' => 'Dr. Eng. Yasin Al-Aqsho, S.Kom., M.Kom (DPL UPN)',
+                'name' => 'Dr. Eng. Yasin Al-Aqsho, S.Kom., M.Kom',
                 'password' => Hash::make('password'),
                 'role' => 'dosen',
-                'university' => 'UPN Veteran Jawa Timur',
+                'university_id' => $universities['UPN']->id,
+                'university' => $universities['UPN']->name,
+            ]
+        );
+        $dosenUpn2 = User::firstOrCreate(
+            ['email' => 'dosen.upn2@upnjatim.ac.id'],
+            [
+                'name' => 'Eva Yulia Puspaningrum, S.Kom., M.Kom',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university_id' => $universities['UPN']->id,
+                'university' => $universities['UPN']->name,
             ]
         );
 
-        // 4. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
+        // 5. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
         $unitData = [
             // Instansi 1: Diskominfo (Agency ID 1)
             [
@@ -325,15 +430,21 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 5. SEED DATA MAHASISWA TESTING (PENDING, VERIFIED, REJECTED)
-        // Mahasiswa 1: Raveldo Andyka (PENDING)
+        // 6. SEED DATA MAHASISWA TESTING (PENDING, VERIFIED, REJECTED)
+        // Mahasiswa 1: Raveldo Andyka (UPN - PENDING)
         $mhs1 = User::firstOrCreate(
             ['email' => 'mahasiswa@gmail.com'],
-            ['name' => 'Raveldo Andyka', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa', 'university' => 'UPN Veteran Jawa Timur']
+            [
+                'name' => 'Raveldo Andyka',
+                'password' => Hash::make('mahasiswa123'),
+                'role' => 'mahasiswa',
+                'university_id' => $universities['UPN']->id,
+                'university' => $universities['UPN']->name,
+            ]
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs1->id],
-            ['nim' => '22081010001', 'universitas' => 'UPN Veteran Jawa Timur', 'jurusan' => 'Informatika', 'phone' => '081234567890']
+            ['nim' => '22081010001', 'universitas' => $universities['UPN']->name, 'jurusan' => 'Informatika', 'phone' => '081234567890']
         );
         Application::firstOrCreate(
             ['user_id' => $mhs1->id],
@@ -345,14 +456,20 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Mahasiswa 2: Dimas Adam (VERIFIED)
+        // Mahasiswa 2: Dimas Adam (UNAIR - VERIFIED)
         $mhs2 = User::firstOrCreate(
             ['email' => 'dimas.adam@mhs.unair.ac.id'],
-            ['name' => 'Dimas Adam', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa', 'university' => 'Universitas Airlangga']
+            [
+                'name' => 'Dimas Adam',
+                'password' => Hash::make('mahasiswa123'),
+                'role' => 'mahasiswa',
+                'university_id' => $universities['UNAIR']->id,
+                'university' => $universities['UNAIR']->name,
+            ]
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs2->id],
-            ['nim' => '22081010002', 'universitas' => 'Universitas Airlangga', 'jurusan' => 'Sistem Informasi', 'phone' => '089876543210']
+            ['nim' => '22081010002', 'universitas' => $universities['UNAIR']->name, 'jurusan' => 'Sistem Informasi', 'phone' => '089876543210']
         );
         Application::firstOrCreate(
             ['user_id' => $mhs2->id],
@@ -364,14 +481,20 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Mahasiswa 3: Siti Nurhaliza (REJECTED)
+        // Mahasiswa 3: Siti Nurhaliza (UNESA - REJECTED)
         $mhs3 = User::firstOrCreate(
             ['email' => 'siti.nurhaliza@mhs.unesa.ac.id'],
-            ['name' => 'Siti Nurhaliza', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa', 'university' => 'Universitas Negeri Surabaya']
+            [
+                'name' => 'Siti Nurhaliza',
+                'password' => Hash::make('mahasiswa123'),
+                'role' => 'mahasiswa',
+                'university_id' => $universities['UNESA']->id,
+                'university' => $universities['UNESA']->name,
+            ]
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs3->id],
-            ['nim' => '22081010003', 'universitas' => 'Universitas Negeri Surabaya', 'jurusan' => 'Teknik Informatika', 'phone' => '087654321098']
+            ['nim' => '22081010003', 'universitas' => $universities['UNESA']->name, 'jurusan' => 'Teknik Informatika', 'phone' => '087654321098']
         );
         Application::firstOrCreate(
             ['user_id' => $mhs3->id],
@@ -384,97 +507,97 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 6. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT, PEMBIMBING DINAS & DOSEN KAMPUS
+        // 7. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI KAMPUS, UNIT & PEMBIMBING
         $graduatedStudents = [
             [
                 'name' => 'Ahmad Fauzi',
                 'email' => 'ahmad.fauzi@mhs.unitomo.ac.id',
                 'nim' => '22081010011',
-                'universitas' => 'Universitas Dr. Soetomo',
+                'univ_key' => 'UNITOMO',
                 'jurusan' => 'Informatika',
                 'phone' => '081234560011',
-                'dosen' => $dosenUnitomo,
+                'dosen' => $dosenUnitomo1,
             ],
             [
                 'name' => 'Nabila Putri Pratama',
                 'email' => 'nabila.putri@mhs.unesa.ac.id',
                 'nim' => '22081010012',
-                'universitas' => 'Universitas Negeri Surabaya',
+                'univ_key' => 'UNESA',
                 'jurusan' => 'Sistem Informasi',
                 'phone' => '081234560012',
-                'dosen' => $dosenUnesa,
+                'dosen' => $dosenUnesa1,
             ],
             [
                 'name' => 'Rizky Ramadhan',
                 'email' => 'rizky.ramadhan@mhs.unitomo.ac.id',
                 'nim' => '22081010013',
-                'universitas' => 'Universitas Dr. Soetomo',
+                'univ_key' => 'UNITOMO',
                 'jurusan' => 'Teknik Informatika',
                 'phone' => '081234560013',
-                'dosen' => $dosenUnitomo,
+                'dosen' => $dosenUnitomo2,
             ],
             [
                 'name' => 'Anisa Rahmawati',
                 'email' => 'anisa.rahma@mhs.unesa.ac.id',
                 'nim' => '22081010014',
-                'universitas' => 'Universitas Negeri Surabaya',
+                'univ_key' => 'UNESA',
                 'jurusan' => 'Teknologi Informasi',
                 'phone' => '081234560014',
-                'dosen' => $dosenUnesa,
+                'dosen' => $dosenUnesa2,
             ],
             [
                 'name' => 'Fajar Dwi Santoso',
-                'email' => 'fajar.dwi@mhs.unesa.ac.id',
+                'email' => 'fajar.dwi@mhs.its.ac.id',
                 'nim' => '22081010015',
-                'universitas' => 'Universitas Negeri Surabaya',
+                'univ_key' => 'ITS',
                 'jurusan' => 'Teknik Informatika',
                 'phone' => '081234560015',
-                'dosen' => $dosenUnesa,
+                'dosen' => $dosenIts1,
             ],
             [
                 'name' => 'Dewi Anggraini',
-                'email' => 'dewi.anggraini@mhs.unitomo.ac.id',
+                'email' => 'dewi.anggraini@mhs.unair.ac.id',
                 'nim' => '22081010016',
-                'universitas' => 'Universitas Dr. Soetomo',
+                'univ_key' => 'UNAIR',
                 'jurusan' => 'Sistem Informasi',
                 'phone' => '081234560016',
-                'dosen' => $dosenUnitomo,
+                'dosen' => $dosenUnair1,
             ],
             [
                 'name' => 'Bagus Tri Wicaksono',
-                'email' => 'bagus.tri@mhs.unitomo.ac.id',
+                'email' => 'bagus.tri@mhs.upnjatim.ac.id',
                 'nim' => '22081010017',
-                'universitas' => 'Universitas Dr. Soetomo',
+                'univ_key' => 'UPN',
                 'jurusan' => 'Informatika',
                 'phone' => '081234560017',
-                'dosen' => $dosenUnitomo,
+                'dosen' => $dosenUpn1,
             ],
             [
                 'name' => 'Clara Salsabila',
-                'email' => 'clara.salsabila@mhs.unesa.ac.id',
+                'email' => 'clara.salsabila@mhs.its.ac.id',
                 'nim' => '22081010018',
-                'universitas' => 'Universitas Negeri Surabaya',
+                'univ_key' => 'ITS',
                 'jurusan' => 'Sistem Informasi',
                 'phone' => '081234560018',
-                'dosen' => $dosenUnesa,
+                'dosen' => $dosenIts2,
             ],
             [
                 'name' => 'Hafidz Maulana',
-                'email' => 'hafidz.m@mhs.unitomo.ac.id',
+                'email' => 'hafidz.m@mhs.unair.ac.id',
                 'nim' => '22081010019',
-                'universitas' => 'Universitas Dr. Soetomo',
+                'univ_key' => 'UNAIR',
                 'jurusan' => 'Teknik Informatika',
                 'phone' => '081234560019',
-                'dosen' => $dosenUnitomo,
+                'dosen' => $dosenUnair2,
             ],
             [
                 'name' => 'Putri Maharani',
-                'email' => 'putri.maharani@mhs.unesa.ac.id',
+                'email' => 'putri.maharani@mhs.upnjatim.ac.id',
                 'nim' => '22081010020',
-                'universitas' => 'Universitas Negeri Surabaya',
-                'jurusan' => 'Pendidikan Teknologi Informasi',
+                'univ_key' => 'UPN',
+                'jurusan' => 'Sains Data',
                 'phone' => '081234560020',
-                'dosen' => $dosenUnesa,
+                'dosen' => $dosenUpn2,
             ],
         ];
 
@@ -490,6 +613,8 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($graduatedStudents as $index => $data) {
+            $univModel = $universities[$data['univ_key']];
+
             // A. Buat User Mahasiswa
             $user = User::firstOrCreate(
                 ['email' => $data['email']],
@@ -497,7 +622,8 @@ class DatabaseSeeder extends Seeder
                     'name' => $data['name'],
                     'password' => Hash::make('mahasiswa123'),
                     'role' => 'mahasiswa',
-                    'university' => $data['universitas'],
+                    'university_id' => $univModel->id,
+                    'university' => $univModel->name,
                 ]
             );
 
@@ -506,23 +632,21 @@ class DatabaseSeeder extends Seeder
                 ['user_id' => $user->id],
                 [
                     'nim' => $data['nim'],
-                    'universitas' => $data['universitas'],
+                    'universitas' => $univModel->name,
                     'jurusan' => $data['jurusan'],
                     'phone' => $data['phone'],
                 ]
             );
 
-            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan Dinas Sesuai Instansi Unit
+            // C. Distribusi Unit Kerja & Pembimbing Lapangan Dinas Sesuai Instansi Unit
             $assignedUnit = $units[$index % count($units)];
-            
-            // Pilih mentor yang agency_profile_id-nya sama dengan unit penempatan
             $agencyMentors = array_values(array_filter($allMentors, function ($m) use ($assignedUnit) {
                 return $m->agency_profile_id === $assignedUnit->agency_profile_id;
             }));
             $assignedMentor = $agencyMentors[$index % count($agencyMentors)];
             $assignedDosen = $data['dosen'];
 
-            // D. Buat Application Status ACCEPTED dengan rentang waktu 3 bulan lalu s.d. hari ini
+            // D. Buat Application Status ACCEPTED
             $application = Application::firstOrCreate(
                 ['user_id' => $user->id],
                 [
