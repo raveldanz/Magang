@@ -34,8 +34,12 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('admin.applications.index');
         }
 
-        if ($user->role === 'pembimbing') {
-            return redirect()->route('pembimbing.dashboard');
+        if ($user->role === 'mentor' || $user->role === 'pembimbing') {
+            return redirect()->route('mentor.dashboard');
+        }
+
+        if ($user->role === 'dosen' || $user->role === 'academic_advisor') {
+            return redirect()->route('lecturer.dashboard');
         }
 
         if ($user->role === 'mahasiswa') {
