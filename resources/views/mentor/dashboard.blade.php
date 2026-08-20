@@ -36,15 +36,15 @@
 
             <!-- Summary Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <!-- Total Mahasiswa -->
+                <!-- Bimbingan Aktif -->
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mahasiswa Bimbingan</p>
-                            <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_students'] }}</h3>
-                            <p class="text-xs text-gray-500 mt-1">Aktif magang</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Bimbingan Aktif</p>
+                            <h3 class="text-2xl font-black text-indigo-600 mt-1">{{ $stats['active_students'] }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">Sedang aktif magang</p>
                         </div>
-                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
@@ -68,13 +68,13 @@
                     </div>
                 </div>
 
-                <!-- Mahasiswa Sudah Dinilai -->
+                <!-- Mahasiswa Sudah Dinilai / Selesai -->
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Telah Dinilai</p>
-                            <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['evaluated_students'] }}</h3>
-                            <p class="text-xs text-gray-500 mt-1">Siap sertifikat</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Alumni Selesai</p>
+                            <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['completed_students'] }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">Telah dinilai & lulus</p>
                         </div>
                         <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,35 +84,69 @@
                     </div>
                 </div>
 
-                <!-- Belum Dinilai -->
+                <!-- Calon Peserta -->
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Belum Dinilai</p>
-                            <h3 class="text-2xl font-black text-rose-600 mt-1">{{ $stats['pending_evaluations'] }}</h3>
-                            <p class="text-xs text-gray-500 mt-1">Menunggu evaluasi akhir</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Calon Peserta</p>
+                            <h3 class="text-2xl font-black text-blue-600 mt-1">{{ $stats['upcoming_students'] }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">Menunggu jadwal mulai</p>
                         </div>
-                        <div class="p-3 bg-rose-50 text-rose-600 rounded-xl">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Segregated Tab Navigation -->
+            <div class="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-2">
+                <a href="{{ route('mentor.dashboard', ['tab' => 'active']) }}" 
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? 'active') === 'active' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>⚡ Bimbingan Aktif</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? 'active') === 'active' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['active_students'] }}</span>
+                </a>
+                <a href="{{ route('mentor.dashboard', ['tab' => 'upcoming']) }}" 
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'upcoming' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>📅 Calon Peserta Magang</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'upcoming' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['upcoming_students'] }}</span>
+                </a>
+                <a href="{{ route('mentor.dashboard', ['tab' => 'completed']) }}" 
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'completed' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>🎓 Alumni Selesai</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'completed' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['completed_students'] }}</span>
+                </a>
+                <a href="{{ route('mentor.dashboard', ['tab' => 'all']) }}" 
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>📁 Semua Mahasiswa</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'all' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['total_students'] }}</span>
+                </a>
+            </div>
+
             <!-- Table Mahasiswa Bimbingan -->
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200">
                 <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900">Daftar Mahasiswa Bimbingan Aktif</h3>
+                        <h3 class="text-lg font-bold text-gray-900">
+                            @if (($tab ?? 'active') === 'active')
+                                Daftar Mahasiswa Bimbingan Aktif
+                            @elseif ($tab === 'upcoming')
+                                Daftar Calon Peserta Magang (Mendatang)
+                            @elseif ($tab === 'completed')
+                                Arsip Alumni Mahasiswa Selesai
+                            @else
+                                Seluruh Daftar Mahasiswa Bimbingan
+                            @endif
+                        </h3>
                         <p class="text-xs text-gray-500 mt-0.5">Kelola verifikasi logbook harian dan berikan penilaian evaluasi akhir</p>
                     </div>
                     <a href="{{ route('mentor.logbooks.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-semibold rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                         </svg>
-                        Semua Logbook Masuk
+                        Feed Logbook Masuk
                     </a>
                 </div>
 
@@ -121,8 +155,9 @@
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                 <th class="py-3.5 px-4">Mahasiswa</th>
-                                <th class="py-3.5 px-4">Unit Penempatan</th>
-                                <th class="py-3.5 px-4 text-center">Status Logbook</th>
+                                <th class="py-3.5 px-4">Unit & Periode</th>
+                                <th class="py-3.5 px-4 text-center">STATUS</th>
+                                <th class="py-3.5 px-4 text-center">LOGBOOK</th>
                                 <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
                                 <th class="py-3.5 px-4 text-center">Nilai Akhir</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
@@ -138,6 +173,7 @@
                                     $report = $place->finalreport;
                                     $totalLog = $place->logbooks->count();
                                     $pendingLog = $place->logbooks->where('status', 'pending')->count();
+                                    $lifecycle = $place->application?->lifecycle_status ?? 'ACCEPTED';
                                     
                                     $rataRata = $eval ? round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 1) : null;
                                 @endphp
@@ -163,6 +199,16 @@
                                         <div class="text-[11px] text-gray-400 mt-0.5">
                                             {{ \Carbon\Carbon::parse($place->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($place->application->end_date)->translatedFormat('d M Y') }}
                                         </div>
+                                    </td>
+
+                                    <!-- Status Lifecycle -->
+                                    <td class="py-4 px-4 text-center">
+                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
+                                            {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
+                                            {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
+                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}">
+                                            {{ $lifecycle }}
+                                        </span>
                                     </td>
 
                                     <!-- Status Logbook -->
@@ -222,24 +268,33 @@
                                     <!-- Aksi -->
                                     <td class="py-4 px-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
-                                            <a href="{{ route('mentor.students.show', $place->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-semibold text-xs rounded-lg transition">
-                                                Detail & Logbook &rarr;
+                                            <a href="{{ route('mentor.students.show', $place->id) }}" 
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200">
+                                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                <span>Detail</span>
                                             </a>
-                                            <a href="{{ route('mentor.evaluations.create', $place->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 {{ $eval ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white' }} font-bold text-xs rounded-lg shadow-sm transition">
-                                                {{ $eval ? 'Edit Nilai' : 'Input Nilai' }}
+                                            <a href="{{ route('mentor.evaluations.create', $place->id) }}" 
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $eval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                <span>{{ $eval ? 'Edit Nilai' : 'Input Nilai' }}</span>
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-12 text-center text-gray-400">
+                                    <td colspan="7" class="py-12 text-center text-gray-400">
                                         <div class="max-w-sm mx-auto space-y-2">
                                             <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
-                                            <p class="font-medium text-gray-600">Belum Ada Mahasiswa Bimbingan</p>
-                                            <p class="text-xs text-gray-400">Mahasiswa yang telah diterima pada unit kerja Anda akan muncul di sini secara otomatis.</p>
+                                            <p class="font-medium text-gray-600">Tidak ada data mahasiswa pada tab ini</p>
+                                            <p class="text-xs text-gray-400">Data mahasiswa bimbingan akan diperbarui sesuai status lifecycle aktif.</p>
                                         </div>
                                     </td>
                                 </tr>

@@ -25,10 +25,12 @@ class ApplicationController extends Controller
             'placement.pembimbing'
         ])->latest();
 
+        $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
+
         // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
-        if ($user && $user->agency_profile_id !== null) {
-            $query->whereHas('unit', function ($q) use ($user) {
-                $q->where('agency_profile_id', $user->agency_profile_id);
+        if ($agencyId) {
+            $query->whereHas('unit', function ($q) use ($agencyId) {
+                $q->where('agency_profile_id', $agencyId);
             });
         }
 
@@ -55,8 +57,8 @@ class ApplicationController extends Controller
         }
 
         // Query Unit untuk Filter Dropdown (Scoped per instansi untuk Admin Dinas, atau All untuk Superadmin)
-        if ($user && $user->agency_profile_id !== null) {
-            $units = \App\Models\Unit::where('agency_profile_id', $user->agency_profile_id)->get();
+        if ($agencyId) {
+            $units = \App\Models\Unit::where('agency_profile_id', $agencyId)->get();
             $groupedUnits = null;
         } else {
             $units = \App\Models\Unit::with('agencyProfile')->get();
@@ -129,7 +131,8 @@ class ApplicationController extends Controller
         
         $application->update([
             'status' => $request->status,
-            'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
+            'rejection_note' => $request->status === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
+            'rejection_reason' => $request->status === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
             'letter_number' => $request->status === 'accepted' ? $request->letter_number : null,
             'letter_date' => $request->status === 'accepted' ? $request->letter_date : null,
         ]);

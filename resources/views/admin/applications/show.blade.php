@@ -18,15 +18,25 @@
 
             <!-- Data Profil & Pengajuan -->
             <div class="bg-white p-6 shadow sm:rounded-lg">
-                <h3 class="text-lg font-bold mb-4">Informasi Pemohon</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <p><strong>NIM:</strong> {{ $application->user->studentProfile->nim ?? '-' }}</p>
-                    <p><strong>Universitas:</strong> {{ $application->user->studentProfile->universitas ?? '-' }}</p>
-                    <p><strong>Jurusan:</strong> {{ $application->user->studentProfile->jurusan ?? '-' }}</p>
-                    <p><strong>No. HP:</strong> {{ $application->user->studentProfile->phone ?? '-' }}</p>
-                    <p><strong>Unit Tujuan:</strong> {{ $application->unit->name ?? '-' }}</p>
-                    <p><strong>Periode Magang:</strong> {{ $application->start_date }} s/d {{ $application->end_date }}
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Informasi Pemohon
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <p><strong class="text-slate-600">Nama Mahasiswa:</strong> <span class="font-bold text-slate-800">{{ $application->user->name }}</span></p>
+                    <p><strong class="text-slate-600">NIM:</strong> {{ $application->user->studentProfile->nim ?? '-' }}</p>
+                    <p><strong class="text-slate-600">Universitas:</strong> {{ $application->user->studentProfile->universitas ?? $application->user->university ?? '-' }}</p>
+                    <p><strong class="text-slate-600">Fakultas / Program Studi:</strong> {{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }} / {{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</p>
+                    <p><strong class="text-slate-600">No. Handphone:</strong> {{ $application->user->studentProfile->phone ?? '-' }}</p>
+                    <p><strong class="text-slate-600">Instansi Tujuan:</strong> 
+                        <span class="font-bold text-indigo-700">
+                            🏛️ {{ $application->unit->agencyProfile->agency_name ?? $application->unit->agencyProfile->name ?? 'Pemerintah Kota Surabaya' }}
+                        </span>
                     </p>
+                    <p><strong class="text-slate-600">Unit Tujuan / Bidang:</strong> <span class="font-semibold text-slate-800">{{ $application->unit->name ?? '-' }}</span></p>
+                    <p><strong class="text-slate-600">Periode Magang:</strong> {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</p>
                 </div>
             </div>
 
