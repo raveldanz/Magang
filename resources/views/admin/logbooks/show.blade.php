@@ -7,6 +7,8 @@
                 $backUrl = route('mentor.logbooks.index');
             } elseif (in_array($userRole, ['dosen', 'academic_advisor'])) {
                 $backUrl = route('lecturer.monitoring.index');
+            } elseif ($userRole === 'universitas') {
+                $backUrl = route('university.dashboard');
             }
         @endphp
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

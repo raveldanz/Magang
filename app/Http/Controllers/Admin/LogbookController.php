@@ -148,7 +148,18 @@ class LogbookController extends Controller
 
         // Authorization Check untuk Dosen Kampus
         if (in_array($user->role, ['dosen', 'academic_advisor'])) {
-            if ($placement->academic_advisor_id !== null && $placement->academic_advisor_id !== $user->id) {
+            $student = $placement?->application?->user;
+            $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
+            $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
+
+            if (!$isSameUniv && $user->university && $student) {
+                $isSameUniv = (
+                    $student->university === $user->university || 
+                    optional($student->studentProfile)->universitas === $user->university
+                );
+            }
+
+            if (!$isSameUniv && !$isAssignedAdvisor) {
                 abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook mahasiswa ini.');
             }
         }

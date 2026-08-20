@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor', 'dosen', 'academic_advisor'])
+            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor', 'dosen', 'academic_advisor', 'universitas'])
                   ->default('mahasiswa')
                   ->after('email');
             $table->string('university')->nullable()->after('agency_profile_id');
@@ -25,7 +25,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Tambahkan baris ini untuk menghapus kolom jika migration di-rollback
             $table->dropColumn('role');
         });
     }
