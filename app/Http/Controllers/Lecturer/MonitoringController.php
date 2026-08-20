@@ -27,7 +27,9 @@ class MonitoringController extends Controller
         ])->where(function ($q) use ($lecturer) {
             $q->where('academic_advisor_id', $lecturer->id)
               ->orWhereHas('application.user', function ($uQuery) use ($lecturer) {
-                  if (!empty($lecturer->university)) {
+                  if ($lecturer->university_id) {
+                      $uQuery->where('university_id', $lecturer->university_id);
+                  } elseif (!empty($lecturer->university)) {
                       $uQuery->where('university', $lecturer->university)
                              ->orWhereHas('studentProfile', function ($sp) use ($lecturer) {
                                  $sp->where('universitas', $lecturer->university);

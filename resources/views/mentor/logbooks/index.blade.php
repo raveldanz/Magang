@@ -91,15 +91,15 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-3">
                                 <span class="px-3 py-1 text-xs font-bold rounded-full 
                                     {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
                                     {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
                                     {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
                                     {{ strtoupper($log->status) }}
                                 </span>
-                                <a href="{{ route('mentor.students.show', $log->placement_id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
-                                    Lihat Profil &rarr;
+                                <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                    Detail & Review &rarr;
                                 </a>
                             </div>
                         </div>
