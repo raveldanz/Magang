@@ -12,34 +12,24 @@ use Illuminate\Support\Facades\Auth;
 class LogbookController extends Controller
 {
     /**
-     * Tampilkan seluruh rekapitulasi & feed logbook mahasiswa bimbingan dosen
+     * Tampilkan seluruh rekapitulasi & feed logbook mahasiswa bimbingan dosen (Strictly Scoped DPL)
      */
     public function index(Request $request)
     {
         $user = Auth::user();
+        $lecturerId = $user->id;
 
-        // 1. Ambil seluruh ID placement yang dibimbing atau satu universitas
-        $placementsQuery = Placement::with(['application.user.studentProfile', 'application.unit.agencyProfile'])
+        // 1. Ambil seluruh ID placement yang dibimbing langsung oleh Dosen ini
+        $supervisedPlacements = Placement::with(['application.user.studentProfile', 'application.unit.agencyProfile'])
+            ->where('academic_advisor_id', $lecturerId)
             ->whereHas('application', function ($q) {
-                $q->where('status', 'accepted');
-            });
+                $q->whereIn('status', ['accepted', 'completed']);
+            })
+            ->get();
 
-        // Scope Kampus & DPL
-        $placementsQuery->where(function ($query) use ($user) {
-            $query->where('academic_advisor_id', $user->id)
-                  ->orWhereHas('application.user', function ($uq) use ($user) {
-                      if ($user->university_id) {
-                          $uq->where('university_id', $user->university_id);
-                      } elseif ($user->university) {
-                          $uq->where('university', $user->university);
-                      }
-                  });
-        });
-
-        $supervisedPlacements = $placementsQuery->get();
         $placementIds = $supervisedPlacements->pluck('id')->toArray();
 
-        // 2. Query Logbook
+        // 2. Query Logbook HANYA untuk mahasiswa bimbingan DPL ini
         $logbooksQuery = Logbook::with([
             'placement.application.user.studentProfile',
             'placement.application.unit.agencyProfile',
@@ -115,9 +105,9 @@ class LogbookController extends Controller
         $placement = $logbook->placement;
         $student = $placement?->application?->user;
 
-        // Otorisasi: Dosen diizinkan jika mahasiswa satu kampus (university_id sama) ATAU dosen adalah pembimbing yang diplot
-        $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
+        // Otorisasi: Dosen adalah pembimbing yang diplot (academic_advisor_id) atau satu kampus
         $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
+        $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
 
         if (!$isSameUniv && $user->university && $student) {
             $isSameUniv = (
@@ -126,7 +116,7 @@ class LogbookController extends Controller
             );
         }
 
-        if (!$isSameUniv && !$isAssignedAdvisor) {
+        if (!$isAssignedAdvisor && !$isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook mahasiswa ini.');
         }
 
@@ -150,8 +140,8 @@ class LogbookController extends Controller
         $student = $placement?->application?->user;
 
         // Otorisasi
-        $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
         $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
+        $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
 
         if (!$isSameUniv && $user->university && $student) {
             $isSameUniv = (
@@ -160,7 +150,7 @@ class LogbookController extends Controller
             );
         }
 
-        if (!$isSameUniv && !$isAssignedAdvisor) {
+        if (!$isAssignedAdvisor && !$isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
         }
 

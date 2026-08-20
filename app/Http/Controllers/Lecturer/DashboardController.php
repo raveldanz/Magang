@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     /**
-     * Helper untuk membuat query placement terisolasi khusus kampus dosen yang sedang login
+     * Helper untuk membuat query placement terisolasi khusus DPL yang sedang login
      */
     protected function getLecturerPlacementsQuery()
     {
@@ -24,23 +24,11 @@ class DashboardController extends Controller
             'logbooks',
             'finalreport',
             'evaluation',
-        ])->where(function ($q) use ($lecturer) {
-            $q->where('academic_advisor_id', $lecturer->id)
-              ->orWhereHas('application.user', function ($uQuery) use ($lecturer) {
-                  if ($lecturer->university_id) {
-                      $uQuery->where('university_id', $lecturer->university_id);
-                  } elseif (!empty($lecturer->university)) {
-                      $uQuery->where('university', $lecturer->university)
-                             ->orWhereHas('studentProfile', function ($sp) use ($lecturer) {
-                                 $sp->where('universitas', $lecturer->university);
-                             });
-                  }
-              });
-        });
+        ])->where('academic_advisor_id', $lecturer->id);
     }
 
     /**
-     * Dashboard DPL: Menampilkan ringkasan mahasiswa bimbingan kampus & status evaluasi
+     * Dashboard DPL: Menampilkan ringkasan mahasiswa bimbingan DPL & status evaluasi
      */
     public function index(Request $request)
     {
@@ -66,7 +54,7 @@ class DashboardController extends Controller
 
         $placements = $query->latest()->get();
 
-        // Hitung metrik statistik kampus
+        // Hitung metrik statistik bimbingan DPL
         $totalStudents = $placements->count();
         $totalEvaluated = $placements->filter(function ($p) {
             return $p->evaluation && $p->evaluation->nilai_akademik > 0;

@@ -116,13 +116,16 @@ class DashboardController extends Controller
 
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
 
-        $placement = Placement::firstOrCreate(
-            ['application_id' => $application->id]
+        // Update row placement yang sudah ada (bukan membuat baris baru)
+        $placement = Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['academic_advisor_id' => $advisor->id]
         );
 
-        $placement->update([
-            'academic_advisor_id' => $advisor->id,
-        ]);
+        // Hapus placement duplikat jika ada
+        Placement::where('application_id', $application->id)
+            ->where('id', '!=', $placement->id)
+            ->delete();
 
         return redirect()->route('dashboard')->with('success', 'Dosen Pembimbing Kampus (' . $advisor->name . ') berhasil dipilih!');
     }
@@ -169,10 +172,6 @@ class DashboardController extends Controller
                 ->first();
         }
 
-        $placement = Placement::firstOrCreate(
-            ['application_id' => $application->id]
-        );
-
         // Kasus 1: Dosen sudah terdaftar di database
         if ($existingLecturer) {
             // Update relasi universitas jika sebelumnya belum terisi
@@ -183,9 +182,14 @@ class DashboardController extends Controller
                 ]);
             }
 
-            $placement->update([
-                'academic_advisor_id' => $existingLecturer->id,
-            ]);
+            $placement = Placement::updateOrCreate(
+                ['application_id' => $application->id],
+                ['academic_advisor_id' => $existingLecturer->id]
+            );
+
+            Placement::where('application_id', $application->id)
+                ->where('id', '!=', $placement->id)
+                ->delete();
 
             return redirect()->route('dashboard')->with('success', "Dosen Pembimbing {$existingLecturer->name} sudah terdaftar sebelumnya di sistem dan berhasil dipilih sebagai Dosen Pembimbing Anda.");
         }
@@ -206,9 +210,14 @@ class DashboardController extends Controller
             'email_verified_at' => now(),
         ]);
 
-        $placement->update([
-            'academic_advisor_id' => $newDosen->id,
-        ]);
+        $placement = Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['academic_advisor_id' => $newDosen->id]
+        );
+
+        Placement::where('application_id', $application->id)
+            ->where('id', '!=', $placement->id)
+            ->delete();
 
         // Kirimkan session flash detail kredensial untuk ditampilkan di modal informasi mahasiswa
         session()->flash('new_advisor_credential', [

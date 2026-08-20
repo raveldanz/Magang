@@ -12,10 +12,12 @@ class MonitoringController extends Controller
 {
     /**
      * Menu Monitoring Rekapitulasi Logbook & Progres Mahasiswa Kampus dengan Segregasi Lifecycle
+     * Strictly Scoped ke Dosen Pembimbing Lapangan (academic_advisor_id) yang sedang login
      */
     public function index(Request $request)
     {
         $lecturer = Auth::user();
+        $lecturerId = $lecturer->id;
 
         $query = Placement::with([
             'application.user.studentProfile',
@@ -25,19 +27,7 @@ class MonitoringController extends Controller
             'logbooks',
             'finalreport',
             'evaluation',
-        ])->where(function ($q) use ($lecturer) {
-            $q->where('academic_advisor_id', $lecturer->id)
-              ->orWhereHas('application.user', function ($uQuery) use ($lecturer) {
-                  if ($lecturer->university_id) {
-                      $uQuery->where('university_id', $lecturer->university_id);
-                  } elseif (!empty($lecturer->university)) {
-                      $uQuery->where('university', $lecturer->university)
-                             ->orWhereHas('studentProfile', function ($sp) use ($lecturer) {
-                                 $sp->where('universitas', $lecturer->university);
-                             });
-                  }
-              });
-        });
+        ])->where('academic_advisor_id', $lecturerId);
 
         if ($request->filled('search')) {
             $search = $request->search;
