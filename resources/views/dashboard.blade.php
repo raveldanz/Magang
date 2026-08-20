@@ -249,7 +249,7 @@
             </div>
 
             <!-- Status Card Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 
                 <!-- Card 1: Profil -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 border-l-4 {{ $profile ? 'border-l-emerald-500' : 'border-l-amber-500' }} space-y-3">
@@ -265,6 +265,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                         </div>
+                        <h3 class="text-lg font-bold tracking-tight text-slate-900 mt-3">
+                            {{ $profile ? 'Lengkap' : 'Belum Lengkap' }}
+                        </h3>
                     </div>
                     <a href="{{ route('student.profile.edit') }}" class="inline-block text-xs font-bold text-indigo-600 hover:text-indigo-800">
                         {{ $profile ? 'Edit Data Profil →' : 'Lengkapi Profil Sekarang →' }}
@@ -314,12 +317,16 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
+                        <h3 class="text-base font-bold text-slate-900 mt-3 truncate">
+                            {{ $application && $application->placement && $application->placement->pembimbing ? $application->placement->pembimbing->name : 'Belum Diplot' }}
+                        </h3>
                     </div>
                     <p class="text-[11px] text-gray-400">Ditugaskan resmi oleh instansi penempatan magang Anda.</p>
                 </div>
 
             </div>
 
+            <!-- Detail Banner Pengajuan Aktif -->
             <!-- Detail Banner Pengajuan Aktif -->
             @if ($application)
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">

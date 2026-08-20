@@ -1,12 +1,6 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Aktivitas & Logbook Magang') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             {{-- Flash Messages --}}
             @if (session('success'))
@@ -229,23 +223,23 @@
                                     <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-sm divide-y divide-gray-50">
+                            <tbody class="text-sm divide-y divide-slate-100">
                                 @forelse ($logbooks as $index => $log)
                                     <tr class="hover:bg-gray-50/50 transition">
                                         <td class="p-4 text-gray-500">{{ $index + 1 }}</td>
                                         <td class="p-4 font-semibold text-gray-700 whitespace-nowrap">
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
                                         </td>
-                                        <td class="p-4 text-gray-700 max-w-xs">
+                                        <td class="py-4 px-5 text-slate-700 max-w-xs leading-relaxed">
                                             <p class="truncate" title="{{ $log->activity }}">{{ Str::limit($log->activity, 80) }}</p>
                                         </td>
-                                        <td class="p-4">
+                                        <td class="py-4 px-5 whitespace-nowrap">
                                             @if ($log->attachment)
                                                 <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline text-xs font-medium inline-flex items-center gap-1">
                                                     <span>📎</span> Lihat File
                                                 </a>
                                             @else
-                                                <span class="text-gray-400 text-xs">-</span>
+                                                <span class="text-slate-400 text-xs">-</span>
                                             @endif
                                         </td>
                                         <td class="p-4 text-center">
@@ -270,7 +264,7 @@
                                                     Edit
                                                 </a>
                                             @else
-                                                <span class="text-gray-400 text-xs">—</span>
+                                                <span class="text-slate-400 text-xs">—</span>
                                             @endif
                                         </td>
                                     </tr>

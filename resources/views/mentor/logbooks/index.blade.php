@@ -1,54 +1,49 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+            <!-- Page Header -->
             <div class="flex items-center gap-3">
-                <a href="{{ route('mentor.dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
+                <a href="{{ route('mentor.dashboard') }}" class="p-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 </a>
                 <div>
-                    <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    <h2 class="text-xl font-bold tracking-tight text-slate-900">
                         Semua Logbook Mahasiswa Bimbingan
                     </h2>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+                    <p class="text-xs text-slate-500 mt-0.5">
                         Tinjau seluruh aktivitas harian mahasiswa di unit kerja Anda
                     </p>
                 </div>
             </div>
-        </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-
-            <!-- Flash Success Message -->
+            <!-- Flash Alert -->
             @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm flex items-center justify-between text-emerald-900 text-sm font-medium">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>{{ session('success') }}</span>
-                    </div>
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-semibold shadow-sm">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
 
             <!-- Filter & Search Bar -->
-            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-4">
                 
-                <!-- Status Filter Tabs -->
+                <!-- Status Filter Pills -->
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <a href="{{ route('mentor.logbooks.index') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ !request('status') ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                    <a href="{{ route('mentor.logbooks.index') }}" 
+                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ !request('status') ? 'bg-blue-600 text-white shadow-sm shadow-blue-200' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
                         Semua Status
                     </a>
-                    <a href="{{ route('mentor.logbooks.index', ['status' => 'pending']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100' }}">
+                    <a href="{{ route('mentor.logbooks.index', ['status' => 'pending']) }}" 
+                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ request('status') === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100' }}">
                         Pending Review
                     </a>
-                    <a href="{{ route('mentor.logbooks.index', ['status' => 'approved']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'approved' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100' }}">
+                    <a href="{{ route('mentor.logbooks.index', ['status' => 'approved']) }}" 
+                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ request('status') === 'approved' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' }}">
                         Approved
                     </a>
-                    <a href="{{ route('mentor.logbooks.index', ['status' => 'rejected']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'rejected' ? 'bg-rose-600 text-white shadow-sm' : 'bg-rose-50 text-rose-800 hover:bg-rose-100' }}">
+                    <a href="{{ route('mentor.logbooks.index', ['status' => 'rejected']) }}" 
+                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ request('status') === 'rejected' ? 'bg-red-600 text-white shadow-sm' : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' }}">
                         Rejected
                     </a>
                 </div>
@@ -59,35 +54,34 @@
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
                     <div class="relative w-full">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa..." class="w-full text-xs border-gray-300 rounded-xl pl-9 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
-                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa..." class="w-full text-xs border border-slate-200 bg-slate-50 text-slate-900 rounded-xl pl-9 pr-3 py-2 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-sm shadow-blue-200 transition">
                         Cari
                     </button>
                 </form>
 
             </div>
 
-            <!-- List Logbook Entries -->
+            <!-- List Logbook Cards -->
             <div class="space-y-4">
                 @forelse ($logbooks as $log)
                     @php
                         $student = $log->placement->application->user ?? null;
                         $unit = $log->placement->application->unit ?? null;
+                        $st = strtolower($log->status ?? '');
                     @endphp
-                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:border-indigo-200 transition space-y-3">
+                    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4 transition-all duration-200 hover:scale-[1.005]">
                         
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center">
+                                <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center">
                                     {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
                                 </div>
                                 <div>
-                                    <div class="font-bold text-gray-900 text-sm">{{ $student->name ?? '-' }}</div>
-                                    <div class="text-xs text-gray-500">{{ $unit->name ?? '-' }} &bull; Tanggal: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}</div>
+                                    <div class="font-bold text-slate-900 text-sm leading-snug">{{ $student->name ?? '-' }}</div>
+                                    <div class="text-xs text-slate-400 mt-0.5">{{ $unit->name ?? '-' }} &bull; Tanggal: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}</div>
                                 </div>
                             </div>
 
@@ -105,35 +99,33 @@
                         </div>
 
                         <!-- Activity Text -->
-                        <div class="text-sm text-gray-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-gray-100">
+                        <div class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50/70 p-4 rounded-xl border border-slate-100">
                             {{ $log->activity }}
                         </div>
 
                         @if ($log->attachment)
-                            <div class="pt-1">
-                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                    </svg>
-                                    Buka Lampiran Dokumen Bukti
+                            <div>
+                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                    Buka Lampiran Bukti
                                 </a>
                             </div>
                         @endif
 
-                        <!-- Form Approve / Reject -->
-                        <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                        <!-- Form Approve / Reject Inline -->
+                        <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-4 gap-2.5 items-center">
                             @csrf
                             @method('PUT')
                             
                             <div class="sm:col-span-3">
-                                <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback mentor..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback perbaikan mentor..." class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-900 px-3.5 py-2 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
                             </div>
 
                             <div class="flex gap-2">
-                                <button type="submit" name="status" value="approved" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                <button type="submit" name="status" value="approved" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition shadow-sm">
                                     Approve
                                 </button>
-                                <button type="submit" name="status" value="rejected" class="w-full px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                <button type="submit" name="status" value="rejected" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition shadow-sm">
                                     Reject
                                 </button>
                             </div>
@@ -141,15 +133,14 @@
 
                     </div>
                 @empty
-                    <div class="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-200">
-                        <p class="font-medium text-gray-600">Tidak Ada Logbook Ditemukan</p>
-                        <p class="text-xs text-gray-400 mt-1">Belum ada aktivitas mahasiswa sesuai filter pencarian yang dipilih.</p>
+                    <div class="bg-white rounded-2xl p-12 text-center text-slate-400 border border-slate-100">
+                        <p class="font-medium text-slate-600">Tidak Ada Logbook Ditemukan</p>
+                        <p class="text-xs text-slate-400 mt-1">Belum ada aktivitas mahasiswa sesuai filter pencarian yang dipilih.</p>
                     </div>
                 @endforelse
 
-                <!-- Pagination -->
                 @if ($logbooks->hasPages())
-                    <div class="p-4 bg-white rounded-2xl border border-gray-200">
+                    <div class="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
                         {{ $logbooks->links() }}
                     </div>
                 @endif
