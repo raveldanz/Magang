@@ -78,7 +78,7 @@
             </div>
 
             <!-- Tabel Monitoring -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -92,7 +92,7 @@
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
+                        <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($placements as $placement)
                                 @php
                                     $student = $placement->application->user;
@@ -110,10 +110,9 @@
                                         <div class="font-bold text-gray-900 leading-snug">{{ $student->name ?? '-' }}</div>
                                         <div class="text-xs text-gray-500 mt-0.5">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</div>
                                     </td>
-
-                                    <td class="py-4 px-4">
-                                        <div class="text-xs font-semibold text-gray-800">🏛️ {{ $agency->agency_name ?? '-' }}</div>
-                                        <div class="text-[11px] text-gray-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
+                                    <td class="py-4 px-5 text-xs">
+                                        <div class="font-semibold text-slate-800">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="text-slate-400 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
@@ -141,11 +140,10 @@
                                                 ⏳ Menunggu
                                             </span>
                                         @else
-                                            <span class="text-xs text-gray-400 italic">Belum Ada</span>
+                                            <span class="text-xs text-slate-400 italic">Belum Ada</span>
                                         @endif
                                     </td>
-
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-5 text-center whitespace-nowrap">
                                         @if ($hasEval)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-xs">
                                                 ⭐ {{ $placement->evaluation->nilai_akademik }}

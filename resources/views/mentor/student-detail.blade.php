@@ -1,204 +1,133 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('mentor.dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                </a>
-                <div>
-                    <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                        {{ $placement->application->user->name }}
-                    </h2>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
-                        {{ $placement->application->user->studentProfile->nim ?? '-' }} &bull; {{ $placement->application->user->studentProfile->universitas ?? '-' }} ({{ $placement->application->user->studentProfile->jurusan ?? '-' }})
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <a href="{{ route('mentor.evaluations.create', $placement->id) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    {{ $placement->evaluation ? 'Edit Penilaian Akhir' : 'Input Penilaian Akhir' }}
-                </a>
-            </div>
-        </div>
-    </x-slot>
-
-    <div class="py-8">
+    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Flash Success Message -->
-            @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm flex items-center justify-between text-emerald-900 text-sm font-medium">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>{{ session('success') }}</span>
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('mentor.dashboard') }}" class="p-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    </a>
+                    <div>
+                        <h2 class="text-xl font-bold tracking-tight text-slate-900">
+                            Detail Mahasiswa Bimbingan
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Monitoring logbook harian, status laporan akhir, dan evaluasi mahasiswa
+                        </p>
                     </div>
+                </div>
+
+                <a href="{{ route('mentor.evaluations.create', $placement->id) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-sm shadow-blue-200 transition-all duration-200 hover:scale-[1.01]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    <span>{{ $placement->evaluation ? 'Edit Evaluasi Nilai' : 'Input Nilai Akhir' }}</span>
+                </a>
+            </div>
+
+            <!-- Flash Alert -->
+            @if (session('success'))
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-semibold shadow-sm">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
 
-            <!-- Grid Kartu Status: Penilaian & Laporan Akhir -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                <!-- 1. Kartu Status Evaluasi Nilai -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between border-b pb-3 mb-4">
-                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                                </svg>
-                                Status Penilaian & E-Sertifikat
-                            </h3>
-                            @if ($placement->evaluation)
-                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                    Sudah Dinilai
-                                </span>
-                            @else
-                                <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
-                                    Belum Dinilai
-                                </span>
-                            @endif
+            <!-- Info Cards Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <!-- Biodata Card -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 font-bold text-base flex items-center justify-center shrink-0">
+                            {{ strtoupper(substr($placement->application->user->name ?? 'M', 0, 2)) }}
                         </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">{{ $placement->application->user->name ?? '-' }}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                {{ $placement->application->user->studentProfile->universitas ?? '-' }} &bull; Jurusan {{ $placement->application->user->studentProfile->jurusan ?? '-' }}
+                            </p>
+                            <span class="inline-block mt-1 px-2.5 py-0.5 bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-semibold rounded-full">
+                                NIM: {{ $placement->application->user->studentProfile->nim ?? '-' }}
+                            </span>
+                        </div>
+                    </div>
 
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-slate-100 text-xs">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block text-[11px]">Unit Penempatan:</span>
+                            <span class="font-bold text-slate-800">{{ $placement->application->unit->name ?? '-' }}</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block text-[11px]">Periode Magang:</span>
+                            <span class="font-bold text-slate-800">
+                                {{ \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Evaluasi & Laporan -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-2">Status Nilai Akhir</span>
                         @if ($placement->evaluation)
                             @php
                                 $eval = $placement->evaluation;
-                                $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
-                                $grade = 'C';
-                                if ($rataRata >= 85) $grade = 'A (Sangat Memuaskan)';
-                                elseif ($rataRata >= 70) $grade = 'B (Memuaskan)';
+                                $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 1);
                             @endphp
-                            <div class="grid grid-cols-3 gap-3 mb-4 text-center">
-                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                    <span class="text-[11px] font-bold text-gray-500 uppercase">Disiplin</span>
-                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval->nilai_disiplin }}</p>
+                            <div class="p-3.5 bg-blue-50 border border-blue-100 rounded-xl">
+                                <div class="flex items-baseline justify-between">
+                                    <span class="text-xs text-blue-700 font-semibold">Rata-rata:</span>
+                                    <span class="text-2xl font-extrabold text-blue-700">{{ $rataRata }}</span>
                                 </div>
-                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                    <span class="text-[11px] font-bold text-gray-500 uppercase">Kinerja</span>
-                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval->nilai_kinerja }}</p>
+                                <div class="text-[11px] text-blue-600 mt-1">
+                                    Predikat: <strong>{{ $rataRata >= 85 ? 'A (Sangat Memuaskan)' : ($rataRata >= 70 ? 'B (Memuaskan)' : 'C (Cukup)') }}</strong>
                                 </div>
-                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                    <span class="text-[11px] font-bold text-gray-500 uppercase">Laporan</span>
-                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval->nilai_laporan }}</p>
-                                </div>
-                            </div>
-
-                            <div class="bg-indigo-50/75 p-3.5 rounded-xl border border-indigo-100 space-y-1 mb-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs font-semibold text-indigo-900">Nilai Akhir Rata-Rata:</span>
-                                    <span class="text-lg font-black text-indigo-700">{{ $rataRata }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs font-semibold text-indigo-900">Predikat Kelulusan:</span>
-                                    <span class="text-xs font-extrabold text-indigo-800">{{ $grade }}</span>
-                                </div>
-                                @if ($eval->catatan)
-                                    <div class="pt-2 border-t border-indigo-100 text-xs text-indigo-950">
-                                        <strong>Catatan:</strong> <em>"{{ $eval->catatan }}"</em>
-                                    </div>
-                                @endif
                             </div>
                         @else
-                            <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-500 text-sm mb-4">
-                                <p>Mahasiswa belum memiliki evaluasi nilai dari Pembimbing Lapangan.</p>
-                                <p class="text-xs text-gray-400 mt-1">Silakan klik tombol di bawah untuk memasukkan nilai evaluasi akhir.</p>
+                            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                                <span class="text-xs text-slate-400 italic">Belum dinilai oleh mentor</span>
                             </div>
                         @endif
                     </div>
 
-                    <a href="{{ route('mentor.evaluations.create', $placement->id) }}" class="w-full text-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
-                        {{ $placement->evaluation ? 'Ubah Nilai Evaluasi' : 'Isi Form Penilaian Evaluasi' }}
-                    </a>
-                </div>
-
-                <!-- 2. Kartu Status Laporan Akhir -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between border-b pb-3 mb-4">
-                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Laporan Akhir Magang
-                            </h3>
-                            @if ($placement->finalreport)
-                                <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                    {{ $placement->finalreport->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $placement->finalreport->status === 'revision' ? 'bg-rose-100 text-rose-800' : '' }}
-                                    {{ $placement->finalreport->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
+                    <div class="pt-3 border-t border-slate-100">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-1.5">Laporan Akhir</span>
+                        @if ($placement->finalreport)
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-full border
+                                    {{ $placement->finalreport->status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
+                                    {{ $placement->finalreport->status === 'revision' ? 'bg-red-50 text-red-700 border-red-200' : '' }}
+                                    {{ $placement->finalreport->status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}">
                                     {{ strtoupper($placement->finalreport->status) }}
                                 </span>
-                            @else
-                                <span class="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
-                                    Belum Diunggah
-                                </span>
-                            @endif
-                        </div>
-
-                        @if ($placement->finalreport && $placement->finalreport->file_path)
-                            <div class="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-2 mb-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-gray-600 font-medium">Berkas Dokumen Laporan:</span>
-                                    <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-bold">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Buka PDF Laporan
+                                @if ($placement->finalreport->file_path)
+                                    <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="text-xs font-semibold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1">
+                                        Unduh PDF <span>&rarr;</span>
                                     </a>
-                                </div>
-                                @if ($placement->finalreport->feedback)
-                                    <p class="text-xs text-gray-500 border-t pt-2 mt-2">
-                                        <strong>Feedback Pembimbing:</strong> "{{ $placement->finalreport->feedback }}"
-                                    </p>
                                 @endif
                             </div>
-
-                            <!-- Form Review Laporan Akhir -->
-                            <form action="{{ route('mentor.final_report.updateStatus', $placement->finalreport->id) }}" method="POST" class="space-y-3 pt-2">
-                                @csrf
-                                @method('PUT')
-                                <input type="text" name="feedback" value="{{ $placement->finalreport->feedback }}" placeholder="Catatan/revisi untuk mahasiswa..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
-                                <div class="flex gap-2">
-                                    <button type="submit" name="status" value="approved" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition">
-                                        Setujui Laporan
-                                    </button>
-                                    <button type="submit" name="status" value="revision" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm transition">
-                                        Minta Revisi
-                                    </button>
-                                </div>
-                            </form>
                         @else
-                            <div class="p-6 bg-gray-50 rounded-xl text-center text-gray-500 text-sm">
-                                <p>Mahasiswa belum mengunggah berkas laporan akhir magang.</p>
-                            </div>
+                            <span class="text-xs text-slate-400 italic">Belum ada unggahan laporan</span>
                         @endif
                     </div>
                 </div>
-
             </div>
 
-            <!-- Daftar Aktivitas Logbook Harian -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200 p-6 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2">
+            <!-- List Logbook Mahasiswa Tersebut -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900">Riwayat & Verifikasi Logbook Harian</h3>
-                        <p class="text-xs text-gray-500">Tinjau deskripsi aktivitas, lampiran bukti, dan berikan status verifikasi beserta feedback</p>
+                        <h3 class="text-base font-bold text-slate-900">Riwayat Logbook Harian</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Daftar seluruh aktivitas harian yang dikerjakan mahasiswa</p>
                     </div>
-                    <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full">
-                        Total: {{ $placement->logbooks->count() }} Kegiatan
+                    <span class="text-xs font-semibold px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-100">
+                        {{ $placement->logbooks->count() }} Logbook
                     </span>
                 </div>
 
-                <div class="space-y-4 pt-2">
-                    @forelse ($placement->logbooks as $log)
-                        <div class="border border-gray-200 p-4 sm:p-5 rounded-2xl bg-slate-50/50 space-y-3 hover:border-indigo-200 transition">
+                <div class="divide-y divide-slate-100 p-6 space-y-4">
+                    @forelse ($placement->logbooks->sortByDesc('date') as $log)
+                        <div class="p-5 bg-slate-50/70 rounded-2xl border border-slate-200/70 space-y-3">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                 <div class="flex items-center gap-2">
                                     <span class="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg">
@@ -223,43 +152,39 @@
                                 </div>
                             </div>
 
-                            <div class="text-sm text-gray-700 leading-relaxed bg-white p-3.5 rounded-xl border border-gray-100">
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-xl border border-slate-100">
                                 {{ $log->activity }}
-                            </div>
+                            </p>
 
                             @if ($log->attachment)
-                                <div class="pt-1">
-                                    <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                        </svg>
-                                        Buka Lampiran Bukti Kegiatan
+                                <div>
+                                    <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                        Buka Lampiran Bukti
                                     </a>
                                 </div>
                             @endif
 
-                            <!-- Form Action Verifikasi (Approve / Reject) -->
-                            <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                            <!-- Quick Form Approve / Reject Inline -->
+                            <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-slate-200/70 grid grid-cols-1 sm:grid-cols-4 gap-2 items-center">
                                 @csrf
                                 @method('PUT')
-                                
                                 <div class="sm:col-span-3">
-                                    <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Tambahkan catatan/feedback pembimbing..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                                    <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback perbaikan logbook..." class="w-full text-xs rounded-xl border border-slate-200 bg-white text-slate-900 px-3 py-2 focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400">
                                 </div>
-
                                 <div class="flex gap-2">
-                                    <button type="submit" name="status" value="approved" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                    <button type="submit" name="status" value="approved" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold uppercase rounded-xl transition shadow-sm">
                                         Approve
                                     </button>
-                                    <button type="submit" name="status" value="rejected" class="w-full px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                    <button type="submit" name="status" value="rejected" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold uppercase rounded-xl transition shadow-sm">
                                         Reject
                                     </button>
                                 </div>
                             </form>
                         </div>
                     @empty
-                        <div class="py-8 text-center text-gray-400">
-                            <p class="text-sm">Mahasiswa belum menginputkan logbook kegiatan.</p>
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            Belum ada logbook kegiatan yang diunggah oleh mahasiswa ini.
                         </div>
                     @endforelse
                 </div>

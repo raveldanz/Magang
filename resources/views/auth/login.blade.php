@@ -1,85 +1,95 @@
 <x-guest-layout>
-    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <!-- Logo Pemkot Surabaya -->
-        <div class="flex justify-center mb-4">
+    <!-- Brand Header -->
+    <div class="text-center mb-6">
+        <div class="inline-flex p-3 rounded-2xl bg-white border border-slate-100 shadow-sm shadow-slate-200/50 mb-3 transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md hover:shadow-blue-100">
             <img src="{{ asset('images/logoPemkotSBY.png') }}" 
-                 alt="Logo Pemkot Surabaya"
-                 class="h-20 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-300">
+                 alt="Logo Pemkot Surabaya" 
+                 class="h-14 w-auto object-contain">
         </div>
-
-        <!-- Header Text -->
-        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight">
+        
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900">
             Portal Magang Mahasiswa
         </h2>
-        <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 mt-1">
-            Pemerintah Kota Surabaya
-        </p>
-        <p class="text-xs text-gray-500 mt-1">
+        <div class="mt-1.5 flex items-center justify-center">
+            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-50 text-blue-600 border border-blue-100">
+                Pemerintah Kota Surabaya
+            </span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">
             Silakan masuk untuk mengelola logbook & pengajuan magang
         </p>
     </div>
 
-    <div class="bg-white py-8 px-6 shadow-xl shadow-gray-100/70 rounded-2xl border border-gray-100 sm:px-10">
-        <!-- Session Status -->
+    <!-- Login Card Surface -->
+    <div class="bg-white p-7 sm:p-8 rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50">
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-5">
+        <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
 
             <!-- Email Address -->
             <div>
-                <x-input-label for="email" value="{{ __('Email') }}"
-                    class="font-semibold text-gray-700 text-xs uppercase tracking-wider" />
-                <x-text-input id="email"
-                    class="block mt-1.5 w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm py-2.5 px-3.5 transition"
-                    type="email" name="email" :value="old('email')" required autofocus autocomplete="username"
-                    placeholder="nama@email.com" />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Email Address
+                </label>
+                <input id="email" 
+                       type="email" 
+                       name="email" 
+                       value="{{ old('email') }}" 
+                       required 
+                       autofocus 
+                       autocomplete="username" 
+                       placeholder="nama@email.com" 
+                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200 ease-in-out" />
+                <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs" />
             </div>
 
             <!-- Password -->
             <div>
-                <div class="flex items-center justify-between">
-                    <x-input-label for="password" value="{{ __('Password') }}"
-                        class="font-semibold text-gray-700 text-xs uppercase tracking-wider" />
+                <div class="flex items-center justify-between mb-1.5">
+                    <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Password
+                    </label>
                     @if (Route::has('password.request'))
-                        <a class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition"
-                            href="{{ route('password.request') }}">
-                            {{ __('Lupa password?') }}
+                        <a href="{{ route('password.request') }}" class="text-xs text-blue-600 hover:text-blue-700 font-medium transition-all duration-200">
+                            Lupa password?
                         </a>
                     @endif
                 </div>
-
-                <x-text-input id="password"
-                    class="block mt-1.5 w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm py-2.5 px-3.5 transition"
-                    type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                <input id="password" 
+                       type="password" 
+                       name="password" 
+                       required 
+                       autocomplete="current-password" 
+                       placeholder="••••••••" 
+                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200 ease-in-out" />
+                <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs" />
             </div>
 
             <!-- Remember Me -->
             <div class="flex items-center">
-                <input id="remember_me" type="checkbox"
-                    class="rounded-md border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 w-4 h-4 cursor-pointer"
-                    name="remember">
-                <label for="remember_me" class="ml-2 text-xs text-gray-600 font-medium cursor-pointer select-none">
-                    {{ __('Ingat saya di perangkat ini') }}
+                <input id="remember_me" 
+                       type="checkbox" 
+                       name="remember" 
+                       class="rounded-md border-slate-300 text-blue-600 shadow-sm focus:ring-blue-400 w-4 h-4 cursor-pointer">
+                <label for="remember_me" class="ml-2 text-xs text-slate-600 font-medium cursor-pointer select-none">
+                    Ingat saya di perangkat ini
                 </label>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Action Button -->
             <div class="pt-2">
-                <button type="submit"
-                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out uppercase tracking-wider">
-                    {{ __('Masuk ke Akun') }}
+                <button type="submit" class="w-full rounded-xl px-4 py-2.5 font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-sm shadow-blue-200 transition-all duration-200 ease-in-out hover:scale-[1.01] active:scale-[0.99]">
+                    Masuk ke Akun
                 </button>
             </div>
         </form>
 
         @if (Route::has('register'))
-            <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-500">
+            <div class="mt-6 pt-5 border-t border-slate-100 text-center">
+                <p class="text-xs text-slate-500">
                     Belum punya akun magang?
-                    <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-800 ml-1">
+                    <a href="{{ route('register') }}" class="font-semibold text-blue-600 hover:text-blue-700 ml-1 transition">
                         Daftar sekarang
                     </a>
                 </p>
@@ -87,8 +97,8 @@
         @endif
     </div>
 
-    <!-- Footer Tagline -->
-    <p class="text-center text-xs text-gray-400 mt-6">
+    <!-- Footer Note -->
+    <p class="text-center text-xs text-slate-400 mt-6 tracking-wide">
         &copy; {{ date('Y') }} Pemerintah Kota Surabaya. All rights reserved.
     </p>
 </x-guest-layout>
