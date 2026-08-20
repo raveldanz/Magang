@@ -58,7 +58,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Kuota Magang</p>
-                    <h3 class="text-2xl font-black text-indigo-600 mt-1">{{ $stats['total_quota'] }}</h3>
+                    <h3 class="text-2xl font-black text-indigo-600 mt-1" id="stat-total-quota">{{ $stats['total_quota'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Kapasitas maksimal</p>
                 </div>
 
@@ -70,7 +70,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sisa Kuota Tersedia</p>
-                    <h3 class="text-2xl font-black text-amber-600 mt-1">{{ $stats['total_remaining'] }}</h3>
+                    <h3 class="text-2xl font-black text-amber-600 mt-1" id="stat-total-remaining">{{ $stats['total_remaining'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Slot mahasiswa baru</p>
                 </div>
             </div>
@@ -80,7 +80,7 @@
                 <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <form method="GET" action="{{ route('admin.units.index') }}" class="flex items-center gap-2">
-                            <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                            <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
                                 <option value="">-- Semua Instansi --</option>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
@@ -97,12 +97,12 @@
                         <input type="hidden" name="agency_id" value="{{ request('agency_id') }}">
                     @endif
                     <div class="relative w-full">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama divisi..." class="w-full text-xs border-gray-300 rounded-xl pl-9 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama divisi..." class="w-full text-xs border-gray-300 rounded-xl pl-9 focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
                         <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                    <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
                         Cari
                     </button>
                 </form>
@@ -112,7 +112,7 @@
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200">
                 <div class="p-6 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-gray-900">Daftar Divisi & Penyesuaian Kuota</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Atur kuota, tambah divisi baru, atau sesuaikan kapasitas secara instan</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Ketik angka kuota langsung atau klik tombol +/- untuk penyesuaian instan</p>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -134,7 +134,7 @@
                                     $remaining = max(0, $unit->quota - $acceptedCount);
                                     $percent = $unit->quota > 0 ? min(100, round(($acceptedCount / $unit->quota) * 100)) : 100;
                                 @endphp
-                                <tr class="hover:bg-slate-50/75 transition-colors">
+                                <tr class="hover:bg-slate-50/75 transition-colors" id="unit-row-{{ $unit->id }}">
                                     
                                     <!-- Nama Divisi & Deskripsi -->
                                     <td class="py-4 px-4 max-w-xs">
@@ -154,16 +154,16 @@
                                         <div class="space-y-1">
                                             <div class="flex justify-between text-xs font-bold text-gray-700">
                                                 <span>{{ $acceptedCount }} Terisi</span>
-                                                <span>{{ $unit->quota }} Total</span>
+                                                <span id="unit-total-quota-{{ $unit->id }}">{{ $unit->quota }} Total</span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                <div class="h-2 rounded-full {{ $percent >= 100 ? 'bg-rose-500' : ($percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}" style="width: {{ $percent }}%"></div>
+                                                <div id="unit-progress-bar-{{ $unit->id }}" class="h-2 rounded-full {{ $percent >= 100 ? 'bg-rose-500' : ($percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}" style="width: {{ $percent }}%"></div>
                                             </div>
                                         </div>
                                     </td>
 
                                     <!-- Sisa Kuota & Status -->
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-4 text-center" id="unit-remaining-badge-{{ $unit->id }}">
                                         @if ($remaining > 0)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">
                                                 {{ $remaining }} Slot Tersedia
@@ -175,37 +175,52 @@
                                         @endif
                                     </td>
 
-                                    <!-- Aksi Cepat Kuota (+ / -) -->
+                                    <!-- Aksi Cepat Kuota (Inline Editable Number Input + Sync Buttons) -->
                                     <td class="py-4 px-4 text-center">
-                                        <div class="inline-flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200 shadow-sm">
+                                        <div class="inline-flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-xs relative">
                                             <!-- Kurang (-1) -->
-                                            <form action="{{ route('admin.units.updateQuota', $unit->id) }}" method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="action" value="decrement">
-                                                <button type="submit" title="Kurangi Kuota (-1)" class="w-7 h-7 flex items-center justify-center bg-white hover:bg-rose-50 text-rose-600 font-black rounded-lg border border-gray-200 transition text-sm">
-                                                    -
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    onclick="adjustQuota({{ $unit->id }}, -1)"
+                                                    title="Kurangi Kuota (-1)" 
+                                                    class="btn-decrement w-7 h-7 flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg border border-slate-200 transition text-sm shadow-xs active:scale-95">
+                                                -
+                                            </button>
 
-                                            <span class="px-2 font-black text-gray-800 text-xs">{{ $unit->quota }}</span>
+                                            <!-- Input Number Editable Langsung -->
+                                            <input type="number" 
+                                                   id="quota-input-{{ $unit->id }}"
+                                                   name="quota" 
+                                                   value="{{ $unit->quota }}" 
+                                                   min="{{ $acceptedCount }}" 
+                                                   max="500"
+                                                   class="quota-input w-16 text-center border-slate-300 rounded-md text-sm font-bold text-slate-800 focus:ring-indigo-500 focus:border-indigo-500 py-1 px-1 bg-white shadow-xs"
+                                                   data-unit-id="{{ $unit->id }}"
+                                                   data-current-val="{{ $unit->quota }}"
+                                                   data-filled="{{ $acceptedCount }}"
+                                                   onchange="updateQuotaValue({{ $unit->id }}, this.value)"
+                                                   onkeydown="if(event.key === 'Enter'){ this.blur(); }">
 
                                             <!-- Tambah (+1) -->
-                                            <form action="{{ route('admin.units.updateQuota', $unit->id) }}" method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="action" value="increment">
-                                                <button type="submit" title="Tambah Kuota (+1)" class="w-7 h-7 flex items-center justify-center bg-white hover:bg-emerald-50 text-emerald-600 font-black rounded-lg border border-gray-200 transition text-sm">
-                                                    +
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    onclick="adjustQuota({{ $unit->id }}, 1)"
+                                                    title="Tambah Kuota (+1)" 
+                                                    class="btn-increment w-7 h-7 flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg border border-slate-200 transition text-sm shadow-xs active:scale-95">
+                                                +
+                                            </button>
+
+                                            <!-- Save Indicator Icon -->
+                                            <span id="save-indicator-{{ $unit->id }}" class="hidden absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full p-0.5 shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
                                         </div>
                                     </td>
 
                                     <!-- Aksi Edit & Hapus -->
                                     <td class="py-4 px-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
-                                            <a href="{{ route('admin.units.edit', $unit->id) }}" class="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition shadow-sm" title="Edit Divisi">
+                                            <a href="{{ route('admin.units.edit', $unit->id) }}" class="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition shadow-xs border border-indigo-100" title="Edit Divisi">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
@@ -214,7 +229,7 @@
                                             <form action="{{ route('admin.units.destroy', $unit->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus divisi {{ $unit->name }}?');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition shadow-sm" title="Hapus Divisi">
+                                                <button type="submit" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition shadow-xs border border-rose-100" title="Hapus Divisi">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -239,4 +254,116 @@
 
         </div>
     </div>
+
+    <!-- Quick Quota AJAX Handler Script -->
+    <script>
+        async function updateQuotaValue(unitId, newValue) {
+            const input = document.getElementById(`quota-input-${unitId}`);
+            const indicator = document.getElementById(`save-indicator-${unitId}`);
+            const filled = parseInt(input.dataset.filled || 0);
+            let val = parseInt(newValue);
+
+            if (isNaN(val) || val < 0) {
+                val = 0;
+                input.value = 0;
+            }
+
+            if (val < filled) {
+                alert(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sudah diterima (${filled} orang).`);
+                input.value = input.dataset.currentVal;
+                return;
+            }
+
+            try {
+                input.classList.add('opacity-50');
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                const response = await fetch(`/admin/units/${unitId}/quota`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        custom_quota: val,
+                        quota: val
+                    })
+                });
+
+                const data = await response.json();
+                input.classList.remove('opacity-50');
+
+                if (response.ok && data.success) {
+                    input.dataset.currentVal = val;
+                    input.value = val;
+                    
+                    // Show visual feedback checkmark
+                    if (indicator) {
+                        indicator.classList.remove('hidden');
+                        setTimeout(() => {
+                            indicator.classList.add('hidden');
+                        }, 2000);
+                    }
+
+                    // Update UI Progress & Remaining
+                    const totalLabel = document.getElementById(`unit-total-quota-${unitId}`);
+                    if (totalLabel) totalLabel.innerText = `${val} Total`;
+
+                    const remainingBadge = document.getElementById(`unit-remaining-badge-${unitId}`);
+                    const remaining = Math.max(0, val - filled);
+                    if (remainingBadge) {
+                        if (remaining > 0) {
+                            remainingBadge.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">${remaining} Slot Tersedia</span>`;
+                        } else {
+                            remainingBadge.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-black rounded-full">PENUH</span>`;
+                        }
+                    }
+
+                    const progressBar = document.getElementById(`unit-progress-bar-${unitId}`);
+                    if (progressBar) {
+                        const percent = val > 0 ? Math.min(100, Math.round((filled / val) * 100)) : 100;
+                        progressBar.style.width = `${percent}%`;
+                        progressBar.className = `h-2 rounded-full ${percent >= 100 ? 'bg-rose-500' : (percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500')}`;
+                    }
+
+                    // Show toast notification
+                    showToast(data.message || 'Kuota berhasil diperbarui!');
+                } else {
+                    alert(data.message || 'Gagal memperbarui kuota.');
+                    input.value = input.dataset.currentVal;
+                }
+            } catch (error) {
+                input.classList.remove('opacity-50');
+                console.error(error);
+                alert('Terjadi kesalahan saat memperbarui kuota.');
+                input.value = input.dataset.currentVal;
+            }
+        }
+
+        function adjustQuota(unitId, change) {
+            const input = document.getElementById(`quota-input-${unitId}`);
+            let current = parseInt(input.value || 0);
+            let nextVal = current + change;
+            if (nextVal < 0) nextVal = 0;
+            input.value = nextVal;
+            updateQuotaValue(unitId, nextVal);
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('quick-quota-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'quick-quota-toast';
+                toast.className = 'fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 z-50 transition-all duration-300 transform translate-y-10 opacity-0';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span>✅</span> <span>${message}</span>`;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+            }, 2500);
+        }
+    </script>
 </x-app-layout>
