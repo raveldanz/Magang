@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController; 
 use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
@@ -24,23 +25,7 @@ Route::get('/', function () {
 });
 
 // Dashboard Pintar Berdasarkan Role
-Route::get('/dashboard', function () {
-    $user = Auth::user();
-
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.applications.index');
-    }
-
-    if ($user->role === 'mentor' || $user->role === 'pembimbing') {
-        return redirect()->route('mentor.dashboard');
-    }
-
-    if ($user->role === 'dosen' || $user->role === 'academic_advisor') {
-        return redirect()->route('lecturer.dashboard');
-    }
-
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [StudentDashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route Publik Verifikasi QR Code Surat Balasan (Bisa di-scan oleh siapa saja tanpa login)
 Route::get('/verify-letter/{id}', function ($id) {
@@ -89,6 +74,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'index'])->name('student.final_report.index');
         Route::post('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'store'])->name('student.final_report.store');
         Route::get('/student/certificate/{placementId}/download', [\App\Http\Controllers\Student\CertificateController::class, 'download'])->name('student.certificate.download');
+
+        // Pemilihan Dosen Pembimbing Lapangan (DPL Kampus)
+        Route::post('/student/select-advisor', [StudentDashboardController::class, 'selectAdvisor'])->name('student.select_advisor');
     });
 
 
@@ -134,6 +122,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard');
         Route::get('/mentor/students/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('mentor.students.show');
         Route::get('/mentor/logbooks', [MentorLogbookController::class, 'index'])->name('mentor.logbooks.index');
+        Route::get('/mentor/logbooks/{id}', [AdminLogbookController::class, 'show'])->name('mentor.logbooks.show');
         Route::put('/mentor/logbooks/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('mentor.logbooks.updateStatus');
         Route::get('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('mentor.evaluations.create');
         Route::post('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('mentor.evaluations.store');
@@ -142,6 +131,7 @@ Route::middleware('auth')->group(function () {
         // Backward compatibility routes untuk nama route pembimbing lama
         Route::get('/pembimbing/dashboard', [MentorDashboardController::class, 'index'])->name('pembimbing.dashboard');
         Route::get('/pembimbing/student/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('pembimbing.student.detail');
+        Route::get('/pembimbing/logbook/{id}', [AdminLogbookController::class, 'show'])->name('pembimbing.logbook.show');
         Route::put('/pembimbing/logbook/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('pembimbing.logbook.updateStatus');
         Route::get('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('pembimbing.evaluation.create');
         Route::post('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('pembimbing.evaluation.store');
@@ -155,6 +145,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index'])->name('lecturer.dashboard');
         Route::get('/lecturer/students/{placementId}', [LecturerDashboardController::class, 'showStudent'])->name('lecturer.students.show');
         Route::get('/lecturer/monitoring', [LecturerMonitoringController::class, 'index'])->name('lecturer.monitoring.index');
+        Route::get('/lecturer/logbooks/{id}', [AdminLogbookController::class, 'show'])->name('lecturer.logbooks.show');
         Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
         Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
     });

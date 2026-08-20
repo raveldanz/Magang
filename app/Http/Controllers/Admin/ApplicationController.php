@@ -80,7 +80,9 @@ class ApplicationController extends Controller
             'user.studentProfile', 
             'unit.agencyProfile', 
             'documents', 
-            'placement.pembimbing'
+            'placement.pembimbing',
+            'placement.mentor',
+            'placement.academicAdvisor',
         ])->findOrFail($id);
 
         // Multi-Tenant Authorization Check
@@ -88,14 +90,15 @@ class ApplicationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
         }
         
-        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing']);
-        if ($user && $user->agency_profile_id !== null) {
-            $pembimbingQuery->where(function ($q) use ($user) {
-                $q->where('agency_profile_id', $user->agency_profile_id)
-                  ->orWhereNull('agency_profile_id');
-            });
+        // Dropdown 'Pilih Pembimbing Lapangan' HANYA memuat user role 'mentor' yang terdaftar di instansi yang bersangkutan
+        $targetAgencyId = $application->unit?->agency_profile_id ?? $user?->agency_profile_id;
+        $pembimbingQuery = User::where('role', 'mentor');
+        
+        if ($targetAgencyId !== null) {
+            $pembimbingQuery->where('agency_profile_id', $targetAgencyId);
         }
-        $pembimbings = $pembimbingQuery->get(); // Untuk dropdown penempatan pembimbing/mentor
+        
+        $pembimbings = $pembimbingQuery->orderBy('name')->get();
 
         return view('admin.applications.show', compact('application', 'pembimbings'));
     }
