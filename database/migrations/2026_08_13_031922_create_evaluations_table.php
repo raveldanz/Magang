@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('placement_id')->constrained()->onDelete('cascade');
-            $table->integer('nilai_disiplin')->default(0);
-            $table->integer('nilai_kinerja')->default(0);
-            $table->integer('nilai_laporan')->default(0);
-            $table->text('catatan')->nullable();
+            $table->integer('nilai_disiplin')->default(0); // Penilaian Pembimbing Dinas
+            $table->integer('nilai_kinerja')->default(0);  // Penilaian Pembimbing Dinas
+            $table->integer('nilai_laporan')->default(0);  // Penilaian Pembimbing Dinas
+            $table->integer('nilai_akademik')->default(0); // Penilaian Dosen Pembimbing Kampus (DPL)
+            $table->text('catatan')->nullable();          // Catatan Pembimbing Dinas
+            $table->text('catatan_dosen')->nullable();    // Catatan/Bimbingan Dosen Kampus
             $table->timestamps();
         });
     }

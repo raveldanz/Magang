@@ -4,8 +4,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController; 
 use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
+use App\Http\Controllers\Admin\UnitController as AdminUnitController;
 use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
+use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
+use App\Http\Controllers\Mentor\LogbookController as MentorLogbookController;
+use App\Http\Controllers\Mentor\EvaluationController as MentorEvaluationController;
+use App\Http\Controllers\Lecturer\DashboardController as LecturerDashboardController;
+use App\Http\Controllers\Lecturer\MonitoringController as LecturerMonitoringController;
+use App\Http\Controllers\Lecturer\EvaluationController as LecturerEvaluationController;
 use App\Http\Controllers\Pembimbing\DashboardController as PembimbingDashboardController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Pembimbing\EvaluationController as PembimbingEvaluationController;
@@ -24,8 +31,12 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin.applications.index');
     }
 
-    if ($user->role === 'pembimbing') {
-        return redirect()->route('pembimbing.dashboard');
+    if ($user->role === 'mentor' || $user->role === 'pembimbing') {
+        return redirect()->route('mentor.dashboard');
+    }
+
+    if ($user->role === 'dosen' || $user->role === 'academic_advisor') {
+        return redirect()->route('lecturer.dashboard');
     }
 
     return view('dashboard');
@@ -103,22 +114,49 @@ Route::middleware('auth')->group(function () {
         // Pengaturan Profil Instansi & TTD Surat
         Route::get('/admin/agency-profile', [AdminAgencyProfileController::class, 'edit'])->name('admin.agency_profile.edit');
         Route::match(['put', 'patch', 'post'], '/admin/agency-profile', [AdminAgencyProfileController::class, 'update'])->name('admin.agency_profile.update');
+
+        // Manajemen Master Unit & Kuota Magang
+        Route::resource('/admin/units', AdminUnitController::class)->names([
+            'index' => 'admin.units.index',
+            'create' => 'admin.units.create',
+            'store' => 'admin.units.store',
+            'edit' => 'admin.units.edit',
+            'update' => 'admin.units.update',
+            'destroy' => 'admin.units.destroy',
+        ]);
+        Route::patch('/admin/units/{id}/quota', [AdminUnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
     });
 
     // ==========================================
-    // 3. ROUTE KHUSUS PEMBIMBING LAPANGAN
+    // 3. ROUTE KHUSUS PEMBIMBING LAPANGAN (MENTOR)
     // ==========================================
-    Route::middleware(['role:pembimbing'])->group(function () {
-        Route::get('/pembimbing/dashboard', [PembimbingDashboardController::class, 'index'])->name('pembimbing.dashboard');
-        Route::get('/pembimbing/student/{placementId}', [PembimbingDashboardController::class, 'showStudent'])->name('pembimbing.student.detail');
-        Route::put('/pembimbing/logbook/{logbookId}', [PembimbingDashboardController::class, 'updateLogbookStatus'])->name('pembimbing.logbook.updateStatus');
+    Route::middleware(['role:mentor,pembimbing'])->group(function () {
+        Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard');
+        Route::get('/mentor/students/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('mentor.students.show');
+        Route::get('/mentor/logbooks', [MentorLogbookController::class, 'index'])->name('mentor.logbooks.index');
+        Route::put('/mentor/logbooks/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('mentor.logbooks.updateStatus');
+        Route::get('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('mentor.evaluations.create');
+        Route::post('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('mentor.evaluations.store');
+        Route::put('/mentor/final-report/{reportId}', [MentorDashboardController::class, 'updateFinalReportStatus'])->name('mentor.final_report.updateStatus');
 
-        // Route Monitoring / Penilaian
-        Route::get('/pembimbing/student/{placementId}/evaluation', [PembimbingEvaluationController::class, 'create'])->name('pembimbing.evaluation.create');
-        Route::post('/pembimbing/student/{placementId}/evaluation', [PembimbingEvaluationController::class, 'store'])->name('pembimbing.evaluation.store');
+        // Backward compatibility routes untuk nama route pembimbing lama
+        Route::get('/pembimbing/dashboard', [MentorDashboardController::class, 'index'])->name('pembimbing.dashboard');
+        Route::get('/pembimbing/student/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('pembimbing.student.detail');
+        Route::put('/pembimbing/logbook/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('pembimbing.logbook.updateStatus');
+        Route::get('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('pembimbing.evaluation.create');
+        Route::post('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('pembimbing.evaluation.store');
+        Route::put('/pembimbing/final-report/{reportId}', [MentorDashboardController::class, 'updateFinalReportStatus'])->name('pembimbing.final_report.updateStatus');
+    });
 
-        // Route Verifikasi Laporan Akhir
-        Route::put('/pembimbing/final-report/{reportId}', [PembimbingDashboardController::class, 'updateFinalReportStatus'])->name('pembimbing.final_report.updateStatus');
+    // ==========================================
+    // 4. ROUTE KHUSUS DOSEN PEMBIMBING LAPANGAN (DPL KAMPUS)
+    // ==========================================
+    Route::middleware(['role:dosen,academic_advisor'])->group(function () {
+        Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index'])->name('lecturer.dashboard');
+        Route::get('/lecturer/students/{placementId}', [LecturerDashboardController::class, 'showStudent'])->name('lecturer.students.show');
+        Route::get('/lecturer/monitoring', [LecturerMonitoringController::class, 'index'])->name('lecturer.monitoring.index');
+        Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
+        Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
     });
 
 });

@@ -76,7 +76,7 @@ class CertificateController extends Controller
         $profile = $student->studentProfile;
         $eval = $placement->evaluation;
         $unit = $placement->application->unit;
-        $pembimbing = $placement->pembimbing;
+        $pembimbing = $placement->mentor ?? $placement->pembimbing;
 
         // Hitung rata-rata
         $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
@@ -113,6 +113,7 @@ class CertificateController extends Controller
             'application.user.studentProfile', 
             'application.unit.agencyProfile', 
             'evaluation', 
+            'mentor',
             'pembimbing'
         ])->findOrFail($placementId);
 
@@ -134,7 +135,7 @@ class CertificateController extends Controller
         $profile = $student->studentProfile;
         $eval = $placement->evaluation;
         $unit = $placement->application->unit;
-        $pembimbing = $placement->pembimbing;
+        $pembimbing = $placement->mentor ?? $placement->pembimbing;
 
         // Hitung rata-rata
         $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);

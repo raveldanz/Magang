@@ -11,6 +11,8 @@ class Placement extends Model
 
     protected $fillable = [
         'application_id',
+        'mentor_id',
+        'academic_advisor_id',
         'pembimbing_id',
         'status',
     ];
@@ -20,7 +22,24 @@ class Placement extends Model
         return $this->belongsTo(Application::class);
     }
 
-    // Relasi ke User (Pembimbing)
+    // Relasi ke User (Pembimbing Lapangan Dinas / Mentor)
+    public function mentor()
+    {
+        return $this->belongsTo(User::class, 'mentor_id');
+    }
+
+    // Relasi ke User (Dosen Pembimbing Kampus / Academic Advisor)
+    public function academicAdvisor()
+    {
+        return $this->belongsTo(User::class, 'academic_advisor_id');
+    }
+
+    public function dosen()
+    {
+        return $this->belongsTo(User::class, 'academic_advisor_id');
+    }
+
+    // Relasi ke User (Pembimbing / Mentor - Legacy)
     public function pembimbing()
     {
         return $this->belongsTo(User::class, 'pembimbing_id');
