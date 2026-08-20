@@ -1,10 +1,28 @@
 <x-guest-layout>
     <form method="POST" action="{{ route('register') }}">
         @csrf
+    
+        <!-- Logo Pemkot Surabaya -->
+        <div class="flex justify-center mb-4">
+            <img src="{{ asset('images/logoPemkotSBY.png') }}" 
+                 alt="Logo Pemkot Surabaya"
+                 class="h-20 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-300">
+        </div>
+        <!-- Header Text -->
+        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight text-center">
+            Portal Magang Mahasiswa
+        </h2>
+        <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 mt-1 text-center">
+            Pemerintah Kota Surabaya
+        </p>
+        <p class="text-xs text-gray-500 mt-1 text-center">
+            Silakan daftar terlebih dahulu untuk masuk ke menu selanjutnya
+        </p>
+
 
         <!-- Name -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
+            <x-input-label for="name" :value="__('Nama')" />
             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
@@ -30,7 +48,7 @@
 
         <!-- Confirm Password -->
         <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
 
             <x-text-input id="password_confirmation" class="block mt-1 w-full"
                             type="password"
@@ -41,11 +59,11 @@
 
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+                {{ __('Sudah daftar?') }}
             </a>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
+            <x-primary-button class="ms-4 flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out uppercase tracking-wide">
+                {{ __('Daftar') }}
             </x-primary-button>
         </div>
     </form>
