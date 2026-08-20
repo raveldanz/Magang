@@ -82,6 +82,13 @@
                         </x-nav-link>
                     @endif
 
+                    <!-- 5. MENU RESMI PERGURUAN TINGGI (UNIVERSITAS) -->
+                    @if (Auth::user()?->role === 'universitas')
+                        <x-nav-link :href="route('university.dashboard')" :active="request()->routeIs('university.*')">
+                            {{ __('Portal Universitas') }}
+                        </x-nav-link>
+                    @endif
+
                 </div>
             </div>
 
@@ -173,6 +180,10 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.agency_profile.edit')" :active="request()->routeIs('admin.agency_profile.*')">
                     {{ __('Pengaturan Instansi') }}
+                </x-responsive-nav-link>
+            @elseif (Auth::user()?->role === 'universitas')
+                <x-responsive-nav-link :href="route('university.dashboard')" :active="request()->routeIs('university.*')">
+                    {{ __('Portal Universitas') }}
                 </x-responsive-nav-link>
             @endif
         </div>

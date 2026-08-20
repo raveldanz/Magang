@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor', 'dosen', 'academic_advisor', 'universitas'])
-                  ->default('mahasiswa')
-                  ->after('email');
-            $table->string('university')->nullable()->after('agency_profile_id');
+            $table->foreignId('university_id')->nullable()->after('university')->constrained('universities')->nullOnDelete();
         });
     }
 
@@ -25,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
+            $table->dropForeign(['university_id']);
+            $table->dropColumn('university_id');
         });
     }
 };

@@ -154,6 +154,7 @@
                                 <th class="py-3 px-4">Uraian Kegiatan Lapangan</th>
                                 <th class="py-3 px-4 text-center">Status Verifikasi Dinas</th>
                                 <th class="py-3 px-4">Catatan Feedback Mentor</th>
+                                <th class="py-3 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 text-sm">
@@ -183,10 +184,15 @@
                                     <td class="py-3.5 px-4 text-xs text-gray-500 italic">
                                         {{ $logbook->feedback ?? '-' }}
                                     </td>
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                        <a href="{{ route('lecturer.logbooks.show', $logbook->id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                            Detail &rarr;
+                                        </a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="py-8 text-center text-gray-400 text-xs">
+                                    <td colspan="5" class="py-8 text-center text-gray-400 text-xs">
                                         Belum ada catatan logbook yang diunggah mahasiswa.
                                     </td>
                                 </tr>
