@@ -57,7 +57,7 @@
 
                         <x-nav-link :href="route('admin.units.index')"
                             :active="request()->routeIs('admin.units.*')">
-                            {{ __('Manajemen Unit & Kuota') }}
+                            {{ __('Manajemen Divisi') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('admin.certificates.index')"
@@ -180,7 +180,7 @@
                     {{ __('Verifikasi Magang') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.units.index')" :active="request()->routeIs('admin.units.*')">
-                    {{ __('Manajemen Unit & Kuota') }}
+                    {{ __('Manajemen Divisi') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.certificates.index')" :active="request()->routeIs('admin.certificates.*')">
                     {{ __('Manajemen Sertifikat') }}
