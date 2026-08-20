@@ -255,9 +255,6 @@
                                                 {{ strtolower($log->status) === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
                                                 {{ strtoupper($log->status) }}
                                             </span>
-                                            @if ($log->feedback)
-                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px] mx-auto" title="{{ $log->feedback }}">"{{ $log->feedback }}"</p>
-                                            @endif
                                         </td>
                                         <td class="p-4 text-center">
                                             <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
@@ -266,9 +263,6 @@
                                                 {{ strtolower($log->lecturer_status ?? 'pending') === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
                                                 {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
                                             </span>
-                                            @if ($log->lecturer_feedback)
-                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px] mx-auto" title="{{ $log->lecturer_feedback }}">"{{ $log->lecturer_feedback }}"</p>
-                                            @endif
                                         </td>
                                         <td class="p-4 text-center">
                                             @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected'))
