@@ -6,7 +6,7 @@
             if (in_array($userRole, ['mentor', 'pembimbing'])) {
                 $backUrl = route('mentor.logbooks.index');
             } elseif (in_array($userRole, ['dosen', 'academic_advisor'])) {
-                $backUrl = route('lecturer.monitoring.index');
+                $backUrl = route('lecturer.logbooks.index');
             } elseif ($userRole === 'universitas') {
                 $backUrl = route('university.dashboard');
             }
@@ -20,7 +20,13 @@
                 </a>
                 <div>
                     <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                        {{ in_array($userRole, ['mentor', 'pembimbing']) ? __('Review & Verifikasi Logbook') : __('Detail & Monitoring Logbook') }}
+                        @if (in_array($userRole, ['mentor', 'pembimbing']))
+                            {{ __('Review & Verifikasi Logbook - Mentor Lapangan') }}
+                        @elseif (in_array($userRole, ['dosen', 'academic_advisor']))
+                            {{ __('Review & Verifikasi Logbook - Dosen Pembimbing') }}
+                        @else
+                            {{ __('Detail & Monitoring Logbook') }}
+                        @endif
                     </h2>
                     <p class="text-xs text-gray-500 mt-0.5">
                         Tanggal Kegiatan: <strong>{{ \Carbon\Carbon::parse($logbook->date)->translatedFormat('l, d F Y') }}</strong> &bull; Mahasiswa: {{ $logbook->placement->application->user->name ?? '-' }}
@@ -59,6 +65,7 @@
                 $mentor = $logbook->placement->mentor ?? $logbook->placement->pembimbing;
                 $dosen = $logbook->placement->academicAdvisor ?? $logbook->placement->dosen;
                 $isMentor = in_array(Auth::user()?->role, ['mentor', 'pembimbing']);
+                $isLecturer = in_array(Auth::user()?->role, ['dosen', 'academic_advisor']);
             @endphp
 
             <!-- 1. Card Informasi Mahasiswa & Penempatan -->
@@ -145,25 +152,90 @@
                 </div>
             </div>
 
-            <!-- 3. Blok Aksi / Monitoring Status -->
+            <!-- 3. Status Verifikasi 2-Arah (Mentor Dinas & Dosen Kampus) -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2 border-b border-gray-100 pb-3">
+                    <span>⚖️ Status Verifikasi 2-Arah</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Panel Status Mentor Dinas -->
+                    <div class="p-4 rounded-xl border {{ $logbook->status === 'approved' ? 'bg-emerald-50/50 border-emerald-200' : ($logbook->status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200') }} space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-700">🏛️ Mentor Lapangan Dinas</span>
+                            @if ($logbook->status === 'approved')
+                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    ✅ APPROVED
+                                </span>
+                            @elseif ($logbook->status === 'rejected')
+                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
+                                    ❌ REJECTED
+                                </span>
+                            @else
+                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                                    ⏳ PENDING
+                                </span>
+                            @endif
+                        </div>
+
+                        <div>
+                            <span class="text-[11px] font-semibold text-gray-500 block mb-0.5">Feedback Mentor:</span>
+                            @if ($logbook->feedback)
+                                <p class="text-xs text-gray-800 italic bg-white p-2.5 rounded-lg border border-gray-200/80">
+                                    "{{ $logbook->feedback }}"
+                                </p>
+                            @else
+                                <p class="text-[11px] text-gray-400 italic">Belum ada catatan feedback dari mentor.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Panel Status Dosen Kampus -->
+                    <div class="p-4 rounded-xl border {{ $logbook->lecturer_status === 'approved' ? 'bg-emerald-50/50 border-emerald-200' : ($logbook->lecturer_status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200') }} space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-700">🎓 Dosen Pembimbing (DPL)</span>
+                            @if ($logbook->lecturer_status === 'approved')
+                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    ✅ ACC DISETUJUI
+                                </span>
+                            @elseif ($logbook->lecturer_status === 'rejected')
+                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
+                                    ❌ PERLU REVISI
+                                </span>
+                            @else
+                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                                    ⏳ BELUM ACC
+                                </span>
+                            @endif
+                        </div>
+
+                        <div>
+                            <span class="text-[11px] font-semibold text-gray-500 block mb-0.5">Feedback Dosen:</span>
+                            @if ($logbook->lecturer_feedback)
+                                <p class="text-xs text-gray-800 italic bg-white p-2.5 rounded-lg border border-gray-200/80">
+                                    "{{ $logbook->lecturer_feedback }}"
+                                </p>
+                            @else
+                                <p class="text-[11px] text-gray-400 italic">Belum ada catatan feedback dari dosen.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 4. Blok Formulir Aksi Sesuai Peran -->
             @if ($isMentor)
-                <!-- ========================================== -->
-                <!-- A. FORMULIR AKSI REVIEW KHUSUS MENTOR     -->
-                <!-- ========================================== -->
-                <div class="bg-white rounded-2xl p-6 border-2 border-indigo-200 shadow-sm space-y-4">
+                <!-- FORM KHUSUS MENTOR LAPANGAN DINAS -->
+                <div class="bg-white rounded-2xl p-6 border-2 border-indigo-300 shadow-sm space-y-4">
                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                         <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
                             <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Aksi Verifikasi & Feedback Pembimbing Lapangan
+                            Formulir Verifikasi Pembimbing Lapangan
                         </h3>
-                        <span class="px-3 py-1 text-xs font-bold rounded-full
-                            {{ $logbook->status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                            {{ $logbook->status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
-                            {{ $logbook->status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
-                            Status Saat Ini: {{ strtoupper($logbook->status) }}
-                        </span>
                     </div>
 
                     <form action="{{ route('mentor.logbooks.updateStatus', $logbook->id) }}" method="POST" class="space-y-4">
@@ -172,12 +244,11 @@
 
                         <div>
                             <label for="feedback" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                Catatan / Feedback Pembimbing:
+                                Catatan / Feedback Pembimbing Lapangan:
                             </label>
-                            <textarea id="feedback" name="feedback" rows="4"
+                            <textarea id="feedback" name="feedback" rows="3"
                                 class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
-                                placeholder="Tuliskan catatan apresiasi, komentar kegiatan, atau instruksi revisi bila diperlukan...">{{ old('feedback', $logbook->feedback) }}</textarea>
-                            <p class="text-[11px] text-gray-400 mt-1">Catatan ini akan dapat dilihat langsung oleh mahasiswa dan dosen pembimbing kampus.</p>
+                                placeholder="Tuliskan catatan komentar atau instruksi bimbingan dinas...">{{ old('feedback', $logbook->feedback) }}</textarea>
                         </div>
 
                         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-gray-100">
@@ -197,75 +268,65 @@
                             </div>
 
                             <a href="{{ $backUrl }}" class="w-full sm:w-auto text-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                                Kembali ke Daftar
+                                Kembali
                             </a>
                         </div>
                     </form>
                 </div>
-            @else
-                <!-- ========================================================================= -->
-                <!-- B. TAMPILAN MONITORING READ-ONLY UNTUK DOSEN, ADMIN, & SUPERADMIN        -->
-                <!-- ========================================================================= -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-                        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+
+            @elseif ($isLecturer)
+                <!-- FORM KHUSUS DOSEN PEMBIMBING KAMPUS (DPL) -->
+                <div class="bg-white rounded-2xl p-6 border-2 border-indigo-400 shadow-sm space-y-4 bg-indigo-50/10">
+                    <div class="flex items-center justify-between border-b border-indigo-100 pb-3">
+                        <h3 class="text-base font-bold text-indigo-950 flex items-center gap-2">
                             <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Status Verifikasi & Feedback Pembimbing Lapangan
+                            Aksi Verifikasi & Feedback Dosen Kampus
                         </h3>
-                        <span class="text-xs text-gray-400 font-medium">Mode Monitoring (Read-Only)</span>
+                        <span class="text-xs font-bold px-3 py-1 rounded-full
+                            {{ $logbook->lecturer_status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
+                            {{ $logbook->lecturer_status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
+                            {{ $logbook->lecturer_status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
+                            Status Dosen: {{ strtoupper($logbook->lecturer_status ?? 'PENDING') }}
+                        </span>
                     </div>
 
-                    <!-- Status Badge -->
-                    <div>
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Status Approval Saat Ini:</span>
-                        @if ($logbook->status === 'approved')
-                            <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-extrabold rounded-xl shadow-xs">
-                                <svg class="w-4 h-4 text-emerald-700" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                <span>✅ TELAH DISETUJUI (APPROVED)</span>
-                            </div>
-                        @elseif ($logbook->status === 'rejected')
-                            <div class="inline-flex items-center gap-2 px-4 py-2 bg-rose-100 text-rose-900 border border-rose-300 text-xs font-extrabold rounded-xl shadow-xs">
-                                <svg class="w-4 h-4 text-rose-700" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                </svg>
-                                <span>❌ DITOLAK / PERLU REVISI (REJECTED)</span>
-                            </div>
-                        @else
-                            <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-900 border border-amber-300 text-xs font-extrabold rounded-xl shadow-xs">
-                                <svg class="w-4 h-4 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                </svg>
-                                <span>⏳ MENUNGGU VERIFIKASI (PENDING)</span>
-                            </div>
-                        @endif
-                    </div>
+                    <form action="{{ route('lecturer.logbooks.updateStatus', $logbook->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        @method('PUT')
 
-                    <!-- Catatan / Feedback dari Mentor -->
-                    <div>
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5">Catatan / Feedback Pembimbing Lapangan:</span>
-                        @if ($logbook->feedback)
-                            <div class="p-4 bg-indigo-50/75 border-l-4 border-indigo-500 rounded-r-xl text-xs sm:text-sm text-indigo-950 font-medium leading-relaxed">
-                                <div class="font-bold text-indigo-900 mb-1">💬 Catatan Mentor ({{ $mentor->name ?? 'Pembimbing Lapangan' }}):</div>
-                                <em>"{{ $logbook->feedback }}"</em>
-                            </div>
-                        @else
-                            <div class="p-4 bg-gray-50 rounded-xl text-gray-400 text-xs italic border border-gray-100">
-                                Belum ada catatan feedback yang diberikan oleh pembimbing lapangan.
-                            </div>
-                        @endif
-                    </div>
+                        <div>
+                            <label for="lecturer_feedback" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Catatan / Feedback Dosen Kampus:
+                            </label>
+                            <textarea id="lecturer_feedback" name="feedback" rows="3"
+                                class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs"
+                                placeholder="Tuliskan catatan evaluasi akademik, konfirmasi kegiatan, atau instruksi perbaikan untuk mahasiswa...">{{ old('feedback', $logbook->lecturer_feedback) }}</textarea>
+                            <p class="text-[11px] text-gray-400 mt-1">Catatan ini akan tampil pada feed logbook mahasiswa dan portal instansi.</p>
+                        </div>
 
-                    <div class="pt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
-                        <span>ℹ️ Verifikasi logbook dikelola langsung oleh Pembimbing Lapangan (Mentor Dinas).</span>
-                        <a href="{{ $backUrl }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition">
-                            Kembali
-                        </a>
-                    </div>
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <button type="submit" name="status" value="approved" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Setujui (ACC Logbook)
+                                </button>
+                                <button type="submit" name="status" value="rejected" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Minta Revisi
+                                </button>
+                            </div>
+
+                            <a href="{{ $backUrl }}" class="w-full sm:w-auto text-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                                Kembali ke Daftar Logbook
+                            </a>
+                        </div>
+                    </form>
                 </div>
             @endif
 

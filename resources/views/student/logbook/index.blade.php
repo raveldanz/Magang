@@ -100,8 +100,8 @@
                                     <th class="p-4">Tanggal</th>
                                     <th class="p-4">Kegiatan</th>
                                     <th class="p-4">Lampiran</th>
-                                    <th class="p-4">Status</th>
-                                    <th class="p-4">Feedback</th>
+                                    <th class="p-4 text-center">Status Mentor Dinas</th>
+                                    <th class="p-4 text-center">Status Dosen Kampus</th>
                                     <th class="p-4">Aksi</th>
                                 </tr>
                             </thead>
@@ -124,16 +124,27 @@
                                                 <span class="text-gray-400 text-xs">-</span>
                                             @endif
                                         </td>
-                                        <td class="p-4">
-                                            <span class="px-2.5 py-1 text-xs font-bold rounded-md 
+                                        <td class="p-4 text-center">
+                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-md 
                                                 {{ strtolower($log->status) === 'approved' ? 'bg-green-100 text-green-700' : '' }}
                                                 {{ strtolower($log->status) === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
                                                 {{ strtolower($log->status) === 'rejected' ? 'bg-red-100 text-red-700' : '' }}">
                                                 {{ strtoupper($log->status) }}
                                             </span>
+                                            @if ($log->feedback)
+                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px]" title="{{ $log->feedback }}">"{{ $log->feedback }}"</p>
+                                            @endif
                                         </td>
-                                        <td class="p-4 text-gray-500 text-xs">
-                                            {{ $log->feedback ?? '-' }}
+                                        <td class="p-4 text-center">
+                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-md 
+                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'approved' ? 'bg-green-100 text-green-700' : '' }}
+                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                {{ strtolower($log->lecturer_status ?? 'pending') === 'rejected' ? 'bg-red-100 text-red-700' : '' }}">
+                                                {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
+                                            </span>
+                                            @if ($log->lecturer_feedback)
+                                                <p class="text-[11px] text-gray-500 italic mt-0.5 truncate max-w-[120px]" title="{{ $log->lecturer_feedback }}">"{{ $log->lecturer_feedback }}"</p>
+                                            @endif
                                         </td>
                                         <td class="p-4">
                                             @if (strtolower($log->status) === 'pending')
