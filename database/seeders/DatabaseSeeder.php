@@ -829,6 +829,9 @@ class DatabaseSeeder extends Seeder
                         'attachment' => null,
                         'status' => $logIndex === 0 ? 'approved' : ($logIndex === 3 ? 'pending' : 'approved'),
                         'feedback' => $logIndex === 0 ? 'Kegiatan terverifikasi dengan sangat baik oleh Pembimbing Dinas.' : null,
+                        'lecturer_status' => $logIndex === 0 ? 'approved' : ($logIndex === 3 ? 'pending' : 'approved'),
+                        'lecturer_feedback' => $logIndex === 0 ? 'Aktivitas sangat relevan dengan kompetensi kurikulum program studi.' : null,
+                        'lecturer_verified_at' => $logIndex === 0 ? Carbon::now()->subDays(14) : null,
                     ]
                 );
             }
