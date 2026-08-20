@@ -90,15 +90,16 @@
                         
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
-                            <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Pilih Pembimbing Lapangan --</option>
+                            <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan (Mentor Dinas Terkait)</label>
+                            <select name="mentor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                <option value="">-- Pilih Pembimbing Lapangan ({{ $application->unit->agencyProfile->agency_name ?? 'Instansi' }}) --</option>
                                 @foreach ($pembimbings as $pembimbing)
-                                    <option value="{{ $pembimbing->id }}" {{ optional($application->placement)->pembimbing_id == $pembimbing->id ? 'selected' : '' }}>
-                                        {{ $pembimbing->name }}
+                                    <option value="{{ $pembimbing->id }}" {{ (optional($application->placement)->mentor_id == $pembimbing->id || optional($application->placement)->pembimbing_id == $pembimbing->id) ? 'selected' : '' }}>
+                                        {{ $pembimbing->name }} ({{ $pembimbing->email }})
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="text-xs text-gray-500 mt-1">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->

@@ -210,12 +210,17 @@
                                         Tanggal: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
                                     </span>
                                 </div>
-                                <span class="px-3 py-1 text-xs font-bold rounded-full 
-                                    {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                    {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                    {{ strtoupper($log->status) }}
-                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full 
+                                        {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
+                                        {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
+                                        {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
+                                        {{ strtoupper($log->status) }}
+                                    </span>
+                                    <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                        Detail &rarr;
+                                    </a>
+                                </div>
                             </div>
 
                             <div class="text-sm text-gray-700 leading-relaxed bg-white p-3.5 rounded-xl border border-gray-100">

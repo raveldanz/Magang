@@ -115,78 +115,103 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. SEED CONTOH AKUN PEMBIMBING LAPANGAN (MENTOR) RESMI MULTI-INSTANSI
-        $mentorDiskominfo = User::firstOrCreate(
-            ['email' => 'mentor.diskominfo@surabaya.go.id'],
-            [
-                'name' => 'Mentor Diskominfo Surabaya (Retno Mumpuni, S.Kom., M.Sc)',
-                'password' => Hash::make('password'),
-                'role' => 'mentor',
-                'agency_profile_id' => $agencies[0]->id,
-            ]
-        );
-
-        $mentorDispusip = User::firstOrCreate(
-            ['email' => 'mentor.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Mentor Dispusip Surabaya (Budi Santoso, S.ST., M.MT)',
-                'password' => Hash::make('password'),
-                'role' => 'mentor',
-                'agency_profile_id' => $agencies[1]->id,
-            ]
-        );
-
-        $mentorDispendukcapil = User::firstOrCreate(
-            ['email' => 'mentor.dispendukcapil@surabaya.go.id'],
-            [
-                'name' => 'Mentor Dispendukcapil Surabaya (Hendra Wijaya, S.Kom., M.Eng)',
-                'password' => Hash::make('password'),
-                'role' => 'mentor',
-                'agency_profile_id' => $agencies[2]->id,
-            ]
-        );
-
-        $agencyMentors = [
-            $agencies[0]->id => $mentorDiskominfo,
-            $agencies[1]->id => $mentorDispusip,
-            $agencies[2]->id => $mentorDispendukcapil,
+        // 2. SEED 3 AKUN MENTOR PER INSTANSI PEMKOT SURABAYA
+        // A. Diskominfo (Agency ID 1)
+        $mentorsDiskominfo = [
+            User::firstOrCreate(
+                ['email' => 'mentor.kominfo1@surabaya.go.id'],
+                [
+                    'name' => 'Retno Mumpuni, S.Kom., M.Sc',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[0]->id,
+                ]
+            ),
+            User::firstOrCreate(
+                ['email' => 'mentor.kominfo2@surabaya.go.id'],
+                [
+                    'name' => 'Ir. Siti Aminah, M.Kom',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[0]->id,
+                ]
+            ),
+            User::firstOrCreate(
+                ['email' => 'mentor.kominfo3@surabaya.go.id'],
+                [
+                    'name' => 'M. Arif Rahman, S.Kom., M.MT',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[0]->id,
+                ]
+            ),
         ];
 
-        // Seed 6 Akun Pembimbing Lapangan Tambahan
-        $pembimbingData = [
-            [
-                'name' => 'Retno Mumpuni, S.Kom., M.Sc',
-                'email' => 'retnomumpuni.if@upnjatim.ac.id',
-                'agency_profile_id' => $agencies[0]->id,
-            ],
-            [
-                'name' => 'Budi Santoso, S.ST., M.MT',
-                'email' => 'budi.santoso@surabaya.go.id',
-                'agency_profile_id' => $agencies[1]->id,
-            ],
-            [
-                'name' => 'Ir. Siti Aminah, M.Kom',
-                'email' => 'siti.aminah@surabaya.go.id',
-                'agency_profile_id' => $agencies[0]->id,
-            ],
-            [
-                'name' => 'Hendra Wijaya, S.Kom., M.Eng',
-                'email' => 'hendra.wijaya@surabaya.go.id',
-                'agency_profile_id' => $agencies[2]->id,
-            ],
-            [
-                'name' => 'Tri Wahyuni, S.T., M.Sc',
-                'email' => 'tri.wahyuni@surabaya.go.id',
-                'agency_profile_id' => $agencies[1]->id,
-            ],
-            [
-                'name' => 'M. Arif Rahman, S.Kom., M.MT',
-                'email' => 'arif.rahman@surabaya.go.id',
-                'agency_profile_id' => $agencies[2]->id,
-            ],
+        // B. Dispusip (Agency ID 2)
+        $mentorsDispusip = [
+            User::firstOrCreate(
+                ['email' => 'mentor.dispusip1@surabaya.go.id'],
+                [
+                    'name' => 'Budi Santoso, S.ST., M.MT',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[1]->id,
+                ]
+            ),
+            User::firstOrCreate(
+                ['email' => 'mentor.dispusip2@surabaya.go.id'],
+                [
+                    'name' => 'Dewi Lestari, S.Sos., M.A',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[1]->id,
+                ]
+            ),
+            User::firstOrCreate(
+                ['email' => 'mentor.dispusip3@surabaya.go.id'],
+                [
+                    'name' => 'Agus Pramono, S.Hum., M.P',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[1]->id,
+                ]
+            ),
         ];
 
-        // 2B. SEED AKUN RESMI DOSEN PEMBIMBING LAPANGAN KAMPUS (DPL)
+        // C. Dispendukcapil (Agency ID 3)
+        $mentorsDispendukcapil = [
+            User::firstOrCreate(
+                ['email' => 'mentor.dukcapil1@surabaya.go.id'],
+                [
+                    'name' => 'Hendra Wijaya, S.Kom., M.Eng',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[2]->id,
+                ]
+            ),
+            User::firstOrCreate(
+                ['email' => 'mentor.dukcapil2@surabaya.go.id'],
+                [
+                    'name' => 'Tri Wahyuni, S.T., M.Sc',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[2]->id,
+                ]
+            ),
+            User::firstOrCreate(
+                ['email' => 'mentor.dukcapil3@surabaya.go.id'],
+                [
+                    'name' => 'Bambang Sutrisno, S.AP., M.AP',
+                    'password' => Hash::make('password'),
+                    'role' => 'mentor',
+                    'agency_profile_id' => $agencies[2]->id,
+                ]
+            ),
+        ];
+
+        $allMentors = array_merge($mentorsDiskominfo, $mentorsDispusip, $mentorsDispendukcapil);
+
+        // 3. SEED AKUN RESMI DOSEN PEMBIMBING LAPANGAN KAMPUS (DPL)
         $dosenUnitomo = User::firstOrCreate(
             ['email' => 'dosen.unitomo@unitomo.ac.id'],
             [
@@ -207,20 +232,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $pembimbings = [$mentorDiskominfo, $mentorDispusip, $mentorDispendukcapil];
-        foreach ($pembimbingData as $pData) {
-            $pembimbings[] = User::firstOrCreate(
-                ['email' => $pData['email']],
-                [
-                    'name' => $pData['name'],
-                    'password' => Hash::make('pembimbing123'),
-                    'role' => 'mentor',
-                    'agency_profile_id' => $pData['agency_profile_id'],
-                ]
-            );
-        }
+        $dosenUpn = User::firstOrCreate(
+            ['email' => 'dosen.upn@upnjatim.ac.id'],
+            [
+                'name' => 'Dr. Eng. Yasin Al-Aqsho, S.Kom., M.Kom (DPL UPN)',
+                'password' => Hash::make('password'),
+                'role' => 'dosen',
+                'university' => 'UPN Veteran Jawa Timur',
+            ]
+        );
 
-        // 3. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
+        // 4. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
         $unitData = [
             // Instansi 1: Diskominfo (Agency ID 1)
             [
@@ -303,11 +325,11 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 4. SEED DATA MAHASISWA TESTING TAMBAHAN (PENDING, VERIFIED, REJECTED)
+        // 5. SEED DATA MAHASISWA TESTING (PENDING, VERIFIED, REJECTED)
         // Mahasiswa 1: Raveldo Andyka (PENDING)
         $mhs1 = User::firstOrCreate(
             ['email' => 'mahasiswa@gmail.com'],
-            ['name' => 'Raveldo Andyka', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
+            ['name' => 'Raveldo Andyka', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa', 'university' => 'UPN Veteran Jawa Timur']
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs1->id],
@@ -326,7 +348,7 @@ class DatabaseSeeder extends Seeder
         // Mahasiswa 2: Dimas Adam (VERIFIED)
         $mhs2 = User::firstOrCreate(
             ['email' => 'dimas.adam@mhs.unair.ac.id'],
-            ['name' => 'Dimas Adam', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
+            ['name' => 'Dimas Adam', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa', 'university' => 'Universitas Airlangga']
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs2->id],
@@ -345,7 +367,7 @@ class DatabaseSeeder extends Seeder
         // Mahasiswa 3: Siti Nurhaliza (REJECTED)
         $mhs3 = User::firstOrCreate(
             ['email' => 'siti.nurhaliza@mhs.unesa.ac.id'],
-            ['name' => 'Siti Nurhaliza', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
+            ['name' => 'Siti Nurhaliza', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa', 'university' => 'Universitas Negeri Surabaya']
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs3->id],
@@ -362,7 +384,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT, PEMBIMBING DINAS & DOSEN KAMPUS
+        // 6. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT, PEMBIMBING DINAS & DOSEN KAMPUS
         $graduatedStudents = [
             [
                 'name' => 'Ahmad Fauzi',
@@ -490,9 +512,14 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan Dinas
+            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan Dinas Sesuai Instansi Unit
             $assignedUnit = $units[$index % count($units)];
-            $assignedPembimbing = $pembimbings[$index % count($pembimbings)];
+            
+            // Pilih mentor yang agency_profile_id-nya sama dengan unit penempatan
+            $agencyMentors = array_values(array_filter($allMentors, function ($m) use ($assignedUnit) {
+                return $m->agency_profile_id === $assignedUnit->agency_profile_id;
+            }));
+            $assignedMentor = $agencyMentors[$index % count($agencyMentors)];
             $assignedDosen = $data['dosen'];
 
             // D. Buat Application Status ACCEPTED dengan rentang waktu 3 bulan lalu s.d. hari ini
@@ -512,13 +539,13 @@ class DatabaseSeeder extends Seeder
             $placement = Placement::firstOrCreate(
                 ['application_id' => $application->id],
                 [
-                    'mentor_id' => $assignedPembimbing->id,
+                    'mentor_id' => $assignedMentor->id,
                     'academic_advisor_id' => $assignedDosen->id,
-                    'pembimbing_id' => $assignedPembimbing->id,
+                    'pembimbing_id' => $assignedMentor->id,
                 ]
             );
 
-            // F. Buat Logbook Kegiatan Magang (Untuk sampel review mentor dinas & monitoring dosen)
+            // F. Buat Logbook Kegiatan Magang
             $logActivities = [
                 'Melakukan perancangan antarmuka pengguna (UI/UX) dan wireframe portal layanan publik.',
                 'Mengembangkan modul otentikasi multi-peran dan integrasi API basis data dinas.',
@@ -551,7 +578,7 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // H. Buat Penilaian Evaluasi (Sebagian sudah dinilai, sebagian belum untuk testing)
+            // H. Buat Penilaian Evaluasi
             if ($index < 8) {
                 $disiplin = rand(88, 96);
                 $kinerja = rand(90, 98);
