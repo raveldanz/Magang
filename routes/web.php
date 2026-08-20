@@ -146,7 +146,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index'])->name('lecturer.dashboard');
         Route::get('/lecturer/students/{placementId}', [LecturerDashboardController::class, 'showStudent'])->name('lecturer.students.show');
         Route::get('/lecturer/monitoring', [LecturerMonitoringController::class, 'index'])->name('lecturer.monitoring.index');
+        Route::get('/lecturer/logbooks', [\App\Http\Controllers\Lecturer\LogbookController::class, 'index'])->name('lecturer.logbooks.index');
         Route::get('/lecturer/logbooks/{id}', [\App\Http\Controllers\Lecturer\LogbookController::class, 'show'])->name('lecturer.logbooks.show');
+        Route::put('/lecturer/logbooks/{id}', [\App\Http\Controllers\Lecturer\LogbookController::class, 'updateStatus'])->name('lecturer.logbooks.updateStatus');
         Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
         Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
     });

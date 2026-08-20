@@ -57,7 +57,7 @@
 
                         <x-nav-link :href="route('admin.units.index')"
                             :active="request()->routeIs('admin.units.*')">
-                            {{ __('Manajemen Unit & Kuota') }}
+                            {{ __('Manajemen Divisi') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('admin.certificates.index')"
@@ -71,14 +71,18 @@
                         </x-nav-link>
                     @endif
 
-                    <!-- 4. MENU DOSEN PEMBIMBING LAPANGAN (DPL KAMPUS) -->
+                    <!-- 4. MENU DOSEN PEMBIMBING LAPANGAN -->
                     @if (Auth::user()?->role === 'dosen' || Auth::user()?->role === 'academic_advisor')
                         <x-nav-link :href="route('lecturer.dashboard')" :active="request()->routeIs('lecturer.dashboard') || request()->routeIs('lecturer.students.*') || request()->routeIs('lecturer.evaluations.*')">
-                            {{ __('Portal Dosen (DPL Kampus)') }}
+                            {{ __('Portal Dosen') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('lecturer.monitoring.index')" :active="request()->routeIs('lecturer.monitoring.*')">
-                            {{ __('Monitoring Mahasiswa') }}
+                            {{ __('Mahasiswa Bimbingan') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('lecturer.logbooks.index')" :active="request()->routeIs('lecturer.logbooks.*')">
+                            {{ __('Logbook Bimbingan') }}
                         </x-nav-link>
                     @endif
 
@@ -163,17 +167,20 @@
                 </x-responsive-nav-link>
             @elseif (Auth::user()?->role === 'dosen' || Auth::user()?->role === 'academic_advisor')
                 <x-responsive-nav-link :href="route('lecturer.dashboard')" :active="request()->routeIs('lecturer.dashboard') || request()->routeIs('lecturer.students.*') || request()->routeIs('lecturer.evaluations.*')">
-                    {{ __('Portal Dosen (DPL Kampus)') }}
+                    {{ __('Portal Dosen') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('lecturer.monitoring.index')" :active="request()->routeIs('lecturer.monitoring.*')">
-                    {{ __('Monitoring Mahasiswa') }}
+                    {{ __('Mahasiswa Bimbingan') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('lecturer.logbooks.index')" :active="request()->routeIs('lecturer.logbooks.*')">
+                    {{ __('Logbook Bimbingan') }}
                 </x-responsive-nav-link>
             @elseif (Auth::user()?->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
                     {{ __('Verifikasi Magang') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.units.index')" :active="request()->routeIs('admin.units.*')">
-                    {{ __('Manajemen Unit & Kuota') }}
+                    {{ __('Manajemen Divisi') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.certificates.index')" :active="request()->routeIs('admin.certificates.*')">
                     {{ __('Manajemen Sertifikat') }}
