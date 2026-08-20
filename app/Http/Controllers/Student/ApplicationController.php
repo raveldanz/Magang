@@ -52,6 +52,7 @@ class ApplicationController extends Controller
             'surat_pengantar' => 'required|mimes:pdf|max:2048', 
             'cv' => 'required|mimes:pdf|max:2048',
             'transkrip' => 'required|mimes:pdf|max:2048',
+            'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
         // Cek Sisa Kuota Instansi yang Dipilih
@@ -62,32 +63,46 @@ class ApplicationController extends Controller
                 ->withErrors(['unit_id' => 'Kuota untuk instansi/unit ini sudah penuh. Silakan pilih unit kerja lain.']);
         }
 
+        // Upload Berkas
+        $proposalPath = $request->file('surat_pengantar') ? $request->file('surat_pengantar')->store('documents/applications', 'public') : null;
+        $cvPath = $request->file('cv') ? $request->file('cv')->store('documents/applications', 'public') : null;
+        $transcriptPath = $request->file('transkrip') ? $request->file('transkrip')->store('documents/applications', 'public') : null;
+        $idCardPath = $request->file('id_card') ? $request->file('id_card')->store('documents/applications', 'public') : null;
+
         // 1. Simpan Data Pengajuan
         $application = Application::create([
             'user_id' => Auth::id(),
             'unit_id' => $request->unit_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'proposal_letter_path' => $proposalPath,
+            'cv_path' => $cvPath,
+            'transcript_path' => $transcriptPath,
+            'id_card_path' => $idCardPath,
             'status' => 'pending',
         ]);
 
-        // 2. Simpan Dokumen Persyaratan
+        // 2. Simpan Dokumen Persyaratan ke tabel application_documents
         $documents = [
-            'Surat Pengantar' => $request->file('surat_pengantar'),
-            'CV' => $request->file('cv'),
-            'Transkrip Nilai' => $request->file('transkrip'),
+            'Surat Pengantar' => $proposalPath,
+            'CV' => $cvPath,
+            'Transkrip Nilai' => $transcriptPath,
         ];
-
-        foreach ($documents as $type => $file) {
-            $path = $file->store('documents/applications', 'public');
-            ApplicationDocument::create([
-                'application_id' => $application->id,
-                'document_type' => $type,
-                'file_path' => $path,
-            ]);
+        if ($idCardPath) {
+            $documents['KTM / Kartu Identitas'] = $idCardPath;
         }
 
-        return redirect()->back()->with('success', 'Pengajuan magang dan dokumen berhasil dikirim!');
+        foreach ($documents as $type => $path) {
+            if ($path) {
+                ApplicationDocument::create([
+                    'application_id' => $application->id,
+                    'document_type' => $type,
+                    'file_path' => $path,
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Pengajuan magang dan dokumen persyaratan berhasil dikirim!');
     }
 
     // Download / Print Surat Penerimaan Magang untuk Mahasiswa
