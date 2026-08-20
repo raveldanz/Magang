@@ -25,6 +25,6 @@ class Application extends Model
 
     public function placement()
     {
-    return $this->hasOne(Placement::class);
+        return $this->hasOne(Placement::class);
     }
 }

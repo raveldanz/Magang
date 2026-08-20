@@ -498,7 +498,21 @@ class DatabaseSeeder extends Seeder
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs1->id],
-            ['nim' => '22081010001', 'universitas' => $universities['UPN']->name, 'jurusan' => 'Informatika', 'phone' => '081234567890']
+            [
+                'nim' => '22081010001',
+                'universitas' => $universities['UPN']->name,
+                'university_id' => $universities['UPN']->id,
+                'faculty' => 'Fakultas Ilmu Komputer',
+                'fakultas' => 'Fakultas Ilmu Komputer',
+                'jurusan' => 'Informatika',
+                'major' => 'Informatika',
+                'semester' => '5',
+                'phone' => '081234567890',
+                'alamat' => 'Jl. Rungkut Asri Timur No. 10, Surabaya',
+                'address' => 'Jl. Rungkut Asri Timur No. 10, Surabaya',
+                'emergency_contact_name' => 'Bpk. Andyka (Orang Tua)',
+                'emergency_contact_phone' => '081234567899',
+            ]
         );
         Application::firstOrCreate(
             ['user_id' => $mhs1->id],
@@ -506,6 +520,10 @@ class DatabaseSeeder extends Seeder
                 'unit_id' => $units[0]->id,
                 'start_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
+                'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
+                'cv_path' => 'documents/applications/sample_cv.pdf',
+                'transcript_path' => 'documents/applications/sample_transkrip.pdf',
+                'id_card_path' => 'documents/applications/sample_ktm.pdf',
                 'status' => 'pending',
             ]
         );
@@ -523,7 +541,21 @@ class DatabaseSeeder extends Seeder
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs2->id],
-            ['nim' => '22081010002', 'universitas' => $universities['UNAIR']->name, 'jurusan' => 'Sistem Informasi', 'phone' => '089876543210']
+            [
+                'nim' => '22081010002',
+                'universitas' => $universities['UNAIR']->name,
+                'university_id' => $universities['UNAIR']->id,
+                'faculty' => 'Fakultas Sains dan Teknologi',
+                'fakultas' => 'Fakultas Sains dan Teknologi',
+                'jurusan' => 'Sistem Informasi',
+                'major' => 'Sistem Informasi',
+                'semester' => '5',
+                'phone' => '089876543210',
+                'alamat' => 'Jl. Mulyorejo No. 45, Surabaya',
+                'address' => 'Jl. Mulyorejo No. 45, Surabaya',
+                'emergency_contact_name' => 'Ibu Ratna (Ibu)',
+                'emergency_contact_phone' => '089876543299',
+            ]
         );
         Application::firstOrCreate(
             ['user_id' => $mhs2->id],
@@ -531,6 +563,10 @@ class DatabaseSeeder extends Seeder
                 'unit_id' => $units[1]->id,
                 'start_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
+                'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
+                'cv_path' => 'documents/applications/sample_cv.pdf',
+                'transcript_path' => 'documents/applications/sample_transkrip.pdf',
+                'id_card_path' => 'documents/applications/sample_ktm.pdf',
                 'status' => 'verified',
             ]
         );
@@ -548,7 +584,21 @@ class DatabaseSeeder extends Seeder
         );
         StudentProfile::firstOrCreate(
             ['user_id' => $mhs3->id],
-            ['nim' => '22081010003', 'universitas' => $universities['UNESA']->name, 'jurusan' => 'Teknik Informatika', 'phone' => '087654321098']
+            [
+                'nim' => '22081010003',
+                'universitas' => $universities['UNESA']->name,
+                'university_id' => $universities['UNESA']->id,
+                'faculty' => 'Fakultas Teknik',
+                'fakultas' => 'Fakultas Teknik',
+                'jurusan' => 'Teknik Informatika',
+                'major' => 'Teknik Informatika',
+                'semester' => '5',
+                'phone' => '087654321098',
+                'alamat' => 'Jl. Ketintang Baru No. 8, Surabaya',
+                'address' => 'Jl. Ketintang Baru No. 8, Surabaya',
+                'emergency_contact_name' => 'Bpk. Nurhalim (Ayah)',
+                'emergency_contact_phone' => '087654321000',
+            ]
         );
         Application::firstOrCreate(
             ['user_id' => $mhs3->id],
@@ -556,6 +606,10 @@ class DatabaseSeeder extends Seeder
                 'unit_id' => $units[3]->id,
                 'start_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
+                'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
+                'cv_path' => 'documents/applications/sample_cv.pdf',
+                'transcript_path' => 'documents/applications/sample_transkrip.pdf',
+                'id_card_path' => 'documents/applications/sample_ktm.pdf',
                 'status' => 'rejected',
                 'rejection_note' => 'Dokumen Portofolio dan Transkrip Nilai belum terlampir dengan jelas. Silakan ajukan ulang berkas yang lengkap.',
             ]
@@ -568,7 +622,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'ahmad.fauzi@mhs.unitomo.ac.id',
                 'nim' => '22081010011',
                 'univ_key' => 'UNITOMO',
+                'fakultas' => 'Fakultas Ilmu Komputer',
                 'jurusan' => 'Informatika',
+                'semester' => '6',
                 'phone' => '081234560011',
                 'dosen' => $dosenUnitomo1,
             ],
@@ -577,7 +633,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'nabila.putri@mhs.unesa.ac.id',
                 'nim' => '22081010012',
                 'univ_key' => 'UNESA',
+                'fakultas' => 'Fakultas Teknik',
                 'jurusan' => 'Sistem Informasi',
+                'semester' => '6',
                 'phone' => '081234560012',
                 'dosen' => $dosenUnesa1,
             ],
@@ -586,7 +644,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'rizky.ramadhan@mhs.unitomo.ac.id',
                 'nim' => '22081010013',
                 'univ_key' => 'UNITOMO',
+                'fakultas' => 'Fakultas Ilmu Komputer',
                 'jurusan' => 'Teknik Informatika',
+                'semester' => '6',
                 'phone' => '081234560013',
                 'dosen' => $dosenUnitomo2,
             ],
@@ -595,7 +655,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'anisa.rahma@mhs.unesa.ac.id',
                 'nim' => '22081010014',
                 'univ_key' => 'UNESA',
+                'fakultas' => 'Fakultas Teknik',
                 'jurusan' => 'Teknologi Informasi',
+                'semester' => '6',
                 'phone' => '081234560014',
                 'dosen' => $dosenUnesa2,
             ],
@@ -604,7 +666,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'fajar.dwi@mhs.its.ac.id',
                 'nim' => '22081010015',
                 'univ_key' => 'ITS',
+                'fakultas' => 'Fakultas Teknologi Elektro dan Informatika Cerdas',
                 'jurusan' => 'Teknik Informatika',
+                'semester' => '6',
                 'phone' => '081234560015',
                 'dosen' => $dosenIts1,
             ],
@@ -613,7 +677,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'dewi.anggraini@mhs.unair.ac.id',
                 'nim' => '22081010016',
                 'univ_key' => 'UNAIR',
+                'fakultas' => 'Fakultas Sains dan Teknologi',
                 'jurusan' => 'Sistem Informasi',
+                'semester' => '6',
                 'phone' => '081234560016',
                 'dosen' => $dosenUnair1,
             ],
@@ -622,7 +688,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'bagus.tri@mhs.upnjatim.ac.id',
                 'nim' => '22081010017',
                 'univ_key' => 'UPN',
+                'fakultas' => 'Fakultas Ilmu Komputer',
                 'jurusan' => 'Informatika',
+                'semester' => '6',
                 'phone' => '081234560017',
                 'dosen' => $dosenUpn1,
             ],
@@ -631,7 +699,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'clara.salsabila@mhs.its.ac.id',
                 'nim' => '22081010018',
                 'univ_key' => 'ITS',
+                'fakultas' => 'Fakultas Teknologi Elektro dan Informatika Cerdas',
                 'jurusan' => 'Sistem Informasi',
+                'semester' => '6',
                 'phone' => '081234560018',
                 'dosen' => $dosenIts2,
             ],
@@ -640,7 +710,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'hafidz.m@mhs.unair.ac.id',
                 'nim' => '22081010019',
                 'univ_key' => 'UNAIR',
+                'fakultas' => 'Fakultas Sains dan Teknologi',
                 'jurusan' => 'Teknik Informatika',
+                'semester' => '6',
                 'phone' => '081234560019',
                 'dosen' => $dosenUnair2,
             ],
@@ -649,7 +721,9 @@ class DatabaseSeeder extends Seeder
                 'email' => 'putri.maharani@mhs.upnjatim.ac.id',
                 'nim' => '22081010020',
                 'univ_key' => 'UPN',
+                'fakultas' => 'Fakultas Ilmu Komputer',
                 'jurusan' => 'Sains Data',
+                'semester' => '6',
                 'phone' => '081234560020',
                 'dosen' => $dosenUpn2,
             ],
@@ -687,8 +761,17 @@ class DatabaseSeeder extends Seeder
                 [
                     'nim' => $data['nim'],
                     'universitas' => $univModel->name,
+                    'university_id' => $univModel->id,
+                    'faculty' => $data['fakultas'],
+                    'fakultas' => $data['fakultas'],
                     'jurusan' => $data['jurusan'],
+                    'major' => $data['jurusan'],
+                    'semester' => $data['semester'],
                     'phone' => $data['phone'],
+                    'alamat' => 'Jl. Dharmawangsa No. ' . ($index + 10) . ', Surabaya',
+                    'address' => 'Jl. Dharmawangsa No. ' . ($index + 10) . ', Surabaya',
+                    'emergency_contact_name' => 'Wali Mahasiswa ' . $data['name'],
+                    'emergency_contact_phone' => '0812998877' . str_pad($index, 2, '0', STR_PAD_LEFT),
                 ]
             );
 
@@ -707,6 +790,10 @@ class DatabaseSeeder extends Seeder
                     'unit_id' => $assignedUnit->id,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
+                    'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
+                    'cv_path' => 'documents/applications/sample_cv.pdf',
+                    'transcript_path' => 'documents/applications/sample_transkrip.pdf',
+                    'id_card_path' => 'documents/applications/sample_ktm.pdf',
                     'status' => 'accepted',
                     'letter_number' => '500.12.2/' . str_pad($index + 10, 3, '0', STR_PAD_LEFT) . '/436.7.14/' . date('Y'),
                     'letter_date' => Carbon::now()->subMonths(3)->subDays(5)->format('Y-m-d'),
@@ -751,6 +838,7 @@ class DatabaseSeeder extends Seeder
                 ['placement_id' => $placement->id],
                 [
                     'file_path' => 'documents/applications/5AdFAcelgeprCcoR82Brj5GF2QzWJvqIMPwbrfc2.pdf',
+                    'final_report_path' => 'documents/applications/5AdFAcelgeprCcoR82Brj5GF2QzWJvqIMPwbrfc2.pdf',
                     'status' => 'approved',
                     'feedback' => 'Laporan akhir magang telah diperiksa, disetujui, dan memenuhi standar instansi & kampus.',
                 ]

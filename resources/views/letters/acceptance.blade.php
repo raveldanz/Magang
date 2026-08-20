@@ -346,11 +346,11 @@
 
         // Data mahasiswa & permohonan
         $student = $application->user->studentProfile;
-        $fakultas = $student->fakultas ?? 'Fakultas Ilmu Komputer';
-        $universitas = $student->universitas ?? 'Perguruan Tinggi';
-        $nim = $student->nim ?? '-';
-        $jurusan = $student->jurusan ?? '-';
-        $semester = $student->semester ?? '5 (Lima)';
+        $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Mahasiswa';
+        $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
+        $nim = $student?->nim ?? '-';
+        $jurusan = $student?->jurusan ?? $student?->major ?? '-';
+        $semester = $student?->semester ? 'Semester ' . $student->semester : '-';
 
         // Format tanggal
         \Carbon\Carbon::setLocale('id');
