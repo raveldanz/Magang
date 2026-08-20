@@ -129,7 +129,8 @@ class ApplicationController extends Controller
         
         $application->update([
             'status' => $request->status,
-            'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
+            'rejection_note' => $request->status === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
+            'rejection_reason' => $request->status === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
             'letter_number' => $request->status === 'accepted' ? $request->letter_number : null,
             'letter_date' => $request->status === 'accepted' ? $request->letter_date : null,
         ]);
