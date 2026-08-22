@@ -307,45 +307,76 @@ class DashboardController extends Controller
             ? University::find($user->university_id) 
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
-        // Cari placement atau application
-        $placement = Placement::with([
-            'application.user.studentProfile',
-            'application.unit.agencyProfile',
-            'mentor',
-            'pembimbing',
-            'academicAdvisor',
-            'logbooks' => function ($q) {
+        // 1. Prioritaskan mencari Application berdasarkan ID pengajuan
+        $application = Application::with([
+            'user.studentProfile',
+            'unit.agencyProfile',
+            'placement.mentor',
+            'placement.pembimbing',
+            'placement.academicAdvisor',
+            'placement.logbooks' => function ($q) {
                 $q->orderBy('date', 'desc');
             },
-            'finalreport',
-            'evaluation'
+            'placement.finalreport',
+            'placement.evaluation'
         ])->find($id);
 
-        if (!$placement) {
-            // Jika ID yang dikirim adalah application_id
-            $application = Application::with([
-                'user.studentProfile',
-                'unit.agencyProfile',
-                'placement.mentor',
-                'placement.academicAdvisor',
-                'placement.logbooks' => function ($q) {
+        if ($application) {
+            $student = $application->user;
+            $placement = $application->placement;
+        } else {
+            // 2. Fallback: Cari jika ID yang dikirim adalah ID penempatan (placement_id)
+            $placement = Placement::with([
+                'application.user.studentProfile',
+                'application.unit.agencyProfile',
+                'mentor',
+                'pembimbing',
+                'academicAdvisor',
+                'logbooks' => function ($q) {
                     $q->orderBy('date', 'desc');
                 },
-                'placement.finalreport',
-                'placement.evaluation'
+                'finalreport',
+                'evaluation'
             ])->findOrFail($id);
 
-            $placement = $application->placement;
-            $student = $application->user;
-        } else {
             $application = $placement->application;
             $student = $application->user;
         }
 
         // Otorisasi: Pastikan mahasiswa berasal dari universitas yang sama
-        $isSameUniv = ($user->university_id !== null && $student->university_id === $user->university_id);
+        $isSameUniv = false;
+
+        if ($user->university_id && $student->university_id && (int)$user->university_id === (int)$student->university_id) {
+            $isSameUniv = true;
+        }
+
         if (!$isSameUniv && $university) {
-            $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
+            $studentUniv = strtolower(trim($student->university ?? ''));
+            $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
+            $targetUnivName = strtolower(trim($university->name ?? ''));
+            $targetUnivCode = strtolower(trim($university->code ?? ''));
+
+            if (
+                ($studentUniv && ($studentUniv === $targetUnivName || $studentUniv === $targetUnivCode)) ||
+                ($studentProfileUniv && ($studentProfileUniv === $targetUnivName || $studentProfileUniv === $targetUnivCode)) ||
+                ($targetUnivName && (str_contains($studentUniv, $targetUnivName) || str_contains($targetUnivName, $studentUniv))) ||
+                ($targetUnivCode && (str_contains($studentUniv, $targetUnivCode) || str_contains($targetUnivCode, $studentUniv)))
+            ) {
+                $isSameUniv = true;
+                if (!$student->university_id && $university->id) {
+                    $student->update(['university_id' => $university->id]);
+                }
+            }
+        }
+
+        if (!$isSameUniv && $user->university) {
+            $userUniv = strtolower(trim($user->university));
+            $studentUniv = strtolower(trim($student->university ?? ''));
+            $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
+
+            if ($studentUniv === $userUniv || $studentProfileUniv === $userUniv || str_contains($studentUniv, $userUniv) || str_contains($userUniv, $studentUniv)) {
+                $isSameUniv = true;
+            }
         }
 
         if (!$isSameUniv) {
