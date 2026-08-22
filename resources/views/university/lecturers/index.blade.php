@@ -18,7 +18,9 @@
                     🎓 {{ $univName ?? 'Kampus Mitra' }}
                 </span>
                 <button type="button" 
-                        @click="window.dispatchEvent(new CustomEvent('open-create-lecturer-modal'))"
+                        x-data
+                        onclick="window.dispatchEvent(new CustomEvent('open-create-lecturer-modal'))"
+                        @click="$dispatch('open-create-lecturer-modal')"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
