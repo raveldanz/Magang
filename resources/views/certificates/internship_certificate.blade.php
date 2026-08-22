@@ -127,7 +127,7 @@
     <!-- ================================================================= -->
     <!-- HALAMAN 1: SERTIFIKAT KELULUSAN RESMI                             -->
     <!-- ================================================================= -->
-    <main class="certificate-sheet p-8 relative">
+    <main class="certificate-sheet p-8 relative flex flex-col justify-between">
         
         <!-- Double Border Ornamen Resmi & Sudut Emas -->
         <div class="absolute inset-3 border-[2.5px] border-amber-600/50 rounded-2xl pointer-events-none"></div>
@@ -139,10 +139,8 @@
             <img src="{{ asset($agencyLogo) }}" alt="Watermark" class="w-[360px] object-contain">
         </div>
 
-        <!-- Bagian Atas: KOP & JUDUL & DATA PESERTA -->
-        <div class="relative z-10 px-5 pt-1">
-            
-            <!-- 1. KOP RESMI DINAS INSTANSI MAGANG & UNIVERSITAS -->
+        <!-- 1. KOP RESMI DINAS INSTANSI MAGANG & UNIVERSITAS (Bagian Atas) -->
+        <div class="relative z-10 px-6 pt-1">
             <div class="flex items-center justify-between border-b-2 border-amber-600/40 pb-3">
                 
                 <!-- Logo Dinas Instansi Tempat Magang (Kiri) -->
@@ -178,27 +176,31 @@
                 </div>
 
             </div>
+        </div>
 
-            <!-- 2. JUDUL SERTIFIKAT & NOMOR REGISTRASI -->
-            <div class="text-center mt-3.5">
-                <h1 class="font-serif-title text-2xl font-black tracking-widest text-slate-900 uppercase">
+        <!-- 2. KONTEN UTAMA SERTIFIKAT (Tengah - Spasi Vertikal Merata & Proporsional) -->
+        <div class="relative z-10 px-6 my-auto text-center space-y-4">
+            
+            <!-- Judul Sertifikat & Nomor Registrasi -->
+            <div class="space-y-1">
+                <h1 class="font-serif-title text-2xl sm:text-3xl font-black tracking-widest text-slate-900 uppercase">
                     Sertifikat Kelulusan Magang
                 </h1>
-                <p class="font-mono text-[11px] font-bold text-amber-700 tracking-wider mt-0.5">
+                <p class="font-mono text-xs font-bold text-amber-700 tracking-wider">
                     NOMOR: {{ $regNumber }}
                 </p>
-                <div class="w-28 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto mt-1.5"></div>
+                <div class="w-32 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto mt-1"></div>
             </div>
 
-            <!-- 3. ISI PERNYATAAN KELULUSAN -->
-            <div class="text-center mt-3 max-w-4xl mx-auto space-y-2 text-slate-700 text-xs leading-relaxed">
-                <p class="font-serif text-[11px] italic text-slate-500">Diberikan secara resmi dan sah kepada:</p>
+            <!-- Isi Pernyataan & Identitas Mahasiswa -->
+            <div class="max-w-4xl mx-auto space-y-3">
+                <p class="font-serif text-xs italic text-slate-500">Diberikan secara resmi dan sah kepada:</p>
                 
-                <div class="py-0.5">
-                    <h2 class="text-xl font-black text-slate-900 tracking-tight uppercase underline decoration-amber-500/50 decoration-2 underline-offset-4">
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight uppercase underline decoration-amber-500/50 decoration-2 underline-offset-4">
                         {{ $student->name }}
                     </h2>
-                    <p class="font-mono text-[11px] font-bold text-blue-900 mt-1">
+                    <p class="text-xs font-bold text-blue-900">
                         NIM: {{ $profile->nim ?? '-' }} &bull; Program Studi: {{ $profile->jurusan ?? 'Informatika' }}
                     </p>
                     <p class="text-xs font-semibold text-slate-600">
@@ -206,7 +208,7 @@
                     </p>
                 </div>
 
-                <p class="text-[11.5px] text-slate-600 max-w-3xl mx-auto pt-1 leading-normal">
+                <p class="text-xs text-slate-600 max-w-3xl mx-auto leading-relaxed pt-1">
                     Telah menyelesaikan seluruh rangkaian program <strong>Praktik Kerja Lapangan (PKL) / Magang MBKM</strong> pada unit kerja 
                     <strong>{{ $application->unit->name ?? 'Bidang Layanan Informatika & E-Government' }}</strong>, 
                     {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}, Pemerintah Kota Surabaya 
@@ -214,10 +216,10 @@
                     sampai dengan <strong>{{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}</strong> dengan predikat:
                 </p>
 
-                <!-- PREDIKAT BADGE BOX (GRADE A SAJA) -->
-                <div class="pt-1.5">
-                    <div class="inline-flex items-center gap-2.5 px-8 py-1.5 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 border border-amber-300 rounded-xl shadow-2xs">
-                        <span class="text-[11px] font-black text-amber-900 uppercase tracking-wider">PREDIKAT:</span>
+                <!-- Predikat Badge Box Emas -->
+                <div class="pt-2">
+                    <div class="inline-flex items-center gap-3 px-8 py-2 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 border border-amber-300 rounded-xl shadow-2xs">
+                        <span class="text-xs font-black text-amber-900 uppercase tracking-wider">PREDIKAT:</span>
                         <span class="text-base font-black text-amber-950 font-serif-title tracking-wide">
                             GRADE {{ $simpleGrade }} (NILAI: {{ $eval->nilai_akhir ?? 90 }})
                         </span>
@@ -227,8 +229,8 @@
 
         </div>
 
-        <!-- 4. FOOTER TANDA TANGAN DUA PIHAK (DPL KAMPUS & KEPALA DINAS) -->
-        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-3 text-center text-xs">
+        <!-- 3. FOOTER TANDA TANGAN DUA PIHAK (Bagian Bawah) -->
+        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-4 text-center text-xs">
             
             <!-- TTD 1: Dosen Pembimbing Lapangan (DPL) / Kampus -->
             <div>
@@ -242,7 +244,7 @@
 
                 <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
                     <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
-                    <p class="font-mono text-[9.5px] text-slate-500">NIP/NIDN: {{ $dosen->nip ?? '-' }}</p>
+                    <p class="text-[9.5px] text-slate-500">NIP/NIDN: {{ $dosen->nip ?? '-' }}</p>
                 </div>
             </div>
 
@@ -258,7 +260,7 @@
 
                 <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
                     <p class="font-bold text-slate-900 text-xs">{{ $agencyProfile->signee_name ?? 'Drs. H. M. NASER, M.Si' }}</p>
-                    <p class="font-mono text-[9.5px] text-slate-500">NIP: {{ $agencyProfile->signee_nip ?? '19700101 199503 1 002' }}</p>
+                    <p class="text-[9.5px] text-slate-500">NIP: {{ $agencyProfile->signee_nip ?? '19700101 199503 1 002' }}</p>
                 </div>
             </div>
 
@@ -269,11 +271,12 @@
     <!-- ================================================================= -->
     <!-- HALAMAN 2: LAMPIRAN TRANSKRIP RINCIAN NILAI KOMPETENSI            -->
     <!-- ================================================================= -->
-    <section class="certificate-sheet page-break p-8 relative">
+    <section class="certificate-sheet page-break p-8 relative flex flex-col justify-between">
         
         <!-- Border Ornamen Halaman 2 -->
         <div class="absolute inset-3 border-[2px] border-slate-300 rounded-2xl pointer-events-none"></div>
 
+        <!-- Bagian Atas: KOP, BIODATA, DAN TABEL TRANSKRIP -->
         <div class="relative z-10 px-5 pt-1">
             
             <!-- 1. HEADER TRANSKRIP NILAI DENGAN LOGO DINAS -->
@@ -302,22 +305,46 @@
                 </div>
             </div>
 
-            <!-- 2. DATA MAHASISWA & PENEMPATAN (2 KOLOM RAPI) -->
-            <div class="grid grid-cols-2 gap-4 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px]">
-                <div class="space-y-0.5">
-                    <div class="flex"><span class="w-28 text-slate-500 font-medium">Nama Mahasiswa</span><span class="font-bold text-slate-900">: {{ $student->name }}</span></div>
-                    <div class="flex"><span class="w-28 text-slate-500 font-medium">NIM</span><span class="font-mono font-bold text-slate-900">: {{ $profile->nim ?? '-' }}</span></div>
-                    <div class="flex"><span class="w-28 text-slate-500 font-medium">Program Studi</span><span class="font-medium text-slate-800">: {{ $profile->jurusan ?? 'Informatika' }}</span></div>
-                </div>
-                <div class="space-y-0.5">
-                    <div class="flex"><span class="w-28 text-slate-500 font-medium">Universitas Asal</span><span class="font-bold text-slate-900">: {{ $profile->universitas ?? ($university->name ?? '-') }}</span></div>
-                    <div class="flex"><span class="w-28 text-slate-500 font-medium">Unit Kerja Magang</span><span class="font-medium text-slate-800">: {{ $application->unit->name ?? '-' }}</span></div>
-                    <div class="flex"><span class="w-28 text-slate-500 font-medium">Periode Magang</span><span class="font-medium text-slate-800">: {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d/m/Y') }}</span></div>
-                </div>
+            <!-- 2. DATA MAHASISWA & PENEMPATAN (TABEL RAPI DENGAN KOLOM TITIK DUA TERSEJAJARKAN) -->
+            <div class="grid grid-cols-2 gap-6 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="w-28 text-slate-500 font-medium py-0.5">Nama Mahasiswa</td>
+                        <td class="w-3 text-slate-400 py-0.5">:</td>
+                        <td class="font-bold text-slate-900 py-0.5">{{ $student->name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-28 text-slate-500 font-medium py-0.5">NIM</td>
+                        <td class="w-3 text-slate-400 py-0.5">:</td>
+                        <td class="font-bold text-slate-900 py-0.5">{{ $profile->nim ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-28 text-slate-500 font-medium py-0.5">Program Studi</td>
+                        <td class="w-3 text-slate-400 py-0.5">:</td>
+                        <td class="font-medium text-slate-800 py-0.5">{{ $profile->jurusan ?? 'Informatika' }}</td>
+                    </tr>
+                </table>
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="w-28 text-slate-500 font-medium py-0.5">Universitas Asal</td>
+                        <td class="w-3 text-slate-400 py-0.5">:</td>
+                        <td class="font-bold text-slate-900 py-0.5">{{ $profile->universitas ?? ($university->name ?? '-') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-28 text-slate-500 font-medium py-0.5">Unit Kerja Magang</td>
+                        <td class="w-3 text-slate-400 py-0.5">:</td>
+                        <td class="font-medium text-slate-800 py-0.5">{{ $application->unit->name ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-28 text-slate-500 font-medium py-0.5">Periode Magang</td>
+                        <td class="w-3 text-slate-400 py-0.5">:</td>
+                        <td class="font-medium text-slate-800 py-0.5">{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d/m/Y') }}</td>
+                    </tr>
+                </table>
             </div>
 
             <!-- 3. TABEL TRANSKRIP RINCIAN PENILAIAN -->
-            <div class="mt-3.5 overflow-hidden rounded-xl border border-slate-300">
+            <div class="mt-4 overflow-hidden rounded-xl border border-slate-300">
                 <table class="min-w-full text-left text-[11px] divide-y divide-slate-200">
                     <thead class="bg-slate-900 text-white font-bold uppercase text-[9.5px] tracking-wider">
                         <tr>
@@ -341,28 +368,28 @@
                             <td class="py-1.5 px-3 text-center text-slate-400">1</td>
                             <td class="py-1.5 px-3">Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->nilai_disiplin ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->nilai_disiplin ?? 90 }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
                             <td class="py-1.5 px-3 text-center text-slate-400">2</td>
                             <td class="py-1.5 px-3">Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->nilai_kinerja ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->nilai_kinerja ?? 90 }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
                             <td class="py-1.5 px-3 text-center text-slate-400">3</td>
                             <td class="py-1.5 px-3">Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->nilai_laporan ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->nilai_laporan ?? 90 }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr class="bg-blue-50/70 font-bold">
                             <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
-                            <td class="py-2 px-3 text-center font-mono text-blue-900">40%</td>
-                            <td class="py-2 px-3 text-center font-mono text-blue-900">{{ $eval->nilai_pembimbing ?? 90 }}</td>
-                            <td class="py-2 px-3 text-center font-mono text-blue-950 font-black">
+                            <td class="py-2 px-3 text-center text-blue-900">40%</td>
+                            <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_pembimbing ?? 90 }}</td>
+                            <td class="py-2 px-3 text-center text-blue-950 font-black">
                                 {{ round(0.40 * ($eval->nilai_pembimbing ?? 90), 2) }}
                             </td>
                         </tr>
@@ -378,28 +405,28 @@
                             <td class="py-1.5 px-3 text-center text-slate-400">1</td>
                             <td class="py-1.5 px-3">Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
                             <td class="py-1.5 px-3 text-center text-slate-400">2</td>
                             <td class="py-1.5 px-3">Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
                             <td class="py-1.5 px-3 text-center text-slate-400">3</td>
                             <td class="py-1.5 px-3">Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr class="bg-indigo-50/70 font-bold">
                             <td colspan="2" class="py-2 px-3 text-right text-indigo-950">Subtotal Nilai DPL (Rata-rata):</td>
-                            <td class="py-2 px-3 text-center font-mono text-indigo-900">60%</td>
-                            <td class="py-2 px-3 text-center font-mono text-indigo-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
-                            <td class="py-2 px-3 text-center font-mono text-indigo-950 font-black">
+                            <td class="py-2 px-3 text-center text-indigo-900">60%</td>
+                            <td class="py-2 px-3 text-center text-indigo-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
+                            <td class="py-2 px-3 text-center text-indigo-950 font-black">
                                 {{ round(0.60 * ($eval->nilai_dosen_calculated ?? 90), 2) }}
                             </td>
                         </tr>
@@ -409,11 +436,11 @@
                             <td colspan="2" class="py-2.5 px-3 text-right uppercase tracking-wider">
                                 Nilai Akhir Total & Mutu:
                             </td>
-                            <td class="py-2.5 px-3 text-center font-mono">100%</td>
-                            <td class="py-2.5 px-3 text-center font-mono text-emerald-400 text-sm">
+                            <td class="py-2.5 px-3 text-center">100%</td>
+                            <td class="py-2.5 px-3 text-center text-emerald-400 text-sm">
                                 {{ $eval->nilai_akhir ?? 90 }}
                             </td>
-                            <td class="py-2.5 px-3 text-center font-mono text-amber-300 text-sm">
+                            <td class="py-2.5 px-3 text-center text-amber-300 text-sm">
                                 GRADE {{ $simpleGrade }}
                             </td>
                         </tr>
@@ -424,25 +451,25 @@
 
         </div>
 
-        <!-- 4. FOOTER TTD TRANSKRIP -->
-        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-4 text-center text-xs">
+        <!-- 4. FOOTER TTD TRANSKRIP (Bagian Bawah) -->
+        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-5 text-center text-xs">
             <div>
-                <p class="font-bold text-slate-800 text-[11px]">Dosen Pembimbing Lapangan,</p>
+                <p class="font-bold text-slate-800 text-xs">Dosen Pembimbing Lapangan,</p>
                 <div class="h-12 flex items-center justify-center my-1">
                     <span class="font-quote text-blue-900/30 text-sm italic font-bold">Approved</span>
                 </div>
                 <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
-                    <p class="font-bold text-slate-900 text-[11px]">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
+                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
                 </div>
             </div>
 
             <div>
-                <p class="font-bold text-slate-800 text-[11px]">Pembimbing Lapangan Dinas,</p>
+                <p class="font-bold text-slate-800 text-xs">Pembimbing Lapangan Dinas,</p>
                 <div class="h-12 flex items-center justify-center my-1">
                     <span class="font-quote text-emerald-900/30 text-sm italic font-bold">Approved</span>
                 </div>
                 <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
-                    <p class="font-bold text-slate-900 text-[11px]">{{ $mentor->name ?? 'Retno Mumpuni, S.Kom., M.Sc' }}</p>
+                    <p class="font-bold text-slate-900 text-xs">{{ $mentor->name ?? 'Retno Mumpuni, S.Kom., M.Sc' }}</p>
                 </div>
             </div>
         </div>
