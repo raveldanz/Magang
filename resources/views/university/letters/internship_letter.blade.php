@@ -74,23 +74,21 @@
 </head>
 <body class="antialiased">
 
-    <!-- Action Bar (Hidden during print) -->
-    <div class="no-print sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md text-white px-6 py-3 shadow-md flex items-center justify-between border-b border-slate-700">
+    <!-- Action Bar (Hidden when Printing) -->
+    <div class="print:hidden no-print bg-slate-900 text-white px-6 py-3.5 shadow-md flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3 font-sans">
-            <a href="{{ route('university.dashboard') }}" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg transition border border-slate-600">
-                ← Kembali ke Dashboard
+            <a href="{{ route('university.dashboard') }}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-sm font-medium transition border border-slate-700">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali ke Dashboard
             </a>
-            <div class="text-xs text-slate-300">
-                Dokumen: <strong class="text-white">Surat Tugas Pengantar Magang MBKM</strong>
-            </div>
+            <span class="text-xs text-slate-400 border-l border-slate-700 pl-3">Dokumen Resmi: Surat Tugas Pengantar Magang MBKM</span>
         </div>
-
-        <div class="flex items-center gap-3 font-sans">
-            <button onclick="window.print()" class="inline-flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg transition active:scale-95 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>🖨️ Cetak Surat / Simpan PDF</span>
+        <div class="flex items-center gap-2 font-sans">
+            <button onclick="window.print()" 
+                    class="inline-flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold shadow-sm transition active:scale-95 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Cetak Surat / Simpan PDF
             </button>
         </div>
     </div>

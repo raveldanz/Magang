@@ -195,8 +195,8 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm">
+                <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <table class="min-w-full divide-y divide-slate-200 text-left text-xs sm:text-sm">
                         <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-[11px] font-bold tracking-wider">
                             <tr>
                                 <th class="px-6 py-3.5">Mahasiswa</th>
@@ -205,7 +205,7 @@
                                 <th class="px-6 py-3.5">Status Pengajuan</th>
                                 <th class="px-6 py-3.5">Dosen DPL</th>
                                 <th class="px-6 py-3.5">Mentor Dinas</th>
-                                <th class="px-6 py-3.5 text-center">Aksi</th>
+                                <th class="px-6 py-3.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[160px]">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -268,26 +268,18 @@
                                             <span class="text-xs text-gray-400">Belum Diplot</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            @if (in_array(strtolower($app->lifecycle_status ?? $app->status), ['accepted', 'active', 'completed']))
-                                                <a href="{{ route('university.students.letter', $app->id) }}" 
-                                                   target="_blank"
-                                                   title="Cetak Surat Tugas / Pengantar Magang Resmi A4"
-                                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-lg transition shadow-2xs">
-                                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                    </svg>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <div class="inline-flex items-center justify-end gap-2">
+                                            @if (in_array(strtoupper($app->lifecycle_status ?? $app->status), ['ACCEPTED', 'ACTIVE', 'COMPLETED']))
+                                                <a href="{{ route('university.students.letter', $app->id) }}" target="_blank"
+                                                   class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition shadow-2xs">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                                     <span>Surat Tugas</span>
                                                 </a>
                                             @endif
-
-                                            <a href="{{ route('university.students.show', $placement?->id ?? $app->id) }}" 
-                                               class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg transition shadow-2xs">
+                                            <a href="{{ route('university.students.show', $placement?->id ?? $app->id) }}"
+                                               class="inline-flex items-center px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition shadow-2xs">
                                                 <span>Detail</span>
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                </svg>
                                             </a>
                                         </div>
                                     </td>
