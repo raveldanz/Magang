@@ -32,7 +32,7 @@
 
                     if ($user) {
                         if ($user->agency_profile_id && $user->agencyProfile) {
-                            $logoPath = $user->agencyProfile->logo;
+                            $logoPath = $user->agencyProfile->logo ?? null;
                             if ($logoPath && file_exists(public_path($logoPath))) {
                                 $navAvatarLogo = asset($logoPath);
                             } else {
@@ -41,27 +41,31 @@
                                 elseif (str_contains($aName, 'penduduk') || str_contains($aName, 'dukcapil')) $navAvatarLogo = asset('images/logos/dispendukcapil.png');
                                 elseif (str_contains($aName, 'pustaka') || str_contains($aName, 'pusip')) $navAvatarLogo = asset('images/logos/dispusip.png');
                             }
-                        } elseif ($user->university_id && $user->university) {
-                            $logoPath = $user->university->logo;
-                            if ($logoPath && file_exists(public_path($logoPath))) {
-                                $navAvatarLogo = asset($logoPath);
-                            } else {
-                                $uName = strtolower($user->university->name ?? '');
-                                if (str_contains($uName, 'unesa')) $navAvatarLogo = asset('images/logos/unesa.png');
-                                elseif (str_contains($uName, 'its')) $navAvatarLogo = asset('images/logos/its.png');
-                                elseif (str_contains($uName, 'unair')) $navAvatarLogo = asset('images/logos/unair.png');
-                                elseif (str_contains($uName, 'upn')) $navAvatarLogo = asset('images/logos/upnjatim.png');
+                        } elseif ($user->university_id || $isUniversitas || $isDosen || $isMahasiswa) {
+                            $univObj = null;
+                            if ($user->university_id) {
+                                $univObj = \App\Models\University::find($user->university_id);
+                            }
+                            $uName = '';
+                            if ($univObj) {
+                                if ($univObj->logo && file_exists(public_path($univObj->logo))) {
+                                    $navAvatarLogo = asset($univObj->logo);
+                                }
+                                $uName = strtolower($univObj->name ?? '');
+                            }
+                            if (!$navAvatarLogo) {
+                                if (empty($uName)) {
+                                    $rawUniv = $user->university ?? null;
+                                    $uName = strtolower(is_string($rawUniv) ? $rawUniv : ($user->studentProfile?->universitas ?? ''));
+                                }
+                                if (str_contains($uName, 'unesa') || str_contains($uName, 'negeri surabaya')) $navAvatarLogo = asset('images/logos/unesa.png');
+                                elseif (str_contains($uName, 'its') || str_contains($uName, 'sepuluh nopember')) $navAvatarLogo = asset('images/logos/its.png');
+                                elseif (str_contains($uName, 'unair') || str_contains($uName, 'airlangga')) $navAvatarLogo = asset('images/logos/unair.png');
+                                elseif (str_contains($uName, 'upn') || str_contains($uName, 'veteran')) $navAvatarLogo = asset('images/logos/upnjatim.png');
                                 elseif (str_contains($uName, 'unitomo') || str_contains($uName, 'soetomo')) $navAvatarLogo = asset('images/logos/unitomo.png');
                             }
                         } elseif ($isSuperAdmin) {
                             $navAvatarLogo = asset('images/logos/surabaya.png');
-                        } elseif ($isMahasiswa && $user->studentProfile) {
-                            $uName = strtolower($user->studentProfile->universitas ?? '');
-                            if (str_contains($uName, 'unesa')) $navAvatarLogo = asset('images/logos/unesa.png');
-                            elseif (str_contains($uName, 'its')) $navAvatarLogo = asset('images/logos/its.png');
-                            elseif (str_contains($uName, 'unair')) $navAvatarLogo = asset('images/logos/unair.png');
-                            elseif (str_contains($uName, 'upn')) $navAvatarLogo = asset('images/logos/upnjatim.png');
-                            elseif (str_contains($uName, 'unitomo') || str_contains($uName, 'soetomo')) $navAvatarLogo = asset('images/logos/unitomo.png');
                         }
                     }
                 @endphp
