@@ -213,23 +213,29 @@
             
             {{-- Distribusi Penempatan: Instansi (Jika Super Admin) atau Unit Divisi (Jika Admin Dinas) --}}
             <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4" style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">🏢</div>
-                        <div>
+                <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0">🏢</div>
+                        <div class="min-w-0">
                             @if($isSuperAdmin)
-                                <h3 class="text-sm font-bold text-slate-800">Distribusi Penempatan Instansi Dinas</h3>
-                                <p class="text-xs text-slate-400">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
+                                <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Penempatan Instansi Dinas</h3>
+                                <p class="text-xs text-slate-400 truncate">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
                             @else
-                                <h3 class="text-sm font-bold text-slate-800">Distribusi Divisi & Unit Kerja Dinas</h3>
-                                <p class="text-xs text-slate-400">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dinas' }}</p>
+                                <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Divisi & Unit Kerja Dinas</h3>
+                                <p class="text-xs text-slate-400 truncate">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dinas' }}</p>
                             @endif
                         </div>
                     </div>
                     @if($isSuperAdmin)
-                        <a href="{{ route('admin.agencies.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">Kelola Dinas →</a>
+                        <a href="{{ route('admin.agencies.index') }}" class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                            <span>Kelola Dinas</span>
+                            <span class="text-sm leading-none">&rarr;</span>
+                        </a>
                     @else
-                        <a href="{{ route('admin.units.index') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">Kelola Unit →</a>
+                        <a href="{{ route('admin.units.index') }}" class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                            <span>Kelola Unit</span>
+                            <span class="text-sm leading-none">&rarr;</span>
+                        </a>
                     @endif
                 </div>
 
@@ -267,20 +273,23 @@
 
             {{-- Distribusi Asal Perguruan Tinggi --}}
             <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4" style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg">🎓</div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">
+                <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg shrink-0">🎓</div>
+                        <div class="min-w-0">
+                            <h3 class="text-sm font-bold text-slate-800 truncate">
                                 {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : 'Distribusi Asal Kampus Mahasiswa Dinas' }}
                             </h3>
-                            <p class="text-xs text-slate-400">
+                            <p class="text-xs text-slate-400 truncate">
                                 {{ $isSuperAdmin ? 'Sebaran perguruan tinggi mitra resmi program magang' : 'Sebaran kampus pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini') }}
                             </p>
                         </div>
                     </div>
                     @if($isSuperAdmin)
-                        <a href="{{ route('admin.universities.index') }}" class="text-xs font-bold text-sky-600 hover:text-sky-800">Kelola Kampus →</a>
+                        <a href="{{ route('admin.universities.index') }}" class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
+                            <span>Kelola Kampus</span>
+                            <span class="text-sm leading-none">&rarr;</span>
+                        </a>
                     @endif
                 </div>
 

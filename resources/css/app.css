@@ -50,14 +50,14 @@
 }
 
 .btn-action-edit {
-    background-color: #eef2ff !important;
-    color: #4338ca !important;
-    border-color: #c7d2fe !important;
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
 }
 .btn-action-edit:hover {
-    background-color: #e0e7ff !important;
-    color: #3730a3 !important;
-    border-color: #a5b4fc !important;
+    background-color: #dbeafe !important;
+    color: #1e40af !important;
+    border-color: #93c5fd !important;
 }
 
 .btn-action-reset {

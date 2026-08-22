@@ -379,6 +379,14 @@
         $bsreLogoPath = public_path('images/bsre-logo.png');
         $bsreLogoData = file_exists($bsreLogoPath) ? @file_get_contents($bsreLogoPath) : '';
         $bsreLogoSrc = $bsreLogoData ? 'data:image/png;base64,' . base64_encode($bsreLogoData) : null;
+
+        // URL Kembali Cerdas
+        $backUrl = route('admin.applications.show', $application->id);
+        if (Auth::user()?->role === 'mahasiswa') {
+            $backUrl = route('dashboard');
+        } elseif (Auth::user()?->role === 'universitas') {
+            $backUrl = route('university.dashboard');
+        }
     @endphp
 
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
@@ -387,9 +395,9 @@
             📄 Surat Penerimaan Magang - {{ $application->user->name }}
         </div>
         <div class="btn-group">
-            <button onclick="window.history.back()" class="btn btn-secondary">
+            <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="btn btn-secondary">
                 &larr; Kembali
-            </button>
+            </a>
             <button onclick="window.print()" class="btn btn-primary">
                 🖨️ Cetak / Simpan PDF
             </button>
