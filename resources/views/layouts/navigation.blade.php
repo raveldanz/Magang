@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             
-            {{-- Brand Logo --}}
+            {{-- Brand Logo Resmi Pemkot Surabaya --}}
             <div class="flex items-center gap-8 lg:gap-10">
                 @php
                     $user = Auth::user();
@@ -20,15 +20,11 @@
                     }
                 @endphp
 
-                <a href="{{ $dashboardRoute }}" class="flex items-center gap-3">
+                <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
                     <img src="{{ asset('images/logos/surabaya.png') }}" 
-                         alt="Pemkot Surabaya" 
-                         class="h-9 w-auto object-contain shrink-0"
-                         onerror="this.src='{{ asset('logo.png') }}'">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-black tracking-tight text-slate-900 leading-none">SIP-MAGANG</span>
-                        <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-1">PEMKOT SURABAYA</span>
-                    </div>
+                         alt="Pemerintah Kota Surabaya" 
+                         class="h-10 sm:h-12 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
+                         style="height: 44px; width: auto; max-height: 48px; object-fit: contain;">
                 </a>
 
                 {{-- Desktop Navigation (Gojek-Style Clean Typography & Spacing) --}}
