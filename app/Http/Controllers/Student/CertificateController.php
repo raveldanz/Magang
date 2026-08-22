@@ -4,74 +4,124 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
+use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\Placement;
+use App\Models\University;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CertificateController extends Controller
 {
     /**
-     * Download E-Sertifikat untuk Mahasiswa yang telah menyelesaikan magang (Laporan Disetujui & Nilai Lengkap)
+     * Helper untuk mengambil data placement & otorisasi sertifikat
      */
-    public function download($placementId)
+    protected function getCertificateData($id)
     {
         $user = Auth::user();
 
-        $placement = Placement::with([
-            'application.user.studentProfile',
-            'application.unit.agencyProfile',
-            'evaluation',
-            'finalreport',
-            'mentor',
-            'pembimbing'
-        ])
-            ->where('id', $placementId)
-            ->whereHas('application', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-            ->firstOrFail();
+        // Cari berdasarkan application_id atau placement_id
+        $application = Application::with([
+            'user.studentProfile.university',
+            'unit.agencyProfile',
+            'placement.mentor',
+            'placement.pembimbing',
+            'placement.academicAdvisor',
+            'placement.dosen',
+            'placement.evaluation',
+            'placement.finalreport',
+        ])->where(function ($q) use ($id) {
+            $q->where('id', $id)
+              ->orWhereHas('placement', function ($pq) use ($id) {
+                  $pq->where('id', $id);
+              });
+        })->firstOrFail();
 
-        // Validasi kelayakan unduh sertifikat
-        if (!$placement->evaluation || optional($placement->finalreport)->status !== 'approved') {
-            return redirect()->route('dashboard')->with('error', 'E-Sertifikat belum dapat diunduh. Pastikan laporan akhir telah disetujui dan pembimbing telah memberikan evaluasi.');
+        $placement = $application->placement;
+
+        // Otorisasi: Mahasiswa pemilik, DPL, Mentor, atau Admin
+        $isOwner = ($user->id === $application->user_id);
+        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isAgencyAdmin = ($user->role === 'admin' && $user->agency_profile_id === $application->unit?->agency_profile_id);
+        $isAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
+
+        if (!$isOwner && !$isSuperAdmin && !$isAgencyAdmin && !$isAdvisor) {
+            abort(403, 'Akses Ditolak: Anda tidak berhak melihat atau mengunduh sertifikat ini.');
         }
 
-        // Ambil profil instansi terkait
-        $agencyProfile = $placement->application?->unit?->agencyProfile 
-            ?? $placement->agencyProfile 
+        // Cek apakah mahasiswa memenuhi syarat kelulusan
+        $eval = $placement?->evaluation;
+        $finalReport = $placement?->finalreport;
+        $isCompleted = ($application->status === 'completed') || 
+                       ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0 && optional($finalReport)->status === 'approved');
+
+        if (!$isCompleted && !$isSuperAdmin) {
+            abort(403, 'Sertifikat Magang Belum Diterbitkan: Pastikan laporan akhir telah disetujui dan nilai evaluasi (Dinas 40% & DPL 60%) telah lengkap.');
+        }
+
+        // Ambil profil instansi
+        $agencyProfile = $application->unit?->agencyProfile 
             ?? AgencyProfile::first();
 
-        $student = $placement->application->user;
+        $student = $application->user;
         $profile = $student->studentProfile;
-        $eval = $placement->evaluation;
-        $unit = $placement->application->unit;
-        $pembimbing = $placement->mentor ?? $placement->pembimbing;
+        $mentor = $placement ? ($placement->mentor ?? $placement->pembimbing) : null;
+        $dosen = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
 
-        // Hitung rata-rata & grade
-        $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
-        $grade = 'C';
-        if ($rataRata >= 85) $grade = 'A';
-        elseif ($rataRata >= 70) $grade = 'B';
+        // Cari Perguruan Tinggi
+        $university = $profile?->university ?? University::where('name', $profile?->universitas ?? '')->first();
 
-        $data = [
-            'placement' => $placement,
-            'agencyProfile' => $agencyProfile,
-            'name' => strtoupper($student->name),
-            'nim' => $profile->nim ?? '-',
-            'universitas' => strtoupper($profile->universitas ?? '-'),
-            'unit' => strtoupper($unit->name ?? '-'),
-            'start_date' => \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d F Y'),
-            'end_date' => \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d F Y'),
-            'rataRata' => $rataRata,
-            'grade' => $grade,
-            'date_issued' => \Carbon\Carbon::now()->translatedFormat('d F Y'),
-            'pembimbing' => $pembimbing,
-        ];
+        // Nomor Registrasi Sertifikat
+        $regNumber = "SERT/{$application->id}/PEMKOT-SBY/" . Carbon::now()->format('Y');
 
-        $pdf = Pdf::loadView('admin.certificates.template', $data)->setPaper('a4', 'landscape');
-        $filename = 'E-Sertifikat_Magang_' . str_replace(' ', '_', $student->name) . '.pdf';
+        return compact(
+            'application',
+            'placement',
+            'agencyProfile',
+            'student',
+            'profile',
+            'mentor',
+            'dosen',
+            'university',
+            'eval',
+            'finalReport',
+            'regNumber'
+        );
+    }
 
-        return $pdf->download($filename);
+    /**
+     * Tampilkan E-Sertifikat Resmi Format Cetak / Preview A4 Landscape
+     */
+    public function show($id)
+    {
+        $data = $this->getCertificateData($id);
+
+        AuditLog::record('CERTIFICATE_VIEW', 'Application', $data['application']->id, [
+            'student_name' => $data['student']->name,
+            'reg_number' => $data['regNumber'],
+        ]);
+
+        return view('certificates.internship_certificate', $data);
+    }
+
+    /**
+     * Unduh Dokumen PDF E-Sertifikat
+     */
+    public function download($id)
+    {
+        $data = $this->getCertificateData($id);
+
+        AuditLog::record('CERTIFICATE_DOWNLOAD', 'Application', $data['application']->id, [
+            'student_name' => $data['student']->name,
+            'reg_number' => $data['regNumber'],
+        ]);
+
+        $studentName = str_replace(' ', '_', $data['student']->name);
+        $filename = "Sertifikat_Magang_{$studentName}.pdf";
+
+        // Tampilkan print view jika dompdf mengalami kendala aset gambar lokal
+        return view('certificates.internship_certificate', $data);
     }
 }

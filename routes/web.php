@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'index'])->name('student.final_report.index');
         Route::post('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'store'])->name('student.final_report.store');
         Route::get('/student/certificate/{placementId}/download', [\App\Http\Controllers\Student\CertificateController::class, 'download'])->name('student.certificate.download');
+        Route::get('/student/certificate/{id}', [\App\Http\Controllers\Student\CertificateController::class, 'show'])->name('student.certificate.show');
 
         // Pemilihan & Input Dosen Pembimbing Lapangan (DPL Kampus)
         Route::post('/student/select-advisor', [StudentDashboardController::class, 'selectAdvisor'])->name('student.select_advisor');
@@ -184,6 +185,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/lecturer/logbooks/{id}', [\App\Http\Controllers\Lecturer\LogbookController::class, 'updateStatus'])->name('lecturer.logbooks.updateStatus');
         Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
         Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
+        Route::post('/lecturer/students/{placementId}/evaluate', [LecturerEvaluationController::class, 'store'])->name('lecturer.students.evaluate');
+        Route::post('/lecturer/students/{placementId}/report-approval', [LecturerEvaluationController::class, 'updateFinalReportStatus'])->name('lecturer.final_report.updateStatus');
     });
 
     // ==========================================
