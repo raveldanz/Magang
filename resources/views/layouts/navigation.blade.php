@@ -2,20 +2,25 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             
-            {{-- Brand Logo Resmi Pemkot Surabaya --}}
-            <div class="flex items-center gap-8 lg:gap-10">
+            {{-- 1. BRAND LOGO RESMI PEMKOT SURABAYA --}}
+            <div class="flex items-center gap-6 lg:gap-8">
                 @php
                     $user = Auth::user();
                     $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
                     $isAdminDinas = $user && ($user->role === 'admin' && !is_null($user->agency_profile_id));
+                    $isMahasiswa = $user && $user->role === 'mahasiswa';
+                    $isDosen = $user && ($user->role === 'dosen' || $user->role === 'academic_advisor');
+                    $isMentor = $user && ($user->role === 'mentor' || $user->role === 'pembimbing');
+                    $isUniversitas = $user && $user->role === 'universitas';
+
                     $dashboardRoute = route('dashboard');
                     if ($isSuperAdmin || $isAdminDinas) {
                         $dashboardRoute = route('admin.dashboard');
-                    } elseif ($user?->role === 'mentor' || $user?->role === 'pembimbing') {
+                    } elseif ($isMentor) {
                         $dashboardRoute = route('mentor.dashboard');
-                    } elseif ($user?->role === 'dosen' || $user?->role === 'academic_advisor') {
+                    } elseif ($isDosen) {
                         $dashboardRoute = route('lecturer.dashboard');
-                    } elseif ($user?->role === 'universitas') {
+                    } elseif ($isUniversitas) {
                         $dashboardRoute = route('university.dashboard');
                     }
                 @endphp
@@ -23,14 +28,14 @@
                 <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
                     <img src="{{ asset('images/logos/surabaya.png') }}" 
                          alt="Pemerintah Kota Surabaya" 
-                         class="h-10 sm:h-12 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
-                         style="height: 44px; width: auto; max-height: 48px; object-fit: contain;">
+                         class="h-10 sm:h-11 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
+                         style="height: 42px; width: auto; max-height: 46px; object-fit: contain;">
                 </a>
 
-                {{-- Desktop Navigation (Gojek-Style Clean Typography & Spacing) --}}
-                <div class="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm font-medium">
+                {{-- 2. DESKTOP NAVIGATION (GOJEK-STYLE CLEAN TYPOGRAPHY) --}}
+                <div class="hidden md:flex items-center space-x-5 lg:space-x-7 text-sm font-medium">
 
-                    {{-- 1. SUPER ADMIN NAVIGATION --}}
+                    {{-- 2.1 SUPER ADMIN --}}
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
@@ -99,7 +104,7 @@
                             Log Audit
                         </a>
 
-                    {{-- 2. ADMIN DINAS NAVIGATION --}}
+                    {{-- 2.2 ADMIN DINAS --}}
                     @elseif ($isAdminDinas)
                         <a href="{{ route('admin.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
@@ -107,7 +112,7 @@
                         </a>
                         <a href="{{ route('admin.applications.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
-                            Verifikasi
+                            Verifikasi Pengajuan
                         </a>
                         <a href="{{ route('admin.units.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
@@ -130,8 +135,8 @@
                             Profil Dinas
                         </a>
 
-                    {{-- 3. MAHASISWA NAVIGATION --}}
-                    @elseif ($user?->role === 'mahasiswa')
+                    {{-- 2.3 MAHASISWA --}}
+                    @elseif ($isMahasiswa)
                         <a href="{{ route('dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
                             Dashboard
@@ -149,19 +154,8 @@
                             Logbook Magang
                         </a>
 
-                    {{-- 4. MENTOR NAVIGATION --}}
-                    @elseif ($user?->role === 'mentor' || $user?->role === 'pembimbing')
-                        <a href="{{ route('mentor.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
-                            Portal Mentor
-                        </a>
-                        <a href="{{ route('mentor.logbooks.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
-                            Review Logbook
-                        </a>
-
-                    {{-- 5. DOSEN (DPL) NAVIGATION --}}
-                    @elseif ($user?->role === 'dosen' || $user?->role === 'academic_advisor')
+                    {{-- 2.4 DOSEN PEMBIMBING LAPANGAN (DPL) --}}
+                    @elseif ($isDosen)
                         <a href="{{ route('lecturer.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
                             Portal Dosen
@@ -175,8 +169,19 @@
                             Logbook Bimbingan
                         </a>
 
-                    {{-- 6. UNIVERSITAS NAVIGATION --}}
-                    @elseif ($user?->role === 'universitas')
+                    {{-- 2.5 MENTOR LAPANGAN DINAS --}}
+                    @elseif ($isMentor)
+                        <a href="{{ route('mentor.dashboard') }}" 
+                           class="transition py-1 {{ request()->routeIs('mentor.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                            Portal Mentor
+                        </a>
+                        <a href="{{ route('mentor.logbooks.index') }}" 
+                           class="transition py-1 {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                            Review Logbook
+                        </a>
+
+                    {{-- 2.6 UNIVERSITAS --}}
+                    @elseif ($isUniversitas)
                         <a href="{{ route('university.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('university.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
                             Portal Universitas
@@ -194,14 +199,14 @@
                 </div>
             </div>
 
-            {{-- Right Section: Profile & Logout --}}
+            {{-- 3. RIGHT SECTION: PROFILE & LOGOUT (DESKTOP) --}}
             <div class="hidden md:flex items-center gap-3">
                 <div x-data="{ profileOpen: false }" class="relative" @click.away="profileOpen = false">
                     <button @click="profileOpen = !profileOpen" 
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
-                        <span class="text-xs font-semibold text-slate-700">{{ Auth::user()->name ?? 'Administrator' }}</span>
-                        <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
-                            {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+                        <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
+                        <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                            {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                         </div>
                         <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{'rotate-180 text-blue-600': profileOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -211,13 +216,13 @@
                     <div x-show="profileOpen" 
                          x-transition 
                          x-cloak
-                         class="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50"
+                         class="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50"
                          style="display: none;">
                         <div class="px-4 py-2 border-b border-slate-100">
                             <div class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name ?? 'User' }}</div>
                             <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">{{ Auth::user()->role ?? 'Role' }}</div>
                         </div>
-                        @if(Auth::user()?->role === 'mahasiswa')
+                        @if($isMahasiswa)
                             <a href="{{ route('student.profile.edit') }}" class="block px-4 py-2 text-xs text-slate-600 hover:bg-slate-50 transition">Profil Saya</a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
@@ -230,9 +235,12 @@
                 </div>
             </div>
 
-            {{-- Mobile Menu Hamburger --}}
+            {{-- 4. MOBILE MENU HAMBURGER BUTTON --}}
             <div class="flex items-center md:hidden">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 cursor-pointer">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                        type="button"
+                        class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none transition cursor-pointer"
+                        aria-label="Buka Menu">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': mobileMenuOpen, 'inline-flex': !mobileMenuOpen }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': !mobileMenuOpen, 'inline-flex': mobileMenuOpen }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -243,22 +251,168 @@
         </div>
     </div>
 
-    {{-- Mobile Menu Dropdown --}}
-    <div x-show="mobileMenuOpen" x-cloak class="md:hidden border-t border-slate-100 bg-white px-4 pt-2 pb-6 space-y-2">
-        @if ($isSuperAdmin)
-            <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Dashboard</a>
-            <a href="{{ route('admin.applications.index') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.applications.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Pengajuan</a>
-            <a href="{{ route('admin.agencies.index') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.agencies.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Instansi & Unit</a>
-            <a href="{{ route('admin.universities.index') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.universities.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Universitas</a>
-            <a href="{{ route('admin.users.index') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Kelola Pengguna</a>
-            <a href="{{ route('admin.mentors.index') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Mentor Lapangan</a>
-            <a href="{{ route('admin.audit_logs.index') }}" class="block px-3 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('admin.audit_logs.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600' }}">Log Audit</a>
-        @endif
-        <div class="pt-4 border-t border-slate-100">
+    {{-- 5. FLOATING ANIMATED MOBILE MENU OVERLAY (LENGKAP UNTUK SELURUH 6 ROLE) --}}
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-4 scale-98"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 -translate-y-4 scale-98"
+         x-cloak
+         @click.away="mobileMenuOpen = false"
+         class="md:hidden absolute top-full left-0 right-0 bg-white/98 backdrop-blur-xl border-b border-slate-200/80 shadow-2xl z-50 px-4 pt-3 pb-6 space-y-3"
+         style="display: none;">
+
+        {{-- Info Profil Pengguna di Mobile --}}
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-slate-800">{{ Auth::user()->name ?? 'Pengguna' }}</div>
+                    <div class="text-[10px] font-semibold text-slate-400 uppercase">{{ Auth::user()->role ?? 'Role' }}</div>
+                </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Online</span>
+        </div>
+
+        {{-- Daftar Navigasi Mobile per Role --}}
+        <div class="space-y-1">
+
+            {{-- 5.1 Menu Mobile Super Admin --}}
+            @if ($isSuperAdmin)
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('admin.applications.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.applications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📋</span>
+                    <span>Pengajuan</span>
+                </a>
+                <a href="{{ route('admin.agencies.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.agencies.*') || request()->routeIs('admin.units.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🏢</span>
+                    <span>Instansi & Unit</span>
+                </a>
+                <a href="{{ route('admin.universities.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.universities.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🎓</span>
+                    <span>Universitas</span>
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👥</span>
+                    <span>Semua Pengguna</span>
+                </a>
+                <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👔</span>
+                    <span>Mentor Lapangan</span>
+                </a>
+                <a href="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.audit_logs.*') || request()->routeIs('admin.audit-logs.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📜</span>
+                    <span>Log Audit</span>
+                </a>
+
+            {{-- 5.2 Menu Mobile Admin Dinas --}}
+            @elseif ($isAdminDinas)
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('admin.applications.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.applications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📋</span>
+                    <span>Verifikasi Pengajuan</span>
+                </a>
+                <a href="{{ route('admin.units.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.units.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🏢</span>
+                    <span>Divisi & Kuota Unit</span>
+                </a>
+                <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👔</span>
+                    <span>Mentor Lapangan</span>
+                </a>
+                <a href="{{ route('admin.logbooks.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📖</span>
+                    <span>Monitoring Logbook</span>
+                </a>
+                <a href="{{ route('admin.certificates.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.certificates.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🏆</span>
+                    <span>Terbitkan Sertifikat</span>
+                </a>
+                <a href="{{ route('admin.agency_profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.agency_profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>⚙️</span>
+                    <span>Profil Dinas</span>
+                </a>
+
+            {{-- 5.3 Menu Mobile Mahasiswa --}}
+            @elseif ($isMahasiswa)
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📊</span>
+                    <span>Dashboard Saya</span>
+                </a>
+                <a href="{{ route('student.profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('student.profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👤</span>
+                    <span>Profil Saya</span>
+                </a>
+                <a href="{{ route('student.application.create') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('student.application.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📝</span>
+                    <span>Pengajuan Magang</span>
+                </a>
+                <a href="{{ route('student.logbook.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('student.logbook.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📖</span>
+                    <span>Logbook Magang</span>
+                </a>
+
+            {{-- 5.4 Menu Mobile Dosen (DPL) --}}
+            @elseif ($isDosen)
+                <a href="{{ route('lecturer.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('lecturer.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👨‍🏫</span>
+                    <span>Portal Dosen</span>
+                </a>
+                <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('lecturer.monitoring.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🎓</span>
+                    <span>Mahasiswa Bimbingan</span>
+                </a>
+                <a href="{{ route('lecturer.logbooks.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('lecturer.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📖</span>
+                    <span>Logbook Bimbingan</span>
+                </a>
+
+            {{-- 5.5 Menu Mobile Mentor Lapangan --}}
+            @elseif ($isMentor)
+                <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('mentor.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👔</span>
+                    <span>Portal Mentor</span>
+                </a>
+                <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📖</span>
+                    <span>Review Logbook</span>
+                </a>
+
+            {{-- 5.6 Menu Mobile Universitas --}}
+            @elseif ($isUniversitas)
+                <a href="{{ route('university.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('university.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🏛️</span>
+                    <span>Portal Universitas</span>
+                </a>
+                <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('university.lecturers.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>👨‍🏫</span>
+                    <span>Dosen Pembimbing</span>
+                </a>
+                <a href="{{ route('university.profile.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('university.profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>🏢</span>
+                    <span>Profil Kampus</span>
+                </a>
+            @endif
+
+        </div>
+
+        {{-- Tombol Logout Mobile --}}
+        <div class="pt-3 border-t border-slate-100">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full text-left px-3 py-2 rounded-xl text-sm font-bold text-rose-600 hover:bg-rose-50">
-                    Keluar Sistem
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition cursor-pointer">
+                    <span>🚪</span>
+                    <span>Keluar Sistem</span>
                 </button>
             </form>
         </div>
