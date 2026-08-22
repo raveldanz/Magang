@@ -66,14 +66,14 @@
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
                             <div class="flex items-start justify-between gap-4">
-                                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0">
+                                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
                                     @if($univ->logo && file_exists(public_path($univ->logo)))
-                                        <img src="{{ asset($univ->logo) }}" alt="{{ $univ->name }}" class="max-h-full max-w-full object-contain">
+                                        <img src="{{ asset($univ->logo) }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @else
                                         <span class="text-2xl">🏛️</span>
                                     @endif
                                 </div>
-                                <span class="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-full text-xs font-black">
+                                <span class="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-full text-xs font-black shrink-0">
                                     {{ $univ->code }}
                                 </span>
                             </div>
