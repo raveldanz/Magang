@@ -95,6 +95,10 @@
                         <x-nav-link :href="route('university.lecturers.index')" :active="request()->routeIs('university.lecturers.*')">
                             {{ __('Daftar Dosen Pembimbing') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('university.profile.index')" :active="request()->routeIs('university.profile.*')">
+                            {{ __('Profil Kampus') }}
+                        </x-nav-link>
                     @endif
 
                 </div>
@@ -198,6 +202,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('university.lecturers.index')" :active="request()->routeIs('university.lecturers.*')">
                     {{ __('Daftar Dosen Pembimbing') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('university.profile.index')" :active="request()->routeIs('university.profile.*')">
+                    {{ __('Profil Kampus') }}
                 </x-responsive-nav-link>
             @endif
         </div>

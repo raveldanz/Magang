@@ -237,17 +237,29 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        @if ($placement)
-                                            <a href="{{ route('university.students.show', $placement->id) }}" 
-                                               class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg transition shadow-2xs">
-                                                <span>Detail Logbook</span>
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </a>
-                                        @else
-                                            <span class="text-xs text-gray-400">-</span>
-                                        @endif
+                                        <div class="flex items-center justify-center gap-2">
+                                            @if (in_array(strtolower($app->lifecycle_status ?? $app->status), ['accepted', 'active', 'completed']))
+                                                <a href="{{ route('university.students.letter', $app->id) }}" 
+                                                   target="_blank"
+                                                   title="Cetak Surat Tugas / Pengantar Magang Resmi A4"
+                                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-lg transition shadow-2xs">
+                                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <span>Surat Tugas</span>
+                                                </a>
+                                            @endif
+
+                                            @if ($placement)
+                                                <a href="{{ route('university.students.show', $placement->id) }}" 
+                                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg transition shadow-2xs">
+                                                    <span>Detail</span>
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </a>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
