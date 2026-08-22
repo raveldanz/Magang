@@ -20,10 +20,12 @@
             <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
                 <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="relative sm:col-span-2">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pengguna, target data, detail aksi, atau IP address..." class="w-full pl-9 pr-3 py-2 text-xs border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 text-xs">
-                            🔍
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
                         </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pengguna, target data, detail aksi, atau IP address..." class="w-full pl-10 pr-3 py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div class="flex items-center gap-2">
