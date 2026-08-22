@@ -1,9 +1,11 @@
-<nav x-data="{ mobileMenuOpen: false }" class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
+<nav x-data="{ mobileMenuOpen: false }" 
+     class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 transition-all"
+     style="position: sticky !important; top: 0 !important; z-index: 1000 !important; background-color: rgba(255, 255, 255, 0.97) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             
             {{-- 1. BRAND LOGO RESMI PEMKOT SURABAYA --}}
-            <div class="flex items-center gap-6 lg:gap-8">
+            <div class="flex items-center gap-4 lg:gap-8 shrink-0">
                 @php
                     $user = Auth::user();
                     $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
@@ -32,28 +34,28 @@
                          style="height: 42px; width: auto; max-height: 46px; object-fit: contain;">
                 </a>
 
-                {{-- 2. DESKTOP NAVIGATION (GOJEK-STYLE CLEAN TYPOGRAPHY) --}}
-                <div class="hidden md:flex items-center space-x-5 lg:space-x-7 text-sm font-medium">
+                {{-- 2. DESKTOP NAVIGATION BAR (CLEAN TYPOGRAPHY & RESPONSIVE SPACING) --}}
+                <div class="hidden lg:flex items-center space-x-4 xl:space-x-6 text-sm font-medium">
 
                     {{-- 2.1 SUPER ADMIN --}}
                     @if ($isSuperAdmin)
                         <a href="{{ route('admin.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Dashboard
                         </a>
 
                         <a href="{{ route('admin.applications.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Pengajuan
                         </a>
 
                         <a href="{{ route('admin.agencies.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.agencies.*') || request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.agencies.*') || request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Instansi & Unit
                         </a>
 
                         <a href="{{ route('admin.universities.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.universities.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.universities.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Universitas
                         </a>
 
@@ -61,7 +63,7 @@
                         <div x-data="{ open: false }" class="relative" @click.away="open = false">
                             <button @click="open = !open" 
                                     type="button" 
-                                    class="flex items-center gap-1.5 py-1 transition focus:outline-none cursor-pointer {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                                    class="flex items-center gap-1 py-1 transition focus:outline-none cursor-pointer {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                                 <span>Pengguna</span>
                                 <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="{'rotate-180 text-blue-600': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -76,7 +78,7 @@
                                  x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                                  x-transition:leave-end="opacity-0 translate-y-1 scale-95"
                                  x-cloak
-                                 class="absolute left-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1"
+                                 class="absolute left-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-[1001] space-y-1"
                                  style="display: none;">
                                 
                                 <a href="{{ route('admin.users.index') }}" 
@@ -100,98 +102,98 @@
                         </div>
 
                         <a href="{{ route('admin.audit_logs.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.audit_logs.*') || request()->routeIs('admin.audit-logs.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.audit_logs.*') || request()->routeIs('admin.audit-logs.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Log Audit
                         </a>
 
                     {{-- 2.2 ADMIN DINAS --}}
                     @elseif ($isAdminDinas)
                         <a href="{{ route('admin.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Dashboard
                         </a>
                         <a href="{{ route('admin.applications.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
-                            Verifikasi Pengajuan
+                           class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Verifikasi
                         </a>
                         <a href="{{ route('admin.units.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Divisi & Kuota
                         </a>
                         <a href="{{ route('admin.mentors.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Mentor Dinas
                         </a>
                         <a href="{{ route('admin.logbooks.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.logbooks.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Logbook
                         </a>
                         <a href="{{ route('admin.certificates.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.certificates.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.certificates.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Sertifikat
                         </a>
                         <a href="{{ route('admin.agency_profile.edit') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.agency_profile.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('admin.agency_profile.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Profil Dinas
                         </a>
 
                     {{-- 2.3 MAHASISWA --}}
                     @elseif ($isMahasiswa)
                         <a href="{{ route('dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Dashboard
                         </a>
                         <a href="{{ route('student.profile.edit') }}" 
-                           class="transition py-1 {{ request()->routeIs('student.profile.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('student.profile.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Profil Saya
                         </a>
                         <a href="{{ route('student.application.create') }}" 
-                           class="transition py-1 {{ request()->routeIs('student.application.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('student.application.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Pengajuan Magang
                         </a>
                         <a href="{{ route('student.logbook.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('student.logbook.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('student.logbook.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Logbook Magang
                         </a>
 
-                    {{-- 2.4 DOSEN PEMBIMBING LAPANGAN (DPL) --}}
+                    {{-- 2.4 DOSEN (DPL) --}}
                     @elseif ($isDosen)
                         <a href="{{ route('lecturer.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('lecturer.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('lecturer.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Portal Dosen
                         </a>
                         <a href="{{ route('lecturer.monitoring.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('lecturer.monitoring.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('lecturer.monitoring.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Mahasiswa Bimbingan
                         </a>
                         <a href="{{ route('lecturer.logbooks.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('lecturer.logbooks.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('lecturer.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Logbook Bimbingan
                         </a>
 
-                    {{-- 2.5 MENTOR LAPANGAN DINAS --}}
+                    {{-- 2.5 MENTOR --}}
                     @elseif ($isMentor)
                         <a href="{{ route('mentor.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('mentor.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Portal Mentor
                         </a>
                         <a href="{{ route('mentor.logbooks.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('mentor.logbooks.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Review Logbook
                         </a>
 
                     {{-- 2.6 UNIVERSITAS --}}
                     @elseif ($isUniversitas)
                         <a href="{{ route('university.dashboard') }}" 
-                           class="transition py-1 {{ request()->routeIs('university.dashboard') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('university.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Portal Universitas
                         </a>
                         <a href="{{ route('university.lecturers.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('university.lecturers.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('university.lecturers.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Dosen Pembimbing
                         </a>
                         <a href="{{ route('university.profile.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('university.profile.*') ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-blue-600' }}">
+                           class="transition py-1 {{ request()->routeIs('university.profile.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Profil Kampus
                         </a>
                     @endif
@@ -199,8 +201,8 @@
                 </div>
             </div>
 
-            {{-- 3. RIGHT SECTION: PROFILE & LOGOUT (DESKTOP) --}}
-            <div class="hidden md:flex items-center gap-3">
+            {{-- 3. RIGHT SECTION: USER BADGE & PROFILE (DESKTOP) --}}
+            <div class="hidden lg:flex items-center gap-3">
                 <div x-data="{ profileOpen: false }" class="relative" @click.away="profileOpen = false">
                     <button @click="profileOpen = !profileOpen" 
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
@@ -216,7 +218,7 @@
                     <div x-show="profileOpen" 
                          x-transition 
                          x-cloak
-                         class="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50"
+                         class="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-[1001]"
                          style="display: none;">
                         <div class="px-4 py-2 border-b border-slate-100">
                             <div class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name ?? 'User' }}</div>
@@ -235,8 +237,8 @@
                 </div>
             </div>
 
-            {{-- 4. MOBILE MENU HAMBURGER BUTTON --}}
-            <div class="flex items-center md:hidden">
+            {{-- 4. MOBILE / TABLET MENU TOGGLE BUTTON --}}
+            <div class="flex items-center lg:hidden">
                 <button @click="mobileMenuOpen = !mobileMenuOpen" 
                         type="button"
                         class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none transition cursor-pointer"
@@ -251,17 +253,17 @@
         </div>
     </div>
 
-    {{-- 5. FLOATING ANIMATED MOBILE MENU OVERLAY (LENGKAP UNTUK SELURUH 6 ROLE) --}}
+    {{-- 5. FLOATING MOBILE MENU OVERLAY --}}
     <div x-show="mobileMenuOpen" 
          x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 -translate-y-4 scale-98"
+         x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
          x-transition:enter-end="opacity-100 translate-y-0 scale-100"
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-         x-transition:leave-end="opacity-0 -translate-y-4 scale-98"
+         x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
          x-cloak
          @click.away="mobileMenuOpen = false"
-         class="md:hidden absolute top-full left-0 right-0 bg-white/98 backdrop-blur-xl border-b border-slate-200/80 shadow-2xl z-50 px-4 pt-3 pb-6 space-y-3"
+         class="lg:hidden absolute top-full left-0 right-0 bg-white/98 backdrop-blur-xl border-b border-slate-200/80 shadow-2xl z-[1001] px-4 py-4 space-y-3"
          style="display: none;">
 
         {{-- Info Profil Pengguna di Mobile --}}
