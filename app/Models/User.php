@@ -42,7 +42,12 @@ class User extends Authenticatable
 
     public function university()
     {
-        return $this->belongsTo(University::class);
+        return $this->belongsTo(University::class, 'university_id');
+    }
+
+    public function universityRelation()
+    {
+        return $this->belongsTo(University::class, 'university_id');
     }
 
     public function applications()

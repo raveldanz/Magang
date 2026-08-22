@@ -162,7 +162,7 @@
                                     👨‍🏫 {{ $academicAdvisor->name }}
                                 </div>
                                 <div class="text-xs text-slate-600 mt-1">
-                                    Email: <span class="font-mono text-slate-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ $academicAdvisor->university?->name ?? $academicAdvisor->university ?? $univName }}</strong>
+                                    Email: <span class="font-mono text-slate-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName) }}</strong>
                                 </div>
                             </div>
 
@@ -198,7 +198,7 @@
                                     <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
                                     @foreach ($availableDosens as $dosen)
                                         <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                            {{ $dosen->name }} — {{ $dosen->university?->name ?? $dosen->university ?? 'Dosen' }} ({{ $dosen->email }})
+                                            {{ $dosen->name }} — {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }} ({{ $dosen->email }})
                                         </option>
                                     @endforeach
                                 </select>

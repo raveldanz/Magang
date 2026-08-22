@@ -13,7 +13,7 @@
             
             <div class="flex items-center gap-2">
                 <span class="px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-xs font-bold shadow-2xs">
-                    🏛️ {{ $lecturer->university->name ?? $lecturer->university ?? 'Perguruan Tinggi Mitra' }}
+                    🏛️ {{ is_string($lecturer->university) ? $lecturer->university : ($lecturer->universityRelation?->name ?? $lecturer->university?->name ?? 'Perguruan Tinggi Mitra') }}
                 </span>
             </div>
         </div>
