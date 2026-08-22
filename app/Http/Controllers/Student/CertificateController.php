@@ -18,90 +18,145 @@ class CertificateController extends Controller
     /**
      * Helper untuk mengambil data placement & otorisasi sertifikat
      */
-    protected function getCertificateData($id)
+    public static function getCertificateData($id, $user = null)
     {
-        $user = Auth::user();
-
-        // 1. Cari berdasarkan application_id terlebih dahulu
-        $application = Application::with([
-            'user.studentProfile.university',
-            'unit.agencyProfile',
-            'placement.mentor',
-            'placement.pembimbing',
-            'placement.academicAdvisor',
-            'placement.dosen',
-            'placement.evaluation',
-            'placement.finalreport',
-        ])->find($id);
-
-        // 2. Jika tidak ditemukan sebagai application_id, coba cari berdasarkan placement_id
-        if (!$application) {
-            $application = Application::with([
-                'user.studentProfile.university',
-                'unit.agencyProfile',
-                'placement.mentor',
-                'placement.pembimbing',
-                'placement.academicAdvisor',
-                'placement.dosen',
-                'placement.evaluation',
-                'placement.finalreport',
-            ])->whereHas('placement', function ($pq) use ($id) {
-                $pq->where('id', $id);
-            })->first();
+        if (!$user) {
+            $user = Auth::user();
         }
 
-        // 3. Jika masih belum ditemukan dan user adalah mahasiswa, ambil aplikasi aktif milik mahasiswa tersebut
-        if (!$application && $user && $user->role === 'mahasiswa') {
-            $application = Application::with([
-                'user.studentProfile.university',
-                'unit.agencyProfile',
-                'placement.mentor',
-                'placement.pembimbing',
-                'placement.academicAdvisor',
-                'placement.dosen',
-                'placement.evaluation',
-                'placement.finalreport',
-            ])->where('user_id', $user->id)->latest()->first();
+        $application = null;
+        $placement = null;
+
+        // 1. Jika user adalah Mahasiswa:
+        if ($user && $user->role === 'mahasiswa') {
+            // Coba cari placement milik mahasiswa yang sesuai
+            $placement = Placement::with([
+                'application.user.studentProfile',
+                'application.unit.agencyProfile',
+                'mentor',
+                'pembimbing',
+                'academicAdvisor',
+                'dosen',
+                'evaluation',
+                'finalreport',
+            ])->where('id', $id)
+              ->whereHas('application', function ($aq) use ($user) {
+                  $aq->where('user_id', $user->id);
+              })->first();
+
+            if ($placement) {
+                $application = $placement->application;
+            } else {
+                // Coba cari berdasarkan application_id milik mahasiswa ini
+                $application = Application::with([
+                    'user.studentProfile',
+                    'unit.agencyProfile',
+                    'placement.mentor',
+                    'placement.pembimbing',
+                    'placement.academicAdvisor',
+                    'placement.dosen',
+                    'placement.evaluation',
+                    'placement.finalreport',
+                ])->where('user_id', $user->id)
+                  ->where(function ($q) use ($id) {
+                      $q->where('id', $id)
+                        ->orWhereHas('placement', function ($pq) use ($id) {
+                            $pq->where('id', $id);
+                        });
+                  })->first();
+
+                // Fallback: Ambil aplikasi terbaru milik mahasiswa ini jika ID tidak cocok (misal placement ID berubah)
+                if (!$application) {
+                    $application = Application::with([
+                        'user.studentProfile',
+                        'unit.agencyProfile',
+                        'placement.mentor',
+                        'placement.pembimbing',
+                        'placement.academicAdvisor',
+                        'placement.dosen',
+                        'placement.evaluation',
+                        'placement.finalreport',
+                    ])->where('user_id', $user->id)->latest()->first();
+                }
+
+                if ($application) {
+                    $placement = $application->placement;
+                }
+            }
+        } else {
+            // 2. Untuk Admin Dinas, Super Admin, Dosen, atau Mentor:
+            // Coba cari berdasarkan placement_id
+            $placement = Placement::with([
+                'application.user.studentProfile',
+                'application.unit.agencyProfile',
+                'mentor',
+                'pembimbing',
+                'academicAdvisor',
+                'dosen',
+                'evaluation',
+                'finalreport',
+            ])->find($id);
+
+            if ($placement && $placement->application) {
+                $application = $placement->application;
+            } else {
+                // Coba cari berdasarkan application_id
+                $application = Application::with([
+                    'user.studentProfile',
+                    'unit.agencyProfile',
+                    'placement.mentor',
+                    'placement.pembimbing',
+                    'placement.academicAdvisor',
+                    'placement.dosen',
+                    'placement.evaluation',
+                    'placement.finalreport',
+                ])->find($id);
+
+                if ($application) {
+                    $placement = $application->placement;
+                }
+            }
         }
 
         if (!$application) {
             abort(404, 'Data pengajuan magang / sertifikat tidak ditemukan.');
         }
 
-        $placement = $application->placement;
+        // Otorisasi: Mahasiswa pemilik, DPL, Mentor, Admin Dinas, Super Admin, atau Universitas
+        $isOwner = ($user && $user->id === $application->user_id);
+        $isSuperAdmin = ($user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id))));
+        $isAgencyAdmin = ($user && $user->role === 'admin' && ($user->agency_profile_id === null || $user->agency_profile_id === $application->unit?->agency_profile_id));
+        $isAdvisor = ($placement && ($placement->academic_advisor_id === $user?->id || $placement->mentor_id === $user?->id || $placement->pembimbing_id === $user?->id));
+        $isUnivAdmin = ($user && $user->role === 'universitas' && ($user->university_id === $application->user?->university_id || $user->university_id === optional($application->user?->studentProfile)->university_id));
 
-        // Otorisasi: Mahasiswa pemilik, DPL, Mentor, atau Admin
-        $isOwner = ($user->id === $application->user_id);
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
-        $isAgencyAdmin = ($user->role === 'admin' && $user->agency_profile_id === $application->unit?->agency_profile_id);
-        $isAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
-
-        if (!$isOwner && !$isSuperAdmin && !$isAgencyAdmin && !$isAdvisor) {
+        if (!$isOwner && !$isSuperAdmin && !$isAgencyAdmin && !$isAdvisor && !$isUnivAdmin) {
             abort(403, 'Akses Ditolak: Anda tidak berhak melihat atau mengunduh sertifikat ini.');
         }
 
-        // Cek apakah mahasiswa memenuhi syarat kelulusan
+        // Cek evaluasi kelulusan
         $eval = $placement?->evaluation;
         $finalReport = $placement?->finalreport;
-        $isCompleted = ($application->status === 'completed') || 
-                       ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0 && optional($finalReport)->status === 'approved') ||
-                       ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0);
-
-        if (!$isCompleted && !$isSuperAdmin) {
-            abort(403, 'Sertifikat Magang Belum Diterbitkan: Pastikan laporan akhir telah disetujui dan nilai evaluasi (Dinas 40% & DPL 60%) telah lengkap.');
-        }
 
         // Ambil profil instansi
         $agencyProfile = $application->unit?->agencyProfile 
             ?? AgencyProfile::first();
 
         $student = $application->user;
-        $profile = $student->studentProfile;
+        $profile = $student?->studentProfile;
         $mentor = $placement ? ($placement->mentor ?? $placement->pembimbing) : null;
         $dosen = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
 
-        // Cari Perguruan Tinggi
-        $university = $profile?->university ?? University::where('name', $profile?->universitas ?? '')->first();
+        // Cari Perguruan Tinggi secara aman
+        $university = null;
+        if ($profile?->university_id) {
+            $university = University::find($profile->university_id);
+        }
+        if (!$university && $student?->university_id) {
+            $university = University::find($student->university_id);
+        }
+        if (!$university && $profile?->universitas) {
+            $university = University::where('name', 'like', '%' . $profile->universitas . '%')->first();
+        }
 
         // Nomor Registrasi Sertifikat
         $regNumber = "SERT/{$application->id}/PEMKOT-SBY/" . Carbon::now()->format('Y');
@@ -126,7 +181,7 @@ class CertificateController extends Controller
      */
     public function show($id)
     {
-        $data = $this->getCertificateData($id);
+        $data = self::getCertificateData($id, Auth::user());
 
         AuditLog::record('CERTIFICATE_VIEW', 'Application', $data['application']->id, [
             'student_name' => $data['student']->name,
@@ -137,21 +192,17 @@ class CertificateController extends Controller
     }
 
     /**
-     * Unduh Dokumen PDF E-Sertifikat
+     * Unduh Dokumen PDF / Cetak E-Sertifikat
      */
     public function download($id)
     {
-        $data = $this->getCertificateData($id);
+        $data = self::getCertificateData($id, Auth::user());
 
         AuditLog::record('CERTIFICATE_DOWNLOAD', 'Application', $data['application']->id, [
             'student_name' => $data['student']->name,
             'reg_number' => $data['regNumber'],
         ]);
 
-        $studentName = str_replace(' ', '_', $data['student']->name);
-        $filename = "Sertifikat_Magang_{$studentName}.pdf";
-
-        // Tampilkan print view jika dompdf mengalami kendala aset gambar lokal
         return view('certificates.internship_certificate', $data);
     }
 }

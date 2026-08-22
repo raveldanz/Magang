@@ -55,8 +55,8 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                                            🖨️ Cetak PDF
+                                        <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                            🖨️ Cetak E-Sertifikat
                                         </a>
                                     </td>
                                 </tr>

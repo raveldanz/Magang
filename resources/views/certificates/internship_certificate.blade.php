@@ -75,12 +75,30 @@
 </head>
 <body class="text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
 
+    @php
+        $backUrl = route('dashboard');
+        $backLabel = 'Kembali ke Dashboard';
+        if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'super_admin') {
+            $backUrl = route('admin.certificates.index');
+            $backLabel = 'Kembali ke Daftar Sertifikat';
+        } elseif (Auth::user()?->role === 'dosen') {
+            $backUrl = route('lecturer.dashboard');
+            $backLabel = 'Kembali ke Dashboard Dosen';
+        } elseif (Auth::user()?->role === 'pembimbing') {
+            $backUrl = route('mentor.dashboard');
+            $backLabel = 'Kembali ke Dashboard Mentor';
+        } elseif (Auth::user()?->role === 'universitas') {
+            $backUrl = route('university.dashboard');
+            $backLabel = 'Kembali ke Dashboard Kampus';
+        }
+    @endphp
+
     {{-- Top Action Bar (Hidden on Print) --}}
     <header class="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white px-6 py-3 flex items-center justify-between shadow-xl">
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition border border-slate-700 cursor-pointer">
+            <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition border border-slate-700 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span>Kembali ke Dashboard</span>
+                <span>{{ $backLabel }}</span>
             </a>
             <div class="hidden sm:block text-xs text-slate-400 border-l border-slate-700 pl-3">
                 <span>Dokumen Resmi: </span>
@@ -91,7 +109,7 @@
         <div class="flex items-center gap-3">
             <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-600/30 transition transform active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                <span>Cetak Sertifikat (A4 Landscape / PDF)</span>
+                <span>Cetak / Simpan PDF (A4 Landscape)</span>
             </button>
         </div>
     </header>
