@@ -182,8 +182,8 @@
                 </div>
 
                 @php
-                    $mentorVal = $evaluation?->nilai_pembimbing;
-                    $dosenVal = $evaluation?->nilai_akademik;
+                    $mentorVal = $student->placement?->evaluation?->nilai_pembimbing ?? $evaluation?->nilai_pembimbing;
+                    $dosenVal = $student->placement?->evaluation?->nilai_akademik ?? $evaluation?->nilai_akademik;
                     $finalVal = null;
                     if ($mentorVal > 0 && $dosenVal > 0) {
                         $finalVal = ($mentorVal * 0.4) + ($dosenVal * 0.6);
@@ -208,7 +208,7 @@
                     <div class="p-4 rounded-xl bg-slate-50 border border-gray-100 text-center">
                         <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Mentor Dinas (40%)</p>
                         <p class="text-2xl font-black text-gray-800 mt-1">
-                            {{ $mentorVal ? number_format($mentorVal, 2) : '-' }}
+                            {{ $mentorVal ? number_format($mentorVal, 2) : ($student->placement?->evaluation?->nilai_pembimbing ?? '-') }}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-0.5">Kedisiplinan & Kinerja Lapangan</p>
                     </div>
@@ -216,7 +216,7 @@
                     <div class="p-4 rounded-xl bg-slate-50 border border-gray-100 text-center">
                         <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Dosen DPL (60%)</p>
                         <p class="text-2xl font-black text-blue-600 mt-1">
-                            {{ $dosenVal ? number_format($dosenVal, 2) : '-' }}
+                            {{ $dosenVal ? number_format($dosenVal, 2) : ($student->placement?->evaluation?->nilai_dosen ?? '-') }}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-0.5">Logbook & Laporan Akhir</p>
                     </div>
@@ -224,7 +224,7 @@
                     <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-100 text-center">
                         <p class="text-xs text-blue-900 font-bold uppercase tracking-wider">Nilai Akhir Terbobot</p>
                         <p class="text-2xl font-black text-blue-700 mt-1">
-                            {{ $finalVal !== null ? number_format($finalVal, 2) : '-' }}
+                            {{ $finalVal !== null ? number_format($finalVal, 2) : ($student->placement?->evaluation?->final_score ?? '-') }}
                         </p>
                         <p class="text-[10px] text-blue-600 mt-0.5">Akumulasi Gabungan</p>
                     </div>

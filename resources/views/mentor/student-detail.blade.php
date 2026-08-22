@@ -9,10 +9,10 @@
                 </a>
                 <div>
                     <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                        {{ $placement->application->user->name }}
+                        {{ $placement->application?->user?->name ?? '-' }}
                     </h2>
                     <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
-                        {{ $placement->application->user->studentProfile->nim ?? '-' }} &bull; {{ $placement->application->user->studentProfile->universitas ?? '-' }} ({{ $placement->application->user->studentProfile->jurusan ?? '-' }})
+                        {{ $placement->application?->user?->studentProfile?->nim ?? '-' }} &bull; {{ $placement->application?->user?->studentProfile?->universitas ?? '-' }} ({{ $placement->application?->user?->studentProfile?->jurusan ?? '-' }})
                     </p>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                         @if ($placement->evaluation)
                             @php
                                 $eval = $placement->evaluation;
-                                $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
+                                $rataRata = round((($eval?->nilai_disiplin ?? 0) + ($eval?->nilai_kinerja ?? 0) + ($eval?->nilai_laporan ?? 0)) / 3, 2);
                                 $grade = 'C';
                                 if ($rataRata >= 85) $grade = 'A (Sangat Memuaskan)';
                                 elseif ($rataRata >= 70) $grade = 'B (Memuaskan)';
@@ -78,15 +78,15 @@
                             <div class="grid grid-cols-3 gap-3 mb-4 text-center">
                                 <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
                                     <span class="text-[11px] font-bold text-gray-500 uppercase">Disiplin</span>
-                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval->nilai_disiplin }}</p>
+                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval?->nilai_disiplin ?? '-' }}</p>
                                 </div>
                                 <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
                                     <span class="text-[11px] font-bold text-gray-500 uppercase">Kinerja</span>
-                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval->nilai_kinerja }}</p>
+                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval?->nilai_kinerja ?? '-' }}</p>
                                 </div>
                                 <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
                                     <span class="text-[11px] font-bold text-gray-500 uppercase">Laporan</span>
-                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval->nilai_laporan }}</p>
+                                    <p class="text-xl font-black text-gray-800 mt-1">{{ $eval?->nilai_laporan ?? '-' }}</p>
                                 </div>
                             </div>
 
@@ -99,7 +99,7 @@
                                     <span class="text-xs font-semibold text-blue-900">Predikat Kelulusan:</span>
                                     <span class="text-xs font-extrabold text-blue-800">{{ $grade }}</span>
                                 </div>
-                                @if ($eval->catatan)
+                                @if ($eval?->catatan)
                                     <div class="pt-2 border-t border-blue-100 text-xs text-blue-950">
                                         <strong>Catatan:</strong> <em>"{{ $eval->catatan }}"</em>
                                     </div>

@@ -17,10 +17,10 @@
     </x-slot>
 
     @php
-        $nilaiDinas = $evaluation ? $evaluation->nilai_pembimbing : 0;
-        $evalMastery = old('score_mastery', $evaluation->score_mastery ?? ($evaluation->nilai_akademik ?? 85));
-        $evalReport = old('score_report', $evaluation->score_report ?? ($evaluation->nilai_akademik ?? 85));
-        $evalAttitude = old('score_attitude', $evaluation->score_attitude ?? ($evaluation->nilai_akademik ?? 85));
+        $nilaiDinas = $evaluation?->nilai_pembimbing ?? 0;
+        $evalMastery = old('score_mastery', $evaluation?->score_mastery ?? ($evaluation?->nilai_akademik ?? 85));
+        $evalReport = old('score_report', $evaluation?->score_report ?? ($evaluation?->nilai_akademik ?? 85));
+        $evalAttitude = old('score_attitude', $evaluation?->score_attitude ?? ($evaluation?->nilai_akademik ?? 85));
     @endphp
 
     <div class="py-8" x-data="{
@@ -188,7 +188,7 @@
                             rows="4" 
                             placeholder="Tuliskan evaluasi komprehensif, masukan penyempurnaan karya ilmiah, atau rekomendasi karir untuk mahasiswa..."
                             class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl shadow-2xs focus:ring-blue-500 focus:border-blue-500"
-                        >{{ old('feedback_dosen', $evaluation->feedback_dosen ?? $evaluation->catatan_dosen ?? '') }}</textarea>
+                        >{{ old('feedback_dosen', $evaluation?->feedback_dosen ?? ($evaluation?->catatan_dosen ?? '')) }}</textarea>
                     </div>
 
                     <!-- Action Buttons -->

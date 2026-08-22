@@ -225,8 +225,8 @@
                                     if (in_array($status, ['ACCEPTED', 'VERIFIED']) && $start && $today->gte($start)) {
                                         $status = 'ACTIVE';
                                     }
-                                    if (($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED') || ($placement && optional($placement->finalreport)->status === 'approved')) {
-                                        if (($app->evaluation && $app->evaluation->nilai_akademik > 0) || ($placement && optional($placement->evaluation)->nilai_akademik > 0)) {
+                                    if (($app->finalReport?->status === 'approved' || strtoupper($app->finalReport?->status ?? '') === 'APPROVED') || ($placement?->finalreport?->status === 'approved')) {
+                                        if ((($app->evaluation?->nilai_akademik ?? 0) > 0) || (($placement?->evaluation?->nilai_akademik ?? 0) > 0)) {
                                             $status = 'COMPLETED';
                                         }
                                     }

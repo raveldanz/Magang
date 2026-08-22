@@ -17,10 +17,10 @@
     </x-slot>
 
     @php
-        $nilaiDinas = $evaluation ? $evaluation->nilai_pembimbing : 0;
-        $evalMastery = old('score_mastery', $evaluation->score_mastery ?? ($evaluation->nilai_akademik ?? 85));
-        $evalReport = old('score_report', $evaluation->score_report ?? ($evaluation->nilai_akademik ?? 85));
-        $evalAttitude = old('score_attitude', $evaluation->score_attitude ?? ($evaluation->nilai_akademik ?? 85));
+        $nilaiDinas = $evaluation?->nilai_pembimbing ?? 0;
+        $evalMastery = old('score_mastery', $evaluation?->score_mastery ?? ($evaluation?->nilai_akademik ?? 85));
+        $evalReport = old('score_report', $evaluation?->score_report ?? ($evaluation?->nilai_akademik ?? 85));
+        $evalAttitude = old('score_attitude', $evaluation?->score_attitude ?? ($evaluation?->nilai_akademik ?? 85));
     @endphp
 
     <div class="py-8" x-data="{
@@ -292,7 +292,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Catatan / Rekomendasi DPL untuk Mahasiswa
                         </label>
-                        <textarea name="feedback_dosen" rows="3" placeholder="Tuliskan evaluasi komprehensif atau saran pengembangan karir bagi mahasiswa..." class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('feedback_dosen', $evaluation->feedback_dosen ?? $evaluation->catatan_dosen) }}</textarea>
+                        <textarea name="feedback_dosen" rows="3" placeholder="Tuliskan evaluasi komprehensif atau saran pengembangan karir bagi mahasiswa..." class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('feedback_dosen', $evaluation?->feedback_dosen ?? ($evaluation?->catatan_dosen ?? '')) }}</textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">

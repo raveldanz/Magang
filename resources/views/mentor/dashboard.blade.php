@@ -166,16 +166,16 @@
                         <tbody class="divide-y divide-gray-100 text-sm">
                             @forelse ($placements as $place)
                                 @php
-                                    $student = $place->application->user ?? null;
+                                    $student = $place->application?->user ?? null;
                                     $profile = $student?->studentProfile;
-                                    $unit = $place->application->unit;
+                                    $unit = $place->application?->unit;
                                     $eval = $place->evaluation;
                                     $report = $place->finalreport;
                                     $totalLog = $place->logbooks->count();
                                     $pendingLog = $place->logbooks->where('status', 'pending')->count();
                                     $lifecycle = $place->application?->lifecycle_status ?? 'ACCEPTED';
                                     
-                                    $rataRata = $eval ? round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 1) : null;
+                                    $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1) : null;
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors">
                                     <!-- Mahasiswa -->
@@ -197,7 +197,7 @@
                                     <td class="py-4 px-4">
                                         <div class="text-xs font-semibold text-gray-800 leading-tight">{{ $unit->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-400 mt-0.5">
-                                            {{ \Carbon\Carbon::parse($place->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($place->application->end_date)->translatedFormat('d M Y') }}
+                                            {{ $place->application?->start_date ? \Carbon\Carbon::parse($place->application->start_date)->translatedFormat('d M Y') : '-' }} s/d {{ $place->application?->end_date ? \Carbon\Carbon::parse($place->application->end_date)->translatedFormat('d M Y') : '-' }}
                                         </div>
                                     </td>
 
