@@ -86,6 +86,95 @@ class LecturerController extends Controller
     }
 
     /**
+     * Tambah Dosen Pembimbing Baru oleh Admin Kampus
+     */
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university ?? 'Perguruan Tinggi';
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'nidn' => 'nullable|string|max:50',
+        ], [
+            'name.required' => 'Nama lengkap beserta gelar dosen wajib diisi.',
+            'email.required' => 'Email resmi dosen wajib diisi.',
+            'email.unique' => 'Email ini sudah terdaftar di dalam sistem.',
+        ]);
+
+        $dosenName = trim($request->name);
+        if ($request->filled('nidn') && !str_contains($dosenName, 'NIDN')) {
+            $dosenName .= ' (NIDN: ' . trim($request->nidn) . ')';
+        }
+
+        $lecturer = User::create([
+            'name' => $dosenName,
+            'email' => strtolower(trim($request->email)),
+            'password' => Hash::make('password'),
+            'role' => 'dosen',
+            'university_id' => $universityId,
+            'university' => $univName,
+            'email_verified_at' => now(),
+        ]);
+
+        return redirect()->route('university.lecturers.index')
+            ->with('success', "Dosen Pembimbing Baru '{$lecturer->name}' berhasil ditambahkan ke daftar dosen kampus!");
+    }
+
+    /**
+     * Update Data Dosen Pembimbing oleh Admin Kampus
+     */
+    public function update(Request $request, $id)
+    {
+        $user = Auth::user();
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university;
+
+        $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
+
+        // Tenant Scoping Authorization Check
+        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
+        if (!$isSameUniv && $univName) {
+            $isSameUniv = ($lecturer->university === $univName);
+        }
+
+        if (!$isSameUniv) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengedit data dosen kampus lain.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $lecturer->id,
+            'nidn' => 'nullable|string|max:50',
+        ], [
+            'name.required' => 'Nama lengkap dosen wajib diisi.',
+            'email.required' => 'Email resmi dosen wajib diisi.',
+            'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
+        ]);
+
+        $dosenName = trim($request->name);
+        if ($request->filled('nidn') && !str_contains($dosenName, 'NIDN')) {
+            $dosenName .= ' (NIDN: ' . trim($request->nidn) . ')';
+        }
+
+        $lecturer->update([
+            'name' => $dosenName,
+            'email' => strtolower(trim($request->email)),
+        ]);
+
+        return redirect()->route('university.lecturers.index')
+            ->with('success', "Data Dosen Pembimbing '{$dosenName}' berhasil diperbarui!");
+    }
+
+    /**
      * Reset password dosen ke default ('password')
      */
     public function resetPassword(Request $request, $id)

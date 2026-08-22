@@ -9,6 +9,7 @@ use App\Models\Placement;
 use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
@@ -119,6 +120,113 @@ class DashboardController extends Controller
             'agencyDistribution',
             'agencies'
         ));
+    }
+
+    /**
+     * Export Rekapitulasi Data & Nilai Mahasiswa Magang ke CSV/Excel
+     */
+    public function export(Request $request)
+    {
+        $user = Auth::user();
+        $university = $user->university_id 
+            ? University::find($user->university_id) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university ?? 'Universitas';
+
+        // Query Semua Pengajuan Mahasiswa Asal Kampus Ini
+        $applications = Application::with([
+            'user.studentProfile',
+            'unit.agencyProfile',
+            'placement.mentor',
+            'placement.academicAdvisor',
+            'placement.evaluation'
+        ])->whereHas('user', function ($uq) use ($user, $university) {
+            if ($user->university_id) {
+                $uq->where('university_id', $user->university_id);
+            } elseif ($university) {
+                $uq->where('university', $university->name);
+            }
+        })
+        ->latest()
+        ->get();
+
+        $cleanUnivName = preg_replace('/[^A-Za-z0-9_]/', '_', $univName);
+        $filename = 'Rekap_Mahasiswa_Magang_' . $cleanUnivName . '_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        return response()->stream(function () use ($applications) {
+            $handle = fopen('php://output', 'w');
+
+            // Add UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Header Kolom
+            fputcsv($handle, [
+                'No',
+                'NIM',
+                'Nama Mahasiswa',
+                'Program Studi',
+                'Instansi Magang',
+                'Unit / Bidang Kerja',
+                'Dosen Pembimbing (DPL)',
+                'Mentor Dinas',
+                'Periode Magang',
+                'Status Magang',
+                'Nilai Mentor',
+                'Nilai Dosen',
+                'Nilai Akhir',
+            ]);
+
+            $no = 1;
+            foreach ($applications as $app) {
+                $student = $app->user;
+                $profile = $student?->studentProfile;
+                $placement = $app->placement;
+                $dosen = $placement?->academicAdvisor;
+                $mentor = $placement?->mentor ?? $placement?->pembimbing;
+                $eval = $placement?->evaluation;
+
+                $mentorScore = ($eval && $eval->nilai_pembimbing) ? number_format($eval->nilai_pembimbing, 2) : '-';
+                $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
+                
+                $finalScore = '-';
+                if ($eval && $eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
+                    $weighted = ($eval->nilai_pembimbing * 0.4) + ($eval->nilai_akademik * 0.6);
+                    $finalScore = number_format($weighted, 2);
+                } elseif ($eval && $eval->nilai_akademik > 0) {
+                    $finalScore = number_format($eval->nilai_akademik, 2);
+                }
+
+                $periode = ($app->start_date && $app->end_date)
+                    ? date('d/m/Y', strtotime($app->start_date)) . ' s.d. ' . date('d/m/Y', strtotime($app->end_date))
+                    : '-';
+
+                fputcsv($handle, [
+                    $no++,
+                    $profile?->nim ?? '-',
+                    $student?->name ?? '-',
+                    $profile?->jurusan ?? '-',
+                    $app->unit?->agencyProfile?->agency_name ?? '-',
+                    $app->unit?->name ?? '-',
+                    $dosen?->name ?? 'Belum Ditentukan',
+                    $mentor?->name ?? 'Belum Diplot',
+                    $periode,
+                    strtoupper($app->lifecycle_status ?? $app->status),
+                    $mentorScore,
+                    $dosenScore,
+                    $finalScore,
+                ]);
+            }
+
+            fclose($handle);
+        }, 200, $headers);
     }
 
     /**

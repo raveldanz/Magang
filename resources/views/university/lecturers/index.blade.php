@@ -13,15 +13,27 @@
                 </p>
             </div>
 
-            <div class="flex items-center gap-2">
-                <span class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-xl">
+            <div class="flex items-center gap-3">
+                <span class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold px-3 py-2 rounded-xl hidden sm:inline-block">
                     🎓 {{ $univName ?? 'Kampus Mitra' }}
                 </span>
+                <button type="button" 
+                        @click="showCreateModal = true"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Tambah Dosen Baru</span>
+                </button>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="{ 
+        showCreateModal: false, 
+        showEditModal: false, 
+        editLecturer: { id: '', name: '', email: '', nidn: '' } 
+    }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success Message -->
@@ -33,6 +45,23 @@
                         </svg>
                         <span>{{ session('success') }}</span>
                     </div>
+                </div>
+            @endif
+
+            <!-- Form Validation Errors -->
+            @if ($errors->any())
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-sm">
+                    <div class="font-bold flex items-center gap-1.5 mb-1 text-rose-800">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        Terdapat kesalahan pada isian form:
+                    </div>
+                    <ul class="list-disc list-inside text-xs space-y-0.5 text-rose-700">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
@@ -144,19 +173,38 @@
                                         </span>
                                     </td>
 
-                                    <!-- Aksi: Reset Password ke Default -->
+                                    <!-- Aksi: Edit & Reset Password -->
                                     <td class="py-4 px-4 text-right">
-                                        <form action="{{ route('university.lecturers.reset_password', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset password untuk {{ $lecturer->name }} ke default (password)?');">
-                                            @csrf
-                                            <button type="submit" 
-                                                    title="Reset password dosen ke default: 'password'"
-                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition shadow-2xs active:scale-95">
-                                                <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                        <div class="flex items-center justify-end gap-2">
+                                            
+                                            <!-- Tombol Edit -->
+                                            <button type="button" 
+                                                    @click="editLecturer = { 
+                                                        id: '{{ $lecturer->id }}', 
+                                                        name: '{{ addslashes($lecturer->name) }}', 
+                                                        email: '{{ addslashes($lecturer->email) }}' 
+                                                    }; showEditModal = true"
+                                                    title="Edit Data Dosen"
+                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
-                                                Reset Password
+                                                <span>Edit</span>
                                             </button>
-                                        </form>
+
+                                            <!-- Tombol Reset Password -->
+                                            <form action="{{ route('university.lecturers.reset_password', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset password untuk {{ $lecturer->name }} ke default (password)?');">
+                                                @csrf
+                                                <button type="submit" 
+                                                        title="Reset password dosen ke default: 'password'"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition shadow-2xs active:scale-95 cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                                    </svg>
+                                                    <span>Reset Password</span>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
 
                                 </tr>
@@ -164,7 +212,7 @@
                                 <tr>
                                     <td colspan="6" class="py-12 text-center text-gray-400">
                                         <p class="font-medium text-gray-600">Belum Ada Dosen Pembimbing Terdaftar</p>
-                                        <p class="text-xs text-gray-400 mt-1">Dosen akan terdaftar otomatis saat mahasiswa memilih atau mendaftarkan DPL mereka.</p>
+                                        <p class="text-xs text-gray-400 mt-1">Klik tombol "+ Tambah Dosen Baru" di atas untuk mendaftarkan dosen pembimbing kampus.</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -174,5 +222,151 @@
             </div>
 
         </div>
+
+        <!-- ========================================== -->
+        <!-- MODAL 1: TAMBAH DOSEN PEMBIMBING BARU -->
+        <!-- ========================================== -->
+        <div x-show="showCreateModal" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 relative"
+                 @click.away="showCreateModal = false"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                
+                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+                            ➕
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-gray-900">Tambah Dosen Pembimbing Baru</h3>
+                            <p class="text-xs text-gray-400">Registrasi akun DPL resmi untuk {{ $univName }}</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                </div>
+
+                <form method="POST" action="{{ route('university.lecturers.store') }}" class="space-y-4">
+                    @csrf
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="name" required placeholder="Contoh: Dr. Budi Santoso, S.Kom., M.Kom." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            NIDN (Nomor Induk Dosen Nasional) <span class="text-gray-400 font-normal text-[10px]">(Opsional)</span>
+                        </label>
+                        <input type="text" name="nidn" placeholder="Contoh: 0715088901" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Email Resmi Kampus / Login <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="email" name="email" required placeholder="Contoh: budi.santoso@unitomo.ac.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <p class="text-[11px] text-gray-400 mt-1">Dosen akan menggunakan email ini untuk login ke Portal Dosen SIP-MAGANG.</p>
+                    </div>
+
+                    <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <span>🔑 Password Awal Dosen:</span>
+                            <span class="font-mono bg-white px-2 py-0.5 rounded-md border border-indigo-200 font-bold">password</span>
+                        </div>
+                        <p class="text-[11px] text-indigo-700">Dosen dapat mengubah kata sandi setelah berhasil login pertama kali.</p>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+                        <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                            Simpan & Daftarkan Dosen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MODAL 2: EDIT DATA DOSEN PEMBIMBING -->
+        <!-- ========================================== -->
+        <div x-show="showEditModal" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 relative"
+                 @click.away="showEditModal = false"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                
+                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+                            ✏️
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-gray-900">Edit Data Dosen Pembimbing</h3>
+                            <p class="text-xs text-gray-400">Perbarui identitas dosen pembimbing kampus</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="showEditModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                </div>
+
+                <form method="POST" :action="'/university/lecturers/' + editLecturer.id" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="name" x-model="editLecturer.name" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Email Resmi Kampus / Login <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="email" name="email" x-model="editLecturer.email" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+                        <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>
