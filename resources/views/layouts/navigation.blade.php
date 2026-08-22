@@ -68,27 +68,45 @@
                             {{ __('Universitas') }}
                         </x-nav-link>
 
-                        <!-- Dropdown Manajemen Akun -->
-                        <div class="inline-flex items-center pt-1">
-                            <x-dropdown align="right" width="48">
-                                <x-slot name="trigger">
-                                    <button class="inline-flex items-center px-1 pt-1 border-b-2 {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*')) ? 'border-indigo-500 text-gray-900 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium' }} text-sm leading-5 transition duration-150 ease-in-out cursor-pointer">
-                                        <span>👥 Akun & Mentor</span>
-                                        <svg class="ms-1 h-4 w-4 fill-current opacity-60" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </x-slot>
+                        <!-- Dropdown Menu Pengguna (Alpine.js Smooth Popup) -->
+                        <div class="relative inline-flex items-center" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
+                            <button @click="open = !open" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*')) ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                <span>👥</span>
+                                <span>Pengguna</span>
+                                <svg class="h-3.5 w-3.5 transition-transform duration-200 opacity-60" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
 
-                                <x-slot name="content">
-                                    <x-dropdown-link :href="route('admin.users.index')">
-                                        👥 {{ __('Semua Pengguna') }}
-                                    </x-dropdown-link>
-                                    <x-dropdown-link :href="route('admin.mentors.index')">
-                                        👔 {{ __('Mentor Dinas') }}
-                                    </x-dropdown-link>
-                                </x-slot>
-                            </x-dropdown>
+                            <!-- Dropdown Content -->
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="transform opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
+                                 class="absolute left-0 top-full mt-2 w-56 rounded-2xl bg-white border border-slate-100 shadow-2xl p-2 z-50 focus:outline-none"
+                                 style="display: none;">
+                                
+                                <a href="{{ route('admin.users.index') }}" 
+                                   class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-700 font-extrabold' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600' }}">
+                                    <span class="text-base">👥</span>
+                                    <div>
+                                        <span class="block">Semua Pengguna</span>
+                                        <span class="block text-[10px] text-slate-400 font-normal">Kelola akun & hak akses</span>
+                                    </div>
+                                </a>
+
+                                <a href="{{ route('admin.mentors.index') }}" 
+                                   class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition mt-1 {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-700 font-extrabold' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600' }}">
+                                    <span class="text-base">👔</span>
+                                    <div>
+                                        <span class="block">Mentor Dinas</span>
+                                        <span class="block text-[10px] text-slate-400 font-normal">Pembimbing dinas lapangan</span>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
 
                         <x-nav-link :href="route('admin.audit_logs.index')" :active="request()->routeIs('admin.audit_logs.*')">
