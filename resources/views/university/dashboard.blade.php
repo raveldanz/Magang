@@ -328,7 +328,7 @@
         <!-- ========================================== -->
         <div x-show="assignModal.show" 
              x-cloak 
-             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             class="fixed inset-0 z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity"
              x-transition:enter="ease-out duration-200"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -336,7 +336,7 @@
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0">
             
-            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 relative"
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto"
                  @click.away="assignModal.show = false"
                  x-transition:enter="ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"

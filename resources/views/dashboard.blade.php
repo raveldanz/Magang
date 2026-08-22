@@ -227,13 +227,13 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                 class="fixed inset-0 z-[9999] overflow-y-auto" style="display: none;">
                 
                 <!-- Backdrop -->
-                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="openNewDosenModal = false"></div>
+                <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" @click="openNewDosenModal = false"></div>
 
                 <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 space-y-4">
+                    <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 sm:p-7 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
                         
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div class="flex items-center gap-2">
@@ -312,13 +312,13 @@
                      x-transition:leave="transition ease-in duration-200"
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                     class="fixed inset-0 z-[9999] overflow-y-auto" style="display: none;">
                     
                     <!-- Backdrop -->
-                    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="showCredentialModal = false"></div>
+                    <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" @click="showCredentialModal = false"></div>
 
                     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5">
+                        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5 my-auto max-h-[90vh] overflow-y-auto">
                             
                             <!-- Header Modal -->
                             <div class="flex items-start justify-between gap-3">
