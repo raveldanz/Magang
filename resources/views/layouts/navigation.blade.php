@@ -69,12 +69,12 @@
                         </x-nav-link>
 
                         <!-- Dropdown Menu Pengguna & Mentor (Alpine.js) -->
-                        <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+                        <div x-data="{ open: false }" class="relative inline-flex items-center h-full" @click.away="open = false">
                             <button @click="open = !open" 
                                     type="button" 
-                                    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition cursor-pointer {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*')) ? 'bg-blue-50 text-blue-700' : '' }}">
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition cursor-pointer {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*')) ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
                                 <span>👥 Pengguna & Mentor</span>
-                                <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 transition-transform duration-200 opacity-70" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
