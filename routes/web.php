@@ -160,6 +160,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/university/dashboard', [\App\Http\Controllers\University\DashboardController::class, 'index'])->name('university.dashboard');
         Route::get('/university/export-students', [\App\Http\Controllers\University\DashboardController::class, 'export'])->name('university.students.export');
         Route::get('/university/students/{placementId}', [\App\Http\Controllers\University\DashboardController::class, 'showStudent'])->name('university.students.show');
+        Route::post('/university/students/{application}/assign-advisor', [\App\Http\Controllers\University\DashboardController::class, 'assignAdvisor'])->name('university.students.assign_advisor');
         Route::get('/university/students/{application}/letter', [\App\Http\Controllers\University\LetterController::class, 'generateLetter'])->name('university.students.letter');
         
         // Pengaturan Profil & Kop Surat Kampus
@@ -170,6 +171,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/university/lecturers', [\App\Http\Controllers\University\LecturerController::class, 'index'])->name('university.lecturers.index');
         Route::post('/university/lecturers', [\App\Http\Controllers\University\LecturerController::class, 'store'])->name('university.lecturers.store');
         Route::match(['put', 'patch'], '/university/lecturers/{id}', [\App\Http\Controllers\University\LecturerController::class, 'update'])->name('university.lecturers.update');
+        Route::delete('/university/lecturers/{id}', [\App\Http\Controllers\University\LecturerController::class, 'destroy'])->name('university.lecturers.destroy');
         Route::post('/university/lecturers/{id}/reset-password', [\App\Http\Controllers\University\LecturerController::class, 'resetPassword'])->name('university.lecturers.reset_password');
     });
 

@@ -5,8 +5,28 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="{ 
+        assignModal: { show: false, appId: '', studentName: '', currentAdvisorId: '' } 
+    }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+            <!-- Flash Message -->
+            @if (session('success'))
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-sm font-medium">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             <!-- Welcome Banner Resmi Universitas -->
             <div class="bg-gradient-to-r from-blue-700 via-indigo-800 to-indigo-950 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -222,10 +242,22 @@
                                         @if ($dosen)
                                             <div class="font-semibold text-gray-900 text-xs">👨‍🏫 {{ $dosen->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono">{{ $dosen->email }}</div>
+                                            <button type="button" 
+                                                    @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '{{ $dosen->id }}' }"
+                                                    class="mt-1 text-[11px] text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer">
+                                                Ganti DPL
+                                            </button>
                                         @else
-                                            <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold">
-                                                Belum Ditentukan
-                                            </span>
+                                            <div>
+                                                <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold">
+                                                    Belum Ditentukan
+                                                </span>
+                                            </div>
+                                            <button type="button" 
+                                                    @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '' }"
+                                                    class="mt-1 text-[11px] text-indigo-600 hover:text-indigo-800 font-bold bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded-md inline-block cursor-pointer">
+                                                + Pilih DPL
+                                            </button>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
@@ -250,15 +282,13 @@
                                                 </a>
                                             @endif
 
-                                            @if ($placement)
-                                                <a href="{{ route('university.students.show', $placement->id) }}" 
-                                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg transition shadow-2xs">
-                                                    <span>Detail</span>
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            @endif
+                                            <a href="{{ route('university.students.show', $placement?->id ?? $app->id) }}" 
+                                               class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg transition shadow-2xs">
+                                                <span>Detail</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -275,5 +305,71 @@
             </div>
 
         </div>
+
+        <!-- ========================================== -->
+        <!-- MODAL: PLOTTING / TUGASKAN DOSEN PEMBIMBING -->
+        <!-- ========================================== -->
+        <div x-show="assignModal.show" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 relative"
+                 @click.away="assignModal.show = false"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                
+                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+                            👨‍🏫
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-gray-900">Plotting Dosen Pembimbing Lapangan</h3>
+                            <p class="text-xs text-gray-400">Mahasiswa: <strong x-text="assignModal.studentName"></strong></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="assignModal.show = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                </div>
+
+                <form method="POST" :action="'/university/students/' + assignModal.appId + '/assign-advisor'" class="space-y-4">
+                    @csrf
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Pilih Dosen Pembimbing (DPL) <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="academic_advisor_id" x-model="assignModal.currentAdvisorId" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                            <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
+                            @foreach ($availableDosens as $d)
+                                <option value="{{ $d->id }}">
+                                    👨‍🏫 {{ $d->name }} ({{ $d->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1">Daftar memuat seluruh dosen yang terdaftar di {{ $university?->name ?? 'kampus Anda' }}.</p>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+                        <button type="button" @click="assignModal.show = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                            Simpan Penugasan DPL
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>
