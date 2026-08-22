@@ -153,12 +153,15 @@
                                     </td>
 
                                     <!-- Affiliation -->
-                                    <td class="py-4 px-4">
+                                    <td class="py-4 px-4 text-xs text-slate-600">
                                         @if($u->agencyProfile)
-                                            <div class="font-semibold text-gray-800 text-xs">🏢 {{ $u->agencyProfile->agency_name }}</div>
-                                            <div class="text-[10px] text-gray-400">{{ $u->agencyProfile->government_name }}</div>
-                                        @elseif($u->university || $u->studentProfile?->universitas)
-                                            <div class="font-semibold text-gray-800 text-xs">🎓 {{ $u->university->name ?? $u->studentProfile->universitas }}</div>
+                                            <div class="font-semibold text-gray-800">🏢 {{ $u->agencyProfile->agency_name ?? $u->agencyProfile->name ?? 'Dinas Terkait' }}</div>
+                                            <div class="text-[10px] text-gray-400">{{ $u->agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}</div>
+                                        @elseif($u->role === 'mahasiswa')
+                                            <div class="font-semibold text-gray-800">🎓 {{ $u->studentProfile?->university?->name ?? $u->studentProfile?->universitas ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}</div>
+                                            <div class="text-[10px] text-gray-400">NIM: {{ $u->studentProfile?->nim ?? '-' }}</div>
+                                        @elseif(in_array($u->role, ['dosen', 'academic_advisor', 'universitas']))
+                                            <div class="font-semibold text-gray-800">🎓 {{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}</div>
                                             <div class="text-[10px] text-gray-400">Mitra Perguruan Tinggi</div>
                                         @else
                                             <span class="text-xs text-gray-400">-</span>
