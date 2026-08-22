@@ -246,17 +246,29 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         @if($status === 'SUBMITTED' || $status === 'PENDING')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Menunggu Verifikasi</span>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                                Menunggu Verifikasi
+                                            </span>
                                         @elseif($status === 'ACCEPTED' || $status === 'VERIFIED')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">Diterima (Persiapan)</span>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                                                Diterima
+                                            </span>
                                         @elseif($status === 'ACTIVE')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Sedang Magang</span>
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                <span>🟢</span>
+                                                <span>Sedang Magang</span>
+                                            </span>
                                         @elseif($status === 'COMPLETED')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">Lulus / Selesai</span>
+                                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
+                                                <span>🎓</span>
+                                                <span>Lulus</span>
+                                            </span>
                                         @elseif($status === 'REJECTED')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Ditolak</span>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                                Ditolak
+                                            </span>
                                         @else
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">{{ $status }}</span>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ $status }}</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">

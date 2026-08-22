@@ -106,7 +106,7 @@ class DashboardController extends Controller
             ];
         }
 
-        // Daftar Dosen Aktif Kampus untuk Plotting DPL
+        // Daftar Dosen Aktif Kampus untuk Plotting DPL (Hanya dosen dengan status aktif)
         $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($user, $university) {
                 if ($user->university_id) {
@@ -114,6 +114,9 @@ class DashboardController extends Controller
                 } elseif ($university) {
                     $q->where('university', $university->name);
                 }
+            })
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', 'active');
             })
             ->orderBy('name')
             ->get();
@@ -392,7 +395,7 @@ class DashboardController extends Controller
         $finalReport = $placement?->finalreport;
         $evaluation = $placement?->evaluation;
 
-        // Daftar Dosen untuk modal Plotting
+        // Daftar Dosen untuk modal Plotting (Hanya dosen aktif)
         $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($user, $university) {
                 if ($user->university_id) {
@@ -400,6 +403,9 @@ class DashboardController extends Controller
                 } elseif ($university) {
                     $q->where('university', $university->name);
                 }
+            })
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', 'active');
             })
             ->orderBy('name')
             ->get();

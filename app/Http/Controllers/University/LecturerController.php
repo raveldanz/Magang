@@ -154,6 +154,7 @@ class LecturerController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $lecturer->id,
             'nidn' => 'nullable|string|max:50',
+            'status' => 'nullable|string|in:active,on_leave,inactive',
         ], [
             'name.required' => 'Nama lengkap dosen wajib diisi.',
             'email.required' => 'Email resmi dosen wajib diisi.',
@@ -168,10 +169,11 @@ class LecturerController extends Controller
         $lecturer->update([
             'name' => $dosenName,
             'email' => strtolower(trim($request->email)),
+            'status' => $request->status ?? 'active',
         ]);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Data Dosen Pembimbing '{$dosenName}' berhasil diperbarui!");
+            ->with('success', "Data & Status Dosen Pembimbing '{$dosenName}' berhasil diperbarui!");
     }
 
     /**
