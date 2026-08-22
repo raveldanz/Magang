@@ -187,7 +187,7 @@
                                             <div>
                                                 <div class="font-bold text-gray-900 leading-snug">{{ $student->name ?? '-' }}</div>
                                                 <div class="text-xs text-gray-500 mt-0.5">
-                                                    {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }}
+                                                    {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}
                                                 </div>
                                             </div>
                                         </div>

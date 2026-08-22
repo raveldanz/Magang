@@ -99,19 +99,19 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <x-input-label for="faculty" value="Fakultas" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile->faculty ?? $profile->fakultas ?? '')" placeholder="Contoh: Fakultas Ilmu Komputer" required />
+                                <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile?->faculty ?? $profile?->fakultas ?? '')" placeholder="Contoh: Fakultas Ilmu Komputer" required />
                                 <x-input-error :messages="$errors->get('faculty')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="jurusan" value="Program Studi / Jurusan" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile->jurusan ?? $profile->major ?? '')" placeholder="Contoh: Teknik Informatika" required />
+                                <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile?->jurusan ?? $profile?->major ?? '')" placeholder="Contoh: Teknik Informatika" required />
                                 <x-input-error :messages="$errors->get('jurusan')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="semester" value="Semester Saat Ini" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="semester" name="semester" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile->semester ?? '5')" placeholder="Contoh: 5 / 6 / 7" required />
+                                <x-text-input id="semester" name="semester" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile?->semester ?? '5')" placeholder="Contoh: 5 / 6 / 7" required />
                                 <x-input-error :messages="$errors->get('semester')" class="mt-1" />
                             </div>
                         </div>
@@ -126,13 +126,13 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="phone" value="No. WhatsApp / HP Aktif" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('phone', $profile->phone ?? '')" placeholder="Contoh: 081234567890" required />
+                                <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('phone', $profile?->phone ?? '')" placeholder="Contoh: 081234567890" required />
                                 <x-input-error :messages="$errors->get('phone')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="alamat" value="Alamat Domisili / Tempat Tinggal" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('alamat', $profile->alamat ?? $profile->address ?? '')" placeholder="Contoh: Jl. Rungkut Asri Timur No. 12, Surabaya" />
+                                <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('alamat', $profile?->alamat ?? $profile?->address ?? '')" placeholder="Contoh: Jl. Rungkut Asri Timur No. 12, Surabaya" />
                                 <x-input-error :messages="$errors->get('alamat')" class="mt-1" />
                             </div>
                         </div>
@@ -147,13 +147,13 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat / Hubungan" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto (Ayah)" />
+                                <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile?->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto (Ayah)" />
                                 <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
+                                <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile?->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
                                 <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-1" />
                             </div>
                         </div>

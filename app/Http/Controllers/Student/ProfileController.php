@@ -13,7 +13,7 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        $profile = $user->studentProfile;
+        $profile = $user->studentProfile ?? new StudentProfile();
         $universities = University::orderBy('name')->get();
 
         return view('student.profile.edit', compact('user', 'profile', 'universities'));
