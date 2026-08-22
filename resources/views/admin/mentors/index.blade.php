@@ -12,7 +12,7 @@
             </div>
 
             <button type="button" 
-                    @click="showCreateModal = true"
+                    @click="window.dispatchEvent(new CustomEvent('open-create-mentor-modal'))"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                 <span>Tambah Mentor Baru</span>
@@ -20,11 +20,13 @@
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="{ 
-        showCreateModal: false, 
-        showEditModal: false, 
-        editMentor: { id: '', name: '', email: '', agency_profile_id: '{{ $agencyId ?? '' }}', status: 'active' } 
-    }">
+    <div class="py-8" 
+         x-data="{ 
+            showCreateModal: false, 
+            showEditModal: false, 
+            editMentor: { id: '', name: '', email: '', agency_profile_id: '{{ $agencyId ?? '' }}', status: 'active' } 
+         }"
+         @open-create-mentor-modal.window="showCreateModal = true">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Alert -->
@@ -173,14 +175,29 @@
         </div>
 
         <!-- MODAL 1: TAMBAH MENTOR -->
-        <div x-show="showCreateModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 relative" @click.away="showCreateModal = false">
+        <div x-show="showCreateModal" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 @click.away="showCreateModal = false">
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
                         <span class="text-xl">👔</span>
                         <h3 class="font-bold text-base text-gray-900">Tambah Mentor Lapangan Baru</h3>
                     </div>
-                    <button type="button" @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                    <button type="button" @click="showCreateModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
                 </div>
 
                 <form method="POST" action="{{ route('admin.mentors.store') }}" class="space-y-4">
@@ -215,7 +232,7 @@
                     @endif
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
-                        <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
                             Batal
                         </button>
                         <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
@@ -227,14 +244,29 @@
         </div>
 
         <!-- MODAL 2: EDIT MENTOR -->
-        <div x-show="showEditModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-gray-100 relative" @click.away="showEditModal = false">
+        <div x-show="showEditModal" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 @click.away="showEditModal = false">
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
                         <span class="text-xl">✏️</span>
                         <h3 class="font-bold text-base text-gray-900">Edit Data Mentor Lapangan</h3>
                     </div>
-                    <button type="button" @click="showEditModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                    <button type="button" @click="showEditModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
                 </div>
 
                 <form method="POST" :action="'/admin/mentors/' + editMentor.id" class="space-y-4">
@@ -280,7 +312,7 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
-                        <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition cursor-pointer">
                             Batal
                         </button>
                         <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
