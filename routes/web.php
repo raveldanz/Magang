@@ -148,6 +148,7 @@ Route::middleware('auth')->group(function () {
 
         // Log Audit Aktivitas Sistem
         Route::get('/admin/audit-logs', [AdminAuditLogController::class, 'index'])->name('admin.audit_logs.index');
+        Route::get('/admin/audit-trail', [AdminAuditLogController::class, 'index'])->name('admin.audit-logs.index');
     });
 
     // ==========================================
