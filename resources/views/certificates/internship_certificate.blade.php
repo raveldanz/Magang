@@ -97,7 +97,19 @@
     </header>
 
     @php
-        // Logo Kampus Resolver
+        // 1. Logo Dinas Instansi Tempat Mahasiswa Magang
+        $agencyLogo = $agencyProfile->logo ?? null;
+        if (!$agencyLogo && $agencyProfile && $agencyProfile->agency_name) {
+            $aName = strtolower($agencyProfile->agency_name);
+            if (str_contains($aName, 'kominfo') || str_contains($aName, 'komunikasi')) $agencyLogo = 'images/logos/diskominfo.png';
+            elseif (str_contains($aName, 'penduduk') || str_contains($aName, 'dukcapil')) $agencyLogo = 'images/logos/dispendukcapil.png';
+            elseif (str_contains($aName, 'pustaka') || str_contains($aName, 'pusip')) $agencyLogo = 'images/logos/dispusip.png';
+        }
+        if (!$agencyLogo || !file_exists(public_path($agencyLogo))) {
+            $agencyLogo = 'images/logos/diskominfo.png';
+        }
+
+        // 2. Logo Universitas Mahasiswa
         $univLogo = $university->logo ?? null;
         if (!$univLogo && $profile && $profile->universitas) {
             $uName = strtolower($profile->universitas);
@@ -107,6 +119,9 @@
             elseif (str_contains($uName, 'upn')) $univLogo = 'images/logos/upnjatim.png';
             elseif (str_contains($uName, 'unitomo') || str_contains($uName, 'soetomo')) $univLogo = 'images/logos/unitomo.png';
         }
+
+        // 3. Simple Grade (e.g. "A")
+        $simpleGrade = $eval->grade_calculated ?? ($eval->grade ?? 'A');
     @endphp
 
     <!-- ================================================================= -->
@@ -119,21 +134,21 @@
         <div class="absolute inset-4.5 border border-amber-500/25 rounded-xl pointer-events-none"></div>
         <div class="absolute inset-0 bg-[radial-gradient(#f8fafc_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none"></div>
 
-        <!-- Watermark Lambang Surabaya Samar di Tengah -->
+        <!-- Watermark Lambang Dinas Samar di Tengah -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04]">
-            <img src="{{ asset('images/logos/surabaya.png') }}" alt="Watermark" class="w-[380px] object-contain">
+            <img src="{{ asset($agencyLogo) }}" alt="Watermark" class="w-[360px] object-contain">
         </div>
 
         <!-- Bagian Atas: KOP & JUDUL & DATA PESERTA -->
         <div class="relative z-10 px-5 pt-1">
             
-            <!-- 1. KOP RESMI PEMKOT SURABAYA & KAMPUS -->
+            <!-- 1. KOP RESMI DINAS INSTANSI MAGANG & UNIVERSITAS -->
             <div class="flex items-center justify-between border-b-2 border-amber-600/40 pb-3">
                 
-                <!-- Logo Pemkot Surabaya (Kiri) -->
+                <!-- Logo Dinas Instansi Tempat Magang (Kiri) -->
                 <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                    <img src="{{ asset('images/logos/surabaya.png') }}" 
-                         alt="Logo Pemkot Surabaya" 
+                    <img src="{{ asset($agencyLogo) }}" 
+                         alt="{{ $agencyProfile->agency_name ?? 'Logo Dinas' }}" 
                          class="max-h-16 max-w-full object-contain"
                          style="height: 58px; width: auto;">
                 </div>
@@ -199,12 +214,12 @@
                     sampai dengan <strong>{{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}</strong> dengan predikat:
                 </p>
 
-                <!-- PREDIKAT BADGE BOX EMAS -->
+                <!-- PREDIKAT BADGE BOX (GRADE A SAJA) -->
                 <div class="pt-1.5">
-                    <div class="inline-flex items-center gap-2.5 px-6 py-1.5 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 border border-amber-300 rounded-xl shadow-2xs">
+                    <div class="inline-flex items-center gap-2.5 px-8 py-1.5 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 border border-amber-300 rounded-xl shadow-2xs">
                         <span class="text-[11px] font-black text-amber-900 uppercase tracking-wider">PREDIKAT:</span>
-                        <span class="text-sm font-black text-amber-950 font-serif-title">
-                            {{ strtoupper($eval->predikat ?? 'DENGAN PUJIAN (SANGAT MEMUASKAN)') }} (NILAI: {{ $eval->nilai_akhir ?? 90 }} / GRADE {{ $eval->grade_calculated ?? 'A' }})
+                        <span class="text-base font-black text-amber-950 font-serif-title tracking-wide">
+                            GRADE {{ $simpleGrade }} (NILAI: {{ $eval->nilai_akhir ?? 90 }})
                         </span>
                     </div>
                 </div>
@@ -213,7 +228,7 @@
         </div>
 
         <!-- 4. FOOTER TANDA TANGAN DUA PIHAK (DPL KAMPUS & KEPALA DINAS) -->
-        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-2 text-center text-xs">
+        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-3 text-center text-xs">
             
             <!-- TTD 1: Dosen Pembimbing Lapangan (DPL) / Kampus -->
             <div>
@@ -261,12 +276,12 @@
 
         <div class="relative z-10 px-5 pt-1">
             
-            <!-- 1. HEADER TRANSKRIP NILAI -->
+            <!-- 1. HEADER TRANSKRIP NILAI DENGAN LOGO DINAS -->
             <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2.5">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('images/logos/surabaya.png') }}" 
-                         alt="Logo Pemkot Surabaya" 
-                         class="w-10 h-10 object-contain">
+                    <img src="{{ asset($agencyLogo) }}" 
+                         alt="{{ $agencyProfile->agency_name ?? 'Logo Dinas' }}" 
+                         class="w-11 h-11 object-contain">
                     <div>
                         <h3 class="font-bold text-[9.5px] uppercase tracking-wider text-slate-500">
                             {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
@@ -288,7 +303,7 @@
             </div>
 
             <!-- 2. DATA MAHASISWA & PENEMPATAN (2 KOLOM RAPI) -->
-            <div class="grid grid-cols-2 gap-4 mt-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px]">
+            <div class="grid grid-cols-2 gap-4 mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px]">
                 <div class="space-y-0.5">
                     <div class="flex"><span class="w-28 text-slate-500 font-medium">Nama Mahasiswa</span><span class="font-bold text-slate-900">: {{ $student->name }}</span></div>
                     <div class="flex"><span class="w-28 text-slate-500 font-medium">NIM</span><span class="font-mono font-bold text-slate-900">: {{ $profile->nim ?? '-' }}</span></div>
@@ -302,15 +317,15 @@
             </div>
 
             <!-- 3. TABEL TRANSKRIP RINCIAN PENILAIAN -->
-            <div class="mt-2.5 overflow-hidden rounded-xl border border-slate-300">
+            <div class="mt-3.5 overflow-hidden rounded-xl border border-slate-300">
                 <table class="min-w-full text-left text-[11px] divide-y divide-slate-200">
                     <thead class="bg-slate-900 text-white font-bold uppercase text-[9.5px] tracking-wider">
                         <tr>
-                            <th class="py-2 px-3 text-center w-10">No</th>
-                            <th class="py-2 px-3">Komponen Penilaian & Aspek Kompetensi Magang</th>
-                            <th class="py-2 px-3 text-center w-20">Bobot (%)</th>
-                            <th class="py-2 px-3 text-center w-24">Skor (0-100)</th>
-                            <th class="py-2 px-3 text-center w-28">Skor Tertimbang</th>
+                            <th class="py-2.5 px-3 text-center w-10">No</th>
+                            <th class="py-2.5 px-3">Komponen Penilaian & Aspek Kompetensi Magang</th>
+                            <th class="py-2.5 px-3 text-center w-20">Bobot (%)</th>
+                            <th class="py-2.5 px-3 text-center w-24">Skor (0-100)</th>
+                            <th class="py-2.5 px-3 text-center w-28">Skor Tertimbang</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-slate-800">
@@ -323,31 +338,31 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-1 px-3 text-center text-slate-400">1</td>
-                            <td class="py-1 px-3">Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1 px-3 text-center font-mono font-bold">{{ $eval->nilai_disiplin ?? 90 }}</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">1</td>
+                            <td class="py-1.5 px-3">Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->nilai_disiplin ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
-                            <td class="py-1 px-3 text-center text-slate-400">2</td>
-                            <td class="py-1 px-3">Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1 px-3 text-center font-mono font-bold">{{ $eval->nilai_kinerja ?? 90 }}</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">2</td>
+                            <td class="py-1.5 px-3">Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->nilai_kinerja ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
-                            <td class="py-1 px-3 text-center text-slate-400">3</td>
-                            <td class="py-1 px-3">Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1 px-3 text-center font-mono font-bold">{{ $eval->nilai_laporan ?? 90 }}</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">3</td>
+                            <td class="py-1.5 px-3">Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->nilai_laporan ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr class="bg-blue-50/70 font-bold">
-                            <td colspan="2" class="py-1.5 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
-                            <td class="py-1.5 px-3 text-center font-mono text-blue-900">40%</td>
-                            <td class="py-1.5 px-3 text-center font-mono text-blue-900">{{ $eval->nilai_pembimbing ?? 90 }}</td>
-                            <td class="py-1.5 px-3 text-center font-mono text-blue-950 font-black">
+                            <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
+                            <td class="py-2 px-3 text-center font-mono text-blue-900">40%</td>
+                            <td class="py-2 px-3 text-center font-mono text-blue-900">{{ $eval->nilai_pembimbing ?? 90 }}</td>
+                            <td class="py-2 px-3 text-center font-mono text-blue-950 font-black">
                                 {{ round(0.40 * ($eval->nilai_pembimbing ?? 90), 2) }}
                             </td>
                         </tr>
@@ -360,46 +375,46 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-1 px-3 text-center text-slate-400">1</td>
-                            <td class="py-1 px-3">Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1 px-3 text-center font-mono font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">1</td>
+                            <td class="py-1.5 px-3">Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
-                            <td class="py-1 px-3 text-center text-slate-400">2</td>
-                            <td class="py-1 px-3">Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1 px-3 text-center font-mono font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">2</td>
+                            <td class="py-1.5 px-3">Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
-                            <td class="py-1 px-3 text-center text-slate-400">3</td>
-                            <td class="py-1 px-3">Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1 px-3 text-center font-mono font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
-                            <td class="py-1 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">3</td>
+                            <td class="py-1.5 px-3">Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
+                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr class="bg-indigo-50/70 font-bold">
-                            <td colspan="2" class="py-1.5 px-3 text-right text-indigo-950">Subtotal Nilai DPL (Rata-rata):</td>
-                            <td class="py-1.5 px-3 text-center font-mono text-indigo-900">60%</td>
-                            <td class="py-1.5 px-3 text-center font-mono text-indigo-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
-                            <td class="py-1.5 px-3 text-center font-mono text-indigo-950 font-black">
+                            <td colspan="2" class="py-2 px-3 text-right text-indigo-950">Subtotal Nilai DPL (Rata-rata):</td>
+                            <td class="py-2 px-3 text-center font-mono text-indigo-900">60%</td>
+                            <td class="py-2 px-3 text-center font-mono text-indigo-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
+                            <td class="py-2 px-3 text-center font-mono text-indigo-950 font-black">
                                 {{ round(0.60 * ($eval->nilai_dosen_calculated ?? 90), 2) }}
                             </td>
                         </tr>
 
                         <!-- REKAPITULASI TOTAL NILAI AKHIR -->
-                        <tr class="bg-slate-900 text-white font-black text-[11px]">
-                            <td colspan="2" class="py-2 px-3 text-right uppercase tracking-wider">
-                                Nilai Akhir Total & Konversi Mutu:
+                        <tr class="bg-slate-900 text-white font-black text-xs">
+                            <td colspan="2" class="py-2.5 px-3 text-right uppercase tracking-wider">
+                                Nilai Akhir Total & Mutu:
                             </td>
-                            <td class="py-2 px-3 text-center font-mono">100%</td>
-                            <td class="py-2 px-3 text-center font-mono text-emerald-400 text-xs">
+                            <td class="py-2.5 px-3 text-center font-mono">100%</td>
+                            <td class="py-2.5 px-3 text-center font-mono text-emerald-400 text-sm">
                                 {{ $eval->nilai_akhir ?? 90 }}
                             </td>
-                            <td class="py-2 px-3 text-center font-mono text-amber-300 text-xs">
-                                {{ $eval->grade_calculated ?? 'A' }} ({{ $eval->predikat ?? 'Sangat Memuaskan' }})
+                            <td class="py-2.5 px-3 text-center font-mono text-amber-300 text-sm">
+                                GRADE {{ $simpleGrade }}
                             </td>
                         </tr>
 
@@ -407,38 +422,26 @@
                 </table>
             </div>
 
-            <!-- 4. CATATAN EVALUASI & FEEDBACK -->
-            <div class="grid grid-cols-2 gap-3 mt-2 text-[10.5px]">
-                <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                    <span class="font-bold text-slate-700 block">💬 Catatan Pembimbing Lapangan Dinas:</span>
-                    <p class="text-slate-600 italic mt-0.5">"{{ $eval->catatan ?? 'Mahasiswa berdedikasi tinggi dan berkinerja sangat memuaskan di dinas.' }}"</p>
-                </div>
-                <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                    <span class="font-bold text-slate-700 block">💬 Catatan DPL Kampus:</span>
-                    <p class="text-slate-600 italic mt-0.5">"{{ $eval->feedback_dosen ?? ($eval->catatan_dosen ?? 'Penulisan laporan sangat komprehensif dan implementasi teknis di dinas sangat baik.') }}"</p>
-                </div>
-            </div>
-
         </div>
 
-        <!-- 5. FOOTER TTD TRANSKRIP -->
-        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-2 text-center text-xs">
+        <!-- 4. FOOTER TTD TRANSKRIP -->
+        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-4 text-center text-xs">
             <div>
                 <p class="font-bold text-slate-800 text-[11px]">Dosen Pembimbing Lapangan,</p>
-                <div class="h-10 flex items-center justify-center my-0.5">
+                <div class="h-12 flex items-center justify-center my-1">
                     <span class="font-quote text-blue-900/30 text-sm italic font-bold">Approved</span>
                 </div>
-                <div class="border-t border-slate-400 pt-0.5 max-w-[200px] mx-auto">
+                <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
                     <p class="font-bold text-slate-900 text-[11px]">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
                 </div>
             </div>
 
             <div>
                 <p class="font-bold text-slate-800 text-[11px]">Pembimbing Lapangan Dinas,</p>
-                <div class="h-10 flex items-center justify-center my-0.5">
+                <div class="h-12 flex items-center justify-center my-1">
                     <span class="font-quote text-emerald-900/30 text-sm italic font-bold">Approved</span>
                 </div>
-                <div class="border-t border-slate-400 pt-0.5 max-w-[200px] mx-auto">
+                <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
                     <p class="font-bold text-slate-900 text-[11px]">{{ $mentor->name ?? 'Retno Mumpuni, S.Kom., M.Sc' }}</p>
                 </div>
             </div>
