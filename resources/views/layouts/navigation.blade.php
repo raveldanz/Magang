@@ -68,42 +68,45 @@
                             {{ __('Universitas') }}
                         </x-nav-link>
 
-                        <!-- Dropdown Menu Pengguna (Alpine.js Smooth Popup) -->
-                        <div class="relative inline-flex items-center" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
-                            <button @click="open = !open" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*')) ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <span>👥</span>
-                                <span>Pengguna</span>
-                                <svg class="h-3.5 w-3.5 transition-transform duration-200 opacity-60" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                        <!-- Dropdown Menu Pengguna & Mentor (Alpine.js) -->
+                        <div x-data="{ open: false }" class="relative inline-block text-left" @click.away="open = false">
+                            <button @click="open = !open" 
+                                    type="button" 
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition cursor-pointer {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*')) ? 'bg-blue-50 text-blue-700' : '' }}">
+                                <span>👥 Pengguna & Mentor</span>
+                                <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
-
-                            <!-- Dropdown Content -->
-                            <div x-show="open"
+                            
+                            <div x-show="open" 
                                  x-transition:enter="transition ease-out duration-150"
-                                 x-transition:enter-start="transform opacity-0 scale-95 -translate-y-1"
-                                 x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
                                  x-transition:leave="transition ease-in duration-100"
-                                 x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
-                                 x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                                 class="absolute left-0 top-full mt-2 w-56 rounded-2xl bg-white border border-slate-100 shadow-2xl p-2 z-50 focus:outline-none"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 x-cloak
+                                 class="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] p-2 space-y-1"
                                  style="display: none;">
-                                
                                 <a href="{{ route('admin.users.index') }}" 
-                                   class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-700 font-extrabold' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600' }}">
-                                    <span class="text-base">👥</span>
+                                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition group {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold group-hover:bg-blue-600 group-hover:text-white transition">
+                                        👥
+                                    </div>
                                     <div>
-                                        <span class="block">Semua Pengguna</span>
-                                        <span class="block text-[10px] text-slate-400 font-normal">Kelola akun & hak akses</span>
+                                        <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700">Semua Pengguna</div>
+                                        <div class="text-[11px] text-slate-400">Kelola akun, role & impersonasi</div>
                                     </div>
                                 </a>
-
                                 <a href="{{ route('admin.mentors.index') }}" 
-                                   class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition mt-1 {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-700 font-extrabold' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600' }}">
-                                    <span class="text-base">👔</span>
+                                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 transition group {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-700 font-bold' : '' }}">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold group-hover:bg-indigo-600 group-hover:text-white transition">
+                                        👔
+                                    </div>
                                     <div>
-                                        <span class="block">Mentor Dinas</span>
-                                        <span class="block text-[10px] text-slate-400 font-normal">Pembimbing dinas lapangan</span>
+                                        <div class="text-xs font-bold text-slate-800 group-hover:text-indigo-700">Mentor Lapangan</div>
+                                        <div class="text-[11px] text-slate-400">Pembimbing teknis dinas</div>
                                     </div>
                                 </a>
                             </div>
