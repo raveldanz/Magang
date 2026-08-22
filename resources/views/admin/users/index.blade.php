@@ -12,7 +12,7 @@
             </div>
 
             @if($isSuperAdmin)
-                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                     <span>Tambah Pengguna Baru</span>
                 </a>
@@ -58,7 +58,7 @@
                     </div>
 
                     <!-- Filter Role -->
-                    <select name="role" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium">
+                    <select name="role" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>🎓 Mahasiswa</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>🏢 Admin Dinas / Super Admin</option>
@@ -68,7 +68,7 @@
                     </select>
 
                     <!-- Filter Instansi -->
-                    <select name="agency_id" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium">
+                    <select name="agency_id" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Instansi Dinas</option>
                         @foreach($agencies as $ag)
                             <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
@@ -79,7 +79,7 @@
 
                     <!-- Submit & Reset -->
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                        <button type="submit" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                             Terapkan Filter
                         </button>
                         @if(request()->hasAny(['search', 'role', 'agency_id', 'university_id']))
@@ -114,14 +114,14 @@
                                     <!-- User Info -->
                                     <td class="py-4 px-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-indigo-50 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs">
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-blue-50 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs">
                                                 {{ strtoupper(substr($u->name, 0, 2)) }}
                                             </div>
                                             <div>
                                                 <div class="font-bold text-gray-900 text-xs sm:text-sm">{{ $u->name }}</div>
                                                 <div class="text-[11px] text-gray-500 font-mono">{{ $u->email }}</div>
                                                 @if($u->studentProfile?->nim)
-                                                    <div class="text-[10px] text-indigo-600 font-mono">NIM: {{ $u->studentProfile->nim }}</div>
+                                                    <div class="text-[10px] text-blue-600 font-mono">NIM: {{ $u->studentProfile->nim }}</div>
                                                 @endif
                                             </div>
                                         </div>
@@ -130,11 +130,11 @@
                                     <!-- Role Badge -->
                                     <td class="py-4 px-4 whitespace-nowrap">
                                         @if($isSuperAdminUser)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-purple-100 text-purple-800 border border-purple-300">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-blue-100 text-blue-900 border border-blue-300">
                                                 👑 Super Admin
                                             </span>
                                         @elseif($u->role === 'admin')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                 🏢 Admin Dinas
                                             </span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))

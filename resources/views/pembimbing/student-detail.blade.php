@@ -32,7 +32,7 @@
                     @else
                         <p class="text-sm text-gray-500">Belum ada penilaian.</p>
                     @endif
-                    <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="inline-block mt-2 px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700">
+                    <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition shadow-xs cursor-pointer">
                         Isi / Edit Penilaian
                     </a>
                 </div>
@@ -43,7 +43,7 @@
                         <h3 class="text-lg font-bold border-b pb-2">Dokumen Laporan Akhir</h3>
                         @if ($placement->finalreport && $placement->finalreport->file_path)
                             <div class="text-sm mt-3">
-                                <p><strong>Status:</strong> <span class="uppercase font-bold text-indigo-700">{{ $placement->finalreport->status }}</span></p>
+                                <p><strong>Status:</strong> <span class="uppercase font-bold text-blue-700">{{ $placement->finalreport->status }}</span></p>
                             </div>
                             <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
                                 📄 Unduh / Lihat Laporan
@@ -70,7 +70,7 @@
             <div class="bg-white p-6 rounded-lg shadow space-y-6">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h3 class="text-lg font-bold">Daftar Kegiatan Harian</h3>
-                    <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700">
+                    <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition shadow-xs cursor-pointer">
                         Isi / Edit Penilaian Magang
                     </a>
                 </div>
@@ -90,7 +90,7 @@
                         <p class="text-sm text-gray-800">{{ $log->activity }}</p>
 
                         @if ($log->attachment)
-                            <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-xs text-indigo-600 hover:underline inline-block">
+                            <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-xs text-blue-600 hover:underline inline-block">
                                 📄 Lihat Bukti Lampiran
                             </a>
                         @endif

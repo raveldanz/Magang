@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     {{ __('Manajemen Divisi & Kuota Magang') }}
@@ -13,7 +13,7 @@
                 </p>
             </div>
 
-            <a href="{{ route('admin.units.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+            <a href="{{ route('admin.units.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
@@ -58,7 +58,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Kuota Magang</p>
-                    <h3 class="text-2xl font-black text-indigo-600 mt-1" id="stat-total-quota">{{ $stats['total_quota'] }}</h3>
+                    <h3 class="text-2xl font-black text-blue-600 mt-1" id="stat-total-quota">{{ $stats['total_quota'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Kapasitas maksimal</p>
                 </div>
 
@@ -80,7 +80,7 @@
                 <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <form method="GET" action="{{ route('admin.units.index') }}" class="flex items-center gap-2">
-                            <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
+                            <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
                                 <option value="">-- Semua Instansi --</option>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
@@ -106,7 +106,7 @@
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer">
                         Cari
                     </button>
                 </form>
@@ -148,7 +148,7 @@
 
                                     <!-- Instansi Induk -->
                                     <td class="py-4 px-4">
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-lg">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">
                                             🏛️ {{ $unit->agencyProfile->agency_name ?? '-' }}
                                         </span>
                                     </td>
@@ -197,7 +197,7 @@
                                                    value="{{ $unit->quota }}" 
                                                    min="{{ $acceptedCount }}" 
                                                    max="500"
-                                                   class="quota-input w-16 text-center border-slate-300 rounded-md text-sm font-bold text-slate-800 focus:ring-indigo-500 focus:border-indigo-500 py-1 px-1 bg-white shadow-xs"
+                                                   class="quota-input w-16 text-center border-slate-300 rounded-md text-sm font-bold text-slate-800 focus:ring-blue-500 focus:border-blue-500 py-1 px-1 bg-white shadow-xs"
                                                    data-unit-id="{{ $unit->id }}"
                                                    data-current-val="{{ $unit->quota }}"
                                                    data-filled="{{ $acceptedCount }}"
@@ -224,7 +224,7 @@
                                     <!-- Aksi Edit & Hapus -->
                                     <td class="py-4 px-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
-                                            <a href="{{ route('admin.units.edit', $unit->id) }}" class="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition shadow-xs border border-indigo-100" title="Edit Divisi">
+                                            <a href="{{ route('admin.units.edit', $unit->id) }}" class="p-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition shadow-xs border border-blue-100" title="Edit Divisi">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>

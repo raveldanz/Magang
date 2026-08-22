@@ -79,12 +79,12 @@
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                 <!-- Info Mahasiswa -->
                 <div class="md:col-span-1 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-4">
-                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Identitas Mahasiswa</span>
+                    <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Identitas Mahasiswa</span>
                     <h3 class="font-black text-xl text-gray-900 mt-1">{{ $student->name }}</h3>
                     <p class="text-xs text-gray-500 mt-0.5">NIM: <span class="font-mono font-bold text-gray-700">{{ $profile->nim ?? '-' }}</span></p>
                     <p class="text-xs text-gray-500">Program Studi: <span class="font-semibold text-gray-700">{{ $profile->jurusan ?? 'Informatika' }}</span></p>
                     <div class="mt-3">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-xl text-xs font-bold">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold">
                             🎓 {{ $profile->universitas ?? '-' }}
                         </span>
                     </div>
@@ -110,7 +110,7 @@
                         </div>
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-gray-500">Skor DPL (60%):</span>
-                            <span class="font-bold text-indigo-700" x-text="calculatedDosen + '/100'"></span>
+                            <span class="font-bold text-blue-700" x-text="calculatedDosen + '/100'"></span>
                         </div>
                         <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-100">
                             <span class="font-bold text-gray-900">Nilai Akhir:</span>
@@ -162,7 +162,7 @@
                                 <span>{{ $finalReport->title ?? 'Naskah Laporan Akhir MBKM' }}</span>
                             </div>
                             @if($finalReport->repository_url)
-                                <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold block">
+                                <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold block">
                                     🔗 Repositori Proyek / Luaran Kerja: {{ $finalReport->repository_url }}
                                 </a>
                             @endif
@@ -172,7 +172,7 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <a href="{{ asset('storage/' . ($finalReport->file_path ?? $finalReport->final_report_path)) }}" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5">
+                            <a href="{{ asset('storage/' . ($finalReport->file_path ?? $finalReport->final_report_path)) }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                                 <span>📥</span>
                                 <span>Buka / Unduh PDF</span>
                             </a>
@@ -186,14 +186,14 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Keputusan DPL & Catatan Bimbingan Laporan
                             </label>
-                            <textarea name="feedback" rows="3" placeholder="Tuliskan catatan perbaikan atau feedback untuk mahasiswa..." class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">{{ old('feedback', $finalReport->feedback) }}</textarea>
+                            <textarea name="feedback" rows="3" placeholder="Tuliskan catatan perbaikan atau feedback untuk mahasiswa..." class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('feedback', $finalReport->feedback) }}</textarea>
                         </div>
 
                         <div class="flex items-center justify-end gap-3">
-                            <button type="submit" name="status" value="revision" class="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition active:scale-95">
+                            <button type="submit" name="status" value="revision" class="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition active:scale-95 cursor-pointer">
                                 ⚠️ Minta Revisi Laporan
                             </button>
-                            <button type="submit" name="status" value="approved" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                            <button type="submit" name="status" value="approved" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                                 ✅ Setujui Laporan Akhir (ACC)
                             </button>
                         </div>
@@ -204,7 +204,7 @@
             <!-- 3. SECTION FORM PENILAIAN AKADEMIK DPL (BOBOT 60%) -->
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs space-y-6">
                 <div class="flex items-center gap-3 pb-4 border-b border-gray-100">
-                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
                         📝
                     </div>
                     <div>
@@ -228,8 +228,8 @@
                                 <p class="text-[11px] text-gray-400 mt-0.5">Pemahaman teori & implementasi di dinas</p>
                             </div>
                             <div class="flex items-center gap-3">
-                                <input type="range" min="0" max="100" x-model="scoreMastery" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                <input type="number" name="score_mastery" min="0" max="100" x-model="scoreMastery" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                <input type="range" min="0" max="100" x-model="scoreMastery" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <input type="number" name="score_mastery" min="0" max="100" x-model="scoreMastery" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             </div>
                         </div>
 
@@ -242,8 +242,8 @@
                                 <p class="text-[11px] text-gray-400 mt-0.5">Struktur penulisan ilmiah & analisis hasil</p>
                             </div>
                             <div class="flex items-center gap-3">
-                                <input type="range" min="0" max="100" x-model="scoreReport" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                <input type="number" name="score_report" min="0" max="100" x-model="scoreReport" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                <input type="range" min="0" max="100" x-model="scoreReport" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <input type="number" name="score_report" min="0" max="100" x-model="scoreReport" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             </div>
                         </div>
 
@@ -256,17 +256,17 @@
                                 <p class="text-[11px] text-gray-400 mt-0.5">Etika, konsultasi & responsivitas</p>
                             </div>
                             <div class="flex items-center gap-3">
-                                <input type="range" min="0" max="100" x-model="scoreAttitude" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                <input type="number" name="score_attitude" min="0" max="100" x-model="scoreAttitude" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                <input type="range" min="0" max="100" x-model="scoreAttitude" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <input type="number" name="score_attitude" min="0" max="100" x-model="scoreAttitude" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Live Calculation Card -->
-                    <div class="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
                         <div class="space-y-1 text-center md:text-left">
-                            <span class="px-3 py-1 bg-white/10 rounded-full text-[11px] font-bold uppercase tracking-wider text-indigo-200 border border-white/10">
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-[11px] font-bold uppercase tracking-wider text-blue-200 border border-white/10">
                                 📊 Kalkulasi Nilai Akhir Otomatis
                             </span>
                             <h4 class="text-lg font-black mt-2">
@@ -283,7 +283,7 @@
                         <div class="text-center md:text-right bg-white/10 p-4 rounded-2xl border border-white/10 min-w-[200px]">
                             <span class="text-[11px] uppercase tracking-wider text-slate-300 font-bold block">Nilai Akhir & Mutu</span>
                             <div class="text-2xl font-black text-emerald-400 mt-1" x-text="calculatedFinal"></div>
-                            <div class="text-xs font-bold text-indigo-200 mt-0.5" x-text="letterGrade"></div>
+                            <div class="text-xs font-bold text-blue-200 mt-0.5" x-text="letterGrade"></div>
                         </div>
                     </div>
 
@@ -292,14 +292,14 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Catatan / Rekomendasi DPL untuk Mahasiswa
                         </label>
-                        <textarea name="feedback_dosen" rows="3" placeholder="Tuliskan evaluasi komprehensif atau saran pengembangan karir bagi mahasiswa..." class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">{{ old('feedback_dosen', $evaluation->feedback_dosen ?? $evaluation->catatan_dosen) }}</textarea>
+                        <textarea name="feedback_dosen" rows="3" placeholder="Tuliskan evaluasi komprehensif atau saran pengembangan karir bagi mahasiswa..." class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('feedback_dosen', $evaluation->feedback_dosen ?? $evaluation->catatan_dosen) }}</textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
                         <a href="{{ route('lecturer.dashboard') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Kembali
                         </a>
-                        <button type="submit" class="px-7 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Penilaian Akademik DPL
                         </button>
                     </div>
@@ -311,7 +311,7 @@
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs space-y-6">
                 <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
                             📖
                         </div>
                         <div>
@@ -319,7 +319,7 @@
                             <p class="text-xs text-gray-400">Pantau catatan logbook harian/mingguan dan status verifikasi mentor dinas</p>
                         </div>
                     </div>
-                    <span class="text-xs text-indigo-600 font-bold">{{ $logbooks->count() }} Entri Logbook</span>
+                    <span class="text-xs text-blue-600 font-bold">{{ $logbooks->count() }} Entri Logbook</span>
                 </div>
 
                 <div class="space-y-4">

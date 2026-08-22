@@ -3,7 +3,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                     {{ __('Rekapitulasi & Feed Logbook Bimbingan') }}
@@ -17,7 +17,7 @@
                 <a href="{{ route('lecturer.monitoring.index') }}" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow-xs">
                     👥 Mahasiswa Bimbingan
                 </a>
-                <a href="{{ route('lecturer.dashboard') }}" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs">
+                <a href="{{ route('lecturer.dashboard') }}" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                     &larr; Dashboard Dosen
                 </a>
             </div>
@@ -73,7 +73,7 @@
                     <!-- Filter Mahasiswa -->
                     <div>
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Mahasiswa Bimbingan:</label>
-                        <select name="placement_id" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="placement_id" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Mahasiswa --</option>
                             @foreach ($supervisedPlacements as $pl)
                                 <option value="{{ $pl->id }}" {{ request('placement_id') == $pl->id ? 'selected' : '' }}>
@@ -86,7 +86,7 @@
                     <!-- Filter Status Verifikasi Dosen -->
                     <div>
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Verifikasi Dosen:</label>
-                        <select name="lecturer_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="lecturer_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Dosen --</option>
                             <option value="pending" {{ request('lecturer_status') === 'pending' ? 'selected' : '' }}>⏳ Menunggu (Pending)</option>
                             <option value="approved" {{ request('lecturer_status') === 'approved' ? 'selected' : '' }}>✅ Disetujui (Approved)</option>
@@ -97,7 +97,7 @@
                     <!-- Filter Status Mentor Dinas -->
                     <div>
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Mentor Dinas:</label>
-                        <select name="mentor_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="mentor_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Mentor --</option>
                             <option value="pending" {{ request('mentor_status') === 'pending' ? 'selected' : '' }}>⏳ Pending Mentor</option>
                             <option value="approved" {{ request('mentor_status') === 'approved' ? 'selected' : '' }}>✅ Approved Mentor</option>
@@ -109,8 +109,8 @@
                     <div>
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cari Keyword:</label>
                         <div class="flex items-center gap-1.5">
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, kegiatan..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-xs">
-                            <button type="submit" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, kegiatan..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
+                            <button type="submit" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 cursor-pointer">
                                 Cari
                             </button>
                         </div>
@@ -158,7 +158,7 @@
                                     <td class="py-4 px-4 align-top">
                                         <div class="font-bold text-gray-900 leading-snug">{{ $mhs->name ?? '-' }}</div>
                                         <div class="text-xs text-gray-500 mt-0.5 font-mono">NIM: {{ $mProfile->nim ?? '-' }}</div>
-                                        <div class="text-[11px] text-indigo-600 mt-0.5">{{ $mProfile->jurusan ?? '-' }}</div>
+                                        <div class="text-[11px] text-blue-600 mt-0.5">{{ $mProfile->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <!-- Instansi & Unit -->
@@ -173,7 +173,7 @@
                                             {{ $log->activity }}
                                         </p>
                                         @if ($log->attachment)
-                                            <div class="mt-1.5 flex items-center gap-1 text-[11px] text-indigo-600 font-semibold">
+                                            <div class="mt-1.5 flex items-center gap-1 text-[11px] text-blue-600 font-semibold">
                                                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                 </svg>
@@ -224,14 +224,13 @@
 
                                     <!-- Tombol Aksi Review Cepat -->
                                     <td class="py-4 px-4 align-top text-right">
-                                        <a href="{{ route('lecturer.logbooks.show', $log->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow-xs">
+                                        <a href="{{ route('lecturer.logbooks.show', $log->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer">
                                             <span>Review / ACC</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </a>
                                     </td>
-
                                 </tr>
                             @empty
                                 <tr>

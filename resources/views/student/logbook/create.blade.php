@@ -33,30 +33,30 @@
                     {{-- Tanggal --}}
                     <div>
                         <label for="date" class="block font-semibold text-sm text-gray-700 mb-1">Tanggal Kegiatan</label>
-                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm" required>
+                        <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm text-sm" required>
                     </div>
 
                     {{-- Deskripsi Kegiatan --}}
                     <div>
                         <label for="activity" class="block font-semibold text-sm text-gray-700 mb-1">Deskripsi Kegiatan</label>
-                        <textarea id="activity" name="activity" rows="5" class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm" placeholder="Tuliskan secara detail kegiatan magang Anda hari ini..." required></textarea>
+                        <textarea id="activity" name="activity" rows="5" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm text-sm" placeholder="Tuliskan secara detail kegiatan magang Anda hari ini..." required></textarea>
                         <p class="text-xs text-gray-400 mt-1">Minimal 10 karakter</p>
                     </div>
 
                     {{-- Lampiran --}}
                     <div>
                         <label for="attachment" class="block font-semibold text-sm text-gray-700 mb-1">Lampiran (Opsional)</label>
-                        <input id="attachment" name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
+                        <input id="attachment" name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
                         <p class="text-xs text-gray-400 mt-1">Format: PDF, JPG, PNG. Maksimal 2MB.</p>
                     </div>
 
                     {{-- Tombol Submit --}}
                     <div class="flex items-center space-x-3 pt-4 border-t border-gray-100">
-                        <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition">
+                        <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer shadow-md">
                             SIMPAN LOGBOOK
                         </button>
 
-                        <a href="{{ route('student.logbook.index') }}" class="px-5 py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-xs font-bold text-gray-700 uppercase tracking-wider hover:bg-gray-200 transition">
+                        <a href="{{ route('student.logbook.index') }}" class="px-5 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-bold text-gray-700 uppercase tracking-wider hover:bg-gray-200 transition">
                             BATAL
                         </a>
                     </div>

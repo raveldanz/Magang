@@ -80,7 +80,7 @@
                             @endphp
 
                             <select id="unit_id" name="unit_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm text-sm"
                                 {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
                                 
                                 @if ($totalAvailable === 0)
@@ -136,28 +136,28 @@
                             <div>
                                 <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus *" class="text-xs font-bold" />
                                 <input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
+                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="cv" value="2. Curriculum Vitae (CV) *" class="text-xs font-bold" />
                                 <input id="cv" name="cv" type="file" accept=".pdf"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
+                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('cv')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir *" class="text-xs font-bold" />
                                 <input id="transkrip" name="transkrip" type="file" accept=".pdf"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
+                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM) / KTP (Opsional)" class="text-xs font-bold" />
                                 <input id="id_card" name="id_card" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
                                 <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
                             </div>
                         </div>
@@ -222,7 +222,7 @@
                                     <td class="p-3">
                                         @if ($app->status === 'accepted')
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
-                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 shadow-sm transition">
+                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
                                                 <span>📄 Download Surat PDF</span>
                                             </a>
                                         @else

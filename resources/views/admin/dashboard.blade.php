@@ -3,7 +3,7 @@
 
         {{-- 1. HERO BANNER DINAMIS & SEIMBANG SESUAI ROLE (SUPER ADMIN VS ADMIN DINAS) --}}
         <div class="rounded-3xl p-6 sm:p-8 lg:p-10 text-white shadow-xl relative overflow-hidden" 
-             style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #312e81 100%) !important; color: #ffffff !important;">
+             style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0369a1 100%) !important; color: #ffffff !important;">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
                 
                 {{-- Kolom Kiri: Judul & Deskripsi Tata Kelola (7 Kolom) --}}
@@ -190,10 +190,10 @@
             {{-- Lulus --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between" style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">Lulus</span>
-                    <span class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">🏆</span>
+                    <span class="text-[11px] font-bold text-sky-600 uppercase tracking-wider">Lulus</span>
+                    <span class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-sm">🏆</span>
                 </div>
-                <div class="text-2xl font-black text-indigo-600">{{ $stats['total_completed'] ?? 0 }}</div>
+                <div class="text-2xl font-black text-sky-600">{{ $stats['total_completed'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">Tersertifikasi</div>
             </div>
 

@@ -45,11 +45,9 @@
                         @error('catatan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
-                    <div class="pt-4 flex justify-end border-t">
-                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700">
+                        <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition shadow-md cursor-pointer">
                             Simpan Penilaian
                         </button>
-                    </div>
                 </form>
             </div>
 

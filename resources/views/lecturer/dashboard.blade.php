@@ -12,7 +12,7 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <span class="px-3.5 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs font-bold shadow-2xs">
+                <span class="px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-xs font-bold shadow-2xs">
                     🏛️ {{ $lecturer->university->name ?? $lecturer->university ?? 'Perguruan Tinggi Mitra' }}
                 </span>
             </div>
@@ -39,7 +39,7 @@
                 <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Bimbingan</span>
-                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">
                             👨‍🎓
                         </div>
                     </div>
@@ -108,7 +108,7 @@
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <select name="agency_id" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium w-full sm:w-auto">
+                        <select name="agency_id" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
                             <option value="">Semua Instansi Dinas</option>
                             @foreach($agencies as $ag)
                                 <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
@@ -117,7 +117,7 @@
                             @endforeach
                         </select>
 
-                        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0">
+                        <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0 cursor-pointer">
                             Cari
                         </button>
 
@@ -172,7 +172,7 @@
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-gray-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 font-mono">NIM: {{ $profile->nim ?? '-' }}</div>
-                                        <div class="text-[10px] text-indigo-600 font-semibold">{{ $profile->jurusan ?? 'Informatika' }}</div>
+                                        <div class="text-[10px] text-blue-600 font-semibold">{{ $profile->jurusan ?? 'Informatika' }}</div>
                                     </td>
 
                                     <!-- Placement Location -->
@@ -195,7 +195,7 @@
 
                                     <!-- Logbook Counter -->
                                     <td class="py-4 px-4 text-center">
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                             📝 {{ $logbooksCount }} Entri
                                         </span>
                                     </td>
@@ -240,7 +240,7 @@
                                     <!-- Action Buttons -->
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-2">
-                                            <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition">
+                                            <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
                                                 <span>Detail & Nilai</span>
                                                 <span>→</span>
                                             </a>

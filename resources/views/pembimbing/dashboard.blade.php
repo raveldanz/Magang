@@ -8,9 +8,9 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            <div class="bg-indigo-600 rounded-lg p-6 text-white shadow">
+            <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-md">
                 <h3 class="text-2xl font-bold">Selamat Datang, {{ Auth::user()->name }}!</h3>
-                <p class="text-indigo-100 mt-1">Panel Pembimbingan & Monitoring Logbook Mahasiswa Magang</p>
+                <p class="text-blue-100 mt-1">Panel Pembimbingan & Monitoring Logbook Mahasiswa Magang</p>
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
@@ -39,7 +39,7 @@
                                         </span>
                                     </td>
                                     <td class="p-3">
-                                        <a href="{{ route('pembimbing.student.detail', $place->id) }}" class="px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-xs font-semibold">
+                                        <a href="{{ route('pembimbing.student.detail', $place->id) }}" class="px-3 py-1.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-xs font-semibold shadow-xs transition cursor-pointer">
                                             Periksa Logbook →
                                         </a>
                                     </td>

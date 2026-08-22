@@ -72,7 +72,7 @@
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Mahasiswa Bimbingan</span>
                     <h3 class="font-black text-gray-900 text-base mt-1">{{ $student->name }}</h3>
                     <p class="text-xs text-gray-500 mt-0.5">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->jurusan ?? 'Informatika' }}</p>
-                    <span class="inline-block mt-2 px-2.5 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-xl border border-purple-200">
+                    <span class="inline-block mt-2 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl border border-blue-200">
                         🎓 {{ $profile->universitas ?? '-' }}
                     </span>
                 </div>
@@ -125,11 +125,11 @@
                                 <label class="block text-xs font-bold text-gray-800 uppercase tracking-wider">
                                     1. Penguasaan Materi & Teknis Magang <span class="text-rose-500">*</span>
                                 </label>
-                                <span class="text-xs font-mono font-bold text-indigo-700" x-text="scoreMastery + '/100'"></span>
+                                <span class="text-xs font-mono font-bold text-blue-700" x-text="scoreMastery + '/100'"></span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <input type="range" min="0" max="100" x-model="scoreMastery" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                <input type="number" name="score_mastery" min="0" max="100" x-model="scoreMastery" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                <input type="range" min="0" max="100" x-model="scoreMastery" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <input type="number" name="score_mastery" min="0" max="100" x-model="scoreMastery" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             </div>
                         </div>
 
@@ -139,11 +139,11 @@
                                 <label class="block text-xs font-bold text-gray-800 uppercase tracking-wider">
                                     2. Kualitas & Sistematika Penulisan Laporan Akhir <span class="text-rose-500">*</span>
                                 </label>
-                                <span class="text-xs font-mono font-bold text-indigo-700" x-text="scoreReport + '/100'"></span>
+                                <span class="text-xs font-mono font-bold text-blue-700" x-text="scoreReport + '/100'"></span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <input type="range" min="0" max="100" x-model="scoreReport" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                <input type="number" name="score_report" min="0" max="100" x-model="scoreReport" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                <input type="range" min="0" max="100" x-model="scoreReport" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <input type="number" name="score_report" min="0" max="100" x-model="scoreReport" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             </div>
                         </div>
 
@@ -153,20 +153,20 @@
                                 <label class="block text-xs font-bold text-gray-800 uppercase tracking-wider">
                                     3. Sikap, Komunikasi & Keaktifan Bimbingan <span class="text-rose-500">*</span>
                                 </label>
-                                <span class="text-xs font-mono font-bold text-indigo-700" x-text="scoreAttitude + '/100'"></span>
+                                <span class="text-xs font-mono font-bold text-blue-700" x-text="scoreAttitude + '/100'"></span>
                             </div>
                             <div class="flex items-center gap-3">
-                                <input type="range" min="0" max="100" x-model="scoreAttitude" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                                <input type="number" name="score_attitude" min="0" max="100" x-model="scoreAttitude" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                <input type="range" min="0" max="100" x-model="scoreAttitude" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                <input type="number" name="score_attitude" min="0" max="100" x-model="scoreAttitude" required class="w-20 text-center font-black text-base border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Live Grade Preview Card -->
-                    <div class="p-5 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="p-5 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-2xl text-white flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div>
-                            <span class="text-xs text-indigo-200 font-semibold uppercase tracking-wider block">Kalkulasi Nilai DPL (60%)</span>
+                            <span class="text-xs text-blue-200 font-semibold uppercase tracking-wider block">Kalkulasi Nilai DPL (60%)</span>
                             <div class="text-2xl font-black text-emerald-400 mt-0.5" x-text="calculatedDosen + '/100'"></div>
                             <div class="text-xs text-slate-300 mt-1">
                                 Predikat Akhir: <strong class="text-white" x-text="letterGrade"></strong>
@@ -187,7 +187,7 @@
                             name="feedback_dosen" 
                             rows="4" 
                             placeholder="Tuliskan evaluasi komprehensif, masukan penyempurnaan karya ilmiah, atau rekomendasi karir untuk mahasiswa..."
-                            class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl shadow-2xs focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full text-xs sm:text-sm border-gray-200 rounded-2xl shadow-2xs focus:ring-blue-500 focus:border-blue-500"
                         >{{ old('feedback_dosen', $evaluation->feedback_dosen ?? $evaluation->catatan_dosen ?? '') }}</textarea>
                     </div>
 
@@ -196,7 +196,7 @@
                         <a href="{{ route('lecturer.dashboard') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
-                        <button type="submit" class="px-7 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Nilai Akademik DPL (60%)
                         </button>
                     </div>

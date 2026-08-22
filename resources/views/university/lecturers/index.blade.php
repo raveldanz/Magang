@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     {{ __('Daftar Dosen Pembimbing Lapangan (DPL)') }}
@@ -14,12 +14,12 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold px-3 py-2 rounded-xl hidden sm:inline-block">
+                <span class="bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-3 py-2 rounded-xl hidden sm:inline-block">
                     🎓 {{ $univName ?? 'Kampus Mitra' }}
                 </span>
                 <button type="button" 
                         @click="showCreateModal = true"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
@@ -75,7 +75,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Dosen Terdaftar</p>
-                    <h3 class="text-2xl font-black text-indigo-600 mt-1">{{ $stats['total_lecturers'] }}</h3>
+                    <h3 class="text-2xl font-black text-blue-600 mt-1">{{ $stats['total_lecturers'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Dosen pembimbing di kampus Anda</p>
                 </div>
 
@@ -87,7 +87,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mahasiswa Telah Lulus</p>
-                    <h3 class="text-2xl font-black text-purple-600 mt-1">{{ $stats['total_completed_students'] }}</h3>
+                    <h3 class="text-2xl font-black text-sky-600 mt-1">{{ $stats['total_completed_students'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Bimbingan selesai & bernilai akhir</p>
                 </div>
             </div>
@@ -105,7 +105,7 @@
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer">
                         Cari
                     </button>
                 </form>
@@ -148,7 +148,7 @@
                                     <!-- Nama Lengkap & Gelar -->
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-gray-900 leading-snug flex items-center gap-2">
-                                            <span class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-100">
+                                            <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 border border-blue-100">
                                                 👨‍🏫
                                             </span>
                                             <div>
@@ -169,7 +169,7 @@
                                             <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-lg" title="Mahasiswa Aktif Bimbingan">
                                                 🟢 {{ $lecturer->active_students_count }} Aktif
                                             </span>
-                                            <span class="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold rounded-lg" title="Mahasiswa Telah Lulus">
+                                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold rounded-lg" title="Mahasiswa Telah Lulus">
                                                 🎓 {{ $lecturer->completed_students_count }} Lulus
                                             </span>
                                         </div>
@@ -197,7 +197,7 @@
 
                                     <!-- Aksi: Edit, Reset Password & Hapus -->
                                     <td class="py-4 px-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div class="btn-action-group">
                                             
                                             <!-- Tombol Edit -->
                                             <button type="button" 
@@ -208,37 +208,28 @@
                                                         status: '{{ $lecturer->status ?? 'active' }}'
                                                     }; showEditModal = true"
                                                     title="Edit Data Dosen"
-                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                                <span>Edit</span>
+                                                    class="btn-action-edit">
+                                                Edit
                                             </button>
 
                                             <!-- Tombol Reset Password -->
-                                            <form action="{{ route('university.lecturers.reset_password', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset password untuk {{ $lecturer->name }} ke default (password)?');">
+                                            <form action="{{ route('university.lecturers.reset_password', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset password untuk {{ $lecturer->name }} ke default (password)?');" class="btn-action-form">
                                                 @csrf
                                                 <button type="submit" 
                                                         title="Reset password dosen ke default: 'password'"
-                                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition shadow-2xs active:scale-95 cursor-pointer">
-                                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                                    </svg>
-                                                    <span>Reset</span>
+                                                        class="btn-action-reset">
+                                                    Reset
                                                 </button>
                                             </form>
 
                                             <!-- Tombol Hapus Dosen -->
-                                            <form action="{{ route('university.lecturers.destroy', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dosen {{ $lecturer->name }} dari daftar kampus?');">
+                                            <form action="{{ route('university.lecturers.destroy', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dosen {{ $lecturer->name }} dari daftar kampus?');" class="btn-action-form">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
                                                         title="Hapus Data Dosen"
-                                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition shadow-2xs active:scale-95 cursor-pointer">
-                                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    <span>Hapus</span>
+                                                        class="btn-action-delete">
+                                                    Hapus
                                                 </button>
                                             </form>
                                         </div>
@@ -284,7 +275,7 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
                             👨‍🏫
                         </div>
                         <div>
@@ -302,29 +293,29 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             NIDN / NIP (Opsional)
                         </label>
-                        <input type="text" name="nidn" value="{{ old('nidn') }}" placeholder="Contoh: 0712058401" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <input type="text" name="nidn" value="{{ old('nidn') }}" placeholder="Contoh: 0712058401" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Resmi Kampus / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="Contoh: ahmad.sudrajat@kampus.ac.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
-                        <p class="text-[11px] text-gray-400 mt-1">Password bawaan akun: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-indigo-600 font-bold">password</code></p>
+                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="Contoh: ahmad.sudrajat@kampus.ac.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        <p class="text-[11px] text-gray-400 mt-1">Password bawaan akun: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-bold">password</code></p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
                         <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan & Daftarkan Dosen
                         </button>
                     </div>
@@ -356,7 +347,7 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
                             ✏️
                         </div>
                         <div>
@@ -375,21 +366,21 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" x-model="editLecturer.name" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <input type="text" name="name" x-model="editLecturer.name" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Resmi Kampus / Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" x-model="editLecturer.email" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <input type="email" name="email" x-model="editLecturer.email" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Status Keaktifan Pembimbing <span class="text-rose-500">*</span>
                         </label>
-                        <select name="status" x-model="editLecturer.status" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium">
+                        <select name="status" x-model="editLecturer.status" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                             <option value="active">🟢 Aktif (Tersedia untuk Membimbing)</option>
                             <option value="on_leave">🟡 Cuti (Sedang Cuti / Tidak Menerima Mahasiswa)</option>
                             <option value="inactive">🔴 Non-Aktif (Tidak Menjadi Pembimbing)</option>
@@ -401,7 +392,7 @@
                         <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>

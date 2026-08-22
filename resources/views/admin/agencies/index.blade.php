@@ -12,7 +12,7 @@
             </div>
 
             @if($isSuperAdmin)
-                <a href="{{ route('admin.agencies.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                <a href="{{ route('admin.agencies.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                     <span>Tambah Instansi Baru</span>
                 </a>
@@ -72,7 +72,7 @@
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
                             <div class="flex items-start justify-between gap-4">
-                                <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl shrink-0">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-xl shrink-0">
                                     🏢
                                 </div>
                                 <span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-[11px] font-bold">
@@ -82,7 +82,7 @@
 
                             <div class="mt-4">
                                 <h3 class="font-black text-base text-gray-900">{{ $agency->agency_name }}</h3>
-                                <p class="text-xs text-indigo-600 font-semibold">{{ $agency->government_name }}</p>
+                                <p class="text-xs text-blue-600 font-semibold">{{ $agency->government_name }}</p>
                                 <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ $agency->address }}</p>
                             </div>
 
@@ -96,9 +96,9 @@
                                     <div class="text-xs font-black text-teal-700">{{ $agency->total_quota }}</div>
                                     <div class="text-[10px] text-teal-600 font-semibold uppercase">Sisa Kuota</div>
                                 </div>
-                                <div class="p-2 rounded-xl bg-indigo-50 border border-indigo-100">
-                                    <div class="text-xs font-black text-indigo-700">{{ $agency->total_mentors }}</div>
-                                    <div class="text-[10px] text-indigo-600 font-semibold uppercase">Mentor</div>
+                                <div class="p-2 rounded-xl bg-blue-50 border border-blue-100">
+                                    <div class="text-xs font-black text-blue-700">{{ $agency->total_mentors }}</div>
+                                    <div class="text-[10px] text-blue-600 font-semibold uppercase">Mentor</div>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +106,7 @@
                         <!-- Action Buttons -->
                         <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                             <div class="flex items-center gap-2">
-                                <a href="{{ route('admin.units.index', ['agency_id' => $agency->id]) }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold">
+                                <a href="{{ route('admin.units.index', ['agency_id' => $agency->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold">
                                     Lihat Unit →
                                 </a>
                             </div>

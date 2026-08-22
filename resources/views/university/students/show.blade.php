@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     {{ __('Detail Monitoring Mahasiswa Magang') }}
@@ -55,7 +55,7 @@
                 <!-- Card Mahasiswa -->
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
                     <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
-                        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg border border-indigo-100 shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg border border-blue-100 shrink-0">
                             {{ substr($student->name, 0, 1) }}
                         </div>
                         <div>
@@ -97,7 +97,7 @@
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between items-start">
                             <span class="text-gray-400">Dinas:</span>
-                            <span class="font-bold text-indigo-900 text-right max-w-[180px]">{{ $agencyProfile?->agency_name ?? '-' }}</span>
+                            <span class="font-bold text-blue-900 text-right max-w-[180px]">{{ $agencyProfile?->agency_name ?? '-' }}</span>
                         </div>
                         <div class="flex justify-between items-start">
                             <span class="text-gray-400">Unit Kerja:</span>
@@ -136,7 +136,7 @@
                         <!-- Tombol Plotting DPL -->
                         <button type="button" 
                                 @click="showAssignModal = true" 
-                                class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg transition shadow-2xs cursor-pointer">
+                                class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold rounded-lg transition shadow-2xs cursor-pointer">
                             {{ $dosen ? 'Ganti DPL' : 'Tugaskan DPL' }}
                         </button>
                     </div>
@@ -215,18 +215,18 @@
 
                     <div class="p-4 rounded-xl bg-slate-50 border border-gray-100 text-center">
                         <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Dosen DPL (60%)</p>
-                        <p class="text-2xl font-black text-indigo-600 mt-1">
+                        <p class="text-2xl font-black text-blue-600 mt-1">
                             {{ $dosenVal ? number_format($dosenVal, 2) : '-' }}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-0.5">Logbook & Laporan Akhir</p>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-indigo-50/70 border border-indigo-100 text-center">
-                        <p class="text-xs text-indigo-900 font-bold uppercase tracking-wider">Nilai Akhir Terbobot</p>
-                        <p class="text-2xl font-black text-indigo-700 mt-1">
+                    <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-100 text-center">
+                        <p class="text-xs text-blue-900 font-bold uppercase tracking-wider">Nilai Akhir Terbobot</p>
+                        <p class="text-2xl font-black text-blue-700 mt-1">
                             {{ $finalVal !== null ? number_format($finalVal, 2) : '-' }}
                         </p>
-                        <p class="text-[10px] text-indigo-600 mt-0.5">Akumulasi Gabungan</p>
+                        <p class="text-[10px] text-blue-600 mt-0.5">Akumulasi Gabungan</p>
                     </div>
 
                     <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-100 text-center">
@@ -262,7 +262,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                        <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
                             Unduh Laporan (PDF)
                         </a>
                     </div>
@@ -313,7 +313,7 @@
                                         @endif
 
                                         @if ($log->lecturer_feedback)
-                                            <div class="mt-1 text-xs bg-indigo-50 border border-indigo-200 rounded-lg p-2 text-indigo-900">
+                                            <div class="mt-1 text-xs bg-blue-50 border border-blue-200 rounded-lg p-2 text-blue-900">
                                                 <span class="font-bold">Feedback Dosen:</span> {{ $log->lecturer_feedback }}
                                             </div>
                                         @endif
@@ -373,7 +373,7 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
                             👨‍🏫
                         </div>
                         <div>
@@ -391,7 +391,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Pilih Dosen Pembimbing (DPL) <span class="text-rose-500">*</span>
                         </label>
-                        <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}" {{ $dosen?->id == $d->id ? 'selected' : '' }}>
@@ -406,7 +406,7 @@
                         <button type="button" @click="showAssignModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Penugasan DPL
                         </button>
                     </div>

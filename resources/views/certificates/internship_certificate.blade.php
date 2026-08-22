@@ -397,7 +397,7 @@
                         <!-- ASPEK II: AKADEMIK DPL (60%) -->
                         <tr class="bg-slate-100/90 font-bold text-slate-900">
                             <td class="py-1.5 px-3 text-center font-bold">B</td>
-                            <td colspan="4" class="py-1.5 px-3 uppercase text-[10px] text-indigo-900">
+                            <td colspan="4" class="py-1.5 px-3 uppercase text-[10px] text-blue-900">
                                 Penilaian Akademik Dosen Pembimbing Lapangan (DPL Kampus)
                             </td>
                         </tr>
@@ -422,11 +422,11 @@
                             <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
-                        <tr class="bg-indigo-50/70 font-bold">
-                            <td colspan="2" class="py-2 px-3 text-right text-indigo-950">Subtotal Nilai DPL (Rata-rata):</td>
-                            <td class="py-2 px-3 text-center text-indigo-900">60%</td>
-                            <td class="py-2 px-3 text-center text-indigo-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
-                            <td class="py-2 px-3 text-center text-indigo-950 font-black">
+                        <tr class="bg-blue-50/70 font-bold">
+                            <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL (Rata-rata):</td>
+                            <td class="py-2 px-3 text-center text-blue-900">60%</td>
+                            <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
+                            <td class="py-2 px-3 text-center text-blue-950 font-black">
                                 {{ round(0.60 * ($eval->nilai_dosen_calculated ?? 90), 2) }}
                             </td>
                         </tr>
