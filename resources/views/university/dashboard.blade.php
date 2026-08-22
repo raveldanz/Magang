@@ -128,19 +128,20 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     @foreach ($agencyDistribution as $dist)
-                        <div class="p-4 rounded-xl border border-gray-100 bg-slate-50 hover:bg-white hover:shadow-sm transition">
-                            <div class="flex justify-between items-start mb-2">
-                                <h5 class="font-bold text-sm text-gray-800 line-clamp-1">{{ $dist['name'] }}</h5>
-                                <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-extrabold rounded-md">
-                                    {{ $dist['count'] }} Mahasiswa
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-full">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <h4 class="text-xs font-semibold text-slate-800 leading-snug line-clamp-2" title="{{ $dist['name'] }}">
+                                    {{ $dist['name'] }}
+                                </h4>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 whitespace-nowrap">
+                                    {{ $dist['count'] ?? 0 }} Mahasiswa
                                 </span>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-3 overflow-hidden">
-                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: {{ $dist['percentage'] }}%"></div>
-                            </div>
-                            <div class="flex justify-between items-center text-[11px] text-gray-500 mt-1.5">
-                                <span>Porsi Penempatan</span>
-                                <span class="font-bold text-gray-700">{{ $dist['percentage'] }}%</span>
+                            <div class="mt-2">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="bg-indigo-600 h-1.5 rounded-full" style="width: {{ $dist['percentage'] ?? 0 }}%"></div>
+                                </div>
+                                <span class="text-[10px] text-slate-400 mt-1 block">Porsi Penempatan: {{ $dist['percentage'] ?? 0 }}%</span>
                             </div>
                         </div>
                     @endforeach
@@ -202,7 +203,7 @@
                                 <th class="px-6 py-3.5">Mahasiswa</th>
                                 <th class="px-6 py-3.5">Jurusan / NIM</th>
                                 <th class="px-6 py-3.5">Instansi & Unit Kerja</th>
-                                <th class="px-6 py-3.5">Status Pengajuan</th>
+                                <th class="px-6 py-3.5">Status Magang</th>
                                 <th class="px-6 py-3.5">Dosen DPL</th>
                                 <th class="px-6 py-3.5">Mentor Dinas</th>
                                 <th class="px-6 py-3.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[160px]">Aksi</th>
@@ -215,6 +216,20 @@
                                     $placement = $app->placement;
                                     $dosen = $placement?->academicAdvisor;
                                     $mentor = $placement?->mentor ?? $placement?->pembimbing;
+
+                                    $status = strtoupper($app->lifecycle_status ?? $app->status);
+                                    $today = \Carbon\Carbon::now();
+                                    $start = $app->start_date ? \Carbon\Carbon::parse($app->start_date) : null;
+                                    $end = $app->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
+
+                                    if (in_array($status, ['ACCEPTED', 'VERIFIED']) && $start && $today->gte($start)) {
+                                        $status = 'ACTIVE';
+                                    }
+                                    if (($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED') || ($placement && optional($placement->finalreport)->status === 'approved')) {
+                                        if (($app->evaluation && $app->evaluation->nilai_akademik > 0) || ($placement && optional($placement->evaluation)->nilai_akademik > 0)) {
+                                            $status = 'COMPLETED';
+                                        }
+                                    }
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="px-6 py-4">
@@ -230,13 +245,19 @@
                                         <div class="text-xs text-gray-600">{{ $app->unit->name ?? '-' }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                            {{ $app->status === 'accepted' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                            {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800' : '' }}
-                                            {{ $app->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                            {{ $app->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                            {{ strtoupper($app->status) }}
-                                        </span>
+                                        @if($status === 'SUBMITTED' || $status === 'PENDING')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Menunggu Verifikasi</span>
+                                        @elseif($status === 'ACCEPTED' || $status === 'VERIFIED')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">Diterima (Persiapan)</span>
+                                        @elseif($status === 'ACTIVE')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Sedang Magang</span>
+                                        @elseif($status === 'COMPLETED')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">Lulus / Selesai</span>
+                                        @elseif($status === 'REJECTED')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Ditolak</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">{{ $status }}</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         @if ($dosen)
@@ -269,19 +290,11 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <div class="inline-flex items-center justify-end gap-2">
-                                            @if (in_array(strtoupper($app->lifecycle_status ?? $app->status), ['ACCEPTED', 'ACTIVE', 'COMPLETED']))
-                                                <a href="{{ route('university.students.letter', $app->id) }}" target="_blank"
-                                                   class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                                    <span>Surat Tugas</span>
-                                                </a>
-                                            @endif
-                                            <a href="{{ route('university.students.show', $placement?->id ?? $app->id) }}"
-                                               class="inline-flex items-center px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition shadow-2xs">
-                                                <span>Detail</span>
-                                            </a>
-                                        </div>
+                                        <a href="{{ route('university.students.show', $app->id) }}"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition">
+                                            <span>Detail & Monitoring</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
                                     </td>
                                 </tr>
                             @empty
