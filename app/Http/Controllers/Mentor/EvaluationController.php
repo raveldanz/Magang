@@ -70,7 +70,7 @@ class EvaluationController extends Controller
             'nilai_laporan.max' => 'Nilai maksimal adalah 100.',
         ]);
 
-        Evaluation::updateOrCreate(
+        $evaluation = Evaluation::updateOrCreate(
             ['placement_id' => $placement->id],
             [
                 'nilai_disiplin' => $request->nilai_disiplin,
@@ -79,6 +79,14 @@ class EvaluationController extends Controller
                 'catatan'        => $request->catatan,
             ]
         );
+
+        \App\Models\AuditLog::record('MENTOR_EVALUATION_SUBMIT', 'Placement', $placement->id, [
+            'student_name' => $placement->application?->user?->name,
+            'nilai_pembimbing' => $evaluation->nilai_pembimbing,
+            'nilai_disiplin' => $request->nilai_disiplin,
+            'nilai_kinerja' => $request->nilai_kinerja,
+            'nilai_laporan' => $request->nilai_laporan,
+        ]);
 
         return redirect()->route('mentor.students.show', $placement->id)
             ->with('success', 'Penilaian evaluasi akhir berhasil disimpan! Mahasiswa kini siap diterbitkan sertifikatnya.');
