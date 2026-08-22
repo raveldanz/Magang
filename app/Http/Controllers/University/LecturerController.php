@@ -205,4 +205,47 @@ class LecturerController extends Controller
         return redirect()->route('university.lecturers.index')
             ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset ke default ('password')!");
     }
+
+    /**
+     * Hapus Dosen Pembimbing oleh Admin Kampus
+     */
+    public function destroy($id)
+    {
+        $user = Auth::user();
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university;
+
+        $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
+
+        // Tenant Scoping Authorization Check
+        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
+        if (!$isSameUniv && $univName) {
+            $isSameUniv = ($lecturer->university === $univName);
+        }
+
+        if (!$isSameUniv) {
+            abort(403, 'Anda tidak memiliki hak akses untuk menghapus dosen kampus lain.');
+        }
+
+        // Periksa apakah dosen masih membimbing mahasiswa aktif
+        $activePlacementsCount = $lecturer->academicPlacements()
+            ->whereHas('application', function ($q) {
+                $q->whereIn('status', ['accepted', 'pending']);
+            })
+            ->count();
+
+        if ($activePlacementsCount > 0) {
+            return redirect()->route('university.lecturers.index')
+                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena masih membimbing {$activePlacementsCount} mahasiswa aktif. Silakan alihkan bimbingan ke dosen lain terlebih dahulu.");
+        }
+
+        $lecturerName = $lecturer->name;
+        $lecturer->delete();
+
+        return redirect()->route('university.lecturers.index')
+            ->with('success', "Dosen Pembimbing '{$lecturerName}' berhasil dihapus dari daftar kampus.");
+    }
 }

@@ -48,6 +48,12 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-sm font-medium">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <!-- Form Validation Errors -->
             @if ($errors->any())
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-sm">
@@ -173,7 +179,7 @@
                                         </span>
                                     </td>
 
-                                    <!-- Aksi: Edit & Reset Password -->
+                                    <!-- Aksi: Edit, Reset Password & Hapus -->
                                     <td class="py-4 px-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
                                             
@@ -201,7 +207,21 @@
                                                     <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                                                     </svg>
-                                                    <span>Reset Password</span>
+                                                    <span>Reset</span>
+                                                </button>
+                                            </form>
+
+                                            <!-- Tombol Hapus Dosen -->
+                                            <form action="{{ route('university.lecturers.destroy', $lecturer->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dosen {{ $lecturer->name }} dari daftar kampus?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        title="Hapus Data Dosen"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition shadow-2xs active:scale-95 cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    <span>Hapus</span>
                                                 </button>
                                             </form>
                                         </div>

@@ -7,6 +7,7 @@ use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
 use App\Models\University;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -105,6 +106,18 @@ class DashboardController extends Controller
             ];
         }
 
+        // Daftar Dosen Aktif Kampus untuk Plotting DPL
+        $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
+            ->where(function ($q) use ($user, $university) {
+                if ($user->university_id) {
+                    $q->where('university_id', $user->university_id);
+                } elseif ($university) {
+                    $q->where('university', $university->name);
+                }
+            })
+            ->orderBy('name')
+            ->get();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_accepted' => $totalAccepted,
@@ -118,8 +131,63 @@ class DashboardController extends Controller
             'allApplications',
             'stats',
             'agencyDistribution',
-            'agencies'
+            'agencies',
+            'availableDosens'
         ));
+    }
+
+    /**
+     * Plotting / Penugasan Dosen Pembimbing oleh Universitas
+     */
+    public function assignAdvisor(Request $request, $applicationId)
+    {
+        $user = Auth::user();
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+
+        $request->validate([
+            'academic_advisor_id' => 'required|exists:users,id',
+        ], [
+            'academic_advisor_id.required' => 'Silakan pilih Dosen Pembimbing Lapangan.',
+        ]);
+
+        $application = Application::with('user.studentProfile')->findOrFail($applicationId);
+        $student = $application->user;
+
+        // Pastikan mahasiswa berasal dari universitas yang sama
+        $isSameUniv = ($universityId && $student->university_id === $universityId);
+        if (!$isSameUniv && $university) {
+            $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
+        }
+
+        if (!$isSameUniv) {
+            abort(403, 'Anda tidak memiliki hak akses untuk memplot dosen mahasiswa kampus lain.');
+        }
+
+        // Pastikan dosen yang dipilih berasal dari universitas yang sama
+        $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
+        $isAdvisorSameUniv = ($universityId && $advisor->university_id === $universityId);
+        if (!$isAdvisorSameUniv && $university) {
+            $isAdvisorSameUniv = ($advisor->university === $university->name);
+        }
+
+        if (!$isAdvisorSameUniv) {
+            return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
+        }
+
+        $placement = Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['academic_advisor_id' => $advisor->id]
+        );
+
+        // Hapus penempatan duplikat jika ada
+        Placement::where('application_id', $application->id)
+            ->where('id', '!=', $placement->id)
+            ->delete();
+
+        return redirect()->back()->with('success', "Dosen Pembimbing Lapangan ({$advisor->name}) berhasil ditugaskan untuk mahasiswa {$student->name}!");
     }
 
     /**
@@ -230,13 +298,16 @@ class DashboardController extends Controller
     }
 
     /**
-     * Detail Mahasiswa Kampus untuk Pemantauan Universitas
+     * Detail Mahasiswa Kampus untuk Pemantauan Universitas (View Khusus Universitas)
      */
-    public function showStudent($placementId)
+    public function showStudent($id)
     {
         $user = Auth::user();
-        $university = $user->university_id ? University::find($user->university_id) : null;
+        $university = $user->university_id 
+            ? University::find($user->university_id) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
+        // Cari placement atau application
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
@@ -248,9 +319,28 @@ class DashboardController extends Controller
             },
             'finalreport',
             'evaluation'
-        ])->findOrFail($placementId);
+        ])->find($id);
 
-        $student = $placement->application->user;
+        if (!$placement) {
+            // Jika ID yang dikirim adalah application_id
+            $application = Application::with([
+                'user.studentProfile',
+                'unit.agencyProfile',
+                'placement.mentor',
+                'placement.academicAdvisor',
+                'placement.logbooks' => function ($q) {
+                    $q->orderBy('date', 'desc');
+                },
+                'placement.finalreport',
+                'placement.evaluation'
+            ])->findOrFail($id);
+
+            $placement = $application->placement;
+            $student = $application->user;
+        } else {
+            $application = $placement->application;
+            $student = $application->user;
+        }
 
         // Otorisasi: Pastikan mahasiswa berasal dari universitas yang sama
         $isSameUniv = ($user->university_id !== null && $student->university_id === $user->university_id);
@@ -262,16 +352,41 @@ class DashboardController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
         }
 
-        return view('lecturer.student-detail', [
-            'placement' => $placement,
-            'student' => $student,
-            'profile' => $student->studentProfile,
-            'unit' => $placement->application->unit,
-            'agencyProfile' => $placement->application->unit?->agencyProfile,
-            'mentor' => $placement->mentor ?? $placement->pembimbing,
-            'logbooks' => $placement->logbooks,
-            'finalReport' => $placement->finalreport,
-            'evaluation' => $placement->evaluation,
-        ]);
+        $profile = $student->studentProfile;
+        $unit = $application->unit;
+        $agencyProfile = $unit?->agencyProfile;
+        $mentor = $placement?->mentor ?? $placement?->pembimbing;
+        $dosen = $placement?->academicAdvisor;
+        $logbooks = $placement ? $placement->logbooks : collect();
+        $finalReport = $placement?->finalreport;
+        $evaluation = $placement?->evaluation;
+
+        // Daftar Dosen untuk modal Plotting
+        $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
+            ->where(function ($q) use ($user, $university) {
+                if ($user->university_id) {
+                    $q->where('university_id', $user->university_id);
+                } elseif ($university) {
+                    $q->where('university', $university->name);
+                }
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('university.students.show', compact(
+            'application',
+            'placement',
+            'student',
+            'profile',
+            'unit',
+            'agencyProfile',
+            'mentor',
+            'dosen',
+            'logbooks',
+            'finalReport',
+            'evaluation',
+            'availableDosens',
+            'university'
+        ));
     }
 }
