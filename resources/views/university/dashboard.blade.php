@@ -291,8 +291,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right">
                                         <a href="{{ route('university.students.show', $app->id) }}"
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition">
-                                            <span>Detail & Monitoring</span>
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition shadow-2xs">
+                                            <span>Detail</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                         </a>
                                     </td>
