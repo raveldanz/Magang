@@ -123,7 +123,7 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="inline-flex items-center justify-end gap-1.5">
+                                        <div class="btn-action-group">
                                             
                                             <!-- Edit -->
                                             <button type="button" 
@@ -134,23 +134,23 @@
                                                         agency_profile_id: '{{ $m->agency_profile_id }}', 
                                                         status: '{{ $m->status ?? 'active' }}' 
                                                     }; showEditModal = true"
-                                                    class="inline-flex items-center justify-center px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
+                                                    class="btn-action-edit">
                                                 Edit
                                             </button>
 
                                             <!-- Reset Password -->
-                                            <form action="{{ route('admin.mentors.reset_password', $m->id) }}" method="POST" onsubmit="return confirm('Reset password mentor {{ $m->name }} ke default (password)?');" class="inline-flex items-center m-0 p-0">
+                                            <form action="{{ route('admin.mentors.reset_password', $m->id) }}" method="POST" onsubmit="return confirm('Reset password mentor {{ $m->name }} ke default (password)?');" class="btn-action-form">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
+                                                <button type="submit" class="btn-action-reset">
                                                     Reset
                                                 </button>
                                             </form>
 
                                             <!-- Hapus -->
-                                            <form action="{{ route('admin.mentors.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus mentor {{ $m->name }}?');" class="inline-flex items-center m-0 p-0">
+                                            <form action="{{ route('admin.mentors.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus mentor {{ $m->name }}?');" class="btn-action-form">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
+                                                <button type="submit" class="btn-action-delete">
                                                     Hapus
                                                 </button>
                                             </form>
