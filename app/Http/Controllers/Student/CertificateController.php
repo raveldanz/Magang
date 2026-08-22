@@ -22,7 +22,7 @@ class CertificateController extends Controller
     {
         $user = Auth::user();
 
-        // Cari berdasarkan application_id atau placement_id
+        // 1. Cari berdasarkan application_id terlebih dahulu
         $application = Application::with([
             'user.studentProfile.university',
             'unit.agencyProfile',
@@ -32,12 +32,41 @@ class CertificateController extends Controller
             'placement.dosen',
             'placement.evaluation',
             'placement.finalreport',
-        ])->where(function ($q) use ($id) {
-            $q->where('id', $id)
-              ->orWhereHas('placement', function ($pq) use ($id) {
-                  $pq->where('id', $id);
-              });
-        })->firstOrFail();
+        ])->find($id);
+
+        // 2. Jika tidak ditemukan sebagai application_id, coba cari berdasarkan placement_id
+        if (!$application) {
+            $application = Application::with([
+                'user.studentProfile.university',
+                'unit.agencyProfile',
+                'placement.mentor',
+                'placement.pembimbing',
+                'placement.academicAdvisor',
+                'placement.dosen',
+                'placement.evaluation',
+                'placement.finalreport',
+            ])->whereHas('placement', function ($pq) use ($id) {
+                $pq->where('id', $id);
+            })->first();
+        }
+
+        // 3. Jika masih belum ditemukan dan user adalah mahasiswa, ambil aplikasi aktif milik mahasiswa tersebut
+        if (!$application && $user && $user->role === 'mahasiswa') {
+            $application = Application::with([
+                'user.studentProfile.university',
+                'unit.agencyProfile',
+                'placement.mentor',
+                'placement.pembimbing',
+                'placement.academicAdvisor',
+                'placement.dosen',
+                'placement.evaluation',
+                'placement.finalreport',
+            ])->where('user_id', $user->id)->latest()->first();
+        }
+
+        if (!$application) {
+            abort(404, 'Data pengajuan magang / sertifikat tidak ditemukan.');
+        }
 
         $placement = $application->placement;
 
@@ -55,7 +84,8 @@ class CertificateController extends Controller
         $eval = $placement?->evaluation;
         $finalReport = $placement?->finalreport;
         $isCompleted = ($application->status === 'completed') || 
-                       ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0 && optional($finalReport)->status === 'approved');
+                       ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0 && optional($finalReport)->status === 'approved') ||
+                       ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0);
 
         if (!$isCompleted && !$isSuperAdmin) {
             abort(403, 'Sertifikat Magang Belum Diterbitkan: Pastikan laporan akhir telah disetujui dan nilai evaluasi (Dinas 40% & DPL 60%) telah lengkap.');
