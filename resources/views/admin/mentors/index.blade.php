@@ -13,7 +13,7 @@
 
             <button type="button" 
                     @click="showCreateModal = true"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                 <span>Tambah Mentor Baru</span>
             </button>
@@ -50,7 +50,7 @@
             @if($isSuperAdmin)
                 <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
                     <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex items-center gap-3">
-                        <select name="agency_id" onchange="this.form.submit()" class="text-xs rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="agency_id" onchange="this.form.submit()" class="text-xs rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
                             <option value="">🏢 Semua Instansi Dinas</option>
                             @foreach($agencies as $ag)
                                 <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
@@ -108,7 +108,7 @@
                                             <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 🟢 {{ $m->active_students_count }} Aktif
                                             </span>
-                                            <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                            <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                                 🎓 {{ $m->completed_students_count }} Lulus
                                             </span>
                                         </div>
@@ -190,14 +190,14 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" required placeholder="Contoh: Ir. Siti Aminah, M.Kom" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <input type="text" name="name" required placeholder="Contoh: Ir. Siti Aminah, M.Kom" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Kedinasan / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" required placeholder="mentor.kominfo@surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <input type="email" name="email" required placeholder="mentor.kominfo@surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                     </div>
 
                     @if($isSuperAdmin)
@@ -205,7 +205,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Instansi Dinas <span class="text-rose-500">*</span>
                             </label>
-                            <select name="agency_profile_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                            <select name="agency_profile_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                 <option value="">-- Pilih Dinas --</option>
                                 @foreach($agencies as $ag)
                                     <option value="{{ $ag->id }}">{{ $ag->agency_name }}</option>
@@ -218,7 +218,7 @@
                         <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Mentor
                         </button>
                     </div>
@@ -245,14 +245,14 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" x-model="editMentor.name" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <input type="text" name="name" x-model="editMentor.name" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Kedinasan / Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" x-model="editMentor.email" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <input type="email" name="email" x-model="editMentor.email" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                     </div>
 
                     @if($isSuperAdmin)
@@ -260,7 +260,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Instansi Dinas <span class="text-rose-500">*</span>
                             </label>
-                            <select name="agency_profile_id" x-model="editMentor.agency_profile_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                            <select name="agency_profile_id" x-model="editMentor.agency_profile_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                 @foreach($agencies as $ag)
                                     <option value="{{ $ag->id }}">{{ $ag->agency_name }}</option>
                                 @endforeach
@@ -272,7 +272,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Status Keaktifan
                         </label>
-                        <select name="status" x-model="editMentor.status" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium">
+                        <select name="status" x-model="editMentor.status" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                             <option value="active">🟢 Aktif (Tersedia Membimbing)</option>
                             <option value="on_leave">🟡 Cuti (Tidak Menerima Bimbingan)</option>
                             <option value="inactive">🔴 Non-Aktif</option>
@@ -283,7 +283,7 @@
                         <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95">
+                        <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>

@@ -11,7 +11,7 @@
                 </p>
             </div>
 
-            <a href="{{ route('admin.universities.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+            <a href="{{ route('admin.universities.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                 <span>Tambah Universitas Baru</span>
             </a>
@@ -77,7 +77,7 @@
                                         <span class="text-2xl">🏛️</span>
                                     @endif
                                 </div>
-                                <span class="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-full text-xs font-black shrink-0">
+                                <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-black shrink-0">
                                     {{ $univ->code }}
                                 </span>
                             </div>
@@ -86,7 +86,7 @@
                                 <h3 class="font-black text-base text-gray-900">{{ $univ->name }}</h3>
                                 <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
                                 @if($univ->pic_name)
-                                    <div class="mt-2 text-[11px] text-indigo-700 font-semibold">
+                                    <div class="mt-2 text-[11px] text-blue-700 font-semibold">
                                         👔 PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
                                     </div>
                                 @endif
@@ -94,13 +94,13 @@
 
                             <!-- Stat Counts -->
                             <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100 text-center">
-                                <div class="p-2 rounded-xl bg-purple-50 border border-purple-100">
-                                    <div class="text-xs font-black text-purple-700">{{ $univ->students_count }}</div>
-                                    <div class="text-[10px] text-purple-600 font-semibold uppercase">Mahasiswa</div>
+                                <div class="p-2 rounded-xl bg-blue-50 border border-blue-100">
+                                    <div class="text-xs font-black text-blue-700">{{ $univ->students_count }}</div>
+                                    <div class="text-[10px] text-blue-600 font-semibold uppercase">Mahasiswa</div>
                                 </div>
-                                <div class="p-2 rounded-xl bg-indigo-50 border border-indigo-100">
-                                    <div class="text-xs font-black text-indigo-700">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] text-indigo-600 font-semibold uppercase">Dosen DPL</div>
+                                <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div class="text-xs font-black text-slate-700">{{ $univ->dosens_count }}</div>
+                                    <div class="text-[10px] text-slate-600 font-semibold uppercase">Dosen DPL</div>
                                 </div>
                                 <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
                                     <div class="text-xs font-black text-slate-700">{{ $univ->users_count }}</div>
@@ -111,7 +111,7 @@
 
                         <!-- Action Buttons -->
                         <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
-                            <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold">
+                            <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold">
                                 Lihat Akun →
                             </a>
 

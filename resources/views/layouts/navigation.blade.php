@@ -25,6 +25,45 @@
                     } elseif ($isUniversitas) {
                         $dashboardRoute = route('university.dashboard');
                     }
+
+                    // Dynamic User Logo Resolver
+                    $navAvatarLogo = null;
+                    $navAvatarInitials = strtoupper(substr($user->name ?? 'U', 0, 1));
+
+                    if ($user) {
+                        if ($user->agency_profile_id && $user->agencyProfile) {
+                            $logoPath = $user->agencyProfile->logo;
+                            if ($logoPath && file_exists(public_path($logoPath))) {
+                                $navAvatarLogo = asset($logoPath);
+                            } else {
+                                $aName = strtolower($user->agencyProfile->agency_name ?? '');
+                                if (str_contains($aName, 'kominfo') || str_contains($aName, 'komunikasi')) $navAvatarLogo = asset('images/logos/diskominfo.png');
+                                elseif (str_contains($aName, 'penduduk') || str_contains($aName, 'dukcapil')) $navAvatarLogo = asset('images/logos/dispendukcapil.png');
+                                elseif (str_contains($aName, 'pustaka') || str_contains($aName, 'pusip')) $navAvatarLogo = asset('images/logos/dispusip.png');
+                            }
+                        } elseif ($user->university_id && $user->university) {
+                            $logoPath = $user->university->logo;
+                            if ($logoPath && file_exists(public_path($logoPath))) {
+                                $navAvatarLogo = asset($logoPath);
+                            } else {
+                                $uName = strtolower($user->university->name ?? '');
+                                if (str_contains($uName, 'unesa')) $navAvatarLogo = asset('images/logos/unesa.png');
+                                elseif (str_contains($uName, 'its')) $navAvatarLogo = asset('images/logos/its.png');
+                                elseif (str_contains($uName, 'unair')) $navAvatarLogo = asset('images/logos/unair.png');
+                                elseif (str_contains($uName, 'upn')) $navAvatarLogo = asset('images/logos/upnjatim.png');
+                                elseif (str_contains($uName, 'unitomo') || str_contains($uName, 'soetomo')) $navAvatarLogo = asset('images/logos/unitomo.png');
+                            }
+                        } elseif ($isSuperAdmin) {
+                            $navAvatarLogo = asset('images/logos/surabaya.png');
+                        } elseif ($isMahasiswa && $user->studentProfile) {
+                            $uName = strtolower($user->studentProfile->universitas ?? '');
+                            if (str_contains($uName, 'unesa')) $navAvatarLogo = asset('images/logos/unesa.png');
+                            elseif (str_contains($uName, 'its')) $navAvatarLogo = asset('images/logos/its.png');
+                            elseif (str_contains($uName, 'unair')) $navAvatarLogo = asset('images/logos/unair.png');
+                            elseif (str_contains($uName, 'upn')) $navAvatarLogo = asset('images/logos/upnjatim.png');
+                            elseif (str_contains($uName, 'unitomo') || str_contains($uName, 'soetomo')) $navAvatarLogo = asset('images/logos/unitomo.png');
+                        }
+                    }
                 @endphp
 
                 <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
@@ -92,9 +131,9 @@
 
                                 <a href="{{ route('admin.mentors.index') }}" 
                                    class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition group {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : '' }}">
-                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">👔</div>
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0">👔</div>
                                     <div>
-                                        <div class="text-xs font-bold text-slate-800 group-hover:text-indigo-600">Mentor Lapangan</div>
+                                        <div class="text-xs font-bold text-slate-800 group-hover:text-blue-600">Mentor Lapangan</div>
                                         <div class="text-[11px] text-slate-400">Pembimbing teknis dinas</div>
                                     </div>
                                 </a>
@@ -207,9 +246,15 @@
                     <button @click="profileOpen = !profileOpen" 
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
                         <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
-                        <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                            {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                        </div>
+                        @if($navAvatarLogo)
+                            <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5">
+                            </div>
+                        @else
+                            <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                                {{ $navAvatarInitials }}
+                            </div>
+                        @endif
                         <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{'rotate-180 text-blue-600': profileOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
@@ -229,9 +274,15 @@
                         {{-- User Header Info --}}
                         <div class="px-3 py-2.5 bg-slate-50 rounded-2xl mb-2 flex items-center justify-between" style="background-color: #f8fafc !important;">
                             <div class="flex items-center gap-2.5 overflow-hidden">
-                                <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                                </div>
+                                @if($navAvatarLogo)
+                                    <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1">
+                                    </div>
+                                @else
+                                    <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                        {{ $navAvatarInitials }}
+                                    </div>
+                                @endif
                                 <div class="overflow-hidden">
                                     <div class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->name ?? 'User' }}</div>
                                     <div class="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">{{ strtoupper(str_replace('_', ' ', Auth::user()->role ?? 'Role')) }}</div>
@@ -346,12 +397,18 @@
         {{-- Info Profil Pengguna di Mobile --}}
         <div class="p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between" style="background-color: #f8fafc !important;">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                </div>
+                @if($navAvatarLogo)
+                    <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1">
+                    </div>
+                @else
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                        {{ $navAvatarInitials }}
+                    </div>
+                @endif
                 <div>
                     <div class="text-xs font-bold text-slate-800">{{ Auth::user()->name ?? 'Pengguna' }}</div>
-                    <div class="text-[10px] font-semibold text-slate-400 uppercase">{{ strtoupper(str_replace('_', ' ', Auth::user()->role ?? 'Role')) }}</div>
+                    <div class="text-[10px] font-semibold text-blue-600 uppercase">{{ strtoupper(str_replace('_', ' ', Auth::user()->role ?? 'Role')) }}</div>
                 </div>
             </div>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Online</span>

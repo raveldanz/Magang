@@ -136,8 +136,8 @@
             @if ($application && in_array($lifecycle, ['ACTIVE', 'ACCEPTED', 'COMPLETED']))
 
                 {{-- Card 1: Informasi Penempatan Magang --}}
-                <div class="bg-indigo-600 rounded-2xl p-6 text-white shadow-lg">
-                    <div class="flex items-center justify-between mb-4 border-b border-indigo-500 pb-3">
+                <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                    <div class="flex items-center justify-between mb-4 border-b border-blue-500 pb-3">
                         <h3 class="text-base font-bold flex items-center gap-2">
                             <span>📑</span> Informasi Penempatan Magang
                         </h3>
@@ -148,20 +148,20 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Instansi & Unit Kerja</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Instansi & Unit Kerja</p>
                             <p class="font-bold text-sm text-white">{{ $application->unit->agencyProfile->agency_name ?? '-' }}</p>
-                            <p class="text-indigo-200 font-medium">{{ $application->unit->name ?? '-' }}</p>
+                            <p class="text-blue-200 font-medium">{{ $application->unit->name ?? '-' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Mentor Lapangan Dinas</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Mentor Lapangan Dinas</p>
                             <p class="font-bold text-sm text-white">{{ $placement->mentor->name ?? $placement->pembimbing->name ?? 'Belum Diplot' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing (DPL)</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing (DPL)</p>
                             <p class="font-bold text-sm text-white">{{ $placement->academicAdvisor->name ?? 'Belum Ditentukan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-indigo-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
                             <p class="font-bold text-sm text-white">{{ \Carbon\Carbon::parse($application->start_date)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->format('d M Y') }}</p>
                         </div>
                     </div>
@@ -169,7 +169,7 @@
 
                 {{-- Card 2: 4 Kartu Statistik Logbook --}}
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-indigo-500">
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-blue-500">
                         <p class="text-xs text-gray-500 font-medium">Total Logbook</p>
                         <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total'] ?? 0 }}</p>
                     </div>
@@ -199,7 +199,7 @@
 
                         {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
                         @if ($lifecycle === 'ACTIVE')
-                            <a href="{{ route('student.logbook.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                            <a href="{{ route('student.logbook.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                 </svg>
@@ -241,7 +241,7 @@
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline text-xs font-medium inline-flex items-center gap-1">
+                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-xs font-medium inline-flex items-center gap-1">
                                                     <span>📎</span> Lihat File
                                                 </a>
                                             @else
@@ -266,7 +266,7 @@
                                         </td>
                                         <td class="p-4 text-center">
                                             @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected'))
-                                                <a href="{{ route('student.logbook.edit', $log->id) }}" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg transition">
+                                                <a href="{{ route('student.logbook.edit', $log->id) }}" class="btn-action-edit">
                                                     Edit
                                                 </a>
                                             @else

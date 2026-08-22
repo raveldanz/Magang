@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <select name="action" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium">
+                        <select name="action" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                             <option value="">Semua Jenis Aksi</option>
                             @foreach($actions as $act)
                                 <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
@@ -40,7 +40,7 @@
                             @endforeach
                         </select>
 
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0 cursor-pointer">
                             Filter
                         </button>
 
@@ -100,11 +100,11 @@
                                                 ➕ {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'EVALUATION'))
-                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                 📝 {{ $log->action }}
                                             </span>
                                         @else
-                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                 🔄 {{ $log->action }}
                                             </span>
                                         @endif

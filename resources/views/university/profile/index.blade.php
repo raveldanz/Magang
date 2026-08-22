@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     {{ __('Pengaturan Profil & Kop Surat Kampus') }}
@@ -83,7 +83,7 @@
                                 @endif
                             </div>
 
-                            <input type="file" name="logo" id="logo" accept="image/*" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                            <input type="file" name="logo" id="logo" accept="image/*" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                             <p class="text-[10px] text-gray-400 mt-1.5">Format: PNG, JPG, WEBP. Maks 2MB.</p>
                         </div>
 
@@ -93,7 +93,7 @@
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                     Nama Lengkap Perguruan Tinggi <span class="text-rose-500">*</span>
                                 </label>
-                                <input type="text" name="name" value="{{ old('name', $university->name) }}" required placeholder="Contoh: Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-semibold">
+                                <input type="text" name="name" value="{{ old('name', $university->name) }}" required placeholder="Contoh: Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -101,14 +101,14 @@
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                         Singkatan / Kode Kampus
                                     </label>
-                                    <input type="text" name="code" value="{{ old('code', $university->code) }}" placeholder="Contoh: UNITOMO" class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono uppercase">
+                                    <input type="text" name="code" value="{{ old('code', $university->code) }}" placeholder="Contoh: UNITOMO" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                         Email Resmi Kampus / Humas
                                     </label>
-                                    <input type="email" name="email" value="{{ old('email', $university->email) }}" placeholder="info@unitomo.ac.id" class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                                    <input type="email" name="email" value="{{ old('email', $university->email) }}" placeholder="info@unitomo.ac.id" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                                 </div>
                             </div>
 
@@ -117,7 +117,7 @@
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                         Nomor Telepon / Hotline Kampus
                                     </label>
-                                    <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" placeholder="(031) 5925970" class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                                    <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" placeholder="(031) 5925970" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                 </div>
                             </div>
 
@@ -125,7 +125,7 @@
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                     Alamat Lengkap Kampus (Untuk Header Kop Surat)
                                 </label>
-                                <textarea name="address" rows="2" placeholder="Jl. Semolowaru No. 84, Menur Pumpungan, Kec. Sukolilo, Surabaya, Jawa Timur 60118" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">{{ old('address', $university->address) }}</textarea>
+                                <textarea name="address" rows="2" placeholder="Jl. Semolowaru No. 84, Menur Pumpungan, Kec. Sukolilo, Surabaya, Jawa Timur 60118" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('address', $university->address) }}</textarea>
                             </div>
                         </div>
 
@@ -147,28 +147,28 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Nama Lengkap & Gelar Pejabat
                             </label>
-                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" placeholder="Dr. Siti Marwiyah, S.H., M.H." class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" placeholder="Dr. Siti Marwiyah, S.H., M.H." class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 NIP / NIDN Pejabat
                             </label>
-                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" placeholder="196808281993032001" class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" placeholder="196808281993032001" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Jabatan Penandatangan
                             </label>
-                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" placeholder="Rektor Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" placeholder="Rektor Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                    <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                         💾 Simpan Perubahan Profil Kampus
                     </button>
                 </div>

@@ -35,7 +35,7 @@
 
                     <!-- Section 1: Informasi Akun & NIM -->
                     <div class="space-y-4">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
                             <span>👤 Identitas Akun & Mahasiswa</span>
                         </h4>
                         
@@ -55,7 +55,7 @@
 
                     <!-- Section 2: Data Perguruan Tinggi & Akademik -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
                             <span>🎓 Data Perguruan Tinggi & Akademik</span>
                         </h4>
 
@@ -119,7 +119,7 @@
 
                     <!-- Section 3: Kontak Pribadi & Domisili -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
                             <span>📞 Kontak Pribadi & Domisili</span>
                         </h4>
 
@@ -140,7 +140,7 @@
 
                     <!-- Section 4: Kontak Darurat (Emergency Contact) -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
                             <span>🚨 Kontak Darurat (Orang Tua / Wali)</span>
                         </h4>
 

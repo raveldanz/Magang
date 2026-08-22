@@ -20,9 +20,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Redirect jika role bukan mahasiswa
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.applications.index');
+        if ($user->role === 'admin' || $user->role === 'super_admin') {
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user->role === 'mentor' || $user->role === 'pembimbing') {

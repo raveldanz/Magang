@@ -3,7 +3,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                     {{ __('Rekapitulasi Logbook Mahasiswa Magang') }}
@@ -35,7 +35,7 @@
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-gray-500 uppercase">Mahasiswa Aktif</span>
-                        <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
@@ -91,7 +91,7 @@
                     
                     <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
                         <!-- Filter Unit -->
-                        <select name="unit_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="unit_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Unit Penempatan --</option>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
@@ -101,7 +101,7 @@
                         </select>
 
                         <!-- Filter Status Logbook -->
-                        <select name="status_filter" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="status_filter" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
                             <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>⏳ Memiliki Logbook Pending</option>
                             <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>✅ Memiliki Logbook Approved</option>
@@ -121,7 +121,7 @@
                                    class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                    style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                         </div>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                             Cari
                         </button>
                         @if (request()->hasAny(['unit_id', 'status_filter', 'search', 'placement_id']))
@@ -144,16 +144,16 @@
                     $selUnit = $selectedPlacement->application->unit;
                     $selMentor = $selectedPlacement->mentor ?? $selectedPlacement->pembimbing;
                 @endphp
-                <div class="bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-6 shadow-sm space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-indigo-100 pb-4">
+                <div class="bg-blue-50/50 border-2 border-blue-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-blue-100 pb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-sm">
+                            <div class="w-10 h-10 bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-sm">
                                 {{ strtoupper(substr($selStudent->name, 0, 2)) }}
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
                                     Riwayat Logbook: {{ $selStudent->name }}
-                                    <span class="text-xs font-mono font-normal bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md">
+                                    <span class="text-xs font-mono font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">
                                         NIM: {{ $selProfile->nim ?? '-' }}
                                     </span>
                                 </h3>
@@ -174,7 +174,7 @@
                     <!-- List Logbook Entries Mahasiswa -->
                     <div class="space-y-3">
                         @forelse ($selectedPlacement->logbooks as $log)
-                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:border-indigo-300 transition">
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:border-blue-300 transition">
                                 <div class="space-y-1.5 flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold font-mono text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md">
@@ -191,7 +191,7 @@
                                         {{ $log->activity }}
                                     </p>
                                     @if ($log->feedback)
-                                        <p class="text-[11px] text-indigo-900 bg-indigo-50/75 px-2.5 py-1 rounded-md">
+                                        <p class="text-[11px] text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md">
                                             💬 <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
                                         </p>
                                     @endif
@@ -203,7 +203,7 @@
                                             📎 Lampiran
                                         </a>
                                     @endif
-                                    <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                                    <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
                                         Detail &rarr;
                                     </a>
                                 </div>
@@ -247,7 +247,7 @@
                                     $latestLog = $placement->logbooks->first();
                                     $isSelected = $selectedPlacement && $selectedPlacement->id === $placement->id;
                                 @endphp
-                                <tr class="hover:bg-slate-50/75 transition-colors {{ $isSelected ? 'bg-indigo-50/40 font-semibold' : '' }}">
+                                <tr class="hover:bg-slate-50/75 transition-colors {{ $isSelected ? 'bg-blue-50/40 font-semibold' : '' }}">
                                     <td class="py-4 px-4 text-center text-xs text-gray-500">
                                         {{ $placements->firstItem() + $index }}
                                     </td>
@@ -257,7 +257,7 @@
                                         <div class="text-xs text-gray-500 mt-0.5 font-mono">
                                             NIM: {{ $profile->nim ?? '-' }}
                                         </div>
-                                        <div class="text-[11px] text-indigo-600 mt-0.5">
+                                        <div class="text-[11px] text-blue-600 mt-0.5">
                                             {{ $profile->universitas ?? '-' }} ({{ $profile->jurusan ?? '-' }})
                                         </div>
                                     </td>
@@ -313,7 +313,7 @@
                                     </td>
 
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $isSelected ? 'bg-indigo-700 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' }} text-xs font-bold rounded-xl transition shadow-xs">
+                                        <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $isSelected ? 'bg-blue-700 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }} text-xs font-bold rounded-xl transition shadow-xs">
                                             <span>Lihat Riwayat</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

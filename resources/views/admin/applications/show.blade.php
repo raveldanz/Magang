@@ -19,7 +19,7 @@
             <!-- Data Profil & Pengajuan -->
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     Informasi Pemohon
@@ -31,7 +31,7 @@
                     <p><strong class="text-slate-600">Fakultas / Program Studi:</strong> {{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }} / {{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</p>
                     <p><strong class="text-slate-600">No. Handphone:</strong> {{ $application->user->studentProfile->phone ?? '-' }}</p>
                     <p><strong class="text-slate-600">Instansi Tujuan:</strong> 
-                        <span class="font-bold text-indigo-700">
+                        <span class="font-bold text-blue-700">
                             🏛️ {{ $application->unit->agencyProfile->agency_name ?? $application->unit->agencyProfile->name ?? 'Pemerintah Kota Surabaya' }}
                         </span>
                     </p>
@@ -82,7 +82,7 @@
                     <!-- Dropdown Status -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Status Pengajuan</label>
-                        <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md">
+                        <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500">
                             <option value="pending" {{ $application->status == 'pending' ? 'selected' : '' }}>PENDING
                             </option>
                             <option value="verified" {{ $application->status == 'verified' ? 'selected' : '' }}>VERIFIED
@@ -101,7 +101,7 @@
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan (Mentor Dinas Terkait)</label>
-                            <select name="mentor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                            <select name="mentor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">-- Pilih Pembimbing Lapangan ({{ $application->unit->agencyProfile->agency_name ?? 'Instansi' }}) --</option>
                                 @foreach ($pembimbings as $pembimbing)
                                     <option value="{{ $pembimbing->id }}" {{ (optional($application->placement)->mentor_id == $pembimbing->id || optional($application->placement)->pembimbing_id == $pembimbing->id) ? 'selected' : '' }}>
@@ -118,12 +118,12 @@
                                 <label class="block text-sm font-medium text-gray-700">Nomor Surat Balasan Dinas</label>
                                 <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
                                     placeholder="Contoh: 500/123/APTIKA/2026"
-                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Surat Balasan</label>
                                 <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
-                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                             </div>
                         </div>
                     </div>

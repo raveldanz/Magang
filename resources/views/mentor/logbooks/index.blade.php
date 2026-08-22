@@ -39,7 +39,7 @@
                 
                 <!-- Status Filter Tabs -->
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <a href="{{ route('mentor.logbooks.index') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ !request('status') ? 'bg-indigo-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                    <a href="{{ route('mentor.logbooks.index') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ !request('status') ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                         Semua Status
                     </a>
                     <a href="{{ route('mentor.logbooks.index', ['status' => 'pending']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100' }}">
@@ -68,7 +68,7 @@
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                         Cari
                     </button>
                 </form>
@@ -82,11 +82,11 @@
                         $student = $log->placement->application->user ?? null;
                         $unit = $log->placement->application->unit ?? null;
                     @endphp
-                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:border-indigo-200 transition space-y-3">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:border-blue-200 transition space-y-3">
                         
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center">
                                     {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
                                 </div>
                                 <div>
@@ -102,7 +102,7 @@
                                     {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
                                     {{ strtoupper($log->status) }}
                                 </span>
-                                <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                                     Detail & Review &rarr;
                                 </a>
                             </div>
@@ -115,7 +115,7 @@
 
                         @if ($log->attachment)
                             <div class="pt-1">
-                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg">
+                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold bg-blue-50 px-3 py-1.5 rounded-lg">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                     </svg>
@@ -130,7 +130,7 @@
                             @method('PUT')
                             
                             <div class="sm:col-span-3">
-                                <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback mentor..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                                <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback mentor..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
                             <div class="flex gap-2">
