@@ -140,33 +140,35 @@
 
             <!-- 2. QUICK MANAGEMENT ACTIONS (SUPER ADMIN ONLY) -->
             @if($isSuperAdmin)
-                <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <div class="rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important; color: #ffffff !important;">
                     <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                         <div>
-                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-200 border border-white/10">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider inline-block" style="background-color: rgba(255, 255, 255, 0.15) !important; color: #e0e7ff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;">
                                 👑 Super Admin Governance Hub
                             </span>
-                            <h3 class="text-xl sm:text-2xl font-black mt-2">Pusat Kendali & Tata Kelola Master Sistem</h3>
-                            <p class="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
+                            <h3 class="text-xl sm:text-2xl font-black mt-2" style="color: #ffffff !important;">
+                                Pusat Kendali & Tata Kelola Master Sistem
+                            </h3>
+                            <p class="text-xs sm:text-sm max-w-2xl mt-1 leading-relaxed" style="color: #cbd5e1 !important;">
                                 Kelola entitas multi-instansi dinas, master universitas di Surabaya, manajemen akun seluruh pengguna, serta audit riwayat aktivitas sistem secara real-time.
                             </p>
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto shrink-0">
-                            <a href="{{ route('admin.agencies.index') }}" class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm">
-                                <span class="text-lg">🏢</span>
-                                <span>Master Dinas</span>
+                            <a href="{{ route('admin.agencies.index') }}" class="px-4 py-3 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm hover:opacity-90 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
+                                <span class="text-xl">🏢</span>
+                                <span style="color: #ffffff !important;">Master Dinas</span>
                             </a>
-                            <a href="{{ route('admin.units.index') }}" class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm">
-                                <span class="text-lg">📁</span>
-                                <span>Unit & Kuota</span>
+                            <a href="{{ route('admin.units.index') }}" class="px-4 py-3 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm hover:opacity-90 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
+                                <span class="text-xl">📁</span>
+                                <span style="color: #ffffff !important;">Unit & Kuota</span>
                             </a>
-                            <a href="{{ route('admin.users.index') }}" class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm">
-                                <span class="text-lg">👥</span>
-                                <span>Kelola Pengguna</span>
+                            <a href="{{ route('admin.users.index') }}" class="px-4 py-3 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm hover:opacity-90 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
+                                <span class="text-xl">👥</span>
+                                <span style="color: #ffffff !important;">Kelola Pengguna</span>
                             </a>
-                            <a href="{{ route('admin.audit_logs.index') }}" class="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm">
-                                <span class="text-lg">📜</span>
-                                <span>Log Audit</span>
+                            <a href="{{ route('admin.audit_logs.index') }}" class="px-4 py-3 rounded-2xl text-center text-xs font-bold transition flex flex-col items-center gap-1.5 shadow-sm hover:opacity-90 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
+                                <span class="text-xl">📜</span>
+                                <span style="color: #ffffff !important;">Log Audit</span>
                             </a>
                         </div>
                     </div>
