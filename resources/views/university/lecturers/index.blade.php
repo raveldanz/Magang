@@ -32,7 +32,7 @@
     <div class="py-8" x-data="{ 
         showCreateModal: false, 
         showEditModal: false, 
-        editLecturer: { id: '', name: '', email: '', nidn: '' } 
+        editLecturer: { id: '', name: '', email: '', nidn: '', status: 'active' } 
     }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
@@ -171,12 +171,24 @@
                                         </div>
                                     </td>
 
-                                    <!-- Status Akun -->
+                                    <!-- Status Akun / Pembimbing -->
                                     <td class="py-4 px-4 text-center">
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                                            Aktif
-                                        </span>
+                                        @if($lecturer->status === 'on_leave')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                                Cuti
+                                            </span>
+                                        @elseif($lecturer->status === 'inactive')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                                Non-Aktif
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                                Aktif
+                                            </span>
+                                        @endif
                                     </td>
 
                                     <!-- Aksi: Edit, Reset Password & Hapus -->
@@ -188,7 +200,8 @@
                                                     @click="editLecturer = { 
                                                         id: '{{ $lecturer->id }}', 
                                                         name: '{{ addslashes($lecturer->name) }}', 
-                                                        email: '{{ addslashes($lecturer->email) }}' 
+                                                        email: '{{ addslashes($lecturer->email) }}',
+                                                        status: '{{ $lecturer->status ?? 'active' }}'
                                                     }; showEditModal = true"
                                                     title="Edit Data Dosen"
                                                     class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer">
@@ -268,11 +281,11 @@
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
-                            ➕
+                            👨‍🏫
                         </div>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Tambah Dosen Pembimbing Baru</h3>
-                            <p class="text-xs text-gray-400">Registrasi akun DPL resmi untuk {{ $univName }}</p>
+                            <p class="text-xs text-gray-400">Daftarkan dosen pembimbing lapangan untuk {{ $univName }}</p>
                         </div>
                     </div>
                     <button type="button" @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
@@ -285,30 +298,22 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Nama Lengkap & Gelar Dosen <span class="text-rose-500">*</span>
                         </label>
-                        <input type="text" name="name" required placeholder="Contoh: Dr. Budi Santoso, S.Kom., M.Kom." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom." class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                            NIDN (Nomor Induk Dosen Nasional) <span class="text-gray-400 font-normal text-[10px]">(Opsional)</span>
+                            NIDN / NIP (Opsional)
                         </label>
-                        <input type="text" name="nidn" placeholder="Contoh: 0715088901" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <input type="text" name="nidn" value="{{ old('nidn') }}" placeholder="Contoh: 0712058401" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                            Email Resmi Kampus / Login <span class="text-rose-500">*</span>
+                            Email Resmi Kampus / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" required placeholder="Contoh: budi.santoso@unitomo.ac.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
-                        <p class="text-[11px] text-gray-400 mt-1">Dosen akan menggunakan email ini untuk login ke Portal Dosen SIP-MAGANG.</p>
-                    </div>
-
-                    <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900 space-y-1">
-                        <div class="font-bold flex items-center gap-1.5">
-                            <span>🔑 Password Awal Dosen:</span>
-                            <span class="font-mono bg-white px-2 py-0.5 rounded-md border border-indigo-200 font-bold">password</span>
-                        </div>
-                        <p class="text-[11px] text-indigo-700">Dosen dapat mengubah kata sandi setelah berhasil login pertama kali.</p>
+                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="Contoh: ahmad.sudrajat@kampus.ac.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                        <p class="text-[11px] text-gray-400 mt-1">Password bawaan akun: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-indigo-600 font-bold">password</code></p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
@@ -324,7 +329,7 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- MODAL 2: EDIT DATA DOSEN PEMBIMBING -->
+        <!-- MODAL 2: EDIT DATA & STATUS DOSEN PEMBIMBING -->
         <!-- ========================================== -->
         <div x-show="showEditModal" 
              x-cloak 
@@ -351,8 +356,8 @@
                             ✏️
                         </div>
                         <div>
-                            <h3 class="font-bold text-base text-gray-900">Edit Data Dosen Pembimbing</h3>
-                            <p class="text-xs text-gray-400">Perbarui identitas dosen pembimbing kampus</p>
+                            <h3 class="font-bold text-base text-gray-900">Edit Data & Status Dosen Pembimbing</h3>
+                            <p class="text-xs text-gray-400">Perbarui identitas atau status keaktifan dosen pembimbing</p>
                         </div>
                     </div>
                     <button type="button" @click="showEditModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
@@ -374,6 +379,18 @@
                             Email Resmi Kampus / Login <span class="text-rose-500">*</span>
                         </label>
                         <input type="email" name="email" x-model="editLecturer.email" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Status Keaktifan Pembimbing <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="status" x-model="editLecturer.status" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs font-medium">
+                            <option value="active">🟢 Aktif (Tersedia untuk Membimbing)</option>
+                            <option value="on_leave">🟡 Cuti (Sedang Cuti / Tidak Menerima Mahasiswa)</option>
+                            <option value="inactive">🔴 Non-Aktif (Tidak Menjadi Pembimbing)</option>
+                        </select>
+                        <p class="text-[11px] text-gray-400 mt-1">Ubah ke "Cuti" atau "Non-Aktif" jika dosen sedang cuti atau tidak ditugaskan membimbing.</p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">

@@ -51,6 +51,61 @@
             margin-top: 2px;
         }
 
+        .topbar-wrapper {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            padding: 12px 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 9999 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        }
+
+        .btn-back {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 8px 16px !important;
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            border: 1px solid #475569 !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .btn-back:hover {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-print {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 8px 20px !important;
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .btn-print:hover {
+            background-color: #4338ca !important;
+        }
+
         @media print {
             body {
                 background: none;
@@ -58,7 +113,7 @@
                 padding: 0;
             }
 
-            .no-print {
+            .no-print, .topbar-wrapper {
                 display: none !important;
             }
 
@@ -75,20 +130,20 @@
 <body class="antialiased">
 
     <!-- Action Bar (Hidden when Printing) -->
-    <div class="print:hidden no-print bg-slate-900 text-white px-6 py-3.5 shadow-md flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center gap-3 font-sans">
-            <a href="{{ route('university.dashboard') }}" 
-               class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-sm font-medium transition border border-slate-700">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Kembali ke Dashboard
+    <div class="topbar-wrapper no-print">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ route('university.dashboard') }}" class="btn-back">
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard</span>
             </a>
-            <span class="text-xs text-slate-400 border-l border-slate-700 pl-3">Dokumen Resmi: Surat Tugas Pengantar Magang MBKM</span>
+            <span style="font-size: 12px; color: #94a3b8; border-left: 1px solid #334155; padding-left: 12px;">
+                Dokumen Resmi: <strong style="color: #ffffff;">Surat Tugas Pengantar Magang MBKM</strong>
+            </span>
         </div>
-        <div class="flex items-center gap-2 font-sans">
-            <button onclick="window.print()" 
-                    class="inline-flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold shadow-sm transition active:scale-95 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Cetak Surat / Simpan PDF
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button onclick="window.print()" class="btn-print">
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span>Cetak Surat / Simpan PDF</span>
             </button>
         </div>
     </div>
