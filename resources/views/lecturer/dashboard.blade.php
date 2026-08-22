@@ -156,13 +156,13 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse($placements as $p)
                                 @php
-                                    $student = $p->application->user;
+                                    $student = $p->application?->user;
                                     $profile = $student?->studentProfile;
-                                    $unit = $p->application->unit;
+                                    $unit = $p->application?->unit;
                                     $agency = $unit?->agencyProfile;
                                     $mentor = $p->mentor ?? $p->pembimbing;
                                     $eval = $p->evaluation;
-                                    $hasEval = $eval && ($eval->nilai_akademik > 0 || $eval->nilai_dosen > 0);
+                                    $hasEval = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0);
                                     $finalReport = $p->finalreport;
                                     $logbooksCount = $p->logbooks->count();
                                 @endphp
@@ -185,7 +185,7 @@
                                     <td class="py-4 px-4">
                                         <div class="font-semibold text-gray-800 text-xs">👔 {{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
                                         <div class="text-[10px] text-emerald-600 font-semibold">
-                                            @if($eval && $eval->nilai_pembimbing > 0)
+                                            @if(($eval?->nilai_pembimbing ?? 0) > 0)
                                                 Skor Dinas: {{ $eval->nilai_pembimbing }}/100 (40%)
                                             @else
                                                 <span class="text-gray-400">Belum dinilai dinas</span>

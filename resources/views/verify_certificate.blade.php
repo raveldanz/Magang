@@ -5,10 +5,10 @@
             ?? \App\Models\AgencyProfile::first();
         $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
         $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
-        $student = $placement->application->user;
-        $profile = $student->studentProfile;
+        $student = $placement->application?->user;
+        $profile = $student?->studentProfile;
         $eval = $placement->evaluation;
-        $rataRata = $eval ? round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2) : 0;
+        $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2) : 0;
         $grade = 'C';
         if ($rataRata >= 85) $grade = 'A (Sangat Memuaskan)';
         elseif ($rataRata >= 70) $grade = 'B (Memuaskan)';

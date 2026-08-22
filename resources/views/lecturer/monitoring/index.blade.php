@@ -99,14 +99,14 @@
                         <tbody class="divide-y divide-gray-100 text-sm">
                             @forelse ($placements as $placement)
                                 @php
-                                    $student = $placement->application->user;
+                                    $student = $placement->application?->user;
                                     $profile = $student?->studentProfile;
-                                    $unit = $placement->application->unit;
+                                    $unit = $placement->application?->unit;
                                     $agency = $unit?->agencyProfile ?? $placement->agencyProfile;
                                     $totalLog = $placement->logbooks->count();
                                     $approvedLog = $placement->logbooks->where('lecturer_status', 'approved')->count();
                                     $finalReport = $placement->finalreport;
-                                    $hasEval = $placement->evaluation && $placement->evaluation->nilai_akademik > 0;
+                                    $hasEval = ($placement->evaluation?->nilai_akademik ?? 0) > 0;
                                     $lifecycle = $placement->application?->lifecycle_status ?? 'ACCEPTED';
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors">
@@ -152,7 +152,7 @@
                                     <td class="py-4 px-4 text-center">
                                         @if ($hasEval)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-xs">
-                                                ⭐ {{ $placement->evaluation->nilai_akademik }}
+                                                ⭐ {{ $placement->evaluation?->nilai_akademik ?? '-' }}
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">

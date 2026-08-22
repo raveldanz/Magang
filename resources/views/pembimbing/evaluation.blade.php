@@ -22,26 +22,26 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700">Nilai Disiplin (0-100)</label>
-                            <input type="number" name="nilai_disiplin" min="0" max="100" value="{{ old('nilai_disiplin', $placement->evaluation->nilai_disiplin ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="number" name="nilai_disiplin" min="0" max="100" value="{{ old('nilai_disiplin', $placement->evaluation?->nilai_disiplin ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                             @error('nilai_disiplin') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700">Nilai Kinerja (0-100)</label>
-                            <input type="number" name="nilai_kinerja" min="0" max="100" value="{{ old('nilai_kinerja', $placement->evaluation->nilai_kinerja ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="number" name="nilai_kinerja" min="0" max="100" value="{{ old('nilai_kinerja', $placement->evaluation?->nilai_kinerja ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                             @error('nilai_kinerja') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700">Nilai Laporan (0-100)</label>
-                            <input type="number" name="nilai_laporan" min="0" max="100" value="{{ old('nilai_laporan', $placement->evaluation->nilai_laporan ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="number" name="nilai_laporan" min="0" max="100" value="{{ old('nilai_laporan', $placement->evaluation?->nilai_laporan ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                             @error('nilai_laporan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Catatan / Evaluasi Umum</label>
-                        <textarea name="catatan" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('catatan', $placement->evaluation->catatan ?? '') }}</textarea>
+                        <textarea name="catatan" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('catatan', $placement->evaluation?->catatan ?? '') }}</textarea>
                         @error('catatan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 

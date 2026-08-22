@@ -24,10 +24,10 @@
                     <h3 class="text-lg font-bold border-b pb-2">Status Penilaian</h3>
                     @if ($placement->evaluation)
                         <div class="text-sm">
-                            <p><strong>Disiplin:</strong> {{ $placement->evaluation->nilai_disiplin }}</p>
-                            <p><strong>Kinerja:</strong> {{ $placement->evaluation->nilai_kinerja }}</p>
-                            <p><strong>Laporan:</strong> {{ $placement->evaluation->nilai_laporan }}</p>
-                            <p><strong>Catatan:</strong> {{ $placement->evaluation->catatan ?? '-' }}</p>
+                            <p><strong>Disiplin:</strong> {{ $placement->evaluation?->nilai_disiplin ?? '-' }}</p>
+                            <p><strong>Kinerja:</strong> {{ $placement->evaluation?->nilai_kinerja ?? '-' }}</p>
+                            <p><strong>Laporan:</strong> {{ $placement->evaluation?->nilai_laporan ?? '-' }}</p>
+                            <p><strong>Catatan:</strong> {{ $placement->evaluation?->catatan ?? '-' }}</p>
                         </div>
                     @else
                         <p class="text-sm text-gray-500">Belum ada penilaian.</p>

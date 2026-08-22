@@ -12,21 +12,21 @@
                         Formulir Penilaian Evaluasi Akhir
                     </h2>
                     <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
-                        Mahasiswa: <strong class="text-gray-700">{{ $placement->application->user->name }}</strong> ({{ $placement->application->user->studentProfile->nim ?? '-' }})
+                        Mahasiswa: <strong class="text-gray-700">{{ $placement->application?->user?->name ?? '-' }}</strong> ({{ $placement->application?->user?->studentProfile?->nim ?? '-' }})
                     </p>
                 </div>
             </div>
 
             <div class="bg-blue-50 border border-blue-100 text-blue-800 text-xs font-semibold px-3.5 py-1.5 rounded-full">
-                {{ $placement->application->unit->name ?? '-' }}
+                {{ $placement->application?->unit?->name ?? '-' }}
             </div>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{
-        disiplin: {{ old('nilai_disiplin', $placement->evaluation->nilai_disiplin ?? 0) }},
-        kinerja: {{ old('nilai_kinerja', $placement->evaluation->nilai_kinerja ?? 0) }},
-        laporan: {{ old('nilai_laporan', $placement->evaluation->nilai_laporan ?? 0) }},
+        disiplin: {{ old('nilai_disiplin', $placement->evaluation?->nilai_disiplin ?? 0) }},
+        kinerja: {{ old('nilai_kinerja', $placement->evaluation?->nilai_kinerja ?? 0) }},
+        laporan: {{ old('nilai_laporan', $placement->evaluation?->nilai_laporan ?? 0) }},
         get average() {
             let d = parseFloat(this.disiplin) || 0;
             let k = parseFloat(this.kinerja) || 0;
@@ -47,19 +47,19 @@
             <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-md">
-                        {{ strtoupper(substr($placement->application->user->name, 0, 2)) }}
+                        {{ strtoupper(substr($placement->application?->user?->name ?? 'M', 0, 2)) }}
                     </div>
                     <div>
-                        <h3 class="font-extrabold text-gray-900 text-lg">{{ $placement->application->user->name }}</h3>
+                        <h3 class="font-extrabold text-gray-900 text-lg">{{ $placement->application?->user?->name ?? '-' }}</h3>
                         <p class="text-xs text-gray-500">
-                            {{ $placement->application->user->studentProfile->universitas ?? '-' }} &bull; Jurusan {{ $placement->application->user->studentProfile->jurusan ?? '-' }}
+                            {{ $placement->application?->user?->studentProfile?->universitas ?? '-' }} &bull; Jurusan {{ $placement->application?->user?->studentProfile?->jurusan ?? '-' }}
                         </p>
                     </div>
                 </div>
                 <div class="text-right sm:text-right">
                     <span class="text-xs text-gray-400 block">Periode Pelaksanaan</span>
                     <span class="text-xs font-bold text-gray-700">
-                        {{ \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') }}
+                        {{ $placement->application?->start_date ? \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') : '-' }} s/d {{ $placement->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') : '-' }}
                     </span>
                 </div>
             </div>
@@ -178,7 +178,7 @@
                             rows="4" 
                             placeholder="Tuliskan evaluasi performa, dedikasi, inisiatif, atau catatan kelulusan mahasiswa selama magang..."
                             class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                        >{{ old('catatan', $placement->evaluation->catatan ?? '') }}</textarea>
+                        >{{ old('catatan', $placement->evaluation?->catatan ?? '') }}</textarea>
                         @error('catatan')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror

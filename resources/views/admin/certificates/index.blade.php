@@ -47,11 +47,11 @@
                                     </td>
                                     <td class="py-4 px-4 text-center">
                                         @php
-                                            $eval = $app->placement->evaluation;
-                                            $rataRata = round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 2);
+                                            $eval = $app->placement?->evaluation;
+                                            $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2) : 0;
                                         @endphp
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            ⭐ {{ $rataRata }}
+                                            ⭐ {{ $rataRata > 0 ? $rataRata : '-' }}
                                         </span>
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
