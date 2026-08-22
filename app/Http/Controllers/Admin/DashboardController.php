@@ -77,9 +77,10 @@ class DashboardController extends Controller
         $totalMentors = User::whereIn('role', ['mentor', 'pembimbing'])->when($agencyId, fn($q) => $q->where('agency_profile_id', $agencyId))->count();
         $totalLecturers = User::whereIn('role', ['dosen', 'academic_advisor'])->count();
 
-        // Distribusi Sebaran Instansi (Jika Super Admin)
+        // Distribusi Sebaran Instansi (Jika Super Admin) atau Unit Divisi (Jika Admin Dinas)
         $agencies = AgencyProfile::all();
         $agencyStats = [];
+        $unitStats = [];
         if ($isSuperAdmin) {
             foreach ($agencies as $ag) {
                 $count = Application::whereHas('unit', fn($q) => $q->where('agency_profile_id', $ag->id))->count();
@@ -92,6 +93,17 @@ class DashboardController extends Controller
                     'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
                 ];
             }
+        } else if ($agencyId) {
+            foreach ($units as $u) {
+                $count = Application::where('unit_id', $u->id)->count();
+                $unitStats[] = [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'count' => $count,
+                    'quota' => $u->quota,
+                    'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+                ];
+            }
         }
 
         // Distribusi Kampus Universitas
@@ -100,15 +112,19 @@ class DashboardController extends Controller
         foreach ($universities as $un) {
             $count = Application::whereHas('user', function ($uq) use ($un) {
                 $uq->where('university_id', $un->id)->orWhere('university', $un->name);
+            })->when($agencyId, function ($aq) use ($agencyId) {
+                $aq->whereHas('unit', fn($uq) => $uq->where('agency_profile_id', $agencyId));
             })->count();
 
-            $universityStats[] = [
-                'id' => $un->id,
-                'name' => $un->name,
-                'code' => $un->code,
-                'count' => $count,
-                'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
-            ];
+            if ($count > 0 || $isSuperAdmin) {
+                $universityStats[] = [
+                    'id' => $un->id,
+                    'name' => $un->name,
+                    'code' => $un->code,
+                    'count' => $count,
+                    'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+                ];
+            }
         }
 
         // Aktivitas Audit Terkini
@@ -142,6 +158,7 @@ class DashboardController extends Controller
             'agencies',
             'universities',
             'agencyStats',
+            'unitStats',
             'universityStats',
             'recentApplications',
             'recentAuditLogs',
