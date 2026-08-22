@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Run dedicated Demo E2E Seeder
+        $this->call(DemoE2ESeeder::class);
+
         // =========================================================================
         // 0. SEED USER SUPERADMIN UTAMA (SELALU TERSEDIA)
         // =========================================================================

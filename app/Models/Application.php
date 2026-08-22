@@ -52,50 +52,45 @@ class Application extends Model
 
     /**
      * Computed dynamic lifecycle status
-     * Statuses: REJECTED | PENDING | COMPLETED | ACTIVE | ACCEPTED
+     * Statuses: REJECTED | SUBMITTED | ACCEPTED | ACTIVE | COMPLETED | DRAFT
      */
     public function getLifecycleStatusAttribute(): string
     {
-        $status = strtoupper($this->status ?? 'PENDING');
+        $rawStatus = strtolower($this->status ?? 'draft');
 
         // 1. REJECTED
-        if ($status === 'REJECTED') {
+        if ($rawStatus === 'rejected') {
             return 'REJECTED';
         }
 
-        // 2. PENDING / VERIFIED
-        if (in_array($status, ['PENDING', 'VERIFIED'])) {
-            return 'PENDING';
-        }
-
-        $today = Carbon::now()->toDateString();
         $placement = $this->placement;
         $hasApprovedReport = $placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']);
-        $hasEvaluation = $placement && $placement->evaluation !== null;
-        $isPastEndDate = !empty($this->end_date) && $today > Carbon::parse($this->end_date)->toDateString();
+        $eval = $placement?->evaluation;
+        $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
 
-        // 3. COMPLETED
-        if ($status === 'COMPLETED' || $hasApprovedReport || ($status === 'ACCEPTED' && $isPastEndDate && ($hasEvaluation || $hasApprovedReport))) {
+        // 2. COMPLETED
+        if ($rawStatus === 'completed' || ($rawStatus === 'accepted' && $hasApprovedReport && $hasCompleteEval)) {
             return 'COMPLETED';
         }
 
-        // 4. ACTIVE
-        $hasAdvisor = $placement && !empty($placement->academic_advisor_id);
-        $hasMentor = $placement && (!empty($placement->mentor_id) || !empty($placement->pembimbing_id));
-        $isWithinDate = !empty($this->start_date) && !empty($this->end_date)
-            && $today >= Carbon::parse($this->start_date)->toDateString()
-            && $today <= Carbon::parse($this->end_date)->toDateString();
+        $today = Carbon::now()->toDateString();
 
-        if ($status === 'ACCEPTED' && $hasAdvisor && $hasMentor && $isWithinDate) {
-            return 'ACTIVE';
-        }
-
-        // 5. ACCEPTED (Awaiting start date or DPL selection)
-        if ($status === 'ACCEPTED') {
+        // 3. ACTIVE / ACCEPTED
+        if ($rawStatus === 'accepted') {
+            $startDate = !empty($this->start_date) ? Carbon::parse($this->start_date)->toDateString() : null;
+            if ($startDate && $today >= $startDate) {
+                return 'ACTIVE';
+            }
             return 'ACCEPTED';
         }
 
-        return $status;
+        // 4. SUBMITTED / PENDING / VERIFIED
+        if (in_array($rawStatus, ['submitted', 'pending', 'verified'])) {
+            return 'SUBMITTED';
+        }
+
+        // 5. DRAFT
+        return 'DRAFT';
     }
 
     public function getIsActiveInternshipAttribute(): bool
