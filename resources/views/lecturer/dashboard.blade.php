@@ -171,8 +171,8 @@
                                     <!-- Student Info -->
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-gray-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
-                                        <div class="text-[11px] text-gray-500 font-mono">NIM: {{ $profile->nim ?? '-' }}</div>
-                                        <div class="text-[10px] text-blue-600 font-semibold">{{ $profile->jurusan ?? 'Informatika' }}</div>
+                                        <div class="text-[11px] text-gray-500 font-mono">NIM: {{ $profile?->nim ?? '-' }}</div>
+                                        <div class="text-[10px] text-blue-600 font-semibold">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <!-- Placement Location -->

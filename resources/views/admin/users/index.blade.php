@@ -121,7 +121,7 @@
                                                 <div class="font-bold text-gray-900 text-xs sm:text-sm">{{ $u->name }}</div>
                                                 <div class="text-[11px] text-gray-500 font-mono">{{ $u->email }}</div>
                                                 @if($u->studentProfile?->nim)
-                                                    <div class="text-[10px] text-blue-600 font-mono">NIM: {{ $u->studentProfile->nim }}</div>
+                                                    <div class="text-[10px] text-blue-600 font-mono">NIM: {{ $u->studentProfile?->nim }}</div>
                                                 @endif
                                             </div>
                                         </div>
