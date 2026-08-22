@@ -216,23 +216,100 @@
                     </button>
 
                     <div x-show="profileOpen" 
-                         x-transition 
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
                          x-cloak
-                         class="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-[1001]"
-                         style="display: none;">
-                        <div class="px-4 py-2 border-b border-slate-100">
-                            <div class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name ?? 'User' }}</div>
-                            <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">{{ Auth::user()->role ?? 'Role' }}</div>
+                         class="absolute right-0 top-full mt-2 w-72 bg-white rounded-3xl shadow-2xl border border-slate-100 p-3 z-[1001] overflow-hidden space-y-1"
+                         style="background-color: #ffffff !important; display: none;">
+                        
+                        {{-- User Header Info --}}
+                        <div class="px-3 py-2.5 bg-slate-50 rounded-2xl mb-2 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5 overflow-hidden">
+                                <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->name ?? 'User' }}</div>
+                                    <div class="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">{{ strtoupper(str_replace('_', ' ', Auth::user()->role ?? 'Role')) }}</div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                Online
+                            </span>
                         </div>
-                        @if($isMahasiswa)
-                            <a href="{{ route('student.profile.edit') }}" class="block px-4 py-2 text-xs text-slate-600 hover:bg-slate-50 transition">Profil Saya</a>
+
+                        {{-- Role Quick Links --}}
+                        @if ($isSuperAdmin)
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📊</span> Dashboard
+                            </a>
+                            <a href="{{ route('admin.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📋</span> Verifikasi Pengajuan
+                            </a>
+                            <a href="{{ route('admin.agencies.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">🏢</span> Instansi & Unit
+                            </a>
+                            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">👥</span> Kelola Pengguna
+                            </a>
+                        @elseif ($isAdminDinas)
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📊</span> Dashboard
+                            </a>
+                            <a href="{{ route('admin.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📋</span> Verifikasi Pengajuan
+                            </a>
+                            <a href="{{ route('admin.units.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">🏢</span> Divisi & Kuota Unit
+                            </a>
+                            <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">👔</span> Mentor Lapangan
+                            </a>
+                        @elseif ($isMahasiswa)
+                            <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📊</span> Dashboard Saya
+                            </a>
+                            <a href="{{ route('student.profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">👤</span> Profil Saya
+                            </a>
+                            <a href="{{ route('student.logbook.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📖</span> Logbook Magang
+                            </a>
+                        @elseif ($isDosen)
+                            <a href="{{ route('lecturer.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">👨‍🏫</span> Portal Dosen
+                            </a>
+                            <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">🎓</span> Mahasiswa Bimbingan
+                            </a>
+                        @elseif ($isMentor)
+                            <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">👔</span> Portal Mentor
+                            </a>
+                            <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">📖</span> Review Logbook
+                            </a>
+                        @elseif ($isUniversitas)
+                            <a href="{{ route('university.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">🏛️</span> Portal Universitas
+                            </a>
+                            <a href="{{ route('university.profile.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">🏢</span> Profil Kampus
+                            </a>
                         @endif
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition flex items-center gap-2 cursor-pointer">
-                                <span>🚪</span> Keluar Sistem
-                            </button>
-                        </form>
+
+                        <div class="pt-2 border-t border-slate-100">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-2xl transition cursor-pointer">
+                                    <span>🚪</span> Keluar Sistem
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
