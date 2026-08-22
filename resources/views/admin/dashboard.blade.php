@@ -1,26 +1,30 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        {{-- 1. HERO BANNER DINAMIS SESUAI ROLE (SUPER ADMIN VS ADMIN DINAS) --}}
-        <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden" 
+        {{-- 1. HERO BANNER DINAMIS & SEIMBANG SESUAI ROLE (SUPER ADMIN VS ADMIN DINAS) --}}
+        <div class="rounded-3xl p-6 sm:p-8 lg:p-10 text-white shadow-xl relative overflow-hidden" 
              style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #312e81 100%) !important; color: #ffffff !important;">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
-                <div class="space-y-2 max-w-2xl">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
+                
+                {{-- Kolom Kiri: Judul & Deskripsi Tata Kelola (7 Kolom) --}}
+                <div class="lg:col-span-7 space-y-3">
                     @if($isSuperAdmin)
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background-color: rgba(251, 191, 36, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(251, 191, 36, 0.4) !important;">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider" 
+                              style="background-color: rgba(251, 191, 36, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(251, 191, 36, 0.4) !important;">
                             👑 SUPER ADMIN GOVERNANCE HUB
                         </span>
-                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight" style="color: #ffffff !important;">
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight" style="color: #ffffff !important;">
                             Pusat Kendali & Tata Kelola Eksekutif
                         </h1>
                         <p class="text-xs sm:text-sm leading-relaxed" style="color: #dbeafe !important;">
-                            Pantau ekosistem magang Pemkot Surabaya secara terpusat: kuota multi-instansi, kemitraan universitas, alur penilaian multi-role, dan jejak aktivitas audit sistem.
+                            Pantau ekosistem magang Pemkot Surabaya secara terpusat: kuota multi-instansi dinas, integrasi kemitraan perguruan tinggi, supervisi penilaian multi-role, dan jejak aktivitas audit sistem secara komprehensif.
                         </p>
                     @else
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" style="background-color: rgba(56, 189, 248, 0.2) !important; color: #7dd3fc !important; border: 1px solid rgba(56, 189, 248, 0.4) !important;">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider" 
+                              style="background-color: rgba(56, 189, 248, 0.2) !important; color: #7dd3fc !important; border: 1px solid rgba(56, 189, 248, 0.4) !important;">
                             🏢 PORTAL TATA KELOLA DINAS
                         </span>
-                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight" style="color: #ffffff !important;">
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight" style="color: #ffffff !important;">
                             {{ $currentAgency->agency_name ?? 'Panel Pengelola Instansi Dinas' }}
                         </h1>
                         <p class="text-xs sm:text-sm leading-relaxed" style="color: #dbeafe !important;">
@@ -29,52 +33,115 @@
                     @endif
                 </div>
 
-                {{-- Quick Actions Hero Sesuai Role --}}
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
+                {{-- Kolom Kanan: 4 Kartu Aksi Cepat (5 Kolom - Mengisi Seluruh Sisi Kanan Secara Seimbang & Mewah) --}}
+                <div class="lg:col-span-5 grid grid-cols-2 gap-3.5">
                     @if($isSuperAdmin)
-                        <a href="{{ route('admin.agencies.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">🏢</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Instansi</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Kelola Kuota</div>
+                        <a href="{{ route('admin.agencies.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">🏢</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_agencies'] ?? 0 }} Dinas</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Instansi</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Kelola Kuota Unit</div>
+                            </div>
                         </a>
-                        <a href="{{ route('admin.universities.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">🎓</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Kampus</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Mitra MBKM</div>
+
+                        <a href="{{ route('admin.universities.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">🎓</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_universities'] ?? 0 }} Kampus</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Kampus</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra MBKM</div>
+                            </div>
                         </a>
-                        <a href="{{ route('admin.users.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">👥</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Pengguna</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Semua Akun</div>
+
+                        <a href="{{ route('admin.users.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">👥</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_users'] ?? 0 }} User</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Pengguna</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Semua Akun & Role</div>
+                            </div>
                         </a>
-                        <a href="{{ route('admin.audit_logs.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">📜</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Log Audit</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Rekam Jejak</div>
+
+                        <a href="{{ route('admin.audit_logs.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">📜</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">Aktivitas</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Log Audit</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Rekam Jejak Sistem</div>
+                            </div>
                         </a>
                     @else
-                        <a href="{{ route('admin.applications.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">📋</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Verifikasi</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Berkas Masuk</div>
+                        <a href="{{ route('admin.applications.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">📋</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_pending'] ?? 0 }} Antrean</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Verifikasi</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Berkas Pendaftar</div>
+                            </div>
                         </a>
-                        <a href="{{ route('admin.units.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">🏢</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Unit & Kuota</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Alokasi Slot</div>
+
+                        <a href="{{ route('admin.units.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">🏢</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_units'] ?? 0 }} Unit</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Divisi & Kuota</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Alokasi Slot Magang</div>
+                            </div>
                         </a>
-                        <a href="{{ route('admin.mentors.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">👔</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Mentor</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Pembimbing</div>
+
+                        <a href="{{ route('admin.mentors.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">👔</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_mentors'] ?? 0 }} Mentor</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Mentor Dinas</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Pembimbing Lapangan</div>
+                            </div>
                         </a>
-                        <a href="{{ route('admin.certificates.index') }}" class="p-3.5 rounded-2xl text-center transition group shadow-sm hover:scale-105 cursor-pointer" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">🏆</div>
-                            <div class="text-xs font-bold" style="color: #ffffff !important;">Sertifikat</div>
-                            <div class="text-[10px]" style="color: #bfdbfe !important;">Penerbitan</div>
+
+                        <a href="{{ route('admin.certificates.index') }}" 
+                           class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
+                           style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">🏆</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_completed'] ?? 0 }} Lulus</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Sertifikat</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Penerbitan Resmi</div>
+                            </div>
                         </a>
                     @endif
                 </div>
+
             </div>
         </div>
 

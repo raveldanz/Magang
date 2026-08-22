@@ -43,21 +43,23 @@
             @endif
 
             <!-- Search Bar -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
+            <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs">
                 <form method="GET" action="{{ route('admin.agencies.index') }}" class="flex items-center gap-3">
                     <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama instansi dinas, email, atau kota..." class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama instansi dinas, email, atau kota..." 
+                               class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
-                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                         Cari
                     </button>
                     @if(request('search'))
-                        <a href="{{ route('admin.agencies.index') }}" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('admin.agencies.index') }}" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">
                             Reset
                         </a>
                     @endif
