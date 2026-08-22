@@ -12,6 +12,13 @@ class University extends Model
     protected $fillable = [
         'name',
         'code',
+        'address',
+        'phone',
+        'email',
+        'pic_name',
+        'pic_nip',
+        'pic_position',
+        'logo',
     ];
 
     public function users()

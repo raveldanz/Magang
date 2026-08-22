@@ -160,7 +160,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/university/dashboard', [\App\Http\Controllers\University\DashboardController::class, 'index'])->name('university.dashboard');
         Route::get('/university/export-students', [\App\Http\Controllers\University\DashboardController::class, 'export'])->name('university.students.export');
         Route::get('/university/students/{placementId}', [\App\Http\Controllers\University\DashboardController::class, 'showStudent'])->name('university.students.show');
+        Route::get('/university/students/{application}/letter', [\App\Http\Controllers\University\LetterController::class, 'generateLetter'])->name('university.students.letter');
         
+        // Pengaturan Profil & Kop Surat Kampus
+        Route::get('/university/profile', [\App\Http\Controllers\University\ProfileController::class, 'index'])->name('university.profile.index');
+        Route::match(['put', 'patch', 'post'], '/university/profile', [\App\Http\Controllers\University\ProfileController::class, 'update'])->name('university.profile.update');
+
         // Manajemen Daftar Dosen Pembimbing
         Route::get('/university/lecturers', [\App\Http\Controllers\University\LecturerController::class, 'index'])->name('university.lecturers.index');
         Route::post('/university/lecturers', [\App\Http\Controllers\University\LecturerController::class, 'store'])->name('university.lecturers.store');
