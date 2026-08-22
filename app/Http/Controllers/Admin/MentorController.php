@@ -58,6 +58,16 @@ class MentorController extends Controller
         return view('admin.mentors.index', compact('mentors', 'agencies', 'currentAgency', 'isSuperAdmin', 'agencyId'));
     }
 
+    public function create()
+    {
+        $user = Auth::user();
+        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $agencies = AgencyProfile::all();
+        $currentAgency = $user->agency_profile_id ? AgencyProfile::find($user->agency_profile_id) : null;
+
+        return view('admin.mentors.create', compact('agencies', 'currentAgency', 'isSuperAdmin'));
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -86,7 +96,23 @@ class MentorController extends Controller
             'agency_id' => $agencyId,
         ]);
 
-        return redirect()->back()->with('success', "Mentor Lapangan '{$mentor->name}' berhasil didaftarkan!");
+        return redirect()->route('admin.mentors.index')->with('success', "Mentor Lapangan '{$mentor->name}' berhasil didaftarkan!");
+    }
+
+    public function edit($id)
+    {
+        $user = Auth::user();
+        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->findOrFail($id);
+
+        if (!$isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses mengedit mentor dinas lain.');
+        }
+
+        $agencies = AgencyProfile::all();
+        $currentAgency = $mentor->agency_profile_id ? AgencyProfile::find($mentor->agency_profile_id) : null;
+
+        return view('admin.mentors.edit', compact('mentor', 'agencies', 'currentAgency', 'isSuperAdmin'));
     }
 
     public function update(Request $request, $id)
@@ -118,7 +144,7 @@ class MentorController extends Controller
             'name' => $mentor->name,
         ]);
 
-        return redirect()->back()->with('success', "Data Mentor Lapangan '{$mentor->name}' berhasil diperbarui!");
+        return redirect()->route('admin.mentors.index')->with('success', "Data Mentor Lapangan '{$mentor->name}' berhasil diperbarui!");
     }
 
     public function resetPassword($id)
