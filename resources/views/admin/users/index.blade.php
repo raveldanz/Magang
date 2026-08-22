@@ -185,13 +185,13 @@
 
                                     <!-- Action Buttons -->
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="flex items-center justify-end gap-1.5">
+                                        <div class="inline-flex items-center justify-end gap-1.5">
 
                                             <!-- Tombol Impersonate / Login As (Hanya Super Admin & Bukan Akun Sendiri / Super Admin Lain) -->
                                             @if($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser)
-                                                <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" onsubmit="return confirm('Masuk sebagai {{ $u->name }}? Anda dapat kembali ke Super Admin kapan saja.');">
+                                                <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" onsubmit="return confirm('Masuk sebagai {{ $u->name }}? Anda dapat kembali ke Super Admin kapan saja.');" class="inline-flex items-center m-0 p-0">
                                                     @csrf
-                                                    <button type="submit" title="Masuk / Login sebagai pengguna ini" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white rounded-lg text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                                    <button type="submit" title="Masuk / Login sebagai pengguna ini" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer leading-none">
                                                         <span>⚡</span>
                                                         <span>Login As</span>
                                                     </button>
@@ -199,24 +199,24 @@
                                             @endif
 
                                             <!-- Tombol Edit -->
-                                            <a href="{{ route('admin.users.edit', $u->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition">
+                                            <a href="{{ route('admin.users.edit', $u->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
                                                 Edit
                                             </a>
 
                                             <!-- Reset Password -->
-                                            <form action="{{ route('admin.users.reset_password', $u->id) }}" method="POST" onsubmit="return confirm('Reset password akun {{ $u->name }} ke default (password)?');">
+                                            <form action="{{ route('admin.users.reset_password', $u->id) }}" method="POST" onsubmit="return confirm('Reset password akun {{ $u->name }} ke default (password)?');" class="inline-flex items-center m-0 p-0">
                                                 @csrf
-                                                <button type="submit" title="Reset password ke default: password" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition">
+                                                <button type="submit" title="Reset password ke default: password" class="inline-flex items-center justify-center px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
                                                     Reset
                                                 </button>
                                             </form>
 
                                             <!-- Hapus User -->
                                             @if($u->id !== $currentUser->id)
-                                                <form action="{{ route('admin.users.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun {{ $u->name }}?');">
+                                                <form action="{{ route('admin.users.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun {{ $u->name }}?');" class="inline-flex items-center m-0 p-0">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition">
+                                                    <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
                                                         Hapus
                                                     </button>
                                                 </form>

@@ -112,15 +112,15 @@
                             </div>
 
                             @if($isSuperAdmin)
-                                <div class="flex items-center gap-2">
-                                    <a href="{{ route('admin.agencies.edit', $agency->id) }}" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition">
+                                <div class="inline-flex items-center gap-2">
+                                    <a href="{{ route('admin.agencies.edit', $agency->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
                                         Edit
                                     </a>
 
-                                    <form action="{{ route('admin.agencies.destroy', $agency->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus instansi ini? Pastikan tidak ada unit atau user terkait.');">
+                                    <form action="{{ route('admin.agencies.destroy', $agency->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus instansi ini? Pastikan tidak ada unit atau user terkait.');" class="inline-flex items-center m-0 p-0">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition">
+                                        <button type="submit" class="inline-flex items-center justify-center px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition shadow-2xs leading-none cursor-pointer">
                                             Hapus
                                         </button>
                                     </form>
