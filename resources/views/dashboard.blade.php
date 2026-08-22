@@ -110,8 +110,8 @@
                                 <p class="text-xl sm:text-2xl font-black mt-1" style="color: #fde047 !important;">{{ $eval->nilai_akhir }}</p>
                             </div>
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
-                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #fde047 !important;">Mutu & Predikat</span>
-                                <p class="text-sm sm:text-base font-black mt-1" style="color: #ffffff !important;">{{ $eval->grade_calculated }} - {{ $eval->predikat }}</p>
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #fde047 !important;">Grade Kelulusan</span>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $eval->grade_calculated ?? ($eval->grade ?? 'A') }}</p>
                             </div>
                         </div>
                     @endif
