@@ -4,8 +4,15 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController; 
 use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\UnitController as AdminUnitController;
+use App\Http\Controllers\Admin\AgencyController as AdminAgencyController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\UniversityController as AdminUniversityController;
+use App\Http\Controllers\Admin\MentorController as AdminMentorController;
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
+use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
@@ -49,6 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Route Impersonation (Bisa diakses saat login)
+    Route::post('/admin/impersonate/leave', [ImpersonationController::class, 'leave'])->name('admin.impersonate.leave');
+
     // ==========================================
     // 1. ROUTE KHUSUS MAHASISWA
     // ==========================================
@@ -82,9 +92,15 @@ Route::middleware('auth')->group(function () {
 
 
     // ==========================================
-    // 2. ROUTE KHUSUS ADMIN
+    // 2. ROUTE KHUSUS ADMIN (SUPER ADMIN & ADMIN DINAS)
     // ==========================================
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['role:admin,super_admin'])->group(function () {
+        // Executive Dashboard
+        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+        // Impersonation ("Login As")
+        Route::post('/admin/impersonate/{userId}', [ImpersonationController::class, 'impersonate'])->name('admin.impersonate');
+
         // Verifikasi Pengajuan Magang
         Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
         Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show');
@@ -114,6 +130,23 @@ Route::middleware('auth')->group(function () {
             'destroy' => 'admin.units.destroy',
         ]);
         Route::patch('/admin/units/{id}/quota', [AdminUnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
+
+        // Master Instansi Dinas
+        Route::resource('/admin/agencies', AdminAgencyController::class)->names('admin.agencies');
+
+        // Master Pengguna Sistem
+        Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
+        Route::post('/admin/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset_password');
+
+        // Master Perguruan Tinggi (Universitas)
+        Route::resource('/admin/universities', AdminUniversityController::class)->names('admin.universities');
+
+        // Manajemen Mentor Internal Dinas
+        Route::resource('/admin/mentors', AdminMentorController::class)->names('admin.mentors');
+        Route::post('/admin/mentors/{id}/reset-password', [AdminMentorController::class, 'resetPassword'])->name('admin.mentors.reset_password');
+
+        // Log Audit Aktivitas Sistem
+        Route::get('/admin/audit-logs', [AdminAuditLogController::class, 'index'])->name('admin.audit_logs.index');
     });
 
     // ==========================================

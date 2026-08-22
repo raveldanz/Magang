@@ -78,6 +78,12 @@ class LogbookController extends Controller
             'feedback' => $request->feedback,
         ]);
 
+        \App\Models\AuditLog::record('MENTOR_LOGBOOK_REVIEW', 'Logbook', $logbook->id, [
+            'status' => $logbook->status,
+            'feedback' => $logbook->feedback,
+            'student_name' => optional($placement->application?->user)->name,
+        ]);
+
         return redirect()->back()->with('success', 'Status logbook mahasiswa berhasil diperbarui!');
     }
 }
