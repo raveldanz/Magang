@@ -36,34 +36,67 @@
             </div>
 
             @php
-                $isPassed = $application && $application->status === 'accepted' && 
-                            optional($application->placement)->evaluation && 
-                            optional(optional($application->placement)->finalreport)->status === 'approved';
+                $eval = optional(optional($application)->placement)->evaluation;
+                $finalReport = optional(optional($application)->placement)->finalreport;
+                $isPassed = $application && (
+                    $application->status === 'completed' || 
+                    ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0 && optional($finalReport)->status === 'approved')
+                );
                 $placement = $application ? $application->placement : null;
                 $mentor = $placement ? ($placement->mentor ?? $placement->pembimbing) : null;
                 $academicAdvisor = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
             @endphp
 
-            <!-- Banner Kelulusan & Unduh E-Sertifikat -->
+            <!-- Banner Kelulusan Resmi & Unduh E-Sertifikat -->
             @if ($isPassed)
-                <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="p-3 bg-white/20 rounded-2xl shadow-inner">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                <div class="bg-gradient-to-br from-emerald-600 via-teal-700 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="p-3.5 bg-white/20 rounded-2xl shadow-inner shrink-0 text-3xl">
+                                🎓
+                            </div>
+                            <div>
+                                <span class="px-3 py-1 bg-white/20 rounded-full text-[11px] font-black uppercase tracking-wider text-emerald-100 border border-white/20">
+                                    Status: Kelulusan Terverifikasi Resmi
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-black mt-2">🎉 Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM</h3>
+                                <p class="text-emerald-100 text-xs sm:text-sm mt-1 max-w-2xl">
+                                    Seluruh kewajiban logbook, laporan akhir ilmiah, dan evaluasi dinas (40%) serta bimbingan akademik DPL (60%) telah lengkap. E-Sertifikat resmi kelulusan telah diterbitkan.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-bold">🎉 Selamat! Anda telah menyelesaikan seluruh rangkaian magang.</h3>
-                            <p class="text-emerald-100 mt-1 text-sm">Laporan akhir Anda telah disetujui dan seluruh evaluasi telah lengkap. Anda dapat mengunduh E-Sertifikat resmi.</p>
+
+                        <div class="shrink-0 w-full md:w-auto">
+                            <a href="{{ route('student.certificate.show', $application->id) }}" 
+                               target="_blank"
+                               class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-emerald-900 font-black text-xs sm:text-sm rounded-2xl shadow-lg hover:bg-emerald-50 transition transform active:scale-95 cursor-pointer">
+                                <span>📜 Cetak Sertifikat Resmi (PDF)</span>
+                                <span>→</span>
+                            </a>
                         </div>
                     </div>
-                    <div class="flex-shrink-0">
-                        <a href="{{ route('student.certificate.download', $placement->id) }}" 
-                           class="inline-flex items-center space-x-2 px-5 py-2.5 bg-white text-emerald-800 font-extrabold text-sm rounded-xl shadow-md hover:bg-emerald-50 transition transform hover:-translate-y-0.5">
-                            <span>📜 Unduh E-Sertifikat</span>
-                        </a>
-                    </div>
+
+                    <!-- Rekapitulasi Nilai Transparan -->
+                    @if($eval)
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/20 text-center">
+                            <div class="p-3 bg-white/10 rounded-2xl border border-white/10">
+                                <span class="text-[10px] font-bold text-emerald-200 uppercase">Nilai Dinas (40%)</span>
+                                <p class="text-lg sm:text-xl font-black text-white mt-0.5">{{ $eval->nilai_pembimbing }}/100</p>
+                            </div>
+                            <div class="p-3 bg-white/10 rounded-2xl border border-white/10">
+                                <span class="text-[10px] font-bold text-emerald-200 uppercase">Nilai DPL (60%)</span>
+                                <p class="text-lg sm:text-xl font-black text-white mt-0.5">{{ $eval->nilai_dosen_calculated }}/100</p>
+                            </div>
+                            <div class="p-3 bg-white/10 rounded-2xl border border-white/10">
+                                <span class="text-[10px] font-bold text-emerald-200 uppercase">Nilai Akhir Total</span>
+                                <p class="text-lg sm:text-xl font-black text-emerald-300 mt-0.5">{{ $eval->nilai_akhir }}</p>
+                            </div>
+                            <div class="p-3 bg-white/20 rounded-2xl border border-white/20">
+                                <span class="text-[10px] font-bold text-amber-200 uppercase">Mutu & Predikat</span>
+                                <p class="text-sm sm:text-base font-black text-amber-300 mt-0.5">{{ $eval->grade_calculated }} - {{ $eval->predikat }}</p>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @endif
 
