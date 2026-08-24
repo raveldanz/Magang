@@ -74,13 +74,13 @@
 
                 <a href="{{ route('notifications.index', ['category' => 'logbook']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    📖 Logbook & Aktivitas
+                    📖 Logbook
                 </a>
 
                 @if(Auth::user() && (Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin'))
                     <a href="{{ route('notifications.index', ['category' => 'audit']) }}" 
                        class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'audit' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                        📜 Log Audit & Aktivitas
+                        📜 Audit
                     </a>
                 @endif
             </div>
