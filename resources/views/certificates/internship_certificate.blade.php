@@ -375,7 +375,13 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-slate-800">
                         
-                        <!-- ASPEK I: KINERJA LAPANGAN (40%) -->
+@php
+    $univ = $eval ? $eval->getUniversity() : null;
+    $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+    $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+    $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+@endphp
+                        <!-- ASPEK I: KINERJA LAPANGAN -->
                         <tr class="bg-slate-100/90 font-bold text-slate-900">
                             <td class="py-1.5 px-3 text-center font-bold">A</td>
                             <td colspan="4" class="py-1.5 px-3 uppercase text-[10px] text-blue-900">
@@ -405,49 +411,64 @@
                         </tr>
                         <tr class="bg-blue-50/70 font-bold">
                             <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
-                            <td class="py-2 px-3 text-center text-blue-900">40%</td>
+                            <td class="py-2 px-3 text-center text-blue-900">{{ $isMentorOnly ? '100%' : ($weightMentor . '%') }}</td>
                             <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_pembimbing ?? 90 }}</td>
                             <td class="py-2 px-3 text-center text-blue-950 font-black">
-                                {{ round(0.40 * ($eval->nilai_pembimbing ?? 90), 2) }}
+                                {{ $isMentorOnly ? ($eval->nilai_pembimbing ?? 90) : round(($weightMentor / 100) * ($eval->nilai_pembimbing ?? 90), 2) }}
                             </td>
                         </tr>
 
-                        <!-- ASPEK II: AKADEMIK DPL (60%) -->
+                        <!-- ASPEK II: AKADEMIK DPL -->
                         <tr class="bg-slate-100/90 font-bold text-slate-900">
                             <td class="py-1.5 px-3 text-center font-bold">B</td>
                             <td colspan="4" class="py-1.5 px-3 uppercase text-[10px] text-blue-900">
                                 Penilaian Akademik Dosen Pembimbing Lapangan (DPL Kampus)
                             </td>
                         </tr>
-                        <tr>
-                            <td class="py-1.5 px-3 text-center text-slate-400">1</td>
-                            <td class="py-1.5 px-3">Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                        </tr>
-                        <tr>
-                            <td class="py-1.5 px-3 text-center text-slate-400">2</td>
-                            <td class="py-1.5 px-3">Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                        </tr>
-                        <tr>
-                            <td class="py-1.5 px-3 text-center text-slate-400">3</td>
-                            <td class="py-1.5 px-3">Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                        </tr>
-                        <tr class="bg-blue-50/70 font-bold">
-                            <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL (Rata-rata):</td>
-                            <td class="py-2 px-3 text-center text-blue-900">60%</td>
-                            <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
-                            <td class="py-2 px-3 text-center text-blue-950 font-black">
-                                {{ round(0.60 * ($eval->nilai_dosen_calculated ?? 90), 2) }}
-                            </td>
-                        </tr>
+                        @if ($isMentorOnly)
+                            <tr>
+                                <td class="py-2 px-3 text-center text-slate-400">-</td>
+                                <td colspan="4" class="py-2 px-3 text-slate-500 italic text-[11px]">
+                                    Penilaian Akademik DPL dilewati (Skema Kebijakan Penilaian Penuh Dinas 100% oleh {{ $univ->name ?? 'Perguruan Tinggi' }}).
+                                </td>
+                            </tr>
+                            <tr class="bg-blue-50/70 font-bold">
+                                <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL:</td>
+                                <td class="py-2 px-3 text-center text-blue-900">0%</td>
+                                <td class="py-2 px-3 text-center text-blue-900">N/A</td>
+                                <td class="py-2 px-3 text-center text-blue-950 font-black">0.00</td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td class="py-1.5 px-3 text-center text-slate-400">1</td>
+                                <td class="py-1.5 px-3">Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 px-3 text-center text-slate-400">2</td>
+                                <td class="py-1.5 px-3">Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 px-3 text-center text-slate-400">3</td>
+                                <td class="py-1.5 px-3">Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            </tr>
+                            <tr class="bg-blue-50/70 font-bold">
+                                <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL (Rata-rata):</td>
+                                <td class="py-2 px-3 text-center text-blue-900">{{ $weightLecturer }}%</td>
+                                <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
+                                <td class="py-2 px-3 text-center text-blue-950 font-black">
+                                    {{ round(($weightLecturer / 100) * ($eval->nilai_dosen_calculated ?? 90), 2) }}
+                                </td>
+                            </tr>
+                        @endif
 
                         <!-- REKAPITULASI TOTAL NILAI AKHIR -->
                         <tr class="bg-slate-900 text-white font-black text-xs">
@@ -472,12 +493,12 @@
         <!-- 4. FOOTER TTD TRANSKRIP (Bagian Bawah) -->
         <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-5 text-center text-xs">
             <div>
-                <p class="font-bold text-slate-800 text-xs">Dosen Pembimbing Lapangan,</p>
+                <p class="font-bold text-slate-800 text-xs">{{ $isMentorOnly ? 'Pihak Perguruan Tinggi,' : 'Dosen Pembimbing Lapangan,' }}</p>
                 <div class="h-12 flex items-center justify-center my-1">
                     <span class="font-quote text-blue-900/30 text-sm italic font-bold">Approved</span>
                 </div>
                 <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
-                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
+                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? ($univ->pic_name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom') }}</p>
                 </div>
             </div>
 

@@ -145,6 +145,26 @@
             </div>
         </div>
 
+        {{-- Alert Notifikasi Kampus Baru Tanpa Akun Portal (Super Admin) --}}
+        @if($isSuperAdmin && isset($pendingUniversities) && $pendingUniversities->count() > 0)
+            <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-5 rounded-2xl bg-white shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🔔</span>
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">
+                            Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar Otomatis
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-0.5">
+                            Mahasiswa mendaftar dari kampus baru: <strong>{{ $pendingUniversities->pluck('name')->implode(', ') }}</strong>. Silakan lengkapi profil kampus dan buatkan akun login PIC/Admin Kampus.
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    Kelola Kampus & Buat Akun &rarr;
+                </a>
+            </div>
+        @endif
+
         {{-- 2. ENAM KARTU METRIK EKSEKUTIF (TERISOLASI OTOMATIS BERDASARKAN DINAS) --}}
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {{-- Pendaftar --}}

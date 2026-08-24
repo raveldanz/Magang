@@ -42,7 +42,17 @@ class UserController extends Controller
 
         // Filter Universitas
         if ($request->filled('university_id')) {
-            $query->where('university_id', $request->university_id);
+            $univId = $request->university_id;
+            $univ = University::find($univId);
+            $univName = $univ?->name;
+
+            $query->where(function ($q) use ($univId, $univName) {
+                $q->where('university_id', $univId);
+                if ($univName) {
+                    $q->orWhere('university', 'like', "%{$univName}%")
+                      ->orWhereHas('studentProfile', fn($sp) => $sp->where('universitas', 'like', "%{$univName}%"));
+                }
+            });
         }
 
         // Search

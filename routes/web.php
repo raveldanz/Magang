@@ -60,6 +60,21 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/impersonate/leave', [ImpersonationController::class, 'leave'])->name('admin.impersonate.leave');
 
     // ==========================================
+    // NOTIFIKASI & PEMBERITAHUAN SISTEM (SEMUA ROLE)
+    // ==========================================
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
+
+    // ==========================================
+    // MASUKAN & LAPORAN KENDALA (FEEDBACK / SUPPORT TICKET)
+    // ==========================================
+    Route::get('/feedbacks/create', [\App\Http\Controllers\FeedbackController::class, 'create'])->name('feedbacks.create');
+    Route::post('/feedbacks', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('feedbacks.store');
+    Route::get('/feedbacks/my', [\App\Http\Controllers\FeedbackController::class, 'myFeedbacks'])->name('feedbacks.my');
+    Route::get('/feedbacks/{id}', [\App\Http\Controllers\FeedbackController::class, 'show'])->name('feedbacks.show');
+
+    // ==========================================
     // 1. ROUTE KHUSUS MAHASISWA
     // ==========================================
     Route::middleware(['role:mahasiswa'])->group(function () {
@@ -140,6 +155,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset_password');
 
         // Master Perguruan Tinggi (Universitas)
+        Route::post('/admin/universities/{id}/create-account', [AdminUniversityController::class, 'createAccount'])->name('admin.universities.create_account');
         Route::resource('/admin/universities', AdminUniversityController::class)->names('admin.universities');
 
         // Manajemen Mentor Internal Dinas
@@ -149,6 +165,14 @@ Route::middleware('auth')->group(function () {
         // Log Audit Aktivitas Sistem
         Route::get('/admin/audit-logs', [AdminAuditLogController::class, 'index'])->name('admin.audit_logs.index');
         Route::get('/admin/audit-trail', [AdminAuditLogController::class, 'index'])->name('admin.audit-logs.index');
+
+        // Pusat Pemberitahuan & Tindakan Super Admin
+        Route::get('/admin/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('admin.notifications.index');
+
+        // Manajemen Feedback & Tiket Masukan (Admin)
+        Route::get('/admin/feedbacks', [\App\Http\Controllers\FeedbackController::class, 'index'])->name('admin.feedbacks.index');
+        Route::get('/admin/feedbacks/{id}', [\App\Http\Controllers\FeedbackController::class, 'show'])->name('admin.feedbacks.show');
+        Route::post('/admin/feedbacks/{id}/respond', [\App\Http\Controllers\FeedbackController::class, 'respond'])->name('admin.feedbacks.respond');
     });
 
     // ==========================================
