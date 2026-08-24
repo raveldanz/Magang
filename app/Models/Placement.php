@@ -61,6 +61,11 @@ class Placement extends Model
         return $this->hasOne(Evaluation::class);
     }
 
+    public function unit()
+    {
+        return $this->hasOneThrough(Unit::class, Application::class, 'id', 'id', 'application_id', 'unit_id');
+    }
+
     // Accessor untuk mendapatkan AgencyProfile dari unit penempatan
     public function getAgencyProfileAttribute()
     {

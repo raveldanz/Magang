@@ -43,23 +43,57 @@ class Evaluation extends Model
     }
 
     /**
-     * Nilai Akhir Gabungan (40% Instansi Dinas + 60% Dosen Kampus)
+     * Dapatkan data Universitas asal Mahasiswa
+     */
+    public function getUniversity()
+    {
+        $student = $this->placement?->application?->user;
+        if (!$student) return null;
+
+        if ($student->university_id) {
+            return University::find($student->university_id);
+        }
+
+        $name = $student->university ?? $student->studentProfile?->universitas;
+        if ($name) {
+            return University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Nilai Akhir Gabungan Adaptif Berdasarkan Kebijakan Kampus
      */
     public function getNilaiAkhirAttribute()
     {
+        $nilaiDinas = $this->nilai_pembimbing;
+        $nilaiDosen = $this->nilai_dosen_calculated;
+        $univ = $this->getUniversity();
+
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+
+        if ($scheme === 'mentor_only') {
+            if ($nilaiDinas > 0) {
+                return (float)$nilaiDinas;
+            }
+            return (float)($this->attributes['final_score'] ?? 0);
+        }
+
+        if ($nilaiDinas > 0 && $nilaiDosen > 0) {
+            return (float)round(($nilaiDinas * ($weightMentor / 100)) + ($nilaiDosen * ($weightLecturer / 100)), 2);
+        }
+
         if (isset($this->attributes['final_score']) && (float)$this->attributes['final_score'] > 0) {
             return (float)$this->attributes['final_score'];
         }
 
-        $nilaiDinas = $this->nilai_pembimbing;
-        $nilaiDosen = $this->nilai_dosen_calculated;
-
-        if ($nilaiDinas > 0 && $nilaiDosen > 0) {
-            return round(($nilaiDinas * 0.40) + ($nilaiDosen * 0.60), 2);
-        } elseif ($nilaiDinas > 0) {
-            return $nilaiDinas;
+        if ($nilaiDinas > 0) {
+            return (float)$nilaiDinas;
         } elseif ($nilaiDosen > 0) {
-            return $nilaiDosen;
+            return (float)$nilaiDosen;
         }
 
         return 0;

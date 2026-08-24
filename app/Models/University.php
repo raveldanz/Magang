@@ -19,6 +19,16 @@ class University extends Model
         'pic_nip',
         'pic_position',
         'logo',
+        'evaluation_scheme',
+        'weight_mentor',
+        'weight_lecturer',
+        'require_dpl',
+    ];
+
+    protected $casts = [
+        'weight_mentor' => 'integer',
+        'weight_lecturer' => 'integer',
+        'require_dpl' => 'boolean',
     ];
 
     public function users()
@@ -34,5 +44,10 @@ class University extends Model
     public function students()
     {
         return $this->hasMany(User::class)->where('role', 'mahasiswa');
+    }
+
+    public function universityAdmin()
+    {
+        return $this->hasOne(User::class)->where('role', 'universitas');
     }
 }

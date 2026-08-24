@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Logbook;
 use App\Models\Placement;
+use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,8 @@ class LogbookController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
+        $user = Auth::user();
+        $userId = $user->id;
 
         // 1. Ambil pengajuan terakhir mahasiswa
         $application = Application::where('user_id', $userId)
@@ -46,16 +48,21 @@ class LogbookController extends Controller
             'rejected' => $logbooks->where('status', 'rejected')->count(),
         ];
 
-        return view('student.logbook.index', compact('application', 'placement', 'logbooks', 'stats'));
+        $requiresDpl = $this->isDplRequiredForStudent($user);
+
+        return view('student.logbook.index', compact('application', 'placement', 'logbooks', 'stats', 'requiresDpl'));
     }
 
     public function create()
     {
-        $application = Application::where('user_id', Auth::id())->latest()->first();
+        $user = Auth::user();
+        $application = Application::where('user_id', $user->id)->latest()->first();
+        $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
+        $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$application || !$application->is_active_internship) {
+        if (!$application || !$application->is_active_internship || !$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
         }
 
         return view('student.logbook.create', compact('application'));
@@ -63,11 +70,14 @@ class LogbookController extends Controller
 
     public function store(Request $request)
     {
-        $application = Application::where('user_id', Auth::id())->latest()->first();
+        $user = Auth::user();
+        $application = Application::where('user_id', $user->id)->latest()->first();
+        $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
+        $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$application || !$application->is_active_internship) {
+        if (!$application || !$application->is_active_internship || !$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
         }
 
         $request->validate([
@@ -75,8 +85,6 @@ class LogbookController extends Controller
             'activity'   => 'required|string|min:10',
             'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
-
-        $placement = Placement::where('application_id', $application->id)->firstOrFail();
 
         $filePath = null;
         if ($request->hasFile('attachment')) {
@@ -89,10 +97,35 @@ class LogbookController extends Controller
             'activity'     => $request->activity,
             'attachment'   => $filePath,
             'status'       => 'pending',
-            'lecturer_status' => 'pending',
+            'lecturer_status' => $requiresDpl ? 'pending' : 'approved',
+            'lecturer_feedback' => $requiresDpl ? null : 'Dilewati (Kebijakan Penilaian 100% Instansi Dinas)',
+            'lecturer_verified_at' => $requiresDpl ? null : now(),
         ]);
 
         return redirect()->route('student.logbook.index')->with('success', 'Logbook kegiatan berhasil disimpan!');
+    }
+
+    /**
+     * Periksa apakah kampus mahasiswa mewajibkan DPL
+     */
+    protected function isDplRequiredForStudent($user): bool
+    {
+        $univ = null;
+        if ($user->university_id) {
+            $univ = University::find($user->university_id);
+        } elseif ($user->university || $user->studentProfile?->universitas) {
+            $name = $user->university ?? $user->studentProfile?->universitas;
+            $univ = University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+        }
+
+        if ($univ) {
+            if ($univ->evaluation_scheme === 'mentor_only') {
+                return false;
+            }
+            return (bool) ($univ->require_dpl ?? true);
+        }
+
+        return true;
     }
 
     public function edit($id)

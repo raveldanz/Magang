@@ -241,7 +241,7 @@
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
-                                                <span>Detail & Nilai</span>
+                                                <span>Detail</span>
                                                 <span>→</span>
                                             </a>
                                         </div>

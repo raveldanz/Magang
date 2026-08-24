@@ -44,7 +44,7 @@
 
             <!-- Search & Filter Card -->
             <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
-                <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: '{{ request('role', '') }}' }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <!-- Search Input -->
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
@@ -58,7 +58,7 @@
                     </div>
 
                     <!-- Filter Role -->
-                    <select name="role" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                    <select name="role" x-model="role" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>🎓 Mahasiswa</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>🏢 Admin Dinas / Super Admin</option>
@@ -67,15 +67,32 @@
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>🏛️ Akun Universitas</option>
                     </select>
 
-                    <!-- Filter Instansi -->
-                    <select name="agency_id" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                        <option value="">Semua Instansi Dinas</option>
-                        @foreach($agencies as $ag)
-                            <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                {{ $ag->agency_name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <!-- Filter Afiliasi / Instansi / Universitas Dinamis -->
+                    <div>
+                        <!-- Case 1: Universitas / Mahasiswa / Dosen -->
+                        <div x-show="['universitas', 'dosen', 'mahasiswa'].includes(role)">
+                            <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                <option value="">Semua Universitas / Kampus</option>
+                                @foreach($universities as $u)
+                                    <option value="{{ $u->id }}" {{ request('university_id') == $u->id ? 'selected' : '' }}>
+                                        {{ $u->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Case 2: Admin Dinas / Mentor Lapangan / Default -->
+                        <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
+                            <select name="agency_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                <option value="">Semua Instansi Dinas</option>
+                                @foreach($agencies as $ag)
+                                    <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
+                                        {{ $ag->agency_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
 
                     <!-- Submit & Reset -->
                     <div class="flex items-center gap-2">

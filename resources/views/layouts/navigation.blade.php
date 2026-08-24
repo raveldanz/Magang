@@ -94,7 +94,7 @@
 
                         <a href="{{ route('admin.agencies.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.agencies.*') || request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Instansi & Unit
+                            Instansi
                         </a>
 
                         <a href="{{ route('admin.universities.index') }}" 
@@ -143,11 +143,6 @@
                                 </a>
                             </div>
                         </div>
-
-                        <a href="{{ route('admin.audit_logs.index') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.audit_logs.*') || request()->routeIs('admin.audit-logs.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Log Audit
-                        </a>
 
                     {{-- 2.2 ADMIN DINAS --}}
                     @elseif ($isAdminDinas)
@@ -244,8 +239,85 @@
                 </div>
             </div>
 
-            {{-- 3. RIGHT SECTION: USER BADGE & PROFILE DROPDOWN (DESKTOP) --}}
+            {{-- 3. RIGHT SECTION: NOTIFICATION BELL & USER PROFILE DROPDOWN (DESKTOP) --}}
             <div class="hidden md:flex items-center gap-3">
+
+                {{-- Notification Bell Dropdown --}}
+                @php
+                    $navHasUnreadDot = Auth::user() ? \App\Services\NotificationService::hasUnreadDot(Auth::user()) : false;
+                    $navQuickNotifs = Auth::user() ? array_slice(\App\Services\NotificationService::getNotificationsForUser(Auth::user()), 0, 4) : [];
+                @endphp
+                <div x-data="{ notifOpen: false }" class="relative" @click.away="notifOpen = false">
+                    <button @click="notifOpen = !notifOpen" 
+                            type="button"
+                            title="Pemberitahuan Sistem"
+                            class="relative p-2.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white text-slate-600 hover:text-blue-600 transition cursor-pointer shadow-2xs">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        @if($navHasUnreadDot)
+                            <span class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white animate-pulse"></span>
+                        @endif
+                    </button>
+
+                    <div x-show="notifOpen" 
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                         x-cloak
+                         class="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-3xl p-3 space-y-2 border border-slate-100"
+                         style="background-color: #ffffff !important; opacity: 1 !important; z-index: 99999 !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; display: none;">
+                        
+                        <div class="flex items-center justify-between px-3 py-2 border-b border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-xs text-slate-900">Pemberitahuan Sistem</span>
+                                @if($navHasUnreadDot)
+                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                @endif
+                            </div>
+                            <a href="{{ route('notifications.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
+                                Lihat Semua &rarr;
+                            </a>
+                        </div>
+
+                        <div class="space-y-1.5 max-h-72 overflow-y-auto">
+                            @forelse($navQuickNotifs as $qn)
+                                <a href="{{ $qn['action_url'] ?? route('notifications.index') }}" class="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition block">
+                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '🔔' }}</span>
+                                    <div class="space-y-0.5 overflow-hidden">
+                                        <div class="text-xs font-bold text-slate-800 truncate">{{ $qn['title'] }}</div>
+                                        <div class="text-[11px] text-slate-500 line-clamp-1">{{ $qn['message'] }}</div>
+                                        <div class="text-[10px] text-slate-400 font-medium">{{ $qn['time'] }}</div>
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="py-6 text-center text-xs text-slate-400">
+                                    Tidak ada pemberitahuan baru
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs px-2">
+                            @if($isSuperAdmin || $isAdminDinas)
+                                <a href="{{ route('admin.feedbacks.index') }}" class="text-[11px] font-bold text-slate-600 hover:text-blue-600 flex items-center gap-1">
+                                    <span>💬</span> <span>Feedback</span>
+                                </a>
+                            @else
+                                <a href="{{ route('feedbacks.create') }}" class="text-[11px] font-bold text-slate-600 hover:text-blue-600 flex items-center gap-1">
+                                    <span>💬</span> <span>Kirim Laporan Kendala</span>
+                                </a>
+                            @endif
+                            <a href="{{ route('notifications.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
+                                Pusat Tindakan &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- User Profile Dropdown --}}
                 <div x-data="{ profileOpen: false }" class="relative" @click.away="profileOpen = false">
                     <button @click="profileOpen = !profileOpen" 
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
@@ -306,7 +378,7 @@
                                 <span class="text-sm">📋</span> Verifikasi Pengajuan
                             </a>
                             <a href="{{ route('admin.agencies.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                <span class="text-sm">🏢</span> Instansi & Unit
+                                <span class="text-sm">🏢</span> Instansi
                             </a>
                             <a href="{{ route('admin.users.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 <span class="text-sm">👥</span> Kelola Pengguna
@@ -356,6 +428,26 @@
                                 <span class="text-sm">🏢</span> Profil Kampus
                             </a>
                         @endif
+
+                        {{-- Unified Feedback & Notification Links in Profile --}}
+                        <div class="pt-1.5 border-t border-slate-100 mt-1.5 space-y-0.5">
+                            <a href="{{ route('notifications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                <span class="text-sm">🔔</span> Pemberitahuan Sistem
+                            </a>
+
+                            @if($isSuperAdmin || $isAdminDinas)
+                                <a href="{{ route('admin.feedbacks.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                    <span class="text-sm">💬</span> Feedback
+                                </a>
+                            @else
+                                <a href="{{ route('feedbacks.create') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                    <span class="text-sm">💬</span> Kirim Laporan Kendala
+                                </a>
+                                <a href="{{ route('feedbacks.my') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                    <span class="text-sm">📋</span> Riwayat Masukan Saya
+                                </a>
+                            @endif
+                        </div>
 
                         <div class="pt-2 border-t border-slate-100">
                             <form method="POST" action="{{ route('logout') }}">
@@ -433,7 +525,7 @@
                 </a>
                 <a href="{{ route('admin.agencies.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.agencies.*') || request()->routeIs('admin.units.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                     <span>🏢</span>
-                    <span>Instansi & Unit</span>
+                    <span>Instansi</span>
                 </a>
                 <a href="{{ route('admin.universities.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.universities.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                     <span>🎓</span>
@@ -446,10 +538,6 @@
                 <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                     <span>👔</span>
                     <span>Mentor Lapangan</span>
-                </a>
-                <a href="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.audit_logs.*') || request()->routeIs('admin.audit-logs.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    <span>📜</span>
-                    <span>Log Audit</span>
                 </a>
 
             {{-- 5.2 Menu Mobile Admin Dinas --}}
@@ -544,6 +632,29 @@
                 </a>
             @endif
 
+        </div>
+
+        {{-- Mobile Utility Links --}}
+        <div class="pt-2 border-t border-slate-100 space-y-1">
+            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('notifications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                <span>🔔</span>
+                <span>Pemberitahuan Sistem</span>
+            </a>
+            @if($isSuperAdmin || $isAdminDinas)
+                <a href="{{ route('admin.feedbacks.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('admin.feedbacks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>💬</span>
+                    <span>Feedback</span>
+                </a>
+            @else
+                <a href="{{ route('feedbacks.create') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('feedbacks.create') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>💬</span>
+                    <span>Kirim Laporan Kendala</span>
+                </a>
+                <a href="{{ route('feedbacks.my') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('feedbacks.my') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <span>📋</span>
+                    <span>Riwayat Masukan Saya</span>
+                </a>
+            @endif
         </div>
 
         {{-- Tombol Logout Mobile --}}

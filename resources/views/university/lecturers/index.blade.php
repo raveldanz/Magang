@@ -205,6 +205,7 @@
         <!-- ========================================== -->
         <div x-show="showCreateModal" 
              x-cloak 
+             style="display: none;"
              class="fixed inset-0 z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity"
              x-transition:enter="ease-out duration-200"
              x-transition:enter-start="opacity-0"
@@ -277,6 +278,7 @@
         <!-- ========================================== -->
         <div x-show="showEditModal" 
              x-cloak 
+             style="display: none;"
              class="fixed inset-0 z-[9999] overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity"
              x-transition:enter="ease-out duration-200"
              x-transition:enter-start="opacity-0"

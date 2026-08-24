@@ -61,11 +61,31 @@ class ProfileController extends Controller
             'pic_nip' => 'nullable|string|max:50',
             'pic_position' => 'nullable|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'evaluation_scheme' => 'required|in:dual_evaluation,mentor_only',
+            'weight_mentor' => 'nullable|integer|min:0|max:100',
+            'weight_lecturer' => 'nullable|integer|min:0|max:100',
+            'require_dpl' => 'nullable',
         ], [
             'name.required' => 'Nama resmi universitas / perguruan tinggi wajib diisi.',
             'logo.image' => 'File logo harus berupa gambar (PNG, JPG, WEBP, atau SVG).',
             'logo.max' => 'Ukuran file logo maksimal 2MB.',
         ]);
+
+        $evaluationScheme = $request->input('evaluation_scheme', 'dual_evaluation');
+        if ($evaluationScheme === 'mentor_only') {
+            $weightMentor = 100;
+            $weightLecturer = 0;
+            $requireDpl = false;
+        } else {
+            $weightMentor = (int) $request->input('weight_mentor', 40);
+            $weightLecturer = (int) $request->input('weight_lecturer', 60);
+
+            if (($weightMentor + $weightLecturer) !== 100) {
+                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas (' . $weightMentor . '%) dan DPL Kampus (' . $weightLecturer . '%) harus berjumlah tepat 100%.');
+            }
+
+            $requireDpl = $request->boolean('require_dpl', true);
+        }
 
         $data = [
             'name' => $request->name,
@@ -76,6 +96,10 @@ class ProfileController extends Controller
             'pic_name' => $request->pic_name,
             'pic_nip' => $request->pic_nip,
             'pic_position' => $request->pic_position,
+            'evaluation_scheme' => $evaluationScheme,
+            'weight_mentor' => $weightMentor,
+            'weight_lecturer' => $weightLecturer,
+            'require_dpl' => $requireDpl,
         ];
 
         // Handle upload logo

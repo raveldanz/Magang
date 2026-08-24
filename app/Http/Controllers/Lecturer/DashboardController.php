@@ -88,7 +88,7 @@ class DashboardController extends Controller
     {
         $lecturer = Auth::user();
 
-        // Cari placement berdasarkan ID atau application_id dengan strict scoping DPL
+        // Cari placement berdasarkan ID langsung atau application_id sebagai fallback
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
@@ -97,10 +97,15 @@ class DashboardController extends Controller
             'logbooks',
             'finalreport',
             'evaluation',
-        ])->where(function ($q) use ($placementId) {
-            $q->where('id', $placementId)
-              ->orWhere('application_id', $placementId);
-        })->firstOrFail();
+        ])->find($placementId) ?? Placement::with([
+            'application.user.studentProfile',
+            'application.unit.agencyProfile',
+            'mentor',
+            'pembimbing',
+            'logbooks',
+            'finalreport',
+            'evaluation',
+        ])->where('application_id', $placementId)->firstOrFail();
 
         $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
         $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));

@@ -19,7 +19,7 @@ class EvaluationController extends Controller
     {
         $lecturer = Auth::user();
 
-        // Cari berdasarkan placement_id atau application_id
+        // Cari berdasarkan placement_id atau application_id sebagai fallback
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
@@ -27,10 +27,14 @@ class EvaluationController extends Controller
             'pembimbing',
             'evaluation',
             'finalreport',
-        ])->where(function ($q) use ($placementId) {
-            $q->where('id', $placementId)
-              ->orWhere('application_id', $placementId);
-        })->firstOrFail();
+        ])->find($placementId) ?? Placement::with([
+            'application.user.studentProfile',
+            'application.unit.agencyProfile',
+            'mentor',
+            'pembimbing',
+            'evaluation',
+            'finalreport',
+        ])->where('application_id', $placementId)->firstOrFail();
 
         // Otorisasi: DPL yang ditugaskan (academic_advisor_id) atau Super Admin
         $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
@@ -111,10 +115,14 @@ class EvaluationController extends Controller
         $evaluation->catatan_dosen = $feedback;
         $evaluation->feedback_dosen = $feedback;
 
-        // Hitung Nilai Akhir jika nilai dinas (40%) sudah ada
+        // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
         $nilaiDinas = $evaluation->nilai_pembimbing;
         if ($nilaiDinas > 0) {
-            $final = round((0.40 * $nilaiDinas) + (0.60 * $nilaiDosen), 2);
+            $univ = $evaluation->getUniversity();
+            $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+            $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+
+            $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * $nilaiDosen), 2);
             $evaluation->final_score = $final;
 
             if ($final >= 85) $grade = 'A';

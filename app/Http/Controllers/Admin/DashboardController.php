@@ -133,6 +133,11 @@ class DashboardController extends Controller
         // Pengajuan Magang Terbaru
         $recentApplications = $allApplications->take(6);
 
+        // Perguruan tinggi baru yang belum punya akun portal
+        $pendingUniversities = University::whereDoesntHave('users', function ($q) {
+            $q->where('role', 'universitas');
+        })->withCount('students')->get();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_pending' => $totalPending,
@@ -147,6 +152,7 @@ class DashboardController extends Controller
             'total_users' => $totalUsers,
             'total_mentors' => $totalMentors,
             'total_lecturers' => $totalLecturers,
+            'pending_universities_count' => $pendingUniversities->count(),
         ];
 
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
@@ -163,7 +169,8 @@ class DashboardController extends Controller
             'recentApplications',
             'recentAuditLogs',
             'currentAgency',
-            'agencyId'
+            'agencyId',
+            'pendingUniversities'
         ));
     }
 }

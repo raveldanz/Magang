@@ -40,6 +40,63 @@
                 </div>
             @endif
 
+            <!-- Credential Flash Alert -->
+            @if (session('new_university_credential'))
+                @php $cred = session('new_university_credential'); @endphp
+                <div class="p-6 rounded-3xl shadow-2xl space-y-4 border" 
+                     style="background-color: #0f172a !important; color: #ffffff !important; border-color: #334155 !important;">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #1e293b !important;">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner shrink-0" style="background-color: #1e293b !important;">
+                                🎉
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-base sm:text-lg tracking-tight" style="color: #ffffff !important;">
+                                    Akun Admin Kampus Baru Berhasil Dibuat!
+                                </h3>
+                                <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">
+                                    Kredensial resmi untuk <strong style="color: #38bdf8 !important;">{{ $cred['univ_name'] }}</strong> siap diteruskan ke pihak kemahasiswaan/rektorat.
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" 
+                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span>✅</span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span>📋</span>', 3000);"
+                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer shrink-0">
+                            <span>Salin Semua Kredensial</span>
+                            <span>📋</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
+                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
+                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">URL Login Portal:</span>
+                            <span class="font-bold select-all break-all text-xs" style="color: #38bdf8 !important;">{{ $cred['login_url'] }}</span>
+                        </div>
+                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
+                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Email / Username:</span>
+                            <span class="font-bold select-all break-all text-xs" style="color: #34d399 !important;">{{ $cred['email'] }}</span>
+                        </div>
+                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
+                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Password Default:</span>
+                            <span class="font-bold select-all text-xs" style="color: #fbbf24 !important;">{{ $cred['password'] }}</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Warning Banner for Unregistered University Accounts -->
+            @if(($unregisteredCount ?? 0) > 0)
+                <div class="p-5 bg-amber-50 border-l-4 border-amber-500 rounded-2xl shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🔔</span>
+                        <div>
+                            <h4 class="font-bold text-amber-900 text-sm">Terdapat {{ $unregisteredCount }} Perguruan Tinggi Baru yang Belum Memiliki Akun Admin Kampus</h4>
+                            <p class="text-xs text-amber-700 mt-0.5">Kampus terdaftar otomatis saat mahasiswa melakukan registrasi. Buatkan akun agar perwakilan kampus dapat login ke Portal Universitas.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Search Card -->
             <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs">
                 <form method="GET" action="{{ route('admin.universities.index') }}" class="flex items-center gap-3">
@@ -67,7 +124,7 @@
             <!-- Universities Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($universities as $univ)
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
                             <div class="flex items-start justify-between gap-4">
                                 <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
@@ -77,19 +134,43 @@
                                         <span class="text-2xl">🏛️</span>
                                     @endif
                                 </div>
-                                <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-black shrink-0">
-                                    {{ $univ->code }}
-                                </span>
+                                <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                    <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-black">
+                                        {{ $univ->code }}
+                                    </span>
+                                    @if($univ->universityAdmin)
+                                        <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                            ● Akun Aktif
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold animate-pulse">
+                                            ⏳ Belum Ada Akun
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="mt-4">
-                                <h3 class="font-black text-base text-gray-900">{{ $univ->name }}</h3>
+                                <h3 class="font-black text-base text-gray-900 leading-snug">{{ $univ->name }}</h3>
                                 <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
-                                @if($univ->pic_name)
-                                    <div class="mt-2 text-[11px] text-blue-700 font-semibold">
-                                        👔 PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
-                                    </div>
-                                @endif
+                                
+                                <div class="mt-3 pt-3 border-t border-slate-50 space-y-1">
+                                    @if($univ->pic_name)
+                                        <div class="text-[11px] text-blue-700 font-semibold truncate">
+                                            👔 PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
+                                        </div>
+                                    @else
+                                        <div class="text-[11px] text-slate-400 italic">
+                                            👔 PIC belum diisi
+                                        </div>
+                                    @endif
+
+                                    @if($univ->universityAdmin)
+                                        <div class="text-[11px] text-slate-600 truncate">
+                                            ✉️ <strong class="font-mono text-slate-700">{{ $univ->universityAdmin->email }}</strong>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
                             <!-- Stat Counts -->
@@ -109,13 +190,23 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
+                        <!-- Action Buttons in Footer -->
                         <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
-                            <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold">
-                                Lihat Akun →
+                            <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold shrink-0">
+                                Lihat Akun &rarr;
                             </a>
 
                             <div class="btn-action-group">
+                                @if(!$univ->universityAdmin)
+                                    <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="btn-action-form">
+                                        @csrf
+                                        <button type="submit" class="btn-action-create" title="Buatkan Akun Admin Kampus">
+                                            <span>⚡</span>
+                                            <span>Buat Akun</span>
+                                        </button>
+                                    </form>
+                                @endif
+
                                 <a href="{{ route('admin.universities.edit', $univ->id) }}" class="btn-action-edit">
                                     Edit
                                 </a>

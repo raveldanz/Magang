@@ -26,7 +26,8 @@
 .btn-action-edit,
 .btn-action-reset,
 .btn-action-delete,
-.btn-action-login {
+.btn-action-login,
+.btn-action-create {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -47,6 +48,17 @@
     white-space: nowrap !important;
     transition: all 0.15s ease-in-out !important;
     font-family: inherit !important;
+}
+
+.btn-action-create {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #1d4ed8 !important;
+    gap: 4px !important;
+}
+.btn-action-create:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1e40af !important;
 }
 
 .btn-action-edit {
