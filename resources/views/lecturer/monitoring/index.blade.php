@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -32,7 +32,7 @@
                             <option value="">-- Semua Dinas Penempatan --</option>
                             @foreach ($agencies as $agency)
                                 <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
-                                    🏛️ {{ $agency->agency_name }}
+                                     {{ $agency->agency_name }}
                                 </option>
                             @endforeach
                         </select>
@@ -61,22 +61,22 @@
             <div class="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-2">
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'active'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? 'active') === 'active' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>⚡ Mahasiswa Aktif</span>
+                    <span> Mahasiswa Aktif</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? 'active') === 'active' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['active'] }}</span>
                 </a>
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'completed'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'completed' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>🎓 Arsip Alumni Selesai</span>
+                    <span> Arsip Alumni Selesai</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'completed' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['completed'] }}</span>
                 </a>
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'upcoming'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>📅 Calon Peserta</span>
+                    <span> Calon Peserta</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['upcoming'] }}</span>
                 </a>
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'all'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>📁 Semua Bimbingan</span>
+                    <span> Semua Bimbingan</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'all' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['total'] }}</span>
                 </a>
             </div>
@@ -116,7 +116,7 @@
                                     </td>
 
                                     <td class="py-4 px-4">
-                                        <div class="text-xs font-semibold text-gray-800">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="text-xs font-semibold text-gray-800"> {{ $agency->agency_name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
@@ -131,18 +131,18 @@
 
                                     <td class="py-4 px-4 text-center">
                                         <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100">
-                                            📝 ACC {{ $approvedLog }} / {{ $totalLog }}
+                                             ACC {{ $approvedLog }} / {{ $totalLog }}
                                         </span>
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
                                         @if ($finalReport && $finalReport->status === 'approved')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
-                                                ✅ Disetujui
+                                                 Disetujui
                                             </span>
                                         @elseif ($finalReport)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200">
-                                                ⏳ Menunggu
+                                                 Menunggu
                                             </span>
                                         @else
                                             <span class="text-xs text-gray-400 italic">Belum Ada</span>
@@ -152,7 +152,7 @@
                                     <td class="py-4 px-4 text-center">
                                         @if ($hasEval)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-xs">
-                                                ⭐ {{ $placement->evaluation?->nilai_akademik ?? '-' }}
+                                                 {{ $placement->evaluation?->nilai_akademik ?? '-' }}
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">

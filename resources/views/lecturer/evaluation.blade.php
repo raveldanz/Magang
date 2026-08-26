@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('lecturer.dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs">
@@ -6,7 +6,7 @@
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>📝</span>
+                    <span></span>
                     <span>Formulir Penilaian Akademik DPL (Bobot 60%)</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
@@ -73,13 +73,13 @@
                     <h3 class="font-black text-gray-900 text-base mt-1">{{ $student->name }}</h3>
                     <p class="text-xs text-gray-500 mt-0.5">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->jurusan ?? 'Informatika' }}</p>
                     <span class="inline-block mt-2 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl border border-blue-200">
-                        🎓 {{ $profile->universitas ?? '-' }}
+                         {{ $profile->universitas ?? '-' }}
                     </span>
                 </div>
 
                 <div>
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Lokasi Magang Dinas</span>
-                    <h4 class="font-bold text-gray-800 text-sm mt-1">🏛️ {{ $agencyProfile->agency_name ?? '-' }}</h4>
+                    <h4 class="font-bold text-gray-800 text-sm mt-1"> {{ $agencyProfile->agency_name ?? '-' }}</h4>
                     <p class="text-xs text-gray-500 mt-0.5">Divisi: {{ $unit->name ?? '-' }}</p>
                     <p class="text-xs text-emerald-700 font-semibold mt-1">Pembimbing Dinas: {{ $mentor->name ?? '-' }}</p>
                 </div>
@@ -88,7 +88,7 @@
             <!-- Nilai Lapangan Dinas Preview (40%) -->
             @if ($evaluation && ($evaluation->nilai_disiplin > 0 || $evaluation->nilai_kinerja > 0))
                 <div class="bg-emerald-50/60 rounded-3xl p-5 border border-emerald-100 shadow-xs">
-                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block">💡 Nilai Evaluasi Pembimbing Dinas (Bobot 40%)</span>
+                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block"> Nilai Evaluasi Pembimbing Dinas (Bobot 40%)</span>
                     <div class="grid grid-cols-3 gap-3 mt-3">
                         <div class="bg-white p-3 rounded-xl border border-emerald-100 text-center">
                             <span class="text-[10px] font-bold text-gray-400 uppercase">Nilai Disiplin</span>

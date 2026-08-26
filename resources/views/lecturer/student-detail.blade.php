@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('lecturer.dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs">
@@ -6,7 +6,7 @@
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>👨‍🎓</span>
+                    <span>👨‍</span>
                     <span>Monitoring & Penilaian: {{ $student->name }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
@@ -58,7 +58,7 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <span></span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                     <p class="text-xs text-gray-500">Program Studi: <span class="font-semibold text-gray-700">{{ $profile->jurusan ?? 'Informatika' }}</span></p>
                     <div class="mt-3">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold">
-                            🎓 {{ $profile->universitas ?? '-' }}
+                             {{ $profile->universitas ?? '-' }}
                         </span>
                     </div>
                 </div>
@@ -93,10 +93,10 @@
                 <!-- Lokasi Magang & Pembimbing Dinas -->
                 <div class="md:col-span-1 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-4">
                     <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Penempatan Instansi</span>
-                    <h4 class="font-bold text-base text-gray-900 mt-1">🏛️ {{ $agencyProfile->agency_name ?? '-' }}</h4>
+                    <h4 class="font-bold text-base text-gray-900 mt-1"> {{ $agencyProfile->agency_name ?? '-' }}</h4>
                     <p class="text-xs text-gray-500 mt-0.5">Divisi: <span class="font-semibold text-gray-700">{{ $unit->name ?? '-' }}</span></p>
                     <div class="mt-2 text-xs text-gray-600">
-                        👔 Mentor: <strong>{{ $mentor->name ?? 'Belum Ditugaskan' }}</strong>
+                         Mentor: <strong>{{ $mentor->name ?? 'Belum Ditugaskan' }}</strong>
                     </div>
                 </div>
 
@@ -125,7 +125,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
-                            📂
+                            
                         </div>
                         <div>
                             <h3 class="font-black text-base text-gray-900">Verifikasi Dokumen Laporan Akhir Magang</h3>
@@ -136,19 +136,19 @@
                     <div>
                         @if(!$finalReport)
                             <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600">
-                                ⚪ Mahasiswa Belum Mengunggah Laporan
+                                 Mahasiswa Belum Mengunggah Laporan
                             </span>
                         @elseif($finalReport->status === 'approved')
                             <span class="px-3 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                ✅ Laporan Disetujui (ACC)
+                                 Laporan Disetujui (ACC)
                             </span>
                         @elseif($finalReport->status === 'revision')
                             <span class="px-3 py-1.5 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300">
-                                ⚠️ Perlu Perbaikan (Revisi)
+                                 Perlu Perbaikan (Revisi)
                             </span>
                         @else
                             <span class="px-3 py-1.5 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
-                                ⏳ Menunggu Keputusan DPL
+                                 Menunggu Keputusan DPL
                             </span>
                         @endif
                     </div>
@@ -158,12 +158,12 @@
                     <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="space-y-1">
                             <div class="font-bold text-gray-900 text-sm flex items-center gap-2">
-                                <span>📄</span>
+                                <span></span>
                                 <span>{{ $finalReport->title ?? 'Naskah Laporan Akhir MBKM' }}</span>
                             </div>
                             @if($finalReport->repository_url)
                                 <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold block">
-                                    🔗 Repositori Proyek / Luaran Kerja: {{ $finalReport->repository_url }}
+                                     Repositori Proyek / Luaran Kerja: {{ $finalReport->repository_url }}
                                 </a>
                             @endif
                             <div class="text-[11px] text-gray-400 font-mono">
@@ -173,7 +173,7 @@
 
                         <div class="flex items-center gap-3">
                             <a href="{{ asset('storage/' . ($finalReport->file_path ?? $finalReport->final_report_path)) }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
-                                <span>📥</span>
+                                <span></span>
                                 <span>Buka / Unduh PDF</span>
                             </a>
                         </div>
@@ -191,10 +191,10 @@
 
                         <div class="flex items-center justify-end gap-3">
                             <button type="submit" name="status" value="revision" class="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition active:scale-95 cursor-pointer">
-                                ⚠️ Minta Revisi Laporan
+                                 Minta Revisi Laporan
                             </button>
                             <button type="submit" name="status" value="approved" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-                                ✅ Setujui Laporan Akhir (ACC)
+                                 Setujui Laporan Akhir (ACC)
                             </button>
                         </div>
                     </form>
@@ -205,7 +205,7 @@
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs space-y-6">
                 <div class="flex items-center gap-3 pb-4 border-b border-gray-100">
                     <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
-                        📝
+                        
                     </div>
                     <div>
                         <h3 class="font-black text-base text-gray-900">Form Evaluasi & Penilaian Akademik DPL (Bobot 60%)</h3>
@@ -267,7 +267,7 @@
                     <div class="p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
                         <div class="space-y-1 text-center md:text-left">
                             <span class="px-3 py-1 bg-white/10 rounded-full text-[11px] font-bold uppercase tracking-wider text-blue-200 border border-white/10">
-                                📊 Kalkulasi Nilai Akhir Otomatis
+                                 Kalkulasi Nilai Akhir Otomatis
                             </span>
                             <h4 class="text-lg font-black mt-2">
                                 Nilai DPL (60%): <span class="text-emerald-400" x-text="calculatedDosen + '/100'"></span>
@@ -312,7 +312,7 @@
                 <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
-                            📖
+                            
                         </div>
                         <div>
                             <h3 class="font-black text-base text-gray-900">Riwayat Logbook Aktivitas Mahasiswa</h3>
@@ -327,7 +327,7 @@
                         <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <span class="text-xs font-bold text-gray-900 font-mono">📅 {{ \Carbon\Carbon::parse($lb->date)->format('d F Y') }}</span>
+                                    <span class="text-xs font-bold text-gray-900 font-mono"> {{ \Carbon\Carbon::parse($lb->date)->format('d F Y') }}</span>
                                     <span class="text-xs text-gray-400 ml-2">({{ \Carbon\Carbon::parse($lb->date)->diffForHumans() }})</span>
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -349,7 +349,7 @@
 
                             @if($lb->feedback)
                                 <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 text-[11px] text-emerald-900">
-                                    👔 <strong>Catatan Mentor Lapangan:</strong> "{{ $lb->feedback }}"
+                                     <strong>Catatan Mentor Lapangan:</strong> "{{ $lb->feedback }}"
                                 </div>
                             @endif
                         </div>
