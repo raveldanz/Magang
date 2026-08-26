@@ -38,11 +38,13 @@ class DashboardController extends Controller
 
         if ($request->filled('search')) {
             $search = trim($request->search);
-            $query->whereHas('application.user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('studentProfile', function ($sp) use ($search) {
-                      $sp->where('nim', 'like', "%{$search}%")
-                         ->orWhere('jurusan', 'like', "%{$search}%");
+            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+
+            $query->whereHas('application.user', function ($q) use ($search, $like) {
+                $q->where('name', $like, "%{$search}%")
+                  ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
+                      $sp->where('nim', $like, "%{$search}%")
+                         ->orWhere('jurusan', $like, "%{$search}%");
                   });
             });
         }
