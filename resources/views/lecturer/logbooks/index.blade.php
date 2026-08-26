@@ -3,9 +3,6 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
                     {{ __('Rekapitulasi & Feed Logbook Bimbingan') }}
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
@@ -15,7 +12,7 @@
 
             <div class="flex items-center gap-2">
                 <a href="{{ route('lecturer.monitoring.index') }}" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow-xs">
-                    👥 Mahasiswa Bimbingan
+                    Mahasiswa Bimbingan
                 </a>
                 <a href="{{ route('lecturer.dashboard') }}" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                     &larr; Dashboard Dosen
@@ -163,7 +160,7 @@
 
                                     <!-- Instansi & Unit -->
                                     <td class="py-4 px-4 align-top">
-                                        <div class="text-xs font-bold text-gray-800">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="text-xs font-bold text-gray-800">{{ $agency->agency_name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
@@ -186,11 +183,11 @@
                                     <td class="py-4 px-4 align-top text-center">
                                         @if ($log->status === 'approved')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                                ✅ Approved
+                                                ✅ Disetujui
                                             </span>
                                         @elseif ($log->status === 'rejected')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
-                                                ❌ Rejected
+                                                ❌ Ditolak
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
@@ -211,7 +208,7 @@
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
-                                                ⏳ Belum ACC
+                                                ⏳ Dalam Pengecekan
                                             </span>
                                         @endif
 
@@ -225,7 +222,7 @@
                                     <!-- Tombol Aksi Review Cepat -->
                                     <td class="py-4 px-4 align-top text-right">
                                         <a href="{{ route('lecturer.logbooks.show', $log->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer">
-                                            <span>Review / ACC</span>
+                                            <span>Review</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
