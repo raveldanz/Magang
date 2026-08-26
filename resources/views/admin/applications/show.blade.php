@@ -82,7 +82,11 @@
                     <!-- Dropdown Status -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Status Pengajuan</label>
+<<<<<<< HEAD
+                        <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md">
+=======
                         <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500">
+>>>>>>> main
                             <option value="pending" {{ $application->status == 'pending' ? 'selected' : '' }}>PENDING
                             </option>
                             <option value="verified" {{ $application->status == 'verified' ? 'selected' : '' }}>VERIFIED
@@ -100,6 +104,17 @@
                         
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
+<<<<<<< HEAD
+                            <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
+                            <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">-- Pilih Pembimbing Lapangan --</option>
+                                @foreach ($pembimbings as $pembimbing)
+                                    <option value="{{ $pembimbing->id }}" {{ optional($application->placement)->pembimbing_id == $pembimbing->id ? 'selected' : '' }}>
+                                        {{ $pembimbing->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+=======
                             <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan (Mentor Dinas Terkait)</label>
                             <select name="mentor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">-- Pilih Pembimbing Lapangan ({{ $application->unit->agencyProfile->agency_name ?? 'Instansi' }}) --</option>
@@ -110,6 +125,7 @@
                                 @endforeach
                             </select>
                             <p class="text-xs text-gray-500 mt-1">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
+>>>>>>> main
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -118,12 +134,20 @@
                                 <label class="block text-sm font-medium text-gray-700">Nomor Surat Balasan Dinas</label>
                                 <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
                                     placeholder="Contoh: 500/123/APTIKA/2026"
+<<<<<<< HEAD
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+=======
                                     class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+>>>>>>> main
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Surat Balasan</label>
                                 <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
+<<<<<<< HEAD
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+=======
                                     class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+>>>>>>> main
                             </div>
                         </div>
                     </div>

@@ -366,8 +366,13 @@
                         <span style="font-size: 13.5px; color: #64748b;">Surabaya, {{ $date_issued }}</span><br>
                         <strong style="color: #0f172a;">Pembimbing Lapangan / Mentor</strong>
                         <div class="sig-line" style="margin: 50px auto 4px auto;"></div>
+<<<<<<< HEAD
+                        <div class="sig-name">{{ $pembimbing->name ?? 'Retno Mumpuni, S.Kom., M.Sc' }}</div>
+                        <div class="sig-title">NIP. {{ $pembimbing->studentProfile->nim ?? $pembimbing->phone ?? '198001012010012001' }}</div>
+=======
                         <div class="sig-name">{{ $pembimbing->name ?? $agencyProfile->signee_name ?? 'Pembimbing Lapangan' }}</div>
                         <div class="sig-title">{{ !empty($pembimbing?->nip) ? 'NIP. ' . $pembimbing->nip : ($pembimbing?->phone ? 'Kontak: ' . $pembimbing->phone : 'Pembimbing Resmi Unit') }}</div>
+>>>>>>> main
                     </td>
                 </tr>
             </table>

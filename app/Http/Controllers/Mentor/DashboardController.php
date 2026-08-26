@@ -12,6 +12,15 @@ class DashboardController extends Controller
 {
     /**
      * Halaman Dashboard Utama Pembimbing Lapangan / Mentor
+<<<<<<< HEAD
+     * Menampilkan ringkasan metrik dan daftar mahasiswa bimbingan aktif.
+     */
+    public function index()
+    {
+        $mentor = Auth::user();
+
+        // Ambil data penempatan mahasiswa yang diplot ke mentor ini
+=======
      * Menampilkan metrik dan daftar mahasiswa bimbingan dengan segmentasi lifecycle.
      */
     public function index(Request $request)
@@ -19,13 +28,18 @@ class DashboardController extends Controller
         $mentor = Auth::user();
 
         // Ambil seluruh penempatan yang diplot ke mentor ini
+>>>>>>> main
         $query = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
             'logbooks',
             'evaluation',
+<<<<<<< HEAD
+            'finalreport'
+=======
             'finalreport',
             'academicAdvisor'
+>>>>>>> main
         ])->where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
               ->orWhere('pembimbing_id', $mentor->id);
@@ -38,6 +52,16 @@ class DashboardController extends Controller
             });
         }
 
+<<<<<<< HEAD
+        $placements = $query->get();
+
+        // Hitung statistik ringkasan untuk dashboard cards
+        $totalStudents = $placements->count();
+        $pendingLogbooksCount = $placements->sum(function ($placement) {
+            return $placement->logbooks->where('status', 'pending')->count();
+        });
+        $evaluatedStudentsCount = $placements->filter(function ($placement) {
+=======
         $allPlacements = $query->latest()->get();
 
         // Pisahkan data berdasarkan computed lifecycle
@@ -60,21 +84,29 @@ class DashboardController extends Controller
             return $placement->logbooks->where('status', 'pending')->count();
         });
         $evaluatedStudentsCount = $allPlacements->filter(function ($placement) {
+>>>>>>> main
             return $placement->evaluation !== null;
         })->count();
         $pendingEvaluationsCount = $totalStudents - $evaluatedStudentsCount;
 
         $stats = [
             'total_students' => $totalStudents,
+<<<<<<< HEAD
+=======
             'active_students' => $activeCount,
             'upcoming_students' => $upcomingStudents->count(),
             'completed_students' => $completedStudents->count(),
+>>>>>>> main
             'pending_logbooks' => $pendingLogbooksCount,
             'evaluated_students' => $evaluatedStudentsCount,
             'pending_evaluations' => $pendingEvaluationsCount,
         ];
 
+<<<<<<< HEAD
+        return view('mentor.dashboard', compact('placements', 'stats'));
+=======
         return view('mentor.dashboard', compact('placements', 'stats', 'tab'));
+>>>>>>> main
     }
 
     /**
@@ -92,7 +124,10 @@ class DashboardController extends Controller
             },
             'evaluation',
             'finalreport',
+<<<<<<< HEAD
+=======
             'academicAdvisor'
+>>>>>>> main
         ])->where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
               ->orWhere('pembimbing_id', $mentor->id);
