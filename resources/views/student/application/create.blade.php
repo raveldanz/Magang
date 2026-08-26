@@ -92,7 +92,7 @@
                                 @else
                                     <option value="">-- Pilih Instansi & Bidang/Divisi Magang --</option>
                                     @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label="🏛️ {{ strtoupper($agencyName) }}">
+                                        <optgroup label="{{ strtoupper($agencyName) }}">
                                             @foreach ($agencyUnits as $unit)
                                                 <option value="{{ $unit->id }}" 
                                                     {{ old('unit_id') == $unit->id ? 'selected' : '' }}
@@ -111,6 +111,44 @@
                         </div>
 
                         <!-- Periode Magang (Datepicker) -->
+<<<<<<< HEAD
+                        <!-- Periode Magang (Datepicker Terkunci Otomatis) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4" 
+     x-data="{ 
+         startDate: '{{ old('start_date', '') }}',
+         endDate: '{{ old('end_date', '') }}',
+         today: '{{ date('Y-m-d') }}'
+     }">
+    
+    <!-- Tanggal Mulai -->
+    <div>
+        <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-semibold uppercase tracking-wider text-slate-500" />
+        <x-text-input id="start_date" 
+                      name="start_date" 
+                      type="date" 
+                      min="{{ date('Y-m-d') }}" 
+                      x-model="startDate"
+                      class="mt-1 block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400"
+                      required />
+        <p class="text-[11px] text-slate-400 mt-1">Pilih tanggal awal mulai kegiatan magang.</p>
+        <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
+    </div>
+
+    <!-- Tanggal Selesai -->
+    <div>
+        <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-semibold uppercase tracking-wider text-slate-500" />
+        <x-text-input id="end_date" 
+                      name="end_date" 
+                      type="date" 
+                      x-bind:min="startDate || today" 
+                      x-model="endDate"
+                      class="mt-1 block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400"
+                      required />
+        <p class="text-[11px] text-slate-400 mt-1">Tanggal selesai otomatis terkunci setelah tanggal mulai.</p>
+        <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
+    </div>
+</div>
+=======
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
 <<<<<<< HEAD
@@ -138,6 +176,7 @@
 >>>>>>> main
                             </div>
                         </div>
+>>>>>>> 50a572d5d784ad7edaf539544c540e0815d13017
 
                         <hr class="my-6">
 <<<<<<< HEAD
@@ -174,39 +213,40 @@
 =======
                         <div class="space-y-1">
                             <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
-                                <span>📁 Upload Dokumen Persyaratan Magang</span>
+                                <span>Upload Dokumen Persyaratan Magang</span>
                             </h4>
                             <p class="text-xs text-gray-500">Seluruh dokumen wajib berformat PDF dengan ukuran maksimum 2MB per file</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div>
-                                <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus *" class="text-xs font-bold" />
+                                <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus " class="text-xs font-bold" />
                                 <input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="cv" value="2. Curriculum Vitae (CV) *" class="text-xs font-bold" />
+                                <x-input-label for="cv" value="2. Curriculum Vitae (CV) " class="text-xs font-bold" />
                                 <input id="cv" name="cv" type="file" accept=".pdf"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('cv')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir *" class="text-xs font-bold" />
+                                <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir " class="text-xs font-bold" />
                                 <input id="transkrip" name="transkrip" type="file" accept=".pdf"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM) / KTP (Opsional)" class="text-xs font-bold" />
+                                <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM)" class="text-xs font-bold" />
                                 <input id="id_card" name="id_card" type="file" accept=".pdf,.jpg,.jpeg,.png"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
                                 <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
                             </div>
+                            
                         </div>
 
                         <div class="flex items-center space-x-3 pt-4 border-t border-gray-100">
@@ -274,8 +314,12 @@
                                                 class="inline-flex items-center space-x-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 shadow-sm transition">
 =======
                                                 class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
+<<<<<<< HEAD
+                                                <span>Download Surat PDF</span>
+=======
 >>>>>>> main
                                                 <span>📄 Download Surat PDF</span>
+>>>>>>> 50a572d5d784ad7edaf539544c540e0815d13017
                                             </a>
                                         @else
                                             <span class="text-gray-400 text-xs italic">Belum tersedia</span>

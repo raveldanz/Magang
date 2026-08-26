@@ -49,8 +49,12 @@
                                         <a href="{{ route('pembimbing.student.detail', $place->id) }}" class="px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-xs font-semibold">
 =======
                                         <a href="{{ route('pembimbing.student.detail', $place->id) }}" class="px-3 py-1.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-xs font-semibold shadow-xs transition cursor-pointer">
+<<<<<<< HEAD
+                                            Periksa Logbook 
+=======
 >>>>>>> main
                                             Periksa Logbook →
+>>>>>>> 50a572d5d784ad7edaf539544c540e0815d13017
                                         </a>
                                     </td>
                                 </tr>

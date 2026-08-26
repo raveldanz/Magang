@@ -52,8 +52,13 @@ class ApplicationController extends Controller
             'surat_pengantar' => 'required|mimes:pdf|max:2048', 
             'cv' => 'required|mimes:pdf|max:2048',
             'transkrip' => 'required|mimes:pdf|max:2048',
-            'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
+            'id_card' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
+
+        $request->validate([
+    'start_date' => 'required|date|after_or_equal:today',
+    'end_date'   => 'required|date|after_or_equal:start_date',
+]);
 
         // Cek Sisa Kuota Instansi yang Dipilih
         $unit = Unit::findOrFail($request->unit_id);

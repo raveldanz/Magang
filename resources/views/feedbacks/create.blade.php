@@ -47,11 +47,11 @@
                                     Kategori Laporan <span class="text-rose-500">*</span>
                                 </label>
                                 <select name="category" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                    <option value="error_bug" {{ old('category') == 'error_bug' ? 'selected' : '' }}>⚠️ Kendala / Error / Bug Sistem</option>
-                                    <option value="saran_fitur" {{ old('category') == 'saran_fitur' ? 'selected' : '' }}>💡 Usulan / Saran Perbaikan Fitur</option>
-                                    <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>❓ Pertanyaan Seputar Alur MBKM</option>
-                                    <option value="koordinasi" {{ old('category') == 'koordinasi' ? 'selected' : '' }}>🤝 Koordinasi Kampus / Instansi</option>
-                                    <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>📝 Lain-lain</option>
+                                    <option value="error_bug" {{ old('category') == 'error_bug' ? 'selected' : '' }}>Kendala / Error / Bug Sistem</option>
+                                    <option value="saran_fitur" {{ old('category') == 'saran_fitur' ? 'selected' : '' }}>Usulan / Saran Perbaikan Fitur</option>
+                                    <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan Seputar Alur MBKM</option>
+                                    <option value="koordinasi" {{ old('category') == 'koordinasi' ? 'selected' : '' }}>Koordinasi Kampus / Instansi</option>
+                                    <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>Lain-lain</option>
                                 </select>
                             </div>
 
@@ -60,9 +60,9 @@
                                     Ditujukan Kepada <span class="text-rose-500">*</span>
                                 </label>
                                 <select name="target_role" x-model="targetRole" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                    <option value="super_admin">👑 Super Administrator (Pengelola Pusat Pemkot)</option>
-                                    <option value="admin_dinas">🏢 Admin Instansi Kedinasan</option>
-                                    <option value="universitas">🎓 Pihak Perguruan Tinggi (Universitas)</option>
+                                    <option value="super_admin">Super Administrator (Pengelola Pusat Pemkot)</option>
+                                    <option value="admin_dinas">Admin Instansi Kedinasan</option>
+                                    <option value="universitas">Pihak Perguruan Tinggi (Universitas)</option>
                                 </select>
                             </div>
                         </div>
@@ -71,7 +71,6 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <!-- Case 1: Super Admin -->
                             <div x-show="targetRole === 'super_admin'" class="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center gap-3">
-                                <span class="text-xl">👑</span>
                                 <div>
                                     <div class="text-xs font-bold text-blue-950">Pengelola Pusat (Super Admin)</div>
                                     <div class="text-[11px] text-blue-700">Laporan ditangani langsung oleh Administrator Utama Pemkot Surabaya</div>
@@ -110,10 +109,10 @@
                                     Tingkat Prioritas
                                 </label>
                                 <select name="priority" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                    <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>🟢 Rendah (Informasi umum)</option>
-                                    <option value="medium" {{ old('priority', 'medium') == 'medium' ? 'selected' : '' }}>🟡 Sedang (Pertanyaan standar)</option>
-                                    <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>🟠 Tinggi (Menghambat aktivitas)</option>
-                                    <option value="urgent" {{ old('priority') == 'urgent' ? 'selected' : '' }}>🔴 Mendesak (Error sistem kritis)</option>
+                                    <option value="low" {{ old('priority') == 'low' ? 'selected' : '' }}>Rendah (Informasi umum)</option>
+                                    <option value="medium" {{ old('priority', 'medium') == 'medium' ? 'selected' : '' }}>Sedang (Pertanyaan standar)</option>
+                                    <option value="high" {{ old('priority') == 'high' ? 'selected' : '' }}>Tinggi (Menghambat aktivitas)</option>
+                                    <option value="urgent" {{ old('priority') == 'urgent' ? 'selected' : '' }}>Mendesak (Error sistem kritis)</option>
                                 </select>
                             </div>
                         </div>
@@ -152,7 +151,6 @@
                     <!-- Info Pengirim -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
                         <div class="flex items-center gap-2">
-                            <span>👤</span>
                             <span class="text-slate-600">Pengirim: <strong>{{ $user->name }}</strong> ({{ $user->email }})</span>
                         </div>
                         <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold text-[10px] uppercase">
