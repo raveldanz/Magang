@@ -28,7 +28,11 @@
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <div>
                             <x-input-label for="agency_profile_id" value="Instansi Induk" />
+<<<<<<< HEAD
+                            <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
+=======
                             <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+>>>>>>> main
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_profile_id', $unit->agency_profile_id) == $agency->id ? 'selected' : '' }}>
                                         🏛️ {{ $agency->agency_name }}
@@ -54,7 +58,11 @@
                             id="name" 
                             name="name" 
                             value="{{ old('name', $unit->name) }}" 
+<<<<<<< HEAD
+                            class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+=======
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+>>>>>>> main
                             required
                         >
                         @error('name')
@@ -72,7 +80,11 @@
                             min="0" 
                             max="100" 
                             value="{{ old('quota', $unit->quota) }}" 
+<<<<<<< HEAD
+                            class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+=======
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+>>>>>>> main
                             required
                         >
                         <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->applications->where('status', 'accepted')->count() }}</strong> mahasiswa diterima.</p>
@@ -88,7 +100,11 @@
                             id="description" 
                             name="description" 
                             rows="4" 
+<<<<<<< HEAD
+                            class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+=======
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+>>>>>>> main
                         >{{ old('description', $unit->description) }}</textarea>
                         @error('description')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
@@ -100,7 +116,11 @@
                         <a href="{{ route('admin.units.index') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
+<<<<<<< HEAD
+                        <button type="submit" class="px-7 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+=======
                         <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+>>>>>>> main
                             Perbarui Data Divisi
                         </button>
                     </div>

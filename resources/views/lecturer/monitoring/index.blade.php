@@ -1,11 +1,25 @@
+<<<<<<< HEAD
 <x-app-layout>
+=======
+﻿<x-app-layout>
+>>>>>>> main
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<<<<<<< HEAD
+                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
+                    {{ __('Monitoring Logbook & Progres Mahasiswa') }}
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">
+                    Kampus: <strong>{{ $lecturer->university }}</strong> &bull; Dosen: {{ $lecturer->name }}
+                </p>
+            </div>
+
+            <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+=======
                     {{ __('Monitoring Mahasiswa Bimbingan Kampus') }}
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
@@ -14,6 +28,7 @@
             </div>
 
             <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs">
+>>>>>>> main
                 &larr; Kembali ke Dashboard
             </a>
         </div>
@@ -25,6 +40,15 @@
             <!-- Filter & Search Bar -->
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <form method="GET" action="{{ route('lecturer.monitoring.index') }}" class="w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+<<<<<<< HEAD
+                    
+                    <div class="w-full sm:w-auto flex items-center gap-3">
+                        <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">-- Semua Dinas Penempatan --</option>
+                            @foreach ($agencies as $agency)
+                                <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
+                                    🏛️ {{ $agency->agency_name }}
+=======
                     <input type="hidden" name="tab" value="{{ $tab ?? 'active' }}">
 
                     <div class="w-full sm:w-auto flex items-center gap-3">
@@ -32,7 +56,8 @@
                             <option value="">-- Semua Dinas Penempatan --</option>
                             @foreach ($agencies as $agency)
                                 <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
-                                    🏛️ {{ $agency->agency_name }}
+                                     {{ $agency->agency_name }}
+>>>>>>> main
                                 </option>
                             @endforeach
                         </select>
@@ -40,6 +65,14 @@
 
                     <div class="w-full sm:w-72 flex items-center gap-2">
                         <div class="relative w-full">
+<<<<<<< HEAD
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau NIM..." class="w-full text-xs border-gray-300 rounded-xl pl-9 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+=======
                             <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 0.85rem !important;">
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -50,6 +83,7 @@
                                    style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                         </div>
                         <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer">
+>>>>>>> main
                             Cari
                         </button>
                     </div>
@@ -57,30 +91,33 @@
                 </form>
             </div>
 
+<<<<<<< HEAD
+=======
             <!-- Tab Switcher Navigation -->
             <div class="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-2">
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'active'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? 'active') === 'active' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>⚡ Mahasiswa Aktif</span>
+                    <span> Mahasiswa Aktif</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? 'active') === 'active' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['active'] }}</span>
                 </a>
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'completed'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'completed' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>🎓 Arsip Alumni Selesai</span>
+                    <span> Arsip Alumni Selesai</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'completed' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['completed'] }}</span>
                 </a>
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'upcoming'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>📅 Calon Peserta</span>
+                    <span> Calon Peserta</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['upcoming'] }}</span>
                 </a>
                 <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'all'])) }}" 
                     class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>📁 Semua Bimbingan</span>
+                    <span> Semua Bimbingan</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'all' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['total'] }}</span>
                 </a>
             </div>
 
+>>>>>>> main
             <!-- Tabel Monitoring -->
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
@@ -89,8 +126,12 @@
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                 <th class="py-3.5 px-4">Mahasiswa</th>
                                 <th class="py-3.5 px-4">Dinas & Unit</th>
+<<<<<<< HEAD
+                                <th class="py-3.5 px-4 text-center">Logbook Terverifikasi</th>
+=======
                                 <th class="py-3.5 px-4 text-center">STATUS</th>
                                 <th class="py-3.5 px-4 text-center">LOGBOOK</th>
+>>>>>>> main
                                 <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
                                 <th class="py-3.5 px-4 text-center">Nilai DPL</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
@@ -99,6 +140,25 @@
                         <tbody class="divide-y divide-gray-100 text-sm">
                             @forelse ($placements as $placement)
                                 @php
+<<<<<<< HEAD
+                                    $student = $placement->application->user;
+                                    $profile = $student->studentProfile;
+                                    $unit = $placement->application->unit;
+                                    $agency = $unit?->agencyProfile ?? $placement->agencyProfile;
+                                    $totalLog = $placement->logbooks->count();
+                                    $approvedLog = $placement->logbooks->where('status', 'approved')->count();
+                                    $finalReport = $placement->finalreport;
+                                    $hasEval = $placement->evaluation && $placement->evaluation->nilai_akademik > 0;
+                                @endphp
+                                <tr class="hover:bg-slate-50/75 transition-colors">
+                                    <td class="py-4 px-4">
+                                        <div class="font-bold text-gray-900 leading-snug">{{ $student->name }}</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">NIM: {{ $profile->nim ?? '-' }}</div>
+                                    </td>
+
+                                    <td class="py-4 px-4">
+                                        <div class="text-xs font-semibold text-gray-800">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+=======
                                     $student = $placement->application?->user;
                                     $profile = $student?->studentProfile;
                                     $unit = $placement->application?->unit;
@@ -116,11 +176,16 @@
                                     </td>
 
                                     <td class="py-4 px-4">
-                                        <div class="text-xs font-semibold text-gray-800">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="text-xs font-semibold text-gray-800"> {{ $agency->agency_name ?? '-' }}</div>
+>>>>>>> main
                                         <div class="text-[11px] text-gray-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
+<<<<<<< HEAD
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg">
+                                            📝 {{ $approvedLog }} / {{ $totalLog }} Kegiatan
+=======
                                         <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
                                             {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
                                             {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
@@ -131,18 +196,28 @@
 
                                     <td class="py-4 px-4 text-center">
                                         <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100">
-                                            📝 ACC {{ $approvedLog }} / {{ $totalLog }}
+                                             ACC {{ $approvedLog }} / {{ $totalLog }}
+>>>>>>> main
                                         </span>
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
                                         @if ($finalReport && $finalReport->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
+<<<<<<< HEAD
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
                                                 ✅ Disetujui
                                             </span>
                                         @elseif ($finalReport)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
                                                 ⏳ Menunggu
+=======
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
+                                                 Disetujui
+                                            </span>
+                                        @elseif ($finalReport)
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200">
+                                                 Menunggu
+>>>>>>> main
                                             </span>
                                         @else
                                             <span class="text-xs text-gray-400 italic">Belum Ada</span>
@@ -151,11 +226,19 @@
 
                                     <td class="py-4 px-4 text-center">
                                         @if ($hasEval)
+<<<<<<< HEAD
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">
+                                                ⭐ {{ $placement->evaluation->nilai_akademik }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md">
+=======
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-xs">
-                                                ⭐ {{ $placement->evaluation?->nilai_akademik ?? '-' }}
+                                                 {{ $placement->evaluation?->nilai_akademik ?? '-' }}
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">
+>>>>>>> main
                                                 Belum Dinilai
                                             </span>
                                         @endif
@@ -163,6 +246,13 @@
 
                                     <td class="py-4 px-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
+<<<<<<< HEAD
+                                            <a href="{{ route('lecturer.students.show', $placement->id) }}" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-lg transition shadow-sm">
+                                                Lihat Detail
+                                            </a>
+                                            <a href="{{ route('lecturer.evaluations.create', $placement->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                                                Nilai
+=======
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200">
                                                 <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,14 +267,20 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                                 <span>{{ $hasEval ? 'Edit Nilai' : 'Input Nilai' }}</span>
+>>>>>>> main
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
+<<<<<<< HEAD
+                                    <td colspan="6" class="py-12 text-center text-gray-400 text-xs">
+                                        Tidak ditemukan data mahasiswa bimbingan.
+=======
                                     <td colspan="7" class="py-12 text-center text-gray-400 text-xs">
                                         Tidak ditemukan data mahasiswa bimbingan pada tab ini.
+>>>>>>> main
                                     </td>
                                 </tr>
                             @endforelse

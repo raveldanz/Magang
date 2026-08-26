@@ -20,7 +20,11 @@
 
                         <!-- Filter Unit / Divisi (w-64) -->
                         <div class="w-full lg:w-64">
+<<<<<<< HEAD
+                            <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+=======
                             <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+>>>>>>> main
                                 <option value="">-- Semua Unit/Divisi --</option>
                                 @if (isset($groupedUnits) && $groupedUnits !== null)
                                     @foreach ($groupedUnits as $agencyName => $agencyUnits)
@@ -44,7 +48,11 @@
 
                         <!-- Filter Status (w-44) -->
                         <div class="w-full lg:w-44">
+<<<<<<< HEAD
+                            <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+=======
                             <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+>>>>>>> main
                                 <option value="">-- Semua Status --</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING</option>
                                 <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED</option>
@@ -55,7 +63,11 @@
 
                         <!-- Action Buttons (Height 10 uniform) -->
                         <div class="flex items-center gap-2 w-full lg:w-auto shrink-0">
+<<<<<<< HEAD
+                            <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-4 h-10 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition w-full lg:w-auto">
+=======
                             <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-4 h-10 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition w-full lg:w-auto cursor-pointer">
+>>>>>>> main
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
@@ -93,7 +105,11 @@
                                     <td class="p-3 font-semibold text-gray-900">
                                         <div class="leading-snug">{{ $app->user->name }}</div>
                                         @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
+<<<<<<< HEAD
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-purple-100 text-purple-800 border border-purple-200">
+=======
                                             <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-blue-100 text-blue-800 border border-blue-200">
+>>>>>>> main
                                                 🎉 SIAP CETAK SERTIFIKAT
                                             </span>
                                         @endif
@@ -110,7 +126,11 @@
                                         </span>
                                     </td>
                                     <td class="p-3">
+<<<<<<< HEAD
+                                        <a href="{{ route('admin.applications.show', $app->id) }}" class="text-indigo-600 hover:text-indigo-900 font-bold text-xs inline-flex items-center space-x-1">
+=======
                                         <a href="{{ route('admin.applications.show', $app->id) }}" class="text-blue-600 hover:text-blue-900 font-bold text-xs inline-flex items-center space-x-1">
+>>>>>>> main
                                             <span>Detail & Verifikasi</span>
                                             <span>&rarr;</span>
                                         </a>

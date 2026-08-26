@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+<<<<<<< HEAD
+#[Fillable(['name', 'email', 'password', 'role', 'agency_profile_id', 'university'])]
+=======
 #[Fillable(['name', 'email', 'password', 'role', 'status', 'agency_profile_id', 'university', 'university_id', 'last_notification_read_at'])]
+>>>>>>> main
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -35,6 +39,16 @@ class User extends Authenticatable
     {
         return $this->hasOne(StudentProfile::class);
     }
+<<<<<<< HEAD
+
+    public function agencyProfile()
+    {
+        return $this->belongsTo(AgencyProfile::class);
+    }
+}
+
+
+=======
 
     public function agencyProfile()
     {
@@ -66,3 +80,4 @@ class User extends Authenticatable
         return $this->hasMany(Placement::class, 'mentor_id');
     }
 }
+>>>>>>> main
