@@ -107,7 +107,7 @@
                         <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('admin.units.index', ['agency_id' => $agency->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold">
-                                    Lihat Unit →
+                                    Lihat Unit 
                                 </a>
                             </div>
 

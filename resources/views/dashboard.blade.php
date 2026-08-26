@@ -4,9 +4,6 @@
             <h2 class="font-black text-xl text-slate-800 leading-tight">
                 {{ __('Dashboard Mahasiswa') }}
             </h2>
-            <span class="text-xs font-bold px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
-                Portal Peserta Magang
-            </span>
         </div>
     </x-slot>
 
@@ -29,10 +26,6 @@
             <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
                  style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #312e81 100%) !important; color: #ffffff !important;">
                 <div class="space-y-1">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-1" 
-                          style="background-color: rgba(251, 191, 36, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(251, 191, 36, 0.4) !important;">
-                        🎓 MAHASISWA MAGANG PEMKOT SURABAYA
-                    </span>
                     <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight" style="color: #ffffff !important;">
                         Selamat Datang, {{ Auth::user()->name }}!
                     </h1>
@@ -43,7 +36,7 @@
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold px-4 py-2 rounded-2xl uppercase tracking-wider" 
                           style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                        🏛️ {{ $univName ?? 'Perguruan Tinggi Mahasiswa' }}
+                         {{$univName ?? 'Perguruan Tinggi Mahasiswa' }}
                     </span>
                 </div>
             </div>
@@ -66,16 +59,9 @@
                      style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #1e3a8a 100%) !important; color: #ffffff !important;">
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div class="flex items-start space-x-4">
-                            <div class="p-3.5 rounded-2xl text-3xl shrink-0" style="background-color: rgba(255, 255, 255, 0.2) !important;">
-                                🎓
-                            </div>
                             <div class="space-y-1">
-                                <span class="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider" 
-                                      style="background-color: rgba(255, 255, 255, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(255, 255, 255, 0.3) !important;">
-                                    🏆 STATUS: KELULUSAN TERVERIFIKASI RESMI
-                                </span>
                                 <h2 class="text-xl sm:text-2xl font-black" style="color: #ffffff !important;">
-                                    🎉 Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
+                                    Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
                                 </h2>
                                 <p class="text-xs sm:text-sm max-w-2xl leading-relaxed" style="color: #d1fae5 !important;">
                                     Seluruh kewajiban logbook harian, laporan akhir ilmiah, dan evaluasi instansi dinas (40%) serta bimbingan akademik DPL kampus (60%) telah lengkap. E-Sertifikat resmi kelulusan telah diterbitkan.
@@ -88,8 +74,8 @@
                                target="_blank"
                                class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 cursor-pointer font-black text-xs sm:text-sm"
                                style="background-color: #ffffff !important; color: #065f46 !important; border: 2px solid #ffffff !important;">
-                                <span>📜 Cetak Sertifikat Resmi (PDF)</span>
-                                <span>→</span>
+                                <span>Cetak Sertifikat Resmi (PDF)</span>
+                                <span></span>
                             </a>
                         </div>
                     </div>
@@ -123,19 +109,17 @@
                 <div class="bg-white rounded-3xl p-6 border-2 {{ $academicAdvisor ? 'border-emerald-200' : 'border-blue-300 bg-blue-50/20' }} shadow-sm space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 {{ $academicAdvisor ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700' }} rounded-2xl flex items-center justify-center font-bold text-lg">
-                                🎓
-                            </div>
+                            
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                                     Dosen Pembimbing Lapangan (DPL Kampus)
                                     @if ($academicAdvisor)
                                         <span class="px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
-                                            ✅ Terpilih
+                                            Terpilih
                                         </span>
                                     @else
                                         <span class="px-2.5 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded-full animate-pulse">
-                                            ⚠️ Perlu Ditentukan
+                                            Perlu Ditentukan
                                         </span>
                                     @endif
                                 </h3>
@@ -159,7 +143,7 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div>
                                 <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                    👨‍🏫 {{ $academicAdvisor->name }}
+                                     {{ $academicAdvisor->name }}
                                 </div>
                                 <div class="text-xs text-slate-600 mt-1">
                                     Email: <span class="font-mono text-slate-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName) }}</strong>
@@ -173,7 +157,6 @@
                     @else
                         <!-- Alert Belum Memilih Dosen -->
                         <div class="p-4 bg-blue-50/80 rounded-2xl border border-blue-200 text-xs text-blue-950 flex items-start gap-3">
-                            <span class="text-lg">📢</span>
                             <div>
                                 <p class="font-bold">Pengajuan magang Anda telah DITERIMA di {{ $application->unit->name ?? '-' }} ({{ $application->unit->agencyProfile->agency_name ?? '-' }}).</p>
                                 <p class="text-blue-800 mt-1">Silakan pilih Dosen Pembimbing terdaftar di kampus Anda atau klik tombol <strong>"Input Dosen Baru"</strong> jika nama dosen belum tertera pada daftar.</p>
@@ -237,7 +220,6 @@
                         
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div class="flex items-center gap-2">
-                                <span class="p-2 bg-blue-100 text-blue-700 rounded-xl font-bold text-sm">👨‍🏫</span>
                                 <h3 class="text-lg font-bold text-slate-900 leading-6">Input Dosen Pembimbing Baru</h3>
                             </div>
                             <button type="button" @click="openNewDosenModal = false" class="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">
@@ -406,12 +388,9 @@
                                 {{ $profile ? 'Lengkap' : 'Belum Lengkap' }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-                            👤
-                        </div>
                     </div>
                     <a href="{{ route('student.profile.edit') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                        {{ $profile ? 'Edit Data Profil →' : 'Lengkapi Profil Sekarang →' }}
+                        {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }}
                     </a>
                 </div>
 
@@ -438,7 +417,7 @@
                                     </span>
                                 @elseif($application->lifecycle_status === 'COMPLETED')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
-                                        COMPLETED (Lulus)
+                                        LULUS
                                     </span>
                                 @elseif($application->lifecycle_status === 'ACCEPTED')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
@@ -455,13 +434,10 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-                            📋
-                        </div>
                     </div>
                     @if(!$application)
                         <a href="{{ route('student.application.create') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                            Buat Pengajuan Baru →
+                            Buat Pengajuan Baru 
                         </a>
                     @else
                         <div class="text-xs text-slate-500">Unit: <strong>{{ $application->unit->name ?? '-' }}</strong></div>
@@ -477,9 +453,6 @@
                                 {{ $mentor ? $mentor->name : 'Belum Diplot Dinas' }}
                             </p>
                         </div>
-                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-                            👔
-                        </div>
                     </div>
                     <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.</p>
                 </div>
@@ -493,7 +466,7 @@
                         <h4 class="font-bold text-slate-800 text-base">Detail Penempatan Magang</h4>
                         @if ($application->status === 'accepted')
                             <a href="{{ route('student.application.letter', $application->id) }}" target="_blank" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                <span>📄 Unduh Surat Balasan Dinas</span>
+                                <span>Unduh Surat Balasan Dinas</span>
                             </a>
                         @endif
                     </div>
@@ -509,7 +482,7 @@
                                 </span>
                             @elseif($application->lifecycle_status === 'COMPLETED')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 border border-blue-200">
-                                    COMPLETED (Lulus)
+                                    LULUS
                                 </span>
                             @elseif($application->lifecycle_status === 'ACCEPTED')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800 border border-sky-200">
