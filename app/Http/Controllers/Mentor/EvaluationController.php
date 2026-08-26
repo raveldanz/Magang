@@ -70,7 +70,11 @@ class EvaluationController extends Controller
             'nilai_laporan.max' => 'Nilai maksimal adalah 100.',
         ]);
 
+<<<<<<< HEAD
         Evaluation::updateOrCreate(
+=======
+        $evaluation = Evaluation::updateOrCreate(
+>>>>>>> main
             ['placement_id' => $placement->id],
             [
                 'nilai_disiplin' => $request->nilai_disiplin,
@@ -80,6 +84,42 @@ class EvaluationController extends Controller
             ]
         );
 
+<<<<<<< HEAD
+=======
+        // Cek skema kampus mahasiswa
+        $univ = $evaluation->getUniversity();
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+
+        if ($scheme === 'mentor_only') {
+            $finalScore = $evaluation->nilai_pembimbing;
+            if ($finalScore >= 85) $grade = 'A';
+            elseif ($finalScore >= 75) $grade = 'AB';
+            elseif ($finalScore >= 65) $grade = 'B';
+            elseif ($finalScore >= 55) $grade = 'BC';
+            elseif ($finalScore >= 40) $grade = 'C';
+            else $grade = 'E';
+
+            $evaluation->update([
+                'final_score' => $finalScore,
+                'grade' => $grade,
+            ]);
+
+            // Jika laporan akhir sudah diapprove, otomatis tandai status COMPLETED
+            $finalReport = $placement->finalreport;
+            if ($finalReport && $finalReport->status === 'approved') {
+                $placement->application->update(['status' => 'completed']);
+            }
+        }
+
+        \App\Models\AuditLog::record('MENTOR_EVALUATION_SUBMIT', 'Placement', $placement->id, [
+            'student_name' => $placement->application?->user?->name,
+            'nilai_pembimbing' => $evaluation->nilai_pembimbing,
+            'nilai_disiplin' => $request->nilai_disiplin,
+            'nilai_kinerja' => $request->nilai_kinerja,
+            'nilai_laporan' => $request->nilai_laporan,
+        ]);
+
+>>>>>>> main
         return redirect()->route('mentor.students.show', $placement->id)
             ->with('success', 'Penilaian evaluasi akhir berhasil disimpan! Mahasiswa kini siap diterbitkan sertifikatnya.');
     }

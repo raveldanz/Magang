@@ -12,21 +12,36 @@
                         Formulir Penilaian Evaluasi Akhir
                     </h2>
                     <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+<<<<<<< HEAD
                         Mahasiswa: <strong class="text-gray-700">{{ $placement->application->user->name }}</strong> ({{ $placement->application->user->studentProfile->nim ?? '-' }})
+=======
+                        Mahasiswa: <strong class="text-gray-700">{{ $placement->application?->user?->name ?? '-' }}</strong> ({{ $placement->application?->user?->studentProfile?->nim ?? '-' }})
+>>>>>>> main
                     </p>
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div class="bg-indigo-50 border border-indigo-100 text-indigo-800 text-xs font-semibold px-3.5 py-1.5 rounded-full">
                 {{ $placement->application->unit->name ?? '-' }}
+=======
+            <div class="bg-blue-50 border border-blue-100 text-blue-800 text-xs font-semibold px-3.5 py-1.5 rounded-full">
+                {{ $placement->application?->unit?->name ?? '-' }}
+>>>>>>> main
             </div>
         </div>
     </x-slot>
 
     <div class="py-8" x-data="{
+<<<<<<< HEAD
         disiplin: {{ old('nilai_disiplin', $placement->evaluation->nilai_disiplin ?? 0) }},
         kinerja: {{ old('nilai_kinerja', $placement->evaluation->nilai_kinerja ?? 0) }},
         laporan: {{ old('nilai_laporan', $placement->evaluation->nilai_laporan ?? 0) }},
+=======
+        disiplin: {{ old('nilai_disiplin', $placement->evaluation?->nilai_disiplin ?? 0) }},
+        kinerja: {{ old('nilai_kinerja', $placement->evaluation?->nilai_kinerja ?? 0) }},
+        laporan: {{ old('nilai_laporan', $placement->evaluation?->nilai_laporan ?? 0) }},
+>>>>>>> main
         get average() {
             let d = parseFloat(this.disiplin) || 0;
             let k = parseFloat(this.kinerja) || 0;
@@ -46,6 +61,7 @@
             <!-- Card Informasi Mahasiswa -->
             <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div class="flex items-center gap-4">
+<<<<<<< HEAD
                     <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-black text-base flex items-center justify-center shadow-md">
                         {{ strtoupper(substr($placement->application->user->name, 0, 2)) }}
                     </div>
@@ -53,13 +69,26 @@
                         <h3 class="font-extrabold text-gray-900 text-lg">{{ $placement->application->user->name }}</h3>
                         <p class="text-xs text-gray-500">
                             {{ $placement->application->user->studentProfile->universitas ?? '-' }} &bull; Jurusan {{ $placement->application->user->studentProfile->jurusan ?? '-' }}
+=======
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-md">
+                        {{ strtoupper(substr($placement->application?->user?->name ?? 'M', 0, 2)) }}
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-gray-900 text-lg">{{ $placement->application?->user?->name ?? '-' }}</h3>
+                        <p class="text-xs text-gray-500">
+                            {{ $placement->application?->user?->studentProfile?->universitas ?? '-' }} &bull; Jurusan {{ $placement->application?->user?->studentProfile?->jurusan ?? '-' }}
+>>>>>>> main
                         </p>
                     </div>
                 </div>
                 <div class="text-right sm:text-right">
                     <span class="text-xs text-gray-400 block">Periode Pelaksanaan</span>
                     <span class="text-xs font-bold text-gray-700">
+<<<<<<< HEAD
                         {{ \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') }}
+=======
+                        {{ $placement->application?->start_date ? \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') : '-' }} s/d {{ $placement->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') : '-' }}
+>>>>>>> main
                     </span>
                 </div>
             </div>
@@ -78,7 +107,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         
                         <!-- 1. Nilai Disiplin -->
+<<<<<<< HEAD
                         <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-indigo-500 transition">
+=======
+                        <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-blue-500 transition">
+>>>>>>> main
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 1. Nilai Disiplin
                             </label>
@@ -90,7 +123,11 @@
                                 max="100" 
                                 step="1" 
                                 x-model="disiplin" 
+<<<<<<< HEAD
                                 class="w-full text-lg font-bold text-gray-900 border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+=======
+                                class="w-full text-lg font-bold text-gray-900 border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+>>>>>>> main
                                 required
                             >
                             @error('nilai_disiplin')
@@ -99,7 +136,11 @@
                         </div>
 
                         <!-- 2. Nilai Kinerja -->
+<<<<<<< HEAD
                         <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-indigo-500 transition">
+=======
+                        <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-blue-500 transition">
+>>>>>>> main
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 2. Nilai Kinerja
                             </label>
@@ -111,7 +152,11 @@
                                 max="100" 
                                 step="1" 
                                 x-model="kinerja" 
+<<<<<<< HEAD
                                 class="w-full text-lg font-bold text-gray-900 border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+=======
+                                class="w-full text-lg font-bold text-gray-900 border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+>>>>>>> main
                                 required
                             >
                             @error('nilai_kinerja')
@@ -120,7 +165,11 @@
                         </div>
 
                         <!-- 3. Nilai Laporan -->
+<<<<<<< HEAD
                         <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-indigo-500 transition">
+=======
+                        <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-blue-500 transition">
+>>>>>>> main
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 3. Nilai Laporan
                             </label>
@@ -132,7 +181,11 @@
                                 max="100" 
                                 step="1" 
                                 x-model="laporan" 
+<<<<<<< HEAD
                                 class="w-full text-lg font-bold text-gray-900 border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+=======
+                                class="w-full text-lg font-bold text-gray-900 border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+>>>>>>> main
                                 required
                             >
                             @error('nilai_laporan')
@@ -143,26 +196,45 @@
                     </div>
 
                     <!-- Live Calculation Preview Card -->
+<<<<<<< HEAD
                     <div class="bg-indigo-900 text-white rounded-2xl p-5 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div class="flex items-center gap-3">
                             <div class="p-3 bg-white/10 rounded-xl text-indigo-200">
+=======
+                    <div class="bg-blue-900 text-white rounded-2xl p-5 shadow-inner flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-white/10 rounded-xl text-blue-200">
+>>>>>>> main
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>
                             </div>
                             <div>
+<<<<<<< HEAD
                                 <h5 class="text-xs font-bold text-indigo-200 uppercase tracking-wider">Kalkulasi Otomatis Transkrip Nilai</h5>
                                 <p class="text-xs text-indigo-300">Nilai kumulatif yang akan dicetak di E-Sertifikat resmi</p>
+=======
+                                <h5 class="text-xs font-bold text-blue-200 uppercase tracking-wider">Kalkulasi Otomatis Transkrip Nilai</h5>
+                                <p class="text-xs text-blue-300">Nilai kumulatif yang akan dicetak di E-Sertifikat resmi</p>
+>>>>>>> main
                             </div>
                         </div>
 
                         <div class="flex items-center gap-6">
                             <div class="text-center">
+<<<<<<< HEAD
                                 <span class="text-[11px] font-medium text-indigo-300 uppercase">Nilai Rata-rata</span>
                                 <div class="text-2xl font-black text-white" x-text="average">0.00</div>
                             </div>
                             <div class="text-center border-l border-indigo-700/60 pl-6">
                                 <span class="text-[11px] font-medium text-indigo-300 uppercase">Predikat</span>
+=======
+                                <span class="text-[11px] font-medium text-blue-300 uppercase">Nilai Rata-rata</span>
+                                <div class="text-2xl font-black text-white" x-text="average">0.00</div>
+                            </div>
+                            <div class="text-center border-l border-blue-700/60 pl-6">
+                                <span class="text-[11px] font-medium text-blue-300 uppercase">Predikat</span>
+>>>>>>> main
                                 <div class="text-sm font-extrabold text-amber-300" x-text="grade">-</div>
                             </div>
                         </div>
@@ -177,8 +249,13 @@
                             name="catatan" 
                             rows="4" 
                             placeholder="Tuliskan evaluasi performa, dedikasi, inisiatif, atau catatan kelulusan mahasiswa selama magang..."
+<<<<<<< HEAD
                             class="w-full text-sm border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
                         >{{ old('catatan', $placement->evaluation->catatan ?? '') }}</textarea>
+=======
+                            class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                        >{{ old('catatan', $placement->evaluation?->catatan ?? '') }}</textarea>
+>>>>>>> main
                         @error('catatan')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror
@@ -189,7 +266,11 @@
                         <a href="{{ route('mentor.students.show', $placement->id) }}" class="w-full sm:w-auto px-5 py-2.5 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
+<<<<<<< HEAD
                         <button type="submit" class="w-full sm:w-auto px-7 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+=======
+                        <button type="submit" class="w-full sm:w-auto px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+>>>>>>> main
                             Simpan & Terbitkan Penilaian
                         </button>
                     </div>

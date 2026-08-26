@@ -346,11 +346,19 @@
 
         // Data mahasiswa & permohonan
         $student = $application->user->studentProfile;
+<<<<<<< HEAD
         $fakultas = $student->fakultas ?? 'Fakultas Ilmu Komputer';
         $universitas = $student->universitas ?? 'Perguruan Tinggi';
         $nim = $student->nim ?? '-';
         $jurusan = $student->jurusan ?? '-';
         $semester = $student->semester ?? '5 (Lima)';
+=======
+        $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Mahasiswa';
+        $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
+        $nim = $student?->nim ?? '-';
+        $jurusan = $student?->jurusan ?? $student?->major ?? '-';
+        $semester = $student?->semester ? 'Semester ' . $student->semester : '-';
+>>>>>>> main
 
         // Format tanggal
         \Carbon\Carbon::setLocale('id');
@@ -379,6 +387,17 @@
         $bsreLogoPath = public_path('images/bsre-logo.png');
         $bsreLogoData = file_exists($bsreLogoPath) ? @file_get_contents($bsreLogoPath) : '';
         $bsreLogoSrc = $bsreLogoData ? 'data:image/png;base64,' . base64_encode($bsreLogoData) : null;
+<<<<<<< HEAD
+=======
+
+        // URL Kembali Cerdas
+        $backUrl = route('admin.applications.show', $application->id);
+        if (Auth::user()?->role === 'mahasiswa') {
+            $backUrl = route('dashboard');
+        } elseif (Auth::user()?->role === 'universitas') {
+            $backUrl = route('university.dashboard');
+        }
+>>>>>>> main
     @endphp
 
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
@@ -387,9 +406,15 @@
             📄 Surat Penerimaan Magang - {{ $application->user->name }}
         </div>
         <div class="btn-group">
+<<<<<<< HEAD
             <button onclick="window.history.back()" class="btn btn-secondary">
                 &larr; Kembali
             </button>
+=======
+            <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="btn btn-secondary">
+                &larr; Kembali
+            </a>
+>>>>>>> main
             <button onclick="window.print()" class="btn btn-primary">
                 🖨️ Cetak / Simpan PDF
             </button>

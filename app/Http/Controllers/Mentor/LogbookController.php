@@ -66,12 +66,20 @@ class LogbookController extends Controller
         $placement = $logbook->placement;
 
         // Authorization Check
+<<<<<<< HEAD
         if ($placement->mentor_id !== $mentor->id && $placement->pembimbing_id !== $mentor->id) {
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
         }
 
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke logbook instansi lain.');
+=======
+        $isAssignedMentor = ($placement->mentor_id === $mentor->id || $placement->pembimbing_id === $mentor->id);
+        $isAgencyStaff = ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id === $mentor->agency_profile_id);
+
+        if (!$isAssignedMentor && !$isAgencyStaff) {
+            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
+>>>>>>> main
         }
 
         $logbook->update([
@@ -79,6 +87,15 @@ class LogbookController extends Controller
             'feedback' => $request->feedback,
         ]);
 
+<<<<<<< HEAD
+=======
+        \App\Models\AuditLog::record('MENTOR_LOGBOOK_REVIEW', 'Logbook', $logbook->id, [
+            'status' => $logbook->status,
+            'feedback' => $logbook->feedback,
+            'student_name' => optional($placement->application?->user)->name,
+        ]);
+
+>>>>>>> main
         return redirect()->back()->with('success', 'Status logbook mahasiswa berhasil diperbarui!');
     }
 }
