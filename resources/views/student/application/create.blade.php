@@ -80,7 +80,11 @@
                             @endphp
 
                             <select id="unit_id" name="unit_id"
+<<<<<<< HEAD
+                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+=======
                                 class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm text-sm"
+>>>>>>> main
                                 {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
                                 
                                 @if ($totalAvailable === 0)
@@ -109,6 +113,16 @@
                         <!-- Periode Magang (Datepicker) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
+<<<<<<< HEAD
+                                <x-input-label for="start_date" value="Tanggal Mulai Magang" />
+                                <x-text-input id="start_date" name="start_date" type="date" class="mt-1 block w-full"
+                                    required />
+                            </div>
+                            <div>
+                                <x-input-label for="end_date" value="Tanggal Selesai Magang" />
+                                <x-text-input id="end_date" name="end_date" type="date" class="mt-1 block w-full"
+                                    required />
+=======
                                 <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider" />
                                 <x-text-input id="start_date" name="start_date" type="date" min="{{ date('Y-m-d') }}" class="mt-1 block w-full text-xs sm:text-sm"
                                     :value="old('start_date')" required />
@@ -121,10 +135,43 @@
                                     :value="old('end_date')" required />
                                 <p class="text-[11px] text-gray-400 mt-1">Pilih tanggal berakhirnya kegiatan magang.</p>
                                 <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
+>>>>>>> main
                             </div>
                         </div>
 
                         <hr class="my-6">
+<<<<<<< HEAD
+                        <h4 class="font-semibold text-md text-gray-700">Upload Dokumen Persyaratan (Format PDF, Maks 2MB)
+                        </h4>
+
+                        <div>
+                            <x-input-label for="surat_pengantar" value="Surat Pengantar Perguruan Tinggi" />
+                            <x-text-input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
+                                class="mt-1 block w-full border p-2 rounded-md" required />
+                        </div>
+
+                        <div>
+                            <x-input-label for="cv" value="Curriculum Vitae (CV)" />
+                            <x-text-input id="cv" name="cv" type="file" accept=".pdf"
+                                class="mt-1 block w-full border p-2 rounded-md" required />
+                        </div>
+
+                        <div>
+                            <x-input-label for="transkrip" value="Transkrip Nilai" />
+                            <x-text-input id="transkrip" name="transkrip" type="file" accept=".pdf"
+                                class="mt-1 block w-full border p-2 rounded-md" required />
+                        </div>
+
+                        <div class="flex items-center space-x-3 pt-2">
+                            <x-primary-button>
+                                {{ __('Kirim Pengajuan Magang') }}
+                            </x-primary-button>
+
+                            <a href="{{ route('dashboard') }}">
+                                <x-secondary-button type="button">
+                                    {{ __('Kembali') }}
+                                </x-secondary-button>
+=======
                         <div class="space-y-1">
                             <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
                                 <span>📁 Upload Dokumen Persyaratan Magang</span>
@@ -169,6 +216,7 @@
 
                             <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                                 {{ __('Kembali') }}
+>>>>>>> main
                             </a>
                         </div>
                     </form>
@@ -222,7 +270,11 @@
                                     <td class="p-3">
                                         @if ($app->status === 'accepted')
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
+<<<<<<< HEAD
+                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 shadow-sm transition">
+=======
                                                 class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
+>>>>>>> main
                                                 <span>📄 Download Surat PDF</span>
                                             </a>
                                         @else

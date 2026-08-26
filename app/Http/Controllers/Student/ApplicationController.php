@@ -63,12 +63,15 @@ class ApplicationController extends Controller
                 ->withErrors(['unit_id' => 'Kuota untuk instansi/unit ini sudah penuh. Silakan pilih unit kerja lain.']);
         }
 
+<<<<<<< HEAD
+=======
         // Upload Berkas
         $proposalPath = $request->file('surat_pengantar') ? $request->file('surat_pengantar')->store('documents/applications', 'public') : null;
         $cvPath = $request->file('cv') ? $request->file('cv')->store('documents/applications', 'public') : null;
         $transcriptPath = $request->file('transkrip') ? $request->file('transkrip')->store('documents/applications', 'public') : null;
         $idCardPath = $request->file('id_card') ? $request->file('id_card')->store('documents/applications', 'public') : null;
 
+>>>>>>> main
         // 1. Simpan Data Pengajuan
         $application = Application::create([
             'user_id' => Auth::id(),
@@ -103,6 +106,17 @@ class ApplicationController extends Controller
         }
 
         return redirect()->back()->with('success', 'Pengajuan magang dan dokumen persyaratan berhasil dikirim!');
+    }
+
+    // Download / Print Surat Penerimaan Magang untuk Mahasiswa
+    public function downloadLetter($id)
+    {
+        $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
+            ->where('user_id', Auth::id())
+            ->where('status', 'accepted')
+            ->findOrFail($id);
+
+        return view('letters.acceptance', compact('application'));
     }
 
     // Download / Print Surat Penerimaan Magang untuk Mahasiswa
