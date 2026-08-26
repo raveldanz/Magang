@@ -40,7 +40,7 @@
                                     </td>
                                     <td class="p-3">
                                         <a href="{{ route('pembimbing.student.detail', $place->id) }}" class="px-3 py-1.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-xs font-semibold shadow-xs transition cursor-pointer">
-                                            Periksa Logbook →
+                                            Periksa Logbook 
                                         </a>
                                     </td>
                                 </tr>
