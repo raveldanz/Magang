@@ -15,7 +15,7 @@
 
             <div>
                 <a href="{{ route('university.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                    ← Kembali ke Dashboard
+                     Kembali ke Dashboard
                 </a>
             </div>
         </div>

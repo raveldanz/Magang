@@ -47,9 +47,6 @@
                      style="background-color: #0f172a !important; color: #ffffff !important; border-color: #334155 !important;">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #1e293b !important;">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner shrink-0" style="background-color: #1e293b !important;">
-                                🎉
-                            </div>
                             <div>
                                 <h3 class="font-extrabold text-base sm:text-lg tracking-tight" style="color: #ffffff !important;">
                                     Akun Admin Kampus Baru Berhasil Dibuat!

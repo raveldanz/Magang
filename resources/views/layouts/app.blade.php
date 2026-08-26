@@ -21,13 +21,13 @@
         @if(session()->has('impersonator_id'))
             <div class="bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 text-white px-4 py-2.5 shadow-lg flex items-center justify-between sticky top-0 z-[99999] text-xs sm:text-sm font-medium border-b border-rose-700">
                 <div class="flex items-center gap-2">
-                    <span class="animate-pulse text-base">⚠️</span>
+                    
                     <span>Mode Penyamaran: Anda sedang mengelola akun <strong>{{ auth()->user()->name }}</strong> (Role: <span class="uppercase tracking-wider font-bold bg-white/20 px-1.5 py-0.5 rounded">{{ auth()->user()->role }}</span>)</span>
                 </div>
                 <form action="{{ route('admin.impersonate.leave') }}" method="POST">
                     @csrf
                     <button type="submit" class="px-3 py-1 bg-white hover:bg-rose-50 text-rose-700 rounded-lg font-bold shadow-md transition text-xs flex items-center gap-1.5 cursor-pointer">
-                        <span>⬅️</span>
+                        
                         <span>Kembali ke Super Admin ({{ session('impersonator_name') }})</span>
                     </button>
                 </form>

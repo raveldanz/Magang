@@ -386,8 +386,12 @@
                                         <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
                                                 <span>Detail</span>
+<<<<<<< HEAD
+                                                <span></span>
+=======
                                                 <span>→</span>
 >>>>>>> main
+>>>>>>> 50a572d5d784ad7edaf539544c540e0815d13017
                                             </a>
                                         </div>
                                     </td>

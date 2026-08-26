@@ -36,7 +36,7 @@
                     <!-- Section 1: Informasi Akun & NIM -->
                     <div class="space-y-4">
                         <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
-                            <span>👤 Identitas Akun & Mahasiswa</span>
+                            <span>Identitas Akun & Mahasiswa</span>
                         </h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -56,7 +56,7 @@
                     <!-- Section 2: Data Perguruan Tinggi & Akademik -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
                         <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
-                            <span>🎓 Data Perguruan Tinggi & Akademik</span>
+                            <span>Data Perguruan Tinggi & Akademik</span>
                         </h4>
 
                         <!-- Input Universitas dengan Searchable Datalist -->
@@ -89,7 +89,6 @@
                             </datalist>
 
                             <p class="text-[11px] text-gray-500 mt-1.5 flex items-center gap-1">
-                                <span>💡</span>
                                 <span>Pilih universitas dari daftar yang tersedia, atau ketik nama universitas baru jika belum terdaftar.</span>
                             </p>
                             <x-input-error :messages="$errors->get('universitas')" class="mt-1" />
@@ -120,7 +119,7 @@
                     <!-- Section 3: Kontak Pribadi & Domisili -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
                         <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
-                            <span>📞 Kontak Pribadi & Domisili</span>
+                            <span>Kontak Pribadi & Domisili</span>
                         </h4>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -141,7 +140,7 @@
                     <!-- Section 4: Kontak Darurat (Emergency Contact) -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
                         <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
-                            <span>🚨 Kontak Darurat (Orang Tua / Wali)</span>
+                            <span>Kontak Darurat (Orang Tua / Wali)</span>
                         </h4>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -19,7 +19,7 @@
             <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
 
                 <div class="mb-6 pb-4 border-b border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-800">📝 Input Catatan Kegiatan Harian</h3>
+                    <h3 class="text-lg font-bold text-gray-800">Input Catatan Kegiatan Harian</h3>
                     <p class="text-sm text-gray-500 mt-1">Isi logbook kegiatan magang Anda untuk hari ini. Logbook akan direview oleh Admin/Pembimbing.</p>
 >>>>>>> main
                 </div>
