@@ -3,7 +3,6 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>👨‍🏫</span>
                     <span>Portal Dosen Pembimbing Lapangan (DPL Kampus)</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -13,7 +12,7 @@
             
             <div class="flex items-center gap-2">
                 <span class="px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-xs font-bold shadow-2xs">
-                    🏛️ {{ is_string($lecturer->university) ? $lecturer->university : ($lecturer->universityRelation?->name ?? $lecturer->university?->name ?? 'Perguruan Tinggi Mitra') }}
+                   {{ is_string($lecturer->university) ? $lecturer->university : ($lecturer->universityRelation?->name ?? $lecturer->university?->name ?? 'Perguruan Tinggi Mitra') }}
                 </span>
             </div>
         </div>
@@ -26,7 +25,6 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -36,58 +34,46 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 <!-- Total Mahasiswa Bimbingan -->
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Bimbingan</span>
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">
-                            👨‍🎓
-                        </div>
+                        <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">Total Bimbingan</span>
                     </div>
                     <div class="mt-4">
                         <span class="text-2xl font-black text-gray-900">{{ $stats['total_students'] }}</span>
-                        <span class="text-[11px] text-gray-400 block mt-0.5">Mahasiswa magang aktif</span>
+                        <span class="text-[11px] text-gray-500 block mt-0.5">Mahasiswa magang aktif</span>
                     </div>
                 </div>
 
                 <!-- Evaluasi Selesai (60%) -->
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Sudah Dinilai</span>
-                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">
-                            📝
-                        </div>
+                        <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">Sudah Dinilai</span>
                     </div>
                     <div class="mt-4">
-                        <span class="text-2xl font-black text-emerald-600">{{ $stats['total_evaluated'] }}</span>
-                        <span class="text-[11px] text-gray-400 block mt-0.5">Nilai DPL 60% tersimpan</span>
+                        <span class="text-2xl font-black text-gray-900">{{ $stats['total_evaluated'] }}</span>
+                        <span class="text-[11px] text-gray-500 block mt-0.5">Nilai DPL 60% tersimpan</span>
                     </div>
                 </div>
 
                 <!-- Laporan Akhir Masuk / Pending -->
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Laporan Akhir</span>
-                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">
-                            📂
-                        </div>
+                        <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">Laporan Akhir</span>
                     </div>
                     <div class="mt-4">
-                        <span class="text-2xl font-black text-amber-600">{{ $stats['total_reports_approved'] }}</span>
-                        <span class="text-[11px] text-gray-400 block mt-0.5">Telah di-ACC DPL</span>
+                        <span class="text-2xl font-black text-gray-900">{{ $stats['total_reports_approved'] }}</span>
+                        <span class="text-[11px] text-gray-500 block mt-0.5">Telah di-ACC DPL</span>
                     </div>
                 </div>
 
                 <!-- Belum Dinilai -->
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
+                <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Belum Dinilai</span>
-                        <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-sm font-bold">
-                            ⏳
-                        </div>
+                        <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">Belum Dinilai</span>
                     </div>
                     <div class="mt-4">
-                        <span class="text-2xl font-black text-rose-600">{{ $stats['total_pending_eval'] }}</span>
-                        <span class="text-[11px] text-gray-400 block mt-0.5">Menunggu penilaian DPL</span>
+                        <span class="text-2xl font-black text-gray-900">{{ $stats['total_pending_eval'] }}</span>
+                        <span class="text-[11px] text-gray-500 block mt-0.5">Menunggu penilaian DPL</span>
                     </div>
                 </div>
 
@@ -134,7 +120,6 @@
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
                 <div class="p-5 border-b border-gray-100 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="text-lg">📋</span>
                         <h3 class="font-bold text-sm text-gray-900">Daftar Mahasiswa Bimbingan Magang</h3>
                     </div>
                     <span class="text-xs text-gray-400 font-mono">{{ $placements->count() }} Mahasiswa</span>
@@ -177,13 +162,13 @@
 
                                     <!-- Placement Location -->
                                     <td class="py-4 px-4">
-                                        <div class="font-bold text-gray-800 text-xs">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="font-bold text-gray-800 text-xs">{{ $agency->agency_name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <!-- Mentor Info -->
                                     <td class="py-4 px-4">
-                                        <div class="font-semibold text-gray-800 text-xs">👔 {{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
+                                        <div class="font-semibold text-gray-800 text-xs">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
                                         <div class="text-[10px] text-emerald-600 font-semibold">
                                             @if(($eval?->nilai_pembimbing ?? 0) > 0)
                                                 Skor Dinas: {{ $eval->nilai_pembimbing }}/100 (40%)
@@ -196,7 +181,7 @@
                                     <!-- Logbook Counter -->
                                     <td class="py-4 px-4 text-center">
                                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                            📝 {{ $logbooksCount }} Entri
+                                            {{ $logbooksCount }} Entri
                                         </span>
                                     </td>
 
@@ -208,15 +193,15 @@
                                             </span>
                                         @elseif($finalReport->status === 'approved')
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                ✅ Disetujui
+                                                Disetujui
                                             </span>
                                         @elseif($finalReport->status === 'revision')
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                                ⚠️ Perlu Revisi
+                                                Perlu Revisi
                                             </span>
                                         @else
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                ⏳ Menunggu Review
+                                                Menunggu Review
                                             </span>
                                         @endif
                                     </td>
@@ -225,7 +210,7 @@
                                     <td class="py-4 px-4 text-center whitespace-nowrap">
                                         @if($hasEval)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                                ⭐ {{ $eval->nilai_dosen_calculated }}/100
+                                                {{ $eval->nilai_dosen_calculated }}/100
                                                 @if($eval->grade)
                                                     ({{ $eval->grade }})
                                                 @endif

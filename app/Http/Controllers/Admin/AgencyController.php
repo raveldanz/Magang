@@ -24,11 +24,12 @@ class AgencyController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('agency_name', 'like', "%{$search}%")
-                  ->orWhere('government_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('city', 'like', "%{$search}%");
+            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->where(function ($q) use ($search, $like) {
+                $q->where('agency_name', $like, "%{$search}%")
+                  ->orWhere('government_name', $like, "%{$search}%")
+                  ->orWhere('email', $like, "%{$search}%")
+                  ->orWhere('city', $like, "%{$search}%");
             });
         }
 
