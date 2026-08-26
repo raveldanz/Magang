@@ -12,7 +12,7 @@
                 </h2>
                 <div class="flex items-center gap-2 mt-1">
                     <span class="px-2.5 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-md">
-                        🎓 {{ $lecturer->university ?? 'Perguruan Tinggi Mitra' }}
+                        {{ $lecturer->university ?? 'Perguruan Tinggi Mitra' }}
                     </span>
                     <span class="text-xs text-gray-500 font-medium">
                         Dosen: {{ $lecturer->name }}
@@ -46,27 +46,27 @@
 
             <!-- Metric Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mahasiswa Bimbingan</p>
                     <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_students'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Mahasiswa asal {{ $lecturer->university ?? 'kampus' }}</p>
                 </div>
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Nilai Akademik Terisi</p>
-                    <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_evaluated'] }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_evaluated'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Telah dinilai oleh DPL</p>
                 </div>
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Menunggu Penilaian</p>
-                    <h3 class="text-2xl font-black text-amber-600 mt-1">{{ $stats['total_pending_eval'] }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_pending_eval'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Perlu input nilai bimbingan</p>
                 </div>
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="bg-white rounded-2xl p-5 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Laporan Akhir Disetujui</p>
-                    <h3 class="text-2xl font-black text-indigo-600 mt-1">{{ $stats['total_reports_approved'] }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_reports_approved'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Laporan magang tervalidasi</p>
                 </div>
             </div>
@@ -122,7 +122,7 @@
 
                                     <!-- Dinas & Unit Penempatan -->
                                     <td class="py-4 px-4">
-                                        <div class="font-semibold text-gray-800 text-xs">🏛️ {{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="font-semibold text-gray-800 text-xs">{{ $agency->agency_name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
@@ -135,7 +135,7 @@
                                     <!-- Logbook Stats -->
                                     <td class="py-4 px-4 text-center">
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-semibold rounded-md">
-                                            📝 {{ $approvedLogbooks }} / {{ $logbookCount }}
+                                            {{ $approvedLogbooks }} / {{ $logbookCount }}
                                         </span>
                                     </td>
 
@@ -143,7 +143,7 @@
                                     <td class="py-4 px-4 text-center">
                                         @if ($hasAcademicEval)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">
-                                                ⭐ {{ $placement->evaluation->nilai_akademik }}
+                                                {{ $placement->evaluation->nilai_akademik }}
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-md">

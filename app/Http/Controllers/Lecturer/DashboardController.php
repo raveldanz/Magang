@@ -46,12 +46,12 @@ class DashboardController extends Controller
         $query = $this->getLecturerPlacementsQuery();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->whereHas('application.user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
                   ->orWhereHas('studentProfile', function ($sp) use ($search) {
-                      $sp->where('nim', 'like', "%{$search}%")
-                         ->orWhere('jurusan', 'like', "%{$search}%");
+                      $sp->whereRaw('LOWER(nim) LIKE ?', ["%{$search}%"])
+                         ->orWhereRaw('LOWER(jurusan) LIKE ?', ["%{$search}%"]);
                   });
             });
         }
