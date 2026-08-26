@@ -15,7 +15,7 @@
 
             <div class="flex items-center gap-2">
                 <a href="{{ route('lecturer.monitoring.index') }}" class="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-xs font-bold rounded-xl transition shadow-xs">
-                    👥 Mahasiswa Bimbingan
+                    Mahasiswa Bimbingan
                 </a>
                 <a href="{{ route('lecturer.dashboard') }}" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                     &larr; Dashboard Dosen
@@ -186,11 +186,11 @@
                                     <td class="py-4 px-4 align-top text-center">
                                         @if ($log->status === 'approved')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                                ✅ Approved
+                                                ✅ Disetujui
                                             </span>
                                         @elseif ($log->status === 'rejected')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
-                                                ❌ Rejected
+                                                ❌ Ditolak
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
@@ -203,15 +203,15 @@
                                     <td class="py-4 px-4 align-top text-center">
                                         @if ($log->lecturer_status === 'approved')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                                ✅ ACC
+                                                ✅ disetujui   
                                             </span>
                                         @elseif ($log->lecturer_status === 'rejected')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
-                                                ❌ Revisi
+                                                ❌ ditolak  
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
-                                                ⏳ Belum ACC
+                                                ⏳ Dalam Pengecekan
                                             </span>
                                         @endif
 
