@@ -27,7 +27,11 @@
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <div>
                             <x-input-label for="agency_profile_id" value="Pilih Instansi Induk" />
+<<<<<<< HEAD
                             <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required>
+=======
+                            <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+>>>>>>> main
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_profile_id', $defaultAgencyId) == $agency->id ? 'selected' : '' }}>
                                         🏛️ {{ $agency->agency_name }}
@@ -51,7 +55,11 @@
                             name="name" 
                             value="{{ old('name') }}" 
                             placeholder="Contoh: Bidang Layanan Informatika & E-Government"
+<<<<<<< HEAD
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+=======
+                            class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+>>>>>>> main
                             required
                         >
                         @error('name')
@@ -69,7 +77,11 @@
                             min="0" 
                             max="100" 
                             value="{{ old('quota', 5) }}" 
+<<<<<<< HEAD
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+=======
+                            class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+>>>>>>> main
                             required
                         >
                         <p class="text-xs text-gray-500 mt-1">Jumlah maksimal mahasiswa yang dapat diterima di divisi ini.</p>
@@ -86,7 +98,11 @@
                             name="description" 
                             rows="4" 
                             placeholder="Jelaskan ruang lingkup pekerjaan, teknologi/keahlian yang dibutuhkan, atau deskripsi umum divisi..."
+<<<<<<< HEAD
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+=======
+                            class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+>>>>>>> main
                         >{{ old('description') }}</textarea>
                         @error('description')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
@@ -98,7 +114,11 @@
                         <a href="{{ route('admin.units.index') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
+<<<<<<< HEAD
                         <button type="submit" class="px-7 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+=======
+                        <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+>>>>>>> main
                             Simpan & Buka Lowongan
                         </button>
                     </div>

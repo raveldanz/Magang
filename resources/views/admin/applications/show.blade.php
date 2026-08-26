@@ -18,15 +18,25 @@
 
             <!-- Data Profil & Pengajuan -->
             <div class="bg-white p-6 shadow sm:rounded-lg">
-                <h3 class="text-lg font-bold mb-4">Informasi Pemohon</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <p><strong>NIM:</strong> {{ $application->user->studentProfile->nim ?? '-' }}</p>
-                    <p><strong>Universitas:</strong> {{ $application->user->studentProfile->universitas ?? '-' }}</p>
-                    <p><strong>Jurusan:</strong> {{ $application->user->studentProfile->jurusan ?? '-' }}</p>
-                    <p><strong>No. HP:</strong> {{ $application->user->studentProfile->phone ?? '-' }}</p>
-                    <p><strong>Unit Tujuan:</strong> {{ $application->unit->name ?? '-' }}</p>
-                    <p><strong>Periode Magang:</strong> {{ $application->start_date }} s/d {{ $application->end_date }}
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Informasi Pemohon
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <p><strong class="text-slate-600">Nama Mahasiswa:</strong> <span class="font-bold text-slate-800">{{ $application->user->name }}</span></p>
+                    <p><strong class="text-slate-600">NIM:</strong> {{ $application->user->studentProfile->nim ?? '-' }}</p>
+                    <p><strong class="text-slate-600">Universitas:</strong> {{ $application->user->studentProfile->universitas ?? $application->user->university ?? '-' }}</p>
+                    <p><strong class="text-slate-600">Fakultas / Program Studi:</strong> {{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }} / {{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</p>
+                    <p><strong class="text-slate-600">No. Handphone:</strong> {{ $application->user->studentProfile->phone ?? '-' }}</p>
+                    <p><strong class="text-slate-600">Instansi Tujuan:</strong> 
+                        <span class="font-bold text-blue-700">
+                            🏛️ {{ $application->unit->agencyProfile->agency_name ?? $application->unit->agencyProfile->name ?? 'Pemerintah Kota Surabaya' }}
+                        </span>
                     </p>
+                    <p><strong class="text-slate-600">Unit Tujuan / Bidang:</strong> <span class="font-semibold text-slate-800">{{ $application->unit->name ?? '-' }}</span></p>
+                    <p><strong class="text-slate-600">Periode Magang:</strong> {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</p>
                 </div>
             </div>
 
@@ -72,7 +82,11 @@
                     <!-- Dropdown Status -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Status Pengajuan</label>
+<<<<<<< HEAD
                         <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md">
+=======
+                        <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500">
+>>>>>>> main
                             <option value="pending" {{ $application->status == 'pending' ? 'selected' : '' }}>PENDING
                             </option>
                             <option value="verified" {{ $application->status == 'verified' ? 'selected' : '' }}>VERIFIED
@@ -90,6 +104,7 @@
                         
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
+<<<<<<< HEAD
                             <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
                             <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="">-- Pilih Pembimbing Lapangan --</option>
@@ -99,6 +114,18 @@
                                     </option>
                                 @endforeach
                             </select>
+=======
+                            <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan (Mentor Dinas Terkait)</label>
+                            <select name="mentor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="">-- Pilih Pembimbing Lapangan ({{ $application->unit->agencyProfile->agency_name ?? 'Instansi' }}) --</option>
+                                @foreach ($pembimbings as $pembimbing)
+                                    <option value="{{ $pembimbing->id }}" {{ (optional($application->placement)->mentor_id == $pembimbing->id || optional($application->placement)->pembimbing_id == $pembimbing->id) ? 'selected' : '' }}>
+                                        {{ $pembimbing->name }} ({{ $pembimbing->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
+>>>>>>> main
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -107,12 +134,20 @@
                                 <label class="block text-sm font-medium text-gray-700">Nomor Surat Balasan Dinas</label>
                                 <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
                                     placeholder="Contoh: 500/123/APTIKA/2026"
+<<<<<<< HEAD
                                     class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+=======
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+>>>>>>> main
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Surat Balasan</label>
                                 <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
+<<<<<<< HEAD
                                     class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+=======
+                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+>>>>>>> main
                             </div>
                         </div>
                     </div>

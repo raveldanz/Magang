@@ -1,3 +1,105 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================================
+   Standarisasi Tombol Aksi Tabel & Card (Edit, Reset, Hapus, Login As)
+   Semua tombol dijamin 100% sejajar, berukuran persis sama, dan simetris
+   ========================================================================== */
+
+.btn-action-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    vertical-align: middle !important;
+}
+
+.btn-action-form {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+}
+
+.btn-action-edit,
+.btn-action-reset,
+.btn-action-delete,
+.btn-action-login,
+.btn-action-create {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    border-radius: 8px !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    transition: all 0.15s ease-in-out !important;
+    font-family: inherit !important;
+}
+
+.btn-action-create {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #1d4ed8 !important;
+    gap: 4px !important;
+}
+.btn-action-create:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1e40af !important;
+}
+
+.btn-action-edit {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
+}
+.btn-action-edit:hover {
+    background-color: #dbeafe !important;
+    color: #1e40af !important;
+    border-color: #93c5fd !important;
+}
+
+.btn-action-reset {
+    background-color: #fffbeb !important;
+    color: #92400e !important;
+    border-color: #fde68a !important;
+}
+.btn-action-reset:hover {
+    background-color: #fef3c7 !important;
+    color: #78350f !important;
+    border-color: #fcd34d !important;
+}
+
+.btn-action-delete {
+    background-color: #fff1f2 !important;
+    color: #be123c !important;
+    border-color: #fecdd3 !important;
+}
+.btn-action-delete:hover {
+    background-color: #ffe4e6 !important;
+    color: #9f1239 !important;
+    border-color: #fda4af !important;
+}
+
+.btn-action-login {
+    background: linear-gradient(to right, #f59e0b, #f43f5e) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    gap: 4px !important;
+}
+.btn-action-login:hover {
+    background: linear-gradient(to right, #d97706, #e11d48) !important;
+}

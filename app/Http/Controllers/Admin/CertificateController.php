@@ -46,6 +46,7 @@ class CertificateController extends Controller
         return view('admin.certificates.index', compact('applications'));
     }
 
+<<<<<<< HEAD
     // Pratinjau Sertifikat (HTML view)
     public function show($placementId)
     {
@@ -166,6 +167,20 @@ class CertificateController extends Controller
         $filename = 'Sertifikat_Magang_' . str_replace(' ', '_', $student->name) . '.pdf';
 
         return $pdf->download($filename);
+=======
+    // Pratinjau & Cetak E-Sertifikat Lengkap (Format Resmi Mahasiswa & Transkrip 2 Halaman)
+    public function show($placementId)
+    {
+        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        return view('certificates.internship_certificate', $data);
+    }
+
+    // Generate & Cetak E-Sertifikat
+    public function generate($placementId)
+    {
+        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        return view('certificates.internship_certificate', $data);
+>>>>>>> main
     }
 }
 
