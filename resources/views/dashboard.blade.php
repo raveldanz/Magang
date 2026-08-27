@@ -7,7 +7,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans" x-data="{ openNewDosenModal: false, showCredentialModal: {{ session('new_advisor_credential') ? 'true' : 'false' }}, copied: false }">
+    <div class="py-8" x-data="{ openNewDosenModal: false, showCredentialModal: {{ session('new_advisor_credential') ? 'true' : 'false' }}, copied: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success Message -->

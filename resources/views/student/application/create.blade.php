@@ -78,7 +78,7 @@
                             @endphp
 
                             <select id="unit_id" name="unit_id"
-                                class="mt-1 block w-full border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/40 rounded-xl shadow-sm text-xs sm:text-sm"
+                                class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm text-sm"
                                 {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
                                 
                                 @if ($totalAvailable === 0)
@@ -104,25 +104,13 @@
                             @enderror
                         </div>
 
-                        <!-- Periode Magang (Datepicker Terkunci Otomatis) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" 
-                             x-data="{ 
-                                 startDate: '{{ old('start_date', '') }}',
-                                 endDate: '{{ old('end_date', '') }}',
-                                 today: '{{ date('Y-m-d') }}'
-                             }">
-                            
-                            <!-- Tanggal Mulai -->
+                        <!-- Periode Magang (Datepicker) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-semibold uppercase tracking-wider text-slate-600" />
-                                <x-text-input id="start_date" 
-                                              name="start_date" 
-                                              type="date" 
-                                              min="{{ date('Y-m-d') }}" 
-                                              x-model="startDate"
-                                              class="mt-1 block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400"
-                                              required />
-                                <p class="text-[11px] text-slate-400 mt-1">Pilih tanggal awal mulai kegiatan magang.</p>
+                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-text-input id="start_date" name="start_date" type="date" min="{{ date('Y-m-d') }}" class="mt-1 block w-full text-xs sm:text-sm"
+                                    :value="old('start_date')" required />
+                                <p class="text-[11px] text-gray-400 mt-1">Pilih tanggal awal mulai kegiatan magang.</p>
                                 <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
                             </div>
 
@@ -141,8 +129,15 @@
                             </div>
                         </div>
 
-                        <!-- Dokumen Persyaratan -->
-                        <div class="pt-4 border-t border-slate-100 space-y-3">
+                        <hr class="my-6">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
+                                <span>Upload Dokumen Persyaratan Magang</span>
+                            </h4>
+                            <p class="text-xs text-gray-500">Seluruh dokumen wajib berformat PDF dengan ukuran maksimum 2MB per file</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div>
                                 <h4 class="font-bold text-sm text-slate-800">Upload Dokumen Persyaratan Magang</h4>
                                 <p class="text-xs text-slate-500 mt-0.5">Dokumen berformat PDF (maksimal 2MB per file)</p>
@@ -247,9 +242,9 @@
                                     <td class="py-4 px-5 whitespace-nowrap">
                                         @if ($app->status === 'accepted')
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
-                                               class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
-                                            
-                                                <span>Unduh Surat PDF</span>
+                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
+                                                <span>📄 Download Surat PDF</span>
+
                                             </a>
                                         @else
                                             <span class="text-slate-400 text-xs italic">Belum tersedia</span>

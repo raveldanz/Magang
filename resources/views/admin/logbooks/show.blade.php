@@ -87,13 +87,13 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div class="p-3 bg-gray-50 rounded-xl space-y-1">
-                        <span class="text-gray-500 font-medium">🏛️ Instansi & Unit Kerja:</span>
+                        <span class="text-gray-500 font-medium">Instansi & Unit Kerja:</span>
                         <p class="font-bold text-gray-800">{{ $agency->agency_name ?? '-' }}</p>
                         <p class="text-blue-600 font-semibold">{{ $unit->name ?? '-' }}</p>
                     </div>
 
                     <div class="p-3 bg-gray-50 rounded-xl space-y-1">
-                        <span class="text-gray-500 font-medium">👨‍🏫 Pembimbing:</span>
+                        <span class="text-gray-500 font-medium">Pembimbing:</span>
                         <p class="font-bold text-gray-800">
                             Mentor Lapangan: <span class="font-semibold text-gray-700">{{ $mentor->name ?? 'Belum Diplot' }}</span>
                         </p>
@@ -108,13 +108,10 @@
             <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-5">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-100 pb-3">
                     <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
                         Uraian Aktivitas Logbook
                     </h3>
                     <div class="text-xs font-mono font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-lg">
-                        📅 {{ \Carbon\Carbon::parse($logbook->date)->translatedFormat('l, d F Y') }}
+                        {{ \Carbon\Carbon::parse($logbook->date)->translatedFormat('l, d F Y') }}
                     </div>
                 </div>
 
@@ -155,7 +152,7 @@
             <!-- 3. Status Verifikasi 2-Arah (Mentor Dinas & Dosen Kampus) -->
             <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
                 <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2 border-b border-gray-100 pb-3">
-                    <span>⚖️ Status Verifikasi 2-Arah</span>
+                    <span>Status Verifikasi 2-Arah</span>
                 </h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -163,18 +160,18 @@
                     <!-- Panel Status Mentor Dinas -->
                     <div class="p-4 rounded-xl border {{ $logbook->status === 'approved' ? 'bg-emerald-50/50 border-emerald-200' : ($logbook->status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200') }} space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-gray-700">🏛️ Mentor Lapangan Dinas</span>
+                            <span class="text-xs font-bold text-gray-700">Mentor Lapangan Dinas</span>
                             @if ($logbook->status === 'approved')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                    ✅ APPROVED
+                                    ✅ Disetujui
                                 </span>
                             @elseif ($logbook->status === 'rejected')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                                    ❌ REJECTED
+                                    ❌ Ditolak
                                 </span>
                             @else
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                    ⏳ PENDING
+                                    ⏳ Menunggu Persetujuan
                                 </span>
                             @endif
                         </div>
@@ -194,18 +191,18 @@
                     <!-- Panel Status Dosen Kampus -->
                     <div class="p-4 rounded-xl border {{ $logbook->lecturer_status === 'approved' ? 'bg-emerald-50/50 border-emerald-200' : ($logbook->lecturer_status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200') }} space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-gray-700">🎓 Dosen Pembimbing (DPL)</span>
+                            <span class="text-xs font-bold text-gray-700">Dosen Pembimbing (DPL)</span>
                             @if ($logbook->lecturer_status === 'approved')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                    ✅ ACC DISETUJUI
+                                    ✅ Disetujui
                                 </span>
                             @elseif ($logbook->lecturer_status === 'rejected')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                                    ❌ PERLU REVISI
+                                    ❌ Perlu Revisi
                                 </span>
                             @else
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                    ⏳ BELUM ACC
+                                    ⏳ Menunggu Persetujuan
                                 </span>
                             @endif
                         </div>
@@ -267,8 +264,7 @@
                                 </button>
                             </div>
 
-                            <a href="{{ $backUrl }}" class="w-full sm:w-auto text-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                                Kembali
+                            <a href="{{ $backUrl }}" class="w-full sm:w-auto text-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">Kembali
                             </a>
                         </div>
                     </form>
@@ -312,7 +308,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
-                                    Setujui (ACC Logbook)
+                                    Setujui Logbook
                                 </button>
                                 <button type="submit" name="status" value="rejected" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
