@@ -43,7 +43,7 @@ class ApplicationController extends Controller
 
         // 1. Pencarian berdasarkan Nama Mahasiswa, NIM, atau Universitas
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->whereHas('user', function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")

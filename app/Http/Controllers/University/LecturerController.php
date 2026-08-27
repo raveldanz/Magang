@@ -34,7 +34,7 @@ class LecturerController extends Controller
             ->with(['academicPlacements.application.user', 'academicPlacements.finalreport', 'academicPlacements.evaluation']);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
