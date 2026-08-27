@@ -15,11 +15,7 @@
                     <img src="{{ asset('storage/' . $agency->logo) }}" alt="Logo Instansi" class="w-16 h-16 mx-auto mb-2 object-contain">
                 @endif
                 <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
-<<<<<<< HEAD
-                <h1 class="text-xl font-extrabold text-indigo-900 uppercase">{{ $agencyName }}</h1>
-=======
                 <h1 class="text-xl font-extrabold text-blue-900 uppercase">{{ $agencyName }}</h1>
->>>>>>> main
                 <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Validasi Magang Resmi</p>
             </div>
 
@@ -46,11 +42,7 @@
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Nomor Surat Balasan:</span>
-<<<<<<< HEAD
-                        <span class="font-bold text-indigo-700 font-mono">{{ $application->letter_number ?? '-' }}</span>
-=======
                         <span class="font-bold text-blue-700 font-mono">{{ $application->letter_number ?? '-' }}</span>
->>>>>>> main
                     </div>
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Tanggal Terbit Surat:</span>
