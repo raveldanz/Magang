@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Logbook;
-<<<<<<< HEAD
-=======
 use App\Models\Placement;
 use App\Models\Unit;
->>>>>>> main
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,13 +22,6 @@ class LogbookController extends Controller
     {
         $user = Auth::user();
 
-<<<<<<< HEAD
-        $query = Logbook::with(['placement.application.user.studentProfile', 'placement.application.unit.agencyProfile']);
-
-        // Multi-Tenant Isolation
-        if ($user && $user->agency_profile_id !== null) {
-            $query->whereHas('placement.application.unit', function ($q) use ($user) {
-=======
         $query = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
@@ -47,26 +37,10 @@ class LogbookController extends Controller
         // Multi-Tenant Isolation untuk Admin Dinas
         if ($user && $user->agency_profile_id !== null) {
             $query->whereHas('application.unit', function ($q) use ($user) {
->>>>>>> main
                 $q->where('agency_profile_id', $user->agency_profile_id);
             });
         }
 
-<<<<<<< HEAD
-        // Filter berdasarkan status (mengantisipasi huruf besar/kecil)
-        if ($request->filled('status')) {
-            $status = strtolower($request->status);
-            $query->whereIn('status', [$status, strtoupper($status)]);
-        }
-
-        $logbooks = $query->orderBy('date', 'desc')->get();
-
-        return view('admin.logbooks.index', compact('logbooks'));
-    }
-
-    /**
-     * Detail logbook + form review (approve/reject)
-=======
         // Filter Berdasarkan Unit
         if ($request->filled('unit_id')) {
             $query->whereHas('application', function ($q) use ($request) {
@@ -156,7 +130,6 @@ class LogbookController extends Controller
 
     /**
      * Detail logbook kegiatan per aktivitas
->>>>>>> main
      */
     public function show($id)
     {
@@ -165,16 +138,6 @@ class LogbookController extends Controller
         $logbook = Logbook::with([
             'placement.application.user.studentProfile', 
             'placement.application.unit.agencyProfile', 
-<<<<<<< HEAD
-            'placement.pembimbing'
-        ])->findOrFail($id);
-
-        // Multi-Tenant Authorization Check
-        if ($user && $user->agency_profile_id !== null && optional($logbook->placement?->application?->unit)->agency_profile_id !== $user->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses ke logbook instansi lain.');
-        }
-
-=======
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor',
@@ -205,7 +168,6 @@ class LogbookController extends Controller
             }
         }
 
->>>>>>> main
         return view('admin.logbooks.show', compact('logbook'));
     }
 
@@ -221,11 +183,7 @@ class LogbookController extends Controller
         $user = Auth::user();
 
         $request->validate([
-<<<<<<< HEAD
-            'status'   => 'required|in:approved,rejected,APPROVED,REJECTED',
-=======
             'status'   => 'required|in:approved,rejected,pending,APPROVED,REJECTED,PENDING',
->>>>>>> main
             'feedback' => 'nullable|string',
         ]);
 
@@ -241,11 +199,6 @@ class LogbookController extends Controller
             'feedback' => $request->feedback,
         ]);
 
-<<<<<<< HEAD
-        return redirect()->route('admin.logbooks.index')
-            ->with('success', 'Logbook berhasil di-review!');
-=======
         return redirect()->back()->with('success', 'Status logbook berhasil diperbarui!');
->>>>>>> main
     }
 }
