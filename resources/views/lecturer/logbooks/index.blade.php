@@ -44,22 +44,22 @@
                     <p class="text-[11px] text-gray-400 mt-0.5">Semua entri aktivitas</p>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs bg-amber-50/20">
-                    <span class="text-xs font-bold text-amber-700 uppercase tracking-wider block">Menunggu ACC Dosen</span>
-                    <div class="text-2xl font-black text-amber-600 mt-1">{{ $pendingDosenLogs }}</div>
-                    <p class="text-[11px] text-amber-600/80 mt-0.5">Perlu diverifikasi</p>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Menunggu Persetujuan Dosen</span>
+                    <div class="text-2xl font-black text-gray-900 mt-1">{{ $pendingDosenLogs }}</div>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Perlu diverifikasi</p>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-xs bg-emerald-50/20">
-                    <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block">Disetujui Dosen</span>
-                    <div class="text-2xl font-black text-emerald-600 mt-1">{{ $approvedDosenLogs }}</div>
-                    <p class="text-[11px] text-emerald-600/80 mt-0.5">ACC terverifikasi</p>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Disetujui Dosen</span>
+                    <div class="text-2xl font-black text-gray-900 mt-1">{{ $approvedDosenLogs }}</div>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Terverifikasi disetujui</p>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-rose-200 shadow-xs bg-rose-50/20">
-                    <span class="text-xs font-bold text-rose-700 uppercase tracking-wider block">Minta Revisi</span>
-                    <div class="text-2xl font-black text-rose-600 mt-1">{{ $rejectedDosenLogs }}</div>
-                    <p class="text-[11px] text-rose-600/80 mt-0.5">Perlu perbaikan mhs</p>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Minta Revisi</span>
+                    <div class="text-2xl font-black text-gray-900 mt-1">{{ $rejectedDosenLogs }}</div>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Perlu perbaikan mhs</p>
                 </div>
             </div>
 
@@ -191,7 +191,7 @@
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
-                                                ⏳ Pending
+                                                ⏳ Dalam Pengecekan
                                             </span>
                                         @endif
                                     </td>
@@ -200,11 +200,11 @@
                                     <td class="py-4 px-4 align-top text-center">
                                         @if ($log->lecturer_status === 'approved')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                                ✅ ACC
+                                                ✅ Disetujui
                                             </span>
                                         @elseif ($log->lecturer_status === 'rejected')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
-                                                ❌ Revisi
+                                                ❌ Ditolak
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
