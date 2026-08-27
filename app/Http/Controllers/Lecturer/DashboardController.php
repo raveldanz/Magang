@@ -37,7 +37,7 @@ class DashboardController extends Controller
         $query = $this->getLecturerPlacementsQuery();
 
         if ($request->filled('search')) {
-            $search = trim($request->search);
+            $search = strtolower(trim($request->search));
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
             $query->whereHas('application.user', function ($q) use ($search, $like) {

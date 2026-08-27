@@ -39,7 +39,7 @@ class LogbookController extends Controller
 
         // Pencarian nama mahasiswa
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->whereHas('placement.application.user', function ($uq) use ($search) {
                 $uq->where('name', 'like', "%{$search}%");
             });

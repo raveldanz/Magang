@@ -25,7 +25,7 @@ class AuditLogController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('action', 'like', "%{$search}%")
                   ->orWhere('user_name', 'like', "%{$search}%")
