@@ -30,7 +30,7 @@ class MonitoringController extends Controller
         ])->where('academic_advisor_id', $lecturerId);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->whereHas('application.user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhereHas('studentProfile', function ($sp) use ($search) {

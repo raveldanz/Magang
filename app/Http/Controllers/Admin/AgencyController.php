@@ -23,7 +23,7 @@ class AgencyController extends Controller
         $query = AgencyProfile::with(['units', 'users'])->withCount('units');
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('agency_name', $like, "%{$search}%")

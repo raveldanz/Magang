@@ -46,7 +46,7 @@ class LogbookController extends Controller
 
         // Pencarian Mahasiswa (Nama / NIM)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->whereHas('application.user', function ($uq) use ($search) {
                 $uq->where('name', 'like', "%{$search}%")
                    ->orWhereHas('studentProfile', function ($sq) use ($search) {

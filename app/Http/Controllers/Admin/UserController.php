@@ -58,7 +58,7 @@ class UserController extends Controller
 
         // Search
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
