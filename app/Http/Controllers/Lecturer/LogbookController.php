@@ -55,7 +55,7 @@ class LogbookController extends Controller
 
         // Search Keyword (Nama Mahasiswa, NIM, Deskripsi Kegiatan)
         if ($request->filled('search')) {
-            $search = trim($request->search);
+            $search = strtolower(trim($request->search));
             $logbooksQuery->where(function ($q) use ($search) {
                 $q->where('activity', 'like', "%{$search}%")
                   ->orWhereHas('placement.application.user', function ($uq) use ($search) {

@@ -51,7 +51,7 @@ class FeedbackController extends Controller
             $query->where('category', $request->category);
         }
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('subject', 'like', "%{$search}%")
                   ->orWhere('message', 'like', "%{$search}%")
