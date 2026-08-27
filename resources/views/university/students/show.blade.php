@@ -253,9 +253,7 @@
                 @if ($finalReport && $finalReport->file_path)
                     <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-gray-200">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-xl font-bold">
-                                📄
-                            </div>
+                            
                             <div>
                                 <h5 class="font-bold text-sm text-gray-900">{{ $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan' }}</h5>
                                 <p class="text-xs text-gray-500">Status: <span class="font-semibold uppercase text-emerald-700">{{ $finalReport->status ?? 'Submitted' }}</span></p>
@@ -396,7 +394,7 @@
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}" {{ $dosen?->id == $d->id ? 'selected' : '' }}>
-                                    👨‍🏫 {{ $d->name }} ({{ $d->email }})
+                                    {{ $d->name }} ({{ $d->email }})
                                 </option>
                             @endforeach
                         </select>

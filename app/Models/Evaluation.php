@@ -9,26 +9,12 @@ class Evaluation extends Model
 {
     use HasFactory;
 
-<<<<<<< HEAD
-    protected $fillable = [
-        'placement_id',
-        'nilai_disiplin',
-        'nilai_kinerja',
-        'nilai_laporan',
-        'nilai_akademik',
-        'catatan',
-        'catatan_dosen',
-    ];
-=======
     protected $guarded = ['id'];
->>>>>>> main
 
     public function placement()
     {
         return $this->belongsTo(Placement::class);
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Nilai Akhir Pembimbing Lapangan Dinas (Rata-rata 3 Aspek: Disiplin, Kinerja/Teknis, Laporan/Inisiatif)
@@ -145,5 +131,4 @@ class Evaluation extends Model
             default => 'Belum Lulus',
         };
     }
->>>>>>> main
 }

@@ -70,11 +70,7 @@ class EvaluationController extends Controller
             'nilai_laporan.max' => 'Nilai maksimal adalah 100.',
         ]);
 
-<<<<<<< HEAD
-        Evaluation::updateOrCreate(
-=======
         $evaluation = Evaluation::updateOrCreate(
->>>>>>> main
             ['placement_id' => $placement->id],
             [
                 'nilai_disiplin' => $request->nilai_disiplin,
@@ -84,8 +80,6 @@ class EvaluationController extends Controller
             ]
         );
 
-<<<<<<< HEAD
-=======
         // Cek skema kampus mahasiswa
         $univ = $evaluation->getUniversity();
         $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
@@ -119,7 +113,6 @@ class EvaluationController extends Controller
             'nilai_laporan' => $request->nilai_laporan,
         ]);
 
->>>>>>> main
         return redirect()->route('mentor.students.show', $placement->id)
             ->with('success', 'Penilaian evaluasi akhir berhasil disimpan! Mahasiswa kini siap diterbitkan sertifikatnya.');
     }
