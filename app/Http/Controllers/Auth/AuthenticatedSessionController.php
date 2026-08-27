@@ -30,13 +30,8 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-<<<<<<< HEAD
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.applications.index');
-=======
         if ($user->role === 'admin' || $user->role === 'super_admin') {
             return redirect()->route('admin.dashboard');
->>>>>>> main
         }
 
         if ($user->role === 'mentor' || $user->role === 'pembimbing') {
@@ -47,20 +42,12 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('lecturer.dashboard');
         }
 
-<<<<<<< HEAD
-        if ($user->role === 'mahasiswa') {
-            if (!$user->studentProfile) {
-                return redirect()->route('student.profile.edit')->with('warning', 'Silakan lengkapi profil Anda terlebih dahulu');
-            }
-            return redirect()->route('student.application.create');
-=======
         if ($user->role === 'universitas') {
             return redirect()->route('university.dashboard');
         }
 
         if ($user->role === 'mahasiswa') {
             return redirect()->route('dashboard');
->>>>>>> main
         }
 
         return redirect()->route('dashboard');

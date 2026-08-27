@@ -32,7 +32,7 @@
                     <p><strong class="text-slate-600">No. Handphone:</strong> {{ $application->user->studentProfile->phone ?? '-' }}</p>
                     <p><strong class="text-slate-600">Instansi Tujuan:</strong> 
                         <span class="font-bold text-blue-700">
-                            🏛️ {{ $application->unit->agencyProfile->agency_name ?? $application->unit->agencyProfile->name ?? 'Pemerintah Kota Surabaya' }}
+                            {{ $application->unit->agencyProfile->agency_name ?? $application->unit->agencyProfile->name ?? 'Pemerintah Kota Surabaya' }}
                         </span>
                     </p>
                     <p><strong class="text-slate-600">Unit Tujuan / Bidang:</strong> <span class="font-semibold text-slate-800">{{ $application->unit->name ?? '-' }}</span></p>
@@ -66,7 +66,7 @@
                         </div>
                         <a href="{{ asset('storage/' . $application->placement->finalreport->file_path) }}" target="_blank"
                             class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                            📄 Buka Laporan Akhir
+                             Buka Laporan Akhir
                         </a>
                     </div>
                 </div>
@@ -82,11 +82,7 @@
                     <!-- Dropdown Status -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Status Pengajuan</label>
-<<<<<<< HEAD
-                        <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md">
-=======
                         <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500">
->>>>>>> main
                             <option value="pending" {{ $application->status == 'pending' ? 'selected' : '' }}>PENDING
                             </option>
                             <option value="verified" {{ $application->status == 'verified' ? 'selected' : '' }}>VERIFIED
@@ -104,17 +100,6 @@
                         
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
-<<<<<<< HEAD
-                            <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan</label>
-                            <select name="pembimbing_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Pilih Pembimbing Lapangan --</option>
-                                @foreach ($pembimbings as $pembimbing)
-                                    <option value="{{ $pembimbing->id }}" {{ optional($application->placement)->pembimbing_id == $pembimbing->id ? 'selected' : '' }}>
-                                        {{ $pembimbing->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-=======
                             <label class="block text-sm font-medium text-gray-700">Plotting Pembimbing Lapangan (Mentor Dinas Terkait)</label>
                             <select name="mentor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">-- Pilih Pembimbing Lapangan ({{ $application->unit->agencyProfile->agency_name ?? 'Instansi' }}) --</option>
@@ -125,7 +110,6 @@
                                 @endforeach
                             </select>
                             <p class="text-xs text-gray-500 mt-1">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
->>>>>>> main
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -134,20 +118,12 @@
                                 <label class="block text-sm font-medium text-gray-700">Nomor Surat Balasan Dinas</label>
                                 <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
                                     placeholder="Contoh: 500/123/APTIKA/2026"
-<<<<<<< HEAD
-                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-=======
                                     class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
->>>>>>> main
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Tanggal Surat Balasan</label>
                                 <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
-<<<<<<< HEAD
-                                    class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-=======
                                     class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
->>>>>>> main
                             </div>
                         </div>
                     </div>
@@ -167,7 +143,7 @@
                         @if ($application->status === 'accepted')
                             <a href="{{ route('admin.applications.letter', $application->id) }}" target="_blank" 
                                 class="inline-flex items-center space-x-1 px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 transition shadow-sm">
-                                <span>📄 Pratinjau / Cetak Surat PDF</span>
+                                <span>Pratinjau / Cetak Surat PDF</span>
                             </a>
                         @endif
 
