@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2.5">
-                    <span class="text-2xl">🔔</span>
+                    
                     <span>Pusat Pemberitahuan & Tindakan Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -53,34 +53,34 @@
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'urgent']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 {{ ($category ?? '') === 'urgent' ? 'bg-amber-500 text-white shadow-xs' : 'text-amber-700 hover:bg-amber-50' }}">
-                    <span>⚡ Perlu Tindakan Segera</span>
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 {{ ($category ?? '') === 'urgent' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Perlu Tindakan Segera
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'application']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    📋 Pendaftaran
+                    Pendaftaran
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'university']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'university' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    🎓 Universitas
+                    Universitas
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'feedback']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'feedback' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    💬 Feedback
+                    Feedback
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'logbook']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    📖 Logbook
+                    Logbook
                 </a>
 
                 @if(Auth::user() && (Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin'))
                     <a href="{{ route('notifications.index', ['category' => 'audit']) }}" 
                        class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'audit' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                        📜 Audit
+                         Audit
                     </a>
                 @endif
             </div>
@@ -98,9 +98,7 @@
 
                     <div class="rounded-3xl border {{ $cardBorder }} p-5 sm:p-6 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 shadow-2xs {{ $isUrgent ? 'bg-amber-100 text-amber-800' : ($isWarning ? 'bg-amber-50 text-amber-700' : ($isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700')) }}">
-                                {{ $notif['icon'] ?? '🔔' }}
-                            </div>
+                            
 
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -144,7 +142,7 @@
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
                         <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mx-auto">
-                            ☕
+                            🐾
                         </div>
                         <h4 class="font-bold text-base text-gray-800">Tidak Ada Pemberitahuan</h4>
                         <p class="text-xs text-gray-400 max-w-md mx-auto">

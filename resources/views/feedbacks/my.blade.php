@@ -3,7 +3,6 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>💬</span>
                     <span>Riwayat Masukan & Laporan Kendala Saya</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -25,7 +24,6 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -36,10 +34,10 @@
                 @forelse($feedbacks as $fb)
                     @php
                         $catLabel = match($fb->category) {
-                            'error_bug' => '⚠️ Kendala Sistem / Bug',
-                            'saran_fitur' => '💡 Saran Fitur',
-                            'pertanyaan' => '❓ Pertanyaan MBKM',
-                            default => '📝 Masukan',
+                            'error_bug' => 'Kendala Sistem / Bug',
+                            'saran_fitur' => 'Saran Fitur',
+                            'pertanyaan' => 'Pertanyaan MBKM',
+                            default => 'Masukan',
                         };
 
                         $statusBadge = match($fb->status) {
@@ -78,7 +76,6 @@
                         @if($fb->admin_response)
                             <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1.5">
                                 <div class="flex items-center gap-2 text-xs font-bold text-emerald-900">
-                                    <span>💬</span>
                                     <span>Tanggapan Resmi Pengelola ({{ $fb->responded_at ? $fb->responded_at->translatedFormat('d M Y, H:i') : '' }}):</span>
                                 </div>
                                 <p class="text-xs text-emerald-800 leading-relaxed whitespace-pre-line">
@@ -87,7 +84,6 @@
                             </div>
                         @else
                             <div class="p-3 rounded-xl bg-amber-50/60 border border-amber-200 text-amber-800 text-[11px] font-medium flex items-center gap-2">
-                                <span>⏳</span>
                                 <span>Laporan Anda telah diterima dan sedang menunggu peninjauan tim pengelola.</span>
                             </div>
                         @endif

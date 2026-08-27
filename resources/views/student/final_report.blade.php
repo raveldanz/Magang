@@ -2,11 +2,10 @@
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs">
-                ←
+                
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>📂</span>
                     <span>Pengunggahan Laporan Akhir Magang MBKM</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
@@ -23,7 +22,6 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -32,7 +30,6 @@
             @if (session('error'))
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>⚠️</span>
                         <span>{{ session('error') }}</span>
                     </div>
                 </div>
@@ -56,7 +53,6 @@
                         <div>
                             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Status Verifikasi Naskah</span>
                             <h3 class="font-black text-lg text-gray-900 mt-1 flex items-center gap-2">
-                                <span>📄</span>
                                 <span>{{ $finalReport->title ?? 'Naskah Laporan Akhir Magang' }}</span>
                             </h3>
                             @if($finalReport->repository_url)
@@ -69,17 +65,17 @@
                         <div>
                             @if($finalReport->status === 'approved')
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-2xs">
-                                    <span>✅</span>
+                                  
                                     <span>Laporan Disetujui (ACC)</span>
                                 </span>
                             @elseif($finalReport->status === 'revision')
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1.5 shadow-2xs">
-                                    <span>⚠️</span>
+                                
                                     <span>Perlu Perbaikan (Revisi)</span>
                                 </span>
                             @else
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-2xs">
-                                    <span>⏳</span>
+                                
                                     <span>Menunggu Verifikasi DPL / Mentor</span>
                                 </span>
                             @endif
@@ -92,7 +88,7 @@
                             Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->format('d F Y, H:i') : '-' }}</strong>
                         </div>
                         <a href="{{ asset('storage/' . ($finalReport->file_path ?? $finalReport->final_report_path)) }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                            <span>📥</span>
+                        
                             <span>Buka / Unduh Berkas PDF</span>
                         </a>
                     </div>
@@ -101,7 +97,7 @@
                     @if ($finalReport->feedback)
                         <div class="p-4 rounded-2xl {{ $finalReport->status === 'revision' ? 'bg-rose-50/80 border-rose-200 text-rose-900' : 'bg-emerald-50/80 border-emerald-200 text-emerald-900' }} border text-xs space-y-1">
                             <span class="font-bold uppercase tracking-wider text-[11px] block">
-                                💬 Catatan dari Pembimbing / DPL:
+                            
                             </span>
                             <p class="whitespace-pre-line leading-relaxed italic">
                                 "{{ $finalReport->feedback }}"
@@ -160,7 +156,7 @@
                 </div>
             @else
                 <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl text-center space-y-2 shadow-xs">
-                    <span class="text-3xl">🎉</span>
+                
                     <h3 class="font-black text-base text-emerald-900">Laporan Akhir Anda Telah Disetujui Secara Resmi</h3>
                     <p class="text-xs text-emerald-700 max-w-xl mx-auto">
                         Naskah laporan akhir Anda telah di-ACC oleh DPL dan pembimbing lapangan. Nilai kelulusan dan sertifikat resmi dapat dilihat di Dashboard.

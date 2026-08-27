@@ -15,7 +15,7 @@
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('university.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-2xs">
-                    ← Kembali ke Dashboard
+                     Kembali ke Dashboard
                 </a>
                 @if (in_array(strtoupper($application->lifecycle_status ?? $application->status), ['ACCEPTED', 'ACTIVE', 'COMPLETED', 'VERIFIED']))
                     <a href="{{ route('university.students.letter', $application->id) }}" target="_blank"

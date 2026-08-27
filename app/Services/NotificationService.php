@@ -38,12 +38,11 @@ class NotificationService
                     'id' => 'univ_' . $u->id,
                     'type' => 'urgent',
                     'category' => 'university',
-                    'icon' => '🎓',
                     'title' => "Perguruan Tinggi Baru: {$u->name}",
                     'message' => "Terdaftar otomatis dari pendaftaran {$u->students_count} mahasiswa. Belum memiliki akun Admin Kampus / PIC.",
                     'time' => $u->created_at ? $u->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.universities.index'),
-                    'action_label' => '⚡ Buat Akun Kampus',
+                    'action_label' => 'Buat Akun Kampus',
                     'is_action_required' => true,
                 ];
             }
@@ -55,12 +54,11 @@ class NotificationService
                     'id' => 'apps_pending',
                     'type' => 'warning',
                     'category' => 'application',
-                    'icon' => '📋',
                     'title' => "{$pendingAppsCount} Pengajuan Magang Menunggu Verifikasi",
                     'message' => "Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.",
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
-                    'action_label' => '🔍 Tinjau Pengajuan',
+                    'action_label' => 'Tinjau Pengajuan',
                     'is_action_required' => true,
                 ];
             }
@@ -96,12 +94,11 @@ class NotificationService
                     'id' => 'audit_' . $log->id,
                     'type' => 'info',
                     'category' => 'audit',
-                    'icon' => '📜',
                     'title' => "Aktivitas: {$log->action}",
                     'message' => "Oleh {$log->user_name} (" . strtoupper($log->user_role) . ") pada " . ($log->target_type ?? 'Sistem') . " #{$log->target_id}. " . \Illuminate\Support\Str::limit($log->details ?? '', 70),
                     'time' => $log->created_at ? $log->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.audit_logs.index'),
-                    'action_label' => '📜 Buka Log Audit',
+                    'action_label' => 'Buka Log Audit',
                     'is_action_required' => false,
                 ];
             }
@@ -115,12 +112,11 @@ class NotificationService
                     'id' => 'unassigned_dpl',
                     'type' => 'info',
                     'category' => 'academic',
-                    'icon' => '👨‍🏫',
                     'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki DPL",
                     'message' => "Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan (DPL) belum ditentukan.",
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
-                    'action_label' => '👥 Lihat Penempatan',
+                    'action_label' => 'Lihat Penempatan',
                     'is_action_required' => false,
                 ];
             }
@@ -136,12 +132,10 @@ class NotificationService
                     'id' => 'agency_apps_pending',
                     'type' => 'warning',
                     'category' => 'application',
-                    'icon' => '📋',
                     'title' => "{$agencyAppsCount} Berkas Pendaftar Menunggu Verifikasi",
                     'message' => "Terdapat pendaftar magang baru di instansi dinas Anda yang menunggu proses verifikasi dan seleksi.",
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
-                    'action_label' => '🔍 Verifikasi Berkas',
                     'is_action_required' => true,
                 ];
             }
@@ -154,12 +148,11 @@ class NotificationService
                     'id' => 'agency_logbooks_pending',
                     'type' => 'info',
                     'category' => 'logbook',
-                    'icon' => '📖',
                     'title' => "{$pendingLogbooks} Logbook Mahasiswa Perlu Review",
                     'message' => "Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.",
                     'time' => 'Monitoring dinas',
                     'action_url' => route('admin.logbooks.index'),
-                    'action_label' => '📖 Cek Logbook',
+                    'action_label' => 'Cek Logbook',
                     'is_action_required' => false,
                 ];
             }
@@ -184,12 +177,11 @@ class NotificationService
                     'id' => 'dosen_logbook_pending',
                     'type' => 'warning',
                     'category' => 'logbook',
-                    'icon' => '📖',
                     'title' => "{$pendingLogbooksCount} Logbook Bimbingan Menunggu Evaluasi",
                     'message' => "Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.",
                     'time' => 'Menunggu review',
                     'action_url' => route('lecturer.logbooks.index'),
-                    'action_label' => '✍️ Review Logbook',
+                    'action_label' => 'Review Logbook',
                     'is_action_required' => true,
                 ];
             }
@@ -204,12 +196,11 @@ class NotificationService
                     'id' => 'dosen_report_pending',
                     'type' => 'urgent',
                     'category' => 'evaluation',
-                    'icon' => '📊',
                     'title' => "{$pendingReportsCount} Laporan Akhir Mahasiswa Siap Dinilai",
                     'message' => "Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.",
                     'time' => 'Perlu penilaian',
                     'action_url' => route('lecturer.monitoring.index'),
-                    'action_label' => '📊 Beri Nilai Akhir',
+                    'action_label' => 'Beri Nilai Akhir',
                     'is_action_required' => true,
                 ];
             }
@@ -219,12 +210,10 @@ class NotificationService
                     'id' => 'dosen_students_active',
                     'type' => 'info',
                     'category' => 'academic',
-                    'icon' => '🎓',
                     'title' => "Total {$placements->count()} Mahasiswa dalam Bimbingan Anda",
                     'message' => "Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.",
                     'time' => 'Portal DPL',
                     'action_url' => route('lecturer.monitoring.index'),
-                    'action_label' => '👥 Buka Bimbingan',
                     'is_action_required' => false,
                 ];
             }
@@ -248,12 +237,11 @@ class NotificationService
                     'id' => 'mentor_logbook_pending',
                     'type' => 'warning',
                     'category' => 'logbook',
-                    'icon' => '📖',
                     'title' => "{$pendingMentorLogbooks} Logbook Menunggu Validasi Mentor",
                     'message' => "Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.",
                     'time' => 'Menunggu persetujuan',
                     'action_url' => route('mentor.logbooks.index'),
-                    'action_label' => '✅ Validasi Logbook',
+                    'action_label' => 'Validasi Logbook',
                     'is_action_required' => true,
                 ];
             }
@@ -263,12 +251,11 @@ class NotificationService
                     'id' => 'mentor_active_students',
                     'type' => 'info',
                     'category' => 'mentor',
-                    'icon' => '👔',
                     'title' => "Supervisi {$mentorPlacements->count()} Mahasiswa di Unit Kerja",
                     'message' => "Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.",
                     'time' => 'Portal Mentor',
                     'action_url' => route('mentor.dashboard'),
-                    'action_label' => '🏢 Dashboard Mentor',
+                    'action_label' => 'Dashboard Mentor',
                     'is_action_required' => false,
                 ];
             }
@@ -284,12 +271,11 @@ class NotificationService
                         'id' => 'student_app_pending',
                         'type' => 'warning',
                         'category' => 'application',
-                        'icon' => '⏳',
                         'title' => 'Pengajuan Magang Sedang Diverifikasi Dinas',
                         'message' => 'Berkas pendaftaran Anda sedang dalam tahap seleksi oleh pihak instansi kedinasan.',
                         'time' => $latestApp->created_at ? $latestApp->created_at->diffForHumans() : 'Terkirim',
                         'action_url' => route('student.logbook.index'),
-                        'action_label' => '📋 Pantau Status',
+                        'action_label' => 'Pantau Status',
                         'is_action_required' => false,
                     ];
                 } elseif ($status === 'accepted') {
@@ -299,12 +285,11 @@ class NotificationService
                             'id' => 'student_need_dpl',
                             'type' => 'urgent',
                             'category' => 'academic',
-                            'icon' => '👨‍🏫',
                             'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih DPL',
                             'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing Lapangan (DPL) pada dashboard.',
                             'time' => 'Tindakan diperlukan',
                             'action_url' => route('dashboard'),
-                            'action_label' => '👨‍🏫 Pilih DPL',
+                            'action_label' => 'Pilih DPL',
                             'is_action_required' => true,
                         ];
                     } else {
@@ -312,12 +297,11 @@ class NotificationService
                             'id' => 'student_ready',
                             'type' => 'success',
                             'category' => 'academic',
-                            'icon' => '🎉',
                             'title' => 'Data Pembimbing Lengkap & Magang Siap Dilaksanakan',
                             'message' => "Mentor Dinas & DPL telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.",
                             'time' => 'Aktif',
                             'action_url' => route('student.logbook.index'),
-                            'action_label' => '📖 Buka Logbook',
+                            'action_label' => 'Buka Logbook',
                             'is_action_required' => false,
                         ];
                     }
@@ -326,12 +310,11 @@ class NotificationService
                         'id' => 'student_rejected',
                         'type' => 'urgent',
                         'category' => 'application',
-                        'icon' => '❌',
                         'title' => 'Pengajuan Magang Belum Diterima',
                         'message' => 'Catatan: "' . ($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi') . '". Anda dapat mengajukan ulang.',
                         'time' => 'Pemberitahuan',
                         'action_url' => route('student.application.create'),
-                        'action_label' => '📝 Ajukan Ulang',
+                        'action_label' => 'Ajukan Ulang',
                         'is_action_required' => true,
                     ];
                 }
@@ -340,12 +323,11 @@ class NotificationService
                     'id' => 'student_no_app',
                     'type' => 'info',
                     'category' => 'application',
-                    'icon' => '📝',
                     'title' => 'Selamat Datang di Portal Magang Terpadu',
                     'message' => 'Silakan lengkapi profil Anda dan ajukan permohonan magang pada unit instansi yang tersedia.',
                     'time' => 'Langkah Awal',
                     'action_url' => route('student.application.create'),
-                    'action_label' => '🚀 Daftar Magang',
+                    'action_label' => 'Daftar Magang',
                     'is_action_required' => true,
                 ];
             }
@@ -362,12 +344,11 @@ class NotificationService
                     'id' => 'my_fb_' . $afb->id,
                     'type' => 'success',
                     'category' => 'feedback',
-                    'icon' => '✅',
                     'title' => "Tanggapan atas Masukan: {$afb->subject}",
                     'message' => "Admin telah membalas masukan Anda: \"" . \Illuminate\Support\Str::limit($afb->admin_response, 80) . "\"",
                     'time' => $afb->responded_at ? $afb->responded_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('feedbacks.show', $afb->id),
-                    'action_label' => '✉️ Lihat Tanggapan',
+                    'action_label' => 'Lihat Tanggapan',
                     'is_action_required' => false,
                 ];
             }
@@ -386,12 +367,11 @@ class NotificationService
                         'id' => 'univ_no_dosen',
                         'type' => 'warning',
                         'category' => 'university',
-                        'icon' => '👨‍🏫',
                         'title' => 'Belum Ada Dosen Pembimbing (DPL) Terdaftar',
                         'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih DPL dengan mudah.',
                         'time' => 'Perlu kelengkapan',
                         'action_url' => route('university.lecturers.index'),
-                        'action_label' => '➕ Tambah DPL',
+                        'action_label' => 'Tambah DPL',
                         'is_action_required' => true,
                     ];
                 }
@@ -401,12 +381,11 @@ class NotificationService
                         'id' => 'univ_profile_incomplete',
                         'type' => 'info',
                         'category' => 'university',
-                        'icon' => '🏛️',
                         'title' => 'Lengkapi Data Profil & Kop Surat Kampus',
                         'message' => 'Lengkapi data PIC Rektorat/Dekanat dan format kop surat resmi untuk penerbitan surat pengantar mahasiswa.',
                         'time' => 'Profil instansi',
                         'action_url' => route('university.profile.index'),
-                        'action_label' => '✏️ Lengkapi Profil',
+                        'action_label' => 'Lengkapi Profil',
                         'is_action_required' => false,
                     ];
                 }
@@ -415,12 +394,11 @@ class NotificationService
                     'id' => 'univ_overview',
                     'type' => 'info',
                     'category' => 'university',
-                    'icon' => '🎓',
                     'title' => "Portal Mitra MBKM: {$univ->name}",
                     'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen DPL aktif pada program magang Pemkot Surabaya.",
                     'time' => 'Terhubung',
                     'action_url' => route('university.dashboard'),
-                    'action_label' => '🏛️ Buka Portal Kampus',
+                    'action_label' => 'Buka Portal Kampus',
                     'is_action_required' => false,
                 ];
             }

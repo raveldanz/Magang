@@ -88,7 +88,7 @@
                                 @else
                                     <option value="">-- Pilih Instansi & Bidang/Divisi Magang --</option>
                                     @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label="🏛️ {{ strtoupper($agencyName) }}">
+                                        <optgroup label="{{ strtoupper($agencyName) }}">
                                             @foreach ($agencyUnits as $unit)
                                                 <option value="{{ $unit->id }}" 
                                                     {{ old('unit_id') == $unit->id ? 'selected' : '' }}
@@ -127,39 +127,40 @@
                         <hr class="my-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
-                                <span>📁 Upload Dokumen Persyaratan Magang</span>
+                                <span>Upload Dokumen Persyaratan Magang</span>
                             </h4>
                             <p class="text-xs text-gray-500">Seluruh dokumen wajib berformat PDF dengan ukuran maksimum 2MB per file</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div>
-                                <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus *" class="text-xs font-bold" />
+                                <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus " class="text-xs font-bold" />
                                 <input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="cv" value="2. Curriculum Vitae (CV) *" class="text-xs font-bold" />
+                                <x-input-label for="cv" value="2. Curriculum Vitae (CV) " class="text-xs font-bold" />
                                 <input id="cv" name="cv" type="file" accept=".pdf"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('cv')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir *" class="text-xs font-bold" />
+                                <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir " class="text-xs font-bold" />
                                 <input id="transkrip" name="transkrip" type="file" accept=".pdf"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
                                 <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM) / KTP (Opsional)" class="text-xs font-bold" />
+                                <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM)" class="text-xs font-bold" />
                                 <input id="id_card" name="id_card" type="file" accept=".pdf,.jpg,.jpeg,.png"
                                     class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
                                 <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
                             </div>
+                            
                         </div>
 
                         <div class="flex items-center space-x-3 pt-4 border-t border-gray-100">
@@ -224,6 +225,7 @@
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
                                                 class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
                                                 <span>📄 Download Surat PDF</span>
+
                                             </a>
                                         @else
                                             <span class="text-gray-400 text-xs italic">Belum tersedia</span>
