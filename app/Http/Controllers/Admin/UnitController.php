@@ -35,8 +35,8 @@ class UnitController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%");
+            $search = strtolower($request->search);
+            $query->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
         }
 
         $units = $query->orderBy('name', 'asc')->get();
