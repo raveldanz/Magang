@@ -60,7 +60,6 @@
                 <!-- Card 1: Identitas & Logo Perguruan Tinggi -->
                 <div class="bg-white rounded-2xl shadow-xs border border-gray-200 p-6 space-y-5">
                     <div class="border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <span class="text-xl">🎓</span>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Identitas Resmi Perguruan Tinggi</h3>
                             <p class="text-xs text-gray-400">Data ini akan tercantum pada kop surat tugas dan dokumen resmi kampus</p>
