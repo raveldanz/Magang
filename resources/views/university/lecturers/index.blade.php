@@ -15,7 +15,7 @@
 
             <div class="flex items-center gap-3">
                 <span class="bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-3 py-2 rounded-xl hidden sm:inline-block">
-                    🎓 {{ $univName ?? 'Kampus Mitra' }}
+                    {{ $univName ?? 'Kampus Mitra' }}
                 </span>
                 <button type="button" 
                         x-data
@@ -135,7 +135,7 @@
                                                 🟢 {{ $l->active_students_count }} Aktif
                                             </span>
                                             <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200" title="Mahasiswa Telah Lulus Magang">
-                                                🎓 {{ $l->completed_students_count }} Lulus
+                                                {{ $l->completed_students_count }} Lulus
                                             </span>
                                         </div>
                                     </td>

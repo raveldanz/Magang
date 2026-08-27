@@ -36,14 +36,14 @@
                             @forelse ($applications as $app)
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-4 px-4 font-bold text-gray-900 text-xs sm:text-sm">
-                                        🎓 {{ $app->user->name }}
+                                        {{ $app->user->name }}
                                     </td>
                                     <td class="py-4 px-4">
                                         <div class="text-gray-800 font-semibold">{{ $app->user->studentProfile->universitas ?? '-' }}</div>
                                         <div class="text-[11px] text-blue-600 font-mono">NIM: {{ $app->user->studentProfile->nim ?? '-' }}</div>
                                     </td>
                                     <td class="py-4 px-4 text-gray-700 font-medium">
-                                        🏢 {{ $app->unit->name ?? '-' }}
+                                        {{ $app->unit->name ?? '-' }}
                                     </td>
                                     <td class="py-4 px-4 text-center">
                                         @php

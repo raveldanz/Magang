@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>👔</span>
+                   
                     <span>Kelola Mentor Lapangan {{ $currentAgency->agency_name ?? ($isSuperAdmin ? 'Seluruh Instansi' : 'Dinas') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -46,7 +46,7 @@
                 <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
                     <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex items-center gap-3">
                         <select name="agency_id" onchange="this.form.submit()" class="text-xs rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">🏢 Semua Instansi Dinas</option>
+                            <option value="">Semua Instansi Dinas</option>
                             @foreach($agencies as $ag)
                                 <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
                                     {{ $ag->agency_name }}
@@ -90,7 +90,7 @@
                             @forelse($mentors as $m)
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-4 px-4 font-bold text-gray-900 text-xs sm:text-sm">
-                                        👔 {{ $m->name }}
+                                        {{ $m->name }}
                                     </td>
                                     <td class="py-4 px-4 font-mono text-gray-600">
                                         {{ $m->email }}
@@ -101,10 +101,10 @@
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
                                             <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                🟢 {{ $m->active_students_count }} Aktif
+                                                {{ $m->active_students_count }} Aktif
                                             </span>
                                             <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                                🎓 {{ $m->completed_students_count }} Lulus
+                                                {{ $m->completed_students_count }} Lulus
                                             </span>
                                         </div>
                                     </td>
