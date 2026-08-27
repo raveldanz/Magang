@@ -77,7 +77,7 @@
                         <label for="attachment" class="block font-semibold text-sm text-gray-700 mb-1">Lampiran (Opsional)</label>
                         @if ($logbook->attachment)
                             <p class="text-xs text-blue-600 mb-2 font-medium">
-                                📄 File saat ini: <a href="{{ asset('storage/' . $logbook->attachment) }}" target="_blank" class="underline hover:text-blue-800">Lihat File</a>
+                                File saat ini: <a href="{{ asset('storage/' . $logbook->attachment) }}" target="_blank" class="underline hover:text-blue-800">Lihat File</a>
                             </p>
                         @endif
                         <input id="attachment" name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
