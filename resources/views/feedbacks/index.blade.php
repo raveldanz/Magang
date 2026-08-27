@@ -25,7 +25,6 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -36,7 +35,6 @@
                 <div class="p-5 bg-white rounded-3xl border border-slate-100 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-slate-400 text-xs uppercase font-bold tracking-wider">Total Masukan</span>
-                        <span class="text-xl">📊</span>
                     </div>
                     <div class="text-2xl font-black text-slate-900">{{ $stats['total'] }}</div>
                     <div class="text-[11px] text-slate-400 mt-1">Seluruh tiket masuk</div>
@@ -45,7 +43,6 @@
                 <div class="p-5 bg-white rounded-3xl border border-amber-200 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-amber-700 text-xs uppercase font-bold tracking-wider">Menunggu Respon</span>
-                        <span class="text-xl">⏳</span>
                     </div>
                     <div class="text-2xl font-black text-amber-600">{{ $stats['pending'] }}</div>
                     <div class="text-[11px] text-amber-700 mt-1">Perlu ditanggapi admin</div>
@@ -54,7 +51,6 @@
                 <div class="p-5 bg-white rounded-3xl border border-blue-200 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-blue-700 text-xs uppercase font-bold tracking-wider">Sedang Diproses</span>
-                        <span class="text-xl">⚙️</span>
                     </div>
                     <div class="text-2xl font-black text-blue-600">{{ $stats['in_progress'] }}</div>
                     <div class="text-[11px] text-blue-700 mt-1">Investigasi / Pengerjaan</div>
@@ -63,7 +59,6 @@
                 <div class="p-5 bg-white rounded-3xl border border-emerald-200 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-emerald-700 text-xs uppercase font-bold tracking-wider">Selesai / Terjawab</span>
-                        <span class="text-xl">✅</span>
                     </div>
                     <div class="text-2xl font-black text-emerald-600">{{ $stats['resolved'] }}</div>
                     <div class="text-[11px] text-emerald-700 mt-1">Telah diselesaikan</div>
@@ -81,10 +76,10 @@
                     <div>
                         <select name="status" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Semua Status --</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ Menunggu (Pending)</option>
-                            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>⚙️ Sedang Diproses</option>
-                            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>✅ Selesai (Resolved)</option>
-                            <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>🔒 Ditutup (Closed)</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu (Pending)</option>
+                            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Sedang Diproses</option>
+                            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Selesai (Resolved)</option>
+                            <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Ditutup (Closed)</option>
                         </select>
                     </div>
 
@@ -113,11 +108,11 @@
                         };
 
                         $catLabel = match($fb->category) {
-                            'error_bug' => '⚠️ Bug / Error',
-                            'saran_fitur' => '💡 Saran Fitur',
-                            'pertanyaan' => '❓ Pertanyaan',
-                            'koordinasi' => '🤝 Koordinasi',
-                            default => '📝 Masukan',
+                            'error_bug' => 'Bug / Error',
+                            'saran_fitur' => 'Saran Fitur',
+                            'pertanyaan' => 'Pertanyaan',
+                            'koordinasi' => 'Koordinasi',
+                            default => 'Masukan',
                         };
 
                         $statusBadge = match($fb->status) {
@@ -141,7 +136,7 @@
 
                                 @if($fb->priority === 'urgent' || $fb->priority === 'high')
                                     <span class="px-2 py-0.5 bg-rose-100 text-rose-800 rounded-full text-[10px] font-black animate-pulse">
-                                        🚨 Prioritas: {{ strtoupper($fb->priority) }}
+                                        Prioritas: {{ strtoupper($fb->priority) }}
                                     </span>
                                 @endif
 
@@ -161,7 +156,7 @@
                             <div class="flex items-center gap-3 text-xs text-slate-500 pt-1">
                                 <span>👤 <strong>{{ $fb->sender_name }}</strong> ({{ strtoupper($fb->sender_role) }})</span>
                                 @if($fb->targetAgency)
-                                    <span>🏛️ Dinas: {{ $fb->targetAgency->agency_name }}</span>
+                                    <span>Dinas: {{ $fb->targetAgency->agency_name }}</span>
                                 @endif
                                 @if($fb->attachment)
                                     <span class="text-blue-600 font-semibold">📎 Ada Lampiran</span>

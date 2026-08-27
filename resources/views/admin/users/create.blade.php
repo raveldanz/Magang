@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.users.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition">
-                ←
+                
             </a>
             <div>
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">

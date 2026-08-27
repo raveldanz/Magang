@@ -10,7 +10,7 @@
             <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
 
                 <div class="mb-6 pb-4 border-b border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-800">✏️ Edit Catatan Kegiatan</h3>
+                    <h3 class="text-lg font-bold text-gray-800">Edit Catatan Kegiatan</h3>
                     <p class="text-sm text-gray-500 mt-1">Perbarui logbook kegiatan magang Anda. Hanya logbook dengan status PENDING/REJECTED yang bisa diedit.</p>
                 </div>
 
@@ -23,7 +23,7 @@
                 @if($mentorFeedback || $lecturerFeedback)
                     <div class="mb-6 rounded-xl border border-rose-200 bg-rose-50/70 p-4">
                         <h4 class="flex items-center gap-2 text-sm font-bold text-rose-800">
-                            <span>⚠️ Catatan Revisi & Feedback Pembimbing</span>
+                            <span>Catatan Revisi & Feedback Pembimbing</span>
                         </h4>
                         
                         @if($mentorFeedback)
