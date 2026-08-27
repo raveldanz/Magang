@@ -12,11 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class LogbookController extends Controller
 {
     /**
-<<<<<<< HEAD
-     * Daftar semua logbook dari seluruh mahasiswa (Multi-Tenant Scoped)
-=======
      * Rekapitulasi agregat aktivitas logbook per mahasiswa (Multi-Tenant Scoped)
->>>>>>> main
      */
     public function index(Request $request)
     {
@@ -172,11 +168,7 @@ class LogbookController extends Controller
     }
 
     /**
-<<<<<<< HEAD
-     * Review logbook: approve atau reject dengan feedback
-=======
      * Review logbook (Opsional / Legacy Support)
->>>>>>> main
      */
     public function review(Request $request, $id)
     {

@@ -13,11 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class EvaluationController extends Controller
 {
     /**
-<<<<<<< HEAD
-     * Helper untuk validasi bahwa penempatan mahasiswa benar berasal dari kampus dosen yang login
-=======
      * Helper untuk validasi bahwa penempatan mahasiswa benar dibimbing oleh DPL yang login
->>>>>>> main
      */
     protected function getAuthorizedPlacement($placementId)
     {
@@ -77,11 +73,7 @@ class EvaluationController extends Controller
     }
 
     /**
-<<<<<<< HEAD
-     * Simpan nilai bimbingan akademik dan catatan dosen kampus
-=======
      * Simpan nilai bimbingan akademik (Bobot 60%) dan catatan dosen kampus
->>>>>>> main
      */
     public function store(Request $request, $placementId)
     {

@@ -170,11 +170,7 @@ class UnitController extends Controller
     }
 
     /**
-<<<<<<< HEAD
-     * Quick action penyesuaian kuota (+1 / -1 / adjust)
-=======
      * Quick action penyesuaian kuota (+1 / -1 / inline editable custom)
->>>>>>> main
      */
     public function updateQuota(Request $request, $id)
     {

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-black text-xl text-slate-800 leading-tight">
+            <h2 class="font-bold text-xl text-slate-800 leading-tight">
                 {{ __('Dashboard Mahasiswa') }}
             </h2>
         </div>
@@ -36,24 +36,27 @@
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold px-4 py-2 rounded-2xl uppercase tracking-wider" 
                           style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; color: #ffffff !important;">
-                         {{$univName ?? 'Perguruan Tinggi Mahasiswa' }}
+                         {{ $univName ?? Auth::user()->studentProfile->universitas ?? 'Perguruan Tinggi Mahasiswa' }}
                     </span>
                 </div>
             </div>
 
             @php
-                $eval = optional(optional($application)->placement)->evaluation;
-                $finalReport = optional(optional($application)->placement)->finalreport;
-                $isPassed = $application && (
-                    $application->status === 'completed' || 
-                    ($application->status === 'accepted' && $eval && $eval->nilai_akhir > 0 && optional($finalReport)->status === 'approved')
-                );
+                $profile = Auth::user()->studentProfile;
+                $application = $application ?? ($profile ? App\Models\Application::where('user_id', Auth::id())->latest()->first() : null);
                 $placement = $application ? $application->placement : null;
+                $eval = optional($placement)->evaluation;
+                $finalReport = optional($placement)->finalreport ?? optional($placement)->finalReport;
                 $mentor = $placement ? ($placement->mentor ?? $placement->pembimbing) : null;
                 $academicAdvisor = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
+
+                $isPassed = $application && (
+                    $application->status === 'completed' || 
+                    ($application->status === 'accepted' && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && optional($finalReport)->status === 'approved')
+                );
             @endphp
 
-            {{-- 2. BANNER KELULUSAN RESMI & UNDUH E-SERTIFIKAT (TEMA EMERALD-SURABAYA BLUE SOLID) --}}
+            <!-- 2. BANNER KELULUSAN RESMI & UNDUH E-SERTIFIKAT (TEMA EMERALD-SURABAYA BLUE SOLID) -->
             @if ($isPassed)
                 <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6 relative overflow-hidden"
                      style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #1e3a8a 100%) !important; color: #ffffff !important;">
@@ -74,30 +77,35 @@
                                target="_blank"
                                class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 cursor-pointer font-black text-xs sm:text-sm"
                                style="background-color: #ffffff !important; color: #065f46 !important; border: 2px solid #ffffff !important;">
-                                <span>Cetak Sertifikat Resmi (PDF)</span>
-                                <span></span>
+                                <span>📜 Cetak Sertifikat Resmi (PDF)</span>
                             </a>
                         </div>
                     </div>
 
                     <!-- Rekapitulasi Nilai Transparan -->
                     @if($eval)
+                        @php
+                            $nilaiDinas = $eval->nilai_pembimbing ?? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1);
+                            $nilaiDpl = $eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0);
+                            $nilaiAkhir = $eval->nilai_akhir ?? round(($nilaiDinas * 0.4) + ($nilaiDpl * 0.6), 2);
+                            $grade = $eval->grade_calculated ?? ($eval->grade ?? ($nilaiAkhir >= 85 ? 'A' : ($nilaiAkhir >= 70 ? 'B' : 'C')));
+                        @endphp
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t text-center" style="border-top-color: rgba(255, 255, 255, 0.2) !important;">
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
                                 <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai Dinas (40%)</span>
-                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $eval->nilai_pembimbing }}/100</p>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $nilaiDinas }}/100</p>
                             </div>
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
                                 <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai DPL (60%)</span>
-                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $eval->nilai_dosen_calculated }}/100</p>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $nilaiDpl }}/100</p>
                             </div>
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
                                 <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #fde047 !important;">Nilai Akhir Total</span>
-                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #fde047 !important;">{{ $eval->nilai_akhir }}</p>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #fde047 !important;">{{ $nilaiAkhir }}</p>
                             </div>
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
                                 <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #fde047 !important;">Grade Kelulusan</span>
-                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $eval->grade_calculated ?? ($eval->grade ?? 'A') }}</p>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $grade }}</p>
                             </div>
                         </div>
                     @endif
@@ -109,10 +117,9 @@
                 <div class="bg-white rounded-3xl p-6 border-2 {{ $academicAdvisor ? 'border-emerald-200' : 'border-blue-300 bg-blue-50/20' }} shadow-sm space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-3">
-                            
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-                                    Dosen Pembimbing Lapangan (DPL Kampus)
+                                    🎓 Dosen Pembimbing Lapangan (DPL Kampus)
                                     @if ($academicAdvisor)
                                         <span class="px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
                                             Terpilih
@@ -124,7 +131,7 @@
                                     @endif
                                 </h3>
                                 <p class="text-xs text-slate-500 mt-0.5">
-                                    Dosen pembimbing dari <strong>{{ $univName ?? 'Perguruan Tinggi Anda' }}</strong> yang bertugas memonitor dan memberikan nilai akademik
+                                    Dosen pembimbing dari <strong>{{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi Anda' }}</strong> yang bertugas memonitor dan memberikan nilai akademik
                                 </p>
                             </div>
                         </div>
@@ -143,10 +150,10 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div>
                                 <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                     {{ $academicAdvisor->name }}
+                                    {{ $academicAdvisor->name }}
                                 </div>
                                 <div class="text-xs text-slate-600 mt-1">
-                                    Email: <span class="font-mono text-slate-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName) }}</strong>
+                                    Email: <span class="font-mono text-slate-800">{{ $academicAdvisor->email }}</span> &bull; Kampus: <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</strong>
                                 </div>
                             </div>
 
@@ -171,7 +178,7 @@
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label for="academic_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                        Pilih Dosen Terdaftar ({{ $univName ?? 'Kampus Mahasiswa' }}):
+                                        Pilih Dosen Terdaftar ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
                                     </label>
                                     <button type="button" @click="openNewDosenModal = true" class="text-[11px] text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer">
                                         Dosen tidak ditemukan? Input Baru
@@ -179,11 +186,13 @@
                                 </div>
                                 <select id="academic_advisor_id" name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
-                                    @foreach ($availableDosens as $dosen)
-                                        <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                            {{ $dosen->name }} — {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }} ({{ $dosen->email }})
-                                        </option>
-                                    @endforeach
+                                    @if(isset($availableDosens))
+                                        @foreach ($availableDosens as $dosen)
+                                            <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
+                                                {{ $dosen->name }} — {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }} ({{ $dosen->email }})
+                                            </option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
 
@@ -263,7 +272,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                                     Asal Perguruan Tinggi:
                                 </label>
-                                <input type="text" value="{{ $univName ?? 'Universitas Mahasiswa' }}" disabled 
+                                <input type="text" value="{{ $univName ?? $profile->universitas ?? 'Universitas Mahasiswa' }}" disabled 
                                     class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
                             </div>
 
@@ -390,7 +399,7 @@
                         </div>
                     </div>
                     <a href="{{ route('student.profile.edit') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                        {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }}
+                        {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }} &rarr;
                     </a>
                 </div>
 
@@ -410,12 +419,12 @@
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200">
                                         Belum Mengajukan
                                     </span>
-                                @elseif($application->lifecycle_status === 'ACTIVE')
+                                @elseif($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                                         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                         ACTIVE (Sedang Magang)
                                     </span>
-                                @elseif($application->lifecycle_status === 'COMPLETED')
+                                @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
                                         LULUS
                                     </span>
@@ -423,7 +432,7 @@
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
                                         ACCEPTED (Calon Peserta)
                                     </span>
-                                @elseif($application->lifecycle_status === 'REJECTED')
+                                @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200">
                                         REJECTED
                                     </span>
@@ -437,7 +446,7 @@
                     </div>
                     @if(!$application)
                         <a href="{{ route('student.application.create') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                            Buat Pengajuan Baru 
+                            Buat Pengajuan Baru &rarr;
                         </a>
                     @else
                         <div class="text-xs text-slate-500">Unit: <strong>{{ $application->unit->name ?? '-' }}</strong></div>
@@ -457,15 +466,16 @@
                     <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.</p>
                 </div>
 
-                @if($evaluation)
-                @php
-                    $rataRata = round(($evaluation->nilai_disiplin + $evaluation->nilai_kinerja + $evaluation->nilai_laporan) / 3, 2);
-                @endphp
-                <div class="bg-white p-5 rounded-2xl shadow-[0_4px_12px_rgba(100,116,139,0.08)] border-l-4 border-purple-500 md:col-span-3">
-                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Penilaian Pembimbing</p>
-                    <p class="text-2xl font-bold mt-1 text-slate-800">{{ $rataRata }}</p>
-                    <p class="text-xs text-slate-500 mt-1">Disiplin: {{ $evaluation->nilai_disiplin }} · Kinerja: {{ $evaluation->nilai_kinerja }} · Laporan: {{ $evaluation->nilai_laporan }}</p>
-                </div>
+                <!-- Card 4: Penilaian Nilai Pembimbing -->
+                @if($eval)
+                    @php
+                        $rataRata = round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2);
+                    @endphp
+                    <div class="bg-white p-5 rounded-2xl shadow-[0_4px_12px_rgba(100,116,139,0.08)] border-l-4 border-purple-500 md:col-span-3">
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Penilaian Pembimbing Lapangan</p>
+                        <p class="text-2xl font-bold mt-1 text-slate-800">{{ $rataRata }}</p>
+                        <p class="text-xs text-slate-500 mt-1">Disiplin: {{ $eval->nilai_disiplin ?? '-' }} · Kinerja: {{ $eval->nilai_kinerja ?? '-' }} · Laporan: {{ $eval->nilai_laporan ?? '-' }}</p>
+                    </div>
                 @endif
             </div>
 
@@ -476,7 +486,7 @@
                         <h4 class="font-bold text-slate-800 text-base">Detail Penempatan Magang</h4>
                         @if ($application->status === 'accepted')
                             <a href="{{ route('student.application.letter', $application->id) }}" target="_blank" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                <span>Unduh Surat Balasan Dinas</span>
+                                <span>Unduh Surat Balasan Dinas</span> &rarr;
                             </a>
                         @endif
                     </div>
@@ -485,12 +495,12 @@
                         <p><span class="text-slate-500">Unit Kerja:</span> <strong>{{ $application->unit->name ?? '-' }}</strong></p>
                         <p><span class="text-slate-500">Periode Magang:</span> <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</strong></p>
                         <p><span class="text-slate-500">Status Saat Ini:</span> 
-                            @if($application->lifecycle_status === 'ACTIVE')
+                            @if($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 border border-emerald-200">
                                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     ACTIVE (Sedang Magang)
                                 </span>
-                            @elseif($application->lifecycle_status === 'COMPLETED')
+                            @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 border border-blue-200">
                                     LULUS
                                 </span>
@@ -498,7 +508,7 @@
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800 border border-sky-200">
                                     ACCEPTED (Calon Peserta)
                                 </span>
-                            @elseif($application->lifecycle_status === 'REJECTED')
+                            @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
                                     REJECTED
                                 </span>

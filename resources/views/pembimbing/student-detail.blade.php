@@ -24,26 +24,15 @@
                     <h3 class="text-lg font-bold border-b pb-2">Status Penilaian</h3>
                     @if ($placement->evaluation)
                         <div class="text-sm">
-<<<<<<< HEAD
-                            <p><strong>Disiplin:</strong> {{ $placement->evaluation->nilai_disiplin }}</p>
-                            <p><strong>Kinerja:</strong> {{ $placement->evaluation->nilai_kinerja }}</p>
-                            <p><strong>Laporan:</strong> {{ $placement->evaluation->nilai_laporan }}</p>
-                            <p><strong>Catatan:</strong> {{ $placement->evaluation->catatan ?? '-' }}</p>
-=======
                             <p><strong>Disiplin:</strong> {{ $placement->evaluation?->nilai_disiplin ?? '-' }}</p>
                             <p><strong>Kinerja:</strong> {{ $placement->evaluation?->nilai_kinerja ?? '-' }}</p>
                             <p><strong>Laporan:</strong> {{ $placement->evaluation?->nilai_laporan ?? '-' }}</p>
                             <p><strong>Catatan:</strong> {{ $placement->evaluation?->catatan ?? '-' }}</p>
->>>>>>> main
                         </div>
                     @else
                         <p class="text-sm text-gray-500">Belum ada penilaian.</p>
                     @endif
-<<<<<<< HEAD
-                    <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="inline-block mt-2 px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700">
-=======
                     <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition shadow-xs cursor-pointer">
->>>>>>> main
                         Isi / Edit Penilaian
                     </a>
                 </div>
@@ -54,14 +43,10 @@
                         <h3 class="text-lg font-bold border-b pb-2">Dokumen Laporan Akhir</h3>
                         @if ($placement->finalreport && $placement->finalreport->file_path)
                             <div class="text-sm mt-3">
-<<<<<<< HEAD
-                                <p><strong>Status:</strong> <span class="uppercase font-bold text-indigo-700">{{ $placement->finalreport->status }}</span></p>
-=======
                                 <p><strong>Status:</strong> <span class="uppercase font-bold text-blue-700">{{ $placement->finalreport->status }}</span></p>
->>>>>>> main
                             </div>
                             <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
-                                📄 Unduh / Lihat Laporan
+                                Unduh / Lihat Laporan
                             </a>
                         @else
                             <p class="text-sm text-gray-500 mt-3">Mahasiswa belum mengunggah laporan akhir.</p>
@@ -85,11 +70,7 @@
             <div class="bg-white p-6 rounded-lg shadow space-y-6">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h3 class="text-lg font-bold">Daftar Kegiatan Harian</h3>
-<<<<<<< HEAD
-                    <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700">
-=======
                     <a href="{{ route('pembimbing.evaluation.create', $placement->id) }}" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition shadow-xs cursor-pointer">
->>>>>>> main
                         Isi / Edit Penilaian Magang
                     </a>
                 </div>
@@ -109,12 +90,8 @@
                         <p class="text-sm text-gray-800">{{ $log->activity }}</p>
 
                         @if ($log->attachment)
-<<<<<<< HEAD
-                            <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-xs text-indigo-600 hover:underline inline-block">
-=======
                             <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-xs text-blue-600 hover:underline inline-block">
->>>>>>> main
-                                📄 Lihat Bukti Lampiran
+                                Lihat Bukti Lampiran
                             </a>
                         @endif
 
