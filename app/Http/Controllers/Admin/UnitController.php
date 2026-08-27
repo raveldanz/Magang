@@ -16,25 +16,16 @@ class UnitController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-<<<<<<< HEAD
-=======
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
->>>>>>> main
 
         $query = Unit::with(['agencyProfile', 'applications']);
 
         // Multi-Tenant Isolation: Admin Instansi hanya melihat unit di bawah dinasnya
-<<<<<<< HEAD
-        if ($user && $user->agency_profile_id !== null) {
-            $query->where('agency_profile_id', $user->agency_profile_id);
-            $agencies = AgencyProfile::where('id', $user->agency_profile_id)->get();
-=======
         if ($agencyId) {
             $query->where(function ($q) use ($agencyId) {
                 $q->where('agency_profile_id', $agencyId);
             });
             $agencies = AgencyProfile::where('id', $agencyId)->get();
->>>>>>> main
         } else {
             // Superadmin dapat memfilter berdasarkan instansi
             if ($request->filled('agency_id')) {
@@ -74,18 +65,11 @@ class UnitController extends Controller
     public function create()
     {
         $user = Auth::user();
-<<<<<<< HEAD
-
-        if ($user && $user->agency_profile_id !== null) {
-            $agencies = AgencyProfile::where('id', $user->agency_profile_id)->get();
-            $defaultAgencyId = $user->agency_profile_id;
-=======
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
 
         if ($agencyId) {
             $agencies = AgencyProfile::where('id', $agencyId)->get();
             $defaultAgencyId = $agencyId;
->>>>>>> main
         } else {
             $agencies = AgencyProfile::all();
             $defaultAgencyId = null;
@@ -100,19 +84,12 @@ class UnitController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-<<<<<<< HEAD
-=======
         $userAgencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
->>>>>>> main
 
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-<<<<<<< HEAD
-            'quota' => 'required|integer|min:0|max:100',
-=======
             'quota' => 'required|integer|min:0|max:500',
->>>>>>> main
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
         ], [
             'name.required' => 'Nama bidang / divisi wajib diisi.',
@@ -120,13 +97,7 @@ class UnitController extends Controller
             'quota.min' => 'Kuota minimal adalah 0.',
         ]);
 
-<<<<<<< HEAD
-        $agencyId = ($user && $user->agency_profile_id !== null)
-            ? $user->agency_profile_id
-            : ($request->agency_profile_id ?? AgencyProfile::first()?->id);
-=======
         $agencyId = $userAgencyId ?? ($request->agency_profile_id ?? AgencyProfile::first()?->id);
->>>>>>> main
 
         Unit::create([
             'name' => $request->name,
@@ -144,17 +115,6 @@ class UnitController extends Controller
     public function edit($id)
     {
         $user = Auth::user();
-<<<<<<< HEAD
-        $unit = Unit::with('agencyProfile')->findOrFail($id);
-
-        // Multi-Tenant Authorization Check
-        if ($user && $user->agency_profile_id !== null && $unit->agency_profile_id !== $user->agency_profile_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
-        }
-
-        if ($user && $user->agency_profile_id !== null) {
-            $agencies = AgencyProfile::where('id', $user->agency_profile_id)->get();
-=======
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
         $unit = Unit::with('agencyProfile')->findOrFail($id);
 
@@ -165,7 +125,6 @@ class UnitController extends Controller
 
         if ($agencyId) {
             $agencies = AgencyProfile::where('id', $agencyId)->get();
->>>>>>> main
         } else {
             $agencies = AgencyProfile::all();
         }
@@ -179,29 +138,18 @@ class UnitController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-<<<<<<< HEAD
-        $unit = Unit::findOrFail($id);
-
-        // Multi-Tenant Authorization Check
-        if ($user && $user->agency_profile_id !== null && $unit->agency_profile_id !== $user->agency_profile_id) {
-=======
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
         $unit = Unit::findOrFail($id);
 
         // Multi-Tenant Authorization Check
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
->>>>>>> main
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
         }
 
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-<<<<<<< HEAD
-            'quota' => 'required|integer|min:0|max:100',
-=======
             'quota' => 'required|integer|min:0|max:500',
->>>>>>> main
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
         ]);
 
@@ -212,11 +160,7 @@ class UnitController extends Controller
         ];
 
         // Superadmin can reassign agency
-<<<<<<< HEAD
-        if ($user && $user->agency_profile_id === null && $request->filled('agency_profile_id')) {
-=======
         if (!$agencyId && $request->filled('agency_profile_id')) {
->>>>>>> main
             $updateData['agency_profile_id'] = $request->agency_profile_id;
         }
 
@@ -235,12 +179,6 @@ class UnitController extends Controller
     public function updateQuota(Request $request, $id)
     {
         $user = Auth::user();
-<<<<<<< HEAD
-        $unit = Unit::findOrFail($id);
-
-        // Multi-Tenant Authorization Check
-        if ($user && $user->agency_profile_id !== null && $unit->agency_profile_id !== $user->agency_profile_id) {
-=======
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
         $unit = Unit::findOrFail($id);
 
@@ -249,7 +187,6 @@ class UnitController extends Controller
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Anda tidak memiliki hak akses ke unit instansi lain.'], 403);
             }
->>>>>>> main
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah kuota unit instansi lain.');
         }
 
@@ -263,18 +200,6 @@ class UnitController extends Controller
                 $unit->decrement('quota', 1);
                 $msg = "Kuota divisi '{$unit->name}' berhasil dikurangi (-1)! Total kuota sekarang: {$unit->quota}";
             } else {
-<<<<<<< HEAD
-                return redirect()->back()->with('error', 'Kuota sudah 0, tidak dapat dikurangi lagi.');
-            }
-        } elseif ($request->filled('custom_quota')) {
-            $request->validate(['custom_quota' => 'required|integer|min:0|max:100']);
-            $unit->update(['quota' => $request->custom_quota]);
-            $msg = "Kuota divisi '{$unit->name}' berhasil diubah menjadi {$unit->quota}";
-        } else {
-            return redirect()->back()->with('error', 'Aksi penyesuaian kuota tidak valid.');
-        }
-
-=======
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => 'Kuota sudah 0, tidak dapat dikurangi lagi.'], 422);
                 }
@@ -306,7 +231,6 @@ class UnitController extends Controller
             ]);
         }
 
->>>>>>> main
         return redirect()->back()->with('success', $msg);
     }
 
@@ -316,20 +240,13 @@ class UnitController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-<<<<<<< HEAD
-=======
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
->>>>>>> main
         $unit = Unit::withCount(['applications' => function ($q) {
             $q->where('status', 'accepted');
         }])->findOrFail($id);
 
         // Multi-Tenant Authorization Check
-<<<<<<< HEAD
-        if ($user && $user->agency_profile_id !== null && $unit->agency_profile_id !== $user->agency_profile_id) {
-=======
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
->>>>>>> main
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus unit instansi lain.');
         }
 

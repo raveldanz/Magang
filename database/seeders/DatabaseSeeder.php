@@ -5,10 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Unit;
 use App\Models\AgencyProfile;
-<<<<<<< HEAD
-=======
 use App\Models\University;
->>>>>>> main
 use App\Models\StudentProfile;
 use App\Models\Application;
 use App\Models\Placement;
@@ -23,87 +20,23 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-<<<<<<< HEAD
-        // 0. SEED PROFIL MULTI-INSTANSI RESMI PEMERINTAH KOTA SURABAYA
-        $agencies = [
-            // Instansi 1: Diskominfo
-            AgencyProfile::firstOrCreate(
-                ['id' => 1],
-                [
-                    'government_name' => 'Pemerintah Kota Surabaya',
-                    'agency_name' => 'Dinas Komunikasi Dan Informatika',
-                    'address' => 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272',
-                    'phone' => '(031) 5312144',
-                    'email' => 'diskominfo@surabaya.go.id',
-                    'website' => 'https://diskominfo.surabaya.go.id',
-                    'logo' => 'images/logos/diskominfo.png',
-                    'signee_name' => 'Drs. H. M. NASER, M.Si',
-                    'signee_nip' => '19700101 199503 1 002',
-                    'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
-                    'city' => 'Surabaya',
-                ]
-            ),
-            // Instansi 2: Dispusip
-            AgencyProfile::firstOrCreate(
-                ['id' => 2],
-                [
-                    'government_name' => 'Pemerintah Kota Surabaya',
-                    'agency_name' => 'Dinas Perpustakaan Dan Kearsipan',
-                    'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Surabaya 60293',
-                    'phone' => '(031) 8704207',
-                    'email' => 'dispusip@surabaya.go.id',
-                    'website' => 'https://dispusip.surabaya.go.id',
-                    'logo' => 'images/logos/dispusip.png',
-                    'signee_name' => 'Ir. Mia Santi Dewi, M.Si',
-                    'signee_nip' => '19680812 199403 2 007',
-                    'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
-                    'city' => 'Surabaya',
-                ]
-            ),
-            // Instansi 3: Dispendukcapil
-            AgencyProfile::firstOrCreate(
-                ['id' => 3],
-                [
-                    'government_name' => 'Pemerintah Kota Surabaya',
-                    'agency_name' => 'Dinas Kependudukan Dan Pencatatan Sipil',
-                    'address' => 'Jl. Manyar Kertoarjo No. 1, Manyar Sabrangan, Kec. Mulyorejo, Surabaya 60116',
-                    'phone' => '(031) 5913222',
-                    'email' => 'dispendukcapil@surabaya.go.id',
-                    'website' => 'https://dispendukcapil.surabaya.go.id',
-                    'logo' => 'images/logos/dispendukcapil.png',
-                    'signee_name' => 'Eddy Christijanto, Drs., M.Si',
-                    'signee_nip' => '19670615 199303 1 005',
-                    'signee_position' => 'Kepala Dinas Kependudukan dan Pencatatan Sipil',
-                    'city' => 'Surabaya',
-                ]
-            ),
-        ];
-
-        // 1. Seed User Admin (Utama & Masing-Masing Instansi Pemkot Surabaya)
-=======
         // Run dedicated Demo E2E Seeder
         $this->call(DemoE2ESeeder::class);
 
         // =========================================================================
         // 0. SEED USER SUPERADMIN UTAMA (SELALU TERSEDIA)
         // =========================================================================
->>>>>>> main
         $adminUtama = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Administrator Utama',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
-<<<<<<< HEAD
-=======
                 'email_verified_at' => now(),
->>>>>>> main
                 'agency_profile_id' => null,
             ]
         );
 
-<<<<<<< HEAD
-=======
         // =========================================================================
         // 1. SEED MASTER DATA UNIVERSITAS DI SURABAYA
         // =========================================================================
@@ -190,7 +123,6 @@ class DatabaseSeeder extends Seeder
         // =========================================================================
         // 2. SEED USER ADMIN MASING-MASING INSTANSI PEMKOT SURABAYA
         // =========================================================================
->>>>>>> main
         $adminDiskominfo = User::firstOrCreate(
             ['email' => 'admin.diskominfo@surabaya.go.id'],
             [
@@ -221,114 +153,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-<<<<<<< HEAD
-        // 2. SEED CONTOH AKUN PEMBIMBING LAPANGAN (MENTOR) RESMI MULTI-INSTANSI
-        $mentorDiskominfo = User::firstOrCreate(
-            ['email' => 'mentor.diskominfo@surabaya.go.id'],
-            [
-                'name' => 'Mentor Diskominfo Surabaya (Retno Mumpuni, S.Kom., M.Sc)',
-                'password' => Hash::make('password'),
-                'role' => 'mentor',
-                'agency_profile_id' => $agencies[0]->id,
-            ]
-        );
-
-        $mentorDispusip = User::firstOrCreate(
-            ['email' => 'mentor.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Mentor Dispusip Surabaya (Budi Santoso, S.ST., M.MT)',
-                'password' => Hash::make('password'),
-                'role' => 'mentor',
-                'agency_profile_id' => $agencies[1]->id,
-            ]
-        );
-
-        $mentorDispendukcapil = User::firstOrCreate(
-            ['email' => 'mentor.dispendukcapil@surabaya.go.id'],
-            [
-                'name' => 'Mentor Dispendukcapil Surabaya (Hendra Wijaya, S.Kom., M.Eng)',
-                'password' => Hash::make('password'),
-                'role' => 'mentor',
-                'agency_profile_id' => $agencies[2]->id,
-            ]
-        );
-
-        $agencyMentors = [
-            $agencies[0]->id => $mentorDiskominfo,
-            $agencies[1]->id => $mentorDispusip,
-            $agencies[2]->id => $mentorDispendukcapil,
-        ];
-
-        // Seed 6 Akun Pembimbing Lapangan Tambahan
-        $pembimbingData = [
-            [
-                'name' => 'Retno Mumpuni, S.Kom., M.Sc',
-                'email' => 'retnomumpuni.if@upnjatim.ac.id',
-                'agency_profile_id' => $agencies[0]->id,
-            ],
-            [
-                'name' => 'Budi Santoso, S.ST., M.MT',
-                'email' => 'budi.santoso@surabaya.go.id',
-                'agency_profile_id' => $agencies[1]->id,
-            ],
-            [
-                'name' => 'Ir. Siti Aminah, M.Kom',
-                'email' => 'siti.aminah@surabaya.go.id',
-                'agency_profile_id' => $agencies[0]->id,
-            ],
-            [
-                'name' => 'Hendra Wijaya, S.Kom., M.Eng',
-                'email' => 'hendra.wijaya@surabaya.go.id',
-                'agency_profile_id' => $agencies[2]->id,
-            ],
-            [
-                'name' => 'Tri Wahyuni, S.T., M.Sc',
-                'email' => 'tri.wahyuni@surabaya.go.id',
-                'agency_profile_id' => $agencies[1]->id,
-            ],
-            [
-                'name' => 'M. Arif Rahman, S.Kom., M.MT',
-                'email' => 'arif.rahman@surabaya.go.id',
-                'agency_profile_id' => $agencies[2]->id,
-            ],
-        ];
-
-        // 2B. SEED AKUN RESMI DOSEN PEMBIMBING LAPANGAN KAMPUS (DPL)
-        $dosenUnitomo = User::firstOrCreate(
-            ['email' => 'dosen.unitomo@unitomo.ac.id'],
-            [
-                'name' => 'Dr. Ir. Bambang Supriyadi, M.Kom (DPL Unitomo)',
-                'password' => Hash::make('password'),
-                'role' => 'dosen',
-                'university' => 'Universitas Dr. Soetomo',
-            ]
-        );
-
-        $dosenUnesa = User::firstOrCreate(
-            ['email' => 'dosen.unesa@unesa.ac.id'],
-            [
-                'name' => 'Dr. Erina Nur Azizah, S.Kom., M.Cs (DPL Unesa)',
-                'password' => Hash::make('password'),
-                'role' => 'dosen',
-                'university' => 'Universitas Negeri Surabaya',
-            ]
-        );
-
-        $pembimbings = [$mentorDiskominfo, $mentorDispusip, $mentorDispendukcapil];
-        foreach ($pembimbingData as $pData) {
-            $pembimbings[] = User::firstOrCreate(
-                ['email' => $pData['email']],
-                [
-                    'name' => $pData['name'],
-                    'password' => Hash::make('pembimbing123'),
-                    'role' => 'mentor',
-                    'agency_profile_id' => $pData['agency_profile_id'],
-                ]
-            );
-        }
-
-        // 3. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
-=======
         // =========================================================================
         // 3. SEED 3 AKUN MENTOR PER INSTANSI PEMKOT SURABAYA (TOTAL 9 MENTOR)
         // =========================================================================
@@ -599,48 +423,31 @@ class DatabaseSeeder extends Seeder
         // =========================================================================
         // 6. SEED MASTER UNIT KERJA TERSTRUKTUR KETAT PER INSTANSI
         // =========================================================================
->>>>>>> main
         $unitData = [
             // Instansi 1: Diskominfo (Agency ID 1)
             [
                 'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Layanan Informatika & E-Government',
                 'description' => 'Pengembangan arsitektur SPBE, integrasi aplikasi layanan publik Pemkot Surabaya, dan portal WargaKu',
-<<<<<<< HEAD
-                'quota' => 10,
-=======
                 'quota' => 15,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Keamanan Informasi & Persandian (CSIRT Surabaya)',
                 'description' => 'Pusat tanggap insiden siber (CSIRT), implementasi TTE BSrE, enkripsi data, dan audit keamanan sistem informasi',
-<<<<<<< HEAD
-                'quota' => 6,
-=======
                 'quota' => 10,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Pengelolaan Informasi & Komunikasi Publik',
                 'description' => 'Pengelolaan media komunikasi resmi, saluran pengaduan masyarakat, kehumasan, dan keterbukaan informasi publik (PPID)',
-<<<<<<< HEAD
-                'quota' => 8,
-=======
                 'quota' => 10,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[0]->id,
                 'name' => 'Bidang Infrastruktur TI & Jaringan Komunikasi',
                 'description' => 'Pemeliharaan jaringan fiber optic intra-pemerintah, Data Center Tier-3 Pemkot, cloud infrastructure, dan free wifi publik',
-<<<<<<< HEAD
-                'quota' => 8,
-=======
                 'quota' => 10,
->>>>>>> main
             ],
 
             // Instansi 2: Dispusip (Agency ID 2)
@@ -648,31 +455,19 @@ class DatabaseSeeder extends Seeder
                 'agency_profile_id' => $agencies[1]->id,
                 'name' => 'Bidang Pelayanan & Otomasi Perpustakaan Digital',
                 'description' => 'Digitalisasi koleksi naskah kuno, sistem temu kembali arsip digital, dan otomasi perpustakaan daerah',
-<<<<<<< HEAD
-                'quota' => 6,
-=======
                 'quota' => 10,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[1]->id,
                 'name' => 'Bidang Preservasi & Pengelolaan Arsip Statis Elektronik',
                 'description' => 'Pengelolaan arsip digital dinas, alih media dokumen bersejarah Kota Surabaya, dan repositori arsip elektronik',
-<<<<<<< HEAD
-                'quota' => 5,
-=======
                 'quota' => 8,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[1]->id,
                 'name' => 'Bidang Pembinaan & Pengembangan Minat Baca',
                 'description' => 'Pemberdayaan taman bacaan masyarakat (TBM), mobil perpustakaan keliling, dan program literasi kota',
-<<<<<<< HEAD
-                'quota' => 6,
-=======
                 'quota' => 8,
->>>>>>> main
             ],
 
             // Instansi 3: Dispendukcapil (Agency ID 3)
@@ -680,31 +475,19 @@ class DatabaseSeeder extends Seeder
                 'agency_profile_id' => $agencies[2]->id,
                 'name' => 'Bidang Pengelolaan Informasi Administrasi Kependudukan (PIAK)',
                 'description' => 'Integrasi sistem database kependudukan Klampid New Generation (KNG) dan keamanan data kependudukan',
-<<<<<<< HEAD
-                'quota' => 6,
-=======
                 'quota' => 10,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[2]->id,
                 'name' => 'Bidang Pelayanan Pendaftaran Penduduk',
                 'description' => 'Pelayanan adminduk terintegrasi di kelurahan, kecamatan, dan mall pelayanan publik (MPP) Siola',
-<<<<<<< HEAD
-                'quota' => 6,
-=======
                 'quota' => 8,
->>>>>>> main
             ],
             [
                 'agency_profile_id' => $agencies[2]->id,
                 'name' => 'Bidang Pemanfaatan Data & Inovasi Pelayanan Kependudukan',
                 'description' => 'Inovasi integrasi data kependudukan dengan BPJS, Dinsos, dan perbankan daerah untuk percepatan layanan publik',
-<<<<<<< HEAD
-                'quota' => 5,
-=======
                 'quota' => 8,
->>>>>>> main
             ],
         ];
 
@@ -722,17 +505,6 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-<<<<<<< HEAD
-        // 4. SEED DATA MAHASISWA TESTING TAMBAHAN (PENDING, VERIFIED, REJECTED)
-        // Mahasiswa 1: Raveldo Andyka (PENDING)
-        $mhs1 = User::firstOrCreate(
-            ['email' => 'mahasiswa@gmail.com'],
-            ['name' => 'Raveldo Andyka', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
-        );
-        StudentProfile::firstOrCreate(
-            ['user_id' => $mhs1->id],
-            ['nim' => '22081010001', 'universitas' => 'UPN Veteran Jawa Timur', 'jurusan' => 'Informatika', 'phone' => '081234567890']
-=======
         // =========================================================================
         // 7. SEED AKUN MAHASISWA LIFECYCLE PROGRESS STAGES
         // =========================================================================
@@ -1469,7 +1241,6 @@ class DatabaseSeeder extends Seeder
                 'emergency_contact_name' => 'Bpk. Andyka (Orang Tua)',
                 'emergency_contact_phone' => '081234567899',
             ]
->>>>>>> main
         );
         Application::firstOrCreate(
             ['user_id' => $mhs1->id],
@@ -1477,27 +1248,14 @@ class DatabaseSeeder extends Seeder
                 'unit_id' => $units[0]->id,
                 'start_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
-<<<<<<< HEAD
-=======
                 'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
                 'cv_path' => 'documents/applications/sample_cv.pdf',
                 'transcript_path' => 'documents/applications/sample_transkrip.pdf',
                 'id_card_path' => 'documents/applications/sample_ktm.pdf',
->>>>>>> main
                 'status' => 'pending',
             ]
         );
 
-<<<<<<< HEAD
-        // Mahasiswa 2: Dimas Adam (VERIFIED)
-        $mhs2 = User::firstOrCreate(
-            ['email' => 'dimas.adam@mhs.unair.ac.id'],
-            ['name' => 'Dimas Adam', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
-        );
-        StudentProfile::firstOrCreate(
-            ['user_id' => $mhs2->id],
-            ['nim' => '22081010002', 'universitas' => 'Universitas Airlangga', 'jurusan' => 'Sistem Informasi', 'phone' => '089876543210']
-=======
         // 2. Dimas Adam (UNAIR - VERIFIED)
         $mhs2 = User::firstOrCreate(
             ['email' => 'dimas.adam@mhs.unair.ac.id'],
@@ -1526,7 +1284,6 @@ class DatabaseSeeder extends Seeder
                 'emergency_contact_name' => 'Ibu Ratna (Ibu)',
                 'emergency_contact_phone' => '089876543299',
             ]
->>>>>>> main
         );
         Application::firstOrCreate(
             ['user_id' => $mhs2->id],
@@ -1534,27 +1291,14 @@ class DatabaseSeeder extends Seeder
                 'unit_id' => $units[1]->id,
                 'start_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
-<<<<<<< HEAD
-=======
                 'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
                 'cv_path' => 'documents/applications/sample_cv.pdf',
                 'transcript_path' => 'documents/applications/sample_transkrip.pdf',
                 'id_card_path' => 'documents/applications/sample_ktm.pdf',
->>>>>>> main
                 'status' => 'verified',
             ]
         );
 
-<<<<<<< HEAD
-        // Mahasiswa 3: Siti Nurhaliza (REJECTED)
-        $mhs3 = User::firstOrCreate(
-            ['email' => 'siti.nurhaliza@mhs.unesa.ac.id'],
-            ['name' => 'Siti Nurhaliza', 'password' => Hash::make('mahasiswa123'), 'role' => 'mahasiswa']
-        );
-        StudentProfile::firstOrCreate(
-            ['user_id' => $mhs3->id],
-            ['nim' => '22081010003', 'universitas' => 'Universitas Negeri Surabaya', 'jurusan' => 'Teknik Informatika', 'phone' => '087654321098']
-=======
         // 3. Siti Nurhaliza (UNESA - REJECTED)
         $mhs3 = User::firstOrCreate(
             ['email' => 'siti.nurhaliza@mhs.unesa.ac.id'],
@@ -1583,7 +1327,6 @@ class DatabaseSeeder extends Seeder
                 'emergency_contact_name' => 'Bpk. Nurhalim (Ayah)',
                 'emergency_contact_phone' => '087654321000',
             ]
->>>>>>> main
         );
         Application::firstOrCreate(
             ['user_id' => $mhs3->id],
@@ -1591,14 +1334,6 @@ class DatabaseSeeder extends Seeder
                 'unit_id' => $units[3]->id,
                 'start_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
                 'end_date' => Carbon::now()->addMonths(3)->format('Y-m-d'),
-<<<<<<< HEAD
-                'status' => 'rejected',
-                'rejection_note' => 'Dokumen Portofolio dan Transkrip Nilai belum terlampir dengan jelas. Silakan ajukan ulang berkas yang lengkap.',
-            ]
-        );
-
-        // 5. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI UNIT, PEMBIMBING DINAS & DOSEN KAMPUS
-=======
                 'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
                 'cv_path' => 'documents/applications/sample_cv.pdf',
                 'transcript_path' => 'documents/applications/sample_transkrip.pdf',
@@ -1612,126 +1347,44 @@ class DatabaseSeeder extends Seeder
         // -------------------------------------------------------------------------
         // G. SEED 10 MAHASISWA LULUS DENGAN DISTRIBUSI KAMPUS, UNIT & PEMBIMBING
         // -------------------------------------------------------------------------
->>>>>>> main
         $graduatedStudents = [
             [
                 'name' => 'Ahmad Fauzi',
                 'email' => 'ahmad.fauzi@mhs.unitomo.ac.id',
                 'nim' => '22081010011',
-<<<<<<< HEAD
-                'universitas' => 'Universitas Dr. Soetomo',
-                'jurusan' => 'Informatika',
-                'phone' => '081234560011',
-                'dosen' => $dosenUnitomo,
-=======
                 'univ_key' => 'UNITOMO',
                 'fakultas' => 'Fakultas Ilmu Komputer',
                 'jurusan' => 'Informatika',
                 'semester' => '6',
                 'phone' => '081234560011',
                 'dosen' => $dosenUnitomo1,
->>>>>>> main
             ],
             [
                 'name' => 'Nabila Putri Pratama',
                 'email' => 'nabila.putri@mhs.unesa.ac.id',
                 'nim' => '22081010012',
-<<<<<<< HEAD
-                'universitas' => 'Universitas Negeri Surabaya',
-                'jurusan' => 'Sistem Informasi',
-                'phone' => '081234560012',
-                'dosen' => $dosenUnesa,
-=======
                 'univ_key' => 'UNESA',
                 'fakultas' => 'Fakultas Teknik',
                 'jurusan' => 'Sistem Informasi',
                 'semester' => '6',
                 'phone' => '081234560012',
                 'dosen' => $dosenUnesa1,
->>>>>>> main
             ],
             [
                 'name' => 'Rizky Ramadhan',
                 'email' => 'rizky.ramadhan@mhs.unitomo.ac.id',
                 'nim' => '22081010013',
-<<<<<<< HEAD
-                'universitas' => 'Universitas Dr. Soetomo',
-                'jurusan' => 'Teknik Informatika',
-                'phone' => '081234560013',
-                'dosen' => $dosenUnitomo,
-=======
                 'univ_key' => 'UNITOMO',
                 'fakultas' => 'Fakultas Ilmu Komputer',
                 'jurusan' => 'Teknik Informatika',
                 'semester' => '6',
                 'phone' => '081234560013',
                 'dosen' => $dosenUnitomo2,
->>>>>>> main
             ],
             [
                 'name' => 'Anisa Rahmawati',
                 'email' => 'anisa.rahma@mhs.unesa.ac.id',
                 'nim' => '22081010014',
-<<<<<<< HEAD
-                'universitas' => 'Universitas Negeri Surabaya',
-                'jurusan' => 'Teknologi Informasi',
-                'phone' => '081234560014',
-                'dosen' => $dosenUnesa,
-            ],
-            [
-                'name' => 'Fajar Dwi Santoso',
-                'email' => 'fajar.dwi@mhs.unesa.ac.id',
-                'nim' => '22081010015',
-                'universitas' => 'Universitas Negeri Surabaya',
-                'jurusan' => 'Teknik Informatika',
-                'phone' => '081234560015',
-                'dosen' => $dosenUnesa,
-            ],
-            [
-                'name' => 'Dewi Anggraini',
-                'email' => 'dewi.anggraini@mhs.unitomo.ac.id',
-                'nim' => '22081010016',
-                'universitas' => 'Universitas Dr. Soetomo',
-                'jurusan' => 'Sistem Informasi',
-                'phone' => '081234560016',
-                'dosen' => $dosenUnitomo,
-            ],
-            [
-                'name' => 'Bagus Tri Wicaksono',
-                'email' => 'bagus.tri@mhs.unitomo.ac.id',
-                'nim' => '22081010017',
-                'universitas' => 'Universitas Dr. Soetomo',
-                'jurusan' => 'Informatika',
-                'phone' => '081234560017',
-                'dosen' => $dosenUnitomo,
-            ],
-            [
-                'name' => 'Clara Salsabila',
-                'email' => 'clara.salsabila@mhs.unesa.ac.id',
-                'nim' => '22081010018',
-                'universitas' => 'Universitas Negeri Surabaya',
-                'jurusan' => 'Sistem Informasi',
-                'phone' => '081234560018',
-                'dosen' => $dosenUnesa,
-            ],
-            [
-                'name' => 'Hafidz Maulana',
-                'email' => 'hafidz.m@mhs.unitomo.ac.id',
-                'nim' => '22081010019',
-                'universitas' => 'Universitas Dr. Soetomo',
-                'jurusan' => 'Teknik Informatika',
-                'phone' => '081234560019',
-                'dosen' => $dosenUnitomo,
-            ],
-            [
-                'name' => 'Putri Maharani',
-                'email' => 'putri.maharani@mhs.unesa.ac.id',
-                'nim' => '22081010020',
-                'universitas' => 'Universitas Negeri Surabaya',
-                'jurusan' => 'Pendidikan Teknologi Informasi',
-                'phone' => '081234560020',
-                'dosen' => $dosenUnesa,
-=======
                 'univ_key' => 'UNESA',
                 'fakultas' => 'Fakultas Teknik',
                 'jurusan' => 'Teknologi Informasi',
@@ -1804,7 +1457,6 @@ class DatabaseSeeder extends Seeder
                 'semester' => '6',
                 'phone' => '081234560020',
                 'dosen' => $dosenUpn2,
->>>>>>> main
             ],
         ];
 
@@ -1820,26 +1472,17 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($graduatedStudents as $index => $data) {
-<<<<<<< HEAD
-=======
             $univModel = $universities[$data['univ_key']];
 
->>>>>>> main
             // A. Buat User Mahasiswa
             $user = User::firstOrCreate(
                 ['email' => $data['email']],
                 [
                     'name' => $data['name'],
-<<<<<<< HEAD
-                    'password' => Hash::make('mahasiswa123'),
-                    'role' => 'mahasiswa',
-                    'university' => $data['universitas'],
-=======
                     'password' => Hash::make('password'),
                     'role' => 'mahasiswa',
                     'university_id' => $univModel->id,
                     'university' => $univModel->name,
->>>>>>> main
                 ]
             );
 
@@ -1848,20 +1491,6 @@ class DatabaseSeeder extends Seeder
                 ['user_id' => $user->id],
                 [
                     'nim' => $data['nim'],
-<<<<<<< HEAD
-                    'universitas' => $data['universitas'],
-                    'jurusan' => $data['jurusan'],
-                    'phone' => $data['phone'],
-                ]
-            );
-
-            // C. Distribusi Acak / Bergantian Unit Kerja & Pembimbing Lapangan Dinas
-            $assignedUnit = $units[$index % count($units)];
-            $assignedPembimbing = $pembimbings[$index % count($pembimbings)];
-            $assignedDosen = $data['dosen'];
-
-            // D. Buat Application Status ACCEPTED dengan rentang waktu 3 bulan lalu s.d. hari ini
-=======
                     'universitas' => $univModel->name,
                     'university_id' => $univModel->id,
                     'faculty' => $data['fakultas'],
@@ -1886,20 +1515,16 @@ class DatabaseSeeder extends Seeder
             $assignedDosen = $data['dosen'];
 
             // D. Buat Application Status ACCEPTED
->>>>>>> main
             $application = Application::firstOrCreate(
                 ['user_id' => $user->id],
                 [
                     'unit_id' => $assignedUnit->id,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-<<<<<<< HEAD
-=======
                     'proposal_letter_path' => 'documents/applications/sample_surat_pengantar.pdf',
                     'cv_path' => 'documents/applications/sample_cv.pdf',
                     'transcript_path' => 'documents/applications/sample_transkrip.pdf',
                     'id_card_path' => 'documents/applications/sample_ktm.pdf',
->>>>>>> main
                     'status' => 'accepted',
                     'letter_number' => '500.12.2/' . str_pad($index + 10, 3, '0', STR_PAD_LEFT) . '/436.7.14/' . date('Y'),
                     'letter_date' => Carbon::now()->subMonths(3)->subDays(5)->format('Y-m-d'),
@@ -1910,15 +1535,6 @@ class DatabaseSeeder extends Seeder
             $placement = Placement::firstOrCreate(
                 ['application_id' => $application->id],
                 [
-<<<<<<< HEAD
-                    'mentor_id' => $assignedPembimbing->id,
-                    'academic_advisor_id' => $assignedDosen->id,
-                    'pembimbing_id' => $assignedPembimbing->id,
-                ]
-            );
-
-            // F. Buat Logbook Kegiatan Magang (Untuk sampel review mentor dinas & monitoring dosen)
-=======
                     'mentor_id' => $assignedMentor->id,
                     'academic_advisor_id' => $assignedDosen->id,
                     'pembimbing_id' => $assignedMentor->id,
@@ -1926,7 +1542,6 @@ class DatabaseSeeder extends Seeder
             );
 
             // F. Buat Logbook Kegiatan Magang
->>>>>>> main
             $logActivities = [
                 'Melakukan perancangan antarmuka pengguna (UI/UX) dan wireframe portal layanan publik.',
                 'Mengembangkan modul otentikasi multi-peran dan integrasi API basis data dinas.',
@@ -1945,12 +1560,9 @@ class DatabaseSeeder extends Seeder
                         'attachment' => null,
                         'status' => $logIndex === 0 ? 'approved' : ($logIndex === 3 ? 'pending' : 'approved'),
                         'feedback' => $logIndex === 0 ? 'Kegiatan terverifikasi dengan sangat baik oleh Pembimbing Dinas.' : null,
-<<<<<<< HEAD
-=======
                         'lecturer_status' => $logIndex === 0 ? 'approved' : ($logIndex === 3 ? 'pending' : 'approved'),
                         'lecturer_feedback' => $logIndex === 0 ? 'Aktivitas sangat relevan dengan kompetensi kurikulum program studi.' : null,
                         'lecturer_verified_at' => $logIndex === 0 ? Carbon::now()->subDays(14) : null,
->>>>>>> main
                     ]
                 );
             }
@@ -1960,20 +1572,13 @@ class DatabaseSeeder extends Seeder
                 ['placement_id' => $placement->id],
                 [
                     'file_path' => 'documents/applications/5AdFAcelgeprCcoR82Brj5GF2QzWJvqIMPwbrfc2.pdf',
-<<<<<<< HEAD
-=======
                     'final_report_path' => 'documents/applications/5AdFAcelgeprCcoR82Brj5GF2QzWJvqIMPwbrfc2.pdf',
->>>>>>> main
                     'status' => 'approved',
                     'feedback' => 'Laporan akhir magang telah diperiksa, disetujui, dan memenuhi standar instansi & kampus.',
                 ]
             );
 
-<<<<<<< HEAD
-            // H. Buat Penilaian Evaluasi (Sebagian sudah dinilai, sebagian belum untuk testing)
-=======
             // H. Buat Penilaian Evaluasi
->>>>>>> main
             if ($index < 8) {
                 $disiplin = rand(88, 96);
                 $kinerja = rand(90, 98);

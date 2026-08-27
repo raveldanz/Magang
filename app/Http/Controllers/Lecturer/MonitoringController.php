@@ -11,20 +11,13 @@ use Illuminate\Support\Facades\Auth;
 class MonitoringController extends Controller
 {
     /**
-<<<<<<< HEAD
-     * Menu Monitoring Rekapitulasi Logbook & Progres Laporan Mahasiswa Kampus
-=======
      * Menu Monitoring Rekapitulasi Logbook & Progres Mahasiswa Kampus dengan Segregasi Lifecycle
      * Strictly Scoped ke Dosen Pembimbing Lapangan (academic_advisor_id) yang sedang login
->>>>>>> main
      */
     public function index(Request $request)
     {
         $lecturer = Auth::user();
-<<<<<<< HEAD
-=======
         $lecturerId = $lecturer->id;
->>>>>>> main
 
         $query = Placement::with([
             'application.user.studentProfile',
@@ -33,22 +26,8 @@ class MonitoringController extends Controller
             'pembimbing',
             'logbooks',
             'finalreport',
-<<<<<<< HEAD
-        ])->where(function ($q) use ($lecturer) {
-            $q->where('academic_advisor_id', $lecturer->id)
-              ->orWhereHas('application.user', function ($uQuery) use ($lecturer) {
-                  if (!empty($lecturer->university)) {
-                      $uQuery->where('university', $lecturer->university)
-                             ->orWhereHas('studentProfile', function ($sp) use ($lecturer) {
-                                 $sp->where('universitas', $lecturer->university);
-                             });
-                  }
-              });
-        });
-=======
             'evaluation',
         ])->where('academic_advisor_id', $lecturerId);
->>>>>>> main
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -66,12 +45,6 @@ class MonitoringController extends Controller
             });
         }
 
-<<<<<<< HEAD
-        $placements = $query->latest()->get();
-        $agencies = AgencyProfile::all();
-
-        return view('lecturer.monitoring.index', compact('placements', 'lecturer', 'agencies'));
-=======
         $allPlacements = $query->latest()->get();
 
         // Pisahkan data bimbingan dosen berdasarkan lifecycle
@@ -97,6 +70,5 @@ class MonitoringController extends Controller
         $agencies = AgencyProfile::all();
 
         return view('lecturer.monitoring.index', compact('placements', 'lecturer', 'agencies', 'stats', 'tab'));
->>>>>>> main
     }
 }
