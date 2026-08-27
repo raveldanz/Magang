@@ -15,89 +15,6 @@
                     $isMentor = $user && ($user->role === 'mentor' || $user->role === 'pembimbing');
                     $isUniversitas = $user && $user->role === 'universitas';
 
-<<<<<<< HEAD
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-
-                    <!-- 1. MENU MAHASISWA -->
-                    @if (Auth::user()?->role === 'mahasiswa')
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('student.profile.edit')" :active="request()->routeIs('student.profile.*')">
-                            {{ __('Profil Saya') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('student.application.create')" :active="request()->routeIs('student.application.*')">
-                            {{ __('Pengajuan Magang') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('student.logbook.index')" :active="request()->routeIs('student.logbook.*')">
-                            {{ __('Logbook Magang') }}
-                        </x-nav-link>
-                    @endif
-
-                    <!-- 2. MENU PEMBIMBING LAPANGAN (MENTOR) -->
-                    @if (Auth::user()?->role === 'mentor' || Auth::user()?->role === 'pembimbing')
-                        <x-nav-link :href="route('mentor.dashboard')" :active="request()->routeIs('mentor.dashboard') || request()->routeIs('mentor.students.*') || request()->routeIs('mentor.evaluations.*')">
-                            {{ __('Portal Pembimbing (Mentor)') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('mentor.logbooks.index')" :active="request()->routeIs('mentor.logbooks.*')">
-                            {{ __('Review Logbook Mahasiswa') }}
-                        </x-nav-link>
-                    @endif
-
-                    <!-- 3. MENU ADMIN -->
-                    @if (Auth::user()?->role === 'admin')
-                        <x-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
-                            {{ __('Verifikasi Magang') }}
-                        </x-nav-link>
-
-                        @if (Route::has('admin.logbooks.index'))
-                            <x-nav-link :href="route('admin.logbooks.index')" :active="request()->routeIs('admin.logbooks.*')">
-                                {{ __('Review Logbook') }}
-                            </x-nav-link>
-                        @endif
-
-                        <x-nav-link :href="route('admin.units.index')"
-                            :active="request()->routeIs('admin.units.*')">
-                            {{ __('Manajemen Unit & Kuota') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('admin.certificates.index')"
-                            :active="request()->routeIs('admin.certificates.*')">
-                            {{ __('Manajemen Sertifikat') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('admin.agency_profile.edit')"
-                            :active="request()->routeIs('admin.agency_profile.*')">
-                            {{ __('Pengaturan Instansi') }}
-                        </x-nav-link>
-                    @endif
-
-                    <!-- 4. MENU DOSEN PEMBIMBING LAPANGAN (DPL KAMPUS) -->
-                    @if (Auth::user()?->role === 'dosen' || Auth::user()?->role === 'academic_advisor')
-                        <x-nav-link :href="route('lecturer.dashboard')" :active="request()->routeIs('lecturer.dashboard') || request()->routeIs('lecturer.students.*') || request()->routeIs('lecturer.evaluations.*')">
-                            {{ __('Portal Dosen (DPL Kampus)') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('lecturer.monitoring.index')" :active="request()->routeIs('lecturer.monitoring.*')">
-                            {{ __('Monitoring Mahasiswa') }}
-                        </x-nav-link>
-                    @endif
-
-                </div>
-            </div>
-
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()?->name ?? 'Guest' }}</div>
-=======
                     $dashboardRoute = route('dashboard');
                     if ($isSuperAdmin || $isAdminDinas) {
                         $dashboardRoute = route('admin.dashboard');
@@ -162,7 +79,6 @@
 
                 {{-- 2. DESKTOP NAVIGATION BAR (768px+ DIPASTIKAN SELALU MUNCUL HORIZONTAL) --}}
                 <div class="hidden md:flex items-center space-x-3 lg:space-x-5 xl:space-x-7 text-xs lg:text-sm font-medium">
->>>>>>> main
 
                     {{-- 2.1 SUPER ADMIN --}}
                     @if ($isSuperAdmin)
@@ -323,11 +239,6 @@
                 </div>
             </div>
 
-<<<<<<< HEAD
-            <!-- Hamburger (Mobile Menu) -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-=======
             {{-- 3. RIGHT SECTION: NOTIFICATION BELL & USER PROFILE DROPDOWN (DESKTOP) --}}
             <div class="hidden md:flex items-center gap-3">
 
@@ -556,7 +467,6 @@
                         type="button"
                         class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none transition cursor-pointer"
                         aria-label="Buka Menu">
->>>>>>> main
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': mobileMenuOpen, 'inline-flex': !mobileMenuOpen }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': !mobileMenuOpen, 'inline-flex': mobileMenuOpen }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -567,60 +477,6 @@
         </div>
     </div>
 
-<<<<<<< HEAD
-    <!-- Responsive Navigation Menu (Mobile View) -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            @if (Auth::user()?->role === 'mahasiswa')
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('student.profile.edit')" :active="request()->routeIs('student.profile.*')">
-                    {{ __('Profil Saya') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('student.application.create')" :active="request()->routeIs('student.application.*')">
-                    {{ __('Pengajuan Magang') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('student.logbook.index')" :active="request()->routeIs('student.logbook.*')">
-                    {{ __('Logbook Magang') }}
-                </x-responsive-nav-link>
-            @elseif (Auth::user()?->role === 'mentor' || Auth::user()?->role === 'pembimbing')
-                <x-responsive-nav-link :href="route('mentor.dashboard')" :active="request()->routeIs('mentor.dashboard') || request()->routeIs('mentor.students.*') || request()->routeIs('mentor.evaluations.*')">
-                    {{ __('Portal Pembimbing (Mentor)') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('mentor.logbooks.index')" :active="request()->routeIs('mentor.logbooks.*')">
-                    {{ __('Review Logbook Mahasiswa') }}
-                </x-responsive-nav-link>
-            @elseif (Auth::user()?->role === 'dosen' || Auth::user()?->role === 'academic_advisor')
-                <x-responsive-nav-link :href="route('lecturer.dashboard')" :active="request()->routeIs('lecturer.dashboard') || request()->routeIs('lecturer.students.*') || request()->routeIs('lecturer.evaluations.*')">
-                    {{ __('Portal Dosen (DPL Kampus)') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('lecturer.monitoring.index')" :active="request()->routeIs('lecturer.monitoring.*')">
-                    {{ __('Monitoring Mahasiswa') }}
-                </x-responsive-nav-link>
-            @elseif (Auth::user()?->role === 'admin')
-                <x-responsive-nav-link :href="route('admin.applications.index')" :active="request()->routeIs('admin.applications.*')">
-                    {{ __('Verifikasi Magang') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.units.index')" :active="request()->routeIs('admin.units.*')">
-                    {{ __('Manajemen Unit & Kuota') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.certificates.index')" :active="request()->routeIs('admin.certificates.*')">
-                    {{ __('Manajemen Sertifikat') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.agency_profile.edit')" :active="request()->routeIs('admin.agency_profile.*')">
-                    {{ __('Pengaturan Instansi') }}
-                </x-responsive-nav-link>
-            @endif
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()?->name ?? 'Guest' }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()?->email ?? '-' }}</div>
-            </div>
-=======
     {{-- 5. FLOATING MOBILE MENU OVERLAY (100% PUTIH SOLID OPAQUE - TIDAK TEMBUS PANDANG) --}}
     <div x-show="mobileMenuOpen" 
          x-transition:enter="transition ease-out duration-200"
@@ -656,7 +512,6 @@
 
         {{-- Daftar Navigasi Mobile per Role --}}
         <div class="space-y-1">
->>>>>>> main
 
             {{-- 5.1 Menu Mobile Super Admin --}}
             @if ($isSuperAdmin)
