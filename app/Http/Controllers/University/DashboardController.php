@@ -62,7 +62,7 @@ class DashboardController extends Controller
 
         // Filter Search & Agency
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $applicationsQuery->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhereHas('studentProfile', function ($sp) use ($search) {
