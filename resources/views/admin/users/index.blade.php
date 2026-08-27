@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>👥</span>
+                   
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -60,11 +60,11 @@
                     <!-- Filter Role -->
                     <select name="role" x-model="role" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
-                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>🎓 Mahasiswa</option>
-                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>🏢 Admin Dinas / Super Admin</option>
-                        <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>👔 Mentor Lapangan</option>
-                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>👨‍🏫 Dosen Pembimbing (DPL)</option>
-                        <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>🏛️ Akun Universitas</option>
+                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Dinas / Super Admin</option>
+                        <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
+                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing (DPL)</option>
+                        <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
                     </select>
 
                     <!-- Filter Afiliasi / Instansi / Universitas Dinamis -->
@@ -148,27 +148,27 @@
                                     <td class="py-4 px-4 whitespace-nowrap">
                                         @if($isSuperAdminUser)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-blue-100 text-blue-900 border border-blue-300">
-                                                👑 Super Admin
+                                                Super Admin
                                             </span>
                                         @elseif($u->role === 'admin')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                🏢 Admin Dinas
+                                                Admin Dinas
                                             </span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
-                                                👔 Mentor Dinas
+                                                Mentor Dinas
                                             </span>
                                         @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                👨‍🏫 Dosen DPL
+                                                Dosen DPL
                                             </span>
                                         @elseif($u->role === 'universitas')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                                                🏛️ Universitas
+                                                Universitas
                                             </span>
                                         @else
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                🎓 Mahasiswa
+                                                Mahasiswa
                                             </span>
                                         @endif
                                     </td>
@@ -176,13 +176,13 @@
                                     <!-- Affiliation -->
                                     <td class="py-4 px-4 text-xs text-slate-600">
                                         @if($u->agencyProfile)
-                                            <div class="font-semibold text-gray-800">🏢 {{ $u->agencyProfile->agency_name ?? $u->agencyProfile->name ?? 'Dinas Terkait' }}</div>
+                                            <div class="font-semibold text-gray-800">{{ $u->agencyProfile->agency_name ?? $u->agencyProfile->name ?? 'Dinas Terkait' }}</div>
                                             <div class="text-[10px] text-gray-400">{{ $u->agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}</div>
                                         @elseif($u->role === 'mahasiswa')
-                                            <div class="font-semibold text-gray-800">🎓 {{ $u->studentProfile?->university?->name ?? $u->studentProfile?->universitas ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}</div>
+                                            <div class="font-semibold text-gray-800">{{ $u->studentProfile?->university?->name ?? $u->studentProfile?->universitas ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}</div>
                                             <div class="text-[10px] text-gray-400">NIM: {{ $u->studentProfile?->nim ?? '-' }}</div>
                                         @elseif(in_array($u->role, ['dosen', 'academic_advisor', 'universitas']))
-                                            <div class="font-semibold text-gray-800">🎓 {{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}</div>
+                                            <div class="font-semibold text-gray-800">{{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}</div>
                                             <div class="text-[10px] text-gray-400">Mitra Perguruan Tinggi</div>
                                         @else
                                             <span class="text-xs text-gray-400">-</span>

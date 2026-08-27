@@ -119,7 +119,7 @@
                         <div class="flex items-center gap-3">
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-                                    🎓 Dosen Pembimbing Lapangan (DPL Kampus)
+                                    Dosen Pembimbing Lapangan (DPL Kampus)
                                     @if ($academicAdvisor)
                                         <span class="px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
                                             Terpilih
