@@ -260,7 +260,7 @@
                                             </span>
                                         @elseif($status === 'COMPLETED')
                                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
-                                                <span>🎓</span>
+                                               
                                                 <span>Lulus</span>
                                             </span>
                                         @elseif($status === 'REJECTED')
