@@ -77,7 +77,7 @@
                                target="_blank"
                                class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 cursor-pointer font-black text-xs sm:text-sm"
                                style="background-color: #ffffff !important; color: #065f46 !important; border: 2px solid #ffffff !important;">
-                                <span>📜 Cetak Sertifikat Resmi (PDF)</span>
+                                <span>Cetak Sertifikat Resmi (PDF)</span>
                             </a>
                         </div>
                     </div>
@@ -314,9 +314,7 @@
                             <!-- Header Modal -->
                             <div class="flex items-start justify-between gap-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl shadow-inner">
-                                        🎉
-                                    </div>
+                                    
                                     <div>
                                         <h3 class="text-lg font-black text-slate-900 leading-snug">Akun Dosen Pembimbing Berhasil Dibuat</h3>
                                         <p class="text-xs text-emerald-600 font-semibold">Tersambung ke {{ $cred['univ_name'] }}</p>
@@ -372,7 +370,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                                     </svg>
-                                    <span x-text="copied ? '✅ Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">Salin Informasi Login</span>
+                                    <span x-text="copied ? 'Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">Salin Informasi Login</span>
                                 </button>
 
                                 <button type="button" @click="showCredentialModal = false" class="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
@@ -422,7 +420,7 @@
                                 @elseif($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                                         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        ACTIVE (Sedang Magang)
+                                        AKTIF (Sedang Magang)
                                     </span>
                                 @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
@@ -430,15 +428,15 @@
                                     </span>
                                 @elseif($application->lifecycle_status === 'ACCEPTED')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
-                                        ACCEPTED (Calon Peserta)
+                                        DITERIMA (Calon Peserta)
                                     </span>
                                 @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200">
-                                        REJECTED
+                                        DITOLAK
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200">
-                                        PENDING
+                                        DALAM PROSES
                                     </span>
                                 @endif
                             </div>
@@ -498,7 +496,7 @@
                             @if($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 border border-emerald-200">
                                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    ACTIVE (Sedang Magang)
+                                    AKTIF (Sedang Magang)
                                 </span>
                             @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 border border-blue-200">
@@ -506,15 +504,15 @@
                                 </span>
                             @elseif($application->lifecycle_status === 'ACCEPTED')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800 border border-sky-200">
-                                    ACCEPTED (Calon Peserta)
+                                    DITERIMA (Calon Peserta)
                                 </span>
                             @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
-                                    REJECTED
+                                    DITOLAK
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800 border border-amber-200">
-                                    PENDING
+                                   DALAM PROSES
                                 </span>
                             @endif
                         </p>

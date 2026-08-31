@@ -337,7 +337,7 @@
                                         <td class="p-4">
                                             @if ($log->attachment)
                                                 <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-xs font-medium inline-flex items-center gap-1">
-                                                    <span>📎</span> Lihat File
+                                                     Lihat File
                                                 </a>
                                             @else
                                                 <span class="text-gray-400 text-xs">-</span>
