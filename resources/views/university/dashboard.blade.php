@@ -196,17 +196,17 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
-                    <table class="min-w-full divide-y divide-slate-200 text-left text-xs sm:text-sm">
-                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-[11px] font-bold tracking-wider">
+                <div class="overflow-x-auto w-full">
+                    <table class="min-w-full divide-y divide-slate-100 text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
                             <tr>
-                                <th class="px-6 py-3.5">Mahasiswa</th>
-                                <th class="px-6 py-3.5">Jurusan / NIM</th>
-                                <th class="px-6 py-3.5">Instansi & Unit Kerja</th>
-                                <th class="px-6 py-3.5">Status Magang</th>
-                                <th class="px-6 py-3.5">Dosen DPL</th>
-                                <th class="px-6 py-3.5">Mentor Dinas</th>
-                                <th class="px-6 py-3.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[160px]">Aksi</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Mahasiswa</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap text-center">Status Magang</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Dosen DPL</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Mentor Dinas</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap text-center min-w-[100px]">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -232,19 +232,19 @@
                                     }
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         <div class="font-bold text-gray-900">{{ $student->name }}</div>
                                         <div class="text-xs text-gray-500 font-mono">{{ $student->email }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         <div class="font-medium text-gray-800">{{ $student->studentProfile->jurusan ?? '-' }}</div>
                                         <div class="text-xs text-gray-500 font-mono">NIM: {{ $student->studentProfile->nim ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         <div class="font-bold text-blue-900">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
                                         <div class="text-xs text-gray-600">{{ $app->unit->name ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4 text-center">
                                         @if($status === 'SUBMITTED' || $status === 'PENDING')
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
                                                 Menunggu Verifikasi
@@ -260,7 +260,6 @@
                                             </span>
                                         @elseif($status === 'COMPLETED')
                                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
-                                               
                                                 <span>Lulus</span>
                                             </span>
                                         @elseif($status === 'REJECTED')
@@ -271,7 +270,7 @@
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ $status }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         @if ($dosen)
                                             <div class="font-semibold text-gray-900 text-xs">👨‍🏫 {{ $dosen->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono">{{ $dosen->email }}</div>
@@ -293,7 +292,7 @@
                                             </button>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         @if ($mentor)
                                             <div class="font-semibold text-gray-900 text-xs">👔 {{ $mentor->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono">{{ $mentor->email }}</div>
@@ -301,9 +300,9 @@
                                             <span class="text-xs text-gray-400">Belum Diplot</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <td class="px-5 py-4 whitespace-nowrap text-center">
                                         <a href="{{ route('university.students.show', $app->id) }}"
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold transition shadow-2xs">
+                                           class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold transition shadow-2xs">
                                             <span>Detail</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                         </a>
@@ -338,7 +337,7 @@
              x-transition:leave-end="opacity-0">
             
             <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto"
-                 @click.away="assignModal.show = false"
+                 @click.outside="assignModal.show = false"
                  x-transition:enter="ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
