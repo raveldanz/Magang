@@ -1,6 +1,5 @@
 <nav x-data="{ mobileMenuOpen: false }" 
-     class="border-b border-slate-100 transition-all"
-     style="position: sticky !important; top: 0 !important; z-index: 1000 !important; background-color: #ffffff !important; opacity: 1 !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;">
+     class="border-b border-slate-100 bg-white transition-all shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             
@@ -502,6 +501,7 @@
          x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
          x-cloak
          @click.outside="mobileMenuOpen = false"
+         :class="{ 'hidden pointer-events-none': !mobileMenuOpen }"
          class="md:hidden absolute top-full left-0 right-0 w-full px-4 py-5 space-y-3 border-b border-slate-200 bg-white shadow-2xl z-50">
 
         {{-- Info Profil Pengguna di Mobile --}}
