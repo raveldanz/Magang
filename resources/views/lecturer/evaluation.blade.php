@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('lecturer.dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs">
@@ -7,7 +7,7 @@
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span></span>
-                    <span>Formulir Penilaian Akademik DPL (Bobot 60%)</span>
+                    <span>Formulir Penilaian Akademik DPL</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
                     Evaluasi bimbingan akademik, mutu laporan ilmiah, dan keaktifan mahasiswa magang
@@ -21,6 +21,22 @@
         $evalMastery = old('score_mastery', $evaluation?->score_mastery ?? ($evaluation?->nilai_akademik ?? 85));
         $evalReport = old('score_report', $evaluation?->score_report ?? ($evaluation?->nilai_akademik ?? 85));
         $evalAttitude = old('score_attitude', $evaluation?->score_attitude ?? ($evaluation?->nilai_akademik ?? 85));
+
+        $univ = $evaluation?->getUniversity();
+        if (!$univ && isset($student)) {
+            if ($student->university_id) {
+                $univ = \App\Models\University::find($student->university_id);
+            } else {
+                $name = $student->university ?? ($profile->universitas ?? null);
+                if ($name) {
+                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                }
+            }
+        }
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+        $isMentorOnly = $scheme === 'mentor_only';
     @endphp
 
     <div class="py-8" x-data="{
@@ -28,6 +44,9 @@
         scoreReport: {{ $evalReport }},
         scoreAttitude: {{ $evalAttitude }},
         scoreDinas: {{ $nilaiDinas }},
+        scheme: '{{ $scheme }}',
+        weightMentor: {{ $weightMentor }},
+        weightLecturer: {{ $weightLecturer }},
         get calculatedDosen() {
             let m = Number(this.scoreMastery) || 0;
             let r = Number(this.scoreReport) || 0;
@@ -37,10 +56,13 @@
         get calculatedFinal() {
             let d = Number(this.scoreDinas) || 0;
             let l = this.calculatedDosen;
-            if (d > 0) {
-                return Math.round(((0.40 * d) + (0.60 * l)) * 100) / 100;
+            if (this.scheme === 'mentor_only') {
+                return d > 0 ? d : l;
             }
-            return l;
+            if (d > 0 && l > 0) {
+                return Math.round((((this.weightMentor / 100) * d) + ((this.weightLecturer / 100) * l)) * 100) / 100;
+            }
+            return d > 0 ? d : l;
         },
         get letterGrade() {
             let f = this.calculatedFinal;
@@ -85,10 +107,10 @@
                 </div>
             </div>
 
-            <!-- Nilai Lapangan Dinas Preview (40%) -->
+            <!-- Nilai Lapangan Dinas Preview -->
             @if ($evaluation && ($evaluation->nilai_disiplin > 0 || $evaluation->nilai_kinerja > 0))
                 <div class="bg-emerald-50/60 rounded-3xl p-5 border border-emerald-100 shadow-xs">
-                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block"> Nilai Evaluasi Pembimbing Dinas (Bobot 40%)</span>
+                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block"> Nilai Evaluasi Pembimbing Dinas</span>
                     <div class="grid grid-cols-3 gap-3 mt-3">
                         <div class="bg-white p-3 rounded-xl border border-emerald-100 text-center">
                             <span class="text-[10px] font-bold text-gray-400 uppercase">Nilai Disiplin</span>
@@ -111,7 +133,7 @@
                 </div>
             @endif
 
-            <!-- Formulir Input Nilai Akademik 60% -->
+            <!-- Formulir Input Nilai Akademik DPL -->
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs">
                 <form action="{{ route('lecturer.evaluations.store', $placement->id) }}" method="POST" class="space-y-6">
                     @csrf
@@ -166,7 +188,7 @@
                     <!-- Live Grade Preview Card -->
                     <div class="p-5 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-2xl text-white flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div>
-                            <span class="text-xs text-blue-200 font-semibold uppercase tracking-wider block">Kalkulasi Nilai DPL (60%)</span>
+                            <span class="text-xs text-blue-200 font-semibold uppercase tracking-wider block">Kalkulasi Nilai DPL</span>
                             <div class="text-2xl font-black text-emerald-400 mt-0.5" x-text="calculatedDosen + '/100'"></div>
                             <div class="text-xs text-slate-300 mt-1">
                                 Predikat Akhir: <strong class="text-white" x-text="letterGrade"></strong>
@@ -197,7 +219,7 @@
                             Batal
                         </a>
                         <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-                            Simpan Nilai Akademik DPL (60%)
+                            Simpan Nilai Akademik DPL
                         </button>
                     </div>
 

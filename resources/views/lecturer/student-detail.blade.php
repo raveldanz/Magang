@@ -20,6 +20,22 @@
         $evalMastery = old('score_mastery', $evaluation?->score_mastery ?? ($evaluation?->nilai_akademik ?? 85));
         $evalReport = old('score_report', $evaluation?->score_report ?? ($evaluation?->nilai_akademik ?? 85));
         $evalAttitude = old('score_attitude', $evaluation?->score_attitude ?? ($evaluation?->nilai_akademik ?? 85));
+
+        $univ = $evaluation?->getUniversity();
+        if (!$univ && isset($student)) {
+            if ($student->university_id) {
+                $univ = \App\Models\University::find($student->university_id);
+            } else {
+                $name = $student->university ?? ($profile->universitas ?? null);
+                if ($name) {
+                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                }
+            }
+        }
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+        $isMentorOnly = $scheme === 'mentor_only';
     @endphp
 
     <div class="py-8" x-data="{
@@ -27,6 +43,9 @@
         scoreReport: {{ $evalReport }},
         scoreAttitude: {{ $evalAttitude }},
         scoreDinas: {{ $nilaiDinas }},
+        scheme: '{{ $scheme }}',
+        weightMentor: {{ $weightMentor }},
+        weightLecturer: {{ $weightLecturer }},
         get calculatedDosen() {
             let m = Number(this.scoreMastery) || 0;
             let r = Number(this.scoreReport) || 0;
@@ -36,10 +55,13 @@
         get calculatedFinal() {
             let d = Number(this.scoreDinas) || 0;
             let l = this.calculatedDosen;
-            if (d > 0) {
-                return Math.round(((0.40 * d) + (0.60 * l)) * 100) / 100;
+            if (this.scheme === 'mentor_only') {
+                return d > 0 ? d : l;
             }
-            return l;
+            if (d > 0 && l > 0) {
+                return Math.round((((this.weightMentor / 100) * d) + ((this.weightLecturer / 100) * l)) * 100) / 100;
+            }
+            return d > 0 ? d : l;
         },
         get letterGrade() {
             let f = this.calculatedFinal;
@@ -104,11 +126,11 @@
                     <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Status Kelulusan</span>
                     <div class="mt-2 space-y-1.5">
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-500">Skor Dinas (40%):</span>
+                            <span class="text-gray-500">Skor Dinas:</span>
                             <span class="font-bold text-gray-800">{{ $nilaiDinas > 0 ? $nilaiDinas . '/100' : 'Belum Ada' }}</span>
                         </div>
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-500">Skor DPL (60%):</span>
+                            <span class="text-gray-500">Skor DPL:</span>
                             <span class="font-bold text-blue-700" x-text="calculatedDosen + '/100'"></span>
                         </div>
                         <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-100">
@@ -200,14 +222,14 @@
                 @endif
             </div>
 
-            <!-- 3. SECTION FORM PENILAIAN AKADEMIK DPL (BOBOT 60%) -->
+            <!-- 3. SECTION FORM PENILAIAN AKADEMIK DPL -->
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs space-y-6">
                 <div class="flex items-center gap-3 pb-4 border-b border-gray-100">
                     <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
                         
                     </div>
                     <div>
-                        <h3 class="font-black text-base text-gray-900">Form Evaluasi & Penilaian Akademik DPL (Bobot 60%)</h3>
+                        <h3 class="font-black text-base text-gray-900">Form Evaluasi & Penilaian Akademik DPL</h3>
                         <p class="text-xs text-gray-400">Masukkan nilai 3 aspek kompetensi akademik magang (skala 0 - 100)</p>
                     </div>
                 </div>
@@ -269,13 +291,17 @@
                                  Kalkulasi Nilai Akhir Otomatis
                             </span>
                             <h4 class="text-lg font-black mt-2">
-                                Nilai DPL (60%): <span class="text-emerald-400" x-text="calculatedDosen + '/100'"></span>
+                                Nilai DPL: <span class="text-emerald-400" x-text="calculatedDosen + '/100'"></span>
                                 @if($nilaiDinas > 0)
-                                    &bull; Dinas (40%): <span class="text-teal-300">{{ $nilaiDinas }}/100</span>
+                                    &bull; Dinas: <span class="text-teal-300">{{ $nilaiDinas }}/100</span>
                                 @endif
                             </h4>
                             <p class="text-xs text-slate-300">
-                                Rumus: (0.40 &times; Nilai Dinas) + (0.60 &times; Nilai DPL)
+                                @if($isMentorOnly)
+                                    Aturan Kampus: Penilaian 100% Pembimbing Lapangan Dinas
+                                @else
+                                    Rumus Aturan Kampus: ({{ $weightMentor }}% &times; Nilai Dinas) + ({{ $weightLecturer }}% &times; Nilai DPL)
+                                @endif
                             </p>
                         </div>
 
