@@ -5,7 +5,23 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
+            refresh: [
+                'resources/views/**',
+                'resources/css/**',
+                'resources/js/**',
+                'routes/**',
+            ],
         }),
     ],
+    server: {
+        watch: {
+            ignored: [
+                '**/storage/**',
+                '**/bootstrap/cache/**',
+                '**/node_modules/**',
+                '**/vendor/**',
+                '**/.git/**',
+            ],
+        },
+    },
 });
