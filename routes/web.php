@@ -75,8 +75,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Route Impersonation (Bisa diakses saat login)
+    // Route Impersonation (Login As & Kembali ke Super Admin)
     Route::post('/admin/impersonate/leave', [ImpersonationController::class, 'leave'])->name('admin.impersonate.leave');
+    Route::post('/admin/impersonate/{userId}', [ImpersonationController::class, 'impersonate'])->name('admin.impersonate');
 
     // Notifikasi & Pemberitahuan Sistem
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -128,9 +129,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:admin,super_admin'])->group(function () {
         // Executive Dashboard
         Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-
-        // Impersonation ("Login As")
-        Route::post('/admin/impersonate/{userId}', [ImpersonationController::class, 'impersonate'])->name('admin.impersonate');
 
         // Verifikasi Pengajuan Magang
         Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
