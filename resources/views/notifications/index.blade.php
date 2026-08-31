@@ -57,6 +57,11 @@
                     Perlu Tindakan Segera
                 </a>
 
+                <a href="{{ route('notifications.index', ['category' => 'logbook']) }}" 
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Logbook
+                </a>
+
                 <a href="{{ route('notifications.index', ['category' => 'application']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Pendaftaran
@@ -70,11 +75,6 @@
                 <a href="{{ route('notifications.index', ['category' => 'feedback']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'feedback' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Feedback
-                </a>
-
-                <a href="{{ route('notifications.index', ['category' => 'logbook']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    Logbook
                 </a>
 
                 @if(Auth::user() && (Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin'))
