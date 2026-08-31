@@ -61,6 +61,23 @@ class EvaluationController extends Controller
         $mentor = $placement->mentor ?? $placement->pembimbing;
         $evaluation = $placement->evaluation;
 
+        $univ = $evaluation?->getUniversity();
+        if (!$univ && $student) {
+            if ($student->university_id) {
+                $univ = \App\Models\University::find($student->university_id);
+            } else {
+                $name = $student->university ?? ($profile?->universitas ?? null);
+                if ($name) {
+                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                }
+            }
+        }
+
+        // Jika universitas memberlakukan 100% Mentor Dinas, arahkan langsung ke halaman detail mahasiswa
+        if ($univ && $univ->evaluation_scheme === 'mentor_only') {
+            return redirect()->route('lecturer.students.show', $placementId);
+        }
+
         return view('lecturer.evaluation', compact(
             'placement',
             'student',
@@ -88,45 +105,55 @@ class EvaluationController extends Controller
             'feedback_dosen' => 'nullable|string|max:1500',
         ]);
 
-        // Hitung nilai akademik DPL
-        if ($request->filled('score_mastery') && $request->filled('score_report') && $request->filled('score_attitude')) {
-            $mastery = (float)$request->score_mastery;
-            $report = (float)$request->score_report;
-            $attitude = (float)$request->score_attitude;
-            $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
-        } else {
-            $nilaiDosen = (float)($request->nilai_akademik ?? 85);
-            $mastery = $nilaiDosen;
-            $report = $nilaiDosen;
-            $attitude = $nilaiDosen;
+        $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
+        $univ = $evaluation->getUniversity();
+        if (!$univ && $placement->application?->user) {
+            $u = $placement->application->user;
+            if ($u->university_id) {
+                $univ = \App\Models\University::find($u->university_id);
+            }
         }
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $isMentorOnly = ($scheme === 'mentor_only');
 
         $feedback = $request->feedback_dosen ?? $request->catatan_dosen;
-
-        $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
-        $evaluation->nilai_disiplin = $evaluation->nilai_disiplin ?? 0;
-        $evaluation->nilai_kinerja = $evaluation->nilai_kinerja ?? 0;
-        $evaluation->nilai_laporan = $evaluation->nilai_laporan ?? 0;
-        $evaluation->nilai_akademik = (int)round($nilaiDosen);
-        $evaluation->score_mastery = $mastery;
-        $evaluation->score_report = $report;
-        $evaluation->score_attitude = $attitude;
-        $evaluation->nilai_dosen = $nilaiDosen;
         $evaluation->catatan_dosen = $feedback;
         $evaluation->feedback_dosen = $feedback;
 
+        $nilaiDosen = null;
+        if (!$isMentorOnly) {
+            if ($request->filled('score_mastery') && $request->filled('score_report') && $request->filled('score_attitude')) {
+                $mastery = (float)$request->score_mastery;
+                $report = (float)$request->score_report;
+                $attitude = (float)$request->score_attitude;
+                $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
+            } else {
+                $nilaiDosen = (float)($request->nilai_akademik ?? 85);
+                $mastery = $nilaiDosen;
+                $report = $nilaiDosen;
+                $attitude = $nilaiDosen;
+            }
+
+            $evaluation->nilai_disiplin = $evaluation->nilai_disiplin ?? 0;
+            $evaluation->nilai_kinerja = $evaluation->nilai_kinerja ?? 0;
+            $evaluation->nilai_laporan = $evaluation->nilai_laporan ?? 0;
+            $evaluation->nilai_akademik = (int)round($nilaiDosen);
+            $evaluation->score_mastery = $mastery;
+            $evaluation->score_report = $report;
+            $evaluation->score_attitude = $attitude;
+            $evaluation->nilai_dosen = $nilaiDosen;
+        }
+
         // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
-        $nilaiDinas = $evaluation->nilai_pembimbing;
+        $nilaiDinas = $evaluation->nilai_pembimbing ?? 0;
         if ($nilaiDinas > 0) {
-            $univ = $evaluation->getUniversity();
-            $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
             $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
             $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
 
-            if ($scheme === 'mentor_only') {
+            if ($isMentorOnly) {
                 $final = $nilaiDinas;
             } else {
-                $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * $nilaiDosen), 2);
+                $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * ($nilaiDosen ?? 0)), 2);
             }
             $evaluation->final_score = $final;
 
@@ -144,23 +171,25 @@ class EvaluationController extends Controller
 
         // Cek apakah mahasiswa otomatis berstatus COMPLETED
         $finalReport = $placement->finalreport;
-        if ($finalReport && $finalReport->status === 'approved' && $nilaiDinas > 0 && ($scheme === 'mentor_only' || $nilaiDosen > 0)) {
+        if ($finalReport && $finalReport->status === 'approved' && $nilaiDinas > 0 && ($isMentorOnly || ($nilaiDosen && $nilaiDosen > 0))) {
             $placement->application->update(['status' => 'completed']);
         }
 
         // Catat Audit Trail
         AuditLog::record('LECTURER_EVALUATION_SUBMIT', 'Evaluation', $evaluation->id, [
             'student_name' => $placement->application->user->name ?? '-',
-            'score_mastery' => $mastery,
-            'score_report' => $report,
-            'score_attitude' => $attitude,
+            'is_mentor_only' => $isMentorOnly,
             'nilai_dosen' => $nilaiDosen,
             'final_score' => $evaluation->final_score ?? null,
             'grade' => $evaluation->grade ?? null,
         ]);
 
+        $successMsg = $isMentorOnly 
+            ? 'Catatan bimbingan DPL berhasil disimpan!' 
+            : 'Nilai bimbingan akademik DPL dan catatan berhasil disimpan!';
+
         return redirect()->route('lecturer.students.show', $placement->id)
-            ->with('success', "Penilaian akademik DPL untuk '{$placement->application->user->name}' berhasil disimpan!");
+            ->with('success', $successMsg);
     }
 
     /**
