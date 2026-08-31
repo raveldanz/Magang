@@ -255,7 +255,7 @@
                                             </span>
                                         @elseif($status === 'ACTIVE')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                                <span>🟢</span>
+                                       
                                                 <span>Sedang Magang</span>
                                             </span>
                                         @elseif($status === 'COMPLETED')

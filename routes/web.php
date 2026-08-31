@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Admin\AgencyController as AdminAgencyController;
 use App\Http\Controllers\Admin\AgencyProfileController as AdminAgencyProfileController;
+use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Admin\MentorController as AdminMentorController;
@@ -18,8 +20,13 @@ use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController
 use App\Http\Controllers\Mentor\EvaluationController as MentorEvaluationController;
 use App\Http\Controllers\Mentor\LogbookController as MentorLogbookController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
 use App\Http\Controllers\Student\CertificateController as StudentCertificateController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\FinalReportController as StudentFinalReportController;
+use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
+use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\University\DashboardController as UniversityDashboardController;
 use App\Http\Controllers\University\LecturerController as UniversityLecturerController;
 use App\Http\Controllers\University\LetterController as UniversityLetterController;
@@ -36,10 +43,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Dashboard Pintar Berdasarkan Role
-Route::get('/dashboard', [StudentDashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Dashboard Utama Berdasarkan Role
+Route::get('/dashboard', [StudentDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-// Route Publik Verifikasi QR Code Surat Balasan (Bisa di-scan oleh siapa saja tanpa login)
+// Route Publik Verifikasi QR Code Surat Balasan
 Route::get('/verify-letter/{id}', function ($id) {
     $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
         ->where('status', 'accepted')
@@ -54,11 +63,6 @@ Route::get('/verify-certificate/{id}', function ($id) {
     return view('verify_certificate', compact('placement'));
 })->name('verify.certificate');
 
-// Dashboard Utama Berdasarkan Role
-Route::get('/dashboard', [StudentDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated Shared Routes
@@ -72,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Route Impersonation (Bisa diakses saat login)
+    // Route Impersonation
     Route::post('/admin/impersonate/leave', [ImpersonationController::class, 'leave'])->name('admin.impersonate.leave');
 
     // Notifikasi & Pemberitahuan Sistem
@@ -108,16 +112,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/student/logbook/{id}', [StudentLogbookController::class, 'destroy'])->name('student.logbook.destroy');
 
         // Laporan Akhir & E-Sertifikat
-        Route::get('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'index'])->name('student.final_report.index');
-        Route::post('/student/final-report', [\App\Http\Controllers\Student\FinalReportController::class, 'store'])->name('student.final_report.store');
-        Route::get('/student/certificate/{placementId}/download', [\App\Http\Controllers\Student\CertificateController::class, 'download'])->name('student.certificate.download');
-        Route::get('/student/certificate/{id}', [\App\Http\Controllers\Student\CertificateController::class, 'show'])->name('student.certificate.show');
+        Route::get('/student/final-report', [StudentFinalReportController::class, 'index'])->name('student.final_report.index');
+        Route::post('/student/final-report', [StudentFinalReportController::class, 'store'])->name('student.final_report.store');
+        Route::get('/student/certificate/{placementId}/download', [StudentCertificateController::class, 'download'])->name('student.certificate.download');
+        Route::get('/student/certificate/{id}', [StudentCertificateController::class, 'show'])->name('student.certificate.show');
 
         // Pemilihan & Input Dosen Pembimbing Lapangan (DPL Kampus)
         Route::post('/student/select-advisor', [StudentDashboardController::class, 'selectAdvisor'])->name('student.select_advisor');
         Route::post('/student/create-advisor', [StudentDashboardController::class, 'storeNewAdvisor'])->name('student.create_advisor');
     });
-
 
     // ==========================================
     // 2. ROUTE KHUSUS ADMIN (SUPER ADMIN & ADMIN DINAS)
@@ -150,8 +153,8 @@ Route::middleware('auth')->group(function () {
         Route::match(['put', 'patch', 'post'], '/admin/agency-profile', [AdminAgencyProfileController::class, 'update'])->name('admin.agency_profile.update');
 
         // Manajemen Master Unit & Kuota Magang
-        Route::resource('/admin/units', AdminUnitController::class)->names('admin.units');
-        Route::patch('/admin/units/{id}/quota', [AdminUnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
+        Route::resource('/admin/units', \App\Http\Controllers\Admin\UnitController::class)->names('admin.units');
+        Route::patch('/admin/units/{id}/quota', [\App\Http\Controllers\Admin\UnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
 
         // Master Instansi Dinas
         Route::resource('/admin/agencies', AdminAgencyController::class)->names('admin.agencies');
@@ -176,9 +179,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
 
         // Manajemen Feedback & Tiket Masukan (Admin)
-        Route::get('/admin/feedbacks', [\App\Http\Controllers\FeedbackController::class, 'index'])->name('admin.feedbacks.index');
-        Route::get('/admin/feedbacks/{id}', [\App\Http\Controllers\FeedbackController::class, 'show'])->name('admin.feedbacks.show');
-        Route::post('/admin/feedbacks/{id}/respond', [\App\Http\Controllers\FeedbackController::class, 'respond'])->name('admin.feedbacks.respond');
+        Route::get('/admin/feedbacks', [FeedbackController::class, 'index'])->name('admin.feedbacks.index');
+        Route::get('/admin/feedbacks/{id}', [FeedbackController::class, 'show'])->name('admin.feedbacks.show');
+        Route::post('/admin/feedbacks/{id}/respond', [FeedbackController::class, 'respond'])->name('admin.feedbacks.respond');
     });
 
     // ==========================================
@@ -194,7 +197,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('mentor.evaluations.store');
         Route::match(['put', 'patch'], '/mentor/final-report/{reportId}', [MentorDashboardController::class, 'updateFinalReportStatus'])->name('mentor.final_report.updateStatus');
 
-        // Backward compatibility routes untuk nama route pembimbing lama
+        // Backward compatibility
         Route::get('/pembimbing/dashboard', [MentorDashboardController::class, 'index'])->name('pembimbing.dashboard');
         Route::get('/pembimbing/student/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('pembimbing.student.detail');
         Route::get('/pembimbing/logbook/{id}', [AdminLogbookController::class, 'show'])->name('pembimbing.logbook.show');
@@ -211,9 +214,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/lecturer/dashboard', [LecturerDashboardController::class, 'index'])->name('lecturer.dashboard');
         Route::get('/lecturer/students/{placementId}', [LecturerDashboardController::class, 'showStudent'])->name('lecturer.students.show');
         Route::get('/lecturer/monitoring', [LecturerMonitoringController::class, 'index'])->name('lecturer.monitoring.index');
-        Route::get('/lecturer/logbooks', [\App\Http\Controllers\Lecturer\LogbookController::class, 'index'])->name('lecturer.logbooks.index');
-        Route::get('/lecturer/logbooks/{id}', [\App\Http\Controllers\Lecturer\LogbookController::class, 'show'])->name('lecturer.logbooks.show');
-        Route::put('/lecturer/logbooks/{id}', [\App\Http\Controllers\Lecturer\LogbookController::class, 'updateStatus'])->name('lecturer.logbooks.updateStatus');
+        Route::get('/lecturer/logbooks', [LecturerLogbookController::class, 'index'])->name('lecturer.logbooks.index');
+        Route::get('/lecturer/logbooks/{id}', [LecturerLogbookController::class, 'show'])->name('lecturer.logbooks.show');
+        Route::put('/lecturer/logbooks/{id}', [LecturerLogbookController::class, 'updateStatus'])->name('lecturer.logbooks.updateStatus');
         Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
         Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
         Route::post('/lecturer/students/{placementId}/evaluate', [LecturerEvaluationController::class, 'store'])->name('lecturer.students.evaluate');
@@ -230,16 +233,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/university/students/{application}/assign-advisor', [UniversityDashboardController::class, 'assignAdvisor'])->name('university.students.assign_advisor');
         Route::get('/university/students/{application}/letter', [UniversityLetterController::class, 'generateLetter'])->name('university.students.letter');
         
-        // Pengaturan Profil & Kop Surat Kampus
+        // Profil & Kop Surat Kampus
         Route::get('/university/profile', [UniversityProfileController::class, 'index'])->name('university.profile.index');
         Route::match(['put', 'patch', 'post'], '/university/profile', [UniversityProfileController::class, 'update'])->name('university.profile.update');
 
-        // Manajemen Daftar Dosen Pembimbing
-        Route::get('/university/lecturers', [\App\Http\Controllers\University\LecturerController::class, 'index'])->name('university.lecturers.index');
-        Route::post('/university/lecturers', [\App\Http\Controllers\University\LecturerController::class, 'store'])->name('university.lecturers.store');
-        Route::match(['put', 'patch'], '/university/lecturers/{id}', [\App\Http\Controllers\University\LecturerController::class, 'update'])->name('university.lecturers.update');
-        Route::delete('/university/lecturers/{id}', [\App\Http\Controllers\University\LecturerController::class, 'destroy'])->name('university.lecturers.destroy');
-        Route::post('/university/lecturers/{id}/reset-password', [\App\Http\Controllers\University\LecturerController::class, 'resetPassword'])->name('university.lecturers.reset_password');
+        // Manajemen Dosen Pembimbing
+        Route::get('/university/lecturers', [UniversityLecturerController::class, 'index'])->name('university.lecturers.index');
+        Route::post('/university/lecturers', [UniversityLecturerController::class, 'store'])->name('university.lecturers.store');
+        Route::match(['put', 'patch'], '/university/lecturers/{id}', [UniversityLecturerController::class, 'update'])->name('university.lecturers.update');
+        Route::delete('/university/lecturers/{id}', [UniversityLecturerController::class, 'destroy'])->name('university.lecturers.destroy');
+        Route::post('/university/lecturers/{id}/reset-password', [UniversityLecturerController::class, 'resetPassword'])->name('university.lecturers.reset_password');
     });
 
 });
