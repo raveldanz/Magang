@@ -215,7 +215,7 @@
              x-transition:leave-end="opacity-0">
             
             <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto"
-                 @click.away="showCreateModal = false"
+                 @click.outside="showCreateModal = false"
                  x-transition:enter="ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
@@ -288,7 +288,7 @@
              x-transition:leave-end="opacity-0">
             
             <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto"
-                 @click.away="showEditModal = false"
+                 @click.outside="showEditModal = false"
                  x-transition:enter="ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
