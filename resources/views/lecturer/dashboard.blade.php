@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -6,7 +6,7 @@
                     <span>Portal Dosen Pembimbing Lapangan (DPL Kampus)</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Monitoring bimbingan akademik, verifikasi logbook, review laporan akhir, dan evaluasi 60% mahasiswa magang
+                    Monitoring bimbingan akademik, verifikasi logbook, review laporan akhir, dan evaluasi akademik mahasiswa magang
                 </p>
             </div>
             
@@ -44,14 +44,14 @@
                     </div>
                 </div>
 
-                <!-- Evaluasi Selesai (60%) -->
+                <!-- Evaluasi Selesai -->
                 <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">Sudah Dinilai</span>
                     </div>
                     <div class="mt-4">
                         <span class="text-2xl font-black text-gray-900">{{ $stats['total_evaluated'] }}</span>
-                        <span class="text-[11px] text-gray-500 block mt-0.5">Nilai DPL 60% tersimpan</span>
+                        <span class="text-[11px] text-gray-500 block mt-0.5">Nilai DPL tersimpan</span>
                     </div>
                 </div>
 
@@ -134,7 +134,7 @@
                                 <th class="py-3.5 px-4">Pembimbing Dinas</th>
                                 <th class="py-3.5 px-4 text-center">Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Nilai DPL (60%)</th>
+                                <th class="py-3.5 px-4 text-center">Nilai DPL</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -171,7 +171,7 @@
                                         <div class="font-semibold text-gray-800 text-xs">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
                                         <div class="text-[10px] text-emerald-600 font-semibold">
                                             @if(($eval?->nilai_pembimbing ?? 0) > 0)
-                                                Skor Dinas: {{ $eval->nilai_pembimbing }}/100 (40%)
+                                                Skor Dinas: {{ $eval->nilai_pembimbing }}/100
                                             @else
                                                 <span class="text-gray-400">Belum dinilai dinas</span>
                                             @endif

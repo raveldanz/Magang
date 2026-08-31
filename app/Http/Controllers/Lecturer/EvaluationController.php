@@ -73,7 +73,7 @@ class EvaluationController extends Controller
     }
 
     /**
-     * Simpan nilai bimbingan akademik (Bobot 60%) dan catatan dosen kampus
+     * Simpan nilai bimbingan akademik dan catatan dosen kampus
      */
     public function store(Request $request, $placementId)
     {
@@ -88,7 +88,7 @@ class EvaluationController extends Controller
             'feedback_dosen' => 'nullable|string|max:1500',
         ]);
 
-        // Hitung nilai akademik DPL (60%)
+        // Hitung nilai akademik DPL
         if ($request->filled('score_mastery') && $request->filled('score_report') && $request->filled('score_attitude')) {
             $mastery = (float)$request->score_mastery;
             $report = (float)$request->score_report;
@@ -119,10 +119,15 @@ class EvaluationController extends Controller
         $nilaiDinas = $evaluation->nilai_pembimbing;
         if ($nilaiDinas > 0) {
             $univ = $evaluation->getUniversity();
+            $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
             $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
             $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
 
-            $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * $nilaiDosen), 2);
+            if ($scheme === 'mentor_only') {
+                $final = $nilaiDinas;
+            } else {
+                $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * $nilaiDosen), 2);
+            }
             $evaluation->final_score = $final;
 
             if ($final >= 85) $grade = 'A';
@@ -139,7 +144,7 @@ class EvaluationController extends Controller
 
         // Cek apakah mahasiswa otomatis berstatus COMPLETED
         $finalReport = $placement->finalreport;
-        if ($finalReport && $finalReport->status === 'approved' && $nilaiDinas > 0 && $nilaiDosen > 0) {
+        if ($finalReport && $finalReport->status === 'approved' && $nilaiDinas > 0 && ($scheme === 'mentor_only' || $nilaiDosen > 0)) {
             $placement->application->update(['status' => 'completed']);
         }
 
@@ -155,7 +160,7 @@ class EvaluationController extends Controller
         ]);
 
         return redirect()->route('lecturer.students.show', $placement->id)
-            ->with('success', "Penilaian akademik 60% untuk '{$placement->application->user->name}' berhasil disimpan!");
+            ->with('success', "Penilaian akademik DPL untuk '{$placement->application->user->name}' berhasil disimpan!");
     }
 
     /**
