@@ -44,7 +44,7 @@ Route::get('/', function () {
 });
 
 // Dashboard Utama Berdasarkan Role
-Route::get('/dashboard', [StudentDashboardController::class, 'index'])
+Route::get('/dashboard', [StudentDashboardController:: class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
