@@ -422,7 +422,7 @@
                                 @elseif($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                                         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        ACTIVE (Sedang Magang)
+                                        AKTIF (Sedang Magang)
                                     </span>
                                 @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
@@ -430,15 +430,15 @@
                                     </span>
                                 @elseif($application->lifecycle_status === 'ACCEPTED')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
-                                        ACCEPTED (Calon Peserta)
+                                        DITERIMA (Calon Peserta)
                                     </span>
                                 @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200">
-                                        REJECTED
+                                        DITOLAK
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200">
-                                        PENDING
+                                        DALAM PROSES
                                     </span>
                                 @endif
                             </div>
@@ -498,7 +498,7 @@
                             @if($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 border border-emerald-200">
                                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    ACTIVE (Sedang Magang)
+                                    AKTIF (Sedang Magang)
                                 </span>
                             @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 border border-blue-200">
@@ -506,15 +506,15 @@
                                 </span>
                             @elseif($application->lifecycle_status === 'ACCEPTED')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800 border border-sky-200">
-                                    ACCEPTED (Calon Peserta)
+                                    DITERIMA (Calon Peserta)
                                 </span>
                             @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
-                                    REJECTED
+                                    DITOLAK
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800 border border-amber-200">
-                                    PENDING
+                                    DALAM PROSES
                                 </span>
                             @endif
                         </p>

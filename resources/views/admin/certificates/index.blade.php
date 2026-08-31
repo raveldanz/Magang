@@ -3,7 +3,6 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>🏆</span>
                     <span>{{ __('Manajemen Sertifikat Kelulusan') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">

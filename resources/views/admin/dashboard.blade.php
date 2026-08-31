@@ -130,7 +130,6 @@
                            class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between" 
                            style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform">🏆</span>
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_completed'] ?? 0 }} Lulus</span>
                             </div>
                             <div>
@@ -209,7 +208,6 @@
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between" style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-sky-600 uppercase tracking-wider">Lulus</span>
-                    <span class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-sm">🏆</span>
                 </div>
                 <div class="text-2xl font-black text-sky-600">{{ $stats['total_completed'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">Tersertifikasi</div>

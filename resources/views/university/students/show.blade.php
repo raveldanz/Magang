@@ -9,7 +9,7 @@
                     {{ __('Detail Monitoring Mahasiswa Magang') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    🏛️ Pemantauan Aktivitas, Logbook, DPL, dan Nilai Mahasiswa &bull; <strong>{{ $student->name }}</strong>
+                    Pemantauan Aktivitas, Logbook, DPL, dan Nilai Mahasiswa &bull; <strong>{{ $student->name }}</strong>
                 </p>
             </div>
 

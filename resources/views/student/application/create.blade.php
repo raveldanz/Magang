@@ -32,7 +32,7 @@
                 </div>
             @endif
 
-            <!-- Alert Penolakan dari Admin (Jika Pengajuan Terakhir Ditolak) -->
+            <!-- Alert Penolakan dari Admin -->
             @if ($applicationHistory->first() && $applicationHistory->first()->status === 'rejected')
                 <div class="p-5 bg-red-50 border border-red-200 rounded-2xl shadow-sm space-y-2">
                     <div class="flex items-center gap-2">
@@ -54,31 +54,25 @@
             @endif
 
             <!-- 1. FORM PENGAJUAN BARU -->
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-7 space-y-5">
-                <div class="border-b border-slate-100 pb-3">
-                    <h3 class="text-base font-bold text-slate-900">Form Buat Pengajuan Magang</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Pilih instansi dinas penempatan dan unggah berkas persyaratan yang diperlukan</p>
-                </div>
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8 space-y-6">
 
                 @if ($activeApplication)
-                    <!-- Alert jika masih ada berkas PENDING -->
                     <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed">
                         <span class="font-bold">Perhatian:</span> Anda masih memiliki pengajuan magang yang sedang diproses (Status: <strong>PENDING</strong>). Anda belum dapat membuat pengajuan baru hingga pengajuan tersebut selesai diverifikasi oleh Admin.
                     </div>
                 @else
-                    <!-- Form Input Magang Baru -->
-                    <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        <!-- Pemilihan Unit (Grouped per Instansi) -->
-                        <div>
-                            <x-input-label for="unit_id" value="Pilih Instansi & Unit Kerja / Divisi Magang" class="text-xs font-semibold uppercase tracking-wider text-slate-600" />
+                        <!-- Bagian A: Pilihan Unit Kerja -->
+                        <div class="space-y-1.5">
+                            <x-input-label for="unit_id" value="PILIH INSTANSI & UNIT KERJA / DIVISI MAGANG" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                             @php
                                 $totalAvailable = $units->filter(fn($unit) => $unit->remaining_quota > 0)->count();
                             @endphp
 
                             <select id="unit_id" name="unit_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm text-sm"
+                                class="block w-full border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 rounded-xl shadow-xs text-xs sm:text-sm p-3"
                                 {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
                                 
                                 @if ($totalAvailable === 0)
@@ -98,89 +92,100 @@
                                     @endforeach
                                 @endif
                             </select>
-                            <p class="mt-1 text-[11px] text-slate-400">Unit kerja telah dikelompokkan secara rapi berdasarkan instansi induk.</p>
+                            <p class="text-[11px] text-slate-400">Unit kerja telah dikelompokkan secara rapi berdasarkan instansi induk.</p>
                             @error('unit_id')
-                                <p class="mt-1 text-xs text-red-600 font-semibold">{{ $message }}</p>
+                                <p class="text-xs text-red-600 font-semibold">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Periode Magang (Datepicker) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="start_date" name="start_date" type="date" min="{{ date('Y-m-d') }}" class="mt-1 block w-full text-xs sm:text-sm"
-                                    :value="old('start_date')" required />
-                                <p class="text-[11px] text-gray-400 mt-1">Pilih tanggal awal mulai kegiatan magang.</p>
+                        <!-- Bagian B: Periode Magang -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" 
+                             x-data="{ 
+                                 startDate: '{{ old('start_date', '') }}',
+                                 endDate: '{{ old('end_date', '') }}',
+                                 today: '{{ date('Y-m-d') }}'
+                             }">
+                            
+                            <!-- Tanggal Mulai -->
+                            <div class="space-y-1.5">
+                                <x-input-label for="start_date" value="TANGGAL MULAI MAGANG" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-text-input id="start_date" 
+                                              name="start_date" 
+                                              type="date" 
+                                              min="{{ date('Y-m-d') }}" 
+                                              x-model="startDate"
+                                              class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                              required />
+                                <p class="text-[11px] text-slate-400">Pilih tanggal awal mulai kegiatan magang.</p>
                                 <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
                             </div>
 
                             <!-- Tanggal Selesai -->
-                            <div>
-                                <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-semibold uppercase tracking-wider text-slate-600" />
+                            <div class="space-y-1.5">
+                                <x-input-label for="end_date" value="TANGGAL SELESAI MAGANG" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                 <x-text-input id="end_date" 
                                               name="end_date" 
                                               type="date" 
                                               x-bind:min="startDate || today" 
                                               x-model="endDate"
-                                              class="mt-1 block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400"
+                                              class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
                                               required />
-                                <p class="text-[11px] text-slate-400 mt-1">Tanggal selesai otomatis terkunci setelah tanggal mulai.</p>
+                                <p class="text-[11px] text-slate-400">Tanggal selesai otomatis terkunci setelah tanggal mulai.</p>
                                 <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
                             </div>
                         </div>
 
-                        <hr class="my-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
-                                <span>Upload Dokumen Persyaratan Magang</span>
-                            </h4>
-                            <p class="text-xs text-gray-500">Seluruh dokumen wajib berformat PDF dengan ukuran maksimum 2MB per file</p>
-                        </div>
+                        <hr class="border-slate-100">
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <!-- Bagian C: Upload Dokumen Persyaratan -->
+                        <div class="space-y-4">
                             <div>
                                 <h4 class="font-bold text-sm text-slate-800">Upload Dokumen Persyaratan Magang</h4>
-                                <p class="text-xs text-slate-500 mt-0.5">Dokumen berformat PDF (maksimal 2MB per file)</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Seluruh dokumen wajib berformat PDF (KTM diperbolehkan JPG/PNG) dengan ukuran maksimum 2MB per file</p>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <!-- Dokumen 1 -->
+                                <div class="space-y-1.5">
                                     <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus" class="text-xs font-semibold text-slate-700" />
                                     <input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
-                                        class="mt-1 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-slate-50 focus:bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
+                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
                                     <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
                                 </div>
 
-                                <div>
+                                <!-- Dokumen 2 -->
+                                <div class="space-y-1.5">
                                     <x-input-label for="cv" value="2. Curriculum Vitae (CV)" class="text-xs font-semibold text-slate-700" />
                                     <input id="cv" name="cv" type="file" accept=".pdf"
-                                        class="mt-1 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-slate-50 focus:bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
+                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
                                     <x-input-error :messages="$errors->get('cv')" class="mt-1" />
                                 </div>
 
-                                <div>
+                                <!-- Dokumen 3 -->
+                                <div class="space-y-1.5">
                                     <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir" class="text-xs font-semibold text-slate-700" />
                                     <input id="transkrip" name="transkrip" type="file" accept=".pdf"
-                                        class="mt-1 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-slate-50 focus:bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
+                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
                                     <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
                                 </div>
 
-                                <div>
+                                <!-- Dokumen 4 -->
+                                <div class="space-y-1.5">
                                     <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM / ID Card)" class="text-xs font-semibold text-slate-700" />
                                     <input id="id_card" name="id_card" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                                        class="mt-1 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-slate-50 focus:bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
+                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
                                     <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
                                 </div>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex items-center space-x-3 pt-4 border-t border-slate-100">
-                            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-sm shadow-blue-200 transition-all duration-200 hover:scale-[1.01]">
+                        <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
+                            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer">
                                 {{ __('Kirim Pengajuan Magang') }}
                             </button>
 
-                            <a href="{{ route('dashboard') }}" class="px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-medium rounded-xl transition">
+                            <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-150 text-center">
                                 {{ __('Kembali') }}
                             </a>
                         </div>
@@ -242,9 +247,9 @@
                                     <td class="py-4 px-5 whitespace-nowrap">
                                         @if ($app->status === 'accepted')
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
-                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
-                                                <span>📄 Download Surat PDF</span>
-
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                <span>Unduh Surat PDF</span>
                                             </a>
                                         @else
                                             <span class="text-slate-400 text-xs italic">Belum tersedia</span>
