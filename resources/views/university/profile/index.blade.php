@@ -3,9 +3,6 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
                     {{ __('Pengaturan Profil & Kop Surat Kampus') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -78,7 +75,7 @@
                                 @if ($university->logo && file_exists(public_path($university->logo)))
                                     <img src="{{ asset($university->logo) }}" alt="Logo {{ $university->name }}" class="max-h-full max-w-full object-contain">
                                 @else
-                                    <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    <span class="text-4xl text-gray-300">🏛️</span>
                                 @endif
                             </div>
 
@@ -134,7 +131,6 @@
                 <!-- Card 2: Pejabat Penandatangan Surat Tugas (PIC / Rektor / Dekan) -->
                 <div class="bg-white rounded-2xl shadow-xs border border-gray-200 p-6 space-y-5">
                     <div class="border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Pejabat Resmi Penandatangan Surat Tugas</h3>
                             <p class="text-xs text-gray-400">Nama dan jabatan pejabat yang otomatis tertera di bagian tanda tangan Surat Pengantar Magang</p>
@@ -181,7 +177,6 @@
                     
                     <div class="border-b border-gray-100 pb-3 flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             <div>
                                 <h3 class="font-bold text-base text-gray-900">Skema Kebijakan Evaluasi & Pengawasan Magang</h3>
                                 <p class="text-xs text-gray-400">Atur porsi pembobotan nilai akhir dan mekanisme persetujuan logbook mahasiswa magang</p>
@@ -202,7 +197,6 @@
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-1 text-blue-600 focus:ring-blue-500">
                                 <div>
                                     <div class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
                                         <span class="font-bold text-xs sm:text-sm text-gray-900">Kemitraan Terpadu (Dua Pihak)</span>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Standar</span>
                                     </div>
@@ -210,8 +204,8 @@
                                         Mahasiswa dibimbing & dinilai oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing (DPL)</strong>. Logbook diverifikasi 2 arah.
                                     </p>
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
-                                        <span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Wajib Pilih DPL</span>
-                                        <span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Verifikasi Logbook 2 Pihak</span>
+                                        <span>✓ Wajib Pilih DPL</span>
+                                        <span>✓ Verifikasi Logbook 2 Pihak</span>
                                     </div>
                                 </div>
                             </div>
@@ -224,15 +218,14 @@
                                 <input type="radio" name="evaluation_scheme" value="mentor_only" x-model="scheme" class="mt-1 text-blue-600 focus:ring-blue-500">
                                 <div>
                                     <div class="flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                         <span class="font-bold text-xs sm:text-sm text-gray-900">Penilaian Mandiri Instansi (100% Dinas)</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
                                         Kampus mempercayakan 100% penilaian dan pengawasan kepada <strong>Mentor Lapangan Dinas</strong>. Dosen tidak diwajibkan menilai.
                                     </p>
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
-                                        <span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Tidak Wajib DPL</span>
-                                        <span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Cukup ACC Mentor Dinas</span>
+                                        <span>✓ Tidak Wajib DPL</span>
+                                        <span>✓ Cukup ACC Mentor Dinas</span>
                                     </div>
                                 </div>
                             </div>
@@ -249,7 +242,6 @@
                         
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-xs sm:text-sm text-gray-800 flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                                 <span>Persentase Pembobotan Nilai Akhir Mahasiswa (Total Wajib 100%)</span>
                             </h4>
                             <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200"
@@ -263,10 +255,7 @@
                             <!-- Bobot Mentor Dinas -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <label class="font-bold text-slate-700 inline-flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                        <span>Bobot Mentor Lapangan Dinas</span>
-                                    </label>
+                                    <label class="font-bold text-slate-700">Bobot Mentor Lapangan Dinas</label>
                                     <span class="font-mono font-bold text-blue-700 text-sm" x-text="weightMentor + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
@@ -277,10 +266,7 @@
                             <!-- Bobot DPL Kampus -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <label class="font-bold text-slate-700 inline-flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                                        <span>Bobot Dosen Pembimbing (DPL)</span>
-                                    </label>
+                                    <label class="font-bold text-slate-700">Bobot Dosen Pembimbing (DPL)</label>
                                     <span class="font-mono font-bold text-purple-700 text-sm" x-text="weightLecturer + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
@@ -301,10 +287,7 @@
 
                     <!-- Notifikasi Banner Jika Skema 100% Dinas -->
                     <div x-show="scheme === 'mentor_only'" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-                        <p class="font-bold flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Informasi Mode Penilaian Penuh Instansi:</span>
-                        </p>
+                        <p class="font-bold">Informasi Mode Penilaian Penuh Instansi:</p>
                         <p class="text-amber-800 leading-relaxed">
                             Mahasiswa dari <strong>{{ $university->name }}</strong> dapat langsung mengisi logbook harian begitu diterima di dinas tanpa terhalang status DPL. Nilai akhir di sertifikat magang dihitung murni 100% dari Mentor Dinas.
                         </p>
@@ -314,9 +297,8 @@
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>Simpan Perubahan Profil & Kebijakan Kampus</span>
+                    <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                        Simpan Perubahan Profil & Kebijakan Kampus
                     </button>
                 </div>
 
