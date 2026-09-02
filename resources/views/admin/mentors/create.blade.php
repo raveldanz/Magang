@@ -71,9 +71,9 @@
                             Status Keaktifan
                         </label>
                         <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                            <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>🟢 Aktif (Tersedia Membimbing)</option>
-                            <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}>🟡 Cuti (Tidak Menerima Bimbingan)</option>
-                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>🔴 Non-Aktif</option>
+                            <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Aktif (Tersedia Membimbing)</option>
+                            <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}>Cuti (Tidak Menerima Bimbingan)</option>
+                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Non-Aktif</option>
                         </select>
                     </div>
 

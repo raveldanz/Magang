@@ -85,9 +85,9 @@
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Verifikasi Dosen:</label>
                         <select name="lecturer_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Dosen --</option>
-                            <option value="pending" {{ request('lecturer_status') === 'pending' ? 'selected' : '' }}>⏳ Menunggu (Pending)</option>
-                            <option value="approved" {{ request('lecturer_status') === 'approved' ? 'selected' : '' }}>✅ Disetujui (Approved)</option>
-                            <option value="rejected" {{ request('lecturer_status') === 'rejected' ? 'selected' : '' }}>❌ Minta Revisi (Rejected)</option>
+                            <option value="pending" {{ request('lecturer_status') === 'pending' ? 'selected' : '' }}>Menunggu (Pending)</option>
+                            <option value="approved" {{ request('lecturer_status') === 'approved' ? 'selected' : '' }}>Disetujui (Approved)</option>
+                            <option value="rejected" {{ request('lecturer_status') === 'rejected' ? 'selected' : '' }}>Minta Revisi (Rejected)</option>
                         </select>
                     </div>
 
@@ -96,9 +96,9 @@
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Mentor Dinas:</label>
                         <select name="mentor_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Mentor --</option>
-                            <option value="pending" {{ request('mentor_status') === 'pending' ? 'selected' : '' }}>⏳ Pending Mentor</option>
-                            <option value="approved" {{ request('mentor_status') === 'approved' ? 'selected' : '' }}>✅ Approved Mentor</option>
-                            <option value="rejected" {{ request('mentor_status') === 'rejected' ? 'selected' : '' }}>❌ Rejected Mentor</option>
+                            <option value="pending" {{ request('mentor_status') === 'pending' ? 'selected' : '' }}>Pending Mentor</option>
+                            <option value="approved" {{ request('mentor_status') === 'approved' ? 'selected' : '' }}>Approved Mentor</option>
+                            <option value="rejected" {{ request('mentor_status') === 'rejected' ? 'selected' : '' }}>Rejected Mentor</option>
                         </select>
                     </div>
 
@@ -182,16 +182,19 @@
                                     <!-- Status Mentor Dinas -->
                                     <td class="py-4 px-4 align-top text-center">
                                         @if ($log->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                                ✅ Disetujui
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-full">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                <span>Disetujui</span>
                                             </span>
                                         @elseif ($log->status === 'rejected')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
-                                                ❌ Ditolak
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold rounded-full">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                <span>Ditolak</span>
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
-                                                ⏳ Dalam Pengecekan
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold rounded-full">
+                                                <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                <span>Dalam Pengecekan</span>
                                             </span>
                                         @endif
                                     </td>
@@ -199,16 +202,19 @@
                                     <!-- Status Dosen Kampus -->
                                     <td class="py-4 px-4 align-top text-center">
                                         @if ($log->lecturer_status === 'approved')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                                                ✅ Disetujui
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-full">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                <span>Disetujui</span>
                                             </span>
                                         @elseif ($log->lecturer_status === 'rejected')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">
-                                                ❌ Ditolak
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold rounded-full">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                <span>Ditolak</span>
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
-                                                ⏳ Dalam Pengecekan
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold rounded-full">
+                                                <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                <span>Dalam Pengecekan</span>
                                             </span>
                                         @endif
 

@@ -95,7 +95,7 @@
                             <option value="">-- Semua Unit Penempatan --</option>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
-                                    🏢 {{ $unit->name }}
+                                    {{ $unit->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -103,9 +103,9 @@
                         <!-- Filter Status Logbook -->
                         <select name="status_filter" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
-                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>⏳ Memiliki Logbook Pending</option>
-                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>✅ Memiliki Logbook Approved</option>
-                            <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}>⚠️ Belum Mengisi Logbook</option>
+                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Memiliki Logbook Pending</option>
+                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Memiliki Logbook Approved</option>
+                            <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}>Belum Mengisi Logbook</option>
                         </select>
                     </div>
 
@@ -177,8 +177,9 @@
                             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:border-blue-300 transition">
                                 <div class="space-y-1.5 flex-1">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold font-mono text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md">
-                                            📅 {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
+                                        <span class="inline-flex items-center gap-1.5 text-xs font-bold font-mono text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md">
+                                            <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
                                         </span>
                                         <span class="px-2.5 py-0.5 text-xs font-bold rounded-full
                                             {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : '' }}
@@ -191,16 +192,18 @@
                                         {{ $log->activity }}
                                     </p>
                                     @if ($log->feedback)
-                                        <p class="text-[11px] text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md">
-                                            💬 <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
+                                        <p class="text-[11px] text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md inline-flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                                            <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
                                         </p>
                                     @endif
                                 </div>
 
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if ($log->attachment)
-                                        <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
-                                            📎 Lampiran
+                                        <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
+                                            <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                            Lampiran
                                         </a>
                                     @endif
                                     <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
@@ -263,7 +266,7 @@
                                     </td>
 
                                     <td class="py-4 px-4">
-                                        <div class="text-xs font-bold text-gray-800">🏢 {{ $unit->name ?? '-' }}</div>
+                                        <div class="text-xs font-bold text-gray-800">{{ $unit->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
@@ -272,7 +275,7 @@
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
                                             <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md" title="Total Kegiatan">
-                                                📝 {{ $totalStudentLogs }} Total
+                                                {{ $totalStudentLogs }} Total
                                             </span>
                                             @if ($approvedCount > 0)
                                                 <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-md" title="Approved">
@@ -281,7 +284,7 @@
                                             @endif
                                             @if ($pendingCount > 0)
                                                 <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-md" title="Pending">
-                                                    ⏳ {{ $pendingCount }}
+                                                    {{ $pendingCount }} Pending
                                                 </span>
                                             @endif
                                             @if ($rejectedCount > 0)

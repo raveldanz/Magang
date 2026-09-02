@@ -9,7 +9,7 @@
                     {{ __('Daftar Dosen Pembimbing Lapangan (DPL)') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    👨‍🏫 Portal Pengelolaan Dosen Pembimbing Kampus &bull; <strong>{{ $univName ?? 'Universitas' }}</strong>
+                    Portal Pengelolaan Dosen Pembimbing Kampus &bull; <strong>{{ $univName ?? 'Universitas' }}</strong>
                 </p>
             </div>
 
@@ -131,8 +131,9 @@
                                     </td>
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
-                                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" title="Mahasiswa Bimbingan Sedang Magang">
-                                                🟢 {{ $l->active_students_count }} Aktif
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" title="Mahasiswa Bimbingan Sedang Magang">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                <span>{{ $l->active_students_count }} Aktif</span>
                                             </span>
                                             <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200" title="Mahasiswa Telah Lulus Magang">
                                                 {{ $l->completed_students_count }} Lulus
@@ -187,7 +188,9 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="py-12 text-center text-gray-400">
-                                        <div class="text-4xl mb-2">👨‍🏫</div>
+                                        <div class="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                        </div>
                                         <p class="font-bold text-gray-600 text-sm">Belum ada data dosen pembimbing terdaftar.</p>
                                         <p class="text-xs text-gray-400 mt-1">Klik tombol <strong>"Tambah Dosen Baru"</strong> untuk mendaftarkan dosen pembimbing kampus.</p>
                                     </td>
@@ -225,15 +228,17 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-                            👨‍🏫
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Tambah Dosen Pembimbing Baru</h3>
                             <p class="text-xs text-gray-400">Daftarkan dosen pembimbing lapangan untuk {{ $univName }}</p>
                         </div>
                     </div>
-                    <button type="button" @click="showCreateModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
+                    <button type="button" @click="showCreateModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <form method="POST" action="{{ route('university.lecturers.store') }}" class="space-y-4">
@@ -298,15 +303,17 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-                            ✏️
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         </div>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Edit Data & Status Dosen Pembimbing</h3>
                             <p class="text-xs text-gray-400">Perbarui identitas atau status keaktifan dosen pembimbing</p>
                         </div>
                     </div>
-                    <button type="button" @click="showEditModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition cursor-pointer">✕</button>
+                    <button type="button" @click="showEditModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <form method="POST" :action="'/university/lecturers/' + editLecturer.id" class="space-y-4">
@@ -332,9 +339,9 @@
                             Status Keaktifan Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="status" x-model="editLecturer.status" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                            <option value="active">🟢 Aktif (Tersedia untuk Membimbing)</option>
-                            <option value="on_leave">🟡 Cuti (Sedang Cuti / Tidak Menerima Mahasiswa)</option>
-                            <option value="inactive">🔴 Non-Aktif (Tidak Menjadi Pembimbing)</option>
+                            <option value="active">Aktif (Tersedia untuk Membimbing)</option>
+                            <option value="on_leave">Cuti (Sedang Cuti / Tidak Menerima Mahasiswa)</option>
+                            <option value="inactive">Non-Aktif (Tidak Menjadi Pembimbing)</option>
                         </select>
                         <p class="text-[11px] text-gray-400 mt-1">Ubah ke "Cuti" atau "Non-Aktif" jika dosen sedang cuti atau tidak ditugaskan membimbing.</p>
                     </div>
