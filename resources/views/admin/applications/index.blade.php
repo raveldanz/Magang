@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Daftar Pengajuan Magang') }}
@@ -24,7 +24,7 @@
                                 <option value="">-- Semua Unit/Divisi --</option>
                                 @if (isset($groupedUnits) && $groupedUnits !== null)
                                     @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label="🏛️ {{ $agencyName }}">
+                                        <optgroup label=" {{ $agencyName }}">
                                             @foreach ($agencyUnits as $u)
                                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
                                                     {{ $u->name }}
@@ -94,7 +94,7 @@
                                         <div class="leading-snug">{{ $app->user->name }}</div>
                                         @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
                                             <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-blue-100 text-blue-800 border border-blue-200">
-                                                🎉 SIAP CETAK SERTIFIKAT
+                                                 SIAP CETAK SERTIFIKAT
                                             </span>
                                         @endif
                                     </td>
