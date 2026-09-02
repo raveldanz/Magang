@@ -31,7 +31,7 @@
                             <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_profile_id', $unit->agency_profile_id) == $agency->id ? 'selected' : '' }}>
-                                        🏛️ {{ $agency->agency_name }}
+                                        {{ $agency->agency_name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -42,7 +42,7 @@
                     @else
                         <div>
                             <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Instansi Induk</span>
-                            <p class="text-sm font-semibold text-gray-800 mt-1">🏛️ {{ $unit->agencyProfile->agency_name ?? '-' }}</p>
+                            <p class="text-sm font-semibold text-gray-800 mt-1">{{ $unit->agencyProfile->agency_name ?? '-' }}</p>
                         </div>
                     @endif
 

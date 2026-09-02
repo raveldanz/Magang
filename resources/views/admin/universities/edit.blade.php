@@ -99,7 +99,7 @@
                         
                         <div class="border-b border-slate-200 pb-2.5 flex items-center justify-between">
                             <h4 class="font-bold text-xs sm:text-sm text-gray-900 flex items-center gap-1.5">
-                                <span>⚙️</span>
+                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span>Skema Kebijakan Evaluasi & Pembobotan Kampus</span>
                             </h4>
                             <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">
@@ -113,7 +113,7 @@
                                    :class="scheme === 'dual_evaluation' ? 'border-blue-600 bg-white shadow-xs' : 'border-slate-200 hover:border-slate-300'">
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
-                                    <strong class="text-gray-900 block">⚖️ Kemitraan Dua Pihak (Standar)</strong>
+                                    <strong class="text-gray-900 block">Kemitraan Dua Pihak (Standar)</strong>
                                     <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & DPL. Logbook diverifikasi 2 arah.</span>
                                 </div>
                             </label>
@@ -122,7 +122,7 @@
                                    :class="scheme === 'mentor_only' ? 'border-blue-600 bg-white shadow-xs' : 'border-slate-200 hover:border-slate-300'">
                                 <input type="radio" name="evaluation_scheme" value="mentor_only" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
-                                    <strong class="text-gray-900 block">🏢 Penilaian Penuh Dinas (100%)</strong>
+                                    <strong class="text-gray-900 block">Penilaian Penuh Dinas (100%)</strong>
                                     <span class="text-gray-500 text-[11px] block mt-0.5">100% dinilai Dinas. Logbook cukup di-ACC Mentor.</span>
                                 </div>
                             </label>

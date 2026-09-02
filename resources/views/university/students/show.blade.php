@@ -9,7 +9,7 @@
                     {{ __('Detail Monitoring Mahasiswa Magang') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    🏛️ Pemantauan Aktivitas, Logbook, DPL, dan Nilai Mahasiswa &bull; <strong>{{ $student->name }}</strong>
+                    Pemantauan Aktivitas, Logbook, DPL, dan Nilai Mahasiswa &bull; <strong>{{ $student->name }}</strong>
                 </p>
             </div>
 
@@ -87,7 +87,7 @@
                 <!-- Card Instansi Penempatan -->
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
                     <div class="flex items-center gap-2 border-b border-gray-100 pb-3">
-                        <span class="text-xl">🏛️</span>
+                        <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         <div>
                             <h3 class="font-bold text-base text-gray-900 leading-tight">Penempatan Magang</h3>
                             <p class="text-xs text-gray-400">Instansi Pemerintah Kota Surabaya</p>
@@ -126,7 +126,7 @@
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">👨‍🏫</span>
+                            <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                             <div>
                                 <h3 class="font-bold text-base text-gray-900 leading-tight">Pembimbing</h3>
                                 <p class="text-xs text-gray-400">DPL Kampus & Mentor Dinas</p>
@@ -145,13 +145,15 @@
                         <div>
                             <span class="text-gray-400 block text-[11px]">Dosen Pembimbing Lapangan (DPL):</span>
                             @if ($dosen)
-                                <div class="font-bold text-gray-900 mt-0.5 flex items-center gap-1.5">
-                                    <span>👨‍🏫 {{ $dosen->name }}</span>
+                                <div class="font-bold text-gray-900 mt-0.5 inline-flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                    <span>{{ $dosen->name }}</span>
                                 </div>
-                                <span class="font-mono text-[11px] text-gray-500">{{ $dosen->email }}</span>
+                                <span class="font-mono text-[11px] text-gray-500 block">{{ $dosen->email }}</span>
                             @else
-                                <span class="inline-block mt-0.5 text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold text-xs">
-                                    ⚠️ Belum Ditentukan
+                                <span class="inline-flex items-center gap-1 mt-0.5 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-semibold text-xs">
+                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <span>Belum Ditentukan</span>
                                 </span>
                             @endif
                         </div>
@@ -159,8 +161,11 @@
                         <div class="border-t border-gray-50 pt-2">
                             <span class="text-gray-400 block text-[11px]">Mentor Lapangan Dinas:</span>
                             @if ($mentor)
-                                <div class="font-bold text-gray-900 mt-0.5">👔 {{ $mentor->name }}</div>
-                                <span class="font-mono text-[11px] text-gray-500">{{ $mentor->email }}</span>
+                                <div class="font-bold text-gray-900 mt-0.5 inline-flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span>{{ $mentor->name }}</span>
+                                </div>
+                                <span class="font-mono text-[11px] text-gray-500 block">{{ $mentor->email }}</span>
                             @else
                                 <span class="text-gray-400">Belum Diplot oleh Dinas</span>
                             @endif
@@ -175,7 +180,8 @@
                 <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
                     <div>
                         <h4 class="font-bold text-gray-900 text-base flex items-center gap-2">
-                            <span>📊 Rekapitulasi Nilai Magang</span>
+                            <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            <span>Rekapitulasi Nilai Magang</span>
                         </h4>
                         <p class="text-xs text-gray-500 mt-0.5">Evaluasi nilai praktis dari mentor dinas dan nilai akademik dari dosen pembimbing</p>
                     </div>
@@ -244,7 +250,8 @@
                 <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
                     <div>
                         <h4 class="font-bold text-gray-900 text-base flex items-center gap-2">
-                            <span>📑 Laporan Akhir Magang</span>
+                            <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Laporan Akhir Magang</span>
                         </h4>
                         <p class="text-xs text-gray-500 mt-0.5">Dokumen laporan karya magang mahasiswa yang telah diverifikasi</p>
                     </div>
@@ -372,15 +379,17 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-                            👨‍🏫
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Plotting Dosen Pembimbing Lapangan</h3>
                             <p class="text-xs text-gray-400">Untuk Mahasiswa: <strong>{{ $student->name }}</strong></p>
                         </div>
                     </div>
-                    <button type="button" @click="showAssignModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                    <button type="button" @click="showAssignModal = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <form method="POST" action="{{ route('university.students.assign_advisor', $application->id) }}" class="space-y-4">

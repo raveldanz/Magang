@@ -30,7 +30,7 @@
                             <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_profile_id', $defaultAgencyId) == $agency->id ? 'selected' : '' }}>
-                                        🏛️ {{ $agency->agency_name }}
+                                        {{ $agency->agency_name }}
                                     </option>
                                 @endforeach
                             </select>

@@ -24,7 +24,7 @@
                                 <option value="">-- Semua Unit/Divisi --</option>
                                 @if (isset($groupedUnits) && $groupedUnits !== null)
                                     @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label="🏛️ {{ $agencyName }}">
+                                        <optgroup label="{{ $agencyName }}">
                                             @foreach ($agencyUnits as $u)
                                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
                                                     {{ $u->name }}
@@ -93,8 +93,9 @@
                                     <td class="p-3 font-semibold text-gray-900">
                                         <div class="leading-snug">{{ $app->user->name }}</div>
                                         @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-blue-100 text-blue-800 border border-blue-200">
-                                                🎉 SIAP CETAK SERTIFIKAT
+                                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-blue-100 text-blue-800 border border-blue-200">
+                                                <svg class="w-3 h-3 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                                <span>SIAP CETAK SERTIFIKAT</span>
                                             </span>
                                         @endif
                                     </td>
