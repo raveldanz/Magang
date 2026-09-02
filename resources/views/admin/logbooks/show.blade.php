@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         @php
             $userRole = Auth::user()?->role;
@@ -163,15 +163,15 @@
                             <span class="text-xs font-bold text-gray-700">Mentor Lapangan Dinas</span>
                             @if ($logbook->status === 'approved')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                    ✅ Disetujui
+                                     Disetujui
                                 </span>
                             @elseif ($logbook->status === 'rejected')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                                    ❌ Ditolak
+                                     Ditolak
                                 </span>
                             @else
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                    ⏳ Menunggu Persetujuan
+                                     Menunggu Persetujuan
                                 </span>
                             @endif
                         </div>
@@ -194,15 +194,15 @@
                             <span class="text-xs font-bold text-gray-700">Dosen Pembimbing (DPL)</span>
                             @if ($logbook->lecturer_status === 'approved')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                    ✅ Disetujui
+                                     Disetujui
                                 </span>
                             @elseif ($logbook->lecturer_status === 'rejected')
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                                    ❌ Perlu Revisi
+                                     Perlu Revisi
                                 </span>
                             @else
                                 <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                    ⏳ Menunggu Persetujuan
+                                     Menunggu Persetujuan
                                 </span>
                             @endif
                         </div>

@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -25,7 +25,7 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <span></span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -34,7 +34,7 @@
             @if (session('error'))
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>⚠️</span>
+                        <span></span>
                         <span>{{ session('error') }}</span>
                     </div>
                 </div>
@@ -57,10 +57,10 @@
                             </div>
                         </div>
                         <button type="button" 
-                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span>✅</span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span>📋</span>', 3000);"
+                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span></span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span></span>', 3000);"
                                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer shrink-0">
                             <span>Salin Semua Kredensial</span>
-                            <span>📋</span>
+                            <span></span>
                         </button>
                     </div>
 
@@ -85,7 +85,7 @@
             @if(($unregisteredCount ?? 0) > 0)
                 <div class="p-5 bg-amber-50 border-l-4 border-amber-500 rounded-2xl shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <span class="text-2xl">🔔</span>
+                        <span class="text-2xl"></span>
                         <div>
                             <h4 class="font-bold text-amber-900 text-sm">Terdapat {{ $unregisteredCount }} Perguruan Tinggi Baru yang Belum Memiliki Akun Admin Kampus</h4>
                             <p class="text-xs text-amber-700 mt-0.5">Kampus terdaftar otomatis saat mahasiswa melakukan registrasi. Buatkan akun agar perwakilan kampus dapat login ke Portal Universitas.</p>
@@ -128,7 +128,7 @@
                                     @if($univ->logo && file_exists(public_path($univ->logo)))
                                         <img src="{{ asset($univ->logo) }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @else
-                                        <span class="text-2xl">🏛️</span>
+                                        <span class="text-2xl"></span>
                                     @endif
                                 </div>
                                 <div class="flex flex-col items-end gap-1.5 shrink-0">
@@ -137,11 +137,11 @@
                                     </span>
                                     @if($univ->universityAdmin)
                                         <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
-                                            ● Akun Aktif
+                                             Akun Aktif
                                         </span>
                                     @else
                                         <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold animate-pulse">
-                                            ⏳ Belum Ada Akun
+                                             Belum Ada Akun
                                         </span>
                                     @endif
                                 </div>
@@ -154,17 +154,17 @@
                                 <div class="mt-3 pt-3 border-t border-slate-50 space-y-1">
                                     @if($univ->pic_name)
                                         <div class="text-[11px] text-blue-700 font-semibold truncate">
-                                            👔 PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
+                                             PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
                                         </div>
                                     @else
                                         <div class="text-[11px] text-slate-400 italic">
-                                            👔 PIC belum diisi
+                                             PIC belum diisi
                                         </div>
                                     @endif
 
                                     @if($univ->universityAdmin)
                                         <div class="text-[11px] text-slate-600 truncate">
-                                            ✉️ <strong class="font-mono text-slate-700">{{ $univ->universityAdmin->email }}</strong>
+                                             <strong class="font-mono text-slate-700">{{ $univ->universityAdmin->email }}</strong>
                                         </div>
                                     @endif
                                 </div>
@@ -198,7 +198,7 @@
                                     <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="btn-action-form">
                                         @csrf
                                         <button type="submit" class="btn-action-create" title="Buatkan Akun Admin Kampus">
-                                            <span>⚡</span>
+                                            <span></span>
                                             <span>Buat Akun</span>
                                         </button>
                                     </form>
