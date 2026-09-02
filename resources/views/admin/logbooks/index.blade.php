@@ -192,7 +192,7 @@
                                     </p>
                                     @if ($log->feedback)
                                         <p class="text-[11px] text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md">
-                                             <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
+                                            <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
                                         </p>
                                     @endif
                                 </div>

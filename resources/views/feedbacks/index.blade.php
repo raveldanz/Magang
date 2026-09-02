@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>💬</span>
+                    
                     <span>Pusat Feedback & Tiket Kendala Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -175,9 +175,7 @@
                     </div>
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mx-auto">
-                            💬
-                        </div>
+                        
                         <h4 class="font-bold text-base text-gray-800">Belum Ada Tiket Masukan</h4>
                         <p class="text-xs text-gray-400">Semua masukan dan kendala pengguna yang masuk akan terdata di sini.</p>
                     </div>

@@ -1,6 +1,5 @@
 <nav x-data="{ mobileMenuOpen: false }" 
-     class="border-b border-slate-100 transition-all"
-     style="position: sticky !important; top: 0 !important; z-index: 1000 !important; background-color: #ffffff !important; opacity: 1 !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;">
+     class="border-b border-slate-100 bg-white transition-all shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             
@@ -33,7 +32,9 @@
                     if ($user) {
                         if ($user->agency_profile_id && $user->agencyProfile) {
                             $logoPath = $user->agencyProfile->logo ?? null;
-                            if ($logoPath && file_exists(public_path($logoPath))) {
+                            if ($logoPath && (file_exists(public_path('storage/' . $logoPath)) || file_exists(storage_path('app/public/' . $logoPath)))) {
+                                $navAvatarLogo = asset('storage/' . $logoPath);
+                            } elseif ($logoPath && file_exists(public_path($logoPath))) {
                                 $navAvatarLogo = asset($logoPath);
                             } else {
                                 $aName = strtolower($user->agencyProfile->agency_name ?? '');
@@ -48,7 +49,9 @@
                             }
                             $uName = '';
                             if ($univObj) {
-                                if ($univObj->logo && file_exists(public_path($univObj->logo))) {
+                                if ($univObj->logo && (file_exists(public_path('storage/' . $univObj->logo)) || file_exists(storage_path('app/public/' . $univObj->logo)))) {
+                                    $navAvatarLogo = asset('storage/' . $univObj->logo);
+                                } elseif ($univObj->logo && file_exists(public_path($univObj->logo))) {
                                     $navAvatarLogo = asset($univObj->logo);
                                 }
                                 $uName = strtolower($univObj->name ?? '');
@@ -70,15 +73,25 @@
                     }
                 @endphp
 
-                <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
-                    <img src="{{ asset('images/logos/surabaya.png') }}" 
-                         alt="Pemerintah Kota Surabaya" 
-                         class="h-10 sm:h-11 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
-                         style="height: 42px; width: auto; max-height: 46px; object-fit: contain;">
+                <a href="{{ $dashboardRoute }}" class="flex items-center gap-3.5 group">
+                    <img src="{{ asset('images/logo.png') }}" 
+                         alt="Logo Pemkot Surabaya" 
+                         class="h-11 w-auto object-contain transition group-hover:scale-105" 
+                         onerror="this.src='{{ asset('images/default-avatar.png') }}';">
+                    <div class="hidden sm:block">
+                        <div class="font-extrabold text-slate-800 text-sm leading-tight tracking-tight group-hover:text-blue-600 transition">
+                            SIP-MAGANG
+                        </div>
+                        <div class="text-[11px] font-semibold text-slate-500 leading-tight">
+                            Pemerintah Kota Surabaya
+                        </div>
+                    </div>
                 </a>
+            </div>
 
-                {{-- 2. DESKTOP NAVIGATION BAR (768px+ DIPASTIKAN SELALU MUNCUL HORIZONTAL) --}}
-                <div class="hidden md:flex items-center space-x-3 lg:space-x-5 xl:space-x-7 text-xs lg:text-sm font-medium">
+            {{-- 2. DESKTOP CENTER NAVIGATION LINKS --}}
+            <div class="hidden md:flex items-center gap-6 lg:gap-8">
+                <div class="flex items-center space-x-6 text-xs lg:text-sm font-semibold text-slate-600">
 
                     {{-- 2.1 SUPER ADMIN --}}
                     @if ($isSuperAdmin)
@@ -86,24 +99,21 @@
                            class="transition py-1 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Dashboard
                         </a>
-
                         <a href="{{ route('admin.applications.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Pengajuan
                         </a>
-
                         <a href="{{ route('admin.agencies.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.agencies.*') || request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Instansi
                         </a>
-
                         <a href="{{ route('admin.universities.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.universities.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Universitas
                         </a>
 
                         {{-- Dropdown Pengguna --}}
-                        <div x-data="{ open: false }" class="relative" @click.away="open = false">
+                        <div x-data="{ open: false }" class="relative" @click.outside="open = false">
                             <button @click="open = !open" 
                                     type="button" 
                                     class="flex items-center gap-1 py-1 transition focus:outline-none cursor-pointer {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -121,8 +131,7 @@
                                  x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                                  x-transition:leave-end="opacity-0 translate-y-1 scale-95"
                                  x-cloak
-                                 class="absolute left-0 top-full mt-3 w-64 rounded-2xl p-2 space-y-1 border border-slate-100"
-                                 style="background-color: #ffffff !important; opacity: 1 !important; z-index: 99999 !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15) !important; display: none;">
+                                 class="absolute left-0 top-full mt-3 w-64 rounded-2xl p-2 space-y-1 border border-slate-100 bg-white shadow-2xl z-50">
                                 
                                 <a href="{{ route('admin.users.index') }}" 
                                    class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition group {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600 font-bold' : '' }}">
@@ -251,7 +260,7 @@
                     $navHasUnreadDot = Auth::user() ? \App\Services\NotificationService::hasUnreadDot(Auth::user()) : false;
                     $navQuickNotifs = Auth::user() ? array_slice(\App\Services\NotificationService::getNotificationsForUser(Auth::user()), 0, 4) : [];
                 @endphp
-                <div x-data="{ notifOpen: false }" class="relative" @click.away="notifOpen = false">
+                <div x-data="{ notifOpen: false }" class="relative" @click.outside="notifOpen = false">
                     <button @click="notifOpen = !notifOpen" 
                             type="button"
                             title="Pemberitahuan Sistem"
@@ -272,8 +281,7 @@
                          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                          x-transition:leave-end="opacity-0 translate-y-2 scale-95"
                          x-cloak
-                         class="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-3xl p-3 space-y-2 border border-slate-100"
-                         style="background-color: #ffffff !important; opacity: 1 !important; z-index: 99999 !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; display: none;">
+                         class="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-3xl p-3 space-y-2 border border-slate-100 bg-white shadow-2xl z-50">
                         
                         <div class="flex items-center justify-between px-3 py-2 border-b border-slate-100">
                             <div class="flex items-center gap-2">
@@ -290,7 +298,7 @@
                         <div class="space-y-1.5 max-h-72 overflow-y-auto">
                             @forelse($navQuickNotifs as $qn)
                                 <a href="{{ $qn['action_url'] ?? route('notifications.index') }}" class="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition block">
-                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '🔔' }}</span>
+                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '' }}</span>
                                     <div class="space-y-0.5 overflow-hidden">
                                         <div class="text-xs font-bold text-slate-800 truncate">{{ $qn['title'] }}</div>
                                         <div class="text-[11px] text-slate-500 line-clamp-1">{{ $qn['message'] }}</div>
@@ -307,11 +315,11 @@
                         <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs px-2">
                             @if($isSuperAdmin || $isAdminDinas)
                                 <a href="{{ route('admin.feedbacks.index') }}" class="text-[11px] font-bold text-slate-600 hover:text-blue-600 flex items-center gap-1">
-                                    <span>💬</span> <span>Feedback</span>
+                                     <span>Feedback</span>
                                 </a>
                             @else
                                 <a href="{{ route('feedbacks.create') }}" class="text-[11px] font-bold text-slate-600 hover:text-blue-600 flex items-center gap-1">
-                                    <span>💬</span> <span>Kirim Laporan Kendala</span>
+                                     <span>Kirim Laporan Kendala</span>
                                 </a>
                             @endif
                             <a href="{{ route('notifications.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
@@ -322,7 +330,7 @@
                 </div>
 
                 {{-- User Profile Dropdown --}}
-                <div x-data="{ profileOpen: false }" class="relative" @click.away="profileOpen = false">
+                <div x-data="{ profileOpen: false }" class="relative" @click.outside="profileOpen = false">
                     <button @click="profileOpen = !profileOpen" 
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
                         <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
@@ -348,8 +356,7 @@
                          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                          x-transition:leave-end="opacity-0 translate-y-2 scale-95"
                          x-cloak
-                         class="absolute right-0 top-full mt-2 w-72 rounded-3xl p-3 space-y-1 border border-slate-100"
-                         style="background-color: #ffffff !important; opacity: 1 !important; z-index: 99999 !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; display: none;">
+                         class="absolute right-0 top-full mt-2 w-72 rounded-3xl p-3 space-y-1 border border-slate-100 bg-white shadow-2xl z-50">
                         
                         {{-- User Header Info --}}
                         <div class="px-3 py-2.5 bg-slate-50 rounded-2xl mb-2 flex items-center justify-between" style="background-color: #f8fafc !important;">
@@ -493,9 +500,9 @@
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
          x-cloak
-         @click.away="mobileMenuOpen = false"
-         class="md:hidden absolute top-full left-0 right-0 w-full px-4 py-5 space-y-3 border-b border-slate-200"
-         style="background-color: #ffffff !important; opacity: 1 !important; z-index: 99999 !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; display: none;">
+         @click.outside="mobileMenuOpen = false"
+         :class="{ 'hidden pointer-events-none': !mobileMenuOpen }"
+         class="md:hidden absolute top-full left-0 right-0 w-full px-4 py-5 space-y-3 border-b border-slate-200 bg-white shadow-2xl z-50">
 
         {{-- Info Profil Pengguna di Mobile --}}
         <div class="p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between" style="background-color: #f8fafc !important;">

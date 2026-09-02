@@ -47,10 +47,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_agencies'] ?? 0 }}
-                                    Dinas</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_agencies'] ?? 0 }} Dinas</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Instansi</div>
@@ -76,10 +73,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_users'] ?? 0 }}
-                                    User</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_users'] ?? 0 }} User</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Pengguna</div>
@@ -91,9 +85,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">Aktivitas</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">Aktivitas</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Log Audit</div>
@@ -105,10 +97,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_pending'] ?? 0 }}
-                                    Antrean</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_pending'] ?? 0 }} Antrean</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Verifikasi
@@ -121,10 +110,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_units'] ?? 0 }}
-                                    Unit</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_units'] ?? 0 }} Unit</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Divisi & Kuota
@@ -137,10 +123,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_mentors'] ?? 0 }}
-                                    Mentor</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_mentors'] ?? 0 }} Mentor</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Mentor Dinas
@@ -153,10 +136,7 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-2xl group-hover:scale-110 transition-transform"></span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_completed'] ?? 0 }}
-                                    Lulus</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_completed'] ?? 0 }} Lulus</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Sertifikat
@@ -175,7 +155,6 @@
             <div
                 class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-5 rounded-2xl bg-white shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl"></span>
                     <div>
                         <h4 class="font-bold text-slate-900 text-sm">
                             Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar
@@ -188,8 +167,26 @@
                         </p>
                     </div>
                 </div>
-                <a href="{{ route('admin.universities.index') }}"
-                    class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    Kelola Kampus & Buat Akun &rarr;
+                </a>
+            </div>
+        @endif
+
+        {{-- Alert Notifikasi Kampus Baru Tanpa Akun Portal (Super Admin) --}}
+        @if($isSuperAdmin && isset($pendingUniversities) && $pendingUniversities->count() > 0)
+            <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-5 rounded-2xl bg-white shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">
+                            Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar Otomatis
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-0.5">
+                            Mahasiswa mendaftar dari kampus baru: <strong>{{ $pendingUniversities->pluck('name')->implode(', ') }}</strong>. Silakan lengkapi profil kampus dan buatkan akun login PIC/Admin Kampus.
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
                     Kelola Kampus & Buat Akun &rarr;
                 </a>
             </div>

@@ -90,9 +90,7 @@
                     </div>
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mx-auto">
-                            💬
-                        </div>
+                        
                         <h4 class="font-bold text-base text-gray-800">Belum Ada Masukan yang Dikirimkan</h4>
                         <p class="text-xs text-gray-400">Jika Anda menemukan kendala atau memiliki saran, silakan klik tombol kirim masukan di atas.</p>
                     </div>
