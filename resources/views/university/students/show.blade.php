@@ -9,7 +9,7 @@
                     {{ __('Detail Monitoring Mahasiswa Magang') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    🏛️ Pemantauan Aktivitas, Logbook, DPL, dan Nilai Mahasiswa &bull; <strong>{{ $student->name }}</strong>
+                    Pemantauan Aktivitas, Logbook, DPL, dan Nilai Mahasiswa &bull; <strong>{{ $student->name }}</strong>
                 </p>
             </div>
 
@@ -87,7 +87,6 @@
                 <!-- Card Instansi Penempatan -->
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
                     <div class="flex items-center gap-2 border-b border-gray-100 pb-3">
-                        <span class="text-xl">🏛️</span>
                         <div>
                             <h3 class="font-bold text-base text-gray-900 leading-tight">Penempatan Magang</h3>
                             <p class="text-xs text-gray-400">Instansi Pemerintah Kota Surabaya</p>
@@ -126,7 +125,6 @@
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-4">
                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">👨‍🏫</span>
                             <div>
                                 <h3 class="font-bold text-base text-gray-900 leading-tight">Pembimbing</h3>
                                 <p class="text-xs text-gray-400">DPL Kampus & Mentor Dinas</p>
@@ -146,12 +144,11 @@
                             <span class="text-gray-400 block text-[11px]">Dosen Pembimbing Lapangan (DPL):</span>
                             @if ($dosen)
                                 <div class="font-bold text-gray-900 mt-0.5 flex items-center gap-1.5">
-                                    <span>👨‍🏫 {{ $dosen->name }}</span>
                                 </div>
                                 <span class="font-mono text-[11px] text-gray-500">{{ $dosen->email }}</span>
                             @else
                                 <span class="inline-block mt-0.5 text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold text-xs">
-                                    ⚠️ Belum Ditentukan
+                                    Belum Ditentukan
                                 </span>
                             @endif
                         </div>
@@ -159,7 +156,7 @@
                         <div class="border-t border-gray-50 pt-2">
                             <span class="text-gray-400 block text-[11px]">Mentor Lapangan Dinas:</span>
                             @if ($mentor)
-                                <div class="font-bold text-gray-900 mt-0.5">👔 {{ $mentor->name }}</div>
+                                <div class="font-bold text-gray-900 mt-0.5">{{ $mentor->name }}</div>
                                 <span class="font-mono text-[11px] text-gray-500">{{ $mentor->email }}</span>
                             @else
                                 <span class="text-gray-400">Belum Diplot oleh Dinas</span>
@@ -175,7 +172,7 @@
                 <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
                     <div>
                         <h4 class="font-bold text-gray-900 text-base flex items-center gap-2">
-                            <span>📊 Rekapitulasi Nilai Magang</span>
+                            <span>Rekapitulasi Nilai Magang</span>
                         </h4>
                         <p class="text-xs text-gray-500 mt-0.5">Evaluasi nilai praktis dari mentor dinas dan nilai akademik dari dosen pembimbing</p>
                     </div>
@@ -357,9 +354,7 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-                            👨‍🏫
-                        </div>
+                        
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Plotting Dosen Pembimbing Lapangan</h3>
                             <p class="text-xs text-gray-400">Untuk Mahasiswa: <strong>{{ $student->name }}</strong></p>
