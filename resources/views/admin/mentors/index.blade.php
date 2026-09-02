@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -26,7 +26,7 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <span></span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -35,7 +35,7 @@
             @if (session('error'))
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>⚠️</span>
+                        <span></span>
                         <span>{{ session('error') }}</span>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="py-12 text-center text-gray-400">
-                                        <div class="text-4xl mb-2">👔</div>
+                                        <div class="text-4xl mb-2"></div>
                                         <p class="font-bold text-gray-600 text-sm">Belum ada data mentor lapangan terdaftar.</p>
                                         <p class="text-xs text-gray-400 mt-1">Klik tombol <strong>"Tambah Mentor Baru"</strong> untuk mendaftarkan mentor lapangan.</p>
                                         <a href="{{ route('admin.mentors.create') }}" 
