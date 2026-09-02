@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.universities.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition">
@@ -99,7 +99,7 @@
                         
                         <div class="border-b border-slate-200 pb-2.5 flex items-center justify-between">
                             <h4 class="font-bold text-xs sm:text-sm text-gray-900 flex items-center gap-1.5">
-                                <span>⚙️</span>
+                                <span></span>
                                 <span>Skema Kebijakan Evaluasi & Pembobotan Kampus</span>
                             </h4>
                             <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">
@@ -113,7 +113,7 @@
                                    :class="scheme === 'dual_evaluation' ? 'border-blue-600 bg-white shadow-xs' : 'border-slate-200 hover:border-slate-300'">
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
-                                    <strong class="text-gray-900 block">⚖️ Kemitraan Dua Pihak (Standar)</strong>
+                                    <strong class="text-gray-900 block"> Kemitraan Dua Pihak (Standar)</strong>
                                     <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & DPL. Logbook diverifikasi 2 arah.</span>
                                 </div>
                             </label>
@@ -122,7 +122,7 @@
                                    :class="scheme === 'mentor_only' ? 'border-blue-600 bg-white shadow-xs' : 'border-slate-200 hover:border-slate-300'">
                                 <input type="radio" name="evaluation_scheme" value="mentor_only" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
-                                    <strong class="text-gray-900 block">🏢 Penilaian Penuh Dinas (100%)</strong>
+                                    <strong class="text-gray-900 block"> Penilaian Penuh Dinas (100%)</strong>
                                     <span class="text-gray-500 text-[11px] block mt-0.5">100% dinilai Dinas. Logbook cukup di-ACC Mentor.</span>
                                 </div>
                             </label>

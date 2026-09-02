@@ -1,9 +1,9 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>🏆</span>
+                    <span></span>
                     <span>{{ __('Manajemen Sertifikat Kelulusan') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -51,12 +51,12 @@
                                             $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2) : 0;
                                         @endphp
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            ⭐ {{ $rataRata > 0 ? $rataRata : '-' }}
+                                             {{ $rataRata > 0 ? $rataRata : '-' }}
                                         </span>
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                                            🖨️ Cetak E-Sertifikat
+                                             Cetak E-Sertifikat
                                         </a>
                                     </td>
                                 </tr>

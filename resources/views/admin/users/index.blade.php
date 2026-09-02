@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -27,7 +27,7 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <span></span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
             @if (session('error'))
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>⚠️</span>
+                        <span></span>
                         <span>{{ session('error') }}</span>
                     </div>
                 </div>
@@ -209,7 +209,7 @@
                                                 <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" onsubmit="return confirm('Masuk sebagai {{ $u->name }}? Anda dapat kembali ke Super Admin kapan saja.');" class="btn-action-form">
                                                     @csrf
                                                     <button type="submit" title="Masuk / Login sebagai pengguna ini" class="btn-action-login">
-                                                        <span>⚡</span>
+                                                        <span></span>
                                                         <span>Login As</span>
                                                     </button>
                                                 </form>
