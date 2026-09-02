@@ -154,12 +154,18 @@
                             </p>
 
                             <div class="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                                <span>👤 <strong>{{ $fb->sender_name }}</strong> ({{ strtoupper($fb->sender_role) }})</span>
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span><strong>{{ $fb->sender_name }}</strong> ({{ strtoupper($fb->sender_role) }})</span>
+                                </span>
                                 @if($fb->targetAgency)
-                                    <span>Dinas: {{ $fb->targetAgency->agency_name }}</span>
+                                    <span>• Dinas: {{ $fb->targetAgency->agency_name }}</span>
                                 @endif
                                 @if($fb->attachment)
-                                    <span class="text-blue-600 font-semibold">📎 Ada Lampiran</span>
+                                    <span class="text-blue-600 font-semibold inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                        Ada Lampiran
+                                    </span>
                                 @endif
                             </div>
                         </div>
