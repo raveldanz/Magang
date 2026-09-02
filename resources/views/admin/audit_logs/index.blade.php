@@ -1,9 +1,9 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>📜</span>
+                    <span></span>
                     <span>Audit Trail & Log Riwayat Aktivitas Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -89,23 +89,23 @@
                                     <td class="py-3.5 px-4 whitespace-nowrap">
                                         @if(str_contains($log->action, 'IMPERSONATE'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-300">
-                                                ⚡ {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'DELETE'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                                🗑️ {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'CREATE'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                ➕ {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'EVALUATION'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                📝 {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @else
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                🔄 {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @endif
                                     </td>

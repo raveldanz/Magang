@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -95,7 +95,7 @@
                             <option value="">-- Semua Unit Penempatan --</option>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
-                                    🏢 {{ $unit->name }}
+                                     {{ $unit->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -103,9 +103,9 @@
                         <!-- Filter Status Logbook -->
                         <select name="status_filter" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
-                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>⏳ Memiliki Logbook Pending</option>
-                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>✅ Memiliki Logbook Approved</option>
-                            <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}>⚠️ Belum Mengisi Logbook</option>
+                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}> Memiliki Logbook Pending</option>
+                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}> Memiliki Logbook Approved</option>
+                            <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}> Belum Mengisi Logbook</option>
                         </select>
                     </div>
 
@@ -178,7 +178,7 @@
                                 <div class="space-y-1.5 flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold font-mono text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md">
-                                            📅 {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
+                                             {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
                                         </span>
                                         <span class="px-2.5 py-0.5 text-xs font-bold rounded-full
                                             {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : '' }}
@@ -200,7 +200,7 @@
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if ($log->attachment)
                                         <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
-                                            📎 Lampiran
+                                             Lampiran
                                         </a>
                                     @endif
                                     <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
@@ -263,7 +263,7 @@
                                     </td>
 
                                     <td class="py-4 px-4">
-                                        <div class="text-xs font-bold text-gray-800">🏢 {{ $unit->name ?? '-' }}</div>
+                                        <div class="text-xs font-bold text-gray-800"> {{ $unit->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
@@ -272,21 +272,21 @@
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
                                             <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md" title="Total Kegiatan">
-                                                📝 {{ $totalStudentLogs }} Total
+                                                 {{ $totalStudentLogs }} Total
                                             </span>
                                             @if ($approvedCount > 0)
                                                 <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-md" title="Approved">
-                                                    ✓ {{ $approvedCount }}
+                                                     {{ $approvedCount }}
                                                 </span>
                                             @endif
                                             @if ($pendingCount > 0)
                                                 <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-md" title="Pending">
-                                                    ⏳ {{ $pendingCount }}
+                                                     {{ $pendingCount }}
                                                 </span>
                                             @endif
                                             @if ($rejectedCount > 0)
                                                 <span class="px-2 py-0.5 bg-rose-50 text-rose-700 text-[11px] font-bold rounded-md" title="Rejected">
-                                                    ✗ {{ $rejectedCount }}
+                                                     {{ $rejectedCount }}
                                                 </span>
                                             @endif
                                         </div>
