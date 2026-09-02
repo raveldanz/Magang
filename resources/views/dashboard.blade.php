@@ -355,7 +355,7 @@
 
                             <!-- Instruksi Mahasiswa -->
                             <div class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-xs text-amber-900 flex items-start gap-3 leading-relaxed">
-                                <span class="text-base shrink-0">📌</span>
+                                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <div>
                                     <strong class="font-bold">Instruksi Mahasiswa:</strong>
                                     <p class="mt-1 text-amber-800">Harap simpan dan teruskan kredensial di atas kepada <strong>Dosen Pembimbing Lapangan (DPL)</strong> Anda agar beliau dapat login ke Portal Dosen untuk memonitor logbook mingguan dan memberikan penilaian akhir magang.</p>
