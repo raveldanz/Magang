@@ -273,9 +273,6 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div
-                            class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0">
-                            </div>
                         <div class="min-w-0">
                             @if($isSuperAdmin)
                                 <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Penempatan Instansi Dinas
