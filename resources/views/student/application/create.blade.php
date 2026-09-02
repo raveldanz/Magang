@@ -66,13 +66,13 @@
 
                         <!-- Bagian A: Pilihan Unit Kerja -->
                         <div class="space-y-1.5">
-                            <x-input-label for="unit_id" value="PILIH INSTANSI & UNIT KERJA / DIVISI MAGANG" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                            <x-input-label for="unit_id" value="Pilih Instansi & Unit Kerja / Divisi Magang *" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                             @php
                                 $totalAvailable = $units->filter(fn($unit) => $unit->remaining_quota > 0)->count();
                             @endphp
 
                             <select id="unit_id" name="unit_id"
-                                class="block w-full border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 rounded-xl shadow-xs text-xs sm:text-sm p-3"
+                                class="block w-full border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 rounded-xl shadow-xs text-xs sm:text-sm p-3 font-medium"
                                 {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
                                 
                                 @if ($totalAvailable === 0)
@@ -108,13 +108,14 @@
                             
                             <!-- Tanggal Mulai -->
                             <div class="space-y-1.5">
-                                <x-input-label for="start_date" value="TANGGAL MULAI MAGANG" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-input-label for="start_date" value="Tanggal Mulai Magang *" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                 <x-text-input id="start_date" 
                                               name="start_date" 
                                               type="date" 
                                               min="{{ date('Y-m-d') }}" 
                                               x-model="startDate"
                                               class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                              :value="old('start_date')"
                                               required />
                                 <p class="text-[11px] text-slate-400">Pilih tanggal awal mulai kegiatan magang.</p>
                                 <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
@@ -122,13 +123,14 @@
 
                             <!-- Tanggal Selesai -->
                             <div class="space-y-1.5">
-                                <x-input-label for="end_date" value="TANGGAL SELESAI MAGANG" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-input-label for="end_date" value="Tanggal Selesai Magang *" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                 <x-text-input id="end_date" 
                                               name="end_date" 
                                               type="date" 
                                               x-bind:min="startDate || today" 
                                               x-model="endDate"
                                               class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                              :value="old('end_date')"
                                               required />
                                 <p class="text-[11px] text-slate-400">Tanggal selesai otomatis terkunci setelah tanggal mulai.</p>
                                 <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
@@ -140,40 +142,46 @@
                         <!-- Bagian C: Upload Dokumen Persyaratan -->
                         <div class="space-y-4">
                             <div>
-                                <h4 class="font-bold text-sm text-slate-800">Upload Dokumen Persyaratan Magang</h4>
-                                <p class="text-xs text-slate-500 mt-0.5">Seluruh dokumen wajib berformat PDF (KTM diperbolehkan JPG/PNG) dengan ukuran maksimum 2MB per file</p>
+                                <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                                    <span>Upload Dokumen Persyaratan Magang</span>
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-0.5">Unggah berkas persyaratan wajib (format PDF / ID Card, maksimum 2MB per file)</p>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <!-- Dokumen 1 -->
-                                <div class="space-y-1.5">
-                                    <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus" class="text-xs font-semibold text-slate-700" />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- 1. Surat Pengantar / Proposal Kampus -->
+                                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-blue-200 transition">
+                                    <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus *" class="text-xs font-bold text-slate-700" />
                                     <input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
-                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                        class="mt-2 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-white focus:ring-2 focus:ring-blue-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                    <span class="text-[10px] text-slate-400 mt-1 block">Format: PDF (Maks. 2MB)</span>
                                     <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
                                 </div>
 
-                                <!-- Dokumen 2 -->
-                                <div class="space-y-1.5">
-                                    <x-input-label for="cv" value="2. Curriculum Vitae (CV)" class="text-xs font-semibold text-slate-700" />
+                                <!-- 2. Curriculum Vitae (CV) -->
+                                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-blue-200 transition">
+                                    <x-input-label for="cv" value="2. Curriculum Vitae (CV) *" class="text-xs font-bold text-slate-700" />
                                     <input id="cv" name="cv" type="file" accept=".pdf"
-                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                        class="mt-2 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-white focus:ring-2 focus:ring-blue-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                    <span class="text-[10px] text-slate-400 mt-1 block">Format: PDF (Maks. 2MB)</span>
                                     <x-input-error :messages="$errors->get('cv')" class="mt-1" />
                                 </div>
 
-                                <!-- Dokumen 3 -->
-                                <div class="space-y-1.5">
-                                    <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir" class="text-xs font-semibold text-slate-700" />
+                                <!-- 3. Transkrip Nilai Akademik Terakhir -->
+                                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-blue-200 transition">
+                                    <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir *" class="text-xs font-bold text-slate-700" />
                                     <input id="transkrip" name="transkrip" type="file" accept=".pdf"
-                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                        class="mt-2 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-white focus:ring-2 focus:ring-blue-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                    <span class="text-[10px] text-slate-400 mt-1 block">Format: PDF (Maks. 2MB)</span>
                                     <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
                                 </div>
 
-                                <!-- Dokumen 4 -->
-                                <div class="space-y-1.5">
-                                    <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM / ID Card)" class="text-xs font-semibold text-slate-700" />
+                                <!-- 4. Kartu Tanda Mahasiswa (KTM / ID Card) -->
+                                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-blue-200 transition">
+                                    <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM / ID Card) *" class="text-xs font-bold text-slate-700" />
                                     <input id="id_card" name="id_card" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                                        class="block w-full text-xs border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:bg-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                        class="mt-2 block w-full text-xs border border-slate-200 rounded-xl p-2 bg-white focus:ring-2 focus:ring-blue-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" required />
+                                    <span class="text-[10px] text-slate-400 mt-1 block">Format: PDF, JPG, PNG (Maks. 2MB)</span>
                                     <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
                                 </div>
                             </div>
@@ -181,7 +189,7 @@
 
                         <!-- Action Buttons -->
                         <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
-                            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer">
+                            <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer">
                                 {{ __('Kirim Pengajuan Magang') }}
                             </button>
 
@@ -228,7 +236,7 @@
                                     <td class="py-4 px-5 whitespace-nowrap">
                                         @php $st = strtolower($app->status ?? ''); @endphp
                                         <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-full border
-                                            {{ $st === 'accepted' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
+                                            {{ in_array($st, ['accepted', 'completed']) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
                                             {{ $st === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}
                                             {{ $st === 'verified' ? 'bg-blue-50 text-blue-700 border-blue-200' : '' }}
                                             {{ $st === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' : '' }}">
@@ -245,7 +253,7 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-5 whitespace-nowrap">
-                                        @if ($app->status === 'accepted')
+                                        @if (in_array($app->status, ['accepted', 'completed']))
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>

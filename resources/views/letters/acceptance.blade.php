@@ -396,7 +396,7 @@
         </div>
         <div class="btn-group">
             <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="btn btn-secondary">
-                &larr; Kembali
+                 Kembali
             </a>
             <button onclick="window.print()" class="btn btn-primary">
                 Cetak / Simpan PDF

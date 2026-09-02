@@ -33,7 +33,7 @@
                 <div>
                     <div class="flex items-center gap-2 mb-1">
                         <span class="px-2.5 py-0.5 text-xs font-black bg-blue-400/30 border border-blue-300/40 rounded-full tracking-wider uppercase">
-                            🏛️ Akun Resmi Perguruan Tinggi
+                        Akun Resmi Perguruan Tinggi
                         </span>
                         @if($university?->code)
                             <span class="px-2 py-0.5 text-xs font-mono font-bold bg-white/20 rounded-md">
@@ -64,11 +64,7 @@
                         <p class="text-2xl font-black text-gray-800 mt-1">{{ $stats['total_students'] }}</p>
                         <p class="text-[11px] text-gray-500 mt-0.5">Mahasiswa mendaftar</p>
                     </div>
-                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                    </div>
+                    
                 </div>
 
                 <!-- Card 2: Diterima / Aktif -->
@@ -78,11 +74,7 @@
                         <p class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_accepted'] }}</p>
                         <p class="text-[11px] text-gray-500 mt-0.5">Sedang menjalani magang</p>
                     </div>
-                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
+                    
                 </div>
 
                 <!-- Card 3: Lulus & Lengkap -->
@@ -92,11 +84,7 @@
                         <p class="text-2xl font-black text-teal-700 mt-1">{{ $stats['total_completed'] }}</p>
                         <p class="text-[11px] text-gray-500 mt-0.5">Laporan & nilai tuntas</p>
                     </div>
-                    <div class="p-3 bg-teal-50 text-teal-700 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
-                    </div>
+                    
                 </div>
 
                 <!-- Card 4: Menunggu Seleksi -->
@@ -106,11 +94,7 @@
                         <p class="text-2xl font-black text-amber-600 mt-1">{{ $stats['total_pending'] }}</p>
                         <p class="text-[11px] text-gray-500 mt-0.5">Dalam proses verifikasi</p>
                     </div>
-                    <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
+                    
                 </div>
 
             </div>
@@ -120,7 +104,7 @@
                 <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                     <div>
                         <h4 class="font-bold text-gray-900 text-base flex items-center gap-2">
-                            <span>🏢 Sebaran Penempatan Mahasiswa di Instansi Pemkot Surabaya</span>
+                            <span>Sebaran Penempatan Mahasiswa di Instansi Pemkot Surabaya</span>
                         </h4>
                         <p class="text-xs text-gray-500 mt-0.5">Distribusi mahasiswa magang asal kampus pada masing-masing dinas pemerintah kota</p>
                     </div>
@@ -192,21 +176,21 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span>📥 Export Data Magang (Excel/CSV)</span>
+                        <span>Export Data Magang (Excel/CSV)</span>
                     </a>
                 </div>
 
-                <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
-                    <table class="min-w-full divide-y divide-slate-200 text-left text-xs sm:text-sm">
-                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-[11px] font-bold tracking-wider">
+                <div class="overflow-x-auto w-full">
+                    <table class="min-w-full divide-y divide-slate-100 text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
                             <tr>
-                                <th class="px-6 py-3.5">Mahasiswa</th>
-                                <th class="px-6 py-3.5">Jurusan / NIM</th>
-                                <th class="px-6 py-3.5">Instansi & Unit Kerja</th>
-                                <th class="px-6 py-3.5">Status Magang</th>
-                                <th class="px-6 py-3.5">Dosen DPL</th>
-                                <th class="px-6 py-3.5">Mentor Dinas</th>
-                                <th class="px-6 py-3.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider min-w-[160px]">Aksi</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Mahasiswa</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap text-center">Status Magang</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Dosen DPL</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap">Mentor Dinas</th>
+                                <th class="px-5 py-3.5 whitespace-nowrap text-center min-w-[100px]">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -232,19 +216,19 @@
                                     }
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         <div class="font-bold text-gray-900">{{ $student->name }}</div>
                                         <div class="text-xs text-gray-500 font-mono">{{ $student->email }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         <div class="font-medium text-gray-800">{{ $student->studentProfile->jurusan ?? '-' }}</div>
                                         <div class="text-xs text-gray-500 font-mono">NIM: {{ $student->studentProfile->nim ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         <div class="font-bold text-blue-900">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
                                         <div class="text-xs text-gray-600">{{ $app->unit->name ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4 text-center">
                                         @if($status === 'SUBMITTED' || $status === 'PENDING')
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
                                                 Menunggu Verifikasi
@@ -260,7 +244,6 @@
                                             </span>
                                         @elseif($status === 'COMPLETED')
                                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
-                                               
                                                 <span>Lulus</span>
                                             </span>
                                         @elseif($status === 'REJECTED')
@@ -271,9 +254,9 @@
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ $status }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         @if ($dosen)
-                                            <div class="font-semibold text-gray-900 text-xs">👨‍🏫 {{ $dosen->name }}</div>
+                                            <div class="font-semibold text-gray-900 text-xs">{{ $dosen->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono">{{ $dosen->email }}</div>
                                             <button type="button" 
                                                     @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '{{ $dosen->id }}' }"
@@ -293,17 +276,17 @@
                                             </button>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-5 py-4">
                                         @if ($mentor)
-                                            <div class="font-semibold text-gray-900 text-xs">👔 {{ $mentor->name }}</div>
+                                            <div class="font-semibold text-gray-900 text-xs">{{ $mentor->name }}</div>
                                             <div class="text-[11px] text-gray-500 font-mono">{{ $mentor->email }}</div>
                                         @else
                                             <span class="text-xs text-gray-400">Belum Diplot</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <td class="px-5 py-4 whitespace-nowrap text-center">
                                         <a href="{{ route('university.students.show', $app->id) }}"
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold transition shadow-2xs">
+                                           class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold transition shadow-2xs">
                                             <span>Detail</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                         </a>
@@ -338,7 +321,7 @@
              x-transition:leave-end="opacity-0">
             
             <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto"
-                 @click.away="assignModal.show = false"
+                 @click.outside="assignModal.show = false"
                  x-transition:enter="ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
@@ -348,9 +331,6 @@
                 
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
-                            👨‍🏫
-                        </div>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Plotting Dosen Pembimbing Lapangan</h3>
                             <p class="text-xs text-gray-400">Mahasiswa: <strong x-text="assignModal.studentName"></strong></p>
@@ -370,7 +350,7 @@
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
                             @foreach ($availableDosens as $d)
                                 <option value="{{ $d->id }}">
-                                    👨‍🏫 {{ $d->name }} ({{ $d->email }})
+                                    {{ $d->name }} ({{ $d->email }})
                                 </option>
                             @endforeach
                         </select>
