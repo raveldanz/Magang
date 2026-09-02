@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Admin\MentorController as AdminMentorController;
+use App\Http\Controllers\Admin\UnitController as AdminUnitController;
 use App\Http\Controllers\Admin\UniversityController as AdminUniversityController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\FeedbackController;
@@ -44,7 +45,7 @@ Route::get('/', function () {
 });
 
 // Dashboard Utama Berdasarkan Role
-Route::get('/dashboard', [StudentDashboardController:: class, 'index'])
+Route::get('/dashboard', [StudentDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -76,8 +77,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Route Impersonation
+    // Route Impersonation (Login As & Kembali ke Super Admin)
     Route::post('/admin/impersonate/leave', [ImpersonationController::class, 'leave'])->name('admin.impersonate.leave');
+    Route::post('/admin/impersonate/{userId}', [ImpersonationController::class, 'impersonate'])->name('admin.impersonate');
 
     // Notifikasi & Pemberitahuan Sistem
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -128,9 +130,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:admin,super_admin'])->group(function () {
         // Executive Dashboard
         Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-
-        // Impersonation ("Login As")
-        Route::post('/admin/impersonate/{userId}', [ImpersonationController::class, 'impersonate'])->name('admin.impersonate');
 
         // Verifikasi Pengajuan Magang
         Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');

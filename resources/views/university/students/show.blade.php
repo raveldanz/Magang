@@ -179,41 +179,26 @@
                 </div>
 
                 @php
-                    $mentorVal = $student->placement?->evaluation?->nilai_pembimbing ?? $evaluation?->nilai_pembimbing;
-                    $dosenVal = $student->placement?->evaluation?->nilai_akademik ?? $evaluation?->nilai_akademik;
-                    $finalVal = null;
-                    if ($mentorVal > 0 && $dosenVal > 0) {
-                        $finalVal = ($mentorVal * 0.4) + ($dosenVal * 0.6);
-                    } elseif ($dosenVal > 0) {
-                        $finalVal = $dosenVal;
-                    }
-
-                    $gradeLetter = '-';
-                    if ($finalVal !== null) {
-                        if ($finalVal >= 85) $gradeLetter = 'A';
-                        elseif ($finalVal >= 80) $gradeLetter = 'A-';
-                        elseif ($finalVal >= 75) $gradeLetter = 'B+';
-                        elseif ($finalVal >= 70) $gradeLetter = 'B';
-                        elseif ($finalVal >= 65) $gradeLetter = 'B-';
-                        elseif ($finalVal >= 60) $gradeLetter = 'C+';
-                        elseif ($finalVal >= 55) $gradeLetter = 'C';
-                        else $gradeLetter = 'D';
-                    }
+                    $evalObj = $student->placement?->evaluation ?? $evaluation ?? null;
+                    $mentorVal = $evalObj?->nilai_pembimbing;
+                    $dosenVal = $evalObj?->nilai_dosen_calculated ?? ($evalObj?->nilai_akademik);
+                    $finalVal = $evalObj?->nilai_akhir;
+                    $gradeLetter = $evalObj?->grade_calculated ?? ($evalObj?->grade ?? '-');
                 @endphp
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div class="p-4 rounded-xl bg-slate-50 border border-gray-100 text-center">
-                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Mentor Dinas (40%)</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Mentor Dinas</p>
                         <p class="text-2xl font-black text-gray-800 mt-1">
-                            {{ $mentorVal ? number_format($mentorVal, 2) : ($student->placement?->evaluation?->nilai_pembimbing ?? '-') }}
+                            {{ $mentorVal ? number_format($mentorVal, 2) : '-' }}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-0.5">Kedisiplinan & Kinerja Lapangan</p>
                     </div>
 
                     <div class="p-4 rounded-xl bg-slate-50 border border-gray-100 text-center">
-                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Dosen DPL (60%)</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Nilai Dosen DPL</p>
                         <p class="text-2xl font-black text-blue-600 mt-1">
-                            {{ $dosenVal ? number_format($dosenVal, 2) : ($student->placement?->evaluation?->nilai_dosen ?? '-') }}
+                            {{ $dosenVal ? number_format($dosenVal, 2) : '-' }}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-0.5">Logbook & Laporan Akhir</p>
                     </div>
@@ -221,7 +206,7 @@
                     <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-100 text-center">
                         <p class="text-xs text-blue-900 font-bold uppercase tracking-wider">Nilai Akhir Terbobot</p>
                         <p class="text-2xl font-black text-blue-700 mt-1">
-                            {{ $finalVal !== null ? number_format($finalVal, 2) : ($student->placement?->evaluation?->final_score ?? '-') }}
+                            {{ $finalVal !== null && $finalVal > 0 ? number_format($finalVal, 2) : '-' }}
                         </p>
                         <p class="text-[10px] text-blue-600 mt-0.5">Akumulasi Gabungan</p>
                     </div>
@@ -359,7 +344,7 @@
              x-transition:leave-end="opacity-0">
             
             <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 relative my-auto max-h-[90vh] overflow-y-auto"
-                 @click.away="showAssignModal = false"
+                 @click.outside="showAssignModal = false"
                  x-transition:enter="ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"

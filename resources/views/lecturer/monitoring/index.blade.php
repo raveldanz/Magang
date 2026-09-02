@@ -10,10 +10,14 @@
                 </p>
             </div>
 
-            <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs">
-                 Kembali ke Dashboard
+            <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Kembali ke Dashboard</span>
             </a>
         </div>
+    </x-slot>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -102,8 +106,24 @@
                                     $totalLog = $placement->logbooks->count();
                                     $approvedLog = $placement->logbooks->where('lecturer_status', 'approved')->count();
                                     $finalReport = $placement->finalreport;
-                                    $hasEval = ($placement->evaluation?->nilai_akademik ?? 0) > 0;
+                                    $eval = $placement->evaluation;
+                                    $hasEval = ($eval?->nilai_akademik ?? 0) > 0 || ($eval?->nilai_dosen ?? 0) > 0;
                                     $lifecycle = $placement->application?->lifecycle_status ?? 'ACCEPTED';
+
+                                    $univ = $eval?->getUniversity();
+                                    if (!$univ && $student) {
+                                        if ($student->university_id) {
+                                            $univ = \App\Models\University::find($student->university_id);
+                                        } else {
+                                            $name = $student->university ?? ($profile?->universitas ?? null);
+                                            if ($name) {
+                                                $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                                            }
+                                        }
+                                    }
+                                    $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                                    $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
+                                    $nilaiDpl = $eval ? ($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0)) : 0;
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors">
                                     <td class="py-4 px-4">
@@ -146,34 +166,57 @@
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
-                                        @if ($hasEval)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-xs">
-                                                 {{ $placement->evaluation?->nilai_akademik ?? '-' }}
-                                            </span>
+                                        @if ($isMentorOnly)
+                                            @if ($nilaiDinas > 0)
+                                                <div class="inline-flex flex-col items-center">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-300 shadow-2xs" title="100% Nilai Pembimbing Lapangan Dinas">
+                                                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <span>Sudah Dinilai Dinas ({{ $nilaiDinas }})</span>
+                                                    </span>
+                                                    <span class="text-[9px] text-slate-400 font-medium mt-0.5">100% Nilai Dinas</span>
+                                                </div>
+                                            @else
+                                                <div class="inline-flex flex-col items-center">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full border border-amber-200">
+                                                        <span>Menunggu Nilai Dinas</span>
+                                                    </span>
+                                                    <span class="text-[9px] text-slate-400 font-medium mt-0.5">100% Nilai Dinas</span>
+                                                </div>
+                                            @endif
                                         @else
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">
-                                                Belum Dinilai
-                                            </span>
+                                            @if ($hasEval)
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full border border-emerald-300 shadow-xs">
+                                                     {{ $nilaiDpl }}/100
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-md border border-amber-200">
+                                                    Belum Dinilai
+                                                </span>
+                                            @endif
                                         @endif
                                     </td>
 
                                     <td class="py-4 px-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200">
-                                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shadow-xs border border-blue-200">
+                                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                                 <span>Detail</span>
                                             </a>
-                                            <a href="{{ route('lecturer.evaluations.create', $placement->id) }}" 
-                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                                <span>{{ $hasEval ? 'Edit Nilai' : 'Input Nilai' }}</span>
-                                            </a>
+                                            @if (!$isMentorOnly)
+                                                <a href="{{ route('lecturer.evaluations.create', $placement->id) }}" 
+                                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                    <span>{{ $hasEval ? 'Edit Nilai' : 'Input Nilai' }}</span>
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
