@@ -5,9 +5,8 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>
-                <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <svg class="w-6 h-6 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                    <span>Kirim Laporan Kendala, Masukan, atau Pertanyaan</span>
+                <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
+                    Kirim Laporan Kendala, Masukan, atau Pertanyaan
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
                     Laporkan kendala/bug sistem, ajukan saran perbaikan, atau sampaikan pertanyaan ke Super Admin / Instansi Dinas / Universitas
@@ -164,12 +163,11 @@
                 <!-- Submit Button -->
                 <div class="flex items-center justify-between">
                     <a href="{{ route('feedbacks.my') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800">
-                        &larr; Lihat Riwayat Laporan Saya
+                         Lihat Riwayat Laporan Saya
                     </a>
 
                     <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md transition cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                        <span>Kirim Laporan Sekarang</span>
+                         <span>Kirim Laporan Sekarang</span>
                     </button>
                 </div>
             </form>

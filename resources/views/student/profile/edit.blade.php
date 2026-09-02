@@ -161,7 +161,7 @@
                     <!-- Tombol Aksi -->
                     <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
                         <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                            &larr; Kembali ke Dashboard
+                             Kembali ke Dashboard
                         </a>
 
                         <x-primary-button class="text-xs px-5 py-2.5">

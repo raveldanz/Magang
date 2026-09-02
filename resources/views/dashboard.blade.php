@@ -67,7 +67,7 @@
                                     Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
                                 </h2>
                                 <p class="text-xs sm:text-sm max-w-2xl leading-relaxed" style="color: #d1fae5 !important;">
-                                    Seluruh kewajiban logbook harian, laporan akhir ilmiah, dan evaluasi instansi dinas (40%) serta bimbingan akademik DPL kampus (60%) telah lengkap. E-Sertifikat resmi kelulusan telah diterbitkan.
+                                    Seluruh kewajiban logbook harian, laporan akhir ilmiah, dan evaluasi instansi dinas serta bimbingan akademik DPL kampus telah lengkap. E-Sertifikat resmi kelulusan telah diterbitkan.
                                 </p>
                             </div>
                         </div>
@@ -87,16 +87,16 @@
                         @php
                             $nilaiDinas = $eval->nilai_pembimbing ?? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1);
                             $nilaiDpl = $eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0);
-                            $nilaiAkhir = $eval->nilai_akhir ?? round(($nilaiDinas * 0.4) + ($nilaiDpl * 0.6), 2);
+                            $nilaiAkhir = $eval->nilai_akhir;
                             $grade = $eval->grade_calculated ?? ($eval->grade ?? ($nilaiAkhir >= 85 ? 'A' : ($nilaiAkhir >= 70 ? 'B' : 'C')));
                         @endphp
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t text-center" style="border-top-color: rgba(255, 255, 255, 0.2) !important;">
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
-                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai Dinas (40%)</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai Dinas</span>
                                 <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $nilaiDinas }}/100</p>
                             </div>
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
-                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai DPL (60%)</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai DPL</span>
                                 <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">{{ $nilaiDpl }}/100</p>
                             </div>
                             <div class="p-3.5 rounded-2xl" style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">

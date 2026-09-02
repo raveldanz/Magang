@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -6,7 +6,7 @@
                     <span>Portal Dosen Pembimbing Lapangan (DPL Kampus)</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Monitoring bimbingan akademik, verifikasi logbook, review laporan akhir, dan evaluasi 60% mahasiswa magang
+                    Monitoring bimbingan akademik, verifikasi logbook, review laporan akhir, dan evaluasi akademik mahasiswa magang
                 </p>
             </div>
             
@@ -44,14 +44,14 @@
                     </div>
                 </div>
 
-                <!-- Evaluasi Selesai (60%) -->
+                <!-- Evaluasi Selesai -->
                 <div class="bg-white p-5 rounded-2xl shadow-xs flex flex-col justify-between">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">Sudah Dinilai</span>
                     </div>
                     <div class="mt-4">
                         <span class="text-2xl font-black text-gray-900">{{ $stats['total_evaluated'] }}</span>
-                        <span class="text-[11px] text-gray-500 block mt-0.5">Nilai DPL 60% tersimpan</span>
+                        <span class="text-[11px] text-gray-500 block mt-0.5">Nilai DPL tersimpan</span>
                     </div>
                 </div>
 
@@ -134,7 +134,7 @@
                                 <th class="py-3.5 px-4">Pembimbing Dinas</th>
                                 <th class="py-3.5 px-4 text-center">Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Nilai DPL (60%)</th>
+                                <th class="py-3.5 px-4 text-center">Nilai DPL</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -150,6 +150,20 @@
                                     $hasEval = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0);
                                     $finalReport = $p->finalreport;
                                     $logbooksCount = $p->logbooks->count();
+
+                                    $univ = $eval?->getUniversity();
+                                    if (!$univ && $student) {
+                                        if ($student->university_id) {
+                                            $univ = \App\Models\University::find($student->university_id);
+                                        } else {
+                                            $name = $student->university ?? ($profile?->universitas ?? null);
+                                            if ($name) {
+                                                $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                                            }
+                                        }
+                                    }
+                                    $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                                    $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
                                     
@@ -170,8 +184,8 @@
                                     <td class="py-4 px-4">
                                         <div class="font-semibold text-gray-800 text-xs">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
                                         <div class="text-[10px] text-emerald-600 font-semibold">
-                                            @if(($eval?->nilai_pembimbing ?? 0) > 0)
-                                                Skor Dinas: {{ $eval->nilai_pembimbing }}/100 (40%)
+                                            @if($nilaiDinas > 0)
+                                                Skor Dinas: {{ $nilaiDinas }}/100
                                             @else
                                                 <span class="text-gray-400">Belum dinilai dinas</span>
                                             @endif
@@ -208,17 +222,38 @@
 
                                     <!-- Nilai DPL Status -->
                                     <td class="py-4 px-4 text-center whitespace-nowrap">
-                                        @if($hasEval)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                                {{ $eval->nilai_dosen_calculated }}/100
-                                                @if($eval->grade)
-                                                    ({{ $eval->grade }})
-                                                @endif
-                                            </span>
+                                        @if($isMentorOnly)
+                                            @if($nilaiDinas > 0)
+                                                <div class="inline-flex flex-col items-center">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs" title="Aturan Kampus: 100% Pembimbing Dinas">
+                                                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <span>Sudah Dinilai Dinas ({{ $nilaiDinas }})</span>
+                                                    </span>
+                                                    <span class="text-[9px] text-slate-400 font-medium mt-0.5">100% Nilai Dinas</span>
+                                                </div>
+                                            @else
+                                                <div class="inline-flex flex-col items-center">
+                                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                        Menunggu Nilai Dinas
+                                                    </span>
+                                                    <span class="text-[9px] text-slate-400 font-medium mt-0.5">100% Nilai Dinas</span>
+                                                </div>
+                                            @endif
                                         @else
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                                Belum Dinilai
-                                            </span>
+                                            @if($hasEval)
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                    {{ $eval->nilai_dosen_calculated }}/100
+                                                    @if($eval->grade)
+                                                        ({{ $eval->grade }})
+                                                    @endif
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                    Belum Dinilai
+                                                </span>
+                                            @endif
                                         @endif
                                     </td>
 
@@ -227,7 +262,6 @@
                                         <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
                                                 <span>Detail</span>
-
                                             </a>
                                         </div>
                                     </td>

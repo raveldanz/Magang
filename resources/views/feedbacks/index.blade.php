@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <svg class="w-6 h-6 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    
                     <span>Pusat Feedback & Tiket Kendala Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -181,9 +181,7 @@
                     </div>
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                        </div>
+                        
                         <h4 class="font-bold text-base text-gray-800">Belum Ada Tiket Masukan</h4>
                         <p class="text-xs text-gray-400">Semua masukan dan kendala pengguna yang masuk akan terdata di sini.</p>
                     </div>
