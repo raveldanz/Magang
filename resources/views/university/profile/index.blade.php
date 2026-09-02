@@ -3,13 +3,10 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
                     {{ __('Pengaturan Profil & Kop Surat Kampus') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    🏛️ Kelola data identitas resmi, alamat, pejabat penandatangan, dan logo untuk Kop Surat Tugas Magang
+                    Kelola data identitas resmi, alamat, pejabat penandatangan, dan logo untuk Kop Surat Tugas Magang
                 </p>
             </div>
 
@@ -134,7 +131,6 @@
                 <!-- Card 2: Pejabat Penandatangan Surat Tugas (PIC / Rektor / Dekan) -->
                 <div class="bg-white rounded-2xl shadow-xs border border-gray-200 p-6 space-y-5">
                     <div class="border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <span class="text-xl">✍️</span>
                         <div>
                             <h3 class="font-bold text-base text-gray-900">Pejabat Resmi Penandatangan Surat Tugas</h3>
                             <p class="text-xs text-gray-400">Nama dan jabatan pejabat yang otomatis tertera di bagian tanda tangan Surat Pengantar Magang</p>
@@ -181,7 +177,6 @@
                     
                     <div class="border-b border-gray-100 pb-3 flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">⚙️</span>
                             <div>
                                 <h3 class="font-bold text-base text-gray-900">Skema Kebijakan Evaluasi & Pengawasan Magang</h3>
                                 <p class="text-xs text-gray-400">Atur porsi pembobotan nilai akhir dan mekanisme persetujuan logbook mahasiswa magang</p>
@@ -202,7 +197,7 @@
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-1 text-blue-600 focus:ring-blue-500">
                                 <div>
                                     <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-xs sm:text-sm text-gray-900">⚖️ Kemitraan Terpadu (Dua Pihak)</span>
+                                        <span class="font-bold text-xs sm:text-sm text-gray-900">Kemitraan Terpadu (Dua Pihak)</span>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Standar</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
@@ -223,7 +218,7 @@
                                 <input type="radio" name="evaluation_scheme" value="mentor_only" x-model="scheme" class="mt-1 text-blue-600 focus:ring-blue-500">
                                 <div>
                                     <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-xs sm:text-sm text-gray-900">🏢 Penilaian Mandiri Instansi (100% Dinas)</span>
+                                        <span class="font-bold text-xs sm:text-sm text-gray-900">Penilaian Mandiri Instansi (100% Dinas)</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
                                         Kampus mempercayakan 100% penilaian dan pengawasan kepada <strong>Mentor Lapangan Dinas</strong>. Dosen tidak diwajibkan menilai.
@@ -247,7 +242,6 @@
                         
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-xs sm:text-sm text-gray-800 flex items-center gap-1.5">
-                                <span>📊</span>
                                 <span>Persentase Pembobotan Nilai Akhir Mahasiswa (Total Wajib 100%)</span>
                             </h4>
                             <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200"
@@ -261,7 +255,7 @@
                             <!-- Bobot Mentor Dinas -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <label class="font-bold text-slate-700">🏢 Bobot Mentor Lapangan Dinas</label>
+                                    <label class="font-bold text-slate-700">Bobot Mentor Lapangan Dinas</label>
                                     <span class="font-mono font-bold text-blue-700 text-sm" x-text="weightMentor + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
@@ -272,7 +266,7 @@
                             <!-- Bobot DPL Kampus -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <label class="font-bold text-slate-700">👨‍🏫 Bobot Dosen Pembimbing (DPL)</label>
+                                    <label class="font-bold text-slate-700">Bobot Dosen Pembimbing (DPL)</label>
                                     <span class="font-mono font-bold text-purple-700 text-sm" x-text="weightLecturer + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
@@ -293,7 +287,7 @@
 
                     <!-- Notifikasi Banner Jika Skema 100% Dinas -->
                     <div x-show="scheme === 'mentor_only'" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-                        <p class="font-bold">ℹ️ Informasi Mode Penilaian Penuh Instansi:</p>
+                        <p class="font-bold">Informasi Mode Penilaian Penuh Instansi:</p>
                         <p class="text-amber-800 leading-relaxed">
                             Mahasiswa dari <strong>{{ $university->name }}</strong> dapat langsung mengisi logbook harian begitu diterima di dinas tanpa terhalang status DPL. Nilai akhir di sertifikat magang dihitung murni 100% dari Mentor Dinas.
                         </p>
@@ -304,7 +298,7 @@
                 <!-- Submit Button -->
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-                        💾 Simpan Perubahan Profil & Kebijakan Kampus
+                        Simpan Perubahan Profil & Kebijakan Kampus
                     </button>
                 </div>
 

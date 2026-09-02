@@ -36,7 +36,7 @@
 
             <div>
                 <a href="{{ $backUrl }}" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs">
-                    &larr; Kembali
+                     Kembali
                 </a>
             </div>
         </div>
