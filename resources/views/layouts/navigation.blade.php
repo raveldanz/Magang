@@ -73,25 +73,15 @@
                     }
                 @endphp
 
-                <a href="{{ $dashboardRoute }}" class="flex items-center gap-3.5 group">
-                    <img src="{{ asset('images/logo.png') }}" 
-                         alt="Logo Pemkot Surabaya" 
-                         class="h-11 w-auto object-contain transition group-hover:scale-105" 
-                         onerror="this.src='{{ asset('images/default-avatar.png') }}';">
-                    <div class="hidden sm:block">
-                        <div class="font-extrabold text-slate-800 text-sm leading-tight tracking-tight group-hover:text-blue-600 transition">
-                            SIP-MAGANG
-                        </div>
-                        <div class="text-[11px] font-semibold text-slate-500 leading-tight">
-                            Pemerintah Kota Surabaya
-                        </div>
-                    </div>
+                <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
+                    <img src="{{ asset('images/logos/surabaya.png') }}" 
+                         alt="Pemerintah Kota Surabaya" 
+                         class="h-10 sm:h-11 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
+                         style="height: 42px; width: auto; max-height: 46px; object-fit: contain;">
                 </a>
-            </div>
 
-            {{-- 2. DESKTOP CENTER NAVIGATION LINKS --}}
-            <div class="hidden md:flex items-center gap-6 lg:gap-8">
-                <div class="flex items-center space-x-6 text-xs lg:text-sm font-semibold text-slate-600">
+                {{-- 2. DESKTOP NAVIGATION BAR (768px+ DIPASTIKAN SELALU MUNCUL HORIZONTAL) --}}
+                <div class="hidden md:flex items-center space-x-3 lg:space-x-5 xl:space-x-7 text-xs lg:text-sm font-semibold text-slate-600">
 
                     {{-- 2.1 SUPER ADMIN --}}
                     @if ($isSuperAdmin)
