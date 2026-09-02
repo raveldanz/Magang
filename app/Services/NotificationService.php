@@ -397,8 +397,8 @@ class NotificationService
                     'title' => "Portal Mitra MBKM: {$univ->name}",
                     'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen DPL aktif pada program magang Pemkot Surabaya.",
                     'time' => 'Terhubung',
-                    'action_url' => route('university.dashboard'),
-                    'action_label' => 'Buka Portal Kampus',
+                    'action_url' => route('university.profile.index'),
+                    'action_label' => 'Buka Profil Kampus',
                     'is_action_required' => false,
                 ];
             }
