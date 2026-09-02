@@ -6,7 +6,7 @@
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
-                    💬 Tiket Masukan #{{ $feedback->id }}
+                    Tiket Masukan #{{ $feedback->id }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
                     Detail laporan kendala, masukan pengguna, dan tanggapan resmi dari tim pengelola

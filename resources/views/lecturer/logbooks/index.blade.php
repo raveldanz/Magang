@@ -15,7 +15,7 @@
                     Mahasiswa Bimbingan
                 </a>
                 <a href="{{ route('lecturer.dashboard') }}" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
-                    &larr; Dashboard Dosen
+                     Dashboard Dosen
                 </a>
             </div>
         </div>

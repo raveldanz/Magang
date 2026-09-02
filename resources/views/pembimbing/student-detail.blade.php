@@ -5,7 +5,7 @@
                 Logbook: {{ $placement->application->user->name }}
             </h2>
             <a href="{{ route('pembimbing.dashboard') }}" class="px-4 py-2 bg-gray-200 text-gray-800 text-xs font-semibold rounded-md">
-                &larr; Kembali
+                 Kembali
             </a>
         </div>
     </x-slot>
