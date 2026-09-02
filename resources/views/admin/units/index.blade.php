@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -84,7 +84,7 @@
                                 <option value="">-- Semua Instansi --</option>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
-                                        {{ $agency->agency_name }}
+                                         {{ $agency->agency_name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -149,7 +149,7 @@
                                     <!-- Instansi Induk -->
                                     <td class="py-4 px-4">
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">
-                                            {{ $unit->agencyProfile->agency_name ?? '-' }}
+                                             {{ $unit->agencyProfile->agency_name ?? '-' }}
                                         </span>
                                     </td>
 
@@ -359,7 +359,7 @@
                 toast.className = 'fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 z-50 transition-all duration-300 transform translate-y-10 opacity-0';
                 document.body.appendChild(toast);
             }
-            toast.innerHTML = `<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> <span>${message}</span>`;
+            toast.innerHTML = `<span></span> <span>${message}</span>`;
             toast.classList.remove('translate-y-10', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-10', 'opacity-0');

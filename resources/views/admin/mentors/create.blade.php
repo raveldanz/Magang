@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.mentors.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition">
@@ -71,9 +71,9 @@
                             Status Keaktifan
                         </label>
                         <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                            <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Aktif (Tersedia Membimbing)</option>
-                            <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}>Cuti (Tidak Menerima Bimbingan)</option>
-                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Non-Aktif</option>
+                            <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}> Aktif (Tersedia Membimbing)</option>
+                            <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}> Cuti (Tidak Menerima Bimbingan)</option>
+                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}> Non-Aktif</option>
                         </select>
                     </div>
 

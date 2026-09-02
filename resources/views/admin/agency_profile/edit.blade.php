@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-slate-800 leading-tight">
             {{ __('Pengaturan Profil Instansi & TTD Surat Balasan') }}
@@ -10,7 +10,7 @@
 
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 rounded-xl shadow-xs text-sm font-bold flex items-center gap-2">
-                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span></span>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
@@ -18,7 +18,7 @@
             @if ($errors->any())
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-800 rounded-xl shadow-xs text-sm">
                     <p class="font-bold flex items-center gap-2">
-                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span></span>
                         <span>Gagal Menyimpan Perubahan:</span>
                     </p>
                     <ul class="mt-1 list-disc list-inside text-xs">
@@ -34,9 +34,8 @@
                 <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
                     @foreach($allAgencies as $agency)
                         <a href="{{ route('admin.agency_profile.edit', ['agency_id' => $agency->id]) }}"
-                           class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition {{ ($agencyProfile->id ?? $profile->id) === $agency->id ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            <span>{{ $agency->agency_name }}</span>
+                           class="px-4 py-2 text-xs font-bold rounded-xl transition {{ ($agencyProfile->id ?? $profile->id) === $agency->id ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200' }}">
+                             {{ $agency->agency_name }}
                         </a>
                     @endforeach
                 </div>
@@ -50,7 +49,7 @@
                 <!-- 1. KARTU INFORMASI INSTANSI & KOP SURAT -->
                 <div class="bg-white shadow-sm rounded-3xl p-6 sm:p-8 border border-slate-100 space-y-4">
                     <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center space-x-2">
-                        <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <span></span>
                         <span>Identitas Pemerintah & Instansi Kerja</span>
                     </h3>
 
@@ -123,7 +122,7 @@
                 <!-- 2. KARTU PEJABAT PENANDATANGAN SURAT -->
                 <div class="bg-white shadow-sm rounded-3xl p-6 sm:p-8 border border-slate-100 space-y-4">
                     <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center space-x-2">
-                        <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <span></span>
                         <span>Pejabat Penandatangan Surat Balasan (TTD Official)</span>
                     </h3>
 
@@ -148,9 +147,8 @@
                     </div>
 
                     <div class="mt-6 flex justify-end">
-                        <x-primary-button class="px-6 py-2.5 inline-flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <span>Simpan Perubahan Profil Instansi</span>
+                        <x-primary-button class="px-6 py-2.5">
+                             Simpan Perubahan Profil Instansi
                         </x-primary-button>
                     </div>
                 </div>
