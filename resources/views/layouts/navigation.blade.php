@@ -298,7 +298,7 @@
                         <div class="space-y-1.5 max-h-72 overflow-y-auto">
                             @forelse($navQuickNotifs as $qn)
                                 <a href="{{ $qn['action_url'] ?? route('notifications.index') }}" class="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition block">
-                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '🔔' }}</span>
+                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '' }}</span>
                                     <div class="space-y-0.5 overflow-hidden">
                                         <div class="text-xs font-bold text-slate-800 truncate">{{ $qn['title'] }}</div>
                                         <div class="text-[11px] text-slate-500 line-clamp-1">{{ $qn['message'] }}</div>
@@ -315,11 +315,11 @@
                         <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs px-2">
                             @if($isSuperAdmin || $isAdminDinas)
                                 <a href="{{ route('admin.feedbacks.index') }}" class="text-[11px] font-bold text-slate-600 hover:text-blue-600 flex items-center gap-1">
-                                    <span>💬</span> <span>Feedback</span>
+                                     <span>Feedback</span>
                                 </a>
                             @else
                                 <a href="{{ route('feedbacks.create') }}" class="text-[11px] font-bold text-slate-600 hover:text-blue-600 flex items-center gap-1">
-                                    <span>💬</span> <span>Kirim Laporan Kendala</span>
+                                     <span>Kirim Laporan Kendala</span>
                                 </a>
                             @endif
                             <a href="{{ route('notifications.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
