@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-slate-800 leading-tight">
             {{ __('Pengaturan Profil Instansi & TTD Surat Balasan') }}
@@ -10,7 +10,7 @@
 
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 rounded-xl shadow-xs text-sm font-bold flex items-center gap-2">
-                    <span>✅</span>
+                    <span></span>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
@@ -18,7 +18,7 @@
             @if ($errors->any())
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-800 rounded-xl shadow-xs text-sm">
                     <p class="font-bold flex items-center gap-2">
-                        <span>⚠️</span>
+                        <span></span>
                         <span>Gagal Menyimpan Perubahan:</span>
                     </p>
                     <ul class="mt-1 list-disc list-inside text-xs">
@@ -35,7 +35,7 @@
                     @foreach($allAgencies as $agency)
                         <a href="{{ route('admin.agency_profile.edit', ['agency_id' => $agency->id]) }}"
                            class="px-4 py-2 text-xs font-bold rounded-xl transition {{ ($agencyProfile->id ?? $profile->id) === $agency->id ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200' }}">
-                            🏛️ {{ $agency->agency_name }}
+                             {{ $agency->agency_name }}
                         </a>
                     @endforeach
                 </div>
@@ -49,7 +49,7 @@
                 <!-- 1. KARTU INFORMASI INSTANSI & KOP SURAT -->
                 <div class="bg-white shadow-sm rounded-3xl p-6 sm:p-8 border border-slate-100 space-y-4">
                     <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center space-x-2">
-                        <span>🏛️</span>
+                        <span></span>
                         <span>Identitas Pemerintah & Instansi Kerja</span>
                     </h3>
 
@@ -122,7 +122,7 @@
                 <!-- 2. KARTU PEJABAT PENANDATANGAN SURAT -->
                 <div class="bg-white shadow-sm rounded-3xl p-6 sm:p-8 border border-slate-100 space-y-4">
                     <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center space-x-2">
-                        <span>✍️</span>
+                        <span></span>
                         <span>Pejabat Penandatangan Surat Balasan (TTD Official)</span>
                     </h3>
 
@@ -148,7 +148,7 @@
 
                     <div class="mt-6 flex justify-end">
                         <x-primary-button class="px-6 py-2.5">
-                            💾 Simpan Perubahan Profil Instansi
+                             Simpan Perubahan Profil Instansi
                         </x-primary-button>
                     </div>
                 </div>

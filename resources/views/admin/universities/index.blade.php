@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -55,10 +55,10 @@
                             </div>
                         </div>
                         <button type="button" 
-                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span>✅</span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span>📋</span>', 3000);"
+                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span></span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span></span>', 3000);"
                                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer shrink-0">
                             <span>Salin Semua Kredensial</span>
-                            <span>📋</span>
+                            <span></span>
                         </button>
                     </div>
 
@@ -125,7 +125,7 @@
                                     @if($univ->logo && file_exists(public_path($univ->logo)))
                                         <img src="{{ asset($univ->logo) }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @else
-                                        <span class="text-2xl">🏛️</span>
+                                        <span class="text-2xl"></span>
                                     @endif
                                 </div>
                                 <div class="flex flex-col items-end gap-1.5 shrink-0">
