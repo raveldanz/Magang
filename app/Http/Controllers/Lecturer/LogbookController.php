@@ -70,6 +70,51 @@ class LogbookController extends Controller
         // Urutkan dari tanggal logbook terbaru
         $logbooks = $logbooksQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->paginate(15)->withQueryString();
 
+        // 3. Kelompokkan menjadi Paket Rangkuman Berkala (7 Hari / Weekly Bundles)
+        $allSupervisedLogs = Logbook::with([
+            'placement.application.user.studentProfile',
+            'placement.application.unit.agencyProfile',
+            'placement.mentor',
+        ])
+        ->whereIn('placement_id', $placementIds)
+        ->orderBy('date', 'desc')
+        ->get();
+
+        $weeklyBundles = $allSupervisedLogs->groupBy(function ($item) {
+            $carbonDate = Carbon::parse($item->date);
+            return $item->placement_id . '_' . $carbonDate->year . '-W' . str_pad($carbonDate->isoWeek(), 2, '0', STR_PAD_LEFT);
+        })->map(function ($group, $key) {
+            $first = $group->first();
+            $minDate = $group->min('date');
+            $maxDate = $group->max('date');
+            $pendingCount = $group->where('lecturer_status', 'pending')->count();
+            $approvedCount = $group->where('lecturer_status', 'approved')->count();
+            $rejectedCount = $group->where('lecturer_status', 'rejected')->count();
+
+            $status = 'approved';
+            if ($pendingCount > 0) {
+                $status = 'pending';
+            } elseif ($rejectedCount > 0) {
+                $status = 'rejected';
+            }
+
+            return [
+                'bundle_key'     => $key,
+                'placement'      => $first->placement,
+                'student'        => $first->placement->application->user ?? null,
+                'min_date'       => $minDate,
+                'max_date'       => $maxDate,
+                'entries_count'  => $group->count(),
+                'pending_count'  => $pendingCount,
+                'approved_count' => $approvedCount,
+                'rejected_count' => $rejectedCount,
+                'status'         => $status,
+                'logbook_ids'    => $group->pluck('id')->toArray(),
+                'entries'        => $group->sortBy('date')->values(),
+                'feedback'       => $group->pluck('lecturer_feedback')->filter()->first() ?? null,
+            ];
+        })->values();
+
         // Statistik Ringkas
         $totalLogs = Logbook::whereIn('placement_id', $placementIds)->count();
         $pendingDosenLogs = Logbook::whereIn('placement_id', $placementIds)->where('lecturer_status', 'pending')->count();
@@ -79,6 +124,7 @@ class LogbookController extends Controller
         return view('lecturer.logbooks.index', compact(
             'user',
             'logbooks',
+            'weeklyBundles',
             'supervisedPlacements',
             'totalLogs',
             'pendingDosenLogs',
@@ -163,5 +209,37 @@ class LogbookController extends Controller
         $statusText = $request->status === 'approved' ? 'disetujui (ACC)' : ($request->status === 'rejected' ? 'ditolak / diminta revisi' : 'diperbarui');
 
         return redirect()->back()->with('success', "Logbook berhasil {$statusText} dan catatan feedback Dosen telah tersimpan!");
+    }
+
+    /**
+     * Setujui secara massal (Bulk Approve) logbook mahasiswa bimbingan Dosen
+     */
+    public function bulkApprove(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'logbook_ids' => 'required|array|min:1',
+            'logbook_ids.*' => 'integer|exists:logbooks,id',
+            'action' => 'required|in:approved,rejected',
+            'bulk_feedback' => 'nullable|string|max:500',
+        ]);
+
+        // Ambil ID placement yang dibimbing langsung oleh Dosen ini
+        $supervisedPlacementIds = Placement::where('academic_advisor_id', $user->id)
+            ->pluck('id')
+            ->toArray();
+
+        $count = Logbook::whereIn('id', $request->logbook_ids)
+            ->whereIn('placement_id', $supervisedPlacementIds)
+            ->update([
+                'lecturer_status' => $request->action,
+                'lecturer_feedback' => $request->bulk_feedback ?? ($request->action === 'approved' ? 'Disetujui secara massal oleh DPL Kampus.' : 'Diminta revisi oleh DPL Kampus.'),
+                'lecturer_verified_at' => Carbon::now(),
+            ]);
+
+        $statusMsg = $request->action === 'approved' ? 'disetujui (ACC)' : 'diminta revisi';
+
+        return redirect()->back()->with('success', "Sebanyak {$count} logbook mahasiswa bimbingan berhasil {$statusMsg} sekaligus!");
     }
 }
