@@ -34,14 +34,13 @@
             </div>
         </header>
 
-        <!-- Main Hero Section (Full Width Left-Aligned & No-Scroll Fitted) -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto py-4">
+        <!-- Main Hero Section (Full Width Left-Aligned & Clean Original Layout) -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto py-6">
             <div class="w-full space-y-5 lg:space-y-6 text-left">
                 
                 <!-- Badge Penerimaan -->
                 <div>
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                        <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-md">
                         <span>Penerimaan Magang Mahasiswa & Siswa</span>
                     </span>
                 </div>
@@ -59,14 +58,14 @@
                 <!-- Tombol Aksi -->
                 <div class="flex flex-col sm:flex-row items-center justify-start gap-3.5 pt-2">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm shadow-blue-200 transition text-center">
+                        <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition text-center">
                             Masuk ke Panel Dashboard &rarr;
                         </a>
                     @else
-                        <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm shadow-blue-200 transition text-center">
+                        <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition text-center">
                             Daftar Akun
                         </a>
-                        <a href="{{ route('login') }}" class="w-full sm:w-auto px-6 py-3 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 text-xs font-semibold uppercase tracking-wider rounded-xl transition text-center">
+                        <a href="{{ route('login') }}" class="w-full sm:w-auto px-6 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs font-semibold uppercase tracking-wider rounded-xl transition text-center">
                             Masuk ke Akun
                         </a>
                     @endauth
