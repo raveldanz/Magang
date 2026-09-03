@@ -65,5 +65,85 @@
                 {{ $slot }}
             </main>
         </div>
+
+        <!-- Global Toast Notification System (Alpine.js) -->
+        <div x-data="{
+            toasts: [],
+            init() {
+                @if(session('success'))
+                    this.add('success', '{{ addslashes(session('success')) }}');
+                @endif
+                @if(session('error'))
+                    this.add('error', '{{ addslashes(session('error')) }}');
+                @endif
+                @if(session('warning'))
+                    this.add('warning', '{{ addslashes(session('warning')) }}');
+                @endif
+                @if(session('status'))
+                    this.add('info', '{{ addslashes(session('status')) }}');
+                @endif
+            },
+            add(type, message) {
+                const id = Date.now() + Math.random();
+                this.toasts.push({ id, type, message });
+                setTimeout(() => this.remove(id), 4500);
+            },
+            remove(id) {
+                this.toasts = this.toasts.filter(t => t.id !== id);
+            }
+        }"
+        @toast.window="add($event.detail.type || 'info', $event.detail.message)"
+        class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full"
+        style="z-index: 99999;">
+            <template x-for="t in toasts" :key="t.id">
+                <div x-show="true"
+                     x-transition:enter="transition ease-out duration-300 transform"
+                     x-transition:enter-start="opacity-0 translate-y-3 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-200 transform"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="pointer-events-auto p-4 rounded-2xl shadow-xl border flex items-start gap-3 backdrop-blur-md transition-all"
+                     :class="{
+                         'bg-white/95 border-emerald-200 text-emerald-900 shadow-emerald-500/10': t.type === 'success',
+                         'bg-white/95 border-rose-200 text-rose-900 shadow-rose-500/10': t.type === 'error',
+                         'bg-white/95 border-amber-200 text-amber-900 shadow-amber-500/10': t.type === 'warning',
+                         'bg-white/95 border-blue-200 text-blue-900 shadow-blue-500/10': t.type === 'info'
+                     }">
+                    
+                    <!-- Icon -->
+                    <div class="shrink-0 mt-0.5">
+                        <template x-if="t.type === 'success'">
+                            <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                        </template>
+                        <template x-if="t.type === 'error'">
+                            <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </div>
+                        </template>
+                        <template x-if="t.type === 'warning'">
+                            <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                        </template>
+                        <template x-if="t.type === 'info'">
+                            <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Message Body -->
+                    <div class="flex-1 text-xs sm:text-sm font-medium leading-snug" x-text="t.message"></div>
+
+                    <!-- Close Button -->
+                    <button @click="remove(t.id)" class="shrink-0 text-gray-400 hover:text-gray-600 transition p-1 rounded-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </template>
+        </div>
     </body>
 </html>

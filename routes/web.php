@@ -216,6 +216,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/lecturer/logbooks', [LecturerLogbookController::class, 'index'])->name('lecturer.logbooks.index');
         Route::get('/lecturer/logbooks/{id}', [LecturerLogbookController::class, 'show'])->name('lecturer.logbooks.show');
         Route::put('/lecturer/logbooks/{id}', [LecturerLogbookController::class, 'updateStatus'])->name('lecturer.logbooks.updateStatus');
+        Route::post('/lecturer/logbooks/bulk-approve', [LecturerLogbookController::class, 'bulkApprove'])->name('lecturer.logbooks.bulk_approve');
         Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
         Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
         Route::post('/lecturer/students/{placementId}/evaluate', [LecturerEvaluationController::class, 'store'])->name('lecturer.students.evaluate');
