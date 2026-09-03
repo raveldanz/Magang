@@ -21,14 +21,16 @@ if (!executablePath) {
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function runLiveStudentFlow() {
-    const uniqueSuffix = Date.now().toString().slice(-4);
-    const studentName = `Muhammad Rizky (Live Hermes ${uniqueSuffix})`;
+    const uniqueSuffix = Math.floor(1000 + Math.random() * 9000);
     const studentEmail = `rizky.live${uniqueSuffix}@unesa.ac.id`;
-    const password = 'password123';
+    const studentPassword = 'password123';
+    const studentNim = `22051204${uniqueSuffix}`;
+    const studentName = 'Muhammad Rizky Pratama';
+    const studentPhone = '081234567890';
 
     console.log(`\n============================================================`);
-    console.log(`🤖 [HERMES LIVE VISUAL AGENT] Registrasi & 7 Hari Logbook`);
-    console.log(`Mahasiswa: ${studentName}`);
+    console.log(`🤖 [SURABAYA MAGANG AGENT] Registrasi Mahasiswa & 7 Hari Logbook`);
+    console.log(`   Akun: ${studentEmail} | NIM: ${studentNim}`);
     console.log(`Email    : ${studentEmail}`);
     console.log(`============================================================\n`);
 
