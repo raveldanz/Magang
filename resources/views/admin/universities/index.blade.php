@@ -219,7 +219,7 @@
                         <!-- Action Buttons in Footer -->
                         <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                             <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold shrink-0">
-                                Lihat Akun &rarr;
+                                Lihat Akun 
                             </a>
 
                             <div class="btn-action-group">

@@ -218,7 +218,7 @@
                                         {{ strtoupper($log->status) }}
                                     </span>
                                     <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
-                                        Detail &rarr;
+                                        Detail 
                                     </a>
                                 </div>
                             </div>
