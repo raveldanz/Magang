@@ -111,7 +111,7 @@
                                 <button type="button" @click="showDetailModal = true"
                                         class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer flex items-center gap-1">
                                     <span>Lihat Detail</span>
-                                    <span>&rarr;</span>
+                                    <span></span>
                                 </button>
                             </div>
                         </div>
@@ -173,23 +173,23 @@
                                         <div class="shrink-0">
                                             @if(empty($profile?->nim))
                                                 <a href="{{ route('student.profile.edit') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    Lengkapi Profil &rarr;
+                                                    Lengkapi Profil 
                                                 </a>
                                             @elseif(!$application)
                                                 <a href="{{ route('student.application.create') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    Pilih Unit &rarr;
+                                                    Pilih Unit 
                                                 </a>
                                             @elseif(!$academicAdvisor)
                                                 <a href="#change-advisor-box" @click="showDetailModal = false" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    Pilih Dosen &rarr;
+                                                    Pilih Dosen 
                                                 </a>
                                             @elseif($logbooksCount < 30)
                                                 <a href="{{ route('student.logbook.create') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    + Isi Logbook Hari Ini &rarr;
+                                                    + Isi Logbook Hari Ini 
                                                 </a>
                                             @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
                                                 <a href="{{ route('student.final_report.index') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    Unggah Laporan &rarr;
+                                                    Unggah Laporan 
                                                 </a>
                                             @endif
                                         </div>
@@ -209,7 +209,7 @@
                                             </span>
                                         @else
                                             <a href="{{ route('student.profile.edit') }}" class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Lengkapi Profil &rarr;
+                                                Lengkapi Profil 
                                             </a>
                                         @endif
                                     </div>
@@ -232,7 +232,7 @@
                                             </span>
                                         @else
                                             <a href="{{ route('student.application.create') }}" class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Pilih Unit &rarr;
+                                                Pilih Unit 
                                             </a>
                                         @endif
                                     </div>
@@ -251,7 +251,7 @@
                                             </span>
                                         @else
                                             <a href="#change-advisor-box" @click="showDetailModal = false" class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Pilih Dosen &rarr;
+                                                Pilih Dosen 
                                             </a>
                                         @endif
                                     </div>
@@ -293,11 +293,11 @@
                                             </span>
                                         @elseif($finalReport)
                                             <a href="{{ route('student.final_report.index') }}" class="px-3 py-1.5 rounded-md font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition inline-block">
-                                                Cek Status Review &rarr;
+                                                Cek Status Review 
                                             </a>
                                         @else
                                             <a href="{{ route('student.final_report.index') }}" class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Unggah Laporan &rarr;
+                                                Unggah Laporan 
                                             </a>
                                         @endif
                                     </div>
@@ -312,7 +312,7 @@
                                     <div class="shrink-0">
                                         @if($isPassed)
                                             <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank" class="px-3.5 py-1.5 rounded-md font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition inline-block">
-                                                Unduh E-Sertifikat (PDF) &rarr;
+                                                Unduh E-Sertifikat (PDF) 
                                             </a>
                                         @else
                                             <span class="px-2.5 py-1 rounded-md font-semibold bg-slate-100 text-slate-500 border border-slate-200 inline-block">
@@ -675,7 +675,7 @@
                         </div>
                     </div>
                     <a href="{{ route('student.profile.edit') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                        {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }} &rarr;
+                        {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }} 
                     </a>
                 </div>
 
@@ -722,7 +722,7 @@
                     </div>
                     @if(!$application)
                         <a href="{{ route('student.application.create') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                            Buat Pengajuan Baru &rarr;
+                            Buat Pengajuan Baru 
                         </a>
                     @else
                         <div class="text-xs text-slate-500">Unit: <strong>{{ $application->unit->name ?? '-' }}</strong></div>
@@ -762,7 +762,7 @@
                         <h4 class="font-bold text-slate-800 text-base">Detail Penempatan Magang</h4>
                         @if ($application->status === 'accepted')
                             <a href="{{ route('student.application.letter', $application->id) }}" target="_blank" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                <span>Unduh Surat Balasan Dinas</span> &rarr;
+                                <span>Unduh Surat Balasan Dinas</span> 
                             </a>
                         @endif
                     </div>

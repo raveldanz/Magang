@@ -214,7 +214,7 @@
                                                     @click="openModal({{ json_encode($bundle) }})"
                                                     class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition active:scale-95 cursor-pointer inline-flex items-center gap-1">
                                                 <span>Lihat Detail & Evaluasi</span>
-                                                <span>&rarr;</span>
+                                                <span></span>
                                             </button>
                                         </td>
                                     </tr>
@@ -284,7 +284,7 @@
                                                         <template x-if="entry.attachment">
                                                             <div class="mt-1">
                                                                 <a :href="'/storage/' + entry.attachment" target="_blank" class="text-[11px] text-blue-600 font-semibold hover:underline">
-                                                                    &rarr; Unduh Dokumen Bukti Lampiran
+                                                                     Unduh Dokumen Bukti Lampiran
                                                                 </a>
                                                             </div>
                                                         </template>
