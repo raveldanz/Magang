@@ -75,7 +75,7 @@
                                 @if ($university->logo && file_exists(public_path($university->logo)))
                                     <img src="{{ asset($university->logo) }}" alt="Logo {{ $university->name }}" class="max-h-full max-w-full object-contain">
                                 @else
-                                    <span class="text-4xl text-gray-300">🏛️</span>
+                                    <img src="{{ asset('images/default-university.svg') }}" alt="Logo Default {{ $university->name }}" class="w-16 h-16 object-contain opacity-80">
                                 @endif
                             </div>
 

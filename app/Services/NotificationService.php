@@ -47,7 +47,26 @@ class NotificationService
                 ];
             }
 
-            // B. Pengajuan Magang Baru Menunggu Verifikasi
+            // B. Instansi Dinas Baru Tanpa Akun Admin Dinas
+            $pendingAgencies = \App\Models\AgencyProfile::whereDoesntHave('users', function ($q) {
+                $q->where('role', 'admin');
+            })->get();
+
+            foreach ($pendingAgencies as $ag) {
+                $actionable[] = [
+                    'id' => 'agency_' . $ag->id,
+                    'type' => 'urgent',
+                    'category' => 'agency',
+                    'title' => "Instansi Dinas Baru: {$ag->agency_name}",
+                    'message' => "Instansi dinas baru terdaftar dan belum memiliki akun Admin Dinas.",
+                    'time' => $ag->created_at ? $ag->created_at->diffForHumans() : 'Baru saja',
+                    'action_url' => route('admin.agencies.index'),
+                    'action_label' => 'Buat Akun Admin Dinas',
+                    'is_action_required' => true,
+                ];
+            }
+
+            // C. Pengajuan Magang Baru Menunggu Verifikasi
             $pendingAppsCount = Application::whereIn('status', ['submitted', 'pending'])->count();
             if ($pendingAppsCount > 0) {
                 $actionable[] = [

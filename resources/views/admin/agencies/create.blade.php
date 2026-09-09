@@ -17,7 +17,7 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
 
-                <form method="POST" action="{{ route('admin.agencies.store') }}" class="space-y-6">
+                <form method="POST" action="{{ route('admin.agencies.store') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -95,6 +95,22 @@
                                 Kota <span class="text-rose-500">*</span>
                             </label>
                             <input type="text" name="city" value="{{ old('city', 'Surabaya') }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+                    </div>
+
+                    <!-- Upload Logo Resmi Dinas -->
+                    <div class="pt-4 border-t border-gray-100">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                            Logo Resmi Instansi Dinas (Opsional)
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+                                <img src="{{ asset('images/default-agency.svg') }}" alt="Logo Default" class="w-10 h-10 object-contain opacity-70">
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="logo" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                                <p class="text-[11px] text-gray-400 mt-1">Format: PNG, JPG, WEBP, SVG. Ukuran maksimal 2MB. Jika dikosongkan, akan menggunakan logo default instansi dinas.</p>
+                            </div>
                         </div>
                     </div>
 

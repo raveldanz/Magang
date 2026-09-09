@@ -17,7 +17,7 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
 
-                <form method="POST" action="{{ route('admin.agencies.update', $agency->id) }}" class="space-y-6">
+                <form method="POST" action="{{ route('admin.agencies.update', $agency->id) }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
@@ -96,6 +96,37 @@
                                 Kota <span class="text-rose-500">*</span>
                             </label>
                             <input type="text" name="city" value="{{ old('city', $agency->city) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+                    </div>
+
+                    <!-- Upload Logo Resmi Dinas -->
+                    <div class="pt-4 border-t border-gray-100">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                            Logo Resmi Instansi Dinas
+                        </label>
+                        <div class="flex items-center gap-4">
+                            @php
+                                $currentLogo = null;
+                                if (!empty($agency->logo)) {
+                                    if (file_exists(public_path($agency->logo))) {
+                                        $currentLogo = asset($agency->logo);
+                                    } elseif (file_exists(public_path('storage/' . $agency->logo))) {
+                                        $currentLogo = asset('storage/' . $agency->logo);
+                                    } elseif (file_exists(storage_path('app/public/' . $agency->logo))) {
+                                        $currentLogo = asset('storage/' . $agency->logo);
+                                    }
+                                }
+                                if (!$currentLogo) {
+                                    $currentLogo = asset('images/default-agency.svg');
+                                }
+                            @endphp
+                            <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+                                <img src="{{ $currentLogo }}" alt="Logo {{ $agency->agency_name }}" class="w-12 h-12 object-contain shrink-0" style="width: 48px; height: 48px; max-width: 48px; max-height: 48px; object-fit: contain;">
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="logo" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                                <p class="text-[11px] text-gray-400 mt-1">Format didukung: PNG, JPG, WEBP, SVG. Ukuran maksimal 2MB.</p>
+                            </div>
                         </div>
                     </div>
 
