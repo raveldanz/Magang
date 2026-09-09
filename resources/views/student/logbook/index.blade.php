@@ -43,7 +43,7 @@
                             </div>
                         </div>
                         <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
-                            Ajukan Magang Sekarang &rarr;
+                            Ajukan Magang Sekarang 
                         </a>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
-                            Buka Dashboard Utama &rarr;
+                            Buka Dashboard Utama 
                         </a>
                     </div>
 
@@ -159,7 +159,7 @@
                             </div>
                         </div>
                         <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
-                            Ajukan Ulang Magang &rarr;
+                            Ajukan Ulang Magang 
                         </a>
                     </div>
                 </div>
@@ -188,7 +188,7 @@
                         </div>
                         @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                             <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
-                                <span>Pilih DPL di Dashboard &rarr;</span>
+                                <span>Pilih DPL di Dashboard </span>
                             </a>
                         @endif
                     </div>

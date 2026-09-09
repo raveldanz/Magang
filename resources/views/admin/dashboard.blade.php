@@ -168,7 +168,7 @@
                     </div>
                 </div>
                 <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
-                    Kelola Kampus & Buat Akun &rarr;
+                    Kelola Kampus & Buat Akun 
                 </a>
             </div>
         @endif
@@ -187,7 +187,7 @@
                     </div>
                 </div>
                 <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
-                    Kelola Kampus & Buat Akun &rarr;
+                    Kelola Kampus & Buat Akun 
                 </a>
             </div>
         @endif
@@ -291,13 +291,13 @@
                         <a href="{{ route('admin.agencies.index') }}"
                             class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
                             <span>Kelola Dinas</span>
-                            <span class="text-sm leading-none">&rarr;</span>
+                            <span class="text-sm leading-none"></span>
                         </a>
                     @else
                         <a href="{{ route('admin.units.index') }}"
                             class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
                             <span>Kelola Unit</span>
-                            <span class="text-sm leading-none">&rarr;</span>
+                            <span class="text-sm leading-none"></span>
                         </a>
                     @endif
                 </div>
@@ -355,7 +355,7 @@
                         <a href="{{ route('admin.universities.index') }}"
                             class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
                             <span>Kelola Kampus</span>
-                            <span class="text-sm leading-none">&rarr;</span>
+                            <span class="text-sm leading-none"></span>
                         </a>
                     @endif
                 </div>

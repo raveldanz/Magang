@@ -285,7 +285,7 @@
                                 @endif
                             </div>
                             <a href="{{ route('notifications.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
-                                Lihat Semua &rarr;
+                                Lihat Semua 
                             </a>
                         </div>
 
@@ -317,7 +317,7 @@
                                 </a>
                             @endif
                             <a href="{{ route('notifications.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
-                                Pusat Tindakan &rarr;
+                                Pusat Tindakan 
                             </a>
                         </div>
                     </div>
