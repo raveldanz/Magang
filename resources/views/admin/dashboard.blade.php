@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         {{-- 1. HERO BANNER DINAMIS & SEIMBANG SESUAI ROLE (SUPER ADMIN VS ADMIN DINAS) --}}
@@ -168,6 +168,9 @@
             <div
                 class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-5 rounded-2xl bg-white shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div class="flex items-start gap-3">
+                    <div class="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
                     <div>
                         <h4 class="font-bold text-slate-900 text-sm">
                             Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar
@@ -183,6 +186,31 @@
                 <a href="{{ route('admin.universities.index') }}"
                     class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
                     Kelola Kampus & Buat Akun &rarr;
+                </a>
+            </div>
+        @endif
+
+        {{-- Alert Notifikasi Instansi Dinas Baru Tanpa Akun Admin Dinas (Super Admin) --}}
+        @if($isSuperAdmin && isset($pendingAgencies) && $pendingAgencies->count() > 0)
+            <div
+                class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-5 rounded-2xl bg-white shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">
+                            Pemberitahuan: Terdapat {{ $pendingAgencies->count() }} Instansi Dinas Baru yang Belum Memiliki Akun Admin Dinas
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-0.5">
+                            Instansi dinas:
+                            <strong>{{ $pendingAgencies->pluck('agency_name')->implode(', ') }}</strong>. Silakan buatkan akun agar perwakilan dinas dapat login dan mengelola unit kerja & kuota.
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.agencies.index') }}"
+                    class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                    Kelola Instansi & Buat Akun &rarr;
                 </a>
             </div>
         @endif

@@ -37,10 +37,7 @@
                             } elseif ($logoPath && file_exists(public_path($logoPath))) {
                                 $navAvatarLogo = asset($logoPath);
                             } else {
-                                $aName = strtolower($user->agencyProfile->agency_name ?? '');
-                                if (str_contains($aName, 'kominfo') || str_contains($aName, 'komunikasi')) $navAvatarLogo = asset('images/logos/diskominfo.png');
-                                elseif (str_contains($aName, 'penduduk') || str_contains($aName, 'dukcapil')) $navAvatarLogo = asset('images/logos/dispendukcapil.png');
-                                elseif (str_contains($aName, 'pustaka') || str_contains($aName, 'pusip')) $navAvatarLogo = asset('images/logos/dispusip.png');
+                                $navAvatarLogo = asset('images/default-agency.svg');
                             }
                         } elseif ($user->university_id || $isUniversitas || $isDosen || $isMahasiswa) {
                             $univObj = null;

@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.universities.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition">
@@ -17,7 +17,7 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
 
-                <form method="POST" action="{{ route('admin.universities.update', $university->id) }}" class="space-y-6">
+                <form method="POST" action="{{ route('admin.universities.update', $university->id) }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
@@ -158,6 +158,49 @@
                             </div>
                         </div>
 
+                    <!-- Upload Logo Resmi Kampus -->
+                    <div class="pt-4 border-t border-gray-100">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                            Logo Resmi Perguruan Tinggi
+                        </label>
+                        <div class="flex items-center gap-4">
+                            @php
+                                $currentUnivLogo = null;
+                                if (!empty($university->logo)) {
+                                    if (file_exists(public_path($university->logo))) {
+                                        $currentUnivLogo = asset($university->logo);
+                                    } elseif (file_exists(public_path('storage/' . $university->logo))) {
+                                        $currentUnivLogo = asset('storage/' . $university->logo);
+                                    } elseif (file_exists(storage_path('app/public/' . $university->logo))) {
+                                        $currentUnivLogo = asset('storage/' . $university->logo);
+                                    }
+                                }
+                                if (!$currentUnivLogo) {
+                                    $uName = strtolower($university->name ?? '');
+                                    $uCode = strtolower($university->code ?? '');
+                                    if (str_contains($uName, 'unesa') || str_contains($uCode, 'unesa')) {
+                                        $currentUnivLogo = asset('images/logos/unesa.png');
+                                    } elseif (str_contains($uName, 'its') || str_contains($uCode, 'its')) {
+                                        $currentUnivLogo = asset('images/logos/its.png');
+                                    } elseif (str_contains($uName, 'unair') || str_contains($uCode, 'unair')) {
+                                        $currentUnivLogo = asset('images/logos/unair.png');
+                                    } elseif (str_contains($uName, 'upn') || str_contains($uCode, 'upn')) {
+                                        $currentUnivLogo = asset('images/logos/upnjatim.png');
+                                    } elseif (str_contains($uName, 'unitomo') || str_contains($uCode, 'unitomo')) {
+                                        $currentUnivLogo = asset('images/logos/unitomo.png');
+                                    } else {
+                                        $currentUnivLogo = asset('images/default-university.svg');
+                                    }
+                                }
+                            @endphp
+                            <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+                                <img src="{{ $currentUnivLogo }}" alt="Logo {{ $university->name }}" class="w-12 h-12 object-contain shrink-0" style="width: 48px; height: 48px; max-width: 48px; max-height: 48px; object-fit: contain;">
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="logo" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                                <p class="text-[11px] text-gray-400 mt-1">Format: PNG, JPG, WEBP, SVG. Ukuran maksimal 2MB. Jika belum ada, sistem menggunakan logo default akademik SVG.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">

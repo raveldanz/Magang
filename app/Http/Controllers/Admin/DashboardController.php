@@ -138,6 +138,11 @@ class DashboardController extends Controller
             $q->where('role', 'universitas');
         })->withCount('students')->get();
 
+        // Instansi dinas baru yang belum punya akun admin dinas
+        $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {
+            $q->where('role', 'admin');
+        })->withCount('units')->get();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_pending' => $totalPending,
@@ -153,6 +158,7 @@ class DashboardController extends Controller
             'total_mentors' => $totalMentors,
             'total_lecturers' => $totalLecturers,
             'pending_universities_count' => $pendingUniversities->count(),
+            'pending_agencies_count' => $pendingAgencies->count(),
         ];
 
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
@@ -170,7 +176,8 @@ class DashboardController extends Controller
             'recentAuditLogs',
             'currentAgency',
             'agencyId',
-            'pendingUniversities'
+            'pendingUniversities',
+            'pendingAgencies'
         ));
     }
 }
