@@ -92,6 +92,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/feedbacks/my', [FeedbackController::class, 'myFeedbacks'])->name('feedbacks.my');
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'show'])->name('feedbacks.show');
 
+    // Naskah Laporan Akhir (Akses Terpusat & Unduhan Multi-Role dengan Format Nama Baku)
+    Route::get('/final-reports/{id}/file', [StudentFinalReportController::class, 'showFile'])->name('final_reports.show');
+
     // ==========================================
     // 1. ROUTE KHUSUS MAHASISWA
     // ==========================================

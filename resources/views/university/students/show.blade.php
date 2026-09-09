@@ -186,7 +186,7 @@
                             <h5 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $finalReport->title ?? 'Laporan Akhir Magang' }}</h5>
                             <p class="text-[11px] text-slate-400 mt-0.5">Status: <span class="font-bold uppercase text-emerald-700">{{ $finalReport->status ?? 'Submitted' }}</span></p>
                         </div>
-                        <a href="{{ asset('storage/' . $finalReport->file_path) }}" target="_blank" class="w-full sm:w-auto text-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="w-full sm:w-auto text-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition">
                             Unduh Laporan (PDF)
                         </a>
                     </div>
