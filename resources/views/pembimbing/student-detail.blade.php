@@ -45,7 +45,7 @@
                             <div class="text-sm mt-3">
                                 <p><strong>Status:</strong> <span class="uppercase font-bold text-blue-700">{{ $placement->finalreport->status }}</span></p>
                             </div>
-                            <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
+                            <a href="{{ route('final_reports.show', $placement->finalreport->id) }}" target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
                                 Unduh / Lihat Laporan
                             </a>
                         @else

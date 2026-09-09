@@ -88,9 +88,9 @@
                         <div class="text-xs text-gray-600">
                             Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->format('d F Y, H:i') : '-' }}</strong>
                         </div>
-                        <a href="{{ asset('storage/' . ($finalReport->file_path ?? $finalReport->final_report_path)) }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                        
-                            <span>Buka / Unduh Berkas PDF</span>
+                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Buka / Unduh Berkas Laporan</span>
                         </a>
                     </div>
 
@@ -135,6 +135,33 @@
                                 Tautan Repositori Proyek / Luaran Kerja (Opsional)
                             </label>
                             <input type="url" name="repository_url" value="{{ old('repository_url', $finalReport->repository_url ?? '') }}" placeholder="https://github.com/username/project atau link Google Drive" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        </div>
+
+                        <!-- Himbauan Format Penamaan Berkas -->
+                        <div class="p-4 rounded-2xl bg-blue-50/80 border border-blue-200/90 flex items-start gap-3.5 shadow-xs">
+                            <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="text-xs space-y-1.5 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-blue-950 text-xs sm:text-sm">Himbauan Format Penamaan Berkas</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-blue-200 text-blue-800 text-[10px] font-black uppercase tracking-wider">Wajib Diperhatikan</span>
+                                </div>
+                                <p class="text-blue-900/90 leading-relaxed text-xs">
+                                    Agar memudahkan Dosen Pembimbing Lapangan (DPL) dan Pembimbing Dinas dalam memeriksa serta mengarsipkan naskah magang Anda, pastikan nama file telah berformat standar sebelum diunggah:
+                                </p>
+                                <div class="p-2.5 bg-white border border-blue-200 rounded-xl space-y-1">
+                                    <div class="flex items-center gap-2 font-mono text-xs font-bold text-blue-700">
+                                        <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span>Format: Laporan_Akhir_[NIM]_[Nama_Lengkap].[pdf/docx]</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500">
+                                        Contoh Anda: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div>

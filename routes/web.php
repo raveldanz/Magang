@@ -49,18 +49,40 @@ Route::get('/dashboard', [StudentDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Route Publik Verifikasi QR Code Surat Balasan
-Route::get('/verify-letter/{id}', function ($id) {
-    $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
+// Route Publik Verifikasi QR Code Surat Balasan (Mendukung Hash Token Unik & Numeric ID Fallback)
+Route::get('/verify-letter/{token}', function ($token) {
+    $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor'])
         ->where('status', 'accepted')
-        ->findOrFail($id);
+        ->where(function ($q) use ($token) {
+            $q->where('letter_token', $token);
+            if (is_numeric($token)) {
+                $q->orWhere('id', (int) $token);
+            }
+        })
+        ->firstOrFail();
+
     return view('verify_letter', compact('application'));
 })->name('verify.letter');
 
-// Route Publik Verifikasi QR Code Sertifikat Magang
-Route::get('/verify-certificate/{id}', function ($id) {
-    $placement = \App\Models\Placement::with(['application.user.studentProfile', 'application.unit.agencyProfile', 'evaluation', 'pembimbing'])
-        ->findOrFail($id);
+// Route Publik Verifikasi QR Code Sertifikat Magang (Mendukung Hash Token Unik & Numeric ID Fallback)
+Route::get('/verify-certificate/{token}', function ($token) {
+    $placement = \App\Models\Placement::with([
+        'application.user.studentProfile', 
+        'application.unit.agencyProfile', 
+        'evaluation', 
+        'pembimbing', 
+        'mentor', 
+        'academicAdvisor'
+    ])
+        ->where(function ($q) use ($token) {
+            $q->where('certificate_hash', $token);
+            if (is_numeric($token)) {
+                $q->orWhere('id', (int) $token)
+                  ->orWhere('application_id', (int) $token);
+            }
+        })
+        ->firstOrFail();
+
     return view('verify_certificate', compact('placement'));
 })->name('verify.certificate');
 
@@ -91,6 +113,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/feedbacks', [FeedbackController::class, 'store'])->name('feedbacks.store');
     Route::get('/feedbacks/my', [FeedbackController::class, 'myFeedbacks'])->name('feedbacks.my');
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'show'])->name('feedbacks.show');
+
+    // Naskah Laporan Akhir (Akses Terpusat & Unduhan Multi-Role dengan Format Nama Baku)
+    Route::get('/final-reports/{id}/file', [StudentFinalReportController::class, 'showFile'])->name('final_reports.show');
 
     // ==========================================
     // 1. ROUTE KHUSUS MAHASISWA

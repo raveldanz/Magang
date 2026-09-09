@@ -64,9 +64,10 @@
                         <div>
                             <p><strong>Status:</strong> <span class="uppercase font-bold text-gray-700">{{ $application->placement->finalreport->status }}</span></p>
                         </div>
-                        <a href="{{ asset('storage/' . $application->placement->finalreport->file_path) }}" target="_blank"
-                            class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                             Buka Laporan Akhir
+                        <a href="{{ route('final_reports.show', $application->placement->finalreport->id) }}" target="_blank"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 shadow-xs transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            <span>Buka Naskah Laporan</span>
                         </a>
                     </div>
                 </div>
