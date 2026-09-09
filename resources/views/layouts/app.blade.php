@@ -1,7 +1,8 @@
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-hidden w-full">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Portal Magang — Pemerintah Kota Surabaya') }}</title>
@@ -15,33 +16,38 @@
 
         <style>
             [x-cloak] { display: none !important; }
+            html, body {
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
         </style>
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            <header class="sticky top-0 z-50 bg-white">
+    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative">
+        <div class="min-h-screen bg-[#F5F8FC] w-full overflow-x-hidden flex flex-col">
+            
+            <header class="sticky top-0 z-50 bg-white w-full border-b border-slate-200/80">
                 @if(session()->has('impersonator_id'))
-                    <aside aria-label="Impersonation Alert" class="bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 text-white shadow-md border-b border-rose-700/60">
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-3 min-h-[44px]">
-                            <div class="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-white/95 tracking-normal">
+                    <aside aria-label="Impersonation Alert" class="bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 text-white shadow-md border-b border-rose-700/60 w-full overflow-hidden">
+                        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 min-h-[44px]">
+                            <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-white/95 tracking-normal truncate max-w-full">
                                 <span class="inline-flex relative flex h-2.5 w-2.5 shrink-0">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
                                 </span>
-                                <span>
-                                    Mode Penyamaran: Anda sedang mengelola akun <strong class="font-bold text-white">{{ auth()->user()->name }}</strong> 
-                                    <span class="inline-flex items-center font-bold tracking-wider uppercase text-[11px] bg-white/20 px-2 py-0.5 rounded-md ml-1 border border-white/25">
+                                <span class="truncate">
+                                    Mode Penyamaran: <strong class="font-bold text-white">{{ auth()->user()->name }}</strong> 
+                                    <span class="inline-flex items-center font-bold tracking-wider uppercase text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1 border border-white/25">
                                         {{ auth()->user()->role }}
                                     </span>
                                 </span>
                             </div>
-                            <form action="{{ route('admin.impersonate.leave') }}" method="POST" class="shrink-0 m-0">
+                            <form action="{{ route('admin.impersonate.leave') }}" method="POST" class="shrink-0 m-0 w-full sm:w-auto">
                                 @csrf
-                                <button type="submit" class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold rounded-lg shadow-sm transition active:scale-95 cursor-pointer border border-white/40">
+                                <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold rounded-lg shadow-sm transition active:scale-95 cursor-pointer border border-white/40">
                                     <svg class="w-3.5 h-3.5 text-rose-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                     </svg>
-                                    <span>Kembali ke Super Admin ({{ session('impersonator_name') }})</span>
+                                    <span>Kembali</span>
                                 </button>
                             </form>
                         </div>
@@ -53,17 +59,18 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <header class="bg-white shadow-xs w-full overflow-hidden border-b border-slate-100">
+                    <div class="max-w-7xl mx-auto py-4 px-3 sm:px-6 lg:px-8 w-full overflow-hidden">
                         {{ $header }}
                     </div>
                 </header>
             @endisset
 
-            <!-- Page Content -->
-            <main>
+            <!-- Page Content (flex-1 agar pas memenuhi sisa layar tanpa memaksa ruang kosong) -->
+            <main class="w-full flex-1 overflow-x-hidden">
                 {{ $slot }}
             </main>
+
         </div>
 
         <!-- Global Toast Notification System (Alpine.js) -->
@@ -93,7 +100,7 @@
             }
         }"
         @toast.window="add($event.detail.type || 'info', $event.detail.message)"
-        class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full"
+        class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-[calc(100vw-2rem)] sm:max-w-sm w-full"
         style="z-index: 99999;">
             <template x-for="t in toasts" :key="t.id">
                 <div x-show="true"
@@ -103,44 +110,16 @@
                      x-transition:leave="transition ease-in duration-200 transform"
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                     class="pointer-events-auto p-4 rounded-2xl shadow-xl border flex items-start gap-3 backdrop-blur-md transition-all"
+                     class="pointer-events-auto p-3.5 rounded-2xl shadow-xl border flex items-start gap-2.5 backdrop-blur-md transition-all text-xs"
                      :class="{
                          'bg-white/95 border-emerald-200 text-emerald-900 shadow-emerald-500/10': t.type === 'success',
                          'bg-white/95 border-rose-200 text-rose-900 shadow-rose-500/10': t.type === 'error',
                          'bg-white/95 border-amber-200 text-amber-900 shadow-amber-500/10': t.type === 'warning',
                          'bg-white/95 border-blue-200 text-blue-900 shadow-blue-500/10': t.type === 'info'
                      }">
-                    
-                    <!-- Icon -->
-                    <div class="shrink-0 mt-0.5">
-                        <template x-if="t.type === 'success'">
-                            <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                        </template>
-                        <template x-if="t.type === 'error'">
-                            <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </div>
-                        </template>
-                        <template x-if="t.type === 'warning'">
-                            <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            </div>
-                        </template>
-                        <template x-if="t.type === 'info'">
-                            <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            </div>
-                        </template>
-                    </div>
-
-                    <!-- Message Body -->
-                    <div class="flex-1 text-xs sm:text-sm font-medium leading-snug" x-text="t.message"></div>
-
-                    <!-- Close Button -->
-                    <button @click="remove(t.id)" class="shrink-0 text-gray-400 hover:text-gray-600 transition p-1 rounded-lg">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <div class="flex-1 font-medium leading-snug" x-text="t.message"></div>
+                    <button @click="remove(t.id)" class="shrink-0 text-gray-400 hover:text-gray-600 transition p-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
             </template>
