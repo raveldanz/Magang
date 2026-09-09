@@ -15,6 +15,8 @@ class Placement extends Model
         'academic_advisor_id',
         'pembimbing_id',
         'status',
+        'certificate_number',
+        'certificate_hash',
     ];
 
     public function application()
