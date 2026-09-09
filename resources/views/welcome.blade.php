@@ -59,7 +59,7 @@
                 <div class="flex flex-col sm:flex-row items-center justify-start gap-3.5 pt-2">
                     @auth
                         <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition text-center">
-                            Masuk ke Panel Dashboard &rarr;
+                            Masuk ke Panel Dashboard 
                         </a>
                     @else
                         <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition text-center">
