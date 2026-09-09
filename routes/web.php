@@ -156,6 +156,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/admin/units/{id}/quota', [\App\Http\Controllers\Admin\UnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
 
         // Master Instansi Dinas
+        Route::post('/admin/agencies/{id}/create-account', [AdminAgencyController::class, 'createAccount'])->name('admin.agencies.create_account');
         Route::resource('/admin/agencies', AdminAgencyController::class)->names('admin.agencies');
 
         // Master Pengguna Sistem

@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -84,6 +84,9 @@
             @if(($unregisteredCount ?? 0) > 0)
                 <div class="p-5 bg-amber-50 border-l-4 border-amber-500 rounded-2xl shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
+                        <div class="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
                         <div>
                             <h4 class="font-bold text-amber-900 text-sm">Terdapat {{ $unregisteredCount }} Perguruan Tinggi Baru yang Belum Memiliki Akun Admin Kampus</h4>
                             <p class="text-xs text-amber-700 mt-0.5">Kampus terdaftar otomatis saat mahasiswa melakukan registrasi. Buatkan akun agar perwakilan kampus dapat login ke Portal Universitas.</p>
@@ -122,11 +125,39 @@
                     <div class="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
                             <div class="flex items-start justify-between gap-4">
-                                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
-                                    @if($univ->logo && file_exists(public_path($univ->logo)))
-                                        <img src="{{ asset($univ->logo) }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
+                                @php
+                                    $univLogoUrl = null;
+                                    if (!empty($univ->logo)) {
+                                        if (file_exists(public_path($univ->logo))) {
+                                            $univLogoUrl = asset($univ->logo);
+                                        } elseif (file_exists(public_path('storage/' . $univ->logo))) {
+                                            $univLogoUrl = asset('storage/' . $univ->logo);
+                                        } elseif (file_exists(storage_path('app/public/' . $univ->logo))) {
+                                            $univLogoUrl = asset('storage/' . $univ->logo);
+                                        }
+                                    }
+                                    // Fallback for well-known campuses if logo is null
+                                    if (!$univLogoUrl) {
+                                        $uName = strtolower($univ->name ?? '');
+                                        $uCode = strtolower($univ->code ?? '');
+                                        if (str_contains($uName, 'unesa') || str_contains($uCode, 'unesa')) {
+                                            $univLogoUrl = asset('images/logos/unesa.png');
+                                        } elseif (str_contains($uName, 'its') || str_contains($uCode, 'its') || str_contains($uName, 'sepuluh nopember')) {
+                                            $univLogoUrl = asset('images/logos/its.png');
+                                        } elseif (str_contains($uName, 'unair') || str_contains($uCode, 'unair') || str_contains($uName, 'airlangga')) {
+                                            $univLogoUrl = asset('images/logos/unair.png');
+                                        } elseif (str_contains($uName, 'upn') || str_contains($uCode, 'upn') || str_contains($uName, 'veteran')) {
+                                            $univLogoUrl = asset('images/logos/upnjatim.png');
+                                        } elseif (str_contains($uName, 'unitomo') || str_contains($uCode, 'unitomo') || str_contains($uName, 'soetomo')) {
+                                            $univLogoUrl = asset('images/logos/unitomo.png');
+                                        }
+                                    }
+                                @endphp
+                                <div class="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
+                                    @if($univLogoUrl)
+                                        <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @else
-                                        <span class="text-2xl"></span>
+                                        <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @endif
                                 </div>
                                 <div class="flex flex-col items-end gap-1.5 shrink-0">

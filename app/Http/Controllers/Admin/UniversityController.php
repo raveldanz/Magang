@@ -8,6 +8,7 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class UniversityController extends Controller
 {
@@ -35,10 +36,10 @@ class UniversityController extends Controller
             });
         }
 
-        $universities = $query->get();
+        $universities = $query->paginate(12)->withQueryString();
 
-        // Cari kampus baru yang belum punya akun
-        $unregisteredCount = $universities->filter(fn($u) => !$u->universityAdmin)->count();
+        // Count un-provisioned university accounts
+        $unregisteredCount = University::doesntHave('universityAdmin')->count();
 
         return view('admin.universities.index', compact('universities', 'unregisteredCount'));
     }
@@ -59,7 +60,21 @@ class UniversityController extends Controller
             'pic_name' => 'nullable|string|max:255',
             'pic_nip' => 'nullable|string|max:50',
             'pic_position' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
+
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
+            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('images/logos');
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $logoPath = 'images/logos/' . $filename;
+        }
 
         $univ = University::create([
             'name' => $request->name,
@@ -70,6 +85,7 @@ class UniversityController extends Controller
             'pic_name' => $request->pic_name,
             'pic_nip' => $request->pic_nip,
             'pic_position' => $request->pic_position,
+            'logo' => $logoPath,
         ]);
 
         AuditLog::record('UNIVERSITY_CREATE', 'University', $univ->id, [
@@ -104,6 +120,7 @@ class UniversityController extends Controller
             'weight_mentor' => 'nullable|integer|min:0|max:100',
             'weight_lecturer' => 'nullable|integer|min:0|max:100',
             'require_dpl' => 'nullable',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
 
         $evaluationScheme = $request->input('evaluation_scheme', $univ->evaluation_scheme ?? 'dual_evaluation');
@@ -122,7 +139,7 @@ class UniversityController extends Controller
             $requireDpl = $request->boolean('require_dpl', true);
         }
 
-        $univ->update([
+        $data = [
             'name' => $request->name,
             'code' => strtoupper(trim($request->code)),
             'email' => $request->email ? strtolower(trim($request->email)) : null,
@@ -135,7 +152,21 @@ class UniversityController extends Controller
             'weight_mentor' => $weightMentor,
             'weight_lecturer' => $weightLecturer,
             'require_dpl' => $requireDpl,
-        ]);
+        ];
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
+            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('images/logos');
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $data['logo'] = 'images/logos/' . $filename;
+        }
+
+        $univ->update($data);
 
         AuditLog::record('UNIVERSITY_UPDATE', 'University', $univ->id, [
             'name' => $univ->name,

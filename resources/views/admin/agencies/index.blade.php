@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -42,6 +42,62 @@
                 </div>
             @endif
 
+            <!-- Credential Flash Alert -->
+            @if (session('new_agency_credential'))
+                @php $cred = session('new_agency_credential'); @endphp
+                <div class="p-6 rounded-3xl shadow-2xl space-y-4 border" 
+                     style="background-color: #0f172a !important; color: #ffffff !important; border-color: #334155 !important;">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #1e293b !important;">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h3 class="font-extrabold text-base sm:text-lg tracking-tight" style="color: #ffffff !important;">
+                                    Akun Admin Dinas Baru Berhasil Dibuat!
+                                </h3>
+                                <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">
+                                    Kredensial resmi untuk <strong style="color: #38bdf8 !important;">{{ $cred['agency_name'] }}</strong> siap digunakan oleh admin instansi dinas terkait.
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" 
+                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span>', 3000);"
+                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                            <span>Salin Semua Kredensial</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
+                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
+                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">URL Login Portal:</span>
+                            <span class="font-bold select-all break-all text-xs" style="color: #38bdf8 !important;">{{ $cred['login_url'] }}</span>
+                        </div>
+                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
+                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Email / Username:</span>
+                            <span class="font-bold select-all break-all text-xs" style="color: #34d399 !important;">{{ $cred['email'] }}</span>
+                        </div>
+                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
+                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Password Default:</span>
+                            <span class="font-bold select-all text-xs" style="color: #fbbf24 !important;">{{ $cred['password'] }}</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Warning Banner for Unregistered Agency Accounts -->
+            @if(($unregisteredCount ?? 0) > 0)
+                <div class="p-5 bg-amber-50 border-l-4 border-amber-500 rounded-2xl shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-amber-900 text-sm">Terdapat {{ $unregisteredCount }} Instansi Dinas yang Belum Memiliki Akun Admin Dinas</h4>
+                            <p class="text-xs text-amber-700 mt-0.5">Buatkan akun agar perwakilan instansi dinas dapat login untuk mengelola kuota unit kerja, verifikasi mahasiswa, dan penugasan mentor.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Search Bar -->
             <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs">
                 <form method="GET" action="{{ route('admin.agencies.index') }}" class="flex items-center gap-3">
@@ -72,18 +128,52 @@
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
                             <div class="flex items-start justify-between gap-4">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-xl shrink-0">
-                                    
+                                @php
+                                    $agencyLogoUrl = null;
+                                    if (!empty($agency->logo)) {
+                                        if (file_exists(public_path($agency->logo))) {
+                                            $agencyLogoUrl = asset($agency->logo);
+                                        } elseif (file_exists(public_path('storage/' . $agency->logo))) {
+                                            $agencyLogoUrl = asset('storage/' . $agency->logo);
+                                        } elseif (file_exists(storage_path('app/public/' . $agency->logo))) {
+                                            $agencyLogoUrl = asset('storage/' . $agency->logo);
+                                        }
+                                    }
+                                    // Fallback strictly to default agency svg if logo is not uploaded or file not found
+                                    if (!$agencyLogoUrl) {
+                                        $agencyLogoUrl = asset('images/default-agency.svg');
+                                    }
+                                @endphp
+                                <div class="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
+                                    <img src="{{ $agencyLogoUrl }}" alt="Logo {{ $agency->agency_name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                 </div>
-                                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-[11px] font-bold">
-                                    {{ $agency->city ?? 'Surabaya' }}
-                                </span>
+                                <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                    <span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-[11px] font-bold">
+                                        {{ $agency->city ?? 'Surabaya' }}
+                                    </span>
+                                    @if(($agency->total_admins ?? 0) > 0)
+                                        <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                            Akun Aktif
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold animate-pulse">
+                                            Belum Ada Akun
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="mt-4">
                                 <h3 class="font-black text-base text-gray-900">{{ $agency->agency_name }}</h3>
                                 <p class="text-xs text-blue-600 font-semibold">{{ $agency->government_name }}</p>
                                 <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ $agency->address }}</p>
+
+                                @php $firstAdmin = $agency->users->firstWhere('role', 'admin'); @endphp
+                                @if($firstAdmin)
+                                    <div class="mt-2 text-[11px] text-slate-600 truncate">
+                                        <span class="text-slate-400 font-medium">Admin:</span> <strong class="font-mono text-slate-700">{{ $firstAdmin->email }}</strong>
+                                    </div>
+                                @endif
                             </div>
 
                             <!-- Stat Pills -->
@@ -107,12 +197,21 @@
                         <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('admin.units.index', ['agency_id' => $agency->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold">
-                                    Lihat Unit 
+                                    Lihat Unit &rarr;
                                 </a>
                             </div>
 
                             @if($isSuperAdmin)
                                 <div class="btn-action-group">
+                                    @if(($agency->total_admins ?? 0) === 0)
+                                        <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}" class="btn-action-form">
+                                            @csrf
+                                            <button type="submit" class="btn-action-create" title="Buatkan Akun Admin Dinas">
+                                                <span>Buat Akun</span>
+                                            </button>
+                                        </form>
+                                    @endif
+
                                     <a href="{{ route('admin.agencies.edit', $agency->id) }}" class="btn-action-edit">
                                         Edit
                                     </a>

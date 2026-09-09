@@ -9,6 +9,8 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 
 class AgencyController extends Controller
 {
@@ -20,7 +22,13 @@ class AgencyController extends Controller
         $user = Auth::user();
         $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
 
-        $query = AgencyProfile::with(['units', 'users'])->withCount('units');
+        $query = AgencyProfile::with(['units', 'users', 'agencyAdmin'])
+            ->withCount('units')
+            ->withExists(['users as has_admin_account' => function ($q) {
+                $q->where('role', 'admin');
+            }])
+            ->orderBy('has_admin_account', 'asc')
+            ->orderBy('updated_at', 'desc');
 
         if ($request->filled('search')) {
             $search = strtolower($request->search);
@@ -40,7 +48,12 @@ class AgencyController extends Controller
             return $ag;
         });
 
-        return view('admin.agencies.index', compact('agencies', 'isSuperAdmin'));
+        // Count un-provisioned agency accounts
+        $unregisteredCount = AgencyProfile::whereDoesntHave('users', function ($q) {
+            $q->where('role', 'admin');
+        })->count();
+
+        return view('admin.agencies.index', compact('agencies', 'isSuperAdmin', 'unregisteredCount'));
     }
 
     public function create()
@@ -61,7 +74,21 @@ class AgencyController extends Controller
             'signee_position' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
             'city' => 'required|string|max:100',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
+
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
+            $filename = $cleanName . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('images/logos');
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $logoPath = 'images/logos/' . $filename;
+        }
 
         $agency = AgencyProfile::create([
             'government_name' => $request->government_name ?? 'Pemerintah Kota Surabaya',
@@ -74,6 +101,7 @@ class AgencyController extends Controller
             'signee_position' => $request->signee_position ?? 'Kepala Dinas',
             'website' => $request->website,
             'city' => $request->city ?? 'Surabaya',
+            'logo' => $logoPath,
         ]);
 
         AuditLog::record('AGENCY_CREATE', 'AgencyProfile', $agency->id, [
@@ -82,7 +110,7 @@ class AgencyController extends Controller
         ]);
 
         return redirect()->route('admin.agencies.index')
-            ->with('success', "Instansi Dinas '{$agency->agency_name}' berhasil ditambahkan ke sistem!");
+            ->with('success', "Instansi Dinas '{$agency->agency_name}' berhasil ditambahkan ke sistem! Anda dapat segera membuatkan akun Admin Dinas melalui tombol 'Buat Akun'.");
     }
 
     public function edit($id)
@@ -106,9 +134,10 @@ class AgencyController extends Controller
             'signee_position' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
             'city' => 'required|string|max:100',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
 
-        $agency->update([
+        $data = [
             'government_name' => $request->government_name ?? $agency->government_name,
             'agency_name' => $request->agency_name,
             'email' => strtolower(trim($request->email)),
@@ -119,7 +148,21 @@ class AgencyController extends Controller
             'signee_position' => $request->signee_position ?? $agency->signee_position ?? 'Kepala Dinas',
             'website' => $request->website,
             'city' => $request->city ?? $agency->city,
-        ]);
+        ];
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
+            $filename = $cleanName . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('images/logos');
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $data['logo'] = 'images/logos/' . $filename;
+        }
+
+        $agency->update($data);
 
         AuditLog::record('AGENCY_UPDATE', 'AgencyProfile', $agency->id, [
             'name' => $agency->agency_name,
@@ -144,5 +187,58 @@ class AgencyController extends Controller
 
         return redirect()->route('admin.agencies.index')
             ->with('success', "Instansi '{$name}' berhasil dihapus dari sistem.");
+    }
+
+    /**
+     * Buat Akun Admin Dinas untuk Instansi tertentu
+     */
+    public function createAccount(Request $request, $id)
+    {
+        $agency = AgencyProfile::findOrFail($id);
+
+        $existingAdmin = User::where('role', 'admin')
+            ->where('agency_profile_id', $agency->id)
+            ->first();
+
+        if ($existingAdmin) {
+            return redirect()->back()->with('error', "Instansi '{$agency->agency_name}' sudah memiliki akun Admin Dinas aktif ({$existingAdmin->email}).");
+        }
+
+        $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $agency->agency_name ?: 'agency'));
+        $defaultEmail = $agency->email ?: ('admin.' . $cleanName . '@surabaya.go.id');
+
+        $email = $defaultEmail;
+        $counter = 1;
+        while (User::where('email', $email)->exists()) {
+            $email = 'admin.' . $cleanName . $counter . '@surabaya.go.id';
+            $counter++;
+        }
+
+        $password = 'password';
+
+        $user = User::create([
+            'name' => 'Admin ' . $agency->agency_name,
+            'email' => $email,
+            'password' => Hash::make($password),
+            'role' => 'admin',
+            'agency_profile_id' => $agency->id,
+            'email_verified_at' => now(),
+        ]);
+
+        AuditLog::record('AGENCY_ACCOUNT_CREATE', 'User', $user->id, [
+            'agency_name' => $agency->agency_name,
+            'email' => $email,
+        ]);
+
+        session()->flash('new_agency_credential', [
+            'agency_name' => $agency->agency_name,
+            'name' => $user->name,
+            'email' => $email,
+            'password' => $password,
+            'login_url' => url('/login'),
+        ]);
+
+        return redirect()->route('admin.agencies.index')
+            ->with('success', "Akun Admin Dinas untuk '{$agency->agency_name}' berhasil dibuat! Email: {$email} | Password: {$password}");
     }
 }
