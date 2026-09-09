@@ -12,7 +12,7 @@
                         <span
                             class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
                             style="background-color: rgba(251, 191, 36, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(251, 191, 36, 0.4) !important;">
-                             SUPER ADMIN GOVERNANCE HUB
+                            SUPER ADMIN GOVERNANCE HUB
                         </span>
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight"
                             style="color: #ffffff !important;">
@@ -27,7 +27,7 @@
                         <span
                             class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
                             style="background-color: rgba(56, 189, 248, 0.2) !important; color: #7dd3fc !important; border: 1px solid rgba(56, 189, 248, 0.4) !important;">
-                             PORTAL TATA KELOLA DINAS
+                            PORTAL TATA KELOLA DINAS
                         </span>
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight"
                             style="color: #ffffff !important;">
@@ -47,7 +47,9 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_agencies'] ?? 0 }} Dinas</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_agencies'] ?? 0 }}
+                                    Dinas</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Instansi</div>
@@ -56,24 +58,26 @@
                         </a>
 
                         <a href="{{ route('admin.universities.index') }}"
-                        class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
-                        style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
-                        <div class="flex items-center justify-end mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_universities'] ?? 0 }}
-                                Kampus</span>
-                        </div>
-                        <div>
-                            <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Kampus</div>
-                            <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra MBKM</div>
-                        </div>
-                    </a>
+                            class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
+                            style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
+                            <div class="flex items-center justify-start mb-2">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_universities'] ?? 0 }}
+                                    Kampus</span>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Kampus</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra MBKM</div>
+                            </div>
+                        </a>
 
                         <a href="{{ route('admin.users.index') }}"
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_users'] ?? 0 }} User</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_users'] ?? 0 }}
+                                    User</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Pengguna</div>
@@ -85,7 +89,8 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">Aktivitas</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">Aktivitas</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Log Audit</div>
@@ -97,7 +102,9 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_pending'] ?? 0 }} Antrean</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_pending'] ?? 0 }}
+                                    Antrean</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Verifikasi
@@ -110,7 +117,9 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_units'] ?? 0 }} Unit</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_units'] ?? 0 }}
+                                    Unit</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Divisi & Kuota
@@ -123,7 +132,9 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_mentors'] ?? 0 }} Mentor</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_mentors'] ?? 0 }}
+                                    Mentor</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Mentor Dinas
@@ -136,7 +147,9 @@
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_completed'] ?? 0 }} Lulus</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">{{ $stats['total_completed'] ?? 0 }}
+                                    Lulus</span>
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Sertifikat
@@ -167,26 +180,8 @@
                         </p>
                     </div>
                 </div>
-                <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
-                    Kelola Kampus & Buat Akun &rarr;
-                </a>
-            </div>
-        @endif
-
-        {{-- Alert Notifikasi Kampus Baru Tanpa Akun Portal (Super Admin) --}}
-        @if($isSuperAdmin && isset($pendingUniversities) && $pendingUniversities->count() > 0)
-            <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-l-4 border-amber-500 p-5 rounded-2xl bg-white shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div class="flex items-start gap-3">
-                    <div>
-                        <h4 class="font-bold text-slate-900 text-sm">
-                            Pemberitahuan: Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi Baru yang Terdaftar Otomatis
-                        </h4>
-                        <p class="text-xs text-slate-600 mt-0.5">
-                            Mahasiswa mendaftar dari kampus baru: <strong>{{ $pendingUniversities->pluck('name')->implode(', ') }}</strong>. Silakan lengkapi profil kampus dan buatkan akun login PIC/Admin Kampus.
-                        </p>
-                    </div>
-                </div>
-                <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
+                <a href="{{ route('admin.universities.index') }}"
+                    class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
                     Kelola Kampus & Buat Akun &rarr;
                 </a>
             </div>
@@ -210,7 +205,7 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Verifikasi</span>
-                    
+
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">Menunggu dinas</div>
@@ -221,7 +216,7 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Diterima</span>
-                    
+
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_accepted'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">Persiapan magang</div>
@@ -232,7 +227,7 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Aktif</span>
-                    
+
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_active'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">Sedang di lapangan</div>
@@ -243,7 +238,7 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lulus</span>
-                    
+
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_completed'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">Tersertifikasi</div>
@@ -254,11 +249,12 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sisa Kuota</span>
-                    
+
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_quota_available'] ?? 0 }}</div>
                 <div class="text-[11px] text-slate-500 mt-1">
-                    {{ $isSuperAdmin ? 'Slot kuota kota' : 'Slot kuota dinas' }}</div>
+                    {{ $isSuperAdmin ? 'Slot kuota kota' : 'Slot kuota dinas' }}
+                </div>
             </div>
         </div>
 
@@ -270,9 +266,6 @@
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div
-                            class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0">
-                            </div>
                         <div class="min-w-0">
                             @if($isSuperAdmin)
                                 <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Penempatan Instansi Dinas
@@ -283,7 +276,8 @@
                                 <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Divisi & Unit Kerja Dinas
                                 </h3>
                                 <p class="text-xs text-slate-400 truncate">Sebaran mahasiswa magang di unit/bidang
-                                    {{ $currentAgency->agency_name ?? 'Dinas' }}</p>
+                                    {{ $currentAgency->agency_name ?? 'Dinas' }}
+                                </p>
                             @endif
                         </div>
                     </div>

@@ -208,16 +208,17 @@
                     <p class="text-xs text-slate-500 mt-0.5">Daftar seluruh pengajuan penempatan yang pernah Anda kirimkan</p>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <!-- Desktop View (Table) -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-max">
                         <thead>
                             <tr class="bg-slate-50/60 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3.5 px-5">Tanggal Pengajuan</th>
-                                <th class="py-3.5 px-5">Unit Instansi</th>
-                                <th class="py-3.5 px-5">Periode Magang</th>
-                                <th class="py-3.5 px-5">Status</th>
-                                <th class="py-3.5 px-5">Catatan / Alasan Admin</th>
-                                <th class="py-3.5 px-5">Surat Penerimaan</th>
+                                <th class="py-3.5 px-5 whitespace-nowrap">Tanggal Pengajuan</th>
+                                <th class="py-3.5 px-5 whitespace-nowrap">Unit Instansi</th>
+                                <th class="py-3.5 px-5 whitespace-nowrap">Periode Magang</th>
+                                <th class="py-3.5 px-5 whitespace-nowrap">Status</th>
+                                <th class="py-3.5 px-5 whitespace-nowrap">Catatan / Alasan Admin</th>
+                                <th class="py-3.5 px-5 whitespace-nowrap">Surat Penerimaan</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100">
@@ -273,6 +274,64 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile View (Cards) -->
+                <div class="block md:hidden border-t border-slate-100 divide-y divide-slate-100">
+                    @forelse ($applicationHistory as $app)
+                        <div class="p-5 space-y-3 hover:bg-slate-50/70 transition-colors duration-150">
+                            <!-- Header: Tanggal & Status -->
+                            <div class="flex justify-between items-start gap-2">
+                                <div class="text-xs text-slate-500 font-mono">
+                                    {{ $app->created_at->format('d M Y, H:i') }}
+                                </div>
+                                @php $st = strtolower($app->status ?? ''); @endphp
+                                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border
+                                    {{ in_array($st, ['accepted', 'completed']) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
+                                    {{ $st === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}
+                                    {{ $st === 'verified' ? 'bg-blue-50 text-blue-700 border-blue-200' : '' }}
+                                    {{ $st === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' : '' }}">
+                                    {{ strtoupper($app->status) }}
+                                </span>
+                            </div>
+
+                            <!-- Body: Unit -->
+                            <div>
+                                <div class="font-bold text-slate-900 text-sm leading-snug">{{ $app->unit->name ?? '-' }}</div>
+                                <div class="text-xs text-slate-500 mt-0.5">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
+                            </div>
+                            
+                            <!-- Body: Periode Magang -->
+                            <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-semibold block mb-1">Periode Magang:</span>
+                                {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
+                            </div>
+
+                            <!-- Footer: Catatan & Surat -->
+                            @if ($app->status === 'rejected')
+                                <div class="text-xs">
+                                    <span class="font-semibold block text-slate-700 mb-1">Catatan Admin:</span>
+                                    <span class="text-red-700 font-medium bg-red-50 px-3 py-2 rounded-xl border border-red-200 block">
+                                        {{ $app->rejection_note ?? 'Tidak ada catatan' }}
+                                    </span>
+                                </div>
+                            @endif
+
+                            @if (in_array($app->status, ['accepted', 'completed']))
+                                <div class="pt-2">
+                                    <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
+                                       class="inline-flex w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                        <span>Unduh Surat PDF</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            Belum ada riwayat pengajuan magang.
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
