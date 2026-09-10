@@ -191,7 +191,7 @@
                     <a href="{{ route('university.students.show', $app->id) }}"
                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 text-xs font-semibold rounded-xl border border-blue-100 transition">
                         <span>Detail</span>
-                        <span class="text-xs">&rarr;</span>
+                        <span class="text-xs"></span>
                     </a>
                 </div>
             </div>

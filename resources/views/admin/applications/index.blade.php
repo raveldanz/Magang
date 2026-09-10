@@ -112,7 +112,7 @@
                                     <td class="p-3">
                                         <a href="{{ route('admin.applications.show', $app->id) }}" class="text-blue-600 hover:text-blue-900 font-bold text-xs inline-flex items-center space-x-1">
                                             <span>Detail & Verifikasi</span>
-                                            <span>&rarr;</span>
+                                            <span></span>
                                         </a>
                                     </td>
                                 </tr>
