@@ -146,25 +146,25 @@
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('university.lecturers.destroy', $l->id) }}" method="POST" onsubmit="return confirm('Hapus dosen {{ $l->name }}?');" class="inline-flex m-0 p-0">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="inline-flex items-center justify-center h-6 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px] rounded-lg transition">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                    <button type="button" 
+                                            @click="$dispatch('open-delete-modal', {
+                                                action: '{{ route('university.lecturers.destroy', $l->id) }}',
+                                                title: 'Hapus Dosen Pembimbing',
+                                                name: '{{ addslashes($l->name) }}',
+                                                desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
+                                            })"
+                                            class="inline-flex items-center justify-center h-6 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px] rounded-lg transition cursor-pointer">
+                                        Hapus
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="py-8 text-center text-slate-400 text-xs">
-                            Belum ada data dosen pembimbing.
-                        </div>
+                        <div class="py-8 text-center text-slate-400 text-xs">Belum ada data dosen pembimbing.</div>
                     @endforelse
                 </div>
 
-                <!-- 2. TAMPILAN DESKTOP: Dibungkus w-full & overflow-hidden agar tidak membocorkan lebar ke mobile -->
+                <!-- 2. TAMPILAN DESKTOP -->
                 <div class="hidden sm:block w-full overflow-x-auto">
                     <table class="w-full divide-y divide-slate-100 text-left text-xs">
                         <thead class="bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
@@ -182,26 +182,16 @@
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-4 px-4 font-bold text-slate-900 text-xs sm:text-sm">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">
-                                                {{ strtoupper(substr($l->name, 0, 1)) }}
-                                            </div>
+                                            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">{{ strtoupper(substr($l->name, 0, 1)) }}</div>
                                             <span>{{ $l->name }}</span>
                                         </div>
                                     </td>
-                                    <td class="py-4 px-4 font-mono text-slate-500">
-                                        {{ $l->studentProfile?->nim ?? ($l->nidn ?? '-') }}
-                                    </td>
-                                    <td class="py-4 px-4 font-mono text-slate-500">
-                                        {{ $l->email }}
-                                    </td>
+                                    <td class="py-4 px-4 font-mono text-slate-500">{{ $l->studentProfile?->nim ?? ($l->nidn ?? '-') }}</td>
+                                    <td class="py-4 px-4 font-mono text-slate-500">{{ $l->email }}</td>
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex items-center gap-1.5 justify-center">
-                                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                {{ $l->active_students_count ?? 0 }} Aktif
-                                            </span>
-                                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                                {{ $l->completed_students_count ?? 0 }} Lulus
-                                            </span>
+                                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">{{ $l->active_students_count ?? 0 }} Aktif</span>
+                                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">{{ $l->completed_students_count ?? 0 }} Lulus</span>
                                         </div>
                                     </td>
                                     <td class="py-4 px-4 text-center whitespace-nowrap">
@@ -234,13 +224,16 @@
                                                 </button>
                                             </form>
 
-                                            <form action="{{ route('university.lecturers.destroy', $l->id) }}" method="POST" onsubmit="return confirm('Hapus dosen {{ $l->name }}?');" class="inline-flex m-0 p-0 items-center">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center justify-center h-7 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-lg text-xs transition cursor-pointer">
-                                                    Hapus
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    @click="$dispatch('open-delete-modal', {
+                                                        action: '{{ route('university.lecturers.destroy', $l->id) }}',
+                                                        title: 'Hapus Dosen Pembimbing',
+                                                        name: '{{ addslashes($l->name) }}',
+                                                        desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
+                                                    })"
+                                                    class="inline-flex items-center justify-center h-7 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-lg text-xs transition cursor-pointer">
+                                                Hapus
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

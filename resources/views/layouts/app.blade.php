@@ -124,5 +124,10 @@
                 </div>
             </template>
         </div>
+
+        <!-- Global Double-Confirmation Delete Modal Component -->
+        <x-confirm-delete-modal />
+
+        @stack('scripts')
     </body>
 </html>

@@ -52,7 +52,7 @@ Route::get('/dashboard', [StudentDashboardController::class, 'index'])
 // Route Publik Verifikasi QR Code Surat Balasan (Mendukung Hash Token Unik & Numeric ID Fallback)
 Route::get('/verify-letter/{token}', function ($token) {
     $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor'])
-        ->where('status', 'accepted')
+        ->whereIn('status', ['accepted', 'completed'])
         ->where(function ($q) use ($token) {
             $q->where('letter_token', $token);
             if (is_numeric($token)) {
