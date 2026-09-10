@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -230,13 +230,17 @@
 
                                             <!-- Hapus User -->
                                             @if($u->id !== $currentUser->id)
-                                                <form action="{{ route('admin.users.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun {{ $u->name }}?');" class="btn-action-form">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn-action-delete">
-                                                        Hapus
-                                                    </button>
-                                                </form>
+                                                <button type="button" 
+                                                        @click="$dispatch('open-delete-modal', {
+                                                            action: '{{ route('admin.users.destroy', $u->id) }}',
+                                                            title: 'Hapus Akun Pengguna',
+                                                            name: '{{ addslashes($u->name) }}',
+                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
+                                                        })" 
+                                                        class="btn-action-delete"
+                                                        title="Hapus Pengguna">
+                                                    Hapus
+                                                </button>
                                             @endif
 
                                         </div>

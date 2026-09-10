@@ -84,27 +84,35 @@
                         </div>
                     </div>
 
-                    <!-- Upload Logo Resmi Kampus -->
+                    <!-- Upload Logo Resmi Kampus (Mobile Friendly Card) -->
                     <div class="pt-4 border-t border-gray-100">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                             Logo Resmi Perguruan Tinggi (Opsional)
                         </label>
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
-                                <img src="{{ asset('images/default-university.svg') }}" alt="Logo Default" class="w-10 h-10 object-contain opacity-70">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                            <div class="flex items-center gap-3 shrink-0">
+                                <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+                                    <img id="univLogoPreview" src="{{ asset('images/default-university.svg') }}" alt="Logo Default" class="w-full h-full object-contain shrink-0 transition-all duration-200">
+                                </div>
+                                <div class="sm:hidden text-xs">
+                                    <span class="font-bold text-slate-800 block">Pratinjau Logo</span>
+                                    <span class="text-[11px] text-slate-500">Maksimal ukuran 2MB</span>
+                                </div>
                             </div>
-                            <div class="flex-1">
-                                <input type="file" name="logo" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                                <p class="text-[11px] text-gray-400 mt-1">Format didukung: PNG, JPG, WEBP, SVG. Ukuran maksimal 2MB. Jika belum ada, sistem menyediakan logo SVG default akademik otomatis.</p>
+                            <div class="flex-1 min-w-0">
+                                <input type="file" id="univLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" 
+                                       onchange="handleLogoPreview(this, 'univLogoPreview', '{{ asset('images/default-university.svg') }}')"
+                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs">
+                                <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format didukung: PNG, JPG, WEBP, SVG. Jika dikosongkan, sistem menyediakan logo default.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                        <a href="{{ route('admin.universities.index') }}" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                    <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-6 border-t border-gray-100">
+                        <a href="{{ route('admin.universities.index') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
                             Batal
                         </a>
-                        <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                             Daftarkan Universitas
                         </button>
                     </div>
@@ -113,4 +121,41 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function handleLogoPreview(input, previewId, defaultSrc) {
+            const preview = document.getElementById(previewId);
+            if (!preview) return;
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validasi tipe file
+                if (!file.type.startsWith('image/')) {
+                    alert('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                // Validasi ukuran file (maks 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran berkas logo terlalu besar (maksimal 2MB).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = defaultSrc;
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>

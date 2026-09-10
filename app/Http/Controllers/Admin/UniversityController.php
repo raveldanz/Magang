@@ -41,7 +41,10 @@ class UniversityController extends Controller
         // Count un-provisioned university accounts
         $unregisteredCount = University::doesntHave('universityAdmin')->count();
 
-        return view('admin.universities.index', compact('universities', 'unregisteredCount'));
+        $user = Auth::user();
+        $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+
+        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'isSuperAdmin'));
     }
 
     public function create()
@@ -222,6 +225,7 @@ class UniversityController extends Controller
         session()->flash('new_university_credential', [
             'univ_name' => $univ->name,
             'name' => $user->name,
+            'user_id' => $user->id,
             'email' => $email,
             'password' => $password,
             'login_url' => url('/login'),
@@ -233,18 +237,45 @@ class UniversityController extends Controller
 
     public function destroy($id)
     {
-        $univ = University::withCount(['users', 'students'])->findOrFail($id);
+        $univ = University::withCount(['students', 'dosens'])->findOrFail($id);
 
-        if ($univ->users_count > 0 || $univ->students_count > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Masih ada {$univ->users_count} user dan {$univ->students_count} mahasiswa terdaftar di universitas ini.");
+        // 1. Proteksi Mahasiswa: Jika ada mahasiswa terdaftar, jangan hapus
+        if ($univ->students_count > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Masih ada {$univ->students_count} mahasiswa terdaftar di {$univ->name}. Pindahkan atau hapus data mahasiswa terlebih dahulu.");
+        }
+
+        // 2. Proteksi Dosen dengan Bimbingan Aktif
+        $activeDosenCount = $univ->dosens()
+            ->whereHas('academicPlacements', function ($q) {
+                $q->whereHas('application', function ($aq) {
+                    $aq->whereIn('status', ['accepted', 'verified']);
+                });
+            })->count();
+
+        if ($activeDosenCount > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeDosenCount} dosen pembimbing dari {$univ->name} yang sedang membimbing mahasiswa aktif.");
         }
 
         $name = $univ->name;
-        $univ->delete();
+
+        \DB::transaction(function () use ($univ) {
+            // Hapus akun admin kampus yang terafiliasi dengan universitas ini
+            User::where('university_id', $univ->id)
+                ->where('role', 'universitas')
+                ->delete();
+
+            // Lepaskan relasi dosen non-aktif jika ada
+            User::where('university_id', $univ->id)
+                ->whereIn('role', ['dosen', 'academic_advisor'])
+                ->update(['university_id' => null, 'university' => null]);
+
+            // Hapus data universitas
+            $univ->delete();
+        });
 
         AuditLog::record('UNIVERSITY_DELETE', 'University', $id, ['name' => $name]);
 
         return redirect()->route('admin.universities.index')
-            ->with('success', "Universitas '{$name}' berhasil dihapus.");
+            ->with('success', "Universitas '{$name}' dan akun admin kampusnya berhasil dihapus.");
     }
 }
