@@ -8,6 +8,7 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class UniversityController extends Controller
 {
@@ -35,12 +36,15 @@ class UniversityController extends Controller
             });
         }
 
-        $universities = $query->get();
+        $universities = $query->paginate(12)->withQueryString();
 
-        // Cari kampus baru yang belum punya akun
-        $unregisteredCount = $universities->filter(fn($u) => !$u->universityAdmin)->count();
+        // Count un-provisioned university accounts
+        $unregisteredCount = University::doesntHave('universityAdmin')->count();
 
-        return view('admin.universities.index', compact('universities', 'unregisteredCount'));
+        $user = Auth::user();
+        $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+
+        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'isSuperAdmin'));
     }
 
     public function create()
@@ -59,7 +63,21 @@ class UniversityController extends Controller
             'pic_name' => 'nullable|string|max:255',
             'pic_nip' => 'nullable|string|max:50',
             'pic_position' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
+
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
+            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('images/logos');
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $logoPath = 'images/logos/' . $filename;
+        }
 
         $univ = University::create([
             'name' => $request->name,
@@ -70,6 +88,7 @@ class UniversityController extends Controller
             'pic_name' => $request->pic_name,
             'pic_nip' => $request->pic_nip,
             'pic_position' => $request->pic_position,
+            'logo' => $logoPath,
         ]);
 
         AuditLog::record('UNIVERSITY_CREATE', 'University', $univ->id, [
@@ -104,6 +123,7 @@ class UniversityController extends Controller
             'weight_mentor' => 'nullable|integer|min:0|max:100',
             'weight_lecturer' => 'nullable|integer|min:0|max:100',
             'require_dpl' => 'nullable',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
 
         $evaluationScheme = $request->input('evaluation_scheme', $univ->evaluation_scheme ?? 'dual_evaluation');
@@ -122,7 +142,7 @@ class UniversityController extends Controller
             $requireDpl = $request->boolean('require_dpl', true);
         }
 
-        $univ->update([
+        $data = [
             'name' => $request->name,
             'code' => strtoupper(trim($request->code)),
             'email' => $request->email ? strtolower(trim($request->email)) : null,
@@ -135,7 +155,21 @@ class UniversityController extends Controller
             'weight_mentor' => $weightMentor,
             'weight_lecturer' => $weightLecturer,
             'require_dpl' => $requireDpl,
-        ]);
+        ];
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
+            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $targetDir = public_path('images/logos');
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $file->move($targetDir, $filename);
+            $data['logo'] = 'images/logos/' . $filename;
+        }
+
+        $univ->update($data);
 
         AuditLog::record('UNIVERSITY_UPDATE', 'University', $univ->id, [
             'name' => $univ->name,
@@ -191,6 +225,7 @@ class UniversityController extends Controller
         session()->flash('new_university_credential', [
             'univ_name' => $univ->name,
             'name' => $user->name,
+            'user_id' => $user->id,
             'email' => $email,
             'password' => $password,
             'login_url' => url('/login'),
@@ -202,18 +237,45 @@ class UniversityController extends Controller
 
     public function destroy($id)
     {
-        $univ = University::withCount(['users', 'students'])->findOrFail($id);
+        $univ = University::withCount(['students', 'dosens'])->findOrFail($id);
 
-        if ($univ->users_count > 0 || $univ->students_count > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Masih ada {$univ->users_count} user dan {$univ->students_count} mahasiswa terdaftar di universitas ini.");
+        // 1. Proteksi Mahasiswa: Jika ada mahasiswa terdaftar, jangan hapus
+        if ($univ->students_count > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Masih ada {$univ->students_count} mahasiswa terdaftar di {$univ->name}. Pindahkan atau hapus data mahasiswa terlebih dahulu.");
+        }
+
+        // 2. Proteksi Dosen dengan Bimbingan Aktif
+        $activeDosenCount = $univ->dosens()
+            ->whereHas('academicPlacements', function ($q) {
+                $q->whereHas('application', function ($aq) {
+                    $aq->whereIn('status', ['accepted', 'verified']);
+                });
+            })->count();
+
+        if ($activeDosenCount > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeDosenCount} dosen pembimbing dari {$univ->name} yang sedang membimbing mahasiswa aktif.");
         }
 
         $name = $univ->name;
-        $univ->delete();
+
+        \DB::transaction(function () use ($univ) {
+            // Hapus akun admin kampus yang terafiliasi dengan universitas ini
+            User::where('university_id', $univ->id)
+                ->where('role', 'universitas')
+                ->delete();
+
+            // Lepaskan relasi dosen non-aktif jika ada
+            User::where('university_id', $univ->id)
+                ->whereIn('role', ['dosen', 'academic_advisor'])
+                ->update(['university_id' => null, 'university' => null]);
+
+            // Hapus data universitas
+            $univ->delete();
+        });
 
         AuditLog::record('UNIVERSITY_DELETE', 'University', $id, ['name' => $name]);
 
         return redirect()->route('admin.universities.index')
-            ->with('success', "Universitas '{$name}' berhasil dihapus.");
+            ->with('success', "Universitas '{$name}' dan akun admin kampusnya berhasil dihapus.");
     }
 }

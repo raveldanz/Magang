@@ -83,7 +83,13 @@ class LogbookController extends Controller
         $request->validate([
             'date'       => 'required|date',
             'activity'   => 'required|string|min:10',
-            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072',
+        ], [
+            'date.required'     => 'Tanggal kegiatan logbook wajib diisi.',
+            'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
+            'activity.min'      => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
+            'attachment.mimes'  => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
+            'attachment.max'    => 'Ukuran file lampiran logbook maksimal 3MB (3072 KB).',
         ]);
 
         $filePath = null;
@@ -165,7 +171,13 @@ class LogbookController extends Controller
         $request->validate([
             'date'       => 'required|date',
             'activity'   => 'required|string|min:10',
-            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072',
+        ], [
+            'date.required'     => 'Tanggal kegiatan logbook wajib diisi.',
+            'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
+            'activity.min'      => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
+            'attachment.mimes'  => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
+            'attachment.max'    => 'Ukuran file lampiran logbook maksimal 3MB (3072 KB).',
         ]);
 
         $logbook = Logbook::findOrFail($id);

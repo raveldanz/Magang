@@ -17,5 +17,15 @@ class AgencyProfile extends Model
     {
         return $this->hasMany(User::class, 'agency_profile_id');
     }
+
+    public function agencyAdmin()
+    {
+        return $this->hasOne(User::class, 'agency_profile_id')->where('role', 'admin');
+    }
+
+    public function admins()
+    {
+        return $this->hasMany(User::class, 'agency_profile_id')->where('role', 'admin');
+    }
 }
 

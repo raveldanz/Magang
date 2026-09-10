@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -228,13 +228,17 @@
                                                 Edit
                                             </a>
 
-                                            <form action="{{ route('admin.units.destroy', $unit->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus divisi {{ $unit->name }}?');" class="btn-action-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn-action-delete" title="Hapus Divisi">
-                                                    Hapus
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    @click="$dispatch('open-delete-modal', {
+                                                        action: '{{ route('admin.units.destroy', $unit->id) }}',
+                                                        title: 'Hapus Divisi / Lowongan Magang',
+                                                        name: '{{ addslashes($unit->name) }}',
+                                                        desc: 'Instansi: {{ addslashes($unit->agencyProfile->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
+                                                    })" 
+                                                    class="btn-action-delete"
+                                                    title="Hapus Divisi">
+                                                Hapus
+                                            </button>
                                         </div>
                                     </td>
 

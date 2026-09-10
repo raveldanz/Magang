@@ -10,6 +10,7 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
 {
@@ -50,13 +51,25 @@ class ApplicationController extends Controller
             'unit_id'         => 'required|exists:units,id',
             'start_date'      => 'required|date|after_or_equal:today',
             'end_date'        => 'required|date|after_or_equal:start_date',
-            'surat_pengantar' => 'required|mimes:pdf|max:2048', 
-            'cv'              => 'required|mimes:pdf|max:2048',
-            'transkrip'       => 'required|mimes:pdf|max:2048',
-            'id_card'         => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+            'surat_pengantar' => 'required|file|mimes:pdf|max:2048', 
+            'cv'              => 'required|file|mimes:pdf|max:2048',
+            'transkrip'       => 'required|file|mimes:pdf|max:2048',
+            'id_card'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
             'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
             'end_date.after_or_equal'   => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
+            'surat_pengantar.required'  => 'Surat Pengantar / Proposal magang wajib diunggah.',
+            'surat_pengantar.mimes'     => 'File Surat Pengantar harus berformat PDF.',
+            'surat_pengantar.max'       => 'Ukuran file Surat Pengantar maksimal 2MB (2048 KB).',
+            'cv.required'               => 'Berkas CV (Curriculum Vitae) wajib diunggah.',
+            'cv.mimes'                  => 'File CV harus berformat PDF.',
+            'cv.max'                    => 'Ukuran file CV maksimal 2MB (2048 KB).',
+            'transkrip.required'        => 'Transkrip Nilai akademik wajib diunggah.',
+            'transkrip.mimes'           => 'File Transkrip Nilai harus berformat PDF.',
+            'transkrip.max'             => 'Ukuran file Transkrip Nilai maksimal 2MB (2048 KB).',
+            'id_card.required'          => 'KTM / Kartu Identitas wajib diunggah.',
+            'id_card.mimes'             => 'File KTM / Kartu Identitas harus berformat PDF, JPG, JPEG, atau PNG.',
+            'id_card.max'               => 'Ukuran file KTM / Kartu Identitas maksimal 2MB (2048 KB).',
         ]);
 
         // Cek Sisa Kuota Instansi yang Dipilih
@@ -84,6 +97,7 @@ class ApplicationController extends Controller
             'transcript_path'      => $transcriptPath,
             'id_card_path'         => $idCardPath,
             'status'               => 'pending',
+            'letter_token'         => Str::random(32),
         ]);
 
         // 2. Simpan Dokumen Persyaratan ke tabel application_documents

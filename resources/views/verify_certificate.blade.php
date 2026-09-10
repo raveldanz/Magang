@@ -49,6 +49,16 @@
                 
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500 font-medium">Nomor Registrasi Sertifikat:</span>
+                        <span class="font-bold text-blue-700 font-mono">{{ $placement->certificate_number ?? ('SRT/' . date('Y') . '/' . str_pad($placement->id, 4, '0', STR_PAD_LEFT)) }}</span>
+                    </div>
+                    @if($placement->certificate_hash)
+                        <div class="flex justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-500 font-medium">Kode Keamanan Digital:</span>
+                            <span class="font-mono text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded font-semibold">{{ substr($placement->certificate_hash, 0, 16) }}...</span>
+                        </div>
+                    @endif
+                    <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Nama Mahasiswa:</span>
                         <span class="font-bold text-gray-900 uppercase">{{ $student->name }}</span>
                     </div>

@@ -1,0 +1,21 @@
+# ==============================================================================
+# Agent Context Boundary (.agentignore)
+# ==============================================================================
+
+# Build artifacts, dependencies, and heavy caches
+node_modules/
+vendor/
+.git/
+storage/logs/
+storage/framework/
+public/build/
+*.log
+*.sql
+
+# ==============================================================================
+# Whitelist (Media, Assets & Organization Logos)
+# ==============================================================================
+!public/images/
+!public/assets/logos/
+!storage/app/public/
+!public/storage/

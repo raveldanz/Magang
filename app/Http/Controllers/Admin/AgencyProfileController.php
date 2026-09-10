@@ -60,7 +60,7 @@ class AgencyProfileController extends Controller
             'phone'           => 'nullable|string|max:50',
             'email'           => 'nullable|email|max:100',
             'website'         => 'nullable|string|max:150',
-            'logo'            => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'logo'            => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
             'signee_name'     => 'required|string|max:255',
             'signee_nip'      => 'nullable|string|max:100',
             'signee_position' => 'required|string|max:255',

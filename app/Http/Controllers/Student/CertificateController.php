@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CertificateController extends Controller
 {
@@ -158,8 +159,29 @@ class CertificateController extends Controller
             $university = University::where('name', 'like', '%' . $profile->universitas . '%')->first();
         }
 
-        // Nomor Registrasi Sertifikat
-        $regNumber = "SERT/{$application->id}/PEMKOT-SBY/" . Carbon::now()->format('Y');
+        // Nomor Registrasi Sertifikat & Hash Verifikasi Publik
+        $year = Carbon::now()->format('Y');
+        $paddedId = str_pad($placement ? $placement->id : $application->id, 3, '0', STR_PAD_LEFT);
+        
+        if ($placement) {
+            $dirty = false;
+            if (empty($placement->certificate_hash)) {
+                $placement->certificate_hash = Str::random(32);
+                $dirty = true;
+            }
+            if (empty($placement->certificate_number)) {
+                $placement->certificate_number = "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+                $dirty = true;
+            }
+            if ($dirty) {
+                $placement->save();
+            }
+        }
+
+        $regNumber = $placement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+        $certificateHash = $placement?->certificate_hash;
+        $verifyCertificateUrl = route('verify.certificate', $certificateHash ?: ($placement ? $placement->id : $application->id));
+        $qrVerifyUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyCertificateUrl);
 
         return compact(
             'application',
@@ -172,7 +194,10 @@ class CertificateController extends Controller
             'university',
             'eval',
             'finalReport',
-            'regNumber'
+            'regNumber',
+            'certificateHash',
+            'verifyCertificateUrl',
+            'qrVerifyUrl'
         );
     }
 

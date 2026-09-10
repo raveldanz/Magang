@@ -44,6 +44,12 @@
                         <span class="text-gray-500 font-medium">Nomor Surat Balasan:</span>
                         <span class="font-bold text-blue-700 font-mono">{{ $application->letter_number ?? '-' }}</span>
                     </div>
+                    @if($application->letter_token)
+                        <div class="flex justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-500 font-medium">Kode Keamanan Digital:</span>
+                            <span class="font-mono text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded font-semibold">{{ substr($application->letter_token, 0, 16) }}...</span>
+                        </div>
+                    @endif
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Tanggal Terbit Surat:</span>
                         <span class="font-semibold text-gray-800">{{ $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->translatedFormat('d F Y') : '-' }}</span>

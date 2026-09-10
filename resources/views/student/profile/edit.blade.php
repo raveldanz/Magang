@@ -159,14 +159,14 @@
                     </div>
 
                     <!-- Tombol Aksi -->
-                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                             Kembali ke Dashboard
+                    <div class="pt-5 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
+                        <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center flex items-center justify-center">
+                            {{ __('Kembali ke Dashboard') }}
                         </a>
 
-                        <x-primary-button class="text-xs px-5 py-2.5">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition cursor-pointer flex items-center justify-center">
                             {{ __('Simpan Perubahan Profil') }}
-                        </x-primary-button>
+                        </button>
                     </div>
                 </form>
 

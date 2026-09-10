@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" width="100%" height="100%">
+  <!-- Soft Theme-Tuned Background -->
+  <rect width="100" height="100" rx="22" fill="#EFF6FF"/>
+  <rect x="1.5" y="1.5" width="97" height="97" rx="20.5" stroke="#DBEAFE" stroke-width="2"/>
+
+  <!-- Cap Base (Skull Cap under Mortarboard) -->
+  <path d="M28 47V56C28 64.5 37.8 71 50 71C62.2 71 72 64.5 72 56V47" fill="#1E40AF"/>
+  <path d="M28 47V56C28 64.5 37.8 71 50 71C62.2 71 72 64.5 72 56V47" stroke="#1E3A8A" stroke-width="1.5"/>
+
+  <!-- Mortarboard Diamond Top -->
+  <polygon points="50,22 89,39 50,56 11,39" fill="#2563EB"/>
+  
+  <!-- Subtle Isometric Top Surface -->
+  <polygon points="50,23.5 87,39 50,54.5 13,39" fill="#3B82F6"/>
+  <polygon points="50,23.5 87,39 50,26.5 13,39" fill="#60A5FA" opacity="0.45"/>
+
+  <!-- Center Pin/Button -->
+  <ellipse cx="50" cy="39" rx="3.5" ry="2.2" fill="#1E3A8A"/>
+
+  <!-- Tassel Cord -->
+  <path d="M50 39 C62 39, 77 43, 81 48 C83 51, 83 60, 83 68" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Tassel Band & Brush -->
+  <rect x="80.5" y="68" width="5" height="3" rx="1" fill="#D97706"/>
+  <path d="M80.5 71 L79 81 C79 82 87 82 87 81 L85.5 71 Z" fill="#F59E0B"/>
+</svg>

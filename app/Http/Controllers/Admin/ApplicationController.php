@@ -11,6 +11,7 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
 {
@@ -166,26 +167,26 @@ class ApplicationController extends Controller
 
         $unit = $application->unit;
 
-        // Dynamic Quota Lifecycle Engine
+        // Dynamic Quota Lifecycle Engine: Validasi kapasitas kuota sebelum menerima pengajuan
         if ($newStatus === 'accepted' && $oldStatus !== 'accepted') {
-            if ($unit && $unit->quota <= 0 && !$isSuperAdmin) {
-                return redirect()->back()->with('error', "Gagal menerima: Kuota unit kerja '{$unit->name}' telah habis (0).");
-            }
-            if ($unit && $unit->quota > 0) {
-                $unit->decrement('quota');
-            }
-        } elseif ($oldStatus === 'accepted' && in_array($newStatus, ['rejected', 'pending'])) {
-            if ($unit) {
-                $unit->increment('quota');
+            if ($unit && $unit->remaining_quota <= 0) {
+                $acceptedCount = $unit->applications()->where('status', 'accepted')->count();
+                return redirect()->back()->with('error', "Gagal menerima pengajuan: Kuota unit kerja '{$unit->name}' telah penuh (Kapasitas: {$unit->quota}, Terisi: {$acceptedCount}). Silakan tambah kapasitas kuota unit kerja terlebih dahulu jika ingin menerima mahasiswa tambahan.");
             }
         }
         
+        $year = date('Y');
+        $paddedId = str_pad($application->id, 3, '0', STR_PAD_LEFT);
+        $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
+        $letterToken = $application->letter_token ?: Str::random(32);
+
         $application->update([
             'status' => $newStatus,
             'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
             'rejection_reason' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
-            'letter_number' => $newStatus === 'accepted' ? $request->letter_number : null,
-            'letter_date' => $newStatus === 'accepted' ? $request->letter_date : null,
+            'letter_number' => $newStatus === 'accepted' ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
+            'letter_date' => $newStatus === 'accepted' ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
+            'letter_token' => $newStatus === 'accepted' ? $letterToken : $application->letter_token,
         ]);
 
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
@@ -198,6 +199,12 @@ class ApplicationController extends Controller
 
         if ($request->filled('academic_advisor_id')) {
             $placementData['academic_advisor_id'] = $request->academic_advisor_id;
+        }
+
+        if ($newStatus === 'accepted') {
+            $existingPlacement = Placement::where('application_id', $application->id)->first();
+            $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
+            $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
         }
 
         if (!empty($placementData) || $newStatus === 'accepted') {

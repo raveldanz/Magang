@@ -8,7 +8,8 @@
         "autopilot": "node scripts/hermes_autopilot.mjs",
         "autopilot:watch": "node scripts/hermes_autopilot.mjs --watch",
         "live": "node scripts/hermes_live_browser.mjs",
-        "student:7days": "node scripts/hermes_live_student_7days.mjs"
+        "student:7days": "node scripts/hermes_live_student_7days.mjs",
+        "test:hermes": "node scripts/hermes_all_roles_test.mjs"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",

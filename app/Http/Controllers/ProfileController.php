@@ -41,20 +41,25 @@ class ProfileController extends Controller
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+{
+    $user = $request->user();
 
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+    // Blokir jika yang mencoba menghapus akun adalah Admin
+    if (in_array($user->role, ['admin', 'super_admin'])) {
+        return back()->with('error', 'Akun Administrator tidak dapat dihapus secara mandiri demi keamanan sistem.');
     }
+
+    $request->validateWithBag('userDeletion', [
+        'password' => ['required', 'current_password'],
+    ]);
+
+    Auth::logout();
+
+    $user->delete();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/')->with('success', 'Akun Anda berhasil dihapus.');
+}
 }

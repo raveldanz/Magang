@@ -247,36 +247,47 @@
 
         </div>
 
-        <!-- 3. FOOTER TANDA TANGAN DUA PIHAK (Bagian Bawah) -->
-        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-4 text-center text-xs">
+        <!-- 3. FOOTER TANDA TANGAN DUA PIHAK & VERIFIKASI DIGITAL (Bagian Bawah) -->
+        <div class="relative z-10 grid grid-cols-3 gap-4 items-end px-8 pb-4 text-center text-xs">
             
             <!-- TTD 1: Dosen Pembimbing Lapangan (DPL) / Kampus -->
             <div>
                 <p class="text-slate-500 font-medium text-[10.5px]">Mengetahui & Menyetujui,</p>
                 <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing Lapangan (DPL)</p>
-                <p class="text-[10px] text-slate-500">{{ $profile->universitas ?? ($university->name ?? 'Universitas') }}</p>
+                <p class="text-[10px] text-slate-500 truncate">{{ $profile->universitas ?? ($university->name ?? 'Universitas') }}</p>
                 
-                <div class="h-14 flex items-center justify-center my-0.5">
-                    <span class="font-quote text-blue-900/35 text-lg italic font-bold">Verified Digital Signature</span>
+                <div class="h-12 flex items-center justify-center my-0.5">
+                    <span class="font-quote text-blue-900/35 text-base italic font-bold">Verified Digital Signature</span>
                 </div>
 
-                <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
+                <div class="border-t border-slate-400/60 pt-1 max-w-[200px] mx-auto">
                     <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
                     <p class="text-[9.5px] text-slate-500">NIP/NIDN: {{ $dosen->nip ?? '-' }}</p>
                 </div>
             </div>
 
-            <!-- TTD 2: Kepala Dinas / Pembimbing Lapangan Instansi -->
+            <!-- TTD 2: QR Code Validasi Keaslian Sertifikat Digital -->
+            <div class="flex flex-col items-center justify-center">
+                <div class="p-1.5 bg-white border border-slate-200/90 rounded-xl shadow-2xs">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data={{ urlencode($qrVerifyUrl ?? route('verify.certificate', $placement->certificate_hash ?? $placement->id)) }}" 
+                         alt="QR Verifikasi Sertifikat" 
+                         class="w-16 h-16 object-contain">
+                </div>
+                <p class="text-[8.5px] font-bold text-slate-700 mt-1 uppercase tracking-wider">Verifikasi Digital Resmi</p>
+                <p class="text-[8px] font-mono text-slate-400 select-all">{{ substr($placement->certificate_hash ?? md5($placement->id), 0, 16) }}...</p>
+            </div>
+
+            <!-- TTD 3: Kepala Dinas / Pembimbing Lapangan Instansi -->
             <div>
                 <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p class="font-bold text-slate-800 text-xs mt-0.5">{{ $agencyProfile->signee_position ?? 'Kepala Dinas' }}</p>
-                <p class="text-[10px] text-slate-500">{{ $agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</p>
+                <p class="text-[10px] text-slate-500 truncate">{{ $agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</p>
                 
-                <div class="h-14 flex items-center justify-center my-0.5">
-                    <span class="font-quote text-emerald-900/35 text-lg italic font-bold">Official Seal Verified</span>
+                <div class="h-12 flex items-center justify-center my-0.5">
+                    <span class="font-quote text-emerald-900/35 text-base italic font-bold">Official Seal Verified</span>
                 </div>
 
-                <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
+                <div class="border-t border-slate-400/60 pt-1 max-w-[200px] mx-auto">
                     <p class="font-bold text-slate-900 text-xs">{{ $agencyProfile->signee_name ?? 'Drs. H. M. NASER, M.Si' }}</p>
                     <p class="text-[9.5px] text-slate-500">NIP: {{ $agencyProfile->signee_nip ?? '19700101 199503 1 002' }}</p>
                 </div>
