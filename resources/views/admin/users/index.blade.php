@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -230,18 +230,19 @@
 
                                             <!-- Hapus User -->
                                             @if($u->id !== $currentUser->id)
-                                                <button type="button" 
-                                                        @click="$dispatch('open-delete-modal', {
-                                                            action: '{{ route('admin.users.destroy', $u->id) }}',
-                                                            title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
-                                                        })" 
-                                                        class="btn-action-delete"
-                                                        title="Hapus Pengguna">
-                                                    Hapus
-                                                </button>
-                                            @endif
+    <form action="{{ route('admin.users.destroy', $u->id) }}" 
+          method="POST" 
+          class="btn-action-form"
+          onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun {{ addslashes($u->name) }}? Tindakan ini tidak dapat dibatalkan.');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" 
+                class="btn-action-delete" 
+                title="Hapus Pengguna">
+            Hapus
+        </button>
+    </form>
+@endif
 
                                         </div>
                                     </td>
