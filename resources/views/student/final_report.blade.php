@@ -1,8 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs">
-                
+            <a href="{{ route('dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs flex items-center justify-center" title="Kembali ke Dashboard">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
@@ -66,17 +68,17 @@
                         <div>
                             @if($finalReport->status === 'approved')
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-2xs">
-                                  
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                     <span>Laporan Disetujui (ACC)</span>
                                 </span>
                             @elseif($finalReport->status === 'revision')
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1.5 shadow-2xs">
-                                
+                                    <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Perlu Perbaikan (Revisi)</span>
                                 </span>
                             @else
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-2xs">
-                                
+                                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span>Menunggu Verifikasi DPL / Mentor</span>
                                 </span>
                             @endif
@@ -97,8 +99,9 @@
                     <!-- Feedback / Catatan Revisi jika ada -->
                     @if ($finalReport->feedback)
                         <div class="p-4 rounded-2xl {{ $finalReport->status === 'revision' ? 'bg-rose-50/80 border-rose-200 text-rose-900' : 'bg-emerald-50/80 border-emerald-200 text-emerald-900' }} border text-xs space-y-1">
-                            <span class="font-bold uppercase tracking-wider text-[11px] block">
-                            
+                            <span class="font-bold uppercase tracking-wider text-[11px] block flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                                {{ $finalReport->status === 'revision' ? 'Catatan Perbaikan / Masukan Revisi:' : 'Catatan Pembimbing:' }}
                             </span>
                             <p class="whitespace-pre-line leading-relaxed italic">
                                 "{{ $finalReport->feedback }}"
@@ -183,8 +186,10 @@
                     </form>
                 </div>
             @else
-                <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl text-center space-y-2 shadow-xs">
-                
+                <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl text-center space-y-3 shadow-xs">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    </div>
                     <h3 class="font-black text-base text-emerald-900">Laporan Akhir Anda Telah Disetujui Secara Resmi</h3>
                     <p class="text-xs text-emerald-700 max-w-xl mx-auto">
                         Naskah laporan akhir Anda telah di-ACC oleh DPL dan pembimbing lapangan. Nilai kelulusan dan sertifikat resmi dapat dilihat di Dashboard.
