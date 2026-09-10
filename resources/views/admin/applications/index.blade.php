@@ -1,13 +1,13 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Daftar Pengajuan Magang') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="py-5 sm:py-8 lg:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100">
                 
                 <!-- Form Filter & Search (Responsive Single-Row Flex Layout) -->
                 <form method="GET" action="{{ route('admin.applications.index') }}" class="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
@@ -71,8 +71,8 @@
                     </div>
                 </form>
 
-                <!-- Tabel Data Pengajuan -->
-                <div class="overflow-x-auto">
+                <!-- Tabel Data Pengajuan (Desktop & Tablet) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b bg-gray-50 text-xs font-semibold text-gray-600 uppercase">
@@ -123,6 +123,53 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Kartu Data Pengajuan Khusus Mobile (< 768px) -->
+                <div class="md:hidden space-y-3">
+                    @forelse ($applications as $app)
+                        <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user->name }}</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">{{ $app->user->studentProfile->universitas ?? '-' }} <span class="text-slate-400">({{ $app->user->studentProfile->jurusan ?? '-' }})</span></p>
+                                </div>
+                                <span class="px-2.5 py-1 text-[11px] font-bold rounded-full border shadow-2xs shrink-0
+                                    {{ $app->status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' : '' }}
+                                    {{ $app->status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-300 font-black' : '' }}
+                                    {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}
+                                    {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800 border-blue-300' : '' }}">
+                                    {{ strtoupper($app->status) }}
+                                </span>
+                            </div>
+
+                            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
+                                <div class="flex items-center justify-between text-slate-600">
+                                    <span class="text-slate-400">Unit Tujuan:</span>
+                                    <span class="font-semibold text-slate-800 text-right">{{ $app->unit->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-slate-600">
+                                    <span class="text-slate-400">Diajukan:</span>
+                                    <span class="font-mono text-slate-500">{{ $app->created_at->format('d M Y, H:i') }}</span>
+                                </div>
+                            </div>
+
+                            @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
+                                <div class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 w-full justify-center">
+                                     SIAP CETAK SERTIFIKAT
+                                </div>
+                            @endif
+
+                            <a href="{{ route('admin.applications.show', $app->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                <span>Detail & Verifikasi Berkas</span>
+                                <span>&rarr;</span>
+                            </a>
+                        </div>
+                    @empty
+                        <div class="p-6 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
+                            Tidak ada pengajuan magang yang sesuai kriteria pencarian.
+                        </div>
+                    @endforelse
                 </div>
 
                 <!-- Paginasi -->

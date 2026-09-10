@@ -72,15 +72,17 @@
                             </label>
                             
                             <div class="w-32 h-32 rounded-2xl bg-white p-2 border border-gray-200 shadow-xs flex items-center justify-center overflow-hidden mb-3">
-                                @if ($university->logo && file_exists(public_path($university->logo)))
-                                    <img src="{{ asset($university->logo) }}" alt="Logo {{ $university->name }}" class="max-h-full max-w-full object-contain">
-                                @else
-                                    <img src="{{ asset('images/default-university.svg') }}" alt="Logo Default {{ $university->name }}" class="w-16 h-16 object-contain opacity-80">
-                                @endif
+                                @php
+                                    $defaultUnivLogo = asset('images/default-university.svg');
+                                    $currentUnivLogo = ($university->logo && file_exists(public_path($university->logo))) ? asset($university->logo) : $defaultUnivLogo;
+                                @endphp
+                                <img id="univLogoPreview" src="{{ $currentUnivLogo }}" alt="Logo {{ $university->name }}" class="max-h-full max-w-full object-contain transition-all duration-200">
                             </div>
 
-                            <input type="file" name="logo" id="logo" accept="image/*" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                            <p class="text-[10px] text-gray-400 mt-1.5">Format: PNG, JPG, WEBP. Maks 2MB.</p>
+                            <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                   onchange="handleLogoPreview(this, 'univLogoPreview', '{{ $currentUnivLogo }}')"
+                                   class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                            <p class="text-[10px] text-gray-400 mt-1.5">Format: PNG, JPG, WEBP, SVG. Maks 2MB.</p>
                         </div>
 
                         <!-- Nama & Singkatan Kampus -->
@@ -297,7 +299,7 @@
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                         Simpan Perubahan Profil & Kebijakan Kampus
                     </button>
                 </div>
@@ -306,4 +308,39 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function handleLogoPreview(input, previewId, defaultSrc) {
+            const preview = document.getElementById(previewId);
+            if (!preview) return;
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran berkas logo terlalu besar (maksimal 2MB).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = defaultSrc;
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>

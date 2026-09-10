@@ -372,7 +372,7 @@
         $pembimbingPhone = $pembimbing->phone ?? optional($pembimbing->studentProfile)->phone ?? $phone ?? '-';
 
         // QR Code Verifikasi Dokumen
-        $verifyUrl = route('verify.letter', $application->id);
+        $verifyUrl = route('verify.letter', $application->letter_token ?? $application->id);
         $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
 
         // Logo BSrE Base64

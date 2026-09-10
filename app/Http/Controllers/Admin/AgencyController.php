@@ -174,19 +174,51 @@ class AgencyController extends Controller
 
     public function destroy($id)
     {
-        $agency = AgencyProfile::withCount(['units', 'users'])->findOrFail($id);
+        $agency = AgencyProfile::with(['units'])->findOrFail($id);
 
-        if ($agency->units_count > 0 || $agency->users_count > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Instansi ini masih memiliki {$agency->units_count} unit kerja dan {$agency->users_count} akun terdaftar.");
+        // 1. Proteksi Unit dengan Mahasiswa Aktif
+        $activeUnitAppsCount = \App\Models\Application::whereIn('unit_id', $agency->units->pluck('id'))
+            ->whereIn('status', ['accepted', 'verified'])
+            ->count();
+
+        if ($activeUnitAppsCount > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Instansi '{$agency->agency_name}' masih memiliki {$activeUnitAppsCount} mahasiswa aktif pada unit kerjanya.");
+        }
+
+        // 2. Proteksi Mentor dengan Bimbingan Aktif
+        $activeMentorsCount = \App\Models\Placement::whereIn('mentor_id', User::where('agency_profile_id', $agency->id)->whereIn('role', ['mentor', 'pembimbing'])->pluck('id'))
+            ->whereHas('application', function ($aq) {
+                $aq->whereIn('status', ['accepted', 'verified']);
+            })->count();
+
+        if ($activeMentorsCount > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Terdapat {$activeMentorsCount} mahasiswa aktif yang sedang dibimbing oleh mentor dinas ini.");
         }
 
         $name = $agency->agency_name;
-        $agency->delete();
+
+        \DB::transaction(function () use ($agency) {
+            // Hapus unit kerja kosong
+            $agency->units()->delete();
+
+            // Hapus akun admin dinas yang terafiliasi dengan instansi ini
+            User::where('agency_profile_id', $agency->id)
+                ->where('role', 'admin')
+                ->delete();
+
+            // Lepaskan relasi mentor non-aktif jika ada
+            User::where('agency_profile_id', $agency->id)
+                ->whereIn('role', ['mentor', 'pembimbing'])
+                ->update(['agency_profile_id' => null]);
+
+            // Hapus data instansi
+            $agency->delete();
+        });
 
         AuditLog::record('AGENCY_DELETE', 'AgencyProfile', $id, ['name' => $name]);
 
         return redirect()->route('admin.agencies.index')
-            ->with('success', "Instansi '{$name}' berhasil dihapus dari sistem.");
+            ->with('success', "Instansi '{$name}' dan akun admin dinasnya berhasil dihapus.");
     }
 
     /**
@@ -233,6 +265,7 @@ class AgencyController extends Controller
         session()->flash('new_agency_credential', [
             'agency_name' => $agency->agency_name,
             'name' => $user->name,
+            'user_id' => $user->id,
             'email' => $email,
             'password' => $password,
             'login_url' => url('/login'),
