@@ -17,7 +17,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-5 sm:py-8 lg:py-10">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success / Error Messages -->
@@ -171,15 +171,28 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Unggah File Laporan (PDF / DOCX) <span class="text-rose-500">*</span>
                             </label>
-                            <input type="file" name="file_laporan" accept=".pdf,.doc,.docx" required class="block w-full text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-slate-50 focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,.doc,.docx" required 
+                                   onchange="handleFinalReportPreview(this)"
+                                   class="block w-full text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-slate-50 focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                             <p class="text-[11px] text-gray-400 mt-1">Ukuran maksimal file: 10 MB. Format yang didukung: PDF, DOC, DOCX.</p>
+
+                            <!-- File Selection Feedback -->
+                            <div id="reportFileBox" class="hidden mt-3 p-3 bg-blue-50/60 border border-blue-200 rounded-xl items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p id="reportFileName" class="text-xs font-bold text-slate-800 truncate"></p>
+                                    <p id="reportFileSize" class="text-[11px] text-slate-500"></p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-3">
-                            <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <div class="pt-3 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
+                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
                                 Batal
                             </a>
-                            <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                            <button type="submit" class="w-full sm:w-auto px-7 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                                 {{ $finalReport ? 'Unggah Ulang Naskah Revisi' : 'Kirim Laporan Akhir' }}
                             </button>
                         </div>
@@ -199,4 +212,33 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function handleFinalReportPreview(input) {
+            const box = document.getElementById('reportFileBox');
+            const nameEl = document.getElementById('reportFileName');
+            const sizeEl = document.getElementById('reportFileSize');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Ukuran berkas naskah laporan melebihi batas maksimal 10MB.');
+                    input.value = '';
+                    box.classList.add('hidden');
+                    box.classList.remove('flex');
+                    return;
+                }
+
+                nameEl.textContent = file.name;
+                sizeEl.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                box.classList.remove('hidden');
+                box.classList.add('flex');
+            } else {
+                box.classList.add('hidden');
+                box.classList.remove('flex');
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>

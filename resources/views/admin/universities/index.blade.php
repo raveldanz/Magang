@@ -21,10 +21,11 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Flash Alert -->
-            @if (session('success'))
+            <!-- Flash Alert Success (Disembunyikan jika kartu kredensial baru aktif agar tidak ada pesan duplikat) -->
+            @if (session('success') && !session('new_university_credential'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -33,49 +34,122 @@
             @if (session('error'))
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span>{{ session('error') }}</span>
                     </div>
                 </div>
             @endif
 
-            <!-- Credential Flash Alert -->
+            <!-- Credential Flash Alert (Tema Resmi Kedinasan Pemerintah Kota Surabaya - Kemitraan Kampus) -->
             @if (session('new_university_credential'))
                 @php $cred = session('new_university_credential'); @endphp
-                <div class="p-6 rounded-3xl shadow-2xl space-y-4 border" 
-                     style="background-color: #0f172a !important; color: #ffffff !important; border-color: #334155 !important;">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #1e293b !important;">
-                        <div class="flex items-center gap-3">
-                            <div>
-                                <h3 class="font-extrabold text-base sm:text-lg tracking-tight" style="color: #ffffff !important;">
-                                    Akun Admin Kampus Baru Berhasil Dibuat!
-                                </h3>
-                                <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">
-                                    Kredensial resmi untuk <strong style="color: #38bdf8 !important;">{{ $cred['univ_name'] }}</strong> siap diteruskan ke pihak kemahasiswaan/rektorat.
-                                </p>
-                            </div>
-                        </div>
-                        <button type="button" 
-                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span></span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span></span>', 3000);"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                            <span>Salin Semua Kredensial</span>
-                            <span></span>
-                        </button>
+                <div class="relative overflow-hidden rounded-3xl shadow-2xl border border-blue-400/30 p-6 sm:p-7 space-y-5"
+                     style="background: linear-gradient(135deg, #09172e 0%, #0d2857 45%, #07152c 100%) !important; color: #ffffff !important;">
+                    
+                    <!-- Watermark Lambang Perisai Kedinasan Pemkot Surabaya -->
+                    <div class="absolute -right-8 -bottom-10 pointer-events-none opacity-[0.06] text-white">
+                        <svg class="w-72 h-72" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.04-7 10.19-3.87-1.15-7-5.52-7-10.19V6.3l7-3.12z"/>
+                        </svg>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
-                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
-                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">URL Login Portal:</span>
-                            <span class="font-bold select-all break-all text-xs" style="color: #38bdf8 !important;">{{ $cred['login_url'] }}</span>
+                    <!-- Header Bagian Atas: Judul dan Tombol Aksi -->
+                    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-blue-400/20 pb-5">
+                        <div class="space-y-1">
+                            <h3 class="font-black text-lg sm:text-xl text-white tracking-tight flex items-center gap-2">
+                                <span>Akun Admin Kampus Baru Berhasil Dibuat!</span>
+                            </h3>
+                            <p class="text-xs text-blue-100/80 leading-relaxed">
+                                Kredensial login resmi untuk mitra <strong class="text-amber-300 font-bold underline decoration-amber-400/40 underline-offset-2">{{ $cred['univ_name'] }}</strong> siap diteruskan ke pihak kemahasiswaan/rektorat.
+                            </p>
                         </div>
-                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
-                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Email / Username:</span>
-                            <span class="font-bold select-all break-all text-xs" style="color: #34d399 !important;">{{ $cred['email'] }}</span>
+
+                        <!-- Action Buttons Group: Salin Kredensial & Login As -->
+                        <div class="flex flex-wrap items-center gap-2.5 shrink-0 pt-1 lg:pt-0">
+                            <!-- Tombol Salin Semua Kredensial -->
+                            <button type="button" 
+                                    id="btnCopyCredUniv"
+                                    onclick="navigator.clipboard.writeText('Universitas: {{ addslashes($cred['univ_name']) }}\nPortal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<svg class=\'w-4 h-4 text-emerald-300\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg><span>Tersalin ke Clipboard!</span>'; setTimeout(() => this.innerHTML = '<svg class=\'w-4 h-4 text-blue-200\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3\'/></svg><span>Salin Semua Kredensial</span>', 3000);"
+                                    class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-blue-950/70 hover:bg-blue-900/80 text-blue-100 border border-blue-400/30 rounded-xl text-xs font-bold transition shadow-sm hover:border-blue-300 cursor-pointer active:scale-95">
+                                <svg class="w-4 h-4 text-blue-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                <span>Salin Semua Kredensial</span>
+                            </button>
+
+                            <!-- Tombol Login As Super Admin (Langsung Masuk Sekali Klik) -->
+                            @if($isSuperAdmin && !empty($cred['user_id']))
+                                <form action="{{ route('admin.impersonate', $cred['user_id']) }}" method="POST" class="inline-block m-0">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-emerald-950/60 hover:shadow-emerald-900/80 border border-emerald-300/40 active:scale-95 cursor-pointer">
+                                        <svg class="w-4 h-4 text-emerald-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                        </svg>
+                                        <span>Masuk Sebagai Admin Kampus (Login As)</span>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
-                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
-                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Password Default:</span>
-                            <span class="font-bold select-all text-xs" style="color: #fbbf24 !important;">{{ $cred['password'] }}</span>
+                    </div>
+
+                    <!-- 3 Kartu Kredensial Formal -->
+                    <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                        <!-- URL Login Portal -->
+                        <div class="p-4 rounded-2xl border border-blue-400/20 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between hover:border-blue-400/40 transition group">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                        <line x1="2" y1="12" x2="22" y2="12" stroke-width="2"/>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke-width="2"/>
+                                    </svg>
+                                    URL Portal Login
+                                </span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $cred['login_url'] }}');" class="text-blue-300 hover:text-white transition text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-800/40 hover:bg-blue-700/60 cursor-pointer" title="Salin URL">
+                                    Salin
+                                </button>
+                            </div>
+                            <div class="font-mono font-bold text-xs text-sky-300 select-all break-all mt-1">
+                                {{ $cred['login_url'] }}
+                            </div>
                         </div>
+
+                        <!-- Email / Username -->
+                        <div class="p-4 rounded-2xl border border-blue-400/20 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between hover:border-blue-400/40 transition group">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" /></svg>
+                                    Email / Akun Kampus
+                                </span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $cred['email'] }}');" class="text-emerald-300 hover:text-white transition text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-800/40 hover:bg-emerald-700/60 cursor-pointer" title="Salin Email">
+                                    Salin
+                                </button>
+                            </div>
+                            <div class="font-mono font-bold text-xs text-emerald-300 select-all break-all mt-1">
+                                {{ $cred['email'] }}
+                            </div>
+                        </div>
+
+                        <!-- Password Default -->
+                        <div class="p-4 rounded-2xl border border-blue-400/20 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between hover:border-blue-400/40 transition group">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                                    Password Default
+                                </span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $cred['password'] }}');" class="text-amber-300 hover:text-white transition text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-800/40 hover:bg-amber-700/60 cursor-pointer" title="Salin Password">
+                                    Salin
+                                </button>
+                            </div>
+                            <div class="font-mono font-bold text-xs text-amber-300 select-all mt-1 flex items-center justify-between">
+                                <span>{{ $cred['password'] }}</span>
+                                <span class="text-[10px] text-amber-200/70 font-sans font-normal">(Default)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keterangan Otoritas Kemitraan Kampus -->
+                    <div class="relative z-10 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-blue-950/40 border border-blue-400/20 text-blue-200/90 text-xs">
+                        <svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Akun ini berwenang mengelola data mahasiswa pendaftar dari perguruan tinggi mitra, menetapkan Dosen Pembimbing Lapangan (DPL), serta memantau dan memvalidasi penilaian magang MBKM.</span>
                     </div>
                 </div>
             @endif
@@ -230,19 +304,31 @@
                                             <span>Buat Akun</span>
                                         </button>
                                     </form>
+                                @elseif($isSuperAdmin)
+                                    <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST" class="btn-action-form">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer" title="Login As ke Akun Admin Kampus">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                                            <span>Login As</span>
+                                        </button>
+                                    </form>
                                 @endif
 
                                 <a href="{{ route('admin.universities.edit', $univ->id) }}" class="btn-action-edit">
                                     Edit
                                 </a>
 
-                                <form action="{{ route('admin.universities.destroy', $univ->id) }}" method="POST" onsubmit="return confirm('Hapus universitas {{ $univ->name }}?');" class="btn-action-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action-delete">
-                                        Hapus
-                                    </button>
-                                </form>
+                                <button type="button" 
+                                        @click="$dispatch('open-delete-modal', {
+                                            action: '{{ route('admin.universities.destroy', $univ->id) }}',
+                                            title: 'Hapus Perguruan Tinggi',
+                                            name: '{{ addslashes($univ->name) }}',
+                                            desc: 'Kode: {{ $univ->code }} &bull; {{ $univ->students_count }} Mahasiswa'
+                                        })" 
+                                        class="btn-action-delete"
+                                        title="Hapus Universitas">
+                                    Hapus
+                                </button>
                             </div>
                         </div>
                     </div>

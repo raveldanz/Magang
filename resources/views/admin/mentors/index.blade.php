@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -135,14 +135,17 @@
                                             </form>
 
                                             <!-- Hapus -->
-                                            <form action="{{ route('admin.mentors.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus mentor {{ $m->name }}?');" class="btn-action-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn-action-delete">
-                                                    Hapus
-                                                </button>
-                                            </form>
-
+                                            <button type="button" 
+                                                    @click="$dispatch('open-delete-modal', {
+                                                        action: '{{ route('admin.mentors.destroy', $m->id) }}',
+                                                        title: 'Hapus Mentor Lapangan',
+                                                        name: '{{ addslashes($m->name) }}',
+                                                        desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile->agency_name ?? 'Dinas Terkait') }}'
+                                                    })" 
+                                                    class="btn-action-delete"
+                                                    title="Hapus Mentor">
+                                                Hapus
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
