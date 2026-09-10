@@ -1,8 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs">
-                
+            <a href="{{ route('dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs flex items-center justify-center" title="Kembali ke Dashboard">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
@@ -15,7 +17,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-5 sm:py-8 lg:py-10">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success / Error Messages -->
@@ -66,17 +68,17 @@
                         <div>
                             @if($finalReport->status === 'approved')
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5 shadow-2xs">
-                                  
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                     <span>Laporan Disetujui (ACC)</span>
                                 </span>
                             @elseif($finalReport->status === 'revision')
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1.5 shadow-2xs">
-                                
+                                    <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Perlu Perbaikan (Revisi)</span>
                                 </span>
                             @else
                                 <span class="px-4 py-2 rounded-2xl text-xs font-black bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-2xs">
-                                
+                                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span>Menunggu Verifikasi DPL / Mentor</span>
                                 </span>
                             @endif
@@ -88,17 +90,18 @@
                         <div class="text-xs text-gray-600">
                             Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->format('d F Y, H:i') : '-' }}</strong>
                         </div>
-                        <a href="{{ asset('storage/' . ($finalReport->file_path ?? $finalReport->final_report_path)) }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                        
-                            <span>Buka / Unduh Berkas PDF</span>
+                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Buka / Unduh Berkas Laporan</span>
                         </a>
                     </div>
 
                     <!-- Feedback / Catatan Revisi jika ada -->
                     @if ($finalReport->feedback)
                         <div class="p-4 rounded-2xl {{ $finalReport->status === 'revision' ? 'bg-rose-50/80 border-rose-200 text-rose-900' : 'bg-emerald-50/80 border-emerald-200 text-emerald-900' }} border text-xs space-y-1">
-                            <span class="font-bold uppercase tracking-wider text-[11px] block">
-                            
+                            <span class="font-bold uppercase tracking-wider text-[11px] block flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                                {{ $finalReport->status === 'revision' ? 'Catatan Perbaikan / Masukan Revisi:' : 'Catatan Pembimbing:' }}
                             </span>
                             <p class="whitespace-pre-line leading-relaxed italic">
                                 "{{ $finalReport->feedback }}"
@@ -137,27 +140,69 @@
                             <input type="url" name="repository_url" value="{{ old('repository_url', $finalReport->repository_url ?? '') }}" placeholder="https://github.com/username/project atau link Google Drive" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         </div>
 
+                        <!-- Himbauan Format Penamaan Berkas -->
+                        <div class="p-4 rounded-2xl bg-blue-50/80 border border-blue-200/90 flex items-start gap-3.5 shadow-xs">
+                            <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="text-xs space-y-1.5 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-blue-950 text-xs sm:text-sm">Himbauan Format Penamaan Berkas</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-blue-200 text-blue-800 text-[10px] font-black uppercase tracking-wider">Wajib Diperhatikan</span>
+                                </div>
+                                <p class="text-blue-900/90 leading-relaxed text-xs">
+                                    Agar memudahkan Dosen Pembimbing Lapangan (DPL) dan Pembimbing Dinas dalam memeriksa serta mengarsipkan naskah magang Anda, pastikan nama file telah berformat standar sebelum diunggah:
+                                </p>
+                                <div class="p-2.5 bg-white border border-blue-200 rounded-xl space-y-1">
+                                    <div class="flex items-center gap-2 font-mono text-xs font-bold text-blue-700">
+                                        <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span>Format: Laporan_Akhir_[NIM]_[Nama_Lengkap].[pdf/docx]</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500">
+                                        Contoh Anda: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Unggah File Laporan (PDF / DOCX) <span class="text-rose-500">*</span>
                             </label>
-                            <input type="file" name="file_laporan" accept=".pdf,.doc,.docx" required class="block w-full text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-slate-50 focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,.doc,.docx" required 
+                                   onchange="handleFinalReportPreview(this)"
+                                   class="block w-full text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-slate-50 focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                             <p class="text-[11px] text-gray-400 mt-1">Ukuran maksimal file: 10 MB. Format yang didukung: PDF, DOC, DOCX.</p>
+
+                            <!-- File Selection Feedback -->
+                            <div id="reportFileBox" class="hidden mt-3 p-3 bg-blue-50/60 border border-blue-200 rounded-xl items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p id="reportFileName" class="text-xs font-bold text-slate-800 truncate"></p>
+                                    <p id="reportFileSize" class="text-[11px] text-slate-500"></p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-3">
-                            <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <div class="pt-3 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
+                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
                                 Batal
                             </a>
-                            <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                            <button type="submit" class="w-full sm:w-auto px-7 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
                                 {{ $finalReport ? 'Unggah Ulang Naskah Revisi' : 'Kirim Laporan Akhir' }}
                             </button>
                         </div>
                     </form>
                 </div>
             @else
-                <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl text-center space-y-2 shadow-xs">
-                
+                <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl text-center space-y-3 shadow-xs">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    </div>
                     <h3 class="font-black text-base text-emerald-900">Laporan Akhir Anda Telah Disetujui Secara Resmi</h3>
                     <p class="text-xs text-emerald-700 max-w-xl mx-auto">
                         Naskah laporan akhir Anda telah di-ACC oleh DPL dan pembimbing lapangan. Nilai kelulusan dan sertifikat resmi dapat dilihat di Dashboard.
@@ -167,4 +212,33 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function handleFinalReportPreview(input) {
+            const box = document.getElementById('reportFileBox');
+            const nameEl = document.getElementById('reportFileName');
+            const sizeEl = document.getElementById('reportFileSize');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Ukuran berkas naskah laporan melebihi batas maksimal 10MB.');
+                    input.value = '';
+                    box.classList.add('hidden');
+                    box.classList.remove('flex');
+                    return;
+                }
+
+                nameEl.textContent = file.name;
+                sizeEl.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                box.classList.remove('hidden');
+                box.classList.add('flex');
+            } else {
+                box.classList.add('hidden');
+                box.classList.remove('flex');
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>

@@ -188,14 +188,13 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex items-center gap-3 pt-4 border-t border-slate-100">
-                            <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer">
-                                {{ __('Kirim Pengajuan Magang') }}
-                            </button>
-
-                            <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-150 text-center">
+                        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-5 border-t border-slate-100">
+                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-150 text-center flex items-center justify-center">
                                 {{ __('Kembali') }}
                             </a>
+                            <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer flex items-center justify-center">
+                                {{ __('Kirim Pengajuan Magang') }}
+                            </button>
                         </div>
                     </form>
                 @endif
