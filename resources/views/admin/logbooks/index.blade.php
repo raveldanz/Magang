@@ -204,7 +204,7 @@
                                         </a>
                                     @endif
                                     <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
-                                        Detail &rarr;
+                                        Detail 
                                     </a>
                                 </div>
                             </div>
