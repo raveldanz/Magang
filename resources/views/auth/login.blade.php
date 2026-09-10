@@ -3,10 +3,9 @@
         <!-- Logo Pemkot Surabaya -->
         <div class="flex justify-center mb-4">
             <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block">
-                <img src="{{ asset('images/logos/surabaya.png') }}" 
-                     alt="Logo Pemkot Surabaya"
-                     class="h-20 w-auto object-contain drop-shadow-md"
-                     style="height: 72px; width: auto; max-height: 80px;">
+                <img src="{{ asset('images/logos/surabaya.png') }}" alt="Logo Pemkot Surabaya"
+                    class="h-20 w-auto object-contain drop-shadow-md"
+                    style="height: 72px; width: auto; max-height: 80px;">
             </a>
         </div>
 
@@ -33,9 +32,9 @@
             <div>
                 <x-input-label for="email" value="{{ __('Email Resmi / Akun') }}"
                     class="font-bold text-slate-700 text-xs uppercase tracking-wider" />
-                <x-text-input id="email"
+                <input id="email"
                     class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition"
-                    type="email" name="email" :value="old('email')" required autofocus autocomplete="username"
+                    type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
                     placeholder="nama@surabaya.go.id / email pendaftar" />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
@@ -53,19 +52,19 @@
                     @endif
                 </div>
 
-                <x-text-input id="password"
+                <input id="password"
                     class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition"
                     type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
-
-            <!-- Remember Me -->
-            <div class="flex items-center">
-                <input id="remember_me" type="checkbox"
-                    class="rounded-md border-slate-300 text-blue-600 shadow-2xs focus:ring-blue-500 w-4 h-4 cursor-pointer"
-                    name="remember">
-                <label for="remember_me" class="ml-2 text-xs text-slate-600 font-medium cursor-pointer select-none">
-                    {{ __('Ingat saya di perangkat ini') }}
+            <!-- Remember Me Block -->
+            <div class="flex items-center mt-4">
+                <label for="remember_me" class="inline-flex items-center cursor-pointer select-none">
+                    <input id="remember_me" type="checkbox" name="remember"
+                        class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2 transition cursor-pointer">
+                    <span class="ms-2 text-xs text-slate-600 font-medium">
+                        Ingat saya di perangkat ini
+                    </span>
                 </label>
             </div>
 
