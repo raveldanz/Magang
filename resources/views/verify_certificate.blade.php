@@ -8,10 +8,13 @@
         $student = $placement->application?->user;
         $profile = $student?->studentProfile;
         $eval = $placement->evaluation;
-        $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2) : 0;
-        $grade = 'C';
-        if ($rataRata >= 85) $grade = 'A (Sangat Memuaskan)';
-        elseif ($rataRata >= 70) $grade = 'B (Memuaskan)';
+        $rataRata = $eval ? ($eval->final_score ?? $eval->nilai_akhir ?? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2)) : 0;
+        $grade = $eval?->grade ?? 'C';
+        if (!$eval?->grade) {
+            if ($rataRata >= 85) $grade = 'A (Sangat Memuaskan)';
+            elseif ($rataRata >= 70) $grade = 'B (Memuaskan)';
+            else $grade = 'C (Cukup)';
+        }
     @endphp
 
     <div class="py-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -80,41 +80,181 @@
                 </div>
             </div>
 
-            <!-- Card Sebaran Mahasiswa per Dinas Penempatan Pemkot Surabaya -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xs space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h4 class="font-bold text-slate-900 text-sm sm:text-base">
-                        Sebaran Penempatan Mahasiswa di Instansi Pemkot Surabaya
-                    </h4>
-                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-                        Distribusi mahasiswa magang asal kampus pada masing-masing dinas pemerintah kota
-                    </p>
+            <!-- Card Sebaran Mahasiswa per Dinas Penempatan Pemkot Surabaya (Optimized, Mobile-Friendly & Compact) -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xs space-y-4"
+                 x-data="{
+                     viewMode: '{{ $activeAgenciesCount > 0 ? 'active' : 'all' }}',
+                     searchQuery: '',
+                     isExpanded: false,
+                     activeCount: {{ $activeAgenciesCount }},
+                     totalCount: {{ $totalAgenciesCount }},
+                     shouldShow(item) {
+                         // Search filter
+                         if (this.searchQuery.trim() !== '') {
+                             const q = this.searchQuery.toLowerCase();
+                             return item.name.toLowerCase().includes(q);
+                         }
+                         // Tab filter
+                         if (this.viewMode === 'active') {
+                             return item.count > 0;
+                         }
+                         return true;
+                     }
+                 }">
+                
+                <!-- Header: Judul, Ringkasan KPI & Segmented Control Switcher -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base">
+                                Sebaran Penempatan Mahasiswa
+                            </h4>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <span>Terisi:</span>
+                                <strong class="font-extrabold text-blue-900">{{ $activeAgenciesCount }}</strong>
+                                <span>/ {{ $totalAgenciesCount }} Dinas</span>
+                            </span>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
+                            Distribusi mahasiswa magang asal kampus pada instansi dinas Pemkot Surabaya
+                        </p>
+                    </div>
+
+                    <!-- Segmented Tab Controls (Hanya Terisi vs Semua Dinas) -->
+                    <div class="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl self-start sm:self-auto shrink-0 text-xs">
+                        <button type="button" 
+                                @click="viewMode = 'active'; isExpanded = false" 
+                                class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 cursor-pointer"
+                                :class="viewMode === 'active' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span>Hanya Terisi</span>
+                            <span class="px-1.5 py-0.2 rounded-full text-[10px]"
+                                  :class="viewMode === 'active' ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'">
+                                {{ $activeAgenciesCount }}
+                            </span>
+                        </button>
+                        <button type="button" 
+                                @click="viewMode = 'all'; isExpanded = false" 
+                                class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 cursor-pointer"
+                                :class="viewMode === 'all' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
+                            <span>Semua Dinas</span>
+                            <span class="px-1.5 py-0.2 rounded-full text-[10px]"
+                                  :class="viewMode === 'all' ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'">
+                                {{ $totalAgenciesCount }}
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                    @forelse ($agencyDistribution as $dist)
-                        <div class="bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-100 flex flex-col justify-between">
-                            <div class="flex items-start justify-between gap-2 mb-2">
-                                <h4 class="text-xs font-semibold text-slate-800 leading-snug line-clamp-2" title="{{ $dist['name'] }}">
-                                    {{ $dist['name'] }}
-                                </h4>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 whitespace-nowrap shrink-0">
-                                    {{ $dist['count'] ?? 0 }} Mhs
-                                </span>
-                            </div>
-                            <div class="mt-2">
-                                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                                    <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style="width: {{ $dist['percentage'] ?? 0 }}%"></div>
-                                </div>
-                                <span class="text-[10px] text-slate-400 mt-1 block">Porsi: {{ $dist['percentage'] ?? 0 }}%</span>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-span-3 text-center py-6 text-xs text-slate-400">
-                            Belum ada data sebaran penempatan dinas.
-                        </div>
-                    @endforelse
+                <!-- Mini Quick Search Filter (Hanya tampil jika dinas banyak atau user beralih ke Semua Dinas) -->
+                <div x-show="viewMode === 'all' || totalCount > 6" 
+                     x-transition 
+                     class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <input type="text" 
+                           x-model="searchQuery" 
+                           placeholder="Cari nama instansi dinas..." 
+                           class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400">
                 </div>
+
+                <!-- Empty State jika Belum Ada Mahasiswa yang Terisi -->
+                @if($activeAgenciesCount === 0)
+                    <div x-show="viewMode === 'active'" class="p-6 text-center rounded-2xl bg-slate-50 border border-dashed border-slate-200 space-y-2">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
+                        <p class="text-xs font-bold text-slate-700">Belum ada mahasiswa yang ditempatkan di dinas Pemkot</p>
+                        <p class="text-[11px] text-slate-400 max-w-sm mx-auto">Mahasiswa kampus Anda masih dalam tahap pendaftaran atau menunggu verifikasi.</p>
+                        <button type="button" @click="viewMode = 'all'" class="text-xs text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">
+                            Lihat Seluruh Daftar Dinas Mitra
+                        </button>
+                    </div>
+                @endif
+
+                <!-- Compact Grid / List Container (Mobile-First: 1 Kolom Ringkas, Tablet/Desktop: 2-3 Kolom) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+                    @foreach ($agencyDistribution as $index => $dist)
+                        @php
+                            $hasStudents = ($dist['count'] > 0);
+                        @endphp
+                        <div x-show="shouldShow({ name: '{{ addslashes($dist['name']) }}', count: {{ $dist['count'] }} }) && (isExpanded || {{ $index }} < (viewMode === 'active' ? 6 : 6) || searchQuery.trim() !== '')"
+                             x-transition:enter="transition ease-out duration-150 transform"
+                             x-transition:enter-start="opacity-0 scale-98"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             class="group relative p-3 rounded-2xl border transition-all duration-150 flex flex-col justify-between {{ $hasStudents ? 'bg-gradient-to-br from-white to-blue-50/30 border-blue-100/90 shadow-2xs hover:shadow-xs hover:border-blue-300' : 'bg-slate-50/60 border-slate-100 hover:bg-white hover:border-slate-200' }}">
+                            
+                            <!-- Baris Atas: Icon + Nama + Badge Count -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                                    <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 {{ $hasStudents ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-200 text-slate-500' }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h5 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-700 transition" title="{{ $dist['name'] }}">
+                                            {{ $dist['name'] }}
+                                        </h5>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span class="text-[10px] font-semibold text-slate-400">
+                                                Porsi: <strong class="{{ $hasStudents ? 'text-blue-700' : 'text-slate-500' }}">{{ $dist['percentage'] }}%</strong>
+                                            </span>
+                                            @if($hasStudents)
+                                                <span class="text-slate-300">&bull;</span>
+                                                <a href="{{ route('university.dashboard', ['agency_id' => $dist['id']]) }}" 
+                                                   class="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline">
+                                                    Filter Mahasiswa
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Badge Jumlah Mahasiswa -->
+                                <div class="shrink-0 text-right">
+                                    @if($hasStudents)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-black bg-blue-600 text-white shadow-2xs">
+                                            {{ $dist['count'] }} Mhs
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-slate-200/80 text-slate-500">
+                                            0 Mhs
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar Persentase Penempatan -->
+                            <div class="mt-2 pt-1 border-t border-slate-100/60">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-1.5 rounded-full transition-all duration-300 {{ $hasStudents ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-300' }}" 
+                                         style="width: {{ max($dist['percentage'], $hasStudents ? 6 : 0) }}%"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Tombol Expand / Collapse (Jika data yang sesuai filter melebihi batas default) -->
+                @if($totalAgenciesCount > 6)
+                    <div class="pt-2 text-center" 
+                         x-show="searchQuery.trim() === '' && ((viewMode === 'active' && activeCount > 6) || (viewMode === 'all' && totalCount > 6))">
+                        <button type="button" 
+                                @click="isExpanded = !isExpanded"
+                                class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                            <span x-text="isExpanded ? 'Tampilkan Lebih Sedikit' : 'Tampilkan Seluruh Instansi Lainnya (' + (viewMode === 'active' ? activeCount : totalCount) + ' Dinas)'"></span>
+                            <svg class="w-3.5 h-3.5 transition-transform duration-200" 
+                                 :class="isExpanded ? 'rotate-180' : ''" 
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                    </div>
+                @endif
+
             </div>
 
             <!-- Filter & Search Panel -->

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
+use App\Models\Application;
 use App\Models\AuditLog;
+use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -53,7 +55,102 @@ class AgencyController extends Controller
             $q->where('role', 'admin');
         })->count();
 
-        return view('admin.agencies.index', compact('agencies', 'isSuperAdmin', 'unregisteredCount'));
+        // Macro Statistics se-Pemerintah Kota Surabaya
+        $macroStats = [
+            'total_agencies' => AgencyProfile::count(),
+            'total_units' => Unit::count(),
+            'total_quota' => Unit::sum('quota'),
+            'total_filled' => Application::where('status', 'accepted')->count(),
+            'total_staff' => User::whereNotNull('agency_profile_id')->whereIn('role', ['admin', 'mentor', 'pembimbing'])->count(),
+        ];
+
+        return view('admin.agencies.index', compact('agencies', 'isSuperAdmin', 'unregisteredCount', 'macroStats'));
+    }
+
+    /**
+     * Pusat Kendali & Manajemen Alur Terpadu Instansi Dinas (Agency Management Hub)
+     */
+    public function show($id)
+    {
+        $user = Auth::user();
+        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+
+        // Multi-Tenant Check: Non-superadmin hanya boleh mengakses dinasnya sendiri
+        if (!$isSuperAdmin && (int)$user->agency_profile_id !== (int)$id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
+        }
+
+        $agency = AgencyProfile::with([
+            'units' => function ($uq) {
+                $uq->withCount(['applications as accepted_count' => function ($aq) {
+                    $aq->where('status', 'accepted');
+                }])->orderBy('name');
+            },
+            'users' => function ($uq) {
+                $uq->whereIn('role', ['admin', 'mentor', 'pembimbing'])->orderBy('name');
+            },
+        ])->findOrFail($id);
+
+        // Ambil data pengajuan magang yang masuk ke unit-unit dinas ini
+        $unitIds = $agency->units->pluck('id');
+        $applications = Application::with([
+            'user.studentProfile',
+            'unit',
+            'placement.mentor',
+            'placement.pembimbing'
+        ])
+            ->whereIn('unit_id', $unitIds)
+            ->latest()
+            ->get();
+
+        // Ambil mahasiswa yang berstatus aktif (accepted)
+        $activePlacements = Placement::with([
+            'application.user.studentProfile',
+            'application.unit',
+            'mentor',
+            'pembimbing',
+            'logbooks'
+        ])
+            ->whereHas('application', function ($aq) use ($unitIds) {
+                $aq->whereIn('unit_id', $unitIds)->where('status', 'accepted');
+            })
+            ->latest()
+            ->get();
+
+        // Metrik khusus dinas ini
+        $totalUnits = $agency->units->count();
+        $totalQuota = $agency->units->sum('quota');
+        $totalFilled = $agency->units->sum('accepted_count');
+        $totalRemaining = max(0, $totalQuota - $totalFilled);
+
+        $adminUsers = $agency->users->where('role', 'admin')->values();
+        $mentorUsers = $agency->users->whereIn('role', ['mentor', 'pembimbing'])->values();
+
+        $pendingAppsCount = $applications->where('status', 'submitted')->count();
+        $acceptedAppsCount = $applications->where('status', 'accepted')->count();
+
+        $stats = [
+            'total_units' => $totalUnits,
+            'total_quota' => $totalQuota,
+            'total_filled' => $totalFilled,
+            'total_remaining' => $totalRemaining,
+            'total_admins' => $adminUsers->count(),
+            'total_mentors' => $mentorUsers->count(),
+            'total_applications' => $applications->count(),
+            'pending_applications' => $pendingAppsCount,
+            'accepted_applications' => $acceptedAppsCount,
+            'active_students' => $activePlacements->count(),
+        ];
+
+        return view('admin.agencies.show', compact(
+            'agency',
+            'isSuperAdmin',
+            'stats',
+            'adminUsers',
+            'mentorUsers',
+            'applications',
+            'activePlacements'
+        ));
     }
 
     public function create()

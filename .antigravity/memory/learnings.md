@@ -25,6 +25,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-008** | 2026-09-10 | Live Upload Preview & Layout Scripts | Logo box tidak berubah saat upload file & ketiadaan @stack('scripts') di app.blade.php | RESOLVED |
 | **LRN-009** | 2026-09-10 | Mobile-First UI & Android Ergonomics | Tampilan mobile berantakan, horizontal table scroll menyulitkan, dan tombol aksi terpotong | RESOLVED |
 | **LRN-010** | 2026-09-10 | Double-Confirmation Deletion & Cascade Clean | Tombol hapus universitas/instansi tertolak akun admin otomatis & ketiadaan modal konfirmasi ganda | RESOLVED |
+| **LRN-011** | 2026-09-13 | Super Admin Agency Hub & Workflow | Tombol terbatas 'Lihat Unit ->', ketiadaan 'Lihat Akun', dan ketiadaan Pusat Kendali Alur Dinas | RESOLVED |
+| **LRN-012** | 2026-09-13 | User Management, Double Confirmation & Bulk Actions | Tombol reset & hapus tidak merespon (Alpine x-data scope), ketiadaan konfirmasi ganda & fitur pilih banyak dengan tripel konfirmasi | RESOLVED |
 
 ---
 
@@ -196,6 +198,50 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Memperbarui seluruh tombol hapus di modul Universitas, Instansi, Pengguna, Divisi, Mentor, dan Dosen agar memicu event modal.
   4. Menyempurnakan logika `UniversityController@destroy` dan `AgencyController@destroy` agar memproteksi mahasiswa & penempatan aktif secara ketat, namun mengizinkan penghapusan instansi/kampus uji coba beserta pembersihan akun admin terkait di dalam transaksi database.
 - **Prevention Rule**: Seluruh aksi destruktif (DELETE) wajib dilindungi oleh modal konfirmasi ganda (Double-Confirmation Modal) dengan checkbox persetujuan eksplisit, dilarang memakai `confirm()` native browser. Controller harus membedakan proteksi relasi bisnis bernilai tinggi (mahasiswa/transkrip aktif) dengan akun teknis internal yang dapat di-*clean-up* aman secara transaksional.
+ 
+---
+
+### [LRN-011] Pembenahan Alur Super Admin: Hub Kendali Terpadu Instansi Dinas, Tombol 'Lihat Akun', dan Eliminasi Panah Mentah
+- **Tanggal**: 2026-09-13
+- **Komponen**: `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/UnitController.php`, `app/Http/Controllers/Admin/UserController.php`, `app/Http/Controllers/Admin/LogbookController.php`, `resources/views/admin/agencies/index.blade.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/admin/units/index.blade.php`, `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**: 
+  1. Pada kartu master instansi dinas (`/admin/agencies`), Super Admin hanya memiliki satu tautan navigasi berupa link teks mentah `Lihat Unit ->` (dengan panah), tanpa opsi melihat akun-akun personel (Admin & Mentor) yang terafiliasi dengan dinas tersebut.
+  2. Alur Super Admin terlalu sempit (hanya fokus pembuatan dinas dan kuota lowongan), padahal diperlukan pengelolaan seluruh siklus hidup dan operasional dinas secara terpadu.
+  3. Mengakses `/admin/units?agency_id=` menampilkan header statis tanpa konteks dinas yang dipilih dan menyisakan query string kosong.
+- **Root Cause**: 
+  1. Kartu pada `resources/views/admin/agencies/index.blade.php` tidak menyediakan tombol `Lihat Akun` dan `Kelola Dinas`.
+  2. `Admin\AgencyController` tidak mengimplementasikan method `show($id)` untuk resource route `admin.agencies.show`.
+  3. `UnitController@index` dan `UserController@index` tidak mengoper objek `$selectedAgency` ke view saat `agency_id` aktif.
+- **Fix Applied**: 
+  1. Menghilangkan panah `->` pada `Lihat Unit`, mendesain ulang tombol aksi sebagai tombol kapsul modern berikon gedung.
+  2. Menambahkan tombol `Lihat Akun` pada kartu instansi lengkap dengan badge penghitung total personel (Admin Dinas + Mentor) menuju `/admin/users?agency_id={id}`.
+  3. Menambahkan tombol `Kelola Dinas` dan membuat halaman Pusat Manajemen Alur Dinas Terpadu (`resources/views/admin/agencies/show.blade.php`) yang merangkum:
+     - Hero profile & data Pejabat Penandatangan Resmi (Kepala Dinas, NIP, Jabatan).
+     - Tombol cepat: `Masuk Sebagai Admin Dinas (Login As)` dan `Edit Profil & TTD`.
+     - 4 Tab Operasional: (1) Personel & Akun Kedinasan, (2) Divisi & Kuota Magang, (3) Pengajuan Magang Masuk, (4) Mahasiswa Aktif Magang & Mentor.
+  4. Menambahkan 4 Executive Macro Stat Cards pada `/admin/agencies` (Total Instansi Dinas, Total Divisi, Total Kuota Magang & Terisi, Total Personel Kedinasan).
+  5. Menambahkan banner konteks dinas aktif pada `/admin/units` dan `/admin/users` serta memperbaiki query submission dropdown.
+- **Prevention Rule**: Master data instansi/entitas induk wajib menyediakan visibilitas dan kontrol 360 derajat (Unit, Akun Personel, Pelamar, dan Pengaturan). Tautan teks mentah bertanda panah dilarang digunakan di antarmuka manajemen utama; gunakan button/pill yang jelas dan terstandarisasi. Seluruh halaman yang difilter oleh parameter `agency_id` wajib menampilkan banner konteks lembaga yang sedang aktif.
+
+---
+
+### [LRN-012] Perbaikan Tombol Reset & Hapus Pengguna, Protokol Dobel Konfirmasi, dan Aksi Massal dengan Tripel Konfirmasi
+- **Tanggal**: 2026-09-13
+- **Komponen**: `app/Http/Controllers/Admin/UserController.php`, `routes/web.php`, `resources/views/admin/users/index.blade.php`, `resources/views/components/confirm-reset-modal.blade.php`, `resources/views/components/confirm-delete-modal.blade.php`, `resources/views/components/bulk-action-modal.blade.php`, `resources/views/layouts/app.blade.php`
+- **Problem / Symptom**: 
+  1. Tombol `Hapus` dan `Reset` pada Master Pengguna Sistem (`/admin/users`) tidak merespon saat diklik.
+  2. Aksi krusial (reset & hapus) sebelumnya berpotensi salah pencet karena reset menggunakan browser `onsubmit="return confirm()"` mentah yang rentan ditekan tidak sengaja atau terblokir Chromium browser.
+  3. Ketiadaan fitur pilih banyak (*multi-select* / *bulk actions*) untuk mengelola banyak akun secara serentak, serta ketiadaan mekanisme pengamanan ekstra tinggi (*triple-confirmation*) untuk operasi massal yang berisiko fatal.
+- **Root Cause**: 
+  1. Elemen tabel dan tombol aksi berada di luar cakupan (*scope*) `x-data` Alpine.js. Di Alpine v3, dispatch event kustom `@click="$dispatch(...)"` diabaikan sepenuhnya jika tidak memiliki elemen leluhur dengan direktif `x-data`.
+  2. Dialog native `confirm()` browser rentan diabaikan/dibungkam oleh browser setelah pengalihan halaman berulang.
+- **Fix Applied**: 
+  1. Menyelimuti kontainer tabel dan floating bar dengan Alpine component `userBulkManagement()`.
+  2. Mengganti semua dialog native browser dengan modal kustom elegan:
+     - **Dobel Konfirmasi (Single Action)**: Menampilkan detail target akun + checkbox persetujuan sadar risiko sebelum tombol aktif (`confirm-reset-modal` dan `confirm-delete-modal`).
+     - **Tripel Konfirmasi (Bulk Actions)**: Menampilkan audit preview daftar akun terdampak (Lapis 1), checkbox pernyataan tanggung jawab (Lapis 2), dan pengetikan kata kunci wajib persis `RESET SEMUA` / `HAPUS SEMUA` (Lapis 3) sebelum tombol eksekusi terbuka (`bulk-action-modal`).
+  3. Menambahkan endpoint backend aman `admin.users.bulk_reset_password` dan `admin.users.bulk_delete` yang memproteksi akun Super Admin, memvalidasi relasi magang/penempatan aktif agar tidak merusak integritas basis data, dan mencatat transaksi ke `AuditLog`.
+- **Prevention Rule**: Seluruh elemen interaktif yang memanfaatkan event Alpine (`$dispatch`, `@click`) WAJIB berada di dalam deklarasi `x-data`. Aksi krusial terhadap data sistem DILARANG menggunakan `window.confirm()` bawaan browser; wajib menggunakan modal konfirmasi ganda (*double confirmation*), dan aksi massal wajib menerapkan verifikasi 3 lapis (*triple confirmation*) dengan pengetikan kata kunci penegasan.
 
 ---
 

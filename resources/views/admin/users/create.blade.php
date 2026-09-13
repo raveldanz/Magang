@@ -15,7 +15,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="{ selectedRole: '{{ old('role', 'mahasiswa') }}' }">
+    <div class="py-8" x-data="{ selectedRole: '{{ old('role', request('role', 'mahasiswa')) }}' }">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
 
@@ -79,7 +79,7 @@
                         <select name="agency_profile_id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Tanpa Instansi / Global Superadmin --</option>
                             @foreach($agencies as $ag)
-                                <option value="{{ $ag->id }}" {{ old('agency_profile_id') == $ag->id ? 'selected' : '' }}>
+                                <option value="{{ $ag->id }}" {{ old('agency_profile_id', request('agency_id')) == $ag->id ? 'selected' : '' }}>
                                     {{ $ag->agency_name }} ({{ $ag->city }})
                                 </option>
                             @endforeach
