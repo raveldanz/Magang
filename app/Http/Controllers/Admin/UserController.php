@@ -36,14 +36,18 @@ class UserController extends Controller
         }
 
         // Filter Instansi
+        $selectedAgency = null;
         if ($request->filled('agency_id')) {
             $query->where('agency_profile_id', $request->agency_id);
+            $selectedAgency = AgencyProfile::find($request->agency_id);
         }
 
         // Filter Universitas
+        $selectedUniversity = null;
         if ($request->filled('university_id')) {
             $univId = $request->university_id;
             $univ = University::find($univId);
+            $selectedUniversity = $univ;
             $univName = $univ?->name;
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
@@ -76,7 +80,9 @@ class UserController extends Controller
             'agencies',
             'universities',
             'isSuperAdmin',
-            'currentUser'
+            'currentUser',
+            'selectedAgency',
+            'selectedUniversity'
         ));
     }
 
@@ -198,28 +204,119 @@ class UserController extends Controller
     }
 
     /**
-     * Hapus Pengguna
+     * Reset Password Massal (Bulk Reset Password ke 'password')
      */
-    public function destroy($id)
+    public function bulkResetPassword(Request $request)
     {
+        $request->validate([
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'required|integer|exists:users,id',
+        ]);
+
         $currentUser = Auth::user();
-        $user = User::findOrFail($id);
+        $targetIds = array_unique($request->user_ids);
 
-        if ($user->id === $currentUser->id) {
-            return redirect()->back()->with('error', 'Tidak dapat menghapus akun Anda sendiri.');
+        // Filter keamanan: larang reset akun sendiri atau akun Super Admin lain
+        $users = User::whereIn('id', $targetIds)
+            ->where('id', '!=', $currentUser->id)
+            ->where(function ($q) {
+                $q->where('role', '!=', 'super_admin')
+                  ->where(function ($sq) {
+                      $sq->where('role', '!=', 'admin')
+                         ->orWhereNotNull('agency_profile_id');
+                  });
+            })
+            ->get();
+
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada akun valid yang dapat direset.');
         }
 
-        // Cek proteksi relasi aktif
-        if ($user->applications()->count() > 0 || $user->academicPlacements()->count() > 0 || $user->mentorPlacements()->count() > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Akun '{$user->name}' memiliki data relasi pengajuan atau penempatan aktif.");
+        $resetCount = 0;
+        $affectedNames = [];
+        $hashedPassword = Hash::make('password');
+
+        foreach ($users as $user) {
+            $user->update(['password' => $hashedPassword]);
+            $resetCount++;
+            $affectedNames[] = "{$user->name} ({$user->email})";
         }
 
-        $name = $user->name;
-        $user->delete();
-
-        AuditLog::record('USER_DELETE', 'User', $id, ['name' => $name]);
+        AuditLog::record('USER_BULK_PASSWORD_RESET', 'User', null, [
+            'total_reset' => $resetCount,
+            'affected_users' => array_slice($affectedNames, 0, 50),
+        ]);
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Akun '{$name}' berhasil dihapus dari sistem.");
+            ->with('success', "Berhasil mereset password untuk {$resetCount} akun pengguna ke nilai default ('password').");
+    }
+
+    /**
+     * Hapus Pengguna Massal (Bulk Delete)
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'required|integer|exists:users,id',
+        ]);
+
+        $currentUser = Auth::user();
+        $targetIds = array_unique($request->user_ids);
+
+        // Filter keamanan: larang hapus akun sendiri atau akun Super Admin lain
+        $users = User::whereIn('id', $targetIds)
+            ->where('id', '!=', $currentUser->id)
+            ->where(function ($q) {
+                $q->where('role', '!=', 'super_admin')
+                  ->where(function ($sq) {
+                      $sq->where('role', '!=', 'admin')
+                         ->orWhereNotNull('agency_profile_id');
+                  });
+            })
+            ->get();
+
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada akun yang diizinkan untuk dihapus (akun Super Admin dilindungi).');
+        }
+
+        $deletedCount = 0;
+        $skippedCount = 0;
+        $deletedNames = [];
+        $skippedNames = [];
+
+        foreach ($users as $user) {
+            // Cek proteksi relasi aktif (pengajuan magang, penempatan mentor/dosen)
+            $hasRelations = ($user->applications()->count() > 0 
+                || $user->academicPlacements()->count() > 0 
+                || $user->mentorPlacements()->count() > 0);
+
+            if ($hasRelations) {
+                $skippedCount++;
+                $skippedNames[] = $user->name;
+                continue;
+            }
+
+            $deletedNames[] = "{$user->name} ({$user->email})";
+            $user->delete();
+            $deletedCount++;
+        }
+
+        if ($deletedCount > 0) {
+            AuditLog::record('USER_BULK_DELETE', 'User', null, [
+                'total_deleted' => $deletedCount,
+                'total_skipped' => $skippedCount,
+                'deleted_users' => array_slice($deletedNames, 0, 50),
+            ]);
+        }
+
+        $message = "Berhasil menghapus {$deletedCount} akun pengguna.";
+        if ($skippedCount > 0) {
+            $message .= " Namun {$skippedCount} akun dilewati karena memiliki relasi data magang/penempatan aktif (" . implode(', ', array_slice($skippedNames, 0, 3)) . ").";
+            return redirect()->route('admin.users.index')->with('warning', $message);
+        }
+
+        return redirect()->route('admin.users.index')->with('success', $message);
     }
 }
+

@@ -83,14 +83,14 @@ class DashboardController extends Controller
 
         // Metrik Statistik Kampus
         $totalStudents = $allApplications->count();
-        $totalAccepted = $allApplications->where('status', 'accepted')->count();
-        $totalCompleted = $allPlacements->filter(function ($p) {
-            return optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
+        $totalAccepted = $allApplications->whereIn('status', ['accepted', 'completed'])->count();
+        $totalCompleted = $allApplications->where('status', 'completed')->count() ?: $allPlacements->filter(function ($p) {
+            return optional($p->finalreport)->status === 'approved' && (optional($p->evaluation)->final_score > 0 || optional($p->evaluation)->nilai_akademik > 0 || optional($p->evaluation)->nilai_pembimbing > 0);
         })->count();
         $totalPending = $allApplications->where('status', 'pending')->count();
 
         // Sebaran Dinas / Instansi Penempatan
-        $agencies = AgencyProfile::all();
+        $agencies = AgencyProfile::orderBy('agency_name')->get();
         $agencyDistribution = [];
 
         foreach ($agencies as $agency) {
@@ -105,6 +105,17 @@ class DashboardController extends Controller
                 'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
             ];
         }
+
+        // Urutkan: instansi dengan mahasiswa terbanyak di urutan teratas, lalu abjad nama
+        usort($agencyDistribution, function ($a, $b) {
+            if ($b['count'] === $a['count']) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+            return $b['count'] <=> $a['count'];
+        });
+
+        $totalAgenciesCount = count($agencyDistribution);
+        $activeAgenciesCount = count(array_filter($agencyDistribution, fn($d) => $d['count'] > 0));
 
         // Daftar Dosen Aktif Kampus untuk Plotting DPL (Hanya dosen dengan status aktif)
         $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
@@ -135,7 +146,9 @@ class DashboardController extends Controller
             'stats',
             'agencyDistribution',
             'agencies',
-            'availableDosens'
+            'availableDosens',
+            'totalAgenciesCount',
+            'activeAgenciesCount'
         ));
     }
 
@@ -268,11 +281,15 @@ class DashboardController extends Controller
                 $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
                 
                 $finalScore = '-';
-                if ($eval && $eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
+                if ($eval && $eval->final_score) {
+                    $finalScore = number_format($eval->final_score, 2);
+                } elseif ($eval && $eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
                     $weighted = ($eval->nilai_pembimbing * 0.4) + ($eval->nilai_akademik * 0.6);
                     $finalScore = number_format($weighted, 2);
                 } elseif ($eval && $eval->nilai_akademik > 0) {
                     $finalScore = number_format($eval->nilai_akademik, 2);
+                } elseif ($eval && $eval->nilai_pembimbing > 0) {
+                    $finalScore = number_format($eval->nilai_pembimbing, 2);
                 }
 
                 $periode = ($app->start_date && $app->end_date)

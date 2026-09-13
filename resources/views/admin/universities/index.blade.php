@@ -169,6 +169,63 @@
                 </div>
             @endif
 
+            <!-- Executive Macro Stats Kemitraan Perguruan Tinggi -->
+            @if(isset($macroStats))
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Kampus Mitra</span>
+                            <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-baseline gap-2">
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_universities'] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">Perguruan Tinggi</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Mahasiswa</span>
+                            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-baseline gap-2">
+                            <span class="text-2xl font-black text-indigo-600">{{ $macroStats['total_students'] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">Mahasiswa Terdaftar</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Dosen DPL</span>
+                            <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-baseline gap-2">
+                            <span class="text-2xl font-black text-teal-600">{{ $macroStats['total_dosens'] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">Dosen Pembimbing</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mahasiswa Aktif Magang</span>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex items-baseline gap-2">
+                            <span class="text-2xl font-black text-emerald-600">{{ $macroStats['total_active_interns'] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">Di Instansi Dinas</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Search Card -->
             <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs">
                 <form method="GET" action="{{ route('admin.universities.index') }}" class="flex items-center gap-3">
@@ -196,7 +253,7 @@
             <!-- Universities Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($universities as $univ)
-                    <div class="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between group">
                         <div>
                             <div class="flex items-start justify-between gap-4">
                                 @php
@@ -227,14 +284,14 @@
                                         }
                                     }
                                 @endphp
-                                <div class="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
+                                <a href="{{ route('admin.universities.show', $univ->id) }}" class="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden hover:border-blue-300 transition" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;" title="Kelola {{ $univ->name }}">
                                     @if($univLogoUrl)
                                         <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @else
                                         <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                     @endif
-                                </div>
-                                <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                </a>
+                                <div class="flex items-center gap-2 shrink-0">
                                     <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-black">
                                         {{ $univ->code }}
                                     </span>
@@ -247,11 +304,78 @@
                                             Belum Ada Akun
                                         </span>
                                     @endif
+
+                                    @if($isSuperAdmin)
+                                        <!-- Dropdown Menu (3-dots) for Clean Secondary Actions -->
+                                        <div x-data="{ menuOpen: false }" class="relative" @click.outside="menuOpen = false">
+                                            <button type="button" 
+                                                    @click="menuOpen = !menuOpen" 
+                                                    class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+                                                    title="Menu Opsi">
+                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                                                </svg>
+                                            </button>
+
+                                            <div x-show="menuOpen" 
+                                                 x-transition:enter="transition ease-out duration-100"
+                                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                                 x-transition:leave="transition ease-in duration-75"
+                                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                                 class="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-20"
+                                                 style="display: none;">
+                                                
+                                                <a href="{{ route('admin.universities.edit', $univ->id) }}" 
+                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    <span>Edit Data</span>
+                                                </a>
+
+                                                <a href="{{ route('admin.applications.index', ['university_id' => $univ->id]) }}" 
+                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                                    <span>Daftar Mahasiswa</span>
+                                                </a>
+
+                                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id, 'role' => 'dosen']) }}" 
+                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                                    <span>Daftar Dosen DPL</span>
+                                                </a>
+
+                                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" 
+                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                                    <span>Daftar Akun</span>
+                                                </a>
+
+                                                <div class="my-1 border-t border-slate-100"></div>
+
+                                                <button type="button" 
+                                                        @click="menuOpen = false; $dispatch('open-delete-modal', {
+                                                            action: '{{ route('admin.universities.destroy', $univ->id) }}',
+                                                            title: 'Hapus Perguruan Tinggi',
+                                                            name: '{{ addslashes($univ->name) }}',
+                                                            desc: 'Kode: {{ $univ->code }} &bull; {{ $univ->students_count }} Mahasiswa'
+                                                        })" 
+                                                        class="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 font-semibold transition cursor-pointer">
+                                                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    <span>Hapus Kampus</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
                             <div class="mt-4">
-                                <h3 class="font-black text-base text-gray-900 leading-snug">{{ $univ->name }}</h3>
+                                <h3 class="font-black text-base text-gray-900 leading-snug">
+                                    <a href="{{ route('admin.universities.show', $univ->id) }}" class="hover:text-blue-600 transition" title="Lihat Pusat Kendali Kampus">
+                                        {{ $univ->name }}
+                                    </a>
+                                </h3>
                                 <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
                                 
                                 <div class="mt-3 pt-3 border-t border-slate-50 space-y-1">
@@ -273,63 +397,57 @@
                                 </div>
                             </div>
 
-                            <!-- Stat Counts -->
+                            <!-- Stat Counts (Interaktif Langsung) -->
                             <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100 text-center">
-                                <div class="p-2 rounded-xl bg-blue-50 border border-blue-100">
+                                <a href="{{ route('admin.applications.index', ['university_id' => $univ->id]) }}" 
+                                   class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100/80 border border-blue-100 hover:border-blue-200 transition group/stat block"
+                                   title="Klik untuk lihat daftar mahasiswa">
                                     <div class="text-xs font-black text-blue-700">{{ $univ->students_count }}</div>
                                     <div class="text-[10px] text-blue-600 font-semibold uppercase">Mahasiswa</div>
-                                </div>
-                                <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                    <div class="text-xs font-black text-slate-700">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] text-slate-600 font-semibold uppercase">Dosen DPL</div>
-                                </div>
-                                <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                    <div class="text-xs font-black text-slate-700">{{ $univ->users_count }}</div>
-                                    <div class="text-[10px] text-slate-500 font-semibold uppercase">Akun</div>
-                                </div>
+                                </a>
+                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id, 'role' => 'dosen']) }}" 
+                                   class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100/80 border border-slate-100 hover:border-slate-200 transition group/stat block"
+                                   title="Klik untuk lihat daftar dosen pembimbing">
+                                    <div class="text-xs font-black text-slate-700 group-hover/stat:text-blue-700">{{ $univ->dosens_count }}</div>
+                                    <div class="text-[10px] text-slate-600 group-hover/stat:text-blue-600 font-semibold uppercase">Dosen DPL</div>
+                                </a>
+                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" 
+                                   class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100/80 border border-slate-100 hover:border-slate-200 transition group/stat block"
+                                   title="Klik untuk lihat seluruh akun kampus">
+                                    <div class="text-xs font-black text-slate-700 group-hover/stat:text-blue-700">{{ $univ->users_count }}</div>
+                                    <div class="text-[10px] text-slate-500 group-hover/stat:text-blue-600 font-semibold uppercase">Akun</div>
+                                </a>
                             </div>
                         </div>
 
-                        <!-- Action Buttons in Footer -->
-                        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
-                            <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold shrink-0">
-                                Lihat Akun 
-                            </a>
-
-                            <div class="btn-action-group">
+                        <!-- Action Footer: 1 Baris Elegan, Hierarki Jelas Tanpa Tombol Menumpuk -->
+                        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+                            <div>
                                 @if(!$univ->universityAdmin)
-                                    <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="btn-action-form">
+                                    <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="inline-block m-0">
                                         @csrf
-                                        <button type="submit" class="btn-action-create" title="Buatkan Akun Admin Kampus">
+                                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold transition cursor-pointer active:scale-95" title="Buatkan Akun Admin Kampus">
+                                            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                             <span>Buat Akun</span>
                                         </button>
                                     </form>
                                 @elseif($isSuperAdmin)
-                                    <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST" class="btn-action-form">
+                                    <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST" class="inline-block m-0">
                                         @csrf
-                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer" title="Login As ke Akun Admin Kampus">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition shadow-2xs cursor-pointer active:scale-95" title="Masuk Sebagai Admin Kampus (Login As)">
+                                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
                                             <span>Login As</span>
                                         </button>
                                     </form>
                                 @endif
-
-                                <a href="{{ route('admin.universities.edit', $univ->id) }}" class="btn-action-edit">
-                                    Edit
-                                </a>
-
-                                <button type="button" 
-                                        @click="$dispatch('open-delete-modal', {
-                                            action: '{{ route('admin.universities.destroy', $univ->id) }}',
-                                            title: 'Hapus Perguruan Tinggi',
-                                            name: '{{ addslashes($univ->name) }}',
-                                            desc: 'Kode: {{ $univ->code }} &bull; {{ $univ->students_count }} Mahasiswa'
-                                        })" 
-                                        class="btn-action-delete"
-                                        title="Hapus Universitas">
-                                    Hapus
-                                </button>
                             </div>
+
+                            <a href="{{ route('admin.universities.show', $univ->id) }}" 
+                               class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow-md cursor-pointer ml-auto"
+                               title="Buka Pusat Kendali & Manajemen Kampus">
+                                <span>Kelola Kampus</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </a>
                         </div>
                     </div>
                 @empty

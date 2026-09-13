@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -85,11 +85,46 @@
                 </div>
             </div>
 
+            <!-- Active University Filter Indicator Banner -->
+            @if(isset($selectedUniversity) && $selectedUniversity)
+                <div class="p-4 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-indigo-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-indigo-700">Filter Aktif Logbook Kampus:</span>
+                            <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.universities.show', $selectedUniversity->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition">
+                            Pusat Kendali Kampus
+                        </a>
+                        <a href="{{ route('admin.logbooks.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Reset Filter
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <!-- Filter & Search Controls -->
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
                 <form method="GET" action="{{ route('admin.logbooks.index') }}" class="flex flex-col md:flex-row items-center justify-between gap-3">
                     
                     <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
+                        <!-- Filter Universitas -->
+                        @if(isset($universities))
+                            <select name="university_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Semua Kampus --</option>
+                                @foreach ($universities as $unv)
+                                    <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
+                                        {{ $unv->name }} ({{ $unv->code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
+
                         <!-- Filter Unit -->
                         <select name="unit_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Unit Penempatan --</option>
@@ -124,7 +159,7 @@
                         <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                             Cari
                         </button>
-                        @if (request()->hasAny(['unit_id', 'status_filter', 'search', 'placement_id']))
+                        @if (request()->hasAny(['unit_id', 'university_id', 'status_filter', 'search', 'placement_id']))
                             <a href="{{ route('admin.logbooks.index') }}" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition" title="Reset Filter">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
