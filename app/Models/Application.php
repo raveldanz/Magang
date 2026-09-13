@@ -78,7 +78,7 @@ class Application extends Model
         // 3. ACTIVE / ACCEPTED
         if ($rawStatus === 'accepted') {
             $startDate = !empty($this->start_date) ? Carbon::parse($this->start_date)->toDateString() : null;
-            if ($startDate && $today >= $startDate) {
+            if (!$startDate || $today >= $startDate) {
                 return 'ACTIVE';
             }
             return 'ACCEPTED';

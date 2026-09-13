@@ -185,11 +185,18 @@ Route::middleware('auth')->group(function () {
         Route::resource('/admin/agencies', AdminAgencyController::class)->names('admin.agencies');
 
         // Master Pengguna Sistem
-        Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
+        Route::post('/admin/users/bulk-reset-password', [AdminUserController::class, 'bulkResetPassword'])->name('admin.users.bulk_reset_password');
+        Route::post('/admin/users/bulk-delete', [AdminUserController::class, 'bulkDelete'])->name('admin.users.bulk_delete');
         Route::post('/admin/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset_password');
+        Route::resource('/admin/users', AdminUserController::class)->names('admin.users');
 
         // Master Perguruan Tinggi (Universitas)
         Route::post('/admin/universities/{id}/create-account', [AdminUniversityController::class, 'createAccount'])->name('admin.universities.create_account');
+        Route::post('/admin/universities/{id}/dosens', [AdminUniversityController::class, 'storeDosen'])->name('admin.universities.dosens.store');
+        Route::post('/admin/universities/{id}/dosens/{dosenId}/reset-password', [AdminUniversityController::class, 'resetDosenPassword'])->name('admin.universities.dosens.reset_password');
+        Route::delete('/admin/universities/{id}/dosens/{dosenId}', [AdminUniversityController::class, 'destroyDosen'])->name('admin.universities.dosens.destroy');
+        Route::post('/admin/universities/{id}/assign-advisor', [AdminUniversityController::class, 'assignAdvisor'])->name('admin.universities.assign_advisor');
+        Route::get('/admin/universities/{id}/export-students', [AdminUniversityController::class, 'exportStudents'])->name('admin.universities.export_students');
         Route::resource('/admin/universities', AdminUniversityController::class)->names('admin.universities');
 
         // Manajemen Mentor Internal Dinas

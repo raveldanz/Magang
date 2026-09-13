@@ -219,7 +219,11 @@ class EvaluationController extends Controller
 
         // Cek jika evaluasi dinas & dosen sudah lengkap dan laporan di-ACC -> otomatis status COMPLETED
         $eval = $placement->evaluation;
-        if ($request->status === 'approved' && $eval && $eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) {
+        $univ = $eval?->getUniversity();
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $isMentorOnly = ($scheme === 'mentor_only');
+
+        if ($request->status === 'approved' && $eval && $eval->nilai_pembimbing > 0 && ($isMentorOnly || $eval->nilai_dosen_calculated > 0 || $eval->final_score > 0) && $placement->application) {
             $placement->application->update(['status' => 'completed']);
         }
 

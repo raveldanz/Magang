@@ -6,7 +6,30 @@
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+            <!-- Active University Filter Indicator Banner -->
+            @if(isset($selectedUniversity) && $selectedUniversity)
+                <div class="p-4 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-indigo-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-indigo-700">Filter Aktif Perguruan Tinggi:</span>
+                            <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.universities.show', $selectedUniversity->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition">
+                            Pusat Kendali Kampus
+                        </a>
+                        <a href="{{ route('admin.applications.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Reset Filter
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100">
                 
                 <!-- Form Filter & Search (Responsive Single-Row Flex Layout) -->
@@ -17,6 +40,20 @@
                             <x-text-input type="text" name="search" value="{{ request('search') }}" 
                                 placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-sm h-10" />
                         </div>
+
+                        <!-- Filter Universitas (w-52) -->
+                        @if(isset($universities))
+                            <div class="w-full lg:w-52">
+                                <select name="university_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                                    <option value="">-- Semua Kampus --</option>
+                                    @foreach ($universities as $unv)
+                                        <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
+                                            {{ $unv->name }} ({{ $unv->code }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
 
                         <!-- Filter Unit / Divisi (w-64) -->
                         <div class="w-full lg:w-64">
@@ -62,7 +99,7 @@
                                 <span>Filter</span>
                             </button>
 
-                            @if(request('search') || request('status') || request('unit_id'))
+                            @if(request('search') || request('status') || request('unit_id') || request('university_id'))
                                 <a href="{{ route('admin.applications.index') }}" class="inline-flex items-center justify-center px-4 h-10 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-lg shadow-sm transition">
                                     Reset
                                 </a>
