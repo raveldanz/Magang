@@ -199,14 +199,88 @@
                     </form>
                 </div>
             @else
-                <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl text-center space-y-3 shadow-xs">
-                    <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-xs space-y-6">
+                    <div class="p-6 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 rounded-2xl text-center space-y-3 shadow-2xs">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <h3 class="font-black text-lg sm:text-xl text-emerald-950">Laporan Akhir Anda Telah Disetujui Secara Resmi (ACC)</h3>
+                        <p class="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
+                            Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan (DPL) dan Mentor Instansi Pemerintah Kota Surabaya.
+                        </p>
                     </div>
-                    <h3 class="font-black text-base text-emerald-900">Laporan Akhir Anda Telah Disetujui Secara Resmi</h3>
-                    <p class="text-xs text-emerald-700 max-w-xl mx-auto">
-                        Naskah laporan akhir Anda telah di-ACC oleh DPL dan pembimbing lapangan. Nilai kelulusan dan sertifikat resmi dapat dilihat di Dashboard.
-                    </p>
+
+                    @if ($evaluation && ($evaluation->final_score > 0 || $evaluation->nilai_akhir > 0 || $evaluation->nilai_pembimbing > 0))
+                        <!-- Rekapitulasi Nilai Kelulusan Mahasiswa -->
+                        <div class="space-y-4 pt-2">
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                <div>
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang MBKM</span>
+                                    <h4 class="font-black text-base text-gray-900">Rekapitulasi Nilai Kelulusan & Prestasi</h4>
+                                </div>
+                                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
+                                    Lulus Magang
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Disiplin</span>
+                                    <span class="text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_disiplin ?? 0, 1) }}</span>
+                                    <span class="text-[10px] text-slate-400">Kehadiran & Tata Tertib</span>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Kinerja</span>
+                                    <span class="text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_kinerja ?? 0, 1) }}</span>
+                                    <span class="text-[10px] text-slate-400">Keahlian & Inisiatif</span>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Laporan</span>
+                                    <span class="text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_laporan ?? 0, 1) }}</span>
+                                    <span class="text-[10px] text-slate-400">Kualitas Naskah</span>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 text-center">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Nilai Akhir</span>
+                                    <span class="text-xl font-black text-indigo-950 mt-1 block">
+                                        {{ number_format($evaluation->final_score ?? $evaluation->nilai_akhir ?? $evaluation->nilai_pembimbing ?? 0, 1) }}
+                                        <span class="text-xs font-bold text-indigo-600 font-mono">({{ $evaluation->grade ?? 'A' }})</span>
+                                    </span>
+                                    <span class="text-[10px] text-indigo-600 font-semibold">Predikat Kelulusan</span>
+                                </div>
+                            </div>
+
+                            @if($evaluation->catatan || $evaluation->feedback_dosen)
+                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                                    @if($evaluation->catatan)
+                                        <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->catatan }}"</span></p>
+                                    @endif
+                                    @if($evaluation->feedback_dosen)
+                                        <p class="text-slate-700"><strong class="text-slate-900">Ulasan Dosen Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
+                                    @endif
+                                </div>
+                            @endif
+
+                            <!-- Action Button: Cetak & Download Sertifikat -->
+                            <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-3">
+                                <a href="{{ route('student.certificate.show', $placement->id) }}" target="_blank"
+                                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl text-xs transition shadow-md shadow-blue-600/20 active:scale-95 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span>Pratinjau E-Sertifikat Resmi</span>
+                                </a>
+
+                                <a href="{{ route('student.certificate.download', $placement->id) }}" target="_blank"
+                                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs transition shadow-md shadow-emerald-600/20 active:scale-95 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <span>Unduh E-Sertifikat & Transkrip</span>
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-1">
+                            <span class="text-xs font-bold text-amber-900 block">Menunggu Penerbitan Nilai Akhir</span>
+                            <p class="text-xs text-amber-700">Pembimbing lapangan dan DPL sedang memproses lembar penilaian evaluasi akhir magang Anda.</p>
+                        </div>
+                    @endif
                 </div>
             @endif
 

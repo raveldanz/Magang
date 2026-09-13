@@ -26,7 +26,7 @@ class CertificateController extends Controller
             'placement.finalreport', 
             'placement.pembimbing'
         ])
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'completed'])
             ->whereHas('placement', function ($query) {
                 $query->whereHas('evaluation')
                       ->whereHas('finalreport', function ($subQuery) {

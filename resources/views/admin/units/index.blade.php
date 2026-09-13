@@ -8,12 +8,18 @@
                     </svg>
                     {{ __('Manajemen Divisi & Kuota Magang') }}
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    {{ Auth::user()->agencyProfile->agency_name ?? 'Super Administrator (Semua Instansi Pemkot Surabaya)' }}
+                <p class="text-xs sm:text-sm text-gray-500 mt-1 flex items-center gap-2">
+                    @if(isset($selectedAgency) && $selectedAgency)
+                        <span class="font-bold text-blue-600">{{ $selectedAgency->agency_name }}</span>
+                        <span class="text-slate-400">&bull;</span>
+                        <span>{{ $selectedAgency->government_name ?? 'Pemerintah Kota Surabaya' }}</span>
+                    @else
+                        <span>{{ Auth::user()->agencyProfile->agency_name ?? 'Super Administrator (Semua Instansi Pemkot Surabaya)' }}</span>
+                    @endif
                 </p>
             </div>
 
-            <a href="{{ route('admin.units.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+            <a href="{{ route('admin.units.create', request('agency_id') ? ['agency_id' => request('agency_id')] : []) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
@@ -44,6 +50,32 @@
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
                         <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Active Agency Filter Indicator Banner -->
+            @if(isset($selectedAgency) && $selectedAgency && Auth::user()->agency_profile_id === null)
+                <div class="p-4 bg-blue-50/80 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-blue-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-blue-700">Filter Aktif Instansi Dinas:</span>
+                            <h4 class="font-black text-sm text-blue-950">{{ $selectedAgency->agency_name }}</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.agencies.show', $selectedAgency->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs transition">
+                            Kelola Dinas Ini
+                        </a>
+                        <a href="{{ route('admin.users.index', ['agency_id' => $selectedAgency->id]) }}" class="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 border border-purple-200 font-bold rounded-xl transition">
+                            Lihat Akun Dinas
+                        </a>
+                        <a href="{{ route('admin.units.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Tampilkan Semua Instansi
+                        </a>
                     </div>
                 </div>
             @endif
@@ -80,7 +112,7 @@
                 <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <form method="GET" action="{{ route('admin.units.index') }}" class="flex items-center gap-2">
-                            <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
+                            <select name="agency_id" onchange="if(this.value){this.form.submit();}else{window.location.href='{{ route('admin.units.index') }}';}" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs font-medium">
                                 <option value="">-- Semua Instansi --</option>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>

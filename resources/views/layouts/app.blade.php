@@ -128,6 +128,12 @@
         <!-- Global Double-Confirmation Delete Modal Component -->
         <x-confirm-delete-modal />
 
+        <!-- Global Double-Confirmation Reset Password Modal Component -->
+        <x-confirm-reset-modal />
+
+        <!-- Global Triple-Confirmation Bulk Action Modal Component -->
+        <x-bulk-action-modal />
+
         @stack('scripts')
     </body>
 </html>
