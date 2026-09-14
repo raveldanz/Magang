@@ -73,6 +73,57 @@
                 </div>
             @endif
 
+            <!-- Evaluasi Akhir & Transkrip Nilai (Jika Sudah Ada Penilaian) -->
+            @if ($application->placement && $application->placement->evaluation)
+                @php $eval = $application->placement->evaluation; @endphp
+                <div class="bg-white p-6 shadow sm:rounded-lg border-l-4 border-indigo-500 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-3">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Evaluasi & Transkrip Kelulusan Magang</span>
+                            <h3 class="text-base font-black text-gray-900 mt-0.5">Rekapitulasi Penilaian Akhir Mahasiswa</h3>
+                        </div>
+                        <a href="{{ route('admin.certificates.show', $application->placement->id) }}" target="_blank"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Pratinjau E-Sertifikat & Transkrip</span>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                            <div class="text-[11px] font-semibold text-slate-500 uppercase">Nilai Disiplin</div>
+                            <div class="text-lg font-black text-slate-800 mt-1">{{ number_format($eval->nilai_disiplin ?? 0, 1) }}</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                            <div class="text-[11px] font-semibold text-slate-500 uppercase">Nilai Kinerja</div>
+                            <div class="text-lg font-black text-slate-800 mt-1">{{ number_format($eval->nilai_kinerja ?? 0, 1) }}</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                            <div class="text-[11px] font-semibold text-slate-500 uppercase">Nilai Laporan</div>
+                            <div class="text-lg font-black text-slate-800 mt-1">{{ number_format($eval->nilai_laporan ?? 0, 1) }}</div>
+                        </div>
+                        <div class="p-3 bg-indigo-50 rounded-xl border border-indigo-100 text-center">
+                            <div class="text-[11px] font-bold text-indigo-700 uppercase">Nilai Akhir (Predikat)</div>
+                            <div class="text-lg font-black text-indigo-900 mt-1">
+                                {{ number_format($eval->final_score ?? $eval->nilai_akhir ?? $eval->nilai_pembimbing ?? 0, 1) }}
+                                <span class="text-xs font-bold text-indigo-600 font-mono">({{ $eval->grade ?? 'A' }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($eval->catatan || $eval->feedback_dosen)
+                        <div class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
+                            @if($eval->catatan)
+                                <p><strong>Catatan Pembimbing Dinas:</strong> <span class="italic">"{{ $eval->catatan }}"</span></p>
+                            @endif
+                            @if($eval->feedback_dosen)
+                                <p><strong>Catatan Dosen DPL:</strong> <span class="italic">"{{ $eval->feedback_dosen }}"</span></p>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             <!-- Form Verifikasi Admin -->
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <h3 class="text-lg font-bold mb-4">Aksi Verifikasi & Seleksi</h3>
@@ -90,14 +141,16 @@
                             </option>
                             <option value="accepted" {{ $application->status == 'accepted' ? 'selected' : '' }}>ACCEPTED
                             </option>
+                            <option value="completed" {{ $application->status == 'completed' ? 'selected' : '' }}>COMPLETED (Selesai Magang & Lulus)
+                            </option>
                             <option value="rejected" {{ $application->status == 'rejected' ? 'selected' : '' }}>REJECTED
                             </option>
                         </select>
                     </div>
 
-                    <!-- Container Khusus Jika Status = ACCEPTED (Hanya Tampil Saat Diterima) -->
-                    <div id="acceptance-box" class="space-y-4 mb-4 border p-4 rounded-lg bg-green-50/50 border-green-200 {{ $application->status == 'accepted' ? '' : 'hidden' }}">
-                        <h4 class="font-semibold text-green-800 border-b pb-2 text-sm">Data Balasan Penerimaan Magang</h4>
+                    <!-- Container Khusus Jika Status = ACCEPTED / COMPLETED -->
+                    <div id="acceptance-box" class="space-y-4 mb-4 border p-4 rounded-lg bg-green-50/50 border-green-200 {{ in_array($application->status, ['accepted', 'completed']) ? '' : 'hidden' }}">
+                        <h4 class="font-semibold text-green-800 border-b pb-2 text-sm">Data Balasan Penerimaan & Penempatan Magang</h4>
                         
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
@@ -111,6 +164,20 @@
                                 @endforeach
                             </select>
                             <p class="text-xs text-gray-500 mt-1">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
+                        </div>
+
+                        <!-- Dropdown Dosen Pembimbing Lapangan (DPL Kampus) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Plotting Dosen Pembimbing Lapangan (DPL Kampus)</label>
+                            <select name="academic_advisor_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="">-- Pilih Dosen Pembimbing Lapangan (Opsional / Kampus Mitra) --</option>
+                                @foreach ($dosens as $dosen)
+                                    <option value="{{ $dosen->id }}" {{ optional($application->placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
+                                        {{ $dosen->name }} ({{ $dosen->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Dosen DPL resmi dari perguruan tinggi mahasiswa yang bersangkutan.</p>
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -141,10 +208,17 @@
                             {{ __('Simpan Perubahan Status') }}
                         </x-primary-button>
 
-                        @if ($application->status === 'accepted')
+                        @if (in_array($application->status, ['accepted', 'completed']))
                             <a href="{{ route('admin.applications.letter', $application->id) }}" target="_blank" 
                                 class="inline-flex items-center space-x-1 px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 transition shadow-sm">
                                 <span>Pratinjau / Cetak Surat PDF</span>
+                            </a>
+                        @endif
+
+                        @if ($application->placement && ($application->status === 'completed' || $application->placement->evaluation))
+                            <a href="{{ route('admin.certificates.show', $application->placement->id) }}" target="_blank" 
+                                class="inline-flex items-center space-x-1 px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-800 transition shadow-sm">
+                                <span>E-Sertifikat & Transkrip</span>
                             </a>
                         @endif
 
@@ -167,7 +241,7 @@
                             if (statusSelect.value === 'rejected') {
                                 rejectionBox.classList.remove('hidden');
                                 acceptanceBox.classList.add('hidden');
-                            } else if (statusSelect.value === 'accepted') {
+                            } else if (statusSelect.value === 'accepted' || statusSelect.value === 'completed') {
                                 acceptanceBox.classList.remove('hidden');
                                 rejectionBox.classList.add('hidden');
                             } else {

@@ -19,6 +19,7 @@ class UnitController extends Controller
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
 
         $query = Unit::with(['agencyProfile', 'applications']);
+        $selectedAgency = null;
 
         // Multi-Tenant Isolation: Admin Instansi hanya melihat unit di bawah dinasnya
         if ($agencyId) {
@@ -26,12 +27,14 @@ class UnitController extends Controller
                 $q->where('agency_profile_id', $agencyId);
             });
             $agencies = AgencyProfile::where('id', $agencyId)->get();
+            $selectedAgency = $agencies->first();
         } else {
             // Superadmin dapat memfilter berdasarkan instansi
             if ($request->filled('agency_id')) {
                 $query->where('agency_profile_id', $request->agency_id);
+                $selectedAgency = AgencyProfile::find($request->agency_id);
             }
-            $agencies = AgencyProfile::all();
+            $agencies = AgencyProfile::orderBy('agency_name')->get();
         }
 
         if ($request->filled('search')) {
@@ -56,13 +59,13 @@ class UnitController extends Controller
             'total_remaining' => $totalRemaining,
         ];
 
-        return view('admin.units.index', compact('units', 'stats', 'agencies'));
+        return view('admin.units.index', compact('units', 'stats', 'agencies', 'selectedAgency'));
     }
 
     /**
      * Tampilkan formulir tambah divisi / lowongan magang baru
      */
-    public function create()
+    public function create(Request $request)
     {
         $user = Auth::user();
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
@@ -71,8 +74,8 @@ class UnitController extends Controller
             $agencies = AgencyProfile::where('id', $agencyId)->get();
             $defaultAgencyId = $agencyId;
         } else {
-            $agencies = AgencyProfile::all();
-            $defaultAgencyId = null;
+            $agencies = AgencyProfile::orderBy('agency_name')->get();
+            $defaultAgencyId = $request->query('agency_id');
         }
 
         return view('admin.units.create', compact('agencies', 'defaultAgencyId'));
