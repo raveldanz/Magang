@@ -27,6 +27,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-010** | 2026-09-10 | Double-Confirmation Deletion & Cascade Clean | Tombol hapus universitas/instansi tertolak akun admin otomatis & ketiadaan modal konfirmasi ganda | RESOLVED |
 | **LRN-011** | 2026-09-13 | Super Admin Agency Hub & Workflow | Tombol terbatas 'Lihat Unit ->', ketiadaan 'Lihat Akun', dan ketiadaan Pusat Kendali Alur Dinas | RESOLVED |
 | **LRN-012** | 2026-09-13 | User Management, Double Confirmation & Bulk Actions | Tombol reset & hapus tidak merespon (Alpine x-data scope), ketiadaan konfirmasi ganda & fitur pilih banyak dengan tripel konfirmasi | RESOLVED |
+| **LRN-013** | 2026-09-14 | Storage Junction, Migrations & ID Collision | Lampiran 404, migrasi token sertifikat tertunda, tabrakan ID multi-tenant, dan surat kelulusan | RESOLVED |
 
 ---
 
@@ -242,6 +243,28 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
      - **Tripel Konfirmasi (Bulk Actions)**: Menampilkan audit preview daftar akun terdampak (Lapis 1), checkbox pernyataan tanggung jawab (Lapis 2), dan pengetikan kata kunci wajib persis `RESET SEMUA` / `HAPUS SEMUA` (Lapis 3) sebelum tombol eksekusi terbuka (`bulk-action-modal`).
   3. Menambahkan endpoint backend aman `admin.users.bulk_reset_password` dan `admin.users.bulk_delete` yang memproteksi akun Super Admin, memvalidasi relasi magang/penempatan aktif agar tidak merusak integritas basis data, dan mencatat transaksi ke `AuditLog`.
 - **Prevention Rule**: Seluruh elemen interaktif yang memanfaatkan event Alpine (`$dispatch`, `@click`) WAJIB berada di dalam deklarasi `x-data`. Aksi krusial terhadap data sistem DILARANG menggunakan `window.confirm()` bawaan browser; wajib menggunakan modal konfirmasi ganda (*double confirmation*), dan aksi massal wajib menerapkan verifikasi 3 lapis (*triple confirmation*) dengan pengetikan kata kunci penegasan.
+
+---
+
+### [LRN-013] Penanganan Windows NTFS Junction Storage, Migrasi Token Verifikasi, & Resolusi Tabrakan ID Multi-Tenant
+- **Tanggal**: 2026-09-14
+- **Komponen**: `public/storage`, `database/migrations/`, `University\DashboardController`, `Student\ApplicationController`
+- **Problem / Symptom**: 
+  1. Lampiran logbook mahasiswa menghasilkan error 404 (Not Found) saat diklik di browser.
+  2. Verifikasi sertifikat menghasilkan error `column "certificate_hash" does not exist`.
+  3. Detail mahasiswa kampus (`/university/students/24`) memicu error 403 "Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain".
+  4. Mahasiswa berstatus lulus/selesai (`completed`) tidak dapat mengunduh kembali arsip surat penerimaan magang (`/student/application/{id}/letter`).
+- **Root Cause**: 
+  1. Direktori `public/storage` di Windows berupa folder fisik terpisah, bukan NTFS Junction ke `storage/app/public`.
+  2. Migrasi penambahan token verifikasi belum dijalankan (`Pending`).
+  3. Terjadi tabrakan ID (*ID collision*) antara `applications.id` dan `placements.id` di controller pemantauan universitas, di mana query mendahulukan `Application` kampus lain daripada `Placement` milik kampus sendiri yang memiliki nomor ID yang sama.
+  4. Query download surat penerimaan dibatasi kaku hanya `where('status', 'accepted')`.
+- **Fix Applied**: 
+  1. Menghapus folder statis dan menghubungkan ulang `public/storage` sebagai NTFS Junction resmi via `php artisan storage:link`.
+  2. Menjalankan `php artisan migrate` untuk mengaktifkan kolom `letter_token` dan `certificate_hash`.
+  3. Memperbarui `University\DashboardController@showStudent` agar mengevaluasi relasi kampus terlebih dahulu dan memprioritaskan entitas yang cocok dengan institusi pengguna yang sedang login.
+  4. Mengubah filter status surat menjadi `whereIn('status', ['accepted', 'completed'])`.
+- **Prevention Rule**: Pastikan symlink Windows selalu bertipe `Junction`. Hindari asumsi nomor ID antar-tabel tidak beririsan; route parameter yang bersifat polimorfik/fallback wajib memvalidasi kepemilikan tenant (*tenant-aware resolution*) sebelum melakukan otorisasi penolakan.
 
 ---
 
