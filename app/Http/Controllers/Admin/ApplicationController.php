@@ -8,6 +8,7 @@ use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Placement;
 use App\Models\Unit;
+use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,9 +30,9 @@ class ApplicationController extends Controller
             'unit.agencyProfile', 
             'documents', 
             'placement.evaluation', 
-            'placement.finalreport',
-            'placement.mentor',
-            'placement.pembimbing',
+            'placement.finalreport', 
+            'placement.mentor', 
+            'placement.pembimbing', 
             'placement.academicAdvisor'
         ])->latest();
 
@@ -65,6 +66,23 @@ class ApplicationController extends Controller
             $query->where('unit_id', $request->unit_id);
         }
 
+        // 4. Filter Berdasarkan Universitas
+        $selectedUniversity = null;
+        if ($request->filled('university_id')) {
+            $univId = $request->university_id;
+            $univ = University::find($univId);
+            $selectedUniversity = $univ;
+            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+
+            $query->whereHas('user', function ($uq) use ($univId, $univ, $like) {
+                $uq->where('university_id', $univId);
+                if ($univ) {
+                    $uq->orWhere('university', $like, "%{$univ->name}%")
+                       ->orWhereHas('studentProfile', fn($sp) => $sp->where('university_id', $univId)->orWhere('universitas', $like, "%{$univ->name}%"));
+                }
+            });
+        }
+
         // Query Unit untuk Filter Dropdown (Scoped per instansi untuk Admin Dinas, atau All untuk Superadmin)
         if ($agencyId) {
             $units = Unit::where('agency_profile_id', $agencyId)->get();
@@ -77,6 +95,7 @@ class ApplicationController extends Controller
         }
 
         $agencies = AgencyProfile::all();
+        $universities = University::orderBy('name')->get();
 
         // Paginasi 10 Data Per Halaman
         $applications = $query->paginate(10)->withQueryString();
@@ -86,6 +105,8 @@ class ApplicationController extends Controller
             'units', 
             'groupedUnits', 
             'agencies', 
+            'universities',
+            'selectedUniversity',
             'isSuperAdmin', 
             'agencyId'
         ));
@@ -146,7 +167,7 @@ class ApplicationController extends Controller
         $request->merge(['status' => $statusInput]);
 
         $request->validate([
-            'status' => 'required|in:pending,verified,accepted,rejected',
+            'status' => 'required|in:pending,verified,accepted,rejected,completed',
             'rejection_note' => 'nullable|string',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
@@ -184,9 +205,9 @@ class ApplicationController extends Controller
             'status' => $newStatus,
             'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
             'rejection_reason' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
-            'letter_number' => $newStatus === 'accepted' ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
-            'letter_date' => $newStatus === 'accepted' ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
-            'letter_token' => $newStatus === 'accepted' ? $letterToken : $application->letter_token,
+            'letter_number' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
+            'letter_date' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
+            'letter_token' => in_array($newStatus, ['accepted', 'completed']) ? $letterToken : $application->letter_token,
         ]);
 
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
@@ -201,13 +222,13 @@ class ApplicationController extends Controller
             $placementData['academic_advisor_id'] = $request->academic_advisor_id;
         }
 
-        if ($newStatus === 'accepted') {
+        if (in_array($newStatus, ['accepted', 'completed'])) {
             $existingPlacement = Placement::where('application_id', $application->id)->first();
             $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
             $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
         }
 
-        if (!empty($placementData) || $newStatus === 'accepted') {
+        if (!empty($placementData) || in_array($newStatus, ['accepted', 'completed'])) {
             Placement::updateOrCreate(
                 ['application_id' => $application->id],
                 $placementData

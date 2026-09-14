@@ -100,8 +100,33 @@ class EvaluationController extends Controller
 
             // Jika laporan akhir sudah diapprove, otomatis tandai status COMPLETED
             $finalReport = $placement->finalreport;
-            if ($finalReport && $finalReport->status === 'approved') {
+            if ($finalReport && $finalReport->status === 'approved' && $placement->application) {
                 $placement->application->update(['status' => 'completed']);
+            }
+        } else {
+            // Skema Dual Evaluation: hitung ulang jika nilai dosen sudah ada
+            $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
+            if ($dosenScore > 0) {
+                $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+                $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+                $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
+
+                if ($finalScore >= 85) $grade = 'A';
+                elseif ($finalScore >= 75) $grade = 'AB';
+                elseif ($finalScore >= 65) $grade = 'B';
+                elseif ($finalScore >= 55) $grade = 'BC';
+                elseif ($finalScore >= 40) $grade = 'C';
+                else $grade = 'E';
+
+                $evaluation->update([
+                    'final_score' => $finalScore,
+                    'grade' => $grade,
+                ]);
+
+                $finalReport = $placement->finalreport;
+                if ($finalReport && $finalReport->status === 'approved' && $placement->application) {
+                    $placement->application->update(['status' => 'completed']);
+                }
             }
         }
 
