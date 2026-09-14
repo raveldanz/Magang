@@ -3,7 +3,6 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                   
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -20,15 +19,24 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="userBulkManagement()">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Alert -->
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span></span>
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('warning'))
+                <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl shadow-xs flex items-center justify-between text-amber-900 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span>{{ session('warning') }}</span>
                     </div>
                 </div>
             @endif
@@ -36,8 +44,63 @@
             @if (session('error'))
                 <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span></span>
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Active Agency Filter Indicator Banner -->
+            @if(isset($selectedAgency) && $selectedAgency)
+                <div class="p-4 bg-purple-50/80 border border-purple-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-purple-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-purple-700">Filter Aktif Personel Instansi Dinas:</span>
+                            <h4 class="font-black text-sm text-purple-950">{{ $selectedAgency->agency_name }}</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.users.create', ['agency_id' => $selectedAgency->id, 'role' => 'admin']) }}" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-xs transition">
+                            + Tambah Akun Dinas Ini
+                        </a>
+                        <a href="{{ route('admin.agencies.show', $selectedAgency->id) }}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl transition">
+                            Pusat Kendali Dinas
+                        </a>
+                        <a href="{{ route('admin.units.index', ['agency_id' => $selectedAgency->id]) }}" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Lihat Unit Dinas
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Reset Filter
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Active University Filter Indicator Banner -->
+            @if(isset($selectedUniversity) && $selectedUniversity)
+                <div class="p-4 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-indigo-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-indigo-700">Filter Aktif Sivitas Perguruan Tinggi:</span>
+                            <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.universities.show', $selectedUniversity->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition">
+                            Pusat Kendali Kampus
+                        </a>
+                        <a href="{{ route('admin.applications.index', ['university_id' => $selectedUniversity->id]) }}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl transition">
+                            Pengajuan Mahasiswa
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Reset Filter
+                        </a>
                     </div>
                 </div>
             @endif
@@ -108,12 +171,19 @@
                 </form>
             </div>
 
-            <!-- Users Table -->
+            <!-- Users Table Card -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
+                                <th class="py-3.5 px-3 w-10 text-center">
+                                    <input type="checkbox" 
+                                           :checked="isAllSelected" 
+                                           @change="toggleSelectAll()" 
+                                           title="Pilih / Batalkan Semua Pengguna di Halaman Ini"
+                                           class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                                </th>
                                 <th class="py-3.5 px-4">Pengguna</th>
                                 <th class="py-3.5 px-4">Role Sistem</th>
                                 <th class="py-3.5 px-4">Afiliasi / Instansi / Kampus</th>
@@ -125,9 +195,24 @@
                             @forelse($users as $u)
                                 @php
                                     $isSuperAdminUser = ($u->role === 'super_admin' || ($u->role === 'admin' && is_null($u->agency_profile_id)));
+                                    $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
                                 @endphp
-                                <tr class="hover:bg-slate-50/80 transition">
+                                <tr class="hover:bg-slate-50/80 transition" :class="isSelected({{ $u->id }}) ? 'bg-blue-50/40' : ''">
                                     
+                                    <!-- Checkbox Selection -->
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
+                                        @if($canSelect)
+                                            <input type="checkbox" 
+                                                   :checked="isSelected({{ $u->id }})" 
+                                                   @change="toggleSelectUser({ id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ addslashes($u->email) }}', role: '{{ $u->role }}' })"
+                                                   class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                                        @else
+                                            <span class="inline-flex text-slate-300 cursor-not-allowed" title="Akun Super Admin / Akun Sendiri Dilindungi">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            </span>
+                                        @endif
+                                    </td>
+
                                     <!-- User Info -->
                                     <td class="py-4 px-4">
                                         <div class="flex items-center gap-3">
@@ -204,13 +289,12 @@
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <div class="btn-action-group">
 
-                                            <!-- Tombol Impersonate / Login As (Hanya Super Admin & Bukan Akun Sendiri / Super Admin Lain) -->
+                                            <!-- Tombol Impersonate / Login As -->
                                             @if($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser)
-                                                <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" onsubmit="return confirm('Masuk sebagai {{ $u->name }}? Anda dapat kembali ke Super Admin kapan saja.');" class="btn-action-form">
+                                                <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="btn-action-form">
                                                     @csrf
-                                                    <button type="submit" title="Masuk / Login sebagai pengguna ini" class="btn-action-login">
-                                                        <span></span>
-                                                        <span>Login As</span>
+                                                    <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)" class="btn-action-login">
+                                                        Login As
                                                     </button>
                                                 </form>
                                             @endif
@@ -220,16 +304,23 @@
                                                 Edit
                                             </a>
 
-                                            <!-- Reset Password -->
-                                            <form action="{{ route('admin.users.reset_password', $u->id) }}" method="POST" onsubmit="return confirm('Reset password akun {{ $u->name }} ke default (password)?');" class="btn-action-form">
-                                                @csrf
-                                                <button type="submit" title="Reset password ke default: password" class="btn-action-reset">
+                                            <!-- Reset Password (Double Confirmation Modal) -->
+                                            @if(!$isSuperAdminUser || $u->id !== $currentUser->id)
+                                                <button type="button" 
+                                                        @click="$dispatch('open-reset-modal', {
+                                                            action: '{{ route('admin.users.reset_password', $u->id) }}',
+                                                            name: '{{ addslashes($u->name) }}',
+                                                            email: '{{ addslashes($u->email) }}',
+                                                            role: '{{ strtoupper($u->role) }}'
+                                                        })" 
+                                                        class="btn-action-reset" 
+                                                        title="Reset password ke default: password">
                                                     Reset
                                                 </button>
-                                            </form>
+                                            @endif
 
-                                            <!-- Hapus User -->
-                                            @if($u->id !== $currentUser->id)
+                                            <!-- Hapus User (Double Confirmation Modal) -->
+                                            @if($u->id !== $currentUser->id && !$isSuperAdminUser)
                                                 <button type="button" 
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
@@ -249,7 +340,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-12 text-center text-gray-400">
+                                    <td colspan="6" class="py-12 text-center text-gray-400">
                                         Tidak ada data pengguna yang sesuai filter.
                                     </td>
                                 </tr>
@@ -266,5 +357,158 @@
             </div>
 
         </div>
+
+        <!-- Sticky Floating Bulk Action Bar (muncul jika ada user yang dicentang) -->
+        <div x-show="selectedCount > 0"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+             class="fixed bottom-6 inset-x-0 z-40 max-w-2xl mx-auto px-4 pointer-events-none"
+             x-cloak>
+            <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md text-white rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3.5">
+                
+                <!-- Info Terpilih -->
+                <div class="flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-2xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow-md shadow-blue-500/20" x-text="selectedCount"></span>
+                    <div>
+                        <div class="text-xs font-black text-white tracking-wide">
+                            <span x-text="selectedCount"></span> Akun Pengguna Dipilih
+                        </div>
+                        <button type="button" @click="clearSelection()" class="text-[11px] text-slate-400 hover:text-slate-200 underline transition cursor-pointer">
+                            Batalkan Semua Pilihan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tombol Aksi Massal -->
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <!-- Reset Massal Button -->
+                    <button type="button" 
+                            @click="openBulkResetModal()" 
+                            class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                        </svg>
+                        <span>Reset Password Massal</span>
+                    </button>
+
+                    <!-- Hapus Massal Button -->
+                    <button type="button" 
+                            @click="openBulkDeleteModal()" 
+                            class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span>Hapus Massal</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
     </div>
+
+    @push('scripts')
+    <script>
+        function userBulkManagement() {
+            return {
+                selectedUsers: [],
+
+                get selectedCount() {
+                    return this.selectedUsers.length;
+                },
+
+                get isAllSelected() {
+                    const selectable = this.getSelectableUsers();
+                    return selectable.length > 0 && selectable.every(u => this.isSelected(u.id));
+                },
+
+                isSelected(id) {
+                    return this.selectedUsers.some(u => u.id === id);
+                },
+
+                toggleSelectUser(user) {
+                    const idx = this.selectedUsers.findIndex(u => u.id === user.id);
+                    if (idx > -1) {
+                        this.selectedUsers.splice(idx, 1);
+                    } else {
+                        this.selectedUsers.push(user);
+                    }
+                },
+
+                toggleSelectAll() {
+                    const selectable = this.getSelectableUsers();
+                    if (this.isAllSelected) {
+                        const selectableIds = selectable.map(u => u.id);
+                        this.selectedUsers = this.selectedUsers.filter(u => !selectableIds.includes(u.id));
+                    } else {
+                        selectable.forEach(u => {
+                            if (!this.isSelected(u.id)) {
+                                this.selectedUsers.push({
+                                    id: u.id,
+                                    name: u.name,
+                                    email: u.email,
+                                    role: u.role
+                                });
+                            }
+                        });
+                    }
+                },
+
+                clearSelection() {
+                    this.selectedUsers = [];
+                },
+
+                getSelectableUsers() {
+                    return this.pageUsers.filter(u => u.selectable);
+                },
+
+                pageUsers: [
+                    @foreach($users as $u)
+                        @php
+                            $isSuperAdminUser = ($u->role === 'super_admin' || ($u->role === 'admin' && is_null($u->agency_profile_id)));
+                            $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
+                        @endphp
+                        {
+                            id: {{ $u->id }},
+                            name: '{{ addslashes($u->name) }}',
+                            email: '{{ addslashes($u->email) }}',
+                            role: '{{ $u->role }}',
+                            selectable: {{ $canSelect ? 'true' : 'false' }}
+                        },
+                    @endforeach
+                ],
+
+                openBulkResetModal() {
+                    if (this.selectedCount === 0) return;
+                    window.dispatchEvent(new CustomEvent('open-bulk-modal', {
+                        detail: {
+                            action: '{{ route('admin.users.bulk_reset_password') }}',
+                            mode: 'reset',
+                            title: 'Reset Password Massal',
+                            users: this.selectedUsers,
+                            userIds: this.selectedUsers.map(u => u.id)
+                        }
+                    }));
+                },
+
+                openBulkDeleteModal() {
+                    if (this.selectedCount === 0) return;
+                    window.dispatchEvent(new CustomEvent('open-bulk-modal', {
+                        detail: {
+                            action: '{{ route('admin.users.bulk_delete') }}',
+                            mode: 'delete',
+                            title: 'Hapus Massal Akun Pengguna',
+                            users: this.selectedUsers,
+                            userIds: this.selectedUsers.map(u => u.id)
+                        }
+                    }));
+                }
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>
