@@ -73,4 +73,43 @@ class Placement extends Model
     {
         return $this->application?->unit?->agencyProfile ?? AgencyProfile::first();
     }
+
+    /**
+     * Evaluasi dan perbarui status kelulusan magang (COMPLETED) secara otomatis.
+     * Syarat: Naskah laporan akhir disetujui (ACC) DAN lembar evaluasi lengkap sesuai skema kampus.
+     */
+    public function syncCompletionStatus(): bool
+    {
+        $app = $this->application;
+        $finalReport = $this->finalreport;
+        $eval = $this->evaluation;
+
+        if (!$app || !$finalReport || strtolower($finalReport->status ?? '') !== 'approved') {
+            return false;
+        }
+
+        $univ = $eval?->getUniversity();
+        if (!$univ && $app->user?->university_id) {
+            $univ = University::find($app->user->university_id);
+        }
+
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $isMentorOnly = ($scheme === 'mentor_only');
+
+        $hasMentor = $eval && $eval->nilai_pembimbing > 0;
+        $hasDosen = $eval && ($eval->nilai_dosen_calculated > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->nilai_akademik ?? 0) > 0);
+
+        $isComplete = $isMentorOnly 
+            ? $hasMentor 
+            : ($hasMentor && $hasDosen);
+
+        if ($isComplete || ($eval && ($eval->final_score ?? 0) > 0)) {
+            if ($app->status !== 'completed') {
+                $app->update(['status' => 'completed']);
+            }
+            return true;
+        }
+
+        return false;
+    }
 }

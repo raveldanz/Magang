@@ -30,9 +30,11 @@ class ApplicationController extends Controller
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
         }
 
-        // 2. Cek apakah ada pengajuan yang masih diproses (PENDING)
-        $activeApplication = Application::where('user_id', $user->id)
-            ->where('status', 'pending')
+        // 2. Cek apakah ada pengajuan yang sedang berjalan atau aktif (pending, verified, accepted, completed)
+        $activeApplication = Application::with(['unit.agencyProfile', 'placement'])
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'verified', 'accepted', 'completed'])
+            ->latest()
             ->first();
 
         // 3. Ambil seluruh riwayat pengajuan mahasiswa
@@ -47,6 +49,29 @@ class ApplicationController extends Controller
     // Menyimpan data pengajuan magang & upload dokumen
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // 1. Cek kelengkapan profil mahasiswa
+        if (!$user->studentProfile) {
+            return redirect()->route('student.profile.edit')
+                ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
+        }
+
+        // 2. Cegah pengajuan ganda jika sudah ada pengajuan aktif / diterima / selesai
+        $existingActive = Application::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'verified', 'accepted', 'completed'])
+            ->first();
+
+        if ($existingActive) {
+            $msg = match ($existingActive->status) {
+                'pending', 'verified' => 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.',
+                'accepted' => 'Akses ditolak: Anda sudah memiliki penempatan magang aktif yang sedang berjalan.',
+                'completed' => 'Anda telah menyelesaikan program magang MBKM pada instansi sebelumnya.',
+                default => 'Anda sudah memiliki pengajuan magang aktif.'
+            };
+            return redirect()->route('student.application.create')->with('error', $msg);
+        }
+
         $request->validate([
             'unit_id'         => 'required|exists:units,id',
             'start_date'      => 'required|date|after_or_equal:today',
@@ -86,7 +111,7 @@ class ApplicationController extends Controller
         $transcriptPath = $request->file('transkrip') ? $request->file('transkrip')->store('documents/applications', 'public') : null;
         $idCardPath = $request->file('id_card') ? $request->file('id_card')->store('documents/applications', 'public') : null;
 
-        // 1. Simpan Data Pengajuan
+        // Simpan Data Pengajuan
         $application = Application::create([
             'user_id'              => Auth::id(),
             'unit_id'              => $request->unit_id,
@@ -100,7 +125,7 @@ class ApplicationController extends Controller
             'letter_token'         => Str::random(32),
         ]);
 
-        // 2. Simpan Dokumen Persyaratan ke tabel application_documents
+        // Simpan Dokumen Persyaratan ke tabel application_documents
         $documents = [
             'Surat Pengantar' => $proposalPath,
             'CV'             => $cvPath,
@@ -132,39 +157,5 @@ class ApplicationController extends Controller
             ->findOrFail($id);
 
         return view('letters.acceptance', compact('application'));
-    }
-
-    // Method show
-    public function show($id)
-    {
-        $application = Application::with(['user.studentProfile', 'unit', 'documents', 'placement'])->findOrFail($id);
-        $pembimbings = User::where('role', 'pembimbing')->get();
-
-        return view('admin.applications.show', compact('application', 'pembimbings'));
-    }
-
-    // Method updateStatus
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status'         => 'required|in:pending,verified,accepted,rejected',
-            'rejection_note' => 'nullable|string',
-            'pembimbing_id'  => 'nullable|exists:users,id',
-        ]);
-
-        $application = Application::findOrFail($id);
-        $application->update([
-            'status'         => $request->status,
-            'rejection_note' => $request->status === 'rejected' ? $request->rejection_note : null,
-        ]);
-
-        if ($request->status === 'accepted' || $request->pembimbing_id) {
-            Placement::updateOrCreate(
-                ['application_id' => $application->id],
-                ['pembimbing_id'  => $request->pembimbing_id]
-            );
-        }
-
-        return redirect()->back()->with('success', 'Status dan Pembimbing berhasil diperbarui!');
     }
 }
