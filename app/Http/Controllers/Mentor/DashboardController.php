@@ -135,16 +135,9 @@ class DashboardController extends Controller
             'feedback' => $request->feedback,
         ]);
 
-        // Jika laporan di-ACC dan evaluasi sudah lengkap, otomatis tandai magang COMPLETED
-        if ($request->status === 'approved' && $placement->application) {
-            $eval = $placement->evaluation;
-            $univ = $eval?->getUniversity();
-            $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-            $isMentorOnly = ($scheme === 'mentor_only');
-
-            if ($eval && $eval->nilai_pembimbing > 0 && ($isMentorOnly || $eval->nilai_dosen_calculated > 0 || $eval->final_score > 0)) {
-                $placement->application->update(['status' => 'completed']);
-            }
+        // Jika laporan di-ACC, sinkronisasi otomatis status kelulusan (COMPLETED)
+        if ($request->status === 'approved') {
+            $placement->syncCompletionStatus();
         }
 
         return redirect()->back()->with('success', 'Status laporan akhir mahasiswa berhasil diperbarui!');

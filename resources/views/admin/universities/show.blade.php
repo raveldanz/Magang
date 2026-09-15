@@ -253,7 +253,7 @@
 
             <!-- Tab Navigasi Manajemen Terpadu -->
             <div class="border-b border-slate-200">
-                <nav class="flex space-x-2 sm:space-x-4 overflow-x-auto pb-px" aria-label="Tabs">
+                <nav class="flex flex-nowrap space-x-2 sm:space-x-4 overflow-x-auto pb-px scrollbar-none" aria-label="Tabs">
                     <!-- Tab 1: Dosen Pembimbing (DPL) -->
                     <button type="button" 
                             @click="activeTab = 'dosen'" 
