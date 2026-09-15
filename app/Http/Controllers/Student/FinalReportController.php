@@ -18,10 +18,16 @@ class FinalReportController extends Controller
      */
     public function index()
     {
+        // Prioritaskan pengajuan yang memiliki penempatan aktif / resmi
         $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
+            ->whereHas('placement')
             ->latest()
-            ->first();
+            ->first()
+            ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->first();
 
         // Cek apakah mahasiswa sudah punya placement
         if (!$application || !$application->placement) {
@@ -40,19 +46,15 @@ class FinalReportController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'nullable|string|max:255',
-            'repository_url' => 'nullable|url|max:255',
-            'file_laporan' => 'required|file|mimes:pdf,doc,docx|max:10240', // Maks 10MB
-        ], [
-            'file_laporan.required' => 'File naskah laporan akhir wajib diunggah.',
-            'file_laporan.mimes' => 'Format file harus berupa PDF atau DOCX.',
-            'file_laporan.max' => 'Ukuran file maksimal adalah 10 MB.',
-            'repository_url.url' => 'Format tautan repositori proyek harus berupa URL valid.',
-        ]);
-
         $user = Auth::user();
-        $application = Application::with('placement')->where('user_id', $user->id)->latest()->first();
+        
+        // Prioritaskan pengajuan yang memiliki penempatan aktif
+        $application = Application::with('placement')
+            ->where('user_id', $user->id)
+            ->whereHas('placement')
+            ->latest()
+            ->first()
+            ?? Application::with('placement')->where('user_id', $user->id)->latest()->first();
         
         if (!$application || !$application->placement) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak: Data penempatan tidak ditemukan.');
@@ -60,38 +62,56 @@ class FinalReportController extends Controller
 
         $placementId = $application->placement->id;
         $finalReport = FinalReport::where('placement_id', $placementId)->first();
+        $hasExistingFile = $finalReport && !empty($finalReport->file_path);
 
-        // Bersihkan file lama jika ada (kecuali file default/template bawaan)
-        if ($finalReport && $finalReport->file_path && Storage::disk('public')->exists($finalReport->file_path)) {
-            $baseOld = basename($finalReport->file_path);
-            if (!in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
-                Storage::disk('public')->delete($finalReport->file_path);
-                @unlink(public_path('storage/' . $finalReport->file_path));
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'repository_url' => 'nullable|url|max:255',
+            'file_laporan' => ($hasExistingFile ? 'nullable' : 'required') . '|file|mimes:pdf,doc,docx|max:10240', // Maks 10MB
+        ], [
+            'file_laporan.required' => 'File naskah laporan akhir wajib diunggah.',
+            'file_laporan.mimes' => 'Format file harus berupa PDF atau DOCX.',
+            'file_laporan.max' => 'Ukuran file maksimal adalah 10 MB.',
+            'repository_url.url' => 'Format tautan repositori proyek harus berupa URL valid.',
+        ]);
+
+        $filePath = $finalReport?->file_path;
+
+        if ($request->hasFile('file_laporan')) {
+            // Bersihkan file lama jika ada (kecuali file default/template bawaan)
+            if ($finalReport && $finalReport->file_path && Storage::disk('public')->exists($finalReport->file_path)) {
+                $baseOld = basename($finalReport->file_path);
+                if (!in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
+                    Storage::disk('public')->delete($finalReport->file_path);
+                    @unlink(public_path('storage/' . $finalReport->file_path));
+                }
+            }
+
+            // Format nama file terstruktur: Laporan_Akhir_[NIM]_[Nama_Mahasiswa]_[Timestamp].[ext]
+            $file = $request->file('file_laporan');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $nim = $user->studentProfile?->nim ?? 'NIM';
+            $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
+            $cleanName = Str::slug($user->name, '_') ?: 'Mahasiswa';
+            $timestamp = time();
+            $customFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}_{$timestamp}.{$ext}";
+
+            $filePath = $file->storeAs('final_reports', $customFilename, 'public');
+
+            // Pastikan salinan juga tersedia di public/storage/final_reports untuk keandalan di Windows
+            try {
+                $publicTarget = public_path('storage/' . $filePath);
+                $publicDir = dirname($publicTarget);
+                if (!file_exists($publicDir)) {
+                    @mkdir($publicDir, 0755, true);
+                }
+                @copy(storage_path('app/public/' . $filePath), $publicTarget);
+            } catch (\Throwable $e) {
+                // Abaikan jika symlink aktif
             }
         }
 
-        // Format nama file terstruktur: Laporan_Akhir_[NIM]_[Nama_Mahasiswa]_[Timestamp].[ext]
-        $file = $request->file('file_laporan');
-        $ext = strtolower($file->getClientOriginalExtension());
-        $nim = $user->studentProfile?->nim ?? 'NIM';
-        $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
-        $cleanName = Str::slug($user->name, '_') ?: 'Mahasiswa';
-        $timestamp = time();
-        $customFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}_{$timestamp}.{$ext}";
-
-        $filePath = $file->storeAs('final_reports', $customFilename, 'public');
-
-        // Pastikan salinan juga tersedia di public/storage/final_reports untuk keandalan di Windows
-        try {
-            $publicTarget = public_path('storage/' . $filePath);
-            $publicDir = dirname($publicTarget);
-            if (!file_exists($publicDir)) {
-                @mkdir($publicDir, 0755, true);
-            }
-            @copy(storage_path('app/public/' . $filePath), $publicTarget);
-        } catch (\Throwable $e) {
-            // Abaikan jika symlink aktif
-        }
+        $newStatus = ($request->hasFile('file_laporan') || $finalReport?->status === 'revision') ? 'pending' : ($finalReport?->status ?? 'pending');
 
         $report = FinalReport::updateOrCreate(
             ['placement_id' => $placementId],
@@ -100,10 +120,12 @@ class FinalReportController extends Controller
                 'repository_url' => $request->repository_url,
                 'file_path' => $filePath,
                 'final_report_path' => $filePath,
-                'status' => 'pending',
-                'feedback' => null
+                'status' => $newStatus,
+                'feedback' => $newStatus === 'pending' ? null : ($finalReport?->feedback),
             ]
         );
+
+        $application->placement->syncCompletionStatus();
 
         AuditLog::record('STUDENT_REPORT_SUBMIT', 'FinalReport', $report->id, [
             'student_name' => $user->name,
@@ -111,7 +133,7 @@ class FinalReportController extends Controller
             'file_path' => $filePath,
         ]);
 
-        return redirect()->route('student.final_report.index')->with('success', 'Laporan akhir magang berhasil diunggah dengan format resmi dan sedang menunggu verifikasi dari DPL serta Pembimbing Dinas.');
+        return redirect()->route('student.final_report.index')->with('success', 'Laporan akhir magang berhasil diperbarui dan disimpan.');
     }
 
     /**
