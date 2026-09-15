@@ -168,13 +168,29 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                Unggah File Laporan (PDF / DOCX) <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,.doc,.docx" required 
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Unggah File Laporan (PDF / DOCX) 
+                                    @if(!$finalReport || !$finalReport->file_path)
+                                        <span class="text-rose-500">*</span>
+                                    @endif
+                                </label>
+                                @if($finalReport && $finalReport->file_path)
+                                    <span class="text-[11px] text-blue-600 font-medium">
+                                        Berkas saat ini tersimpan (Opsional ganti berkas)
+                                    </span>
+                                @endif
+                            </div>
+                            <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,.doc,.docx" 
+                                   {{ $finalReport && $finalReport->file_path ? '' : 'required' }}
                                    onchange="handleFinalReportPreview(this)"
                                    class="block w-full text-xs text-gray-900 border border-gray-300 rounded-xl cursor-pointer bg-slate-50 focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            <p class="text-[11px] text-gray-400 mt-1">Ukuran maksimal file: 10 MB. Format yang didukung: PDF, DOC, DOCX.</p>
+                            <p class="text-[11px] text-gray-400 mt-1">
+                                Ukuran maksimal file: 10 MB. Format yang didukung: PDF, DOC, DOCX.
+                                @if($finalReport && $finalReport->file_path)
+                                    <span class="text-slate-600 font-semibold italic block mt-0.5">*Kosongkan jika hanya ingin memperbarui judul naskah atau tautan repositori proyek.</span>
+                                @endif
+                            </p>
 
                             <!-- File Selection Feedback -->
                             <div id="reportFileBox" class="hidden mt-3 p-3 bg-blue-50/60 border border-blue-200 rounded-xl items-center gap-3">
@@ -210,7 +226,22 @@
                         </p>
                     </div>
 
-                    @if ($evaluation && ($evaluation->final_score > 0 || $evaluation->nilai_akhir > 0 || $evaluation->nilai_pembimbing > 0))
+                    @php
+                        $univ = $evaluation?->getUniversity();
+                        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+                        $isMentorOnly = ($scheme === 'mentor_only');
+
+                        $hasMentorScore = $evaluation && $evaluation->nilai_pembimbing > 0;
+                        $hasDosenScore = $evaluation && ($evaluation->nilai_dosen_calculated > 0 || ($evaluation->nilai_dosen ?? 0) > 0 || ($evaluation->nilai_akademik ?? 0) > 0);
+
+                        $isEvalComplete = $evaluation && (
+                            ($isMentorOnly && $hasMentorScore) ||
+                            (!$isMentorOnly && $hasMentorScore && $hasDosenScore) ||
+                            (($evaluation->final_score ?? 0) > 0)
+                        );
+                    @endphp
+
+                    @if ($isEvalComplete)
                         <!-- Rekapitulasi Nilai Kelulusan Mahasiswa -->
                         <div class="space-y-4 pt-2">
                             <div class="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -276,9 +307,20 @@
                             </div>
                         </div>
                     @else
-                        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-1">
-                            <span class="text-xs font-bold text-amber-900 block">Menunggu Penerbitan Nilai Akhir</span>
-                            <p class="text-xs text-amber-700">Pembimbing lapangan dan DPL sedang memproses lembar penilaian evaluasi akhir magang Anda.</p>
+                        <div class="p-5 rounded-2xl bg-amber-50/90 border border-amber-200 text-center space-y-2">
+                            <div class="w-10 h-10 mx-auto rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian Akhir</span>
+                            <p class="text-xs text-amber-800 max-w-md mx-auto leading-relaxed">
+                                @if($hasMentorScore && !$isMentorOnly && !$hasDosenScore)
+                                    Nilai dari Pembimbing Lapangan Instansi telah selesai diinput. Saat ini sedang menunggu input lembar evaluasi akademik dari <strong>Dosen Pembimbing Lapangan (DPL)</strong> perguruan tinggi Anda sebelum E-Sertifikat dapat diterbitkan.
+                                @elseif(!$hasMentorScore && $hasDosenScore)
+                                    Nilai akademik dari DPL kampus telah tercatat. Saat ini sedang menunggu input nilai kinerja dari <strong>Pembimbing Lapangan Instansi Dinas</strong>.
+                                @else
+                                    Pembimbing lapangan instansi dinas dan DPL kampus sedang memproses lembar penilaian evaluasi akhir magang Anda.
+                                @endif
+                            </p>
                         </div>
                     @endif
                 </div>
