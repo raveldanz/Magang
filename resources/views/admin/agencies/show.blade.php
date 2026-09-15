@@ -191,7 +191,7 @@
             <!-- Tabbed Management Control Panel -->
             <div class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden">
                 <!-- Tab Header Navigasi -->
-                <div class="border-b border-slate-100 px-6 pt-4 flex items-center gap-4 overflow-x-auto">
+                <div class="border-b border-slate-100 px-6 pt-4 flex flex-nowrap items-center gap-4 overflow-x-auto scrollbar-none">
                     <button type="button" 
                             @click="activeTab = 'users'" 
                             :class="activeTab === 'users' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"

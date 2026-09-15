@@ -28,6 +28,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-011** | 2026-09-13 | Super Admin Agency Hub & Workflow | Tombol terbatas 'Lihat Unit ->', ketiadaan 'Lihat Akun', dan ketiadaan Pusat Kendali Alur Dinas | RESOLVED |
 | **LRN-012** | 2026-09-13 | User Management, Double Confirmation & Bulk Actions | Tombol reset & hapus tidak merespon (Alpine x-data scope), ketiadaan konfirmasi ganda & fitur pilih banyak dengan tripel konfirmasi | RESOLVED |
 | **LRN-013** | 2026-09-14 | Storage Junction, Migrations & ID Collision | Lampiran 404, migrasi token sertifikat tertunda, tabrakan ID multi-tenant, dan surat kelulusan | RESOLVED |
+| **LRN-014** | 2026-09-14 | Integrity Guard: Duplicate Application & Adaptive Certificate | Celah pengajuan ganda menimpa penempatan aktif, query final report rentan, dan sertifikat prematur | RESOLVED |
+| **LRN-015** | 2026-09-15 | UI Hardening & Mobile-Friendly E2E Multi-Role | Tumpukan tombol ganda kartu kampus, tab bar melipat di layar HP, dan otomasi E2E lintas role mobile/desktop | RESOLVED |
 
 ---
 
@@ -265,6 +267,44 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Memperbarui `University\DashboardController@showStudent` agar mengevaluasi relasi kampus terlebih dahulu dan memprioritaskan entitas yang cocok dengan institusi pengguna yang sedang login.
   4. Mengubah filter status surat menjadi `whereIn('status', ['accepted', 'completed'])`.
 - **Prevention Rule**: Pastikan symlink Windows selalu bertipe `Junction`. Hindari asumsi nomor ID antar-tabel tidak beririsan; route parameter yang bersifat polimorfik/fallback wajib memvalidasi kepemilikan tenant (*tenant-aware resolution*) sebelum melakukan otorisasi penolakan.
+
+---
+
+### [LRN-014] Proteksi Integritas Pengajuan Ganda Mahasiswa, Resolusi Penempatan Laporan Akhir, & Penerbitan Sertifikat Adaptif
+- **Tanggal**: 2026-09-14
+- **Komponen**: `Student\ApplicationController`, `Student\FinalReportController`, `resources/views/student/application/create.blade.php`, `resources/views/student/final_report.blade.php`
+- **Problem / Symptom**: 
+  1. Mahasiswa yang sudah berstatus `accepted` (sedang aktif magang) atau `completed` masih dapat mengakses dan mengirim formulir pengajuan baru.
+  2. Saat pengajuan baru terbuat (`status: pending`), query `Application::where('user_id', ...)->latest()->first()` di controller laporan akhir, logbook, dan dashboard mengambil baris pending baru tersebut, menyebabkan penempatan aktif, mentor, logbook, dan laporan akhir mendadak tersembunyi dengan error "Anda belum memiliki penempatan magang aktif".
+  3. Pada universitas berskema penilaian ganda (*Dual Evaluation*), tombol unduh E-Sertifikat di `final_report.blade.php` langsung aktif saat pembimbing dinas selesai menilai (`nilai_pembimbing > 0`), padahal DPL kampus belum memasukkan nilai, berisiko menerbitkan sertifikat dengan nilai belum lengkap.
+  4. Adanya *dead code* method admin `show` dan `updateStatus` di dalam `Student\ApplicationController`.
+- **Root Cause**: 
+  1. Pengecekan aktif di `create()` kaku hanya `status === 'pending'`, dan di `store()` sama sekali tidak ada validasi pengajuan aktif.
+  2. Query `FinalReportController` tidak memprioritaskan relasi `whereHas('placement')`.
+  3. Pengecekan view sertifikat hanya mengevaluasi `nilai_pembimbing > 0` tanpa memeriksa kelengkapan skema kampus (`evaluation_scheme`).
+- **Fix Applied**: 
+  1. Menambahkan guard di `create()` dan `store()` pada `Student\ApplicationController` yang memblokir pembuatan pengajuan baru jika mahasiswa memiliki pengajuan `pending`, `verified`, `accepted`, atau `completed`.
+  2. Menjadikan banner status pengajuan di `create.blade.php` adaptif, dinamis, dan informatif.
+  3. Memperkuat resolusi aplikasi di `FinalReportController@index` dan `@store` agar memprioritaskan `whereHas('placement')`.
+  4. Memperketat pengecekan kelengkapan nilai pada `final_report.blade.php` agar mengevaluasi skema `dual_evaluation` (kedua pihak harus selesai menilai) atau `mentor_only` sebelum membuka tombol sertifikat, disertai pesan informatif jika baru salah satu pihak yang menilai.
+  5. Menghapus method *dead code* di `Student\ApplicationController`.
+- **Prevention Rule**: Seluruh alur formulir pengajuan wajib menerapkan *Guard Clause* terhadap status siklus hidup aktif pengguna. Query pemrosesan tahap lanjutan (Laporan Akhir, Evaluasi, Sertifikat) wajib mengaitkan entitas penempatan (`whereHas('placement')`) dan dilarang hanya bertumpu pada `latest()`. Validasi penerbitan dokumen resmi (sertifikat) wajib mematuhi skema penilaian institusi secara utuh.
+
+---
+
+### [LRN-015] Perapian UI Kartu Universitas (Primary + Dropdown ⋮), Tab Navigasi Horizontal Scrollable, & Pengujian E2E Multi-Role Layar Sentuh
+- **Tanggal**: 2026-09-15
+- **Komponen**: `resources/views/admin/universities/index.blade.php`, `resources/views/admin/universities/show.blade.php`, `resources/views/admin/agencies/show.blade.php`, Suite Pengujian E2E Desktop & Mobile
+- **Problem / Symptom**: 
+  1. Kartu universitas di halaman Super Admin memiliki tumpukan 5+ tombol aksi berdampingan (*Kelola Kampus, Akun, Login As, Edit, Hapus*), menyebabkan layout berantakan, teks bertumpuk, dan horizontal overflow pada perangkat mobile/tablet.
+  2. Tab navigasi modul pada Pusat Kendali (Command Hub) melipat menjadi baris ganda (*multi-row wrap*) yang mengganggu estetika antarmuka saat dibuka pada layar ponsel 390px.
+  3. Pengujian antarmuka sebelumnya hanya mengecek response status code tanpa validasi rendering aset CSS/JS dan kenyamanan sentuhan layar (*touch targets*).
+- **Root Cause**: Desain tombol aksi menggunakan button biasa tanpa hierarki visual primary vs secondary, serta ketiadaan utilitas scrolling horizontal pada kontainer tab flex.
+- **Fix Applied**: 
+  1. Merefaktor kartu universitas menjadi pola standar industri: **1 Tombol Utama `Kelola Kampus` (Primary)** + **1 Tombol Dropdown Tiga Titik (`⋮`)** yang merangkum aksi sekunder (*Login As, Buatkan Akun, Edit, Daftar Dosen, Daftar Mahasiswa, Hapus*) menggunakan Alpine.js dengan click-outside protection.
+  2. Menambahkan `flex-nowrap overflow-x-auto scrollbar-none` pada navigasi tab command hub universitas dan instansi.
+  3. Melakukan kompilasi aset permanen via `npm run build` dan mengeksekusi uji coba langsung multi-role pada resolusi Desktop (1920x1080) dan Mobile (390x844) dengan capture visual terverifikasi.
+- **Prevention Rule**: Seluruh halaman master data dengan lebih dari 2 aksi wajib menerapkan hierarki tombol (1 Primary + 1 Dropdown Secondary `⋮`). Kontainer navigasi tab horizontal wajib mendukung geser sentuh (*horizontal scrollable*) tanpa melipat (*no wrapping*).
 
 ---
 

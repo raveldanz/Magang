@@ -13,15 +13,25 @@ use Illuminate\Support\Facades\Storage;
 
 class LogbookController extends Controller
 {
+    /**
+     * Helper untuk mengambil pengajuan magang yang memiliki penempatan resmi
+     */
+    protected function getActiveInternship($userId)
+    {
+        return Application::where('user_id', $userId)
+            ->whereHas('placement')
+            ->latest()
+            ->first()
+            ?? Application::where('user_id', $userId)->latest()->first();
+    }
+
     public function index()
     {
         $user = Auth::user();
         $userId = $user->id;
 
-        // 1. Ambil pengajuan terakhir mahasiswa
-        $application = Application::where('user_id', $userId)
-            ->latest()
-            ->first();
+        // 1. Ambil pengajuan magang aktif mahasiswa
+        $application = $this->getActiveInternship($userId);
 
         $placement = null;
         $logbooks = collect();
@@ -56,7 +66,7 @@ class LogbookController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $application = Application::where('user_id', $user->id)->latest()->first();
+        $application = $this->getActiveInternship($user->id);
         $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
@@ -71,7 +81,7 @@ class LogbookController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $application = Application::where('user_id', $user->id)->latest()->first();
+        $application = $this->getActiveInternship($user->id);
         $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
@@ -136,7 +146,7 @@ class LogbookController extends Controller
 
     public function edit($id)
     {
-        $application = Application::where('user_id', Auth::id())->latest()->first();
+        $application = $this->getActiveInternship(Auth::id());
 
         if (!$application || !$application->is_active_internship) {
             return redirect()->route('student.logbook.index')
@@ -161,7 +171,7 @@ class LogbookController extends Controller
 
     public function update(Request $request, $id)
     {
-        $application = Application::where('user_id', Auth::id())->latest()->first();
+        $application = $this->getActiveInternship(Auth::id());
 
         if (!$application || !$application->is_active_internship) {
             return redirect()->route('student.logbook.index')
