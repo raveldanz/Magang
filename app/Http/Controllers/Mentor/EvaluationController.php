@@ -98,11 +98,8 @@ class EvaluationController extends Controller
                 'grade' => $grade,
             ]);
 
-            // Jika laporan akhir sudah diapprove, otomatis tandai status COMPLETED
-            $finalReport = $placement->finalreport;
-            if ($finalReport && $finalReport->status === 'approved' && $placement->application) {
-                $placement->application->update(['status' => 'completed']);
-            }
+            // Cek kelengkapan evaluasi dan sinkronkan status COMPLETED
+            $placement->syncCompletionStatus();
         } else {
             // Skema Dual Evaluation: hitung ulang jika nilai dosen sudah ada
             $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
@@ -123,10 +120,7 @@ class EvaluationController extends Controller
                     'grade' => $grade,
                 ]);
 
-                $finalReport = $placement->finalreport;
-                if ($finalReport && $finalReport->status === 'approved' && $placement->application) {
-                    $placement->application->update(['status' => 'completed']);
-                }
+                $placement->syncCompletionStatus();
             }
         }
 
