@@ -157,8 +157,8 @@
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Kuota Magang Tersedia</span>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-black text-teal-600">{{ $stats['total_remaining'] }}</span>
-                        <span class="text-xs text-slate-500 font-medium">Slot ({{ $stats['total_filled'] }} terisi)</span>
+                        <span class="text-2xl font-black text-slate-900">{{ $stats['total_remaining'] }}</span>
+                        <span class="text-xs text-slate-500 font-medium">Slot</span>
                     </div>
                     <div class="text-[11px] text-slate-400 mt-2">
                         Total Kapasitas: <strong class="text-slate-700">{{ $stats['total_quota'] }}</strong>
@@ -166,9 +166,9 @@
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Personel Kedinasan</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Personil Kedinasan</span>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-black text-purple-600">{{ $stats['total_admins'] + $stats['total_mentors'] }}</span>
+                        <span class="text-2xl font-black text-slate-900">{{ $stats['total_admins'] + $stats['total_mentors'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Akun Sistem</span>
                     </div>
                     <div class="text-[11px] text-slate-500 mt-2">
@@ -179,7 +179,7 @@
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mahasiswa Magang</span>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-black text-emerald-600">{{ $stats['active_students'] }}</span>
+                        <span class="text-2xl font-black text-slate-900">{{ $stats['active_students'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Aktif Magang</span>
                     </div>
                     <div class="text-[11px] text-amber-600 font-bold mt-2">
@@ -196,40 +196,36 @@
                             @click="activeTab = 'users'" 
                             :class="activeTab === 'users' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        <span>Personel & Akun Kedinasan ({{ $stats['total_admins'] + $stats['total_mentors'] }})</span>
+                            <span>Personil & Akun Kedinasan </span>
                     </button>
 
                     <button type="button" 
                             @click="activeTab = 'units'" 
                             :class="activeTab === 'units' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        <span>Divisi & Kuota Magang ({{ $stats['total_units'] }})</span>
+                        <span>Divisi & Kuota Magang </span>
                     </button>
 
                     <button type="button" 
                             @click="activeTab = 'applications'" 
                             :class="activeTab === 'applications' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        <span>Pengajuan Magang Masuk ({{ $stats['total_applications'] }})</span>
+                        <span>Pengajuan Magang Masuk</span>
                     </button>
 
                     <button type="button" 
                             @click="activeTab = 'students'" 
                             :class="activeTab === 'students' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        <span>Mahasiswa Aktif Magang ({{ $stats['active_students'] }})</span>
+                        <span>Mahasiswa Aktif Magang </span>
                     </button>
                 </div>
 
-                <!-- Konten Tab 1: Akun Personel Kedinasan -->
+                <!-- Konten Tab 1: Akun Personil Kedinasan -->
                 <div x-show="activeTab === 'users'" class="p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 class="font-bold text-base text-slate-900">Daftar Akun Personel Kedinasan</h3>
+                            <h3 class="font-bold text-base text-slate-900">Daftar Akun Personil Kedinasan</h3>
                             <p class="text-xs text-slate-500 mt-0.5">Seluruh akun Admin Dinas (PIC) dan Mentor Lapangan yang memiliki akses kelola magang di dinas ini</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -249,7 +245,7 @@
                         <table class="min-w-full divide-y divide-slate-100 text-left text-xs">
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                                 <tr>
-                                    <th class="py-3 px-4">Nama Personel</th>
+                                    <th class="py-3 px-4">Nama Personil</th>
                                     <th class="py-3 px-4">Email / Login</th>
                                     <th class="py-3 px-4">Role Kedinasan</th>
                                     <th class="py-3 px-4 text-center">Status</th>
@@ -282,12 +278,10 @@
                                         </td>
                                         <td class="py-3.5 px-4 text-center">
                                             @if(($u->status ?? 'active') === 'active')
-                                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"> Aktif
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Non-Aktif
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800"> Non-Aktif
                                                 </span>
                                             @endif
                                         </td>
@@ -316,7 +310,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="5" class="py-8 text-center text-slate-400 font-medium">
-                                            Belum ada akun personel yang terdaftar di dinas ini.
+                                            Belum ada akun Personil yang terdaftar di dinas ini.
                                         </td>
                                     </tr>
                                 @endforelse

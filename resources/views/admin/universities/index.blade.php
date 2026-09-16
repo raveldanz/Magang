@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -175,9 +175,7 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Kampus Mitra</span>
-                            <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
                             <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_universities'] }}</span>
@@ -188,12 +186,10 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Mahasiswa</span>
-                            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-indigo-600">{{ $macroStats['total_students'] }}</span>
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_students'] }}</span>
                             <span class="text-xs text-slate-500 font-medium">Mahasiswa Terdaftar</span>
                         </div>
                     </div>
@@ -201,12 +197,10 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Dosen DPL</span>
-                            <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-teal-600">{{ $macroStats['total_dosens'] }}</span>
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_dosens'] }}</span>
                             <span class="text-xs text-slate-500 font-medium">Dosen Pembimbing</span>
                         </div>
                     </div>
@@ -214,12 +208,10 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mahasiswa Aktif Magang</span>
-                            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-emerald-600">{{ $macroStats['total_active_interns'] }}</span>
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_active_interns'] }}</span>
                             <span class="text-xs text-slate-500 font-medium">Di Instansi Dinas</span>
                         </div>
                     </div>
