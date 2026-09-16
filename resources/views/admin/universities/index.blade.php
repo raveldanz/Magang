@@ -169,59 +169,31 @@
                 </div>
             @endif
 
-            <!-- Executive Macro Stats Kemitraan Perguruan Tinggi -->
+            <!-- Executive Macro Stats Kemitraan Perguruan Tinggi (Clean Minimalist Typography) -->
             @if(isset($macroStats))
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Kampus Mitra</span>
-                            <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                            </div>
-                        </div>
-                        <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_universities'] }}</span>
-                            <span class="text-xs text-slate-500 font-medium">Perguruan Tinggi</span>
-                        </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Total Kampus Mitra</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">{{ $macroStats['total_universities'] }}</div>
+                        <div class="mt-1 text-xs text-slate-400">Perguruan tinggi mitra</div>
                     </div>
 
-                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Mahasiswa</span>
-                            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                            </div>
-                        </div>
-                        <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-indigo-600">{{ $macroStats['total_students'] }}</span>
-                            <span class="text-xs text-slate-500 font-medium">Mahasiswa Terdaftar</span>
-                        </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Total Mahasiswa</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">{{ $macroStats['total_students'] }}</div>
+                        <div class="mt-1 text-xs text-slate-400">Mahasiswa terdaftar</div>
                     </div>
 
-                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Dosen DPL</span>
-                            <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                            </div>
-                        </div>
-                        <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-teal-600">{{ $macroStats['total_dosens'] }}</span>
-                            <span class="text-xs text-slate-500 font-medium">Dosen Pembimbing</span>
-                        </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Dosen Pembimbing</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">{{ $macroStats['total_dosens'] }}</div>
+                        <div class="mt-1 text-xs text-slate-400">Dosen DPL aktif</div>
                     </div>
 
-                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mahasiswa Aktif Magang</span>
-                            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            </div>
-                        </div>
-                        <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-emerald-600">{{ $macroStats['total_active_interns'] }}</span>
-                            <span class="text-xs text-slate-500 font-medium">Di Instansi Dinas</span>
-                        </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Mahasiswa Magang</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">{{ $macroStats['total_active_interns'] }}</div>
+                        <div class="mt-1 text-xs text-slate-400">Sedang magang di dinas</div>
                     </div>
                 </div>
             @endif
@@ -253,8 +225,9 @@
             <!-- Universities Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($universities as $univ)
-                    <div class="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between group">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
+                            <!-- Header: Logo, Kode Kampus, Status Badge, dan Menu Opsi -->
                             <div class="flex items-start justify-between gap-4">
                                 @php
                                     $univLogoUrl = null;
@@ -283,20 +256,20 @@
                                             $univLogoUrl = asset('images/logos/unitomo.png');
                                         }
                                     }
+                                    if (!$univLogoUrl) {
+                                        $univLogoUrl = asset('images/default-university.svg');
+                                    }
                                 @endphp
-                                <a href="{{ route('admin.universities.show', $univ->id) }}" class="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden hover:border-blue-300 transition" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;" title="Kelola {{ $univ->name }}">
-                                    @if($univLogoUrl)
-                                        <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
-                                    @else
-                                        <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
-                                    @endif
+                                <a href="{{ route('admin.universities.show', $univ->id) }}" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2.5 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;" title="Kelola {{ $univ->name }}">
+                                    <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
                                 </a>
+                                
                                 <div class="flex items-center gap-2 shrink-0">
-                                    <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-black">
+                                    <span class="px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-xs font-bold">
                                         {{ $univ->code }}
                                     </span>
                                     @if($univ->universityAdmin)
-                                        <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold shadow-2xs">
                                             Akun Aktif
                                         </span>
                                     @else
@@ -317,53 +290,49 @@
                                 </div>
                             </div>
 
+                            <!-- Identitas Universitas & Hierarki Tipografi Bersih -->
                             <div class="mt-4">
-                                <h3 class="font-black text-base text-gray-900 leading-snug">
-                                    <a href="{{ route('admin.universities.show', $univ->id) }}" class="hover:text-blue-600 transition" title="Lihat Pusat Kendali Kampus">
+                                <h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug tracking-tight">
+                                    <a href="{{ route('admin.universities.show', $univ->id) }}" title="Lihat Pusat Kendali Kampus">
                                         {{ $univ->name }}
                                     </a>
                                 </h3>
-                                <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
+                                <p class="text-xs text-slate-500 mt-2 line-clamp-2 min-h-[2.5rem] leading-relaxed">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
                                 
-                                <div class="mt-3 pt-3 border-t border-slate-50 space-y-1">
+                                <div class="mt-3 text-xs text-slate-600 space-y-1">
                                     @if($univ->pic_name)
-                                        <div class="text-[11px] text-blue-700 font-semibold truncate">
-                                            PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
-                                        </div>
-                                    @else
-                                        <div class="text-[11px] text-slate-400 italic">
-                                            PIC belum diisi
+                                        <div class="truncate text-slate-500">
+                                            <span class="text-slate-400 font-medium">PIC:</span>
+                                            <span class="font-medium text-slate-700 ml-1">{{ $univ->pic_name }}</span>
+                                            @if($univ->pic_position) <span class="text-slate-400">({{ $univ->pic_position }})</span> @endif
                                         </div>
                                     @endif
 
-                                    @if($univ->universityAdmin)
-                                        <div class="text-[11px] text-slate-600 truncate">
-                                            <strong class="font-mono text-slate-700">{{ $univ->universityAdmin->email }}</strong>
-                                        </div>
-                                    @endif
+                                    <div class="truncate text-xs text-slate-600 flex items-baseline gap-1.5">
+                                        <span class="text-slate-400 font-medium">Admin:</span>
+                                        @if($univ->universityAdmin)
+                                            <span class="font-mono font-semibold text-slate-700">{{ $univ->universityAdmin->email }}</span>
+                                        @else
+                                            <span class="text-slate-400 italic">Belum ditugaskan</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Stat Counts (Interaktif Langsung) -->
-                            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100 text-center">
-                                <a href="{{ route('admin.applications.index', ['university_id' => $univ->id]) }}" 
-                                   class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100/80 border border-blue-100 hover:border-blue-200 transition group/stat block"
-                                   title="Klik untuk lihat daftar mahasiswa">
-                                    <div class="text-xs font-black text-blue-700">{{ $univ->students_count }}</div>
-                                    <div class="text-[10px] text-blue-600 font-semibold uppercase">Mahasiswa</div>
-                                </a>
-                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id, 'role' => 'dosen']) }}" 
-                                   class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100/80 border border-slate-100 hover:border-slate-200 transition group/stat block"
-                                   title="Klik untuk lihat daftar dosen pembimbing">
-                                    <div class="text-xs font-black text-slate-700 group-hover/stat:text-blue-700">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] text-slate-600 group-hover/stat:text-blue-600 font-semibold uppercase">Dosen DPL</div>
-                                </a>
-                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" 
-                                   class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100/80 border border-slate-100 hover:border-slate-200 transition group/stat block"
-                                   title="Klik untuk lihat seluruh akun kampus">
-                                    <div class="text-xs font-black text-slate-700 group-hover/stat:text-blue-700">{{ $univ->users_count }}</div>
-                                    <div class="text-[10px] text-slate-500 group-hover/stat:text-blue-600 font-semibold uppercase">Akun</div>
-                                </a>
+                            <!-- Metrik Ringkas & Bernafas (Pure Minimalist Stats, Non-Clickable) -->
+                            <div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-100 text-center select-none">
+                                <div class="py-1">
+                                    <div class="text-xl font-black text-slate-900 tracking-tight">{{ $univ->students_count }}</div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Mahasiswa</div>
+                                </div>
+                                <div class="py-1 border-x border-slate-100">
+                                    <div class="text-xl font-black text-blue-600 tracking-tight">{{ $univ->dosens_count }}</div>
+                                    <div class="text-[11px] font-semibold text-blue-600/90 mt-0.5">Dosen DPL</div>
+                                </div>
+                                <div class="py-1">
+                                    <div class="text-xl font-black text-slate-900 tracking-tight">{{ $univ->users_count }}</div>
+                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Akun</div>
+                                </div>
                             </div>
                         </div>
 
