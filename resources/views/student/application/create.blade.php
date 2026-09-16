@@ -57,8 +57,30 @@
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8 space-y-6">
 
                 @if ($activeApplication)
-                    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed">
-                        <span class="font-bold">Perhatian:</span> Anda masih memiliki pengajuan magang yang sedang diproses (Status: <strong>PENDING</strong>). Anda belum dapat membuat pengajuan baru hingga pengajuan tersebut selesai diverifikasi oleh Admin.
+                    <div class="p-5 rounded-2xl border {{ $activeApplication->status === 'accepted' ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($activeApplication->status === 'completed' ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-amber-50 border-amber-200 text-amber-950') }} shadow-xs space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-sm">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>
+                                @if(in_array($activeApplication->status, ['pending', 'verified']))
+                                    Pengajuan Magang Sedang Diproses (Status: {{ strtoupper($activeApplication->status) }})
+                                @elseif($activeApplication->status === 'accepted')
+                                    Anda Sudah Memiliki Penempatan Magang Aktif
+                                @elseif($activeApplication->status === 'completed')
+                                    Program Magang MBKM Telah Selesai
+                                @endif
+                            </span>
+                        </div>
+                        <p class="text-xs leading-relaxed">
+                            @if(in_array($activeApplication->status, ['pending', 'verified']))
+                                Berkas pengajuan magang Anda di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}) saat ini sedang dalam tahap seleksi & verifikasi oleh Tim Admin Dinas. Anda belum dapat mengajukan magang baru sampai proses ini selesai.
+                            @elseif($activeApplication->status === 'accepted')
+                                Selamat! Anda telah resmi diterima magang di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}). Silakan fokus pada pelaksanaan kegiatan magang harian dan pengisian pada menu <strong>Logbook Magang</strong>.
+                            @elseif($activeApplication->status === 'completed')
+                                Anda telah menyelesaikan seluruh rangkaian kegiatan magang MBKM serta menerima penilaian akhir resmi. Anda dapat mengunduh E-Sertifikat dan arsip laporan melalui menu <strong>Laporan Akhir</strong>.
+                            @endif
+                        </p>
                     </div>
                 @else
                     <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">

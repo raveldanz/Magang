@@ -273,67 +273,19 @@
                                             Akun Aktif
                                         </span>
                                     @else
-                                        <span class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[11px] font-bold">
-                                            Belum Ada Akun
-                                        </span>
-                                    @endif
-
-                                    @if($isSuperAdmin)
-                                        <!-- Dropdown Menu (3-dots) for Clean Secondary Actions -->
-                                        <div x-data="{ menuOpen: false }" class="relative" @click.outside="menuOpen = false">
-                                            <button type="button" 
-                                                    @click="menuOpen = !menuOpen" 
-                                                    class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer"
-                                                    title="Menu Opsi">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                                        {{-- ✅ QUICK ACTION: Badge "Belum Ada Akun" langsung bisa diklik untuk buat akun --}}
+                                        <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="m-0 inline-block"
+                                              onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($univ->name) }}?')">
+                                            @csrf
+                                            <button type="submit"
+                                                    title="Klik untuk langsung buatkan akun admin kampus ini"
+                                                    class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-900 border border-amber-300 hover:border-amber-400 rounded-full text-[10px] font-bold animate-pulse hover:animate-none transition cursor-pointer active:scale-95 shadow-sm">
+                                                <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                                                 </svg>
+                                                Belum Ada Akun
                                             </button>
-
-                                            <div x-show="menuOpen" 
-                                                 x-transition:enter="transition ease-out duration-100"
-                                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                                 x-transition:leave="transition ease-in duration-75"
-                                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                                 class="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-20"
-                                                 style="display: none;">
-                                                
-                                                <a href="{{ route('admin.universities.edit', $univ->id) }}" 
-                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
-                                                    <span>Edit Data</span>
-                                                </a>
-
-                                                <a href="{{ route('admin.applications.index', ['university_id' => $univ->id]) }}" 
-                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
-                                                    <span>Daftar Mahasiswa</span>
-                                                </a>
-
-                                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id, 'role' => 'dosen']) }}" 
-                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
-                                                    <span>Daftar Dosen DPL</span>
-                                                </a>
-
-                                                <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" 
-                                                   class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
-                                                    <span>Daftar Akun</span>
-                                                </a>
-
-                                                <div class="my-1 border-t border-slate-100"></div>
-
-                                                <button type="button" 
-                                                        @click="menuOpen = false; $dispatch('open-delete-modal', {
-                                                            action: '{{ route('admin.universities.destroy', $univ->id) }}',
-                                                            title: 'Hapus Perguruan Tinggi',
-                                                            name: '{{ addslashes($univ->name) }}',
-                                                            desc: 'Kode: {{ $univ->code }} &bull; {{ $univ->students_count }} Mahasiswa'
-                                                        })" 
-                                                        class="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 font-semibold transition cursor-pointer">
-                                                    <span>Hapus Kampus</span>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
@@ -384,31 +336,100 @@
                             </div>
                         </div>
 
-                        <!-- Action Footer: Bersih & Bebas Ikon Kecil -->
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-                            <div>
-                                @if(!$univ->universityAdmin)
-                                    <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="inline-block m-0">
-                                        @csrf
-                                        <button type="submit" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer active:scale-95" title="Buatkan Akun Admin Kampus">
-                                            Buat Akun
-                                        </button>
-                                    </form>
-                                @elseif($isSuperAdmin)
-                                    <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST" class="inline-block m-0">
-                                        @csrf
-                                        <button type="submit" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/80 rounded-xl text-xs font-semibold transition cursor-pointer active:scale-95" title="Masuk Sebagai Admin Kampus (Login As)">
-                                            Login As
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-
+                        <!-- Action Footer: 1 Tombol Utama (Primary) + 1 Tombol Dropdown Titik Tiga (⋮) -->
+                        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center gap-2">
+                            <!-- Tombol Utama: Kelola Kampus -->
                             <a href="{{ route('admin.universities.show', $univ->id) }}" 
-                               class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-xs font-bold transition shadow-xs hover:shadow cursor-pointer ml-auto"
+                               class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow-md active:scale-95 cursor-pointer"
                                title="Buka Pusat Kendali & Manajemen Kampus">
-                                Kelola Kampus
+                                <span>Kelola Kampus</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </a>
+
+                            <!-- Tombol Dropdown Titik Tiga (⋮) Berisi Aksi Sekunder -->
+                            <div x-data="{ menuOpen: false }" class="relative shrink-0" @click.outside="menuOpen = false">
+                                <button type="button" 
+                                        @click="menuOpen = !menuOpen" 
+                                        class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 transition active:scale-95 cursor-pointer shadow-2xs"
+                                        title="Menu Opsi Lainnya">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                                    </svg>
+                                </button>
+
+                                <div x-show="menuOpen" 
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-30 divide-y divide-slate-100"
+                                     style="display: none;">
+                                    
+                                    <div class="py-1">
+                                        @if(!$univ->universityAdmin)
+                                            <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="m-0">
+                                                @csrf
+                                                <button type="submit" class="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-amber-700 hover:bg-amber-50 font-semibold transition cursor-pointer">
+                                                    <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                    <span>Buatkan Akun Admin</span>
+                                                </button>
+                                            </form>
+                                        @elseif($isSuperAdmin)
+                                            <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST" class="m-0">
+                                                @csrf
+                                                <button type="submit" class="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-emerald-700 hover:bg-emerald-50 font-semibold transition cursor-pointer">
+                                                    <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                                                    <span>Login Sebagai Admin</span>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <a href="{{ route('admin.universities.edit', $univ->id) }}" 
+                                           class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            <span>Edit Profil Kampus</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="py-1">
+                                        <a href="{{ route('admin.applications.index', ['university_id' => $univ->id]) }}" 
+                                           class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                            <span>Daftar Mahasiswa ({{ $univ->students_count }})</span>
+                                        </a>
+
+                                        <a href="{{ route('admin.users.index', ['university_id' => $univ->id, 'role' => 'dosen']) }}" 
+                                           class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                            <span>Daftar Dosen DPL ({{ $univ->dosens_count }})</span>
+                                        </a>
+
+                                        <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" 
+                                           class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                            <span>Kelola Seluruh Akun ({{ $univ->users_count }})</span>
+                                        </a>
+                                    </div>
+
+                                    @if($isSuperAdmin)
+                                        <div class="py-1">
+                                            <button type="button" 
+                                                    @click="menuOpen = false; $dispatch('open-delete-modal', {
+                                                        action: '{{ route('admin.universities.destroy', $univ->id) }}',
+                                                        title: 'Hapus Perguruan Tinggi',
+                                                        name: '{{ addslashes($univ->name) }}',
+                                                        desc: 'Kode: {{ $univ->code }} &bull; {{ $univ->students_count }} Mahasiswa'
+                                                    })" 
+                                                    class="w-full text-left flex items-center gap-2 px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 font-semibold transition cursor-pointer">
+                                                <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus Kampus</span>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @empty
