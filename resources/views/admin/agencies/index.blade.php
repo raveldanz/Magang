@@ -177,9 +177,7 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Instansi Dinas</span>
-                            <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
                             <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_agencies'] }}</span>
@@ -190,12 +188,10 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Unit / Divisi</span>
-                            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-indigo-600">{{ $macroStats['total_units'] }}</span>
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_units'] }}</span>
                             <span class="text-xs text-slate-500 font-medium">Bidang Kerja</span>
                         </div>
                     </div>
@@ -203,25 +199,21 @@
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Kuota Magang</span>
-                            <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                            </div>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-teal-600">{{ $macroStats['total_quota'] }}</span>
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_quota'] }}</span>
                             <span class="text-xs text-slate-500 font-medium">Kapasitas ({{ $macroStats['total_filled'] }} Terisi)</span>
                         </div>
                     </div>
 
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Personel Kedinasan</span>
-                            <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                            </div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Personil Kedinasan</span>
+                            
                         </div>
                         <div class="mt-2 flex items-baseline gap-2">
-                            <span class="text-2xl font-black text-purple-600">{{ $macroStats['total_staff'] }}</span>
+                            <span class="text-2xl font-black text-slate-900">{{ $macroStats['total_staff'] }}</span>
                             <span class="text-xs text-slate-500 font-medium">Admin & Mentor</span>
                         </div>
                     </div>
@@ -328,7 +320,7 @@
                                                 <a href="{{ route('admin.users.index', ['agency_id' => $agency->id]) }}" 
                                                    class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 font-semibold transition">
                                                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                                                    <span>Daftar Personel</span>
+                                                    <span>Daftar Personil</span>
                                                 </a>
 
                                                 <div class="my-1 border-t border-slate-100"></div>
@@ -381,9 +373,9 @@
                                 </div>
                                 <a href="{{ route('admin.users.index', ['agency_id' => $agency->id]) }}" 
                                    class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100/80 border border-blue-100 hover:border-blue-200 transition group/stat block"
-                                   title="Klik untuk lihat daftar akun personel">
+                                   title="Klik untuk lihat daftar akun Personil">
                                     <div class="text-xs font-black text-blue-700">{{ ($agency->total_admins ?? 0) + ($agency->total_mentors ?? 0) }}</div>
-                                    <div class="text-[10px] text-blue-600 font-semibold uppercase">Personel</div>
+                                    <div class="text-[10px] text-blue-600 font-semibold uppercase">Personil</div>
                                 </a>
                             </div>
                         </div>
