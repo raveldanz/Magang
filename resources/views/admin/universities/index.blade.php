@@ -300,9 +300,19 @@
                                             Akun Aktif
                                         </span>
                                     @else
-                                        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold animate-pulse">
-                                            Belum Ada Akun
-                                        </span>
+                                        {{-- ✅ QUICK ACTION: Badge "Belum Ada Akun" langsung bisa diklik untuk buat akun --}}
+                                        <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="m-0 inline-block"
+                                              onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($univ->name) }}?')">
+                                            @csrf
+                                            <button type="submit"
+                                                    title="Klik untuk langsung buatkan akun admin kampus ini"
+                                                    class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-900 border border-amber-300 hover:border-amber-400 rounded-full text-[10px] font-bold animate-pulse hover:animate-none transition cursor-pointer active:scale-95 shadow-sm">
+                                                <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                                </svg>
+                                                Belum Ada Akun
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
