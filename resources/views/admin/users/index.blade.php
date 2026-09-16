@@ -11,7 +11,7 @@
             </div>
 
             @if($isSuperAdmin)
-                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer w-full sm:w-auto">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                     <span>Tambah Pengguna Baru</span>
                 </a>
@@ -19,8 +19,8 @@
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="userBulkManagement()">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-8" x-data="userBulkManagement()">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
 
             <!-- Flash Alert -->
             @if (session('success'))
@@ -106,8 +106,8 @@
             @endif
 
             <!-- Search & Filter Card -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs">
-                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: '{{ request('role', '') }}' }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
+                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: '{{ request('role', '') }}' }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
                     <!-- Search Input -->
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
@@ -117,11 +117,11 @@
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM..." 
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-                               style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.6rem !important; padding-bottom: 0.6rem !important;">
+                               style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
 
                     <!-- Filter Role -->
-                    <select name="role" x-model="role" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                    <select name="role" x-model="role" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Dinas / Super Admin</option>
@@ -134,7 +134,7 @@
                     <div>
                         <!-- Case 1: Universitas / Mahasiswa / Dosen -->
                         <div x-show="['universitas', 'dosen', 'mahasiswa'].includes(role)">
-                            <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                                 <option value="">Semua Universitas / Kampus</option>
                                 @foreach($universities as $u)
                                     <option value="{{ $u->id }}" {{ request('university_id') == $u->id ? 'selected' : '' }}>
@@ -146,7 +146,7 @@
 
                         <!-- Case 2: Admin Dinas / Mentor Lapangan / Default -->
                         <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
-                            <select name="agency_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <select name="agency_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                                 <option value="">Semua Instansi Dinas</option>
                                 @foreach($agencies as $ag)
                                     <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
@@ -159,11 +159,11 @@
 
                     <!-- Submit & Reset -->
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                        <button type="submit" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer text-center">
                             Terapkan Filter
                         </button>
                         @if(request()->hasAny(['search', 'role', 'agency_id', 'university_id']))
-                            <a href="{{ route('admin.users.index') }}" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition">
+                            <a href="{{ route('admin.users.index') }}" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition text-center">
                                 Reset
                             </a>
                         @endif
@@ -171,9 +171,11 @@
                 </form>
             </div>
 
-            <!-- Users Table Card -->
+            <!-- Users Presentation Card (Desktop Table + Mobile Card View) -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-                <div class="overflow-x-auto">
+                
+                <!-- 1. Tampilan Tabel Desktop & Tablet (>= 768px) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
@@ -328,7 +330,7 @@
                                                             name: '{{ addslashes($u->name) }}',
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
                                                         })" 
-                                                        class="btn-action-delete"
+                                                        class="btn-action-delete" 
                                                         title="Hapus Pengguna">
                                                     Hapus
                                                 </button>
@@ -349,6 +351,179 @@
                     </table>
                 </div>
 
+                <!-- 2. Tampilan Kartu Khusus Mobile (< 768px) -->
+                <div class="md:hidden">
+                    <!-- Mobile Select All Bar -->
+                    <div class="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100 text-xs text-slate-600">
+                        <label class="inline-flex items-center gap-2 font-bold cursor-pointer select-none">
+                            <input type="checkbox" 
+                                   :checked="isAllSelected" 
+                                   @change="toggleSelectAll()" 
+                                   class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                            <span>Pilih Semua Pengguna</span>
+                        </label>
+                        <span class="text-[11px] font-semibold text-slate-500" x-show="selectedCount > 0">
+                            <span x-text="selectedCount" class="font-black text-blue-600"></span> terpilih
+                        </span>
+                    </div>
+
+                    <!-- Mobile List Cards -->
+                    <div class="divide-y divide-gray-100">
+                        @forelse($users as $u)
+                            @php
+                                $isSuperAdminUser = ($u->role === 'super_admin' || ($u->role === 'admin' && is_null($u->agency_profile_id)));
+                                $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
+                            @endphp
+                            <div class="p-4 space-y-3 transition" :class="isSelected({{ $u->id }}) ? 'bg-blue-50/50' : 'hover:bg-slate-50/50'">
+                                <!-- Top: Checkbox, Avatar, Nama, Email, Status -->
+                                <div class="flex items-start justify-between gap-2.5">
+                                    <div class="flex items-start gap-2.5 min-w-0">
+                                        <div class="pt-0.5 shrink-0">
+                                            @if($canSelect)
+                                                <input type="checkbox" 
+                                                       :checked="isSelected({{ $u->id }})" 
+                                                       @change="toggleSelectUser({ id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ addslashes($u->email) }}', role: '{{ $u->role }}' })"
+                                                       class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                                            @else
+                                                <span class="inline-flex text-slate-300 cursor-not-allowed" title="Akun Super Admin / Akun Sendiri Dilindungi">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-blue-50 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0 shadow-2xs">
+                                                {{ strtoupper(substr($u->name, 0, 2)) }}
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug break-words">{{ $u->name }}</div>
+                                                <div class="text-[11px] text-gray-500 font-mono break-all">{{ $u->email }}</div>
+                                                @if($u->studentProfile?->nim)
+                                                    <div class="text-[10px] text-blue-600 font-mono font-semibold">NIM: {{ $u->studentProfile?->nim }}</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Badge -->
+                                    <div class="shrink-0">
+                                        @if($u->status === 'on_leave')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Cuti</span>
+                                        @elseif($u->status === 'inactive')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Non-Aktif</span>
+                                        @else
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Role & Affiliation Info Box -->
+                                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Role Sistem:</span>
+                                        <div>
+                                            @if($isSuperAdminUser)
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 border border-blue-300">
+                                                    Super Admin
+                                                </span>
+                                            @elseif($u->role === 'admin')
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                                                    Admin Dinas
+                                                </span>
+                                            @elseif(in_array($u->role, ['mentor', 'pembimbing']))
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
+                                                    Mentor Dinas
+                                                </span>
+                                            @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                    Dosen DPL
+                                                </span>
+                                            @elseif($u->role === 'universitas')
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                                                    Universitas
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                    Mahasiswa
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 shrink-0">Afiliasi:</span>
+                                        <div class="text-right text-[11px] font-semibold text-slate-700 truncate">
+                                            @if($u->agencyProfile)
+                                                <span>{{ $u->agencyProfile->agency_name ?? $u->agencyProfile->name ?? 'Dinas Terkait' }}</span>
+                                            @elseif($u->role === 'mahasiswa')
+                                                <span>{{ $u->studentProfile?->university?->name ?? $u->studentProfile?->universitas ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}</span>
+                                            @elseif(in_array($u->role, ['dosen', 'academic_advisor', 'universitas']))
+                                                <span>{{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}</span>
+                                            @else
+                                                <span class="text-slate-400 font-normal">-</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons in Mobile (Touch Friendly & Responsive) -->
+                                <div class="pt-2 border-t border-gray-100 flex flex-wrap items-center gap-2 justify-end">
+                                    @if($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser)
+                                        <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="inline-block m-0">
+                                            @csrf
+                                            <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)"
+                                                    class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                                                <span>Login As</span>
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <a href="{{ route('admin.users.edit', $u->id) }}" 
+                                       class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95">
+                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        <span>Edit</span>
+                                    </a>
+
+                                    @if(!$isSuperAdminUser || $u->id !== $currentUser->id)
+                                        <button type="button" 
+                                                @click="$dispatch('open-reset-modal', {
+                                                    action: '{{ route('admin.users.reset_password', $u->id) }}',
+                                                    name: '{{ addslashes($u->name) }}',
+                                                    email: '{{ addslashes($u->email) }}',
+                                                    role: '{{ strtoupper($u->role) }}'
+                                                })" 
+                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer" 
+                                                title="Reset password ke default: password">
+                                            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                            <span>Reset</span>
+                                        </button>
+                                    @endif
+
+                                    @if($u->id !== $currentUser->id && !$isSuperAdminUser)
+                                        <button type="button" 
+                                                @click="$dispatch('open-delete-modal', {
+                                                    action: '{{ route('admin.users.destroy', $u->id) }}',
+                                                    title: 'Hapus Akun Pengguna',
+                                                    name: '{{ addslashes($u->name) }}',
+                                                    desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
+                                                })" 
+                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
+                                                title="Hapus Pengguna">
+                                            <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            <span>Hapus</span>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div class="py-12 text-center text-gray-400 text-xs">
+                                Tidak ada data pengguna yang sesuai filter.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
                 @if($users->hasPages())
                     <div class="p-4 border-t border-gray-100 bg-gray-50/50">
                         {{ $users->links() }}
@@ -366,20 +541,22 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
              x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-             class="fixed bottom-6 inset-x-0 z-40 max-w-2xl mx-auto px-4 pointer-events-none"
+             class="fixed bottom-4 sm:bottom-6 inset-x-0 z-40 max-w-2xl mx-auto px-3 sm:px-4 pointer-events-none"
              x-cloak>
-            <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md text-white rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3.5">
+            <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3.5 w-full">
                 
                 <!-- Info Terpilih -->
-                <div class="flex items-center gap-3">
-                    <span class="w-9 h-9 rounded-2xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow-md shadow-blue-500/20" x-text="selectedCount"></span>
-                    <div>
-                        <div class="text-xs font-black text-white tracking-wide">
-                            <span x-text="selectedCount"></span> Akun Pengguna Dipilih
+                <div class="flex items-center justify-between w-full sm:w-auto gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0" x-text="selectedCount"></span>
+                        <div>
+                            <div class="text-xs font-black text-white tracking-wide">
+                                <span x-text="selectedCount"></span> Akun Dipilih
+                            </div>
+                            <button type="button" @click="clearSelection()" class="text-[11px] text-slate-400 hover:text-slate-200 underline transition cursor-pointer">
+                                Batalkan Pilihan
+                            </button>
                         </div>
-                        <button type="button" @click="clearSelection()" class="text-[11px] text-slate-400 hover:text-slate-200 underline transition cursor-pointer">
-                            Batalkan Semua Pilihan
-                        </button>
                     </div>
                 </div>
 
@@ -388,17 +565,17 @@
                     <!-- Reset Massal Button -->
                     <button type="button" 
                             @click="openBulkResetModal()" 
-                            class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                            class="flex-1 sm:flex-none px-3 sm:px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                         </svg>
-                        <span>Reset Password Massal</span>
+                        <span>Reset Massal</span>
                     </button>
 
                     <!-- Hapus Massal Button -->
                     <button type="button" 
                             @click="openBulkDeleteModal()" 
-                            class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                            class="flex-1 sm:flex-none px-3 sm:px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
