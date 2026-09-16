@@ -252,6 +252,54 @@ class UserController extends Controller
     }
 
     /**
+     * Hapus Satu Pengguna (Single Delete)
+     */
+    public function destroy($id)
+    {
+        $currentUser = Auth::user();
+        $user = User::findOrFail($id);
+
+        // Proteksi: tidak bisa hapus diri sendiri
+        if ($user->id === $currentUser->id) {
+            return redirect()->back()->with('error', 'Tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        // Proteksi: tidak bisa hapus Super Admin
+        if ($user->role === 'super_admin') {
+            return redirect()->back()->with('error', 'Akun Super Admin tidak dapat dihapus.');
+        }
+
+        // Proteksi: tidak bisa hapus Admin Sistem (admin tanpa agency_profile_id)
+        if ($user->role === 'admin' && is_null($user->agency_profile_id)) {
+            return redirect()->back()->with('error', 'Akun Admin Sistem tidak dapat dihapus melalui panel ini.');
+        }
+
+        // Proteksi: cek relasi data aktif (pengajuan, penempatan dosen/mentor)
+        $hasRelations = ($user->applications()->count() > 0
+            || $user->academicPlacements()->count() > 0
+            || $user->mentorPlacements()->count() > 0);
+
+        if ($hasRelations) {
+            return redirect()->back()->with('error', "Akun '{$user->name}' tidak dapat dihapus karena memiliki relasi data magang/penempatan aktif.");
+        }
+
+        $deletedName = $user->name;
+        $deletedEmail = $user->email;
+        $deletedRole = $user->role;
+
+        AuditLog::record('USER_DELETE', 'User', $user->id, [
+            'name'  => $deletedName,
+            'email' => $deletedEmail,
+            'role'  => $deletedRole,
+        ]);
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')
+            ->with('success', "Akun '{$deletedName}' ({$deletedRole}) berhasil dihapus.");
+    }
+
+    /**
      * Hapus Pengguna Massal (Bulk Delete)
      */
     public function bulkDelete(Request $request)
