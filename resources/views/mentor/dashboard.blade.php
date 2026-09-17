@@ -206,7 +206,9 @@
                                         <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
                                             {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
                                             {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}">
+                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}
+                                            {{ $lifecycle === 'RESIGNED' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
+                                            {{ $lifecycle === 'REJECTED' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
                                             {{ $lifecycle }}
                                         </span>
                                     </td>

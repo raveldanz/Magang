@@ -345,7 +345,7 @@
         $logoSrc = $logoData ? 'data:' . $mime . ';base64,' . base64_encode($logoData) : '';
 
         // Data mahasiswa & permohonan
-        $student = $application->user->studentProfile;
+        $student = $application->user?->studentProfile;
         $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Mahasiswa';
         $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
         $nim = $student?->nim ?? '-';
@@ -367,9 +367,9 @@
             : '-';
 
         // Data Pembimbing
-        $pembimbing = optional($application->placement)->pembimbing;
-        $pembimbingName = $pembimbing ? $pembimbing->name : 'Pembimbing Lapangan / Unit Kerja Terkait';
-        $pembimbingPhone = $pembimbing->phone ?? optional($pembimbing->studentProfile)->phone ?? $phone ?? '-';
+        $pembimbing = $application->placement?->pembimbing ?? $application->placement?->mentor;
+        $pembimbingName = $pembimbing?->name ?? 'Pembimbing Lapangan / Unit Kerja Terkait';
+        $pembimbingPhone = $pembimbing?->phone ?? $pembimbing?->studentProfile?->phone ?? $phone ?? '-';
 
         // QR Code Verifikasi Dokumen
         $verifyUrl = route('verify.letter', $application->letter_token ?? $application->id);
@@ -392,7 +392,7 @@
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
     <div class="no-print">
         <div style="font-size: 13px; font-weight: 500;">
-            Surat Penerimaan Magang - {{ $application->user->name }}
+            Surat Penerimaan Magang - {{ $application->user?->name ?? 'Mahasiswa' }}
         </div>
         <div class="btn-group">
             <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="btn btn-secondary">
@@ -490,7 +490,7 @@
                 <tbody>
                     <tr>
                         <td style="text-align: center;">1</td>
-                        <td style="font-weight: bold;">{{ $application->user->name }}</td>
+                        <td style="font-weight: bold;">{{ $application->user?->name ?? '-' }}</td>
                         <td style="text-align: center;">{{ $nim }}</td>
                         <td>{{ $jurusan }}</td>
                         <td>{{ $fakultas }}</td>

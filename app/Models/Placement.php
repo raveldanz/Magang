@@ -88,23 +88,8 @@ class Placement extends Model
             return false;
         }
 
-        $univ = $eval?->getUniversity();
-        if (!$univ && $app->user?->university_id) {
-            $univ = University::find($app->user->university_id);
-        }
-
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-        $isMentorOnly = ($scheme === 'mentor_only');
-
-        $hasMentor = $eval && $eval->nilai_pembimbing > 0;
-        $hasDosen = $eval && ($eval->nilai_dosen_calculated > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->nilai_akademik ?? 0) > 0);
-
-        $isComplete = $isMentorOnly 
-            ? $hasMentor 
-            : ($hasMentor && $hasDosen);
-
-        if ($isComplete || ($eval && ($eval->final_score ?? 0) > 0)) {
-            if ($app->status !== 'completed') {
+        if ($eval && $eval->is_complete) {
+            if ($app->status !== 'completed' && !in_array($app->status, ['resigned', 'canceled', 'rejected'])) {
                 $app->update(['status' => 'completed']);
             }
             return true;
