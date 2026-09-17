@@ -8,12 +8,8 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 </a>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-black rounded-md uppercase tracking-wider">Pusat Kendali Dinas</span>
-                        <span class="text-xs text-slate-400 font-medium">{{ $agency->city ?? 'Surabaya' }}</span>
-                    </div>
-                    <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight mt-0.5">
-                        {{ $agency->agency_name }}
+                    <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
+                        Pusat Kendali Instansi
                     </h2>
                 </div>
             </div>
@@ -25,7 +21,6 @@
                     <form action="{{ route('admin.impersonate', $firstAdmin->id) }}" method="POST" class="inline-block m-0">
                         @csrf
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
                             <span>Masuk Sebagai Admin Dinas (Login As)</span>
                         </button>
                     </form>
@@ -33,15 +28,13 @@
                     <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}" class="inline-block m-0">
                         @csrf
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
                             <span>Buat Akun Admin Dinas</span>
                         </button>
                     </form>
                 @endif
 
                 <a href="{{ route('admin.agencies.edit', $agency->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl shadow-2xs transition">
-                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    <span>Edit Profil & TTD</span>
+                    <span>Edit Profil</span>
                 </a>
             </div>
         </div>
@@ -78,9 +71,7 @@
                             if (!empty($agency->logo)) {
                                 if (file_exists(public_path($agency->logo))) {
                                     $agencyLogoUrl = asset($agency->logo);
-                                } elseif (file_exists(public_path('storage/' . $agency->logo))) {
-                                    $agencyLogoUrl = asset('storage/' . $agency->logo);
-                                } elseif (file_exists(storage_path('app/public/' . $agency->logo))) {
+                                } elseif (file_exists(public_path('storage/' . $agency->logo)) || file_exists(storage_path('app/public/' . $agency->logo))) {
                                     $agencyLogoUrl = asset('storage/' . $agency->logo);
                                 }
                             }
@@ -88,8 +79,8 @@
                                 $agencyLogoUrl = asset('images/default-agency.svg');
                             }
                         @endphp
-                        <div class="w-20 h-20 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center p-3 shrink-0 overflow-hidden" style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
-                            <img src="{{ $agencyLogoUrl }}" alt="Logo {{ $agency->agency_name }}" class="w-14 h-14 object-contain shrink-0" style="width: 56px; height: 56px; max-width: 56px; max-height: 56px; object-fit: contain;">
+                        <div class="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 shadow-2xs flex items-center justify-center p-3 shrink-0 overflow-hidden" style="width: 80px; height: 80px; min-width: 80px; min-height: 80px;">
+                            <img src="{{ $agencyLogoUrl }}" alt="Logo {{ $agency->agency_name }}" class="w-14 h-14 object-contain shrink-0">
                         </div>
 
                         <div class="space-y-1.5">
@@ -101,10 +92,10 @@
                                     <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold animate-pulse">Belum Ada Akun Admin</span>
                                 @endif
                             </div>
-                            <p class="text-xs text-blue-600 font-bold uppercase tracking-wider">{{ $agency->government_name ?? 'Pemerintah Kota Surabaya' }}</p>
+
                             <p class="text-xs text-slate-500 flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span>{{ $agency->address ?? 'Alamat belum diatur' }}</span>
+                                <span>{{ $agency->address ?? 'Alamat kantor belum diatur' }}</span>
                             </p>
 
                             <!-- Kontak Kedinasan -->
@@ -149,15 +140,15 @@
                         <span class="text-2xl font-black text-slate-900">{{ $stats['total_units'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Divisi Aktif</span>
                     </div>
-                    <a href="{{ route('admin.units.index', ['agency_id' => $agency->id]) }}" class="text-[11px] font-bold text-blue-600 hover:underline mt-2 inline-block">
-                        Kelola Unit &rarr;
-                    </a>
+                    <button type="button" @click="activeTab = 'units'" class="text-[11px] font-bold text-blue-600 hover:underline mt-2 inline-block cursor-pointer">
+                        Lihat Divisi &rarr;
+                    </button>
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Kuota Magang Tersedia</span>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-2xl font-black text-slate-900">{{ $stats['total_remaining'] }}</span>
+                        <span class="text-2xl font-black text-blue-600">{{ $stats['total_remaining'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Slot</span>
                     </div>
                     <div class="text-[11px] text-slate-400 mt-2">
@@ -166,7 +157,7 @@
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Personil Kedinasan</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Personel Kedinasan</span>
                     <div class="mt-2 flex items-baseline gap-2">
                         <span class="text-2xl font-black text-slate-900">{{ $stats['total_admins'] + $stats['total_mentors'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Akun Sistem</span>
@@ -196,14 +187,14 @@
                             @click="activeTab = 'users'" 
                             :class="activeTab === 'users' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                            <span>Personil & Akun Kedinasan </span>
+                        <span>Personil & Akun Kedinasan</span>
                     </button>
 
                     <button type="button" 
                             @click="activeTab = 'units'" 
                             :class="activeTab === 'units' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                        <span>Divisi & Kuota Magang </span>
+                        <span>Divisi & Kuota Magang</span>
                     </button>
 
                     <button type="button" 
@@ -217,7 +208,7 @@
                             @click="activeTab = 'students'" 
                             :class="activeTab === 'students' ? 'text-blue-600 border-blue-600 font-black' : 'text-slate-500 border-transparent hover:text-slate-800 font-bold'"
                             class="pb-3 px-1 border-b-2 text-xs uppercase tracking-wider transition whitespace-nowrap cursor-pointer flex items-center gap-2">
-                        <span>Mahasiswa Aktif Magang </span>
+                        <span>Mahasiswa Aktif Magang</span>
                     </button>
                 </div>
 
@@ -225,18 +216,17 @@
                 <div x-show="activeTab === 'users'" class="p-6 space-y-4">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 class="font-bold text-base text-slate-900">Daftar Akun Personil Kedinasan</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Seluruh akun Admin Dinas (PIC) dan Mentor Lapangan yang memiliki akses kelola magang di dinas ini</p>
+                            <h3 class="font-bold text-base text-slate-900">Daftar Akun Personel Kedinasan</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Admin Dinas (PIC) dan Mentor Lapangan yang memiliki akses kelola magang di dinas ini</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <a href="{{ route('admin.users.create', ['agency_id' => $agency->id, 'role' => 'admin']) }}" 
+                            <a href="{{ route('admin.users.create', ['agency_id' => $agency->id, 'role' => 'admin', 'return_to' => url()->current()]) }}"
                                class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                                 <span>Tambah Akun Baru</span>
                             </a>
                             <a href="{{ route('admin.users.index', ['agency_id' => $agency->id]) }}" 
                                class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
-                                <span>Buka Tabel Pengguna Lengkap</span>
+                                <span>Tabel Pengguna</span>
                             </a>
                         </div>
                     </div>
@@ -278,11 +268,9 @@
                                         </td>
                                         <td class="py-3.5 px-4 text-center">
                                             @if(($u->status ?? 'active') === 'active')
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"> Aktif
-                                                </span>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
                                             @else
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800"> Non-Aktif
-                                                </span>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800">Non-Aktif</span>
                                             @endif
                                         </td>
                                         <td class="py-3.5 px-4 text-right">
@@ -296,7 +284,7 @@
                                                     </form>
                                                     <form action="{{ route('admin.users.reset_password', $u->id) }}" method="POST" class="btn-action-form" onsubmit="return confirm('Reset password akun {{ addslashes($u->name) }} ke password default (password)?');">
                                                         @csrf
-                                                        <button type="submit" class="btn-action-reset" title="Reset Password ke default (password)">
+                                                        <button type="submit" class="btn-action-reset" title="Reset Password ke default">
                                                             Reset
                                                         </button>
                                                     </form>
@@ -310,7 +298,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="5" class="py-8 text-center text-slate-400 font-medium">
-                                            Belum ada akun Personil yang terdaftar di dinas ini.
+                                            Belum ada akun personel yang terdaftar di dinas ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -324,19 +312,12 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="font-bold text-base text-slate-900">Divisi & Bidang Kerja Magang</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Daftar lowongan divisi di bawah {{ $agency->agency_name }} beserta kuota penerimaan</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Daftar bidang unit kerja beserta kuota penerimaan peserta magang</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <a href="{{ route('admin.units.create', ['agency_id' => $agency->id]) }}" 
-                               class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                <span>Tambah Divisi Baru</span>
-                            </a>
-                            <a href="{{ route('admin.units.index', ['agency_id' => $agency->id]) }}" 
-                               class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
-                                <span>Buka Manajemen Kuota Lengkap</span>
-                            </a>
-                        </div>
+                        <a href="{{ route('admin.units.create', ['agency_id' => $agency->id, 'return_to' => url()->current()]) }}"
+                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                           <span>Tambah Divisi Baru</span>
+                        </a>
                     </div>
 
                     <div class="overflow-x-auto rounded-2xl border border-slate-100">
@@ -375,7 +356,7 @@
                                         </td>
                                         <td class="py-3.5 px-4 text-right">
                                             <div class="btn-action-group">
-                                                <a href="{{ route('admin.units.edit', $unit->id) }}" class="btn-action-edit">
+                                                <a href="{{ route('admin.users.edit', ['user' => $u->id, 'return_to' => url()->current()]) }}" class="btn-action-edit">
                                                     Edit
                                                 </a>
                                             </div>
@@ -398,11 +379,11 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="font-bold text-base text-slate-900">Daftar Pengajuan Magang Masuk</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Semua berkas lamaran mahasiswa yang mendaftar ke divisi-divisi di bawah dinas ini</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Semua berkas lamaran mahasiswa yang mendaftar ke divisi-divisi dinas ini</p>
                         </div>
                         <a href="{{ route('admin.applications.index', ['agency_id' => $agency->id]) }}" 
                            class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
-                            <span>Buka Verifikasi Pengajuan Lengkap</span>
+                            <span>Buka Verifikasi Lengkap</span>
                         </a>
                     </div>
 
@@ -470,11 +451,9 @@
 
                 <!-- Konten Tab 4: Mahasiswa Aktif & Bimbingan -->
                 <div x-show="activeTab === 'students'" class="p-6 space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-900">Mahasiswa Aktif Magang & Mentor Pembimbing</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Peserta magang yang telah diterima dan sedang menjalani masa magang di {{ $agency->agency_name }}</p>
-                        </div>
+                    <div>
+                        <h3 class="font-bold text-base text-slate-900">Mahasiswa Aktif Magang & Mentor Pembimbing</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Peserta magang yang sedang aktif menjalani program di lingkungan dinas</p>
                     </div>
 
                     <div class="overflow-x-auto rounded-2xl border border-slate-100">
