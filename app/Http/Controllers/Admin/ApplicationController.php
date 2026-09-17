@@ -12,6 +12,7 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
@@ -167,7 +168,7 @@ class ApplicationController extends Controller
         $request->merge(['status' => $statusInput]);
 
         $request->validate([
-            'status' => 'required|in:pending,verified,accepted,rejected,completed',
+            'status' => 'required|in:pending,verified,accepted,rejected,completed,resigned',
             'rejection_note' => 'nullable|string',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
@@ -188,11 +189,32 @@ class ApplicationController extends Controller
 
         $unit = $application->unit;
 
-        // Dynamic Quota Lifecycle Engine: Validasi kapasitas kuota sebelum menerima pengajuan
+        // Strict Validation for COMPLETED status
+        if ($newStatus === 'completed' && $oldStatus !== 'completed') {
+            $placement = $application->placement;
+            $hasApprovedReport = $placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']);
+            $eval = $placement?->evaluation;
+            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
+
+            if (!$hasApprovedReport || !$hasCompleteEval) {
+                return redirect()->back()->with('error', "Gagal menyelesaikan magang: Mahasiswa belum melengkapi Laporan Akhir (disetujui) atau Penilaian (Mentor & DPL) belum tuntas.");
+            }
+        }
+
+        // Time-Aware Quota Lifecycle Engine: Cek irisan tanggal
         if ($newStatus === 'accepted' && $oldStatus !== 'accepted') {
-            if ($unit && $unit->remaining_quota <= 0) {
-                $acceptedCount = $unit->applications()->where('status', 'accepted')->count();
-                return redirect()->back()->with('error', "Gagal menerima pengajuan: Kuota unit kerja '{$unit->name}' telah penuh (Kapasitas: {$unit->quota}, Terisi: {$acceptedCount}). Silakan tambah kapasitas kuota unit kerja terlebih dahulu jika ingin menerima mahasiswa tambahan.");
+            if ($unit) {
+                $overlappingInterns = $unit->applications()
+                    ->where('status', 'accepted')
+                    ->where('id', '!=', $application->id)
+                    ->where(function ($query) use ($application) {
+                        $query->where('start_date', '<=', $application->end_date)
+                              ->where('end_date', '>=', $application->start_date);
+                    })->count();
+
+                if ($overlappingInterns >= $unit->quota) {
+                    return redirect()->back()->with('error', "Gagal menerima pengajuan: Kuota unit kerja '{$unit->name}' penuh pada rentang tanggal magang pemohon (Kapasitas: {$unit->quota}, Terisi: {$overlappingInterns} pada rentang tersebut).");
+                }
             }
         }
         
@@ -200,53 +222,54 @@ class ApplicationController extends Controller
         $paddedId = str_pad($application->id, 3, '0', STR_PAD_LEFT);
         $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
         $letterToken = $application->letter_token ?: Str::random(32);
-
-        $application->update([
-            'status' => $newStatus,
-            'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
-            'rejection_reason' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
-            'letter_number' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
-            'letter_date' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
-            'letter_token' => in_array($newStatus, ['accepted', 'completed']) ? $letterToken : $application->letter_token,
-        ]);
-
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
 
-        $placementData = [];
-        if ($assignedMentorId) {
-            $placementData['mentor_id'] = $assignedMentorId;
-            $placementData['pembimbing_id'] = $assignedMentorId;
-        }
+        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin) {
+            $application->update([
+                'status' => $newStatus,
+                'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
+                'rejection_reason' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
+                'letter_number' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
+                'letter_date' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
+                'letter_token' => in_array($newStatus, ['accepted', 'completed']) ? $letterToken : $application->letter_token,
+            ]);
 
-        if ($request->filled('academic_advisor_id')) {
-            $placementData['academic_advisor_id'] = $request->academic_advisor_id;
-        }
+            $placementData = [];
+            if ($assignedMentorId) {
+                $placementData['mentor_id'] = $assignedMentorId;
+                $placementData['pembimbing_id'] = $assignedMentorId;
+            }
 
-        if (in_array($newStatus, ['accepted', 'completed'])) {
-            $existingPlacement = Placement::where('application_id', $application->id)->first();
-            $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
-            $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
-        }
+            if ($request->filled('academic_advisor_id')) {
+                $placementData['academic_advisor_id'] = $request->academic_advisor_id;
+            }
 
-        if (!empty($placementData) || in_array($newStatus, ['accepted', 'completed'])) {
-            Placement::updateOrCreate(
-                ['application_id' => $application->id],
-                $placementData
-            );
-        }
+            if (in_array($newStatus, ['accepted', 'completed'])) {
+                $existingPlacement = Placement::where('application_id', $application->id)->first();
+                $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
+                $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+            }
 
-        // Catat Audit Trail
-        AuditLog::record('APPLICATION_STATUS_UPDATE', 'Application', $application->id, [
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
-            'student_name' => $application->user?->name,
-            'unit_name' => $unit?->name,
-            'assigned_mentor_id' => $assignedMentorId,
-            'override_reason' => $request->override_reason,
-            'is_super_admin' => $isSuperAdmin,
-        ]);
+            if (!empty($placementData) || in_array($newStatus, ['accepted', 'completed'])) {
+                Placement::updateOrCreate(
+                    ['application_id' => $application->id],
+                    $placementData
+                );
+            }
 
-        return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan & kuota unit berhasil diperbarui!');
+            // Catat Audit Trail
+            AuditLog::record('APPLICATION_STATUS_UPDATE', 'Application', $application->id, [
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'student_name' => $application->user?->name,
+                'unit_name' => $unit?->name,
+                'assigned_mentor_id' => $assignedMentorId,
+                'override_reason' => $request->override_reason,
+                'is_super_admin' => $isSuperAdmin,
+            ]);
+        });
+
+        return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
     }
 
     /**
@@ -263,7 +286,7 @@ class ApplicationController extends Controller
             'placement.pembimbing',
             'placement.mentor'
         ])
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'completed'])
             ->findOrFail($id);
 
         // Multi-Tenant Authorization Check

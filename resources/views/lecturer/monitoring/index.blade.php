@@ -140,7 +140,8 @@
                                         <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
                                             {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
                                             {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}">
+                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}
+                                            {{ $lifecycle === 'RESIGNED' ? 'bg-slate-200 text-slate-800 border border-slate-300' : '' }}">
                                             {{ $lifecycle }}
                                         </span>
                                     </td>

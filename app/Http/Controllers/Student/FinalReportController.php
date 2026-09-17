@@ -18,14 +18,16 @@ class FinalReportController extends Controller
      */
     public function index()
     {
-        // Prioritaskan pengajuan yang memiliki penempatan aktif / resmi
+        // Prioritaskan pengajuan yang memiliki penempatan aktif / resmi dan belum resigned/rejected
         $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
+            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
             ->whereHas('placement')
             ->latest()
             ->first()
             ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
                 ->where('user_id', Auth::id())
+                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
                 ->latest()
                 ->first();
 
@@ -48,13 +50,18 @@ class FinalReportController extends Controller
     {
         $user = Auth::user();
         
-        // Prioritaskan pengajuan yang memiliki penempatan aktif
+        // Prioritaskan pengajuan aktif yang belum resigned/rejected
         $application = Application::with('placement')
             ->where('user_id', $user->id)
+            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
             ->whereHas('placement')
             ->latest()
             ->first()
-            ?? Application::with('placement')->where('user_id', $user->id)->latest()->first();
+            ?? Application::with('placement')
+                ->where('user_id', $user->id)
+                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+                ->latest()
+                ->first();
         
         if (!$application || !$application->placement) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak: Data penempatan tidak ditemukan.');
@@ -63,6 +70,10 @@ class FinalReportController extends Controller
         $placementId = $application->placement->id;
         $finalReport = FinalReport::where('placement_id', $placementId)->first();
         $hasExistingFile = $finalReport && !empty($finalReport->file_path);
+
+        if ($finalReport && $finalReport->status === 'approved') {
+            return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir yang sudah disetujui tidak dapat diubah atau diunggah ulang.');
+        }
 
         $request->validate([
             'title' => 'nullable|string|max:255',

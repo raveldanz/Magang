@@ -228,17 +228,13 @@
 
                     @php
                         $univ = $evaluation?->getUniversity();
-                        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+                        $scheme = $evaluation?->evaluation_scheme ?? ($univ->evaluation_scheme ?? 'dual_evaluation');
                         $isMentorOnly = ($scheme === 'mentor_only');
 
-                        $hasMentorScore = $evaluation && $evaluation->nilai_pembimbing > 0;
-                        $hasDosenScore = $evaluation && ($evaluation->nilai_dosen_calculated > 0 || ($evaluation->nilai_dosen ?? 0) > 0 || ($evaluation->nilai_akademik ?? 0) > 0);
+                        $hasMentorScore = $evaluation && ($evaluation->nilai_pembimbing ?? 0) > 0;
+                        $hasDosenScore = $evaluation && (($evaluation->nilai_dosen_calculated ?? 0) > 0 || ($evaluation->nilai_dosen ?? 0) > 0 || ($evaluation->nilai_akademik ?? 0) > 0);
 
-                        $isEvalComplete = $evaluation && (
-                            ($isMentorOnly && $hasMentorScore) ||
-                            (!$isMentorOnly && $hasMentorScore && $hasDosenScore) ||
-                            (($evaluation->final_score ?? 0) > 0)
-                        );
+                        $isEvalComplete = $evaluation && $evaluation->is_complete;
                     @endphp
 
                     @if ($isEvalComplete)
@@ -273,7 +269,7 @@
                                 <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 text-center">
                                     <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Nilai Akhir</span>
                                     <span class="text-xl font-black text-indigo-950 mt-1 block">
-                                        {{ number_format($evaluation->final_score ?? $evaluation->nilai_akhir ?? $evaluation->nilai_pembimbing ?? 0, 1) }}
+                                        {{ number_format($evaluation->nilai_akhir > 0 ? $evaluation->nilai_akhir : ($evaluation->final_score ?? 0), 1) }}
                                         <span class="text-xs font-bold text-indigo-600 font-mono">({{ $evaluation->grade ?? 'A' }})</span>
                                     </span>
                                     <span class="text-[10px] text-indigo-600 font-semibold">Predikat Kelulusan</span>

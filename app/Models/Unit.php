@@ -20,10 +20,19 @@ class Unit extends Model
         return $this->hasMany(Application::class);
     }
 
-    // Accessor untuk menghitung sisa kuota otomatis: $unit->remaining_quota
+    // Accessor untuk menghitung sisa kuota dinamis: $unit->remaining_quota
+    // Hanya menghitung mahasiswa berstatus accepted yang rentang magangnya masih aktif saat ini atau ke depan
     public function getRemainingQuotaAttribute()
     {
-        $acceptedCount = $this->applications()->where('status', 'accepted')->count();
-        return max(0, $this->quota - $acceptedCount);
+        $today = date('Y-m-d');
+        $occupiedCount = $this->applications()
+            ->where('status', 'accepted')
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', $today);
+            })
+            ->count();
+
+        return max(0, $this->quota - $occupiedCount);
     }
 }

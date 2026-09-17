@@ -128,6 +128,11 @@ class UnitController extends Controller
     /**
      * Tampilkan formulir edit divisi / unit magang
      */
+    public function show($id)
+    {
+        return redirect()->route('admin.units.edit', $id);
+    }
+
     public function edit(Request $request, $id)
     {
         $user = Auth::user();
