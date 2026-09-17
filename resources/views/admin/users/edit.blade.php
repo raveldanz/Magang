@@ -21,6 +21,8 @@
 
                 <form method="POST" action="{{ route('admin.users.update', $user->id) }}" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="return_to" value="{{ $returnTo ?? request('return_to') ?? old('return_to') }}">
+                   
                     @method('PUT')
 
                     <div>
