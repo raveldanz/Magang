@@ -14,14 +14,20 @@ use Illuminate\Support\Facades\Storage;
 class LogbookController extends Controller
 {
     /**
-     * Helper untuk mengambil pengajuan magang yang memiliki penempatan resmi
+     * Helper untuk mengambil pengajuan magang yang aktif / berjalan
+     * Mencegah pembajakan data oleh pengajuan lama yang sudah resigned/rejected/canceled
      */
     protected function getActiveInternship($userId)
     {
         return Application::where('user_id', $userId)
+            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
             ->whereHas('placement')
             ->latest()
             ->first()
+            ?? Application::where('user_id', $userId)
+                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+                ->latest()
+                ->first()
             ?? Application::where('user_id', $userId)->latest()->first();
     }
 
@@ -161,7 +167,7 @@ class LogbookController extends Controller
         }
 
         // Keamanan: Hanya status PENDING / REJECTED yang bisa diedit
-        if (strtolower($logbook->status) === 'approved') {
+        if (strtolower($logbook->status) === 'approved' && strtolower($logbook->lecturer_status ?? 'approved') !== 'rejected') {
             return redirect()->route('student.logbook.index')
                 ->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
         }
@@ -196,7 +202,7 @@ class LogbookController extends Controller
             abort(403, 'Akses tidak diizinkan.');
         }
 
-        if (strtolower($logbook->status) === 'approved') {
+        if (strtolower($logbook->status) === 'approved' && strtolower($logbook->lecturer_status ?? 'approved') !== 'rejected') {
             return redirect()->route('student.logbook.index')
                 ->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
         }

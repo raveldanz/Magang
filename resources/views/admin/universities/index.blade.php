@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -225,10 +225,11 @@
             <!-- Universities Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($universities as $univ)
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
-                        <div>
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition p-6 flex flex-col h-full">
+                        <!-- Upper Section: Logo, Kode Kampus, Status, dan Identitas -->
+                        <div class="flex-1 flex flex-col">
                             <!-- Header: Logo, Kode Kampus, Status Badge, dan Menu Opsi -->
-                            <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-start justify-between gap-4 shrink-0">
                                 @php
                                     $univLogoUrl = null;
                                     if (!empty($univ->logo)) {
@@ -290,54 +291,58 @@
                                 </div>
                             </div>
 
-                            <!-- Identitas Universitas & Hierarki Tipografi Bersih -->
-                            <div class="mt-4">
-                                <h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug tracking-tight">
-                                    <a href="{{ route('admin.universities.show', $univ->id) }}" title="Lihat Pusat Kendali Kampus">
+                            <!-- Identitas Universitas: Tinggi Slot Konsisten & Bebas Distorsi -->
+                            <div class="mt-4 flex-1 flex flex-col justify-start">
+                                <h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug tracking-tight line-clamp-2 h-[3rem] overflow-hidden">
+                                    <a href="{{ route('admin.universities.show', $univ->id) }}" title="Lihat Pusat Kendali Kampus" class="hover:text-blue-600 transition">
                                         {{ $univ->name }}
                                     </a>
                                 </h3>
-                                <p class="text-xs text-slate-500 mt-2 line-clamp-2 min-h-[2.5rem] leading-relaxed">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
+                                <p class="text-xs text-slate-500 mt-1.5 line-clamp-2 h-9 leading-relaxed overflow-hidden" title="{{ $univ->address ?? 'Alamat belum diatur' }}">
+                                    {{ $univ->address ?? 'Alamat belum diatur' }}
+                                </p>
                                 
-                                <div class="mt-3 text-xs text-slate-600 space-y-1">
-                                    @if($univ->pic_name)
-                                        <div class="truncate text-slate-500">
-                                            <span class="text-slate-400 font-medium">PIC:</span>
-                                            <span class="font-medium text-slate-700 ml-1">{{ $univ->pic_name }}</span>
-                                            @if($univ->pic_position) <span class="text-slate-400">({{ $univ->pic_position }})</span> @endif
-                                        </div>
-                                    @endif
+                                <div class="mt-2.5 text-xs text-slate-600 h-10 flex flex-col justify-center space-y-1">
+                                    <div class="truncate text-slate-500 h-4.5 flex items-center gap-1">
+                                        <span class="text-slate-400 font-medium shrink-0">PIC:</span>
+                                        @if($univ->pic_name)
+                                            <span class="font-medium text-slate-700 truncate" title="{{ $univ->pic_name }}">{{ $univ->pic_name }}</span>
+                                            @if($univ->pic_position) <span class="text-slate-400 truncate">({{ $univ->pic_position }})</span> @endif
+                                        @else
+                                            <span class="text-slate-400 italic">Belum ditentukan</span>
+                                        @endif
+                                    </div>
 
-                                    <div class="truncate text-xs text-slate-600 flex items-baseline gap-1.5">
-                                        <span class="text-slate-400 font-medium">Admin:</span>
+                                    <div class="truncate text-xs text-slate-600 flex items-center gap-1.5 h-4.5">
+                                        <span class="text-slate-400 font-medium shrink-0">Admin:</span>
                                         @if($univ->universityAdmin)
-                                            <span class="font-mono font-semibold text-slate-700">{{ $univ->universityAdmin->email }}</span>
+                                            <span class="font-mono font-semibold text-slate-700 truncate" title="{{ $univ->universityAdmin->email }}">{{ $univ->universityAdmin->email }}</span>
                                         @else
                                             <span class="text-slate-400 italic">Belum ditugaskan</span>
                                         @endif
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Metrik Ringkas & Bernafas (Pure Minimalist Stats, Non-Clickable) -->
-                            <div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-100 text-center select-none">
-                                <div class="py-1">
-                                    <div class="text-xl font-black text-slate-900 tracking-tight">{{ $univ->students_count }}</div>
-                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Mahasiswa</div>
-                                </div>
-                                <div class="py-1 border-x border-slate-100">
-                                    <div class="text-xl font-black text-blue-600 tracking-tight">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[11px] font-semibold text-blue-600/90 mt-0.5">Dosen DPL</div>
-                                </div>
-                                <div class="py-1">
-                                    <div class="text-xl font-black text-slate-900 tracking-tight">{{ $univ->users_count }}</div>
-                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Akun</div>
-                                </div>
+                        <!-- Metrik Ringkas & Bernafas (Pure Minimalist Stats, Selalu Sejajar Sempurna Secara Horizontal) -->
+                        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-100 text-center select-none shrink-0">
+                            <div class="py-1">
+                                <div class="text-xl font-black text-slate-900 tracking-tight">{{ $univ->students_count }}</div>
+                                <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Mahasiswa</div>
+                            </div>
+                            <div class="py-1 border-x border-slate-100">
+                                <div class="text-xl font-black text-blue-600 tracking-tight">{{ $univ->dosens_count }}</div>
+                                <div class="text-[11px] font-semibold text-blue-600/90 mt-0.5">Dosen DPL</div>
+                            </div>
+                            <div class="py-1">
+                                <div class="text-xl font-black text-slate-900 tracking-tight">{{ $univ->users_count }}</div>
+                                <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Akun</div>
                             </div>
                         </div>
 
                         <!-- Action Footer: 1 Tombol Utama (Primary) + 1 Tombol Dropdown Titik Tiga (⋮) -->
-                        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center gap-2">
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 shrink-0">
                             <!-- Tombol Utama: Kelola Kampus -->
                             <a href="{{ route('admin.universities.show', $univ->id) }}" 
                                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow-md active:scale-95 cursor-pointer"

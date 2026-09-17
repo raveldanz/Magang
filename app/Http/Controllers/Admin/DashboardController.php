@@ -44,22 +44,12 @@ class DashboardController extends Controller
 
         // Metrik Agregat Mahasiswa
         $totalStudents = $allApplications->count();
-        $totalPending = $allApplications->whereIn('status', ['pending', 'submitted'])->count();
-        $totalAccepted = $allApplications->whereIn('status', ['accepted', 'verified'])->count();
-        $totalRejected = $allApplications->where('status', 'rejected')->count();
-
-        $today = now();
-        $totalActive = $allApplications->filter(function ($app) use ($today) {
-            $isAccepted = in_array(strtolower($app->status), ['accepted', 'verified']);
-            $isStarted = $app->start_date && $today->gte(\Carbon\Carbon::parse($app->start_date));
-            $isNotDone = !($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED' && optional($app->placement?->evaluation)->nilai_akademik > 0);
-            return $isAccepted && $isStarted && $isNotDone;
-        })->count();
-
-        $totalCompleted = $allApplications->filter(function ($app) {
-            return ($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED') ||
-                   ($app->placement && optional($app->placement->finalreport)->status === 'approved' && optional($app->placement->evaluation)->nilai_akademik > 0);
-        })->count();
+        $totalPending = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['SUBMITTED', 'DRAFT']))->count();
+        $totalAccepted = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['ACCEPTED']))->count();
+        $totalRejected = $allApplications->filter(fn($app) => $app->lifecycle_status === 'REJECTED')->count();
+        $totalActive = $allApplications->filter(fn($app) => $app->lifecycle_status === 'ACTIVE')->count();
+        $totalCompleted = $allApplications->filter(fn($app) => $app->lifecycle_status === 'COMPLETED')->count();
+        $totalResigned = $allApplications->filter(fn($app) => $app->lifecycle_status === 'RESIGNED')->count();
 
         // Kuota Unit Magang
         $unitsQuery = Unit::with('agencyProfile');
@@ -150,6 +140,7 @@ class DashboardController extends Controller
             'total_active' => $totalActive,
             'total_completed' => $totalCompleted,
             'total_rejected' => $totalRejected,
+            'total_resigned' => $totalResigned,
             'total_quota_available' => $totalQuotaAvailable,
             'total_units' => $totalUnits,
             'total_agencies' => $totalAgencies,

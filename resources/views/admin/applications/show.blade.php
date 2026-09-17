@@ -141,9 +141,21 @@
                             </option>
                             <option value="accepted" {{ $application->status == 'accepted' ? 'selected' : '' }}>ACCEPTED
                             </option>
-                            <option value="completed" {{ $application->status == 'completed' ? 'selected' : '' }}>COMPLETED (Selesai Magang & Lulus)
+                            @php
+                                $canComplete = false;
+                                if ($application->placement) {
+                                    $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status ?? ''), ['approved', 'disetujui']);
+                                    $eval = $application->placement->evaluation;
+                                    $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
+                                    $canComplete = $hasApprovedReport && $hasCompleteEval;
+                                }
+                            @endphp
+                            <option value="completed" {{ $application->status == 'completed' ? 'selected' : '' }} {{ !$canComplete && $application->status != 'completed' ? 'disabled' : '' }}>
+                                COMPLETED (Selesai Magang & Lulus) {{ !$canComplete && $application->status != 'completed' ? ' - [Syarat Laporan/Nilai Belum Tuntas]' : '' }}
                             </option>
                             <option value="rejected" {{ $application->status == 'rejected' ? 'selected' : '' }}>REJECTED
+                            </option>
+                            <option value="resigned" {{ $application->status == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)
                             </option>
                         </select>
                     </div>

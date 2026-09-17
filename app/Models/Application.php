@@ -58,15 +58,18 @@ class Application extends Model
     {
         $rawStatus = strtolower($this->status ?? 'draft');
 
-        // 1. REJECTED
-        if ($rawStatus === 'rejected') {
+        if ($rawStatus === 'rejected' || $rawStatus === 'canceled') {
             return 'REJECTED';
+        }
+        
+        if ($rawStatus === 'resigned') {
+            return 'RESIGNED';
         }
 
         $placement = $this->placement;
         $hasApprovedReport = $placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']);
         $eval = $placement?->evaluation;
-        $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
+        $hasCompleteEval = $eval && $eval->is_complete;
 
         // 2. COMPLETED
         if ($rawStatus === 'completed' || ($rawStatus === 'accepted' && $hasApprovedReport && $hasCompleteEval)) {
