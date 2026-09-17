@@ -23,9 +23,7 @@ class UnitController extends Controller
 
         // Multi-Tenant Isolation: Admin Instansi hanya melihat unit di bawah dinasnya
         if ($agencyId) {
-            $query->where(function ($q) use ($agencyId) {
-                $q->where('agency_profile_id', $agencyId);
-            });
+            $query->where('agency_profile_id', $agencyId);
             $agencies = AgencyProfile::where('id', $agencyId)->get();
             $selectedAgency = $agencies->first();
         } else {
@@ -78,7 +76,9 @@ class UnitController extends Controller
             $defaultAgencyId = $request->query('agency_id');
         }
 
-        return view('admin.units.create', compact('agencies', 'defaultAgencyId'));
+        $returnTo = $request->query('return_to', url()->previous());
+
+        return view('admin.units.create', compact('agencies', 'defaultAgencyId', 'returnTo'));
     }
 
     /**
@@ -94,6 +94,7 @@ class UnitController extends Controller
             'description' => 'nullable|string',
             'quota' => 'required|integer|min:0|max:500',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
+            'return_to' => 'nullable|string',
         ], [
             'name.required' => 'Nama bidang / divisi wajib diisi.',
             'quota.required' => 'Jumlah kuota wajib diisi.',
@@ -102,14 +103,26 @@ class UnitController extends Controller
 
         $agencyId = $userAgencyId ?? ($request->agency_profile_id ?? AgencyProfile::first()?->id);
 
-        Unit::create([
+        $unit = Unit::create([
             'name' => $request->name,
             'description' => $request->description,
             'quota' => $request->quota,
             'agency_profile_id' => $agencyId,
         ]);
 
-        return redirect()->route('admin.units.index')->with('success', 'Divisi / unit magang baru berhasil ditambahkan!');
+        $successMsg = "Divisi '{$unit->name}' berhasil ditambahkan!";
+
+        // 1. Prioritas return_to dari pemanggil
+        if ($request->filled('return_to') && !str_contains($request->return_to, 'units/create')) {
+            return redirect($request->return_to)->with('success', $successMsg);
+        }
+
+        // 2. Balik ke detail instansi jika ada agencyId
+        if ($agencyId) {
+            return redirect()->route('admin.agencies.show', $agencyId)->with('success', $successMsg);
+        }
+
+        return redirect()->route('admin.units.index')->with('success', $successMsg);
     }
 
     /**
@@ -120,24 +133,20 @@ class UnitController extends Controller
         return redirect()->route('admin.units.edit', $id);
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $user = Auth::user();
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
         $unit = Unit::with('agencyProfile')->findOrFail($id);
 
-        // Multi-Tenant Authorization Check
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
         }
 
-        if ($agencyId) {
-            $agencies = AgencyProfile::where('id', $agencyId)->get();
-        } else {
-            $agencies = AgencyProfile::all();
-        }
+        $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
+        $returnTo = $request->query('return_to', url()->previous());
 
-        return view('admin.units.edit', compact('unit', 'agencies'));
+        return view('admin.units.edit', compact('unit', 'agencies', 'returnTo'));
     }
 
     /**
@@ -149,7 +158,6 @@ class UnitController extends Controller
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
         $unit = Unit::findOrFail($id);
 
-        // Multi-Tenant Authorization Check
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
         }
@@ -159,6 +167,7 @@ class UnitController extends Controller
             'description' => 'nullable|string',
             'quota' => 'required|integer|min:0|max:500',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
+            'return_to' => 'nullable|string',
         ]);
 
         $updateData = [
@@ -167,14 +176,24 @@ class UnitController extends Controller
             'quota' => $request->quota,
         ];
 
-        // Superadmin can reassign agency
         if (!$agencyId && $request->filled('agency_profile_id')) {
             $updateData['agency_profile_id'] = $request->agency_profile_id;
         }
 
         $unit->update($updateData);
+        $successMsg = 'Data divisi / unit magang berhasil diperbarui!';
 
-        return redirect()->route('admin.units.index')->with('success', 'Data divisi / unit magang berhasil diperbarui!');
+        // 1. Prioritas return_to dari pemanggil
+        if ($request->filled('return_to') && !str_contains($request->return_to, 'units/' . $id . '/edit')) {
+            return redirect($request->return_to)->with('success', $successMsg);
+        }
+
+        // 2. Balik ke detail instansi terkait
+        if ($unit->agency_profile_id) {
+            return redirect()->route('admin.agencies.show', $unit->agency_profile_id)->with('success', $successMsg);
+        }
+
+        return redirect()->route('admin.units.index')->with('success', $successMsg);
     }
 
     /**
@@ -186,7 +205,6 @@ class UnitController extends Controller
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
         $unit = Unit::findOrFail($id);
 
-        // Multi-Tenant Authorization Check
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Anda tidak memiliki hak akses ke unit instansi lain.'], 403);
@@ -241,7 +259,7 @@ class UnitController extends Controller
     /**
      * Hapus divisi / unit magang jika belum ada mahasiswa aktif
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $user = Auth::user();
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
@@ -249,7 +267,6 @@ class UnitController extends Controller
             $q->where('status', 'accepted');
         }])->findOrFail($id);
 
-        // Multi-Tenant Authorization Check
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus unit instansi lain.');
         }
@@ -259,7 +276,12 @@ class UnitController extends Controller
         }
 
         $unit->delete();
+        $successMsg = "Divisi / unit magang '{$unit->name}' berhasil dihapus.";
 
-        return redirect()->route('admin.units.index')->with('success', "Divisi / unit magang '{$unit->name}' berhasil dihapus.");
+        if ($request->filled('return_to')) {
+            return redirect($request->return_to)->with('success', $successMsg);
+        }
+
+        return redirect()->back()->with('success', $successMsg);
     }
 }
