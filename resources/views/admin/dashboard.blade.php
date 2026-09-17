@@ -185,7 +185,7 @@
                 </div>
                 <a href="{{ route('admin.universities.index') }}"
                     class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
-                    Kelola Kampus & Buat Akun &rarr;
+                    Kelola Kampus & Buat Akun
                 </a>
             </div>
         @endif
@@ -210,7 +210,7 @@
                 </div>
                 <a href="{{ route('admin.agencies.index') }}"
                     class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">
-                    Kelola Instansi & Buat Akun &rarr;
+                    Kelola Instansi & Buat Akun 
                 </a>
             </div>
         @endif

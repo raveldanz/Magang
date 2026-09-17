@@ -303,18 +303,18 @@
             <!-- ============================================================== -->
             <div x-show="activeTab === 'dosen'" class="space-y-4" style="display: none;">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
-                    <div>
-                        <h3 class="text-sm font-black text-slate-900">Dosen Pembimbing Lapangan (DPL) Terdaftar</h3>
-                        <p class="text-xs text-slate-500">Kelola akun dosen pembimbing akademik dari {{ $university->name }} yang memantau & menilai logbook mahasiswa</p>
-                    </div>
+    <div>
+        <h3 class="text-sm font-black text-slate-900">Dosen Pembimbing Lapangan (DPL) Terdaftar</h3>
+        <p class="text-xs text-slate-500">Kelola akun dosen pembimbing akademik dari {{ $university->name }} yang memantau & menilai logbook mahasiswa</p>
+    </div>
 
-                    <button type="button" 
-                            @click="showAddDosenModal = true"
-                            class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                        <span>Tambah DPL Baru</span>
-                    </button>
-                </div>
+    <!-- Tombol Tambah DPL (Mengarah ke form create & otomatis kembali ke sini) -->
+    <a href="{{ route('admin.users.create', ['university_id' => $university->id, 'role' => 'dosen', 'return_to' => url()->current()]) }}" 
+       class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        <span>Tambah DPL Baru</span>
+    </a>
+</div>
 
                 <div class="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
                     <div class="overflow-x-auto">
