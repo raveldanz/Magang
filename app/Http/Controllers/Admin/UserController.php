@@ -9,6 +9,7 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -49,7 +50,7 @@ class UserController extends Controller
             $univ = University::find($univId);
             $selectedUniversity = $univ;
             $univName = $univ?->name;
-            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
             $query->where(function ($q) use ($univId, $univName, $like) {
                 $q->where('university_id', $univId);
@@ -63,7 +64,7 @@ class UserController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = strtolower($request->search);
-            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
                   ->orWhere('email', $like, "%{$search}%")
@@ -89,11 +90,13 @@ class UserController extends Controller
     /**
      * Form Tambah User Baru
      */
-    public function create()
+    public function create(Request $request)
     {
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        return view('admin.users.create', compact('agencies', 'universities'));
+        $returnTo = $request->query('return_to', url()->previous());
+
+        return view('admin.users.create', compact('agencies', 'universities', 'returnTo'));
     }
 
     /**
@@ -109,6 +112,7 @@ class UserController extends Controller
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
             'status' => 'nullable|string|in:active,on_leave,inactive',
+            'return_to' => 'nullable|string',
         ]);
 
         $password = $request->filled('password') ? $request->password : 'password';
@@ -130,19 +134,38 @@ class UserController extends Controller
             'role' => $user->role,
         ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "Akun '{$user->name}' ({$user->role}) berhasil dibuat!");
+        $successMsg = "Akun '{$user->name}' ({$user->role}) berhasil dibuat!";
+
+        // 1. Prioritas return_to dari halaman pemanggil
+        if ($request->filled('return_to') && !str_contains($request->return_to, 'users/create')) {
+            return redirect($request->return_to)->with('success', $successMsg);
+        }
+
+        // 2. Fallback: Balik ke Instansi jika memiliki agency_profile_id
+        if ($user->agency_profile_id) {
+            return redirect()->route('admin.agencies.show', $user->agency_profile_id)->with('success', $successMsg);
+        }
+
+        // 3. Fallback: Balik ke Perguruan Tinggi jika memiliki university_id
+        if ($user->university_id && in_array($user->role, ['universitas', 'dosen'])) {
+            return redirect()->route('admin.universities.show', $user->university_id)->with('success', $successMsg);
+        }
+
+        // 4. Fallback: Halaman Master Pengguna
+        return redirect()->route('admin.users.index')->with('success', $successMsg);
     }
 
     /**
      * Form Edit User
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $user = User::findOrFail($id);
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        return view('admin.users.edit', compact('user', 'agencies', 'universities'));
+        $returnTo = $request->query('return_to', url()->previous());
+
+        return view('admin.users.edit', compact('user', 'agencies', 'universities', 'returnTo'));
     }
 
     /**
@@ -160,6 +183,7 @@ class UserController extends Controller
             'university_id' => 'nullable|exists:universities,id',
             'status' => 'nullable|string|in:active,on_leave,inactive',
             'password' => 'nullable|string|min:6',
+            'return_to' => 'nullable|string',
         ]);
 
         $updateData = [
@@ -182,8 +206,25 @@ class UserController extends Controller
             'role' => $user->role,
         ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "Data pengguna '{$user->name}' berhasil diperbarui!");
+        $successMsg = "Data pengguna '{$user->name}' berhasil diperbarui!";
+
+        // 1. Prioritas return_to dari halaman pemanggil
+        if ($request->filled('return_to') && !str_contains($request->return_to, 'users/' . $id . '/edit')) {
+            return redirect($request->return_to)->with('success', $successMsg);
+        }
+
+        // 2. Fallback: Balik ke Instansi jika memiliki agency_profile_id
+        if ($user->agency_profile_id) {
+            return redirect()->route('admin.agencies.show', $user->agency_profile_id)->with('success', $successMsg);
+        }
+
+        // 3. Fallback: Balik ke Perguruan Tinggi jika memiliki university_id
+        if ($user->university_id && in_array($user->role, ['universitas', 'dosen'])) {
+            return redirect()->route('admin.universities.show', $user->university_id)->with('success', $successMsg);
+        }
+
+        // 4. Fallback: Halaman Master Pengguna
+        return redirect()->route('admin.users.index')->with('success', $successMsg);
     }
 
     /**
@@ -247,14 +288,14 @@ class UserController extends Controller
             'affected_users' => array_slice($affectedNames, 0, 50),
         ]);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->back()
             ->with('success', "Berhasil mereset password untuk {$resetCount} akun pengguna ke nilai default ('password').");
     }
 
     /**
      * Hapus Satu Pengguna (Single Delete)
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $currentUser = Auth::user();
         $user = User::findOrFail($id);
@@ -286,6 +327,8 @@ class UserController extends Controller
         $deletedName = $user->name;
         $deletedEmail = $user->email;
         $deletedRole = $user->role;
+        $agencyId = $user->agency_profile_id;
+        $universityId = $user->university_id;
 
         AuditLog::record('USER_DELETE', 'User', $user->id, [
             'name'  => $deletedName,
@@ -295,8 +338,14 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "Akun '{$deletedName}' ({$deletedRole}) berhasil dihapus.");
+        $successMsg = "Akun '{$deletedName}' ({$deletedRole}) berhasil dihapus.";
+
+        // Kembalikan ke halaman asal jika ada parameter return_to atau redirect back
+        if ($request->filled('return_to')) {
+            return redirect($request->return_to)->with('success', $successMsg);
+        }
+
+        return redirect()->back()->with('success', $successMsg);
     }
 
     /**
@@ -361,10 +410,9 @@ class UserController extends Controller
         $message = "Berhasil menghapus {$deletedCount} akun pengguna.";
         if ($skippedCount > 0) {
             $message .= " Namun {$skippedCount} akun dilewati karena memiliki relasi data magang/penempatan aktif (" . implode(', ', array_slice($skippedNames, 0, 3)) . ").";
-            return redirect()->route('admin.users.index')->with('warning', $message);
+            return redirect()->back()->with('warning', $message);
         }
 
-        return redirect()->route('admin.users.index')->with('success', $message);
+        return redirect()->back()->with('success', $message);
     }
 }
-
