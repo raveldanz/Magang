@@ -59,6 +59,11 @@ class MentorController extends Controller
         return view('admin.mentors.index', compact('mentors', 'agencies', 'currentAgency', 'isSuperAdmin', 'agencyId'));
     }
 
+    public function show($id)
+    {
+        return redirect()->route('admin.mentors.edit', $id);
+    }
+
     public function create()
     {
         $user = Auth::user();
