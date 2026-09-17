@@ -144,20 +144,35 @@
             
             <div class="mt-sm">
                 @if($application)
-                    @if(strtolower($application->status) === 'accepted')
+                    @if($application->lifecycle_status === 'ACTIVE')
                         <span class="inline-flex items-center gap-xs bg-secondary-container/30 text-secondary px-sm py-xs rounded-full font-label-md text-label-md">
                             <span class="w-2 h-2 rounded-full bg-secondary"></span>
                             Magang Aktif
                         </span>
-                    @elseif(strtolower($application->status) === 'pending')
+                    @elseif($application->lifecycle_status === 'ACCEPTED')
+                        <span class="inline-flex items-center gap-xs bg-emerald-100 text-emerald-700 px-sm py-xs rounded-full font-label-md text-label-md">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Diterima
+                        </span>
+                    @elseif($application->lifecycle_status === 'COMPLETED')
+                        <span class="inline-flex items-center gap-xs bg-indigo-100 text-indigo-700 px-sm py-xs rounded-full font-label-md text-label-md">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            Selesai Magang
+                        </span>
+                    @elseif($application->lifecycle_status === 'SUBMITTED')
                         <span class="inline-flex items-center gap-xs bg-amber-100 text-amber-700 px-sm py-xs rounded-full font-label-md text-label-md">
                             <span class="w-2 h-2 rounded-full bg-amber-500"></span>
                             Menunggu Review
                         </span>
-                    @elseif(strtolower($application->status) === 'verified')
-                        <span class="inline-flex items-center gap-xs bg-blue-100 text-blue-700 px-sm py-xs rounded-full font-label-md text-label-md">
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                            Terverifikasi
+                    @elseif($application->lifecycle_status === 'RESIGNED')
+                        <span class="inline-flex items-center gap-xs bg-slate-200 text-slate-700 px-sm py-xs rounded-full font-label-md text-label-md">
+                            <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                            Mengundurkan Diri
+                        </span>
+                    @elseif($application->lifecycle_status === 'CANCELED')
+                        <span class="inline-flex items-center gap-xs bg-slate-200 text-slate-700 px-sm py-xs rounded-full font-label-md text-label-md">
+                            <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                            Dibatalkan
                         </span>
                     @else
                         <span class="inline-flex items-center gap-xs bg-red-100 text-red-700 px-sm py-xs rounded-full font-label-md text-label-md">

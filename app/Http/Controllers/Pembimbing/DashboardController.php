@@ -66,6 +66,11 @@ class DashboardController extends Controller
             'feedback' => $request->feedback,
         ]);
 
+        // Sinkronisasi otomatis status kelulusan (COMPLETED) jika laporan di-ACC
+        if ($request->status === 'approved') {
+            $report->placement->syncCompletionStatus();
+        }
+
         return redirect()->back()->with('success', 'Status laporan akhir berhasil diperbarui!');
     }
 }

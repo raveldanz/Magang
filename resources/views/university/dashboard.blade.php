@@ -194,7 +194,7 @@
                                         </svg>
                                     </div>
                                     <div class="min-w-0 flex-1">
-                                        <h5 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-700 transition" title="{{ $dist['name'] }}">
+                                        <h5 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 h-8 flex items-start group-hover:text-blue-700 transition" title="{{ $dist['name'] }}">
                                             {{ $dist['name'] }}
                                         </h5>
                                         <div class="flex items-center gap-2 mt-0.5">
@@ -226,8 +226,8 @@
                                 </div>
                             </div>
 
-                            <!-- Progress Bar Persentase Penempatan -->
-                            <div class="mt-2 pt-1 border-t border-slate-100/60">
+                            <!-- Progress Bar Persentase Penempatan: Selalu di Bagian Bawah -->
+                            <div class="mt-2.5 pt-1.5 border-t border-slate-100/60 mt-auto">
                                 <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                                     <div class="h-1.5 rounded-full transition-all duration-300 {{ $hasStudents ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-300' }}" 
                                          style="width: {{ max($dist['percentage'], $hasStudents ? 6 : 0) }}%"></div>

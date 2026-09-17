@@ -50,15 +50,12 @@ class LecturerController extends Controller
 
         foreach ($lecturers as $lecturer) {
             $activeCount = $lecturer->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && !$isPassed;
+                $lifecycle = optional($p->application)->lifecycle_status;
+                return in_array($lifecycle, ['ACTIVE', 'ACCEPTED']);
             })->count();
 
             $completedCount = $lecturer->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && $isPassed;
+                return optional($p->application)->lifecycle_status === 'COMPLETED';
             })->count();
 
             $lecturer->active_students_count = $activeCount;
