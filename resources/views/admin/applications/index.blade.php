@@ -193,7 +193,6 @@
 
                             <a href="{{ route('admin.applications.show', $app->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition cursor-pointer">
                                 <span>Detail & Verifikasi Berkas</span>
-                                <span>&rarr;</span>
                             </a>
                         </div>
                     @empty
