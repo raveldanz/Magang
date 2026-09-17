@@ -37,12 +37,34 @@
                     ($application->status === 'accepted' && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && optional($finalReport)->status === 'approved')
                 );
 
+                // Status mapping untuk banner dan tracking
+                $appStatusLabel = 'Registrasi Akun';
+                if ($application) {
+                    $rawSt = strtolower($application->status);
+                    $lifeSt = strtoupper($application->lifecycle_status ?? '');
+                    if ($lifeSt === 'RESIGNED' || $rawSt === 'resigned') {
+                        $appStatusLabel = 'Mengundurkan Diri';
+                    } elseif ($lifeSt === 'ACTIVE' || $rawSt === 'accepted') {
+                        $appStatusLabel = 'Magang Aktif';
+                    } elseif ($lifeSt === 'COMPLETED' || $rawSt === 'completed') {
+                        $appStatusLabel = 'Lulus Magang';
+                    } elseif ($lifeSt === 'ACCEPTED') {
+                        $appStatusLabel = 'Diterima (Calon Peserta)';
+                    } elseif ($lifeSt === 'REJECTED' || $rawSt === 'rejected' || $rawSt === 'canceled') {
+                        $appStatusLabel = 'Ditolak';
+                    } elseif ($rawSt === 'verified') {
+                        $appStatusLabel = 'Terverifikasi Dinas';
+                    } else {
+                        $appStatusLabel = 'Dalam Proses';
+                    }
+                }
+
                 // Hitung persentase progress operasional
                 $stepCount = 0;
                 if (!empty($profile?->nim)) $stepCount++;
-                if (!empty($application)) $stepCount++;
+                if (!empty($application) && !in_array($application->status, ['resigned', 'rejected', 'canceled'])) $stepCount++;
                 if ($application && in_array($application->status, ['accepted', 'completed'])) $stepCount++;
-                if (!empty($academicAdvisor)) $stepCount++;
+                if (!empty($academicAdvisor) && !in_array($application->status ?? '', ['resigned', 'rejected', 'canceled'])) $stepCount++;
                 if ($logbooksCount > 0) $stepCount++;
                 if ($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui'])) $stepCount++;
                 if ($isPassed) $stepCount++;
@@ -56,7 +78,7 @@
                         <div class="space-y-1">
                             <div class="flex items-center gap-2">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide bg-white/15 border border-white/20 text-white">
-                                    <span>Status: {{ $application ? ($application->status === 'accepted' ? 'Magang Aktif' : ucfirst($application->status)) : 'Registrasi Akun' }}</span>
+                                    <span>Status: {{ $appStatusLabel }}</span>
                                 </span>
                                 <span class="text-[11px] font-medium text-blue-200">&bull; SPBE Pemerintah Kota Surabaya</span>
                             </div>
@@ -155,8 +177,8 @@
                                             <p class="text-slate-700 leading-relaxed font-medium">
                                                 @if(empty($profile?->nim))
                                                     Lengkapi biodata dan Nomor Induk Mahasiswa (NIM) terlebih dahulu.
-                                                @elseif(!$application)
-                                                    Ajukan permohonan penempatan pada unit kerja instansi Pemkot Surabaya.
+                                                @elseif(!$application || in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
+                                                    Status pengajuan Anda saat ini: <strong>{{ $appStatusLabel }}</strong>. Silakan buat permohonan magang baru untuk melanjutkan program magang.
                                                 @elseif(!$academicAdvisor)
                                                     Pilih Dosen Pembimbing Lapangan (DPL) dari perguruan tinggi Anda.
                                                 @elseif($logbooksCount < 30)
@@ -175,9 +197,9 @@
                                                 <a href="{{ route('student.profile.edit') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
                                                     Lengkapi Profil 
                                                 </a>
-                                            @elseif(!$application)
+                                            @elseif(!$application || in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
                                                 <a href="{{ route('student.application.create') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    Pilih Unit 
+                                                    Buat Pengajuan Baru &rarr;
                                                 </a>
                                             @elseif(!$academicAdvisor)
                                                 <a href="#change-advisor-box" @click="showDetailModal = false" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
@@ -226,6 +248,10 @@
                                             <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                                                 Diterima ({{ $application->unit->name ?? 'Instansi Dinas' }})
                                             </span>
+                                        @elseif($application && in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
+                                            <a href="{{ route('student.application.create') }}" class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
+                                                Buat Pengajuan Baru &rarr;
+                                            </a>
                                         @elseif($application)
                                             <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
                                                 Menunggu Verifikasi Dinas
@@ -665,18 +691,18 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 <!-- Card 1: Profil Mahasiswa -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 {{ $profile ? 'border-l-emerald-500' : 'border-l-amber-500' }} space-y-3">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Profil</p>
-                            <p class="text-lg font-black mt-1 text-slate-800">
-                                {{ $profile ? 'Lengkap' : 'Belum Lengkap' }}
-                            </p>
-                        </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 {{ $profile ? 'border-l-emerald-500' : 'border-l-amber-500' }} flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Profil</p>
+                        <p class="text-lg font-black mt-1 text-slate-800">
+                            {{ $profile ? 'Lengkap' : 'Belum Lengkap' }}
+                        </p>
                     </div>
-                    <a href="{{ route('student.profile.edit') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                        {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }} 
-                    </a>
+                    <div class="mt-4 pt-2">
+                        <a href="{{ route('student.profile.edit') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
+                            {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }} 
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Card 2: Status Pengajuan & Lifecycle -->
@@ -686,60 +712,66 @@
                     {{ optional($application)->lifecycle_status === 'ACCEPTED' ? 'border-l-sky-500' : '' }}
                     {{ optional($application)->lifecycle_status === 'PENDING' ? 'border-l-amber-500' : '' }}
                     {{ optional($application)->lifecycle_status === 'REJECTED' ? 'border-l-rose-500' : '' }}
-                    {{ !$application ? 'border-l-slate-300' : '' }} space-y-3">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Magang</div>
-                            <div class="mt-1 flex items-center gap-2">
-                                @if(!$application)
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200">
-                                        Belum Mengajukan
-                                    </span>
-                                @elseif($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-                                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        AKTIF (Sedang Magang)
-                                    </span>
-                                @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
-                                        LULUS
-                                    </span>
-                                @elseif($application->lifecycle_status === 'ACCEPTED')
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
-                                        DITERIMA (Calon Peserta)
-                                    </span>
-                                @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200">
-                                        DITOLAK
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200">
-                                        DALAM PROSES
-                                    </span>
-                                @endif
-                            </div>
+                    {{ (optional($application)->lifecycle_status === 'RESIGNED' || optional($application)->status === 'resigned') ? 'border-l-slate-400' : '' }}
+                    {{ !$application ? 'border-l-slate-300' : '' }} flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Magang</div>
+                        <div class="mt-1 flex items-center gap-2">
+                            @if(!$application)
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200">
+                                    Belum Mengajukan
+                                </span>
+                            @elseif($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+                                    <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    AKTIF (Sedang Magang)
+                                </span>
+                            @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
+                                    LULUS
+                                </span>
+                            @elseif($application->lifecycle_status === 'ACCEPTED')
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
+                                    DITERIMA (Calon Peserta)
+                                </span>
+                            @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200">
+                                    DITOLAK
+                                </span>
+                            @elseif($application->lifecycle_status === 'RESIGNED' || $application->status === 'resigned')
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 border border-slate-300">
+                                    <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+                                    MENGUNDURKAN DIRI
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200">
+                                    DALAM PROSES
+                                </span>
+                            @endif
                         </div>
                     </div>
-                    @if(!$application)
-                        <a href="{{ route('student.application.create') }}" class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                            Buat Pengajuan Baru 
-                        </a>
-                    @else
-                        <div class="text-xs text-slate-500">Unit: <strong>{{ $application->unit->name ?? '-' }}</strong></div>
-                    @endif
+                    <div class="mt-4 pt-2">
+                        @if(!$application || in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']) || in_array(strtoupper($application->lifecycle_status ?? ''), ['RESIGNED', 'REJECTED']))
+                            <a href="{{ route('student.application.create') }}" class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800">
+                                <span>Buat Pengajuan Baru &rarr;</span>
+                            </a>
+                        @else
+                            <div class="text-xs text-slate-500">Unit: <strong>{{ $application->unit->name ?? '-' }}</strong></div>
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Card 3: Pembimbing Lapangan Dinas -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 border-l-blue-600 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pembimbing Lapangan (Dinas)</p>
-                            <p class="text-base font-bold mt-1 text-slate-800">
-                                {{ $mentor ? $mentor->name : 'Belum Diplot Dinas' }}
-                            </p>
-                        </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 border-l-blue-600 flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pembimbing Lapangan (Dinas)</p>
+                        <p class="text-base font-bold mt-1 text-slate-800">
+                            {{ $mentor ? $mentor->name : 'Belum Diplot Dinas' }}
+                        </p>
                     </div>
-                    <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.</p>
+                    <div class="mt-4 pt-2">
+                        <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.</p>
+                    </div>
                 </div>
 
                 <!-- Card 4: Penilaian Nilai Pembimbing -->
@@ -788,15 +820,29 @@
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
                                     DITOLAK
                                 </span>
+                            @elseif($application->lifecycle_status === 'RESIGNED' || $application->status === 'resigned')
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700 border border-slate-300">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                    MENGUNDURKAN DIRI
+                                </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800 border border-amber-200">
                                    DALAM PROSES
                                 </span>
                             @endif
                         </p>
-                        @if ($application->status === 'rejected' || $application->lifecycle_status === 'REJECTED')
+                        @if ($application->status === 'rejected' || $application->lifecycle_status === 'REJECTED' || $application->status === 'canceled')
                             <div class="col-span-1 md:col-span-2 p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs">
                                 <strong>Catatan Penolakan:</strong> {{ $application->rejection_reason ?? $application->rejection_note }}
+                            </div>
+                        @elseif ($application->status === 'resigned' || $application->lifecycle_status === 'RESIGNED')
+                            <div class="col-span-1 md:col-span-2 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                                <div>
+                                    <strong>Status:</strong> Anda telah mengundurkan diri dari kegiatan magang ini.
+                                </div>
+                                <a href="{{ route('student.application.create') }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition shadow-sm">
+                                    Buat Pengajuan Baru &rarr;
+                                </a>
                             </div>
                         @endif
                     </div>

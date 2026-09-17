@@ -60,11 +60,11 @@
                     </div>
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">NIM / NPM:</span>
-                        <span class="font-semibold text-gray-800">{{ $application->user->studentProfile->nim ?? '-' }}</span>
+                        <span class="font-semibold text-gray-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</span>
                     </div>
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Universitas / Jurusan:</span>
-                        <span class="font-semibold text-gray-800 text-right">{{ $application->user->studentProfile->universitas ?? '-' }} <br><span class="text-xs text-gray-500">({{ $application->user->studentProfile->jurusan ?? '-' }})</span></span>
+                        <span class="font-semibold text-gray-800 text-right">{{ $application->user?->studentProfile?->universitas ?? '-' }} <br><span class="text-xs text-gray-500">({{ $application->user?->studentProfile?->jurusan ?? '-' }})</span></span>
                     </div>
                     <div class="flex justify-between py-2 border-b border-gray-100">
                         <span class="text-gray-500 font-medium">Unit Kerja Tujuan:</span>
@@ -76,7 +76,7 @@
                     </div>
                     <div class="flex justify-between py-2">
                         <span class="text-gray-500 font-medium">Pembimbing Lapangan:</span>
-                        <span class="font-semibold text-gray-800">{{ optional($application->placement)->pembimbing->name ?? '-' }}</span>
+                        <span class="font-semibold text-gray-800">{{ $application->placement?->pembimbing?->name ?? $application->placement?->mentor?->name ?? '-' }}</span>
                     </div>
                 </div>
             </div>

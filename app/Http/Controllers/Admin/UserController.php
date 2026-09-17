@@ -135,6 +135,14 @@ class UserController extends Controller
     }
 
     /**
+     * Detail Pengguna (Redirect ke Form Edit)
+     */
+    public function show($id)
+    {
+        return redirect()->route('admin.users.edit', $id);
+    }
+
+    /**
      * Form Edit User
      */
     public function edit($id)

@@ -7,10 +7,15 @@
         $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
         $student = $placement->application?->user;
         $profile = $student?->studentProfile;
+        $app = $placement->application;
+        $lifecycle = $app?->lifecycle_status;
+        $isCompleted = ($lifecycle === 'COMPLETED' || $app?->status === 'completed');
+        $isResigned = in_array(strtolower($app?->status ?? ''), ['resigned', 'canceled', 'rejected']);
+
         $eval = $placement->evaluation;
-        $rataRata = $eval ? ($eval->final_score ?? $eval->nilai_akhir ?? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2)) : 0;
-        $grade = $eval?->grade ?? 'C';
-        if (!$eval?->grade) {
+        $rataRata = $eval ? ($eval->final_score ?? $eval->nilai_akhir ?? 0) : 0;
+        $grade = $eval?->grade ?? $eval?->grade_calculated ?? '-';
+        if ($grade === '-' && $rataRata > 0) {
             if ($rataRata >= 85) $grade = 'A (Sangat Memuaskan)';
             elseif ($rataRata >= 70) $grade = 'B (Memuaskan)';
             else $grade = 'C (Cukup)';
@@ -18,7 +23,7 @@
     @endphp
 
     <div class="py-10 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl rounded-2xl p-6 border-t-8 border-blue-600">
+        <div class="bg-white overflow-hidden shadow-xl rounded-2xl p-6 border-t-8 {{ $isCompleted ? 'border-emerald-600' : ($isResigned ? 'border-rose-600' : 'border-amber-500') }}">
             
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
@@ -30,21 +35,53 @@
                 <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Sertifikasi Magang Resmi</p>
             </div>
 
-            <!-- Badge Status Verifikasi Sah -->
-            <div class="mt-6 flex items-center space-x-4 bg-blue-50 p-4 rounded-xl border border-blue-200 shadow-sm">
-                <div class="flex-shrink-0 bg-blue-600 text-white p-3 rounded-full shadow-md">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+            <!-- Badge Status Verifikasi Sah / Peringatan -->
+            @if($isCompleted)
+                <div class="mt-6 flex items-center space-x-4 bg-emerald-50 p-4 rounded-xl border border-emerald-200 shadow-xs">
+                    <div class="flex-shrink-0 bg-emerald-600 text-white p-3 rounded-full shadow-md">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 text-xs font-black bg-emerald-200 text-emerald-900 rounded-full mb-1">
+                            STATUS: E-SERTIFIKAT SAH & TERVERIFIKASI
+                        </span>
+                        <h3 class="font-extrabold text-emerald-950 text-base leading-tight">SERTIFIKAT KELULUSAN MAGANG RESMI</h3>
+                        <p class="text-xs text-emerald-700 mt-0.5">Sertifikat ini diterbitkan secara resmi dan tercatat sah dalam pangkalan data Pemerintah Kota Surabaya.</p>
+                    </div>
                 </div>
-                <div>
-                    <span class="inline-block px-2.5 py-0.5 text-xs font-bold bg-blue-200 text-blue-900 rounded-full mb-1">
-                        STATUS: E-SERTIFIKAT SAH & TERVERIFIKASI
-                    </span>
-                    <h3 class="font-extrabold text-blue-950 text-base leading-tight">SERTIFIKAT KELULUSAN MAGANG RESMI</h3>
-                    <p class="text-xs text-blue-700 mt-0.5">Sertifikat ini diterbitkan secara resmi dan tersimpan dalam pangkalan data Pemerintah Kota Surabaya.</p>
+            @elseif($isResigned)
+                <div class="mt-6 flex items-center space-x-4 bg-rose-50 p-4 rounded-xl border border-rose-200 shadow-xs">
+                    <div class="flex-shrink-0 bg-rose-600 text-white p-3 rounded-full shadow-md">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 text-xs font-black bg-rose-200 text-rose-900 rounded-full mb-1">
+                            STATUS: DOKUMEN TIDAK BERLAKU
+                        </span>
+                        <h3 class="font-extrabold text-rose-950 text-base leading-tight">PESERTA MENGUNDURKAN DIRI / DROP OUT</h3>
+                        <p class="text-xs text-rose-700 mt-0.5">Mahasiswa telah mengundurkan diri atau dibatalkan dari penempatan magang ini, sehingga tidak ada sertifikat kelulusan yang sah.</p>
+                    </div>
                 </div>
-            </div>
+            @else
+                <div class="mt-6 flex items-center space-x-4 bg-amber-50 p-4 rounded-xl border border-amber-200 shadow-xs">
+                    <div class="flex-shrink-0 bg-amber-600 text-white p-3 rounded-full shadow-md">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 text-xs font-black bg-amber-200 text-amber-900 rounded-full mb-1">
+                            STATUS: MAGANG SEDANG BERJALAN / BELUM LULUS
+                        </span>
+                        <h3 class="font-extrabold text-amber-950 text-base leading-tight">SERTIFIKAT BELUM DITERBITKAN</h3>
+                        <p class="text-xs text-amber-800 mt-0.5">Peserta saat ini masih aktif menempuh program magang dan belum menyelesaikan seluruh evaluasi serta laporan akhir.</p>
+                    </div>
+                </div>
+            @endif
 
             <!-- Detail Informasi Sertifikat -->
             <div class="mt-6">

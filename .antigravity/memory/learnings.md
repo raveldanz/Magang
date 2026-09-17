@@ -30,6 +30,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-013** | 2026-09-14 | Storage Junction, Migrations & ID Collision | Lampiran 404, migrasi token sertifikat tertunda, tabrakan ID multi-tenant, dan surat kelulusan | RESOLVED |
 | **LRN-014** | 2026-09-14 | Integrity Guard: Duplicate Application & Adaptive Certificate | Celah pengajuan ganda menimpa penempatan aktif, query final report rentan, dan sertifikat prematur | RESOLVED |
 | **LRN-015** | 2026-09-15 | UI Hardening & Mobile-Friendly E2E Multi-Role | Tumpukan tombol ganda kartu kampus, tab bar melipat di layar HP, dan otomasi E2E lintas role mobile/desktop | RESOLVED |
+| **LRN-016** | 2026-09-17 | UI Alignment & Card Layout Standardization | Posisi vertikal angka metrik kartu tidak rata akibat variasi panjang teks judul & alamat | RESOLVED |
+| **LRN-017** | 2026-09-17 | Lifecycle Status Integration & Re-Application Loop | Status mahasiswa mengundurkan diri (resigned) keliru tampil 'DALAM PROSES' di dashboard | RESOLVED |
 
 ---
 
@@ -308,6 +310,44 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-016] Harmonisasi Slot UI Kartu Grid & Eliminasi Pergeseran Vertikal Angka Metrik
+- **Tanggal**: 2026-09-17
+- **Komponen**: `resources/views/admin/agencies/index.blade.php`, `resources/views/admin/universities/index.blade.php`, `resources/views/university/dashboard.blade.php`, `resources/views/dashboard.blade.php`
+- **Problem / Symptom**: 
+  1. Pada kartu instansi dinas (`/admin/agencies`) dan kartu universitas (`/admin/universities`), panjang judul/nama instansi (1 baris vs 2 baris), alamat (1 baris vs 2 baris), dan keberadaan PIC menyebabkan tinggi blok identitas bervariasi drastis antar kartu.
+  2. Akibatnya, blok angka metrik ringkas (`Unit Kerja | Sisa Kuota | Personel` atau `Mahasiswa | Dosen | Akun`) serta tombol aksi di bagian bawah terdorong ke bawah atau tertarik ke atas, sehingga posisi angka metrik tidak sejajar secara horizontal antar-kartu dalam satu baris grid.
+- **Root Cause**: 
+  1. Elemen judul (`h3`) dan alamat (`p`) tidak memiliki slot tinggi tetap atau *fixed vertical footprint* (`line-clamp-2 h-[3rem]` dan `h-9`).
+  2. Blok metrik ringkas dibungkus di dalam `div` pembungkus teks yang sama di atas, bukan sebagai elemen terpisah dengan `mt-auto` atau flex child berposisi presisi.
+- **Fix Applied**: 
+  1. **Slotting Standar**: Mengunci tinggi judul ke `line-clamp-2 h-[3rem] overflow-hidden` dan alamat ke `line-clamp-2 h-9 leading-relaxed overflow-hidden` pada kartu dinas dan kampus mitra.
+  2. **Metadata Konsisten**: Memberikan slot 2-baris konstan (`h-10`) untuk informasi PIC dan Admin email.
+  3. **Direct Child Alignment**: Menjadikan blok metrik ringkas dan footer aksi sebagai *direct flex children* dengan `shrink-0` dan `mt-4 pt-4 border-t`, dengan kontainer konten atas disetel ke `flex-1 flex flex-col`. Hasilnya, seluruh angka metrik dan tombol aksi sejajar 100% pada ketinggian pixel horizontal yang sama persis di setiap baris.
+- **Prevention Rule**: Seluruh antarmuka berbasis *Card Grid* (`grid-cols-2`, `grid-cols-3`, `lg:grid-cols-4`) yang memiliki teks dinamis wajib menerapkan standarisasi tinggi slot (`line-clamp-X h-[Xrem]`) pada setiap lapisan teks dan memisahkan blok metrik/angka serta footer tombol dengan `shrink-0` / `mt-auto` agar tata letak kartu tidak bergelombang (*uneven/wavy layout*).
+
+---
+
+### [LRN-017] Integrasi Status Magang 'Mengundurkan Diri' (Resigned/Canceled) & Alur Pengajuan Ulang
+- **Tanggal**: 2026-09-17
+- **Komponen**: `resources/views/dashboard.blade.php`, `resources/views/student/logbook/index.blade.php`, `resources/views/mentor/dashboard.blade.php`, `resources/views/university/students/show.blade.php`, `resources/views/student/application/create.blade.php`
+- **Problem / Symptom**: 
+  1. Mahasiswa yang telah berstatus mengundurkan diri (`resigned` / lifecycle `RESIGNED`) pada database PostgreSQL tetap menampilkan status **"DALAM PROSES"** (badge kuning) pada kartu Status Magang dan Detail Penempatan Magang di dasbor mahasiswa (`/dashboard`).
+  2. Banner eksekutif atas menampilkan teks mentah "Status: Resigned" bukannya bahasa Indonesia yang baku.
+  3. Mahasiswa yang mengundurkan diri terjebak dalam kondisi *limbo* karena tidak memiliki tautan aksi untuk mendaftar ulang (*re-apply*), serta pada halaman logbook tidak ada penjelasan status pengunduran diri.
+- **Root Cause**: 
+  1. Pada `dashboard.blade.php`, percabangan `@if / @elseif` hanya mengecek `ACTIVE/accepted`, `COMPLETED/completed`, `ACCEPTED`, dan `REJECTED/rejected`. Status `RESIGNED` dan `CANCELED` tidak terdefinisi pada kondisi cabang manapun sehingga otomatis masuk ke blok fallback `@else`, yang mencetak badge teks kuning `<span ...>DALAM PROSES</span>`.
+  2. Kartu border kiri (`border-l-4`) belum memiliki kelas slate untuk `RESIGNED`/`CANCELED`.
+  3. Modal rincian kelengkapan berkas menganggap status `resigned` sebagai "Menunggu Verifikasi Dinas" karena hanya memeriksa keberadaan objek `$application`.
+- **Fix Applied**: 
+  1. Menambahkan pemetaan status terpadu di awal view `dashboard.blade.php` dengan penerjemahan resmi ke Bahasa Indonesia (`Mengundurkan Diri`, `Dibatalkan`, `Magang Aktif`, `Lulus Magang`, `Diterima (Calon Peserta)`, `Ditolak`).
+  2. Menambahkan cabang eksplisit `@elseif($application->lifecycle_status === 'RESIGNED' || $application->status === 'resigned')` dengan badge slate resmi (`bg-slate-100 text-slate-700 border-slate-300`) baik pada Card 2 maupun pada Detail Penempatan Magang.
+  3. Menyediakan Call-to-Action (CTA) interaktif `Buat Pengajuan Baru →` mengarah ke rute `student.application.create` pada kartu status, modal detail, dan alert box penempatan.
+  4. Menambahkan alert banner terintegrasi pada `student/logbook/index.blade.php` yang menginformasikan penonaktifan logbook akibat pengunduran diri serta mengarahkan pendaftaran ulang.
+  5. Memperbarui badge styling status pada `mentor/dashboard.blade.php` dan `university/students/show.blade.php` agar dinamis dan konsisten di seluruh role.
+- **Prevention Rule**: Setiap kali memperkenalkan atau mengubah status siklus hidup (*lifecycle status*), pastikan seluruh view Blade yang memiliki logika kondisional status memperlakukan setiap status valid secara eksplisit (jangan membiarkan status terminal seperti `RESIGNED`, `CANCELED`, atau `TERMINATED` jatuh ke fallback `@else` yang ambigu). Sediakan selalu jalur pemulihan bisnis (*recovery path*) berupa tombol buat pengajuan baru bagi mahasiswa berstatus non-aktif.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
@@ -319,3 +359,4 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+

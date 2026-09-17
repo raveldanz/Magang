@@ -53,6 +53,23 @@
                 </div>
             @endif
 
+            <!-- Alert Pengunduran Diri -->
+            @if ($applicationHistory->first() && $applicationHistory->first()->status === 'resigned')
+                <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm space-y-2">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-sm font-bold text-slate-800">
+                            Anda Telah Mengundurkan Diri dari Program Magang Sebelumnya
+                        </h3>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Anda dapat mendaftar kembali ke program magang dengan memilih instansi & divisi kerja yang tersedia di bawah serta mengirimkan berkas pengajuan baru.
+                    </p>
+                </div>
+            @endif
+
             <!-- 1. FORM PENGAJUAN BARU -->
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8 space-y-6">
 

@@ -227,10 +227,11 @@
             <!-- List Instansi Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($agencies as $agency)
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
-                        <div>
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition p-6 flex flex-col h-full">
+                        <!-- Upper Section: Logo, Status Badge, Menu Opsi, dan Identitas -->
+                        <div class="flex-1 flex flex-col">
                             <!-- Header: Logo, Status Badge, dan Menu Opsi -->
-                            <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-start justify-between gap-4 shrink-0">
                                 @php
                                     $agencyLogoUrl = null;
                                     if (!empty($agency->logo)) {
@@ -317,48 +318,50 @@
                                 </div>
                             </div>
 
-                            <!-- Identitas Instansi & Hierarki Tipografi Bersih -->
-                            <div class="mt-4">
-                                <div class="text-[11px] font-bold uppercase tracking-wider text-blue-600">
+                            <!-- Identitas Instansi: Tinggi Slot Konsisten & Bebas Distorsi -->
+                            <div class="mt-4 flex-1 flex flex-col justify-start">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-blue-600 truncate">
                                     {{ $agency->government_name }} &bull; {{ $agency->city ?? 'Surabaya' }}
                                 </div>
-                                <h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug tracking-tight mt-1">
-                                    <a href="{{ route('admin.agencies.show', $agency->id) }}" title="Buka Pusat Kendali & Alur Dinas">
+                                <h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug tracking-tight mt-1 line-clamp-2 h-[3rem] overflow-hidden">
+                                    <a href="{{ route('admin.agencies.show', $agency->id) }}" title="Buka Pusat Kendali & Alur Dinas" class="hover:text-blue-600 transition">
                                         {{ $agency->agency_name }}
                                     </a>
                                 </h3>
-                                <p class="text-xs text-slate-500 mt-2 line-clamp-2 min-h-[2.5rem] leading-relaxed">{{ $agency->address }}</p>
+                                <p class="text-xs text-slate-500 mt-1.5 line-clamp-2 h-9 leading-relaxed overflow-hidden" title="{{ $agency->address }}">
+                                    {{ $agency->address }}
+                                </p>
 
                                 @php $firstAdmin = $agency->users->firstWhere('role', 'admin'); @endphp
-                                <div class="mt-3 text-xs text-slate-600 flex items-baseline gap-1.5 truncate">
-                                    <span class="text-slate-400 font-medium">Admin:</span>
+                                <div class="mt-2.5 text-xs text-slate-600 flex items-center gap-1.5 truncate h-5">
+                                    <span class="text-slate-400 font-medium shrink-0">Admin:</span>
                                     @if($firstAdmin)
-                                        <span class="font-mono font-semibold text-slate-700">{{ $firstAdmin->email }}</span>
+                                        <span class="font-mono font-semibold text-slate-700 truncate" title="{{ $firstAdmin->email }}">{{ $firstAdmin->email }}</span>
                                     @else
                                         <span class="text-slate-400 italic">Belum ditugaskan</span>
                                     @endif
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Metrik Ringkas, Lega & Catch-Eye (Tanpa Kotak Bertumpuk) -->
-                            <div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-100 text-center select-none">
-                                <div class="py-1">
-                                    <div class="text-xl font-black text-slate-900 tracking-tight">{{ $agency->units_count }}</div>
-                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Unit Kerja</div>
-                                </div>
-                                <div class="py-1 border-x border-slate-100">
-                                    <div class="text-xl font-black text-blue-600 tracking-tight">{{ $agency->total_quota }}</div>
-                                    <div class="text-[11px] font-semibold text-blue-600/90 mt-0.5">Sisa Kuota</div>
-                                </div>
-                                <div class="py-1">
-                                    <div class="text-xl font-black text-slate-900 tracking-tight">{{ ($agency->total_admins ?? 0) + ($agency->total_mentors ?? 0) }}</div>
-                                    <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Personel</div>
-                                </div>
+                        <!-- Metrik Ringkas, Lega & Catch-Eye (Selalu Sejajar Sempurna Secara Horizontal) -->
+                        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-100 text-center select-none shrink-0">
+                            <div class="py-1">
+                                <div class="text-xl font-black text-slate-900 tracking-tight">{{ $agency->units_count }}</div>
+                                <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Unit Kerja</div>
+                            </div>
+                            <div class="py-1 border-x border-slate-100">
+                                <div class="text-xl font-black text-blue-600 tracking-tight">{{ $agency->total_quota }}</div>
+                                <div class="text-[11px] font-semibold text-blue-600/90 mt-0.5">Sisa Kuota</div>
+                            </div>
+                            <div class="py-1">
+                                <div class="text-xl font-black text-slate-900 tracking-tight">{{ ($agency->total_admins ?? 0) + ($agency->total_mentors ?? 0) }}</div>
+                                <div class="text-[11px] font-semibold text-slate-400 mt-0.5">Personel</div>
                             </div>
                         </div>
 
-                        <!-- Action Footer: Bersih & Bebas Ikon Kecil -->
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                        <!-- Action Footer: Bersih & Selalu Sejajar di Bagian Bawah -->
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
                             <div>
                                 @if(($agency->total_admins ?? 0) === 0)
                                     <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}" class="inline-block m-0">

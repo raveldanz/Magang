@@ -83,11 +83,10 @@ class DashboardController extends Controller
 
         // Metrik Statistik Kampus
         $totalStudents = $allApplications->count();
-        $totalAccepted = $allApplications->whereIn('status', ['accepted', 'completed'])->count();
-        $totalCompleted = $allApplications->where('status', 'completed')->count() ?: $allPlacements->filter(function ($p) {
-            return optional($p->finalreport)->status === 'approved' && (optional($p->evaluation)->final_score > 0 || optional($p->evaluation)->nilai_akademik > 0 || optional($p->evaluation)->nilai_pembimbing > 0);
-        })->count();
-        $totalPending = $allApplications->where('status', 'pending')->count();
+        $totalAccepted = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['ACCEPTED', 'ACTIVE', 'COMPLETED']))->count();
+        $totalCompleted = $allApplications->filter(fn($app) => $app->lifecycle_status === 'COMPLETED')->count();
+        $totalPending = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['SUBMITTED', 'DRAFT']))->count();
+        $totalResigned = $allApplications->filter(fn($app) => $app->lifecycle_status === 'RESIGNED')->count();
 
         // Sebaran Dinas / Instansi Penempatan
         $agencies = AgencyProfile::orderBy('agency_name')->get();
