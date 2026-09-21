@@ -131,7 +131,6 @@
                                     @endforeach
                                 @endif
                             </select>
-                            <p class="text-[11px] text-slate-400">Unit kerja telah dikelompokkan secara rapi berdasarkan instansi induk.</p>
                             @error('unit_id')
                                 <p class="text-xs text-red-600 font-semibold">{{ $message }}</p>
                             @enderror
@@ -151,12 +150,10 @@
                                 <x-text-input id="start_date" 
                                               name="start_date" 
                                               type="date" 
-                                              min="{{ date('Y-m-d') }}" 
                                               x-model="startDate"
                                               class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
                                               :value="old('start_date')"
                                               required />
-                                <p class="text-[11px] text-slate-400">Pilih tanggal awal mulai kegiatan magang.</p>
                                 <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
                             </div>
 
@@ -166,12 +163,11 @@
                                 <x-text-input id="end_date" 
                                               name="end_date" 
                                               type="date" 
-                                              x-bind:min="startDate || today" 
+                                              x-bind:min="startDate"
                                               x-model="endDate"
                                               class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
                                               :value="old('end_date')"
                                               required />
-                                <p class="text-[11px] text-slate-400">Tanggal selesai otomatis terkunci setelah tanggal mulai.</p>
                                 <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
                             </div>
                         </div>
@@ -184,8 +180,7 @@
                                 <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
                                     <span>Upload Dokumen Persyaratan Magang</span>
                                 </h4>
-                                <p class="text-xs text-slate-500 mt-0.5">Unggah berkas persyaratan wajib (format PDF / ID Card, maksimum 2MB per file)</p>
-                            </div>
+                                </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- 1. Surat Pengantar / Proposal Kampus -->
@@ -243,7 +238,6 @@
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
                 <div class="p-6 border-b border-slate-100">
                     <h3 class="text-base font-bold text-slate-900">Riwayat Pengajuan Magang Anda</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Daftar seluruh pengajuan penempatan yang pernah Anda kirimkan</p>
                 </div>
 
                 <!-- Desktop View (Table) -->

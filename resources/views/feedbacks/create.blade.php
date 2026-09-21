@@ -1,21 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ url()->previous() }}" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 transition shadow-2xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
                     Kirim Laporan Kendala, Masukan, atau Pertanyaan
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Laporkan kendala/bug sistem, ajukan saran perbaikan, atau sampaikan pertanyaan ke Super Admin / Instansi Dinas / Universitas
-                </p>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-2">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if ($errors->any())
