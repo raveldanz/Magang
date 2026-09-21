@@ -1,18 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-xs flex items-center justify-center" title="Kembali ke Dashboard">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-            </a>
+            
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Pengunggahan Laporan Akhir Magang MBKM</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
-                    Kirimkan dokumen naskah laporan ilmiah dan tautan luaran proyek magang Anda
-                </p>
+                
             </div>
         </div>
     </x-slot>
@@ -129,9 +123,7 @@
                         <h3 class="font-black text-base text-gray-900">
                             {{ $finalReport ? 'Perbarui / Unggah Ulang Laporan Revisi' : 'Formulir Pengunggahan Laporan Akhir' }}
                         </h3>
-                        <p class="text-xs text-gray-400 mt-0.5">
-                            Pastikan format naskah laporan telah mengikuti pedoman tata tulis magang MBKM
-                        </p>
+                        
                     </div>
 
                     <form action="{{ route('student.final_report.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
