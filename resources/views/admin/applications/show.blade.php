@@ -137,9 +137,8 @@
                         <select id="status-select" name="status" class="w-full mt-1 border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500">
                             <option value="pending" {{ $application->status == 'pending' ? 'selected' : '' }}>PENDING
                             </option>
-                            <option value="verified" {{ $application->status == 'verified' ? 'selected' : '' }}>VERIFIED
-                            </option>
-                            <option value="accepted" {{ $application->status == 'accepted' ? 'selected' : '' }}>ACCEPTED
+
+                            <option value="accepted" {{ $application->status == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang)
                             </option>
                             @php
                                 $canComplete = false;
