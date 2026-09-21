@@ -351,12 +351,25 @@
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
                                         </td>
                                         <td class="p-4 text-gray-700 max-w-xs">
-                                            <p class="truncate" title="{{ $log->activity }}">{{ Str::limit($log->activity, 80) }}</p>
+                                            <p class="font-medium text-slate-800">{{ Str::limit($log->activity, 120) }}</p>
+                                            @if(!empty($log->mentor_note))
+                                                <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
+                                                    <span class="font-bold shrink-0">Catatan Mentor:</span>
+                                                    <span>{{ $log->mentor_note }}</span>
+                                                </div>
+                                            @endif
+                                            @if(!empty($log->lecturer_note))
+                                                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
+                                                    <span class="font-bold shrink-0">Catatan DPL:</span>
+                                                    <span>{{ $log->lecturer_note }}</span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-xs font-medium inline-flex items-center gap-1">
-                                                     Lihat File
+                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                                    <span>Buka Lampiran</span>
                                                 </a>
                                             @else
                                                 <span class="text-gray-400 text-xs">-</span>

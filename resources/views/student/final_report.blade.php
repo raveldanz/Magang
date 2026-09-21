@@ -48,6 +48,17 @@
                 </div>
             @endif
 
+            <!-- Informational Banner for Early & Parallel Upload -->
+            <div class="p-4 bg-sky-50 border border-sky-200 rounded-2xl flex items-start gap-3 text-sky-900 text-xs sm:text-sm font-medium leading-relaxed shadow-2xs">
+                <svg class="w-5 h-5 text-sky-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <span class="font-bold block text-sky-950 text-sm mb-0.5">Informasi Pengunggahan Laporan Akhir</span>
+                    <span>Anda dapat mengunggah atau memperbarui draf naskah laporan ilmiah & repositori proyek magang Anda <strong>kapan saja</strong> selama periode magang berlangsung. Pastikan juga untuk tetap mengisi logbook kegiatan harian secara teratur.</span>
+                </div>
+            </div>
+
             <!-- 1. STATUS LAPORAN SAAT INI -->
             @if ($finalReport)
                 <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xs space-y-4">

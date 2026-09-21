@@ -160,8 +160,8 @@
                 @elseif (file_exists(public_path('images/logos/unitomo.png')))
                     <img src="{{ asset('images/logos/unitomo.png') }}" alt="Logo Kampus" class="max-h-24 max-w-24 object-contain">
                 @else
-                    <div class="w-20 h-20 border-2 border-black rounded-full flex items-center justify-center text-2xl font-bold font-sans">
-                        🏛️
+                    <div class="w-20 h-20 border-2 border-black rounded-full flex items-center justify-center text-xs font-bold font-sans">
+                        KAMPUS
                     </div>
                 @endif
             </div>
