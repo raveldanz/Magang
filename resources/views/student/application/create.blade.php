@@ -93,7 +93,7 @@
                             @if(in_array($activeApplication->status, ['pending', 'verified']))
                                 Berkas pengajuan magang Anda di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}) saat ini sedang dalam tahap seleksi & verifikasi oleh Tim Admin Dinas. Anda belum dapat mengajukan magang baru sampai proses ini selesai.
                             @elseif($activeApplication->status === 'accepted')
-                                Selamat! Anda telah resmi diterima magang di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}). Silakan fokus pada pelaksanaan kegiatan magang harian dan pengisian pada menu <strong>Logbook Magang</strong>.
+                                Selamat! Anda telah resmi diterima magang di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}). Silakan fokus pada pelaksanaan kegiatan magang harian Anda.
                             @elseif($activeApplication->status === 'completed')
                                 Anda telah menyelesaikan seluruh rangkaian kegiatan magang MBKM serta menerima penilaian akhir resmi. Anda dapat mengunduh E-Sertifikat dan arsip laporan melalui menu <strong>Laporan Akhir</strong>.
                             @endif
