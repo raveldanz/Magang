@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-bold text-xl text-slate-800 leading-tight">
             {{ __('Dashboard Aktivitas & Logbook Magang') }}
         </h2>
     </x-slot>
@@ -71,8 +71,7 @@
                         <div class="flex items-center gap-3">
                             <div>
                                 <h3 class="font-black text-base text-gray-900">Alur Proses & Informasi Pengajuan Magang</h3>
-                                <p class="text-xs text-gray-400">Pantau tahapan seleksi dan penempatan Anda</p>
-                            </div>
+                                </div>
                         </div>
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                             Buka Dashboard Utama 
@@ -230,7 +229,7 @@
                             </div>
                         </div>
                         <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
-                            Buat Pengajuan Baru &rarr;
+                            Buat Pengajuan Baru 
                         </a>
                     </div>
                 </div>
