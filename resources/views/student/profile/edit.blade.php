@@ -27,8 +27,6 @@
                 
                 <div class="border-b border-gray-100 pb-4">
                     <h3 class="text-lg font-bold text-gray-900">Data Akademik, Pribadi & Kontak Darurat</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Lengkapi seluruh field profil di bawah ini secara akurat untuk verifikasi penempatan magang Pemkot Surabaya</p>
-                </div>
 
                 <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6">
                     @csrf
@@ -42,7 +40,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="name" value="Nama Lengkap (Sesuai Akun)" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="name" type="text" class="mt-1 block w-full bg-gray-50 text-gray-500 cursor-not-allowed text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" disabled />
+                                <x-text-input id="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" required />
                             </div>
 
                             <div>
