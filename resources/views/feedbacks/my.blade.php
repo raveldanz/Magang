@@ -5,9 +5,7 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Riwayat Masukan & Laporan Kendala Saya</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Pantau status tiket masukan dan tanggapan resmi dari tim pengelola
-                </p>
+                
             </div>
 
             <a href="{{ route('feedbacks.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">

@@ -74,14 +74,16 @@ class ApplicationController extends Controller
 
         $request->validate([
             'unit_id'         => 'required|exists:units,id',
-            'start_date'      => 'required|date|after_or_equal:today',
+            'start_date'      => 'required|date',
             'end_date'        => 'required|date|after_or_equal:start_date',
             'surat_pengantar' => 'required|file|mimes:pdf|max:2048', 
             'cv'              => 'required|file|mimes:pdf|max:2048',
             'transkrip'       => 'required|file|mimes:pdf|max:2048',
             'id_card'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
-            'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
+            'start_date.required' => 'Tanggal mulai magang wajib diisi.',
+            'start_date.date'     => 'Tanggal mulai magang tidak valid.',
+            'end_date.required'   => 'Tanggal selesai magang wajib diisi.',
             'end_date.after_or_equal'   => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
             'surat_pengantar.required'  => 'Surat Pengantar / Proposal magang wajib diunggah.',
             'surat_pengantar.mimes'     => 'File Surat Pengantar harus berformat PDF.',
