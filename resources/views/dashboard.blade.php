@@ -577,23 +577,8 @@
                                             </span>
                                         @endif
                                     </h3>
-                                    <p class="text-xs text-slate-500 mt-0.5">
-                                        Dosen pembimbing dari
-                                        <strong>{{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi Anda' }}</strong>
-                                        yang bertugas memonitor dan memberikan nilai akademik
-                                    </p>
                                 </div>
                             </div>
-
-                            <!-- Tombol Modal Input Dosen Baru -->
-                            <button type="button" @click="openNewDosenModal = true"
-                                class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold rounded-xl transition shadow-2xs cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                                <span>Input Dosen Baru</span>
-                            </button>
                         </div>
 
                         @if ($academicAdvisor)
@@ -620,69 +605,70 @@
                             </div>
                         @else
                             <!-- Alert Belum Memilih Dosen -->
-                            <div
-                                class="p-4 bg-blue-50/80 rounded-2xl border border-blue-200 text-xs text-blue-950 flex items-start gap-3">
-                                <div>
-                                    <p class="font-bold">Pengajuan magang Anda telah DITERIMA di
-                                        {{ $application->unit->name ?? '-' }}
-                                        ({{ $application->unit->agencyProfile->agency_name ?? '-' }}).
-                                    </p>
-                                    <p class="text-blue-800 mt-1">Silakan pilih Dosen Pembimbing terdaftar di kampus Anda atau
-                                        klik
-                                        tombol <strong>"Input Dosen Baru"</strong> jika nama dosen belum tertera pada daftar.
+                            <div class="space-y-0.5">
+                                    <p class="text-xs text-black-800 leading-relaxed">
+                                        Silakan pilih Dosen Pembimbing yang terdaftar di kampus Anda, atau klik tombol
+                                        <strong>Input Dosen Baru</strong>
+                                        jika nama dosen belum tertera pada daftar pilihan.
                                     </p>
                                 </div>
-                            </div>
                         @endif
 
                         <!-- Form Pilihan Dosen -->
-                        <div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} pt-2">
-                            <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-3">
-                                @csrf
-                                <div>
-                                    <div class="flex justify-between items-center mb-1">
-                                        <label for="academic_advisor_id"
-                                            class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            Pilih Dosen Terdaftar
-                                            ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
-                                        </label>
-                                        <button type="button" @click="openNewDosenModal = true"
-                                            class="text-[11px] text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer">
-                                            Dosen tidak ditemukan? Input Baru
-                                        </button>
-                                    </div>
-                                    <select id="academic_advisor_id" name="academic_advisor_id" required
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                        <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
-                                        @if(isset($availableDosens))
-                                            @foreach ($availableDosens as $dosen)
-                                                <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                                    {{ $dosen->name }} —
-                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
-                                                    ({{ $dosen->email }})
-                                                </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-
-                                <div class="flex items-center gap-3">
-                                    <button type="submit"
-                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
-                                        {{ __('Simpan Dosen Pembimbing') }}
-                                    </button>
-                                    @if ($academicAdvisor)
-                                        <button type="button"
-                                            onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
-                                            class="px-3 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 cursor-pointer">
-                                            Batal
-                                        </button>
-                                    @endif
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+<div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} pt-2 scroll-mt-6">
+    <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-4">
+        @csrf
+        <div>
+            <div class="flex justify-between items-center mb-1.5">
+                <label for="academic_advisor_id"
+                    class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Pilih Dosen Terdaftar ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
+                </label>
+            </div>
+            <select id="academic_advisor_id" name="academic_advisor_id" required
+                class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
+                <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
+                @if(isset($availableDosens))
+                    @foreach ($availableDosens as $dosen)
+                        <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
+                            {{ $dosen->name }} —
+                            {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
+                            ({{ $dosen->email }})
+                        </option>
+                    @endforeach
                 @endif
+            </select>
+        </div>
+
+        <!-- Baris Aksi Terpadu (Mobile: Turun ke Bawah, Desktop: Sebelahan Kiri & Kanan) -->
+        <div class="pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <!-- Sisi Kiri: Simpan & Batal -->
+            <div class="flex items-center gap-2">
+                <button type="submit"
+                    class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                    {{ __('Simpan Dosen Pembimbing') }}
+                </button>
+
+                @if ($academicAdvisor)
+                    <button type="button"
+                        onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
+                        class="px-3 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition rounded-xl hover:bg-slate-100 cursor-pointer">
+                        Batal
+                    </button>
+                @endif
+            </div>
+
+            <!-- Sisi Kanan: Input Dosen Baru -->
+            <button type="button" 
+                @click="openNewDosenModal = true"
+                class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
+                Dosen tidak ditemukan? Input Dosen Baru
+            </button>
+        </div>
+    </form>
+</div>
+</div>
+@endif
 
                 <!-- Modal Input Dosen Baru -->
                 <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
