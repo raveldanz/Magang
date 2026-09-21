@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-bold text-2xl text-gray-900 leading-tight">
             {{ __('Daftar Pengajuan Magang') }}
         </h2>
     </x-slot>
@@ -84,8 +84,8 @@
                             <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
                                 <option value="">-- Semua Status --</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING</option>
-                                <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED</option>
                                 <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>ACCEPTED</option>
+                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>COMPLETED</option>
                                 <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>REJECTED</option>
                             </select>
                         </div>
@@ -129,20 +129,15 @@
                                     </td>
                                     <td class="p-3 font-semibold text-gray-900">
                                         <div class="leading-snug">{{ $app->user->name }}</div>
-                                        @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 bg-blue-100 text-blue-800 border border-blue-200">
-                                                 SIAP CETAK SERTIFIKAT
-                                            </span>
-                                        @endif
                                     </td>
                                     <td class="p-3 text-gray-600">{{ $app->user->studentProfile->universitas ?? '-' }} <br><span class="text-xs text-gray-400">({{ $app->user->studentProfile->jurusan ?? '-' }})</span></td>
                                     <td class="p-3 font-medium text-gray-800">{{ $app->unit->name ?? '-' }}</td>
                                     <td class="p-3">
                                         <span class="px-2.5 py-1 text-xs font-bold rounded-full border shadow-sm
                                             {{ $app->status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' : '' }}
+                                            {{ $app->status === 'completed' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : '' }}
                                             {{ $app->status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-300 font-black' : '' }}
-                                            {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}
-                                            {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800 border-blue-300' : '' }}">
+                                            {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}">
                                             {{ strtoupper($app->status) }}
                                         </span>
                                     </td>
@@ -173,9 +168,9 @@
                                 </div>
                                 <span class="px-2.5 py-1 text-[11px] font-bold rounded-full border shadow-2xs shrink-0
                                     {{ $app->status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' : '' }}
+                                    {{ $app->status === 'completed' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : '' }}
                                     {{ $app->status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-300 font-black' : '' }}
-                                    {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}
-                                    {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800 border-blue-300' : '' }}">
+                                    {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}">
                                     {{ strtoupper($app->status) }}
                                 </span>
                             </div>
@@ -191,11 +186,7 @@
                                 </div>
                             </div>
 
-                            @if ($app->status === 'accepted' && optional($app->placement)->evaluation && optional(optional($app->placement)->finalreport)->status === 'approved')
-                                <div class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 w-full justify-center">
-                                     SIAP CETAK SERTIFIKAT
-                                </div>
-                            @endif
+
 
                             <a href="{{ route('admin.applications.show', $app->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition cursor-pointer">
                                 <span>Detail & Verifikasi Berkas</span>
