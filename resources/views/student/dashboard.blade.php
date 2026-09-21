@@ -247,9 +247,75 @@
             @endif
 
             <!-- Page Header -->
-            <div class="mb-lg">
-                <h2 class="font-headline-lg text-headline-lg font-bold text-text-main">Welcome back, {{ Auth::user()->name }}</h2>
-                <p class="text-text-muted font-body-sm text-body-sm">Here's your internship progress dashboard.</p>
+            <div class="mb-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg font-bold text-text-main">Selamat datang, {{ Auth::user()->name }}</h2>
+                    <p class="text-text-muted font-body-sm text-body-sm">Pantau progress magang, pengisian logbook, dan penerbitan sertifikat resmi Anda di sini.</p>
+                </div>
+            </div>
+
+            <!-- 5-Step Progress Stepper Bar -->
+            @php
+                $step = 1;
+                if ($application) {
+                    $l = $application->lifecycle_status;
+                    if (in_array($l, ['PENDING', 'SUBMITTED', 'VERIFIED'])) {
+                        $step = 2;
+                    } elseif ($l === 'ACCEPTED' || ($placement && empty($placement->academic_advisor_id))) {
+                        $step = 3;
+                    } elseif ($l === 'ACTIVE') {
+                        $step = 4;
+                    } elseif ($l === 'COMPLETED' || $certificate) {
+                        $step = 5;
+                    }
+                }
+            @endphp
+            <div class="bg-surface rounded-[24px] p-md border border-border-subtle shadow-sm">
+                <h3 class="font-headline-sm text-sm uppercase tracking-wider text-text-muted font-bold mb-md flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-base">route</span> Alur Perjalanan Magang Anda
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-sm relative">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center text-center p-xs rounded-xl {{ $step >= 1 ? 'bg-primary/5 text-primary' : 'opacity-40' }}">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-xs {{ $step >= 1 ? 'bg-primary text-white shadow-xs' : 'bg-slate-200 text-slate-600' }}">
+                            {!! $step > 1 ? '<span class="material-symbols-outlined text-sm">check</span>' : '1' !!}
+                        </div>
+                        <span class="font-bold text-xs">1. Pendaftaran</span>
+                        <span class="text-[10px] text-text-muted">Kirim Berkas</span>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center text-center p-xs rounded-xl {{ $step >= 2 ? 'bg-primary/5 text-primary' : 'opacity-40' }}">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-xs {{ $step >= 2 ? 'bg-primary text-white shadow-xs' : 'bg-slate-200 text-slate-600' }}">
+                            {!! $step > 2 ? '<span class="material-symbols-outlined text-sm">check</span>' : '2' !!}
+                        </div>
+                        <span class="font-bold text-xs">2. Verifikasi Dinas</span>
+                        <span class="text-[10px] text-text-muted">Seleksi Kuota</span>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center text-center p-xs rounded-xl {{ $step >= 3 ? 'bg-primary/5 text-primary' : 'opacity-40' }}">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-xs {{ $step >= 3 ? 'bg-primary text-white shadow-xs' : 'bg-slate-200 text-slate-600' }}">
+                            {!! $step > 3 ? '<span class="material-symbols-outlined text-sm">check</span>' : '3' !!}
+                        </div>
+                        <span class="font-bold text-xs">3. Penugasan DPL</span>
+                        <span class="text-[10px] text-text-muted">Pembimbing Kampus</span>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center text-center p-xs rounded-xl {{ $step >= 4 ? 'bg-primary/5 text-primary' : 'opacity-40' }}">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-xs {{ $step >= 4 ? 'bg-primary text-white shadow-xs' : 'bg-slate-200 text-slate-600' }}">
+                            {!! $step > 4 ? '<span class="material-symbols-outlined text-sm">check</span>' : '4' !!}
+                        </div>
+                        <span class="font-bold text-xs">4. Logbook Magang</span>
+                        <span class="text-[10px] text-text-muted">Catatan Harian</span>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center text-center p-xs rounded-xl col-span-2 md:col-span-1 {{ $step >= 5 ? 'bg-emerald-50 text-emerald-700' : 'opacity-40' }}">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs mb-xs {{ $step >= 5 ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 text-slate-600' }}">
+                            {!! $step >= 5 ? '<span class="material-symbols-outlined text-sm">verified</span>' : '5' !!}
+                        </div>
+                        <span class="font-bold text-xs">5. E-Sertifikat</span>
+                        <span class="text-[10px] text-text-muted">Unduh Sertifikat</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Bento Grid: Metrics & Quick Actions -->

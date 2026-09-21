@@ -36,6 +36,23 @@
                 $academicAdvisor = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
                 $logbooksCount = $placement ? ($placement->logbooks ? $placement->logbooks->count() : 0) : 0;
 
+                // Hitung target hari kerja secara dinamis berdasarkan periode magang diajukan
+                $targetDays = 30;
+                if ($application && $application->start_date && $application->end_date) {
+                    try {
+                        $start = \Carbon\Carbon::parse($application->start_date);
+                        $end = \Carbon\Carbon::parse($application->end_date);
+                        $diff = $start->diffInDaysFiltered(function(\Carbon\Carbon $date) {
+                            return !$date->isWeekend();
+                        }, $end);
+                        if ($diff > 0) {
+                            $targetDays = (int) $diff;
+                        }
+                    } catch (\Exception $e) {
+                        $targetDays = 30;
+                    }
+                }
+
                 $isPassed = $application && (
                     $application->status === 'completed' ||
                     ($application->status === 'accepted' && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && optional($finalReport)->status === 'approved')
@@ -228,7 +245,7 @@
                                                     <strong>{{ $logbooksCount }} hari</strong>, tersisa
                                                     <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
                                                 @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
-                                                    Unggah berkas Laporan Akhir Magang untuk dievaluasi oleh DPL dan Mentor.
+                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta mengunggah/mencicil draf Laporan Akhir kapan saja.
                                                 @else
                                                     Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap
                                                     diunduh.
