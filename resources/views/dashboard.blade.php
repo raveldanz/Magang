@@ -32,6 +32,23 @@
                 $academicAdvisor = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
                 $logbooksCount = $placement ? ($placement->logbooks ? $placement->logbooks->count() : 0) : 0;
 
+                // Hitung target hari kerja secara dinamis berdasarkan periode magang diajukan
+                $targetDays = 30;
+                if ($application && $application->start_date && $application->end_date) {
+                    try {
+                        $start = \Carbon\Carbon::parse($application->start_date);
+                        $end = \Carbon\Carbon::parse($application->end_date);
+                        $diff = $start->diffInDaysFiltered(function(\Carbon\Carbon $date) {
+                            return !$date->isWeekend();
+                        }, $end);
+                        if ($diff > 0) {
+                            $targetDays = (int) $diff;
+                        }
+                    } catch (\Exception $e) {
+                        $targetDays = 30;
+                    }
+                }
+
                 $isPassed = $application && (
                     $application->status === 'completed' || 
                     ($application->status === 'accepted' && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && optional($finalReport)->status === 'approved')
@@ -181,10 +198,8 @@
                                                     Status pengajuan Anda saat ini: <strong>{{ $appStatusLabel }}</strong>. Silakan buat permohonan magang baru untuk melanjutkan program magang.
                                                 @elseif(!$academicAdvisor)
                                                     Pilih Dosen Pembimbing Lapangan (DPL) dari perguruan tinggi Anda.
-                                                @elseif($logbooksCount < 30)
-                                                    Terus catat aktivitas kerja harian Anda (sudah terisi <strong>{{ $logbooksCount }} hari</strong>, tersisa <strong>{{ 30 - $logbooksCount }} hari kerja</strong>).
                                                 @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
-                                                    Unggah berkas Laporan Akhir Magang untuk dievaluasi oleh DPL dan Mentor.
+                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta mengunggah/mencicil draf Laporan Akhir kapan saja.
                                                 @else
                                                     Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap diunduh.
                                                 @endif
@@ -205,14 +220,15 @@
                                                 <a href="#change-advisor-box" @click="showDetailModal = false" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
                                                     Pilih Dosen 
                                                 </a>
-                                            @elseif($logbooksCount < 30)
-                                                <a href="{{ route('student.logbook.create') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    + Isi Logbook Hari Ini 
-                                                </a>
                                             @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
-                                                <a href="{{ route('student.final_report.index') }}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block">
-                                                    Unggah Laporan 
-                                                </a>
+                                                <div class="flex items-center gap-2">
+                                                    <a href="{{ route('student.logbook.create') }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition inline-block text-xs">
+                                                        + Logbook
+                                                    </a>
+                                                    <a href="{{ route('student.final_report.index') }}" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg shadow-xs transition inline-block text-xs">
+                                                        Unggah Laporan
+                                                    </a>
+                                                </div>
                                             @endif
                                         </div>
                                     </div>
@@ -289,10 +305,10 @@
                                         <div class="font-bold text-slate-800">4. Logbook Kegiatan Harian</div>
                                         <div class="text-slate-500 mt-0.5">
                                             Status: <strong>{{ $logbooksCount }} hari terisi</strong>
-                                            @if($logbooksCount < 30)
-                                                &bull; <span class="text-amber-700 font-medium">Tersisa {{ 30 - $logbooksCount }} hari kerja untuk memenuhi syarat minimal</span>
+                                            @if($logbooksCount < $targetDays)
+                                                &bull; <span class="text-amber-700 font-medium">Tersisa {{ max(0, $targetDays - $logbooksCount) }} hari kerja dari estimasi target {{ $targetDays }} hari</span>
                                             @else
-                                                &bull; <span class="text-emerald-700 font-medium">Target minimal 30 hari telah terpenuhi</span>
+                                                &bull; <span class="text-emerald-700 font-medium">Target estimasi {{ $targetDays }} hari kerja telah terpenuhi</span>
                                             @endif
                                         </div>
                                     </div>
@@ -313,7 +329,11 @@
                                         <div class="text-slate-500 mt-0.5">Dokumen pertanggungjawaban kegiatan magang yang disahkan DPL & Mentor</div>
                                     </div>
                                     <div class="shrink-0">
-                                        @if($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
+                                        @if(!$academicAdvisor)
+                                            <a href="#change-advisor-box" @click="showDetailModal = false" class="px-3 py-1.5 rounded-md font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 transition inline-block text-xs" title="Pilih DPL Terlebih Dahulu">
+                                                Pilih DPL Dahulu 
+                                            </a>
+                                        @elseif($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
                                             <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                                                 Disetujui & Disahkan
                                             </span>
