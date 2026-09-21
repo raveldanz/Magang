@@ -84,7 +84,6 @@
                             <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
                                 <option value="">-- Semua Status --</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING</option>
-                                <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED</option>
                                 <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>ACCEPTED</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>COMPLETED</option>
                                 <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>REJECTED</option>
@@ -138,8 +137,7 @@
                                             {{ $app->status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' : '' }}
                                             {{ $app->status === 'completed' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : '' }}
                                             {{ $app->status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-300 font-black' : '' }}
-                                            {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}
-                                            {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800 border-blue-300' : '' }}">
+                                            {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}">
                                             {{ strtoupper($app->status) }}
                                         </span>
                                     </td>
@@ -172,8 +170,7 @@
                                     {{ $app->status === 'accepted' ? 'bg-green-100 text-green-800 border-green-300' : '' }}
                                     {{ $app->status === 'completed' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : '' }}
                                     {{ $app->status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-300 font-black' : '' }}
-                                    {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}
-                                    {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800 border-blue-300' : '' }}">
+                                    {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : '' }}">
                                     {{ strtoupper($app->status) }}
                                 </span>
                             </div>
