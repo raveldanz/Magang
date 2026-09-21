@@ -1,8 +1,10 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ $returnTo ?? request('return_to', route('admin.units.index')) }}"
-                class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
+            @php
+                $backRoute = (isset($defaultAgencyId) && $defaultAgencyId) ? route('admin.agencies.show', $defaultAgencyId) : route('admin.units.index');
+            @endphp
+            <a href="{{ $backRoute }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -88,7 +90,7 @@
 
                     <!-- Action Buttons -->
                     <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
-                        <a href="{{ $returnTo ?? request('return_to', route('admin.units.index')) }}" class="...">
+                        <a href="{{ $backRoute }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
                         <button type="submit"
