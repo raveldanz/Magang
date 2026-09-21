@@ -217,7 +217,7 @@
                             <p class="text-[11px] text-gray-400">Diunggah: {{ $finalReport->updated_at ? $finalReport->updated_at->format('d M Y, H:i') : '-' }}</p>
                             @if($finalReport->repository_url)
                                 <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1">
-                                    <span>🔗 Tautan Repository / Luaran: {{ $finalReport->repository_url }}</span>
+                                    <span>Tautan Repository / Luaran: {{ $finalReport->repository_url }}</span>
                                 </a>
                             @endif
                         </div>
@@ -311,7 +311,6 @@
                         @endif
                     @else
                         <div class="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-2">
-                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-700 text-lg font-bold">⏳</span>
                             <h4 class="text-sm font-bold text-amber-900">Menunggu Penilaian dari Pembimbing Lapangan Dinas</h4>
                             <p class="text-xs text-amber-800 max-w-lg mx-auto">
                                 Pembimbing lapangan instansi ({{ $mentor->name ?? 'Mentor Dinas' }}) saat ini belum menginput nilai evaluasi magang. Begitu dinilai, nilai akhir akan langsung tampil di sini secara otomatis.

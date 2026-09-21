@@ -37,6 +37,12 @@ class FinalReportController extends Controller
         }
 
         $placement = $application->placement;
+
+        // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
+        if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
+            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+        }
+
         $finalReport = $placement->finalreport;
         $evaluation = $placement->evaluation;
 
@@ -65,6 +71,13 @@ class FinalReportController extends Controller
         
         if (!$application || !$application->placement) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak: Data penempatan tidak ditemukan.');
+        }
+
+        $placement = $application->placement;
+
+        // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
+        if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;
