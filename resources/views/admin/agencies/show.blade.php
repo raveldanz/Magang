@@ -141,7 +141,7 @@
                         <span class="text-xs text-slate-500 font-medium">Divisi Aktif</span>
                     </div>
                     <button type="button" @click="activeTab = 'units'" class="text-[11px] font-bold text-blue-600 hover:underline mt-2 inline-block cursor-pointer">
-                        Lihat Divisi &rarr;
+                        Lihat Divisi 
                     </button>
                 </div>
 
