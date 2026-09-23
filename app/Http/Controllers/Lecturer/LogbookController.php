@@ -67,18 +67,11 @@ class LogbookController extends Controller
             });
         }
 
-        // Urutkan dari tanggal logbook terbaru
-        $logbooks = $logbooksQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->paginate(15)->withQueryString();
-
         // 3. Kelompokkan menjadi Paket Rangkuman Berkala (7 Hari / Weekly Bundles)
-        $allSupervisedLogs = Logbook::with([
-            'placement.application.user.studentProfile',
-            'placement.application.unit.agencyProfile',
-            'placement.mentor',
-        ])
-        ->whereIn('placement_id', $placementIds)
-        ->orderBy('date', 'desc')
-        ->get();
+        $allSupervisedLogs = (clone $logbooksQuery)->orderBy('date', 'desc')->get();
+
+        // Urutkan dari tanggal logbook terbaru untuk pagination (meski saat ini tidak tampil di UI)
+        $logbooks = $logbooksQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->paginate(15)->withQueryString();
 
         $weeklyBundles = $allSupervisedLogs->groupBy(function ($item) {
             $carbonDate = Carbon::parse($item->date);
@@ -109,9 +102,23 @@ class LogbookController extends Controller
                 'approved_count' => $approvedCount,
                 'rejected_count' => $rejectedCount,
                 'status'         => $status,
-                'logbook_ids'    => $group->pluck('id')->toArray(),
-                'entries'        => $group->sortBy('date')->values(),
-                'feedback'       => $group->pluck('lecturer_feedback')->filter()->first() ?? null,
+                'modal_data'     => [
+                    'student' => ['name' => $first->placement->application->user->name ?? 'Mahasiswa'],
+                    'min_date' => $minDate,
+                    'max_date' => $maxDate,
+                    'entries_count' => $group->count(),
+                    'logbook_ids' => $group->pluck('id')->toArray(),
+                    'feedback' => $group->pluck('lecturer_feedback')->filter()->first() ?? null,
+                    'entries' => $group->sortBy('date')->map(function($entry) {
+                        return [
+                            'id' => $entry->id,
+                            'date' => $entry->date,
+                            'activity' => $entry->activity,
+                            'attachment' => $entry->attachment,
+                            'status' => $entry->status,
+                        ];
+                    })->values()->toArray(),
+                ],
             ];
         })->values();
 

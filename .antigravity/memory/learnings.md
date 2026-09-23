@@ -33,6 +33,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-016** | 2026-09-17 | UI Alignment & Card Layout Standardization | Posisi vertikal angka metrik kartu tidak rata akibat variasi panjang teks judul & alamat | RESOLVED |
 | **LRN-017** | 2026-09-17 | Lifecycle Status Integration & Re-Application Loop | Status mahasiswa mengundurkan diri (resigned) keliru tampil 'DALAM PROSES' di dashboard | RESOLVED |
 | **LRN-018** | 2026-09-23 | Graduation Verification & Evaluation Precondition | Label 'Aksi Kelulusan' muncul prematur saat nilai evaluasi magang belum diinput | RESOLVED |
+| **LRN-019** | 2026-09-23 | Laporan Akhir & Lightbox Logbook | Pratinjau berkas live, lightbox modal, checklist 3-sisi & eliminasi orphan view | RESOLVED |
+| **LRN-020** | 2026-09-23 | DPL Logbook & Serialization Memory Leak | Memory limit 512MB exhausted saat json_encode Eloquent model dengan recursive accessor | RESOLVED |
 
 ---
 
@@ -364,6 +366,37 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-019] Perapian Pratinjau Berkas Laporan Akhir, Lightbox Logbook, Eliminasi View Duplicate, & Checklist Evaluasi 3-Sisi
+- **Tanggal**: 2026-09-23
+- **Komponen**: `resources/views/student/final_report.blade.php`, `resources/views/student/logbook/index.blade.php`, `resources/views/student/dashboard.blade.php` (Deleted)
+- **Problem / Symptom**: 
+  1. Halaman unggah laporan akhir mahasiswa tidak memiliki tombol `Lihat Berkas` langsung pada box status file yang baru dipilih.
+  2. Gambar lampiran logbook di smartphone tidak dapat diperbesar penuh.
+  3. Berkas view `student/dashboard.blade.php` tidak terpakai (orphan) yang mengabaikan master layout app.
+  4. Indikator kelayakan E-Sertifikat tidak menampilkan checklist 3-sisi (Pembimbing Dinas, DPL Kampus, ACC Naskah Laporan).
+- **Root Cause**: Ketiadaan handler URL Object di tombol box status laporan akhir, ketiadaan modal Lightbox Alpine.js pada view logbook, serta layout duplicate.
+- **Fix Applied**: 
+  1. Menambahkan tombol `Lihat Berkas` interaktif berbasis `URL.createObjectURL` di `resources/views/student/final_report.blade.php`.
+  2. Menambahkan modal Lightbox Image Viewer Alpine.js universal di `resources/views/student/logbook/index.blade.php`.
+  3. Menghapus berkas redundan `resources/views/student/dashboard.blade.php`.
+  4. Menyajikan *3-Item Progress Checklist* pada modul evaluasi laporan akhir.
+- **Prevention Rule**: Setiap modul input berkas (file uploader) wajib dilengkapi tombol pratinjau `Lihat Berkas` secara live sebelum pengguna mengeklik tombol submit. Seluruh lampiran gambar pada antarmuka mobile wajib dilindungi modal Lightbox preview.
+
+---
+
+### [LRN-020] Memory Exhaustion saat Serialize Eloquent Model (N+1 Json Encode Blade)
+- **Tanggal**: 2026-09-23
+- **Komponen**: `LecturerLogbookController@index`, `resources/views/lecturer/logbooks/index.blade.php`
+- **Problem / Symptom**: Mengakses halaman `/lecturer/logbooks` memicu error HTTP 500 dengan pesan `Allowed memory size of 536870912 bytes exhausted` (Memory Leak) dan mematikan server lokal/produksi.
+- **Root Cause**: Pemanggilan `json_encode($bundle)` di Blade View (untuk data modal Alpine.js) di mana `$bundle` ternyata menampung utuh objek Eloquent Model (`Placement`, `Application`, `User`). Laravel secara otomatis akan men-serialize seluruh nested relations dan mengaktifkan accessor `$appends`. Accessor `getLifecycleStatusAttribute` pada model `Application` memanggil relasi `$this->placement` dari basis data, yang kemudian terhidrasi kembali dan diserialisasi secara tak terhingga (infinite recursive object graph).
+- **Fix Applied**: 
+  1. Memisahkan secara tegas payload untuk antarmuka/modal. 
+  2. Menambahkan array `modal_data` di dalam `$bundle` pada `LecturerLogbookController`, yang *hanya* diekstrak menjadi primitive values (string, integer, array dasar).
+  3. Mengubah trigger modal di `index.blade.php` menjadi `json_encode($bundle['modal_data'])`.
+- **Prevention Rule**: DILARANG KERAS mengeksekusi `json_encode()` pada objek Eloquent Model secara utuh di dalam file Blade/Alpine JS. Terutama jika model tersebut memiliki `$appends` atau relasi bersarang. Selalu gunakan DTO (Data Transfer Object) atau mapping array primitif ringan (`map->toArray()`) khusus untuk konsumsi JSON front-end.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
@@ -375,4 +408,3 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
-
