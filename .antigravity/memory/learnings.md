@@ -32,6 +32,9 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-015** | 2026-09-15 | UI Hardening & Mobile-Friendly E2E Multi-Role | Tumpukan tombol ganda kartu kampus, tab bar melipat di layar HP, dan otomasi E2E lintas role mobile/desktop | RESOLVED |
 | **LRN-016** | 2026-09-17 | UI Alignment & Card Layout Standardization | Posisi vertikal angka metrik kartu tidak rata akibat variasi panjang teks judul & alamat | RESOLVED |
 | **LRN-017** | 2026-09-17 | Lifecycle Status Integration & Re-Application Loop | Status mahasiswa mengundurkan diri (resigned) keliru tampil 'DALAM PROSES' di dashboard | RESOLVED |
+| **LRN-018** | 2026-09-23 | Graduation Verification & Evaluation Precondition | Label 'Aksi Kelulusan' muncul prematur saat nilai evaluasi magang belum diinput | RESOLVED |
+| **LRN-019** | 2026-09-23 | Laporan Akhir & Lightbox Logbook | Pratinjau berkas live, lightbox modal, checklist 3-sisi & eliminasi orphan view | RESOLVED |
+| **LRN-020** | 2026-09-23 | DPL Logbook & Serialization Memory Leak | Memory limit 512MB exhausted saat json_encode Eloquent model dengan recursive accessor | RESOLVED |
 
 ---
 
@@ -348,7 +351,22 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-018] Perapian Pratinjau Berkas Laporan Akhir, Lightbox Logbook, Eliminasi View Duplicate, & Checklist Evaluasi 3-Sisi
+### [LRN-018] Penyelarasan Syarat Kelulusan Magang (Laporan Akhir Disetujui & Penilaian Lengkap)
+- **Tanggal**: 2026-09-23
+- **Komponen**: `app/Models/Application.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/applications/show.blade.php`
+- **Problem / Symptom**: Mahasiswa magang berstatus `accepted` yang laporan akhirnya telah disetujui (misal pengajuan #25) muncul dengan label prioritas "Siap Kelulusan" dan tombol "Aksi Kelulusan" pada tabel Daftar Pengajuan Magang (`/admin/applications`). Namun, ketika admin membuka halaman detail, tombol keputusan status "COMPLETED" terkunci (disabled) dengan pesan syarat belum lengkap karena mahasiswa bersangkutan belum dinilai oleh Pembimbing Lapangan/DPL.
+- **Root Cause**: Query penentuan ranking prioritas dan kondisi tampilan pada `index.blade.php` sebelumnya hanya memeriksa status laporan akhir (`final_reports.status IN ('approved', 'disetujui')`) tanpa memverifikasi kelengkapan nilai evaluasi pada tabel `evaluations`.
+- **Fix Applied**: 
+  1. Menambahkan atribut accessor terpadu pada `Application.php`: `has_approved_report`, `has_complete_evaluation` (memanfaatkan `Evaluation::is_complete` dan skema kampus `mentor_only` vs `dual_evaluation`), serta `can_complete`.
+  2. Memperketat query pengurutan prioritas `ApplicationController::index()` sehingga Rank 2 ("Siap Diluluskan") hanya diberikan jika laporan berstatus approved DAN evaluasi telah dinilai (`final_score > 0` atau sub-skor dinas/dosen terisi). Mahasiswa yang laporannya disetujui namun nilainya belum lengkap diturunkan ke prioritas reguler (Rank 3).
+  3. Memperbarui tabel & mobile card `index.blade.php`: menampilkan badge status yang tepat `● Menunggu Nilai` (badge biru) dan tombol standar `Detail Berkas` (bukan `Aksi Kelulusan`) jika mahasiswa belum selesai dinilai.
+  4. Memperbarui `show.blade.php` dengan kartu info kontekstual "Menunggu Input Nilai Evaluasi Magang" dan subtitle dinamis pada tombol COMPLETED (misal: "Nilai Belum Diinput Lengkap" atau "Laporan Akhir Belum Disetujui").
+  5. Menambahkan validasi ketat backend di `ApplicationController::updateStatus` yang memberikan notifikasi error spesifik jika admin mencoba mem-bypass status COMPLETED sebelum kedua syarat terpenuhi.
+- **Prevention Rule**: Jangan pernah menggunakan asumsi satu syarat (misal hanya persetujuan laporan) untuk memicu tindakan kelulusan akhir jika bisnis proses mensyaratkan gabungan prasyarat (laporan + transkrip nilai). Selalu satukan logika prasyarat kelulusan ke level Model Accessor (`can_complete`) agar tabel daftar, halaman detail, dan validator controller selalu 100% konsisten.
+
+---
+
+### [LRN-019] Perapian Pratinjau Berkas Laporan Akhir, Lightbox Logbook, Eliminasi View Duplicate, & Checklist Evaluasi 3-Sisi
 - **Tanggal**: 2026-09-23
 - **Komponen**: `resources/views/student/final_report.blade.php`, `resources/views/student/logbook/index.blade.php`, `resources/views/student/dashboard.blade.php` (Deleted)
 - **Problem / Symptom**: 
@@ -366,7 +384,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-019] Memory Exhaustion saat Serialize Eloquent Model (N+1 Json Encode Blade)
+### [LRN-020] Memory Exhaustion saat Serialize Eloquent Model (N+1 Json Encode Blade)
 - **Tanggal**: 2026-09-23
 - **Komponen**: `LecturerLogbookController@index`, `resources/views/lecturer/logbooks/index.blade.php`
 - **Problem / Symptom**: Mengakses halaman `/lecturer/logbooks` memicu error HTTP 500 dengan pesan `Allowed memory size of 536870912 bytes exhausted` (Memory Leak) dan mematikan server lokal/produksi.

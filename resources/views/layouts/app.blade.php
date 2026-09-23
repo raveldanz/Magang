@@ -22,7 +22,7 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative">
+    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}">
         <div class="min-h-screen bg-[#F5F8FC] w-full overflow-x-hidden flex flex-col">
             
             <header class="sticky top-0 z-50 bg-white w-full border-b border-slate-200/80">
