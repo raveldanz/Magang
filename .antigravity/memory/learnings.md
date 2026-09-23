@@ -366,6 +366,19 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-019] Memory Exhaustion saat Serialize Eloquent Model (N+1 Json Encode Blade)
+- **Tanggal**: 2026-09-23
+- **Komponen**: `LecturerLogbookController@index`, `resources/views/lecturer/logbooks/index.blade.php`
+- **Problem / Symptom**: Mengakses halaman `/lecturer/logbooks` memicu error HTTP 500 dengan pesan `Allowed memory size of 536870912 bytes exhausted` (Memory Leak) dan mematikan server lokal/produksi.
+- **Root Cause**: Pemanggilan `json_encode($bundle)` di Blade View (untuk data modal Alpine.js) di mana `$bundle` ternyata menampung utuh objek Eloquent Model (`Placement`, `Application`, `User`). Laravel secara otomatis akan men-serialize seluruh nested relations dan mengaktifkan accessor `$appends`. Accessor `getLifecycleStatusAttribute` pada model `Application` memanggil relasi `$this->placement` dari basis data, yang kemudian terhidrasi kembali dan diserialisasi secara tak terhingga (infinite recursive object graph).
+- **Fix Applied**: 
+  1. Memisahkan secara tegas payload untuk antarmuka/modal. 
+  2. Menambahkan array `modal_data` di dalam `$bundle` pada `LecturerLogbookController`, yang *hanya* diekstrak menjadi primitive values (string, integer, array dasar).
+  3. Mengubah trigger modal di `index.blade.php` menjadi `json_encode($bundle['modal_data'])`.
+- **Prevention Rule**: DILARANG KERAS mengeksekusi `json_encode()` pada objek Eloquent Model secara utuh di dalam file Blade/Alpine JS. Terutama jika model tersebut memiliki `$appends` atau relasi bersarang. Selalu gunakan DTO (Data Transfer Object) atau mapping array primitif ringan (`map->toArray()`) khusus untuk konsumsi JSON front-end.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
