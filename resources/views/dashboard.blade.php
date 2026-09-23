@@ -42,7 +42,7 @@
                     try {
                         $start = \Carbon\Carbon::parse($application->start_date);
                         $end = \Carbon\Carbon::parse($application->end_date);
-                        $diff = $start->diffInDaysFiltered(function(\Carbon\Carbon $date) {
+                        $diff = $start->diffInDaysFiltered(function (\Carbon\Carbon $date) {
                             return !$date->isWeekend();
                         }, $end);
                         if ($diff > 0) {
@@ -178,6 +178,7 @@
                     aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     @php
                         $isAccepted = !empty($application) && in_array(strtolower($application->status ?? ''), ['accepted', 'completed', 'verified']);
+                        $canProceed = $isAccepted && !empty($academicAdvisor);
                     @endphp
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <!-- Backdrop -->
@@ -245,7 +246,9 @@
                                                     <strong>{{ $logbooksCount }} hari</strong>, tersisa
                                                     <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
                                                 @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
-                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta mengunggah/mencicil draf Laporan Akhir kapan saja.
+                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas
+                                                    harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta
+                                                    mengunggah/mencicil draf Laporan Akhir kapan saja.
                                                 @else
                                                     Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap
                                                     diunduh.
@@ -340,10 +343,12 @@
                                                 Menunggu Verifikasi Dinas
                                             </span>
                                         @else
-                                            <a href="{{ route('student.application.create') }}"
-                                                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Pilih Unit
-                                            </a>
+                                            <button type="button" disabled
+                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
+                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                <span>Pilih Unit</span>
+                                                
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -367,33 +372,25 @@
                                                 Pilih Dosen
                                             </a>
                                         @else
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-semibold bg-slate-100 text-slate-400 border border-slate-200 inline-block cursor-not-allowed"
-                                                title="Menunggu pengajuan magang disetujui">
-                                                Terkunci (Menunggu Tahap 2)
-                                            </span>
+                                            <button type="button" disabled
+                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
+                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                <span>Pilih Dosen</span>
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
 
-                                <!-- 4. Logbook Magang -->
+                                <!-- 4. Logbook Kegiatan Harian -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
                                         <div class="font-bold text-slate-800">4. Logbook Kegiatan Harian</div>
                                         <div class="text-slate-500 mt-0.5">
                                             Status: <strong>{{ $logbooksCount }} hari terisi</strong>
-                                            @if($logbooksCount < 30)
-                                                &bull; <span class="text-amber-700 font-medium">Tersisa
-                                                    {{ max(0, 30 - $logbooksCount) }} hari kerja untuk memenuhi syarat
-                                                    minimal</span>
-                                            @else
-                                                &bull; <span class="text-emerald-700 font-medium">Target minimal 30 hari
-                                                    telah terpenuhi</span>
-                                            @endif
                                         </div>
                                     </div>
                                     <div class="shrink-0 flex items-center gap-2">
-                                        @if($isAccepted)
+                                        @if ($canProceed)
                                             <a href="{{ route('student.logbook.create') }}"
                                                 class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-flex items-center gap-1">
                                                 <span>+ Isi Logbook</span>
@@ -403,34 +400,42 @@
                                                 Lihat Riwayat
                                             </a>
                                         @else
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-semibold bg-slate-100 text-slate-400 border border-slate-200 inline-block cursor-not-allowed"
-                                                title="Menunggu pengajuan magang disetujui">
-                                                Terkunci (Menunggu Tahap 2)
-                                            </span>
+                                          <button type="button" disabled
+                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
+                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                <span>+ Isi Logbook</span>
+                                                
+                                            </button>
+                                            <button type="button" disabled
+                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-block shadow-none"
+                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                Lihat Riwayat
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
 
-                                <!-- 5. Laporan Akhir -->
+                                <!-- 5. Laporan Akhir Ilmiah Magang -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
                                         <div class="font-bold text-slate-800">5. Laporan Akhir Ilmiah Magang</div>
-
+                                        <div class="text-slate-500 mt-0.5">Dokumen pertanggungjawaban kegiatan magang
+                                            yang disahkan DPL & Mentor</div>
                                     </div>
                                     <div class="shrink-0">
-                                        @if(!$isAccepted)
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-semibold bg-slate-100 text-slate-400 border border-slate-200 inline-block cursor-not-allowed"
-                                                title="Menunggu pengajuan magang disetujui">
-                                                Terkunci (Menunggu Tahap 2)
-                                            </span>
-                                        @elseif($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
+                                        @if (!$canProceed)
+                                            <button type="button" disabled
+                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
+                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                <span>Unggah Laporan</span>
+                                                
+                                            </button>
+                                        @elseif ($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
                                             <span
                                                 class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                                                 Disetujui & Disahkan
                                             </span>
-                                        @elseif($finalReport)
+                                        @elseif ($finalReport)
                                             <a href="{{ route('student.final_report.index') }}"
                                                 class="px-3 py-1.5 rounded-md font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition inline-block">
                                                 Cek Status Review
@@ -458,10 +463,12 @@
                                                     Unduh E-Sertifikat (PDF)
                                                 </a>
                                             @else
-                                                <span
-                                                    class="px-2.5 py-1 rounded-md font-semibold bg-slate-100 text-slate-500 border border-slate-200 inline-block">
-                                                    Terkunci (Menunggu Tahap 4 & 5)
-                                                </span>
+                                                <button type="button" disabled
+                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
+                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                <span>Unduh E-Sertifikat</span>
+                                                
+                                            </button>
                                             @endif
                                         </div>
                                     </div>
@@ -606,69 +613,69 @@
                         @else
                             <!-- Alert Belum Memilih Dosen -->
                             <div class="space-y-0.5">
-                                    <p class="text-xs text-black-800 leading-relaxed">
-                                        Silakan pilih Dosen Pembimbing yang terdaftar di kampus Anda, atau klik tombol
-                                        <strong>Input Dosen Baru</strong>
-                                        jika nama dosen belum tertera pada daftar pilihan.
-                                    </p>
-                                </div>
+                                <p class="text-xs text-black-800 leading-relaxed">
+                                    Silakan pilih Dosen Pembimbing yang terdaftar di kampus Anda, atau klik tombol
+                                    <strong>Input Dosen Baru</strong>
+                                    jika nama dosen belum tertera pada daftar pilihan.
+                                </p>
+                            </div>
                         @endif
 
                         <!-- Form Pilihan Dosen -->
-<div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} pt-2 scroll-mt-6">
-    <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-4">
-        @csrf
-        <div>
-            <div class="flex justify-between items-center mb-1.5">
-                <label for="academic_advisor_id"
-                    class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    Pilih Dosen Terdaftar ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
-                </label>
-            </div>
-            <select id="academic_advisor_id" name="academic_advisor_id" required
-                class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
-                <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
-                @if(isset($availableDosens))
-                    @foreach ($availableDosens as $dosen)
-                        <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                            {{ $dosen->name }} —
-                            {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
-                            ({{ $dosen->email }})
-                        </option>
-                    @endforeach
+                        <div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} pt-2 scroll-mt-6">
+                            <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-4">
+                                @csrf
+                                <div>
+                                    <div class="flex justify-between items-center mb-1.5">
+                                        <label for="academic_advisor_id"
+                                            class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                            Pilih Dosen Terdaftar
+                                            ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
+                                        </label>
+                                    </div>
+                                    <select id="academic_advisor_id" name="academic_advisor_id" required
+                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
+                                        <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
+                                        @if(isset($availableDosens))
+                                            @foreach ($availableDosens as $dosen)
+                                                <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
+                                                    {{ $dosen->name }} —
+                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
+                                                    ({{ $dosen->email }})
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <!-- Baris Aksi Terpadu (Mobile: Turun ke Bawah, Desktop: Sebelahan Kiri & Kanan) -->
+                                <div class="pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                    <!-- Sisi Kiri: Simpan & Batal -->
+                                    <div class="flex items-center gap-2">
+                                        <button type="submit"
+                                            class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                                            {{ __('Simpan Dosen Pembimbing') }}
+                                        </button>
+
+                                        @if ($academicAdvisor)
+                                            <button type="button"
+                                                onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
+                                                class="px-3 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition rounded-xl hover:bg-slate-100 cursor-pointer">
+                                                Batal
+                                            </button>
+                                        @endif
+                                    </div>
+
+                                    <!-- Sisi Kanan: Input Dosen Baru -->
+                                    <button type="button" @click="openNewDosenModal = true"
+                                        class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
+                                        Dosen tidak ditemukan? Input Dosen Baru
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 @endif
-            </select>
-        </div>
-
-        <!-- Baris Aksi Terpadu (Mobile: Turun ke Bawah, Desktop: Sebelahan Kiri & Kanan) -->
-        <div class="pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <!-- Sisi Kiri: Simpan & Batal -->
-            <div class="flex items-center gap-2">
-                <button type="submit"
-                    class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                    {{ __('Simpan Dosen Pembimbing') }}
-                </button>
-
-                @if ($academicAdvisor)
-                    <button type="button"
-                        onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
-                        class="px-3 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition rounded-xl hover:bg-slate-100 cursor-pointer">
-                        Batal
-                    </button>
-                @endif
-            </div>
-
-            <!-- Sisi Kanan: Input Dosen Baru -->
-            <button type="button" 
-                @click="openNewDosenModal = true"
-                class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
-                Dosen tidak ditemukan? Input Dosen Baru
-            </button>
-        </div>
-    </form>
-</div>
-</div>
-@endif
 
                 <!-- Modal Input Dosen Baru -->
                 <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
