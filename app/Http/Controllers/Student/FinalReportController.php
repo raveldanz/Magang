@@ -17,37 +17,44 @@ class FinalReportController extends Controller
      * Tampilkan Halaman Laporan Akhir Mahasiswa
      */
     public function index()
-    {
-        // Prioritaskan pengajuan yang memiliki penempatan aktif / resmi dan belum resigned/rejected
-        $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+{
+    // 1. Ambil pengajuan magang yang aktif / terbaru
+    $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+        ->where('user_id', Auth::id())
+        ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+        ->whereHas('placement')
+        ->latest()
+        ->first()
+        ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
             ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
-            ->whereHas('placement')
             ->latest()
-            ->first()
-            ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
-                ->where('user_id', Auth::id())
-                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
-                ->latest()
-                ->first();
+            ->first();
 
-        // Cek apakah mahasiswa sudah punya placement
-        if (!$application || !$application->placement) {
-            return redirect()->route('dashboard')->with('error', 'Anda belum memiliki penempatan magang aktif.');
-        }
+    // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
+    if (!$application) {
+        return redirect()->route('dashboard')->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
+    }
 
-        $placement = $application->placement;
+    $lifecycle = strtoupper($application->status ?? 'NONE');
+    $placement = $application->placement;
+    $finalReport = null;
+    $evaluation = null;
 
-        // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
+    // 3. Jika sudah diterima dan memiliki placement, baru cek DPL & ambil data laporan
+    if ($placement) {
+        // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
             return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
         }
 
         $finalReport = $placement->finalreport;
         $evaluation = $placement->evaluation;
-
-        return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation'));
     }
+
+    // 4. Kirimkan $lifecycle ke view agar kartu alur/stepper muncul saat masih pending
+    return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation', 'lifecycle'));
+}
 
     /**
      * Upload / Unggah Dokumen Laporan Akhir Magang (PDF / DOCX) & Repositori Proyek
