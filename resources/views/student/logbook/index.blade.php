@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-bold text-xl text-slate-800 leading-tight">
             {{ __('Dashboard Aktivitas & Logbook Magang') }}
         </h2>
     </x-slot>
@@ -71,8 +71,7 @@
                         <div class="flex items-center gap-3">
                             <div>
                                 <h3 class="font-black text-base text-gray-900">Alur Proses & Informasi Pengajuan Magang</h3>
-                                <p class="text-xs text-gray-400">Pantau tahapan seleksi dan penempatan Anda</p>
-                            </div>
+                                </div>
                         </div>
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                             Buka Dashboard Utama 
@@ -174,10 +173,7 @@
                                 </h4>
                                 @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                                     <p class="text-xs sm:text-sm text-amber-700 mt-1 leading-relaxed">
-                                        Pengajuan magang Anda telah <strong>DITERIMA</strong> oleh dinas dan mentor lapangan telah terdaftar. Namun, Anda <strong>belum menentukan Dosen Pembimbing Lapangan (DPL)</strong> dari perguruan tinggi Anda.
-                                    </p>
-                                    <p class="text-xs text-amber-800 font-semibold mt-1">
-                                        Fitur pengisian logbook harian baru akan terbuka setelah DPL terdaftar agar kegiatan magang dapat dipantau dan diverifikasi dua arah oleh kampus.
+                                        Silahkan memilih Dosen Pembimbing Lapangan terlebih dahulu agar dapat mengakses fitur pengisian Logbook harian.
                                     </p>
                                 @else
                                     <p class="text-xs text-amber-700 mt-0.5">
@@ -186,8 +182,9 @@
                                 @endif
                             </div>
                         </div>
+                        
                         @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
-                            <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
+                            <a href="{{ route('dashboard') }}#change-advisor-box" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
                                 <span>Pilih DPL di Dashboard </span>
                             </a>
                         @endif
@@ -230,7 +227,7 @@
                             </div>
                         </div>
                         <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
-                            Buat Pengajuan Baru &rarr;
+                            Buat Pengajuan Baru 
                         </a>
                     </div>
                 </div>
@@ -304,20 +301,29 @@
                             <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Dosen Kampus)</p>
                         </div>
 
-                        {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE & Kebijakan DPL Terpenuhi) --}}
-                        @if ($lifecycle === 'ACTIVE')
-                            @if (!$requiresDpl || ($placement && !empty($placement->academic_advisor_id)))
-                                <a href="{{ route('student.logbook.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Tambah Aktivitas Logbook
-                                </a>
-                            @else
-                                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer" title="Pilih Dosen Pembimbing Lapangan di Dashboard">
-                                    <span>Pilih DPL di Dashboard Terlebih Dahulu</span>
-                                </a>
-                            @endif
+                        {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
+@if ($lifecycle === 'ACTIVE')
+    @if (!$requiresDpl || ($placement && !empty($placement->academic_advisor_id)))
+        {{-- Tombol Aktif / Bisa Dipencet --}}
+        <a href="{{ route('student.logbook.create') }}" 
+           class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Tambah Aktivitas Logbook</span>
+        </a>
+    @else
+        {{-- Tombol Terkunci / Disable jika belum pilih DPL --}}
+        <button type="button" 
+                disabled 
+                title="Pilih Dosen Pembimbing Lapangan (DPL) di Dashboard terlebih dahulu untuk membuka akses pengisian logbook"
+                class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 text-slate-400 border border-slate-300 rounded-xl text-xs font-bold cursor-not-allowed select-none shadow-none">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Tambah Aktivitas Logbook</span>
+        </button>
+    @endif
                         @elseif ($lifecycle === 'COMPLETED')
                             <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200">
                                 Mode Arsip Magang Selesai
@@ -351,12 +357,25 @@
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
                                         </td>
                                         <td class="p-4 text-gray-700 max-w-xs">
-                                            <p class="truncate" title="{{ $log->activity }}">{{ Str::limit($log->activity, 80) }}</p>
+                                            <p class="font-medium text-slate-800">{{ Str::limit($log->activity, 120) }}</p>
+                                            @if(!empty($log->mentor_note))
+                                                <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
+                                                    <span class="font-bold shrink-0">Catatan Mentor:</span>
+                                                    <span>{{ $log->mentor_note }}</span>
+                                                </div>
+                                            @endif
+                                            @if(!empty($log->lecturer_note))
+                                                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
+                                                    <span class="font-bold shrink-0">Catatan DPL:</span>
+                                                    <span>{{ $log->lecturer_note }}</span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-xs font-medium inline-flex items-center gap-1">
-                                                     Lihat File
+                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                                    <span>Buka Lampiran</span>
                                                 </a>
                                             @else
                                                 <span class="text-gray-400 text-xs">-</span>

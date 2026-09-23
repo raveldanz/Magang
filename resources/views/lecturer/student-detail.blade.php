@@ -211,22 +211,48 @@
                 </div>
 
                 @if($finalReport)
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-xs sm:text-sm text-gray-900">{{ $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM' }}</h4>
-                            <p class="text-[11px] text-gray-400">Diunggah: {{ $finalReport->updated_at ? $finalReport->updated_at->format('d M Y, H:i') : '-' }}</p>
-                            @if($finalReport->repository_url)
-                                <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1">
-                                    <span>🔗 Tautan Repository / Luaran: {{ $finalReport->repository_url }}</span>
+                    <div x-data="{ showPdf: false }" class="space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-xs sm:text-sm text-gray-900">{{ $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM' }}</h4>
+                                <p class="text-[11px] text-gray-400">Diunggah: {{ $finalReport->updated_at ? $finalReport->updated_at->format('d M Y, H:i') : '-' }}</p>
+                                @if($finalReport->repository_url)
+                                    <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1">
+                                        <span>Tautan Repository / Luaran: {{ $finalReport->repository_url }}</span>
+                                    </a>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" @click="showPdf = !showPdf" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span x-text="showPdf ? 'Tutup Preview' : 'Preview Naskah PDF'">Preview Naskah PDF</span>
+                                </button>
+                                <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>Unduh File</span>
                                 </a>
-                            @endif
+                            </div>
                         </div>
 
-                        <div class="flex items-center gap-2">
-                            <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span>Buka / Unduh Berkas</span>
-                            </a>
+                        <!-- Live Inline PDF Viewer Card for DPL -->
+                        <div x-show="showPdf" x-collapse x-cloak class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
+                            <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5 text-slate-800">
+                                    <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    </div>
+                                    <span class="text-xs font-bold tracking-tight">Dokumen Naskah Laporan Mahasiswa (Live Reader)</span>
+                                </div>
+                                <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
+                                    <span>Buka di Tab Baru ↗</span>
+                                </a>
+                            </div>
+                            <div class="p-4 sm:p-5 bg-slate-50/60">
+                                <div class="w-full h-[520px] rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-xs">
+                                    <iframe src="{{ route('final_reports.show', $finalReport->id) }}" class="w-full h-full border-0"></iframe>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -311,7 +337,6 @@
                         @endif
                     @else
                         <div class="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-2">
-                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-700 text-lg font-bold">⏳</span>
                             <h4 class="text-sm font-bold text-amber-900">Menunggu Penilaian dari Pembimbing Lapangan Dinas</h4>
                             <p class="text-xs text-amber-800 max-w-lg mx-auto">
                                 Pembimbing lapangan instansi ({{ $mentor->name ?? 'Mentor Dinas' }}) saat ini belum menginput nilai evaluasi magang. Begitu dinilai, nilai akhir akan langsung tampil di sini secara otomatis.

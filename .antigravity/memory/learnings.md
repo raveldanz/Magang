@@ -32,6 +32,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-015** | 2026-09-15 | UI Hardening & Mobile-Friendly E2E Multi-Role | Tumpukan tombol ganda kartu kampus, tab bar melipat di layar HP, dan otomasi E2E lintas role mobile/desktop | RESOLVED |
 | **LRN-016** | 2026-09-17 | UI Alignment & Card Layout Standardization | Posisi vertikal angka metrik kartu tidak rata akibat variasi panjang teks judul & alamat | RESOLVED |
 | **LRN-017** | 2026-09-17 | Lifecycle Status Integration & Re-Application Loop | Status mahasiswa mengundurkan diri (resigned) keliru tampil 'DALAM PROSES' di dashboard | RESOLVED |
+| **LRN-018** | 2026-09-23 | Graduation Verification & Evaluation Precondition | Label 'Aksi Kelulusan' muncul prematur saat nilai evaluasi magang belum diinput | RESOLVED |
 
 ---
 
@@ -345,6 +346,21 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Menambahkan alert banner terintegrasi pada `student/logbook/index.blade.php` yang menginformasikan penonaktifan logbook akibat pengunduran diri serta mengarahkan pendaftaran ulang.
   5. Memperbarui badge styling status pada `mentor/dashboard.blade.php` dan `university/students/show.blade.php` agar dinamis dan konsisten di seluruh role.
 - **Prevention Rule**: Setiap kali memperkenalkan atau mengubah status siklus hidup (*lifecycle status*), pastikan seluruh view Blade yang memiliki logika kondisional status memperlakukan setiap status valid secara eksplisit (jangan membiarkan status terminal seperti `RESIGNED`, `CANCELED`, atau `TERMINATED` jatuh ke fallback `@else` yang ambigu). Sediakan selalu jalur pemulihan bisnis (*recovery path*) berupa tombol buat pengajuan baru bagi mahasiswa berstatus non-aktif.
+
+---
+
+### [LRN-018] Penyelarasan Syarat Kelulusan Magang (Laporan Akhir Disetujui & Penilaian Lengkap)
+- **Tanggal**: 2026-09-23
+- **Komponen**: `app/Models/Application.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/applications/show.blade.php`
+- **Problem / Symptom**: Mahasiswa magang berstatus `accepted` yang laporan akhirnya telah disetujui (misal pengajuan #25) muncul dengan label prioritas "Siap Kelulusan" dan tombol "Aksi Kelulusan" pada tabel Daftar Pengajuan Magang (`/admin/applications`). Namun, ketika admin membuka halaman detail, tombol keputusan status "COMPLETED" terkunci (disabled) dengan pesan syarat belum lengkap karena mahasiswa bersangkutan belum dinilai oleh Pembimbing Lapangan/DPL.
+- **Root Cause**: Query penentuan ranking prioritas dan kondisi tampilan pada `index.blade.php` sebelumnya hanya memeriksa status laporan akhir (`final_reports.status IN ('approved', 'disetujui')`) tanpa memverifikasi kelengkapan nilai evaluasi pada tabel `evaluations`.
+- **Fix Applied**: 
+  1. Menambahkan atribut accessor terpadu pada `Application.php`: `has_approved_report`, `has_complete_evaluation` (memanfaatkan `Evaluation::is_complete` dan skema kampus `mentor_only` vs `dual_evaluation`), serta `can_complete`.
+  2. Memperketat query pengurutan prioritas `ApplicationController::index()` sehingga Rank 2 ("Siap Diluluskan") hanya diberikan jika laporan berstatus approved DAN evaluasi telah dinilai (`final_score > 0` atau sub-skor dinas/dosen terisi). Mahasiswa yang laporannya disetujui namun nilainya belum lengkap diturunkan ke prioritas reguler (Rank 3).
+  3. Memperbarui tabel & mobile card `index.blade.php`: menampilkan badge status yang tepat `● Menunggu Nilai` (badge biru) dan tombol standar `Detail Berkas` (bukan `Aksi Kelulusan`) jika mahasiswa belum selesai dinilai.
+  4. Memperbarui `show.blade.php` dengan kartu info kontekstual "Menunggu Input Nilai Evaluasi Magang" dan subtitle dinamis pada tombol COMPLETED (misal: "Nilai Belum Diinput Lengkap" atau "Laporan Akhir Belum Disetujui").
+  5. Menambahkan validasi ketat backend di `ApplicationController::updateStatus` yang memberikan notifikasi error spesifik jika admin mencoba mem-bypass status COMPLETED sebelum kedua syarat terpenuhi.
+- **Prevention Rule**: Jangan pernah menggunakan asumsi satu syarat (misal hanya persetujuan laporan) untuk memicu tindakan kelulusan akhir jika bisnis proses mensyaratkan gabungan prasyarat (laporan + transkrip nilai). Selalu satukan logika prasyarat kelulusan ke level Model Accessor (`can_complete`) agar tabel daftar, halaman detail, dan validator controller selalu 100% konsisten.
 
 ---
 

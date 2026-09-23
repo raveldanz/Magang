@@ -55,6 +55,21 @@ class DashboardController extends Controller
             });
         }
 
+        if ($request->filled('report_status')) {
+            $status = strtolower($request->report_status);
+            if ($status === 'pending') {
+                $query->whereHas('finalreport', function ($q) {
+                    $q->whereIn('status', ['pending', 'submitted', 'menunggu', 'revision']);
+                });
+            } elseif ($status === 'approved') {
+                $query->whereHas('finalreport', function ($q) {
+                    $q->whereIn('status', ['approved', 'disetujui']);
+                });
+            } elseif ($status === 'none') {
+                $query->whereDoesntHave('finalreport');
+            }
+        }
+
         $placements = $query->latest()->get();
 
         // Hitung metrik statistik bimbingan DPL

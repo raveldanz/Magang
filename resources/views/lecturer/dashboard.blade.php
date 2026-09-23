@@ -94,6 +94,13 @@
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <select name="report_status" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
+                            <option value="">Semua Status Laporan</option>
+                            <option value="pending" {{ request('report_status') == 'pending' ? 'selected' : '' }}>Menunggu Review DPL</option>
+                            <option value="approved" {{ request('report_status') == 'approved' ? 'selected' : '' }}>Disetujui (Approved)</option>
+                            <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah</option>
+                        </select>
+
                         <select name="agency_id" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
                             <option value="">Semua Instansi Dinas</option>
                             @foreach($agencies as $ag)
@@ -104,10 +111,10 @@
                         </select>
 
                         <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition shrink-0 cursor-pointer">
-                            Cari
+                            Filter
                         </button>
 
-                        @if(request()->hasAny(['search', 'agency_id']))
+                        @if(request()->hasAny(['search', 'agency_id', 'report_status']))
                             <a href="{{ route('lecturer.dashboard') }}" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition shrink-0">
                                 Reset
                             </a>

@@ -28,7 +28,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="{}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Message -->
@@ -265,7 +265,7 @@
                                                         action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                         title: 'Hapus Divisi / Lowongan Magang',
                                                         name: '{{ addslashes($unit->name) }}',
-                                                        desc: 'Instansi: {{ addslashes($unit->agencyProfile->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
+                                                        desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
                                                     })" 
                                                     class="btn-action-delete"
                                                     title="Hapus Divisi">
