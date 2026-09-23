@@ -441,12 +441,6 @@
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
                                         </span>
                                     </div>
-                                    @if ($log->attachment)
-                                        <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                            <span>Lampiran</span>
-                                        </a>
-                                    @endif
                                 </div>
 
                                 <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -480,7 +474,6 @@
 
                                 @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected' || strtolower($log->lecturer_status ?? '') === 'rejected'))
                                     <a href="{{ route('student.logbook.edit', $log->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                         <span>Perbaiki / Edit Logbook</span>
                                     </a>
                                 @endif

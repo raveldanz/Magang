@@ -31,43 +31,59 @@ class LogbookController extends Controller
             ?? Application::where('user_id', $userId)->latest()->first();
     }
 
-    public function index()
-    {
-        $user = Auth::user();
-        $userId = $user->id;
+public function index()
+{
+    $user = Auth::user();
+    $userId = $user->id;
 
-        // 1. Ambil pengajuan magang aktif mahasiswa
-        $application = $this->getActiveInternship($userId);
+    // 1. Ambil data pengajuan magang
+    $application = $this->getActiveInternship($userId);
 
-        $placement = null;
-        $logbooks = collect();
-
-        if ($application) {
-            // 2. Ambil data penempatan (placement)
-            $placement = Placement::where('application_id', $application->id)
-                ->with(['pembimbing', 'mentor', 'academicAdvisor'])
-                ->first();
-
-            if ($placement) {
-                // 3. Ambil riwayat logbook jika placement sudah ada
-                $logbooks = Logbook::where('placement_id', $placement->id)
-                    ->orderBy('date', 'desc')
-                    ->get();
-            }
-        }
-
-        // 4. Hitung statistik logbook untuk tampilan kartu/card di view
-        $stats = [
-            'total'    => $logbooks->count(),
-            'approved' => $logbooks->where('status', 'approved')->count(),
-            'pending'  => $logbooks->where('status', 'pending')->count(),
-            'rejected' => $logbooks->where('status', 'rejected')->count(),
-        ];
-
-        $requiresDpl = $this->isDplRequiredForStudent($user);
-
-        return view('student.logbook.index', compact('application', 'placement', 'logbooks', 'stats', 'requiresDpl'));
+    // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
+    if (!$application) {
+        return redirect()->route('dashboard')
+            ->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
     }
+
+    // 3. Tentukan status lifecycle pengajuan
+    $lifecycle = strtoupper($application->status ?? 'NONE');
+
+    // 4. Inisialisasi variabel penempatan & logbook
+    $placement = null;
+    $logbooks = collect();
+    $requiresDpl = $this->isDplRequiredForStudent($user);
+
+    // 5. Jika pengajuan sudah memiliki placement (Diterima / Aktif)
+    if ($application->placement) {
+        $placement = Placement::where('application_id', $application->id)
+            ->with(['pembimbing', 'mentor', 'academicAdvisor'])
+            ->first();
+
+        if ($placement) {
+            $logbooks = Logbook::where('placement_id', $placement->id)
+                ->orderBy('date', 'desc')
+                ->get();
+        }
+    }
+
+    // 6. Hitung statistik logbook
+    $stats = [
+        'total'    => $logbooks->count(),
+        'approved' => $logbooks->where('status', 'approved')->count(),
+        'pending'  => $logbooks->where('status', 'pending')->count(),
+        'rejected' => $logbooks->where('status', 'rejected')->count(),
+    ];
+
+    // Oper $lifecycle juga ke view
+    return view('student.logbook.index', compact(
+        'application', 
+        'placement', 
+        'logbooks', 
+        'stats', 
+        'requiresDpl',
+        'lifecycle'
+    ));
+}
 
     public function create()
     {
