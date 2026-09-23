@@ -24,6 +24,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $request->validate([
+            'name' => 'required|string|max:255',
             'nim' => 'required|string|max:50',
             'universitas' => 'required|string|max:255',
             'faculty' => 'nullable|string|max:255',
@@ -46,6 +47,7 @@ class ProfileController extends Controller
             $targetUnivId = $university->id;
 
             $user->update([
+                'name' => $request->name,
                 'university_id' => $university->id,
                 'university' => $university->name,
             ]);
@@ -58,6 +60,7 @@ class ProfileController extends Controller
         StudentProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
+                'name' => $request->name,
                 'nim' => $request->nim,
                 'universitas' => $universityName,
                 'university_id' => $targetUnivId ?? $user->university_id,

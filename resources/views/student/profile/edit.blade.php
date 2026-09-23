@@ -40,7 +40,8 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="name" value="Nama Lengkap (Sesuai Akun)" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" required />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" required />
+                                <x-input-error :messages="$errors->get('name')" class="mt-1" />
                             </div>
 
                             <div>
@@ -128,7 +129,7 @@
                             </div>
 
                             <div>
-                                <x-input-label for="alamat" value="Alamat Domisili / Tempat Tinggal" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-input-label for="alamat" value="Alamat Domisili / Tempat Tinggal*" class="text-xs font-bold uppercase tracking-wider" />
                                 <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('alamat', $profile?->alamat ?? $profile?->address ?? '')" placeholder="Contoh: Jl. Rungkut Asri Timur No. 12, Surabaya" />
                                 <x-input-error :messages="$errors->get('alamat')" class="mt-1" />
                             </div>
@@ -143,17 +144,19 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat / Hubungan" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat / Hubungan*" class="text-xs font-bold uppercase tracking-wider" />
                                 <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile?->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto (Ayah)" />
                                 <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat*" class="text-xs font-bold uppercase tracking-wider" />
                                 <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile?->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
                                 <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-1" />
+                                    
                             </div>
                         </div>
+                          <p class="text-xs text-gray-500 italic">*opsional</p>
                     </div>
 
                     <!-- Tombol Aksi -->
