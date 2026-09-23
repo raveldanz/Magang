@@ -320,38 +320,35 @@
                                         @endif
                                     </div>
                                 </div>
-
-                                <!-- 2. Unit Penempatan -->
-                                <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                    <div>
-                                        <div class="font-bold text-slate-800">2. Penempatan Instansi & Unit Kerja</div>
-                                    </div>
-                                    <div class="shrink-0">
-                                        @if($application && in_array($application->status, ['accepted', 'completed']))
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
-                                                Diterima ({{ $application->unit->name ?? 'Instansi Dinas' }})
-                                            </span>
-                                        @elseif($application && in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
-                                            <a href="{{ route('student.application.create') }}"
-                                                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                                                Buat Pengajuan Baru
-                                            </a>
-                                        @elseif($application)
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
-                                                Menunggu Verifikasi Dinas
-                                            </span>
-                                        @else
-                                            <button type="button" disabled
-                                                class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
-                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
-                                                <span>Pilih Unit</span>
-                                                
-                                            </button>
-                                        @endif
-                                    </div>
-                                </div>
+<!-- 2. Unit Penempatan -->
+<div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+        <div class="font-bold text-slate-800">2. Penempatan Instansi & Unit Kerja</div>
+        <div class="text-slate-500 mt-0.5">Pemilihan instansi dinas dan divisi penempatan magang</div>
+    </div>
+    <div class="shrink-0">
+        @if($application && in_array(strtolower($application->status), ['accepted', 'completed', 'verified']))
+            <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
+                Diterima ({{ $application->unit->name ?? 'Instansi Dinas' }})
+            </span>
+        @elseif($application && in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
+            <a href="{{ route('student.application.create') }}"
+                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
+                Buat Pengajuan Baru
+            </a>
+        @elseif($application)
+            <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
+                Menunggu Verifikasi Dinas
+            </span>
+        @else
+            {{-- Karena NIM sudah ada, saat belum ada pengajuan tombol ini HARUS BISA DIKLIK --}}
+            <a href="{{ route('student.application.create') }}"
+                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
+                Pilih Unit
+            </a>
+        @endif
+    </div>
+</div>
 
                                 <!-- 3. DPL Kampus -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
