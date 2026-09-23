@@ -249,7 +249,7 @@
                                            placeholder="https://github.com/username/project atau link Google Drive" 
                                            class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono pr-24 sm:pr-28">
                                     <a id="repoTestBtn" href="#" target="_blank" class="hidden absolute right-1.5 px-2.5 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition items-center gap-1 shadow-xs">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <svg class="w-3.5 h-3.5 fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         <span>Uji</span>
                                     </a>
                                 </div>
@@ -283,7 +283,7 @@
                             </div>
 
                             <!-- Interactive Drag & Drop Dropzone -->
-                            <div>
+                            <div class="space-y-3">
                                 <div class="flex items-center justify-between mb-1.5 gap-2">
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider truncate">
                                         Unggah File Naskah Laporan (PDF / DOCX) 
@@ -323,18 +323,29 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        <span>Lihat Berkas</span>
-                                    </a>
-                                    <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
-                                        Ganti Berkas
-                                    </button>
+
+                                <!-- File Info Box Saat Berkas Dipilih -->
+                                <div id="reportFileBox" class="hidden p-3.5 bg-slate-50 border border-slate-200 rounded-2xl items-center justify-between gap-3 shadow-2xs">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div id="reportFileIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                                            PDF
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p id="reportFileName" class="text-xs font-bold text-slate-800 truncate"></p>
+                                            <p id="reportFileSize" class="text-[11px] text-slate-500 font-medium"></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat Berkas</span>
+                                        </a>
+                                        <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
+                                            Ganti
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
-                        </div>
 
                             <div class="pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
                                 <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
@@ -433,78 +444,78 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                    @else
-                        <div class="p-5 rounded-2xl bg-amber-50/90 border border-amber-200 space-y-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        @else
+                            <div class="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-amber-50/90 border border-amber-200 space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian & Verifikasi</span>
+                                        <p class="text-xs text-amber-800 leading-relaxed">
+                                            E-Sertifikat resmi akan otomatis terbit begitu seluruh 3 indikator kelengkapan di bawah terpenuhi.
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian & Verifikasi</span>
-                                    <p class="text-xs text-amber-800 leading-relaxed">
-                                        E-Sertifikat resmi akan otomatis terbit begitu seluruh 3 indikator kelengkapan di bawah terpenuhi.
-                                    </p>
+
+                                <!-- 3-Item Progress Checklist -->
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                                    <div class="p-3 rounded-xl border {{ $hasMentorScore ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
+                                        <div class="flex items-center gap-1.5 font-bold">
+                                            @if($hasMentorScore)
+                                                <span class="text-emerald-600 font-bold">✓</span>
+                                                <span>1. Pembimbing Lapangan</span>
+                                            @else
+                                                <span class="text-amber-500 font-bold">⏳</span>
+                                                <span>1. Pembimbing Lapangan</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-[11px] {{ $hasMentorScore ? 'text-emerald-700' : 'text-slate-500' }}">
+                                            {{ $hasMentorScore ? 'Selesai Menilai' : 'Menunggu Penilaian Dinas' }}
+                                        </p>
+                                    </div>
+
+                                    <div class="p-3 rounded-xl border {{ ($hasDosenScore || $isMentorOnly) ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
+                                        <div class="flex items-center gap-1.5 font-bold">
+                                            @if($hasDosenScore || $isMentorOnly)
+                                                <span class="text-emerald-600 font-bold">✓</span>
+                                                <span>2. DPL Kampus</span>
+                                            @else
+                                                <span class="text-amber-500 font-bold">⏳</span>
+                                                <span>2. DPL Kampus</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
+                                            {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Akademik DPL') }}
+                                        </p>
+                                    </div>
+
+                                    <div class="p-3 rounded-xl border {{ ($finalReport && $finalReport->status === 'approved') ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
+                                        <div class="flex items-center gap-1.5 font-bold">
+                                            @if($finalReport && $finalReport->status === 'approved')
+                                                <span class="text-emerald-600 font-bold">✓</span>
+                                                <span>3. Naskah Laporan Akhir</span>
+                                            @else
+                                                <span class="text-amber-500 font-bold">⏳</span>
+                                                <span>3. Naskah Laporan Akhir</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-[11px] {{ ($finalReport && $finalReport->status === 'approved') ? 'text-emerald-700' : 'text-slate-500' }}">
+                                            {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui (ACC)' : 'Menunggu Persetujuan Naskah' }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
+                        @endif
+                    </div>
+                @endif
 
-                            <!-- 3-Item Progress Checklist -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
-                                <div class="p-3 rounded-xl border {{ $hasMentorScore ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
-                                    <div class="flex items-center gap-1.5 font-bold">
-                                        @if($hasMentorScore)
-                                            <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>1. Pembimbing Lapangan</span>
-                                        @else
-                                            <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>1. Pembimbing Lapangan</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-[11px] {{ $hasMentorScore ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ $hasMentorScore ? 'Selesai Menilai' : 'Menunggu Penilaian Dinas' }}
-                                    </p>
-                                </div>
-
-                                <div class="p-3 rounded-xl border {{ ($hasDosenScore || $isMentorOnly) ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
-                                    <div class="flex items-center gap-1.5 font-bold">
-                                        @if($hasDosenScore || $isMentorOnly)
-                                            <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>2. DPL Kampus</span>
-                                        @else
-                                            <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>2. DPL Kampus</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Akademik DPL') }}
-                                    </p>
-                                </div>
-
-                                <div class="p-3 rounded-xl border {{ ($finalReport && $finalReport->status === 'approved') ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
-                                    <div class="flex items-center gap-1.5 font-bold">
-                                        @if($finalReport && $finalReport->status === 'approved')
-                                            <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>3. Naskah Laporan Akhir</span>
-                                        @else
-                                            <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>3. Naskah Laporan Akhir</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-[11px] {{ ($finalReport && $finalReport->status === 'approved') ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui (ACC)' : 'Menunggu Persetujuan Naskah' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            @endif
+            @endif {{-- Penutup Utama: if (in_array($lifecycle, ...)) / if ($placement) --}}
 
         </div>
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script>
         let currentObjectUrl = null;
 
