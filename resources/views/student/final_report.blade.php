@@ -1,22 +1,20 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Pengunggahan Laporan Akhir Magang MBKM</span>
                 </h2>
-                
             </div>
         </div>
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
 
             <!-- Flash Success / Error Messages -->
             @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
+                <div class="p-3.5 sm:p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl sm:rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-xs sm:text-sm font-medium">
                     <div class="flex items-center gap-2">
                         <span>{{ session('success') }}</span>
                     </div>
@@ -24,7 +22,7 @@
             @endif
 
             @if (session('error'))
-                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
+                <div class="p-3.5 sm:p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl sm:rounded-r-2xl shadow-xs flex items-center justify-between text-rose-900 text-xs sm:text-sm font-medium">
                     <div class="flex items-center gap-2">
                         <span>{{ session('error') }}</span>
                     </div>
@@ -32,9 +30,9 @@
             @endif
 
             @if ($errors->any())
-                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-xs space-y-1">
-                    <p class="font-bold">Terjadi kesalahan validasi berkas:</p>
-                    <ul class="list-disc list-inside">
+                <div class="p-3.5 sm:p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl sm:rounded-r-2xl shadow-xs text-rose-900 text-xs space-y-1">
+                    <p class="font-bold text-xs sm:text-sm">Terjadi kesalahan validasi berkas:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
                         @foreach ($errors->all() as $err)
                             <li>{{ $err }}</li>
                         @endforeach
@@ -42,373 +40,470 @@
                 </div>
             @endif
 
-            <!-- Informational Banner for Early & Parallel Upload -->
-            <div class="p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl flex items-start gap-3 text-blue-900 text-xs sm:text-sm font-medium leading-relaxed shadow-2xs">
-                <div class="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <span class="font-bold block text-blue-950 text-sm mb-0.5">Informasi Pengunggahan Laporan Akhir</span>
-                    <span>Anda dapat mengunggah atau memperbarui draf naskah laporan ilmiah & repositori proyek magang Anda <strong>kapan saja</strong> selama periode magang berlangsung. Pastikan juga untuk tetap mengisi logbook kegiatan harian secara teratur.</span>
-                </div>
-            </div>
-
-            <!-- 1. STATUS LAPORAN SAAT INI -->
-            @if ($finalReport)
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Status Verifikasi Naskah</span>
-                            <h3 class="font-black text-lg text-slate-900 mt-1 flex items-center gap-2">
-                                <span>{{ $finalReport->title ?? 'Naskah Laporan Akhir Magang' }}</span>
-                            </h3>
-                            @if($finalReport->repository_url)
-                                <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold mt-1 inline-flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                                    <span>Tautan Proyek: {{ $finalReport->repository_url }}</span>
-                                </a>
-                            @endif
+            {{-- KONDISI 1: JIKA STATUS MASIH DALAM VERIFIKASI SELEKSI INSTANSI --}}
+            @if (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'SUBMITTED', 'VERIFIED']) || !$placement)
+                
+                <!-- Status Banner Kuning / Amber -->
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xs space-y-3">
+                    <div class="flex items-start justify-between flex-wrap gap-3">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-amber-900 text-sm sm:text-base leading-snug">Pengajuan Magang Sedang Diverifikasi</h4>
+                            <p class="text-xs sm:text-sm text-amber-700 leading-relaxed">
+                                Pengajuan magang Anda saat ini sedang dalam proses verifikasi dan seleksi oleh instansi <strong>{{ $application->unit->name ?? 'Dinas Perpustakaan Dan Kearsipan' }}</strong>.
+                            </p>
                         </div>
-
-                        <div>
-                            @if($finalReport->status === 'approved')
-                                <span class="px-4 py-2 rounded-2xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
-                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                    <span>Laporan Disetujui (ACC)</span>
-                                </span>
-                            @elseif($finalReport->status === 'revision')
-                                <span class="px-4 py-2 rounded-2xl text-xs font-black bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-1.5 shadow-2xs">
-                                    <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                    <span>Perlu Perbaikan (Revisi)</span>
-                                </span>
-                            @else
-                                <span class="px-4 py-2 rounded-2xl text-xs font-black bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5 shadow-2xs">
-                                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span>Menunggu Verifikasi DPL / Mentor</span>
-                                </span>
-                            @endif
-                        </div>
+                        <span class="px-3 py-1 bg-amber-200 text-amber-900 text-[10px] sm:text-xs font-black rounded-full uppercase tracking-wider shrink-0">
+                            STATUS: {{ $lifecycle ?? 'SUBMITTED' }}
+                        </span>
                     </div>
+                </div>
 
-                    <!-- Detail & Unduh File -->
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div class="text-xs text-slate-600">
-                            Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->format('d F Y, H:i') : '-' }}</strong>
-                        </div>
-                        <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Buka / Unduh Berkas Laporan</span>
+                <!-- Stepper Alur Proses Magang Terpadu -->
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-slate-200/80 shadow-xs space-y-5 sm:space-y-6">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">Alur Proses & Informasi Pengajuan Magang</h3>
+                        <a href="{{ route('dashboard') }}" class="text-[11px] sm:text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline shrink-0">
+                            Buka Dashboard Utama
                         </a>
                     </div>
 
-                    <!-- Feedback / Catatan Revisi jika ada -->
-                    @if ($finalReport->feedback)
-                        <div class="p-4 rounded-2xl {{ $finalReport->status === 'revision' ? 'bg-rose-50/80 border-rose-200 text-rose-900' : 'bg-emerald-50/80 border-emerald-200 text-emerald-900' }} border text-xs space-y-1">
-                            <span class="font-bold uppercase tracking-wider text-[11px] block flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-                                {{ $finalReport->status === 'revision' ? 'Catatan Perbaikan / Masukan Revisi:' : 'Catatan Pembimbing:' }}
+                    <!-- 4 Steps Timeline Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-emerald-200 bg-emerald-50/50">
+                            <span class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                Berkas Dikirim
                             </span>
-                            <p class="whitespace-pre-line leading-relaxed italic">
-                                "{{ $finalReport->feedback }}"
-                            </p>
+                            <p class="text-[11px] text-emerald-600 mt-1">Formulir, CV, & Transkrip terkirim ke sistem.</p>
                         </div>
-                    @endif
-                </div>
-            @endif
 
-            <!-- 2. FORM UNGGAH / PERBAHARUI LAPORAN -->
-            @if (!$finalReport || $finalReport->status !== 'approved')
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-                    <div class="border-b border-slate-100 pb-3">
-                        <h3 class="font-black text-base text-slate-900">
-                            {{ $finalReport ? 'Perbarui / Unggah Ulang Laporan Revisi' : 'Formulir Pengunggahan Laporan Akhir' }}
-                        </h3>
+                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-amber-400 bg-amber-50/60 shadow-2xs">
+                            <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                                <span class="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-black">2</span>
+                                Verifikasi Dinas
+                            </span>
+                            <p class="text-[11px] text-amber-800 mt-1">Pemeriksaan berkas & kualifikasi oleh admin dinas.</p>
+                        </div>
+
+                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 text-slate-400">
+                            <span class="text-xs font-bold flex items-center gap-1.5">
+                                <span class="w-4 h-4 rounded-full bg-slate-300 text-white flex items-center justify-center text-[10px] font-black">3</span>
+                                Penugasan Pembimbing
+                            </span>
+                            <p class="text-[11px] mt-1">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan (DPL).</p>
+                        </div>
+
+                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 text-slate-400">
+                            <span class="text-xs font-bold flex items-center gap-1.5">
+                                <span class="w-4 h-4 rounded-full bg-slate-300 text-white flex items-center justify-center text-[10px] font-black">4</span>
+                                Laporan Akhir Magang
+                            </span>
+                            <p class="text-[11px] mt-1">Pengunggahan naskah laporan & penilaian akhir.</p>
+                        </div>
                     </div>
 
-                    <form action="{{ route('student.final_report.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-                        @csrf
-
+                    <!-- Ringkasan Info Penempatan -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 text-xs">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                Judul Naskah Laporan Akhir Magang
-                            </label>
-                            <input type="text" name="title" value="{{ old('title', $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM') }}" placeholder="Contoh: Rancang Bangun Sistem Monitoring Layanan Publik..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Instansi Penempatan</span>
+                            <strong class="text-slate-800 font-bold block mt-0.5 truncate">{{ $application->unit->name ?? 'Dinas Terkait' }}</strong>
                         </div>
-
                         <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Tautan Repositori Proyek / Luaran Kerja (Opsional)
-                                </label>
-                                <span id="repoUrlBadge" class="hidden text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
-                                    ✓ Format Tautan Valid
-                                </span>
-                            </div>
-                            <div class="relative flex items-center">
-                                <input type="url" name="repository_url" id="repository_url" value="{{ old('repository_url', $finalReport->repository_url ?? '') }}" 
-                                       oninput="handleRepoUrlChange(this)"
-                                       placeholder="https://github.com/username/project atau link Google Drive" 
-                                       class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono pr-28">
-                                <a id="repoTestBtn" href="#" target="_blank" class="hidden absolute right-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition items-center gap-1 shadow-xs">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    <span>Uji Link</span>
-                                </a>
-                            </div>
+                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Universitas / Kampus</span>
+                            <strong class="text-slate-800 font-bold block mt-0.5 truncate">{{ $application->user->studentProfile->universitas ?? Auth::user()->university ?? 'UPN Veteran Jawa Timur' }}</strong>
                         </div>
-
-                        <!-- Himbauan Format Penamaan Berkas -->
-                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3.5 shadow-2xs">
-                            <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <div class="text-xs space-y-1.5 flex-1">
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-slate-900 text-xs sm:text-sm">Himbauan Format Penamaan Berkas</span>
-                                    <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider">Format Baku</span>
-                                </div>
-                                <p class="text-slate-600 leading-relaxed text-xs">
-                                    Agar memudahkan Dosen Pembimbing Lapangan (DPL) dan Pembimbing Dinas dalam memeriksa serta mengarsipkan naskah magang Anda, pastikan nama file telah berformat standar sebelum diunggah:
-                                </p>
-                                <div class="p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
-                                    <div class="flex items-center gap-2 font-mono text-xs font-bold text-blue-700">
-                                        <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        <span>Format: Laporan_Akhir_[NIM]_[Nama_Lengkap].[pdf/docx]</span>
-                                    </div>
-                                    <div class="text-[11px] text-slate-500">
-                                        Contoh Anda: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. INTERACTIVE DRAG & DROP DROPZONE + HARMONIZED LIVE PREVIEW -->
                         <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Unggah File Naskah Laporan (PDF / DOCX) 
-                                    @if(!$finalReport || !$finalReport->file_path)
-                                        <span class="text-rose-500">*</span>
-                                    @endif
-                                </label>
-                                @if($finalReport && $finalReport->file_path)
-                                    <span class="text-[11px] text-blue-600 font-medium">
-                                        Berkas tersimpan tersedia (Opsional ganti berkas)
-                                    </span>
-                                @endif
-                            </div>
-
-                            <!-- Drag & Drop Zone Box -->
-                            <div id="dropzoneArea" 
-                                 onclick="document.getElementById('file_laporan').click()"
-                                 ondragover="handleDragOver(event)" 
-                                 ondragleave="handleDragLeave(event)" 
-                                 ondrop="handleFileDrop(event)"
-                                 class="relative border-2 border-dashed border-slate-300 hover:border-blue-600 rounded-3xl p-6 sm:p-8 bg-slate-50/50 hover:bg-blue-50/40 transition cursor-pointer text-center group space-y-3">
-                                <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,.doc,.docx" 
-                                       {{ $finalReport && $finalReport->file_path ? '' : 'required' }}
-                                       onchange="handleFinalReportPreview(this)"
-                                       class="hidden">
-                                
-                                <div class="w-12 h-12 mx-auto rounded-2xl bg-blue-50 group-hover:bg-blue-600 text-blue-600 group-hover:text-white border border-blue-100 flex items-center justify-center transition shadow-2xs">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                </div>
-                                <div class="space-y-1">
-                                    <p class="text-xs sm:text-sm font-bold text-slate-800">
-                                        <span class="text-blue-600 underline">Pilih berkas dari komputer</span> atau tarik & lepas (drag & drop) di sini
-                                    </p>
-                                    <p class="text-[11px] text-slate-400">
-                                        Format didukung: <strong>PDF, DOC, DOCX</strong> (Maksimal 10 MB)
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- File Info & Quick Actions Box -->
-                            <div id="reportFileBox" class="hidden mt-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl items-center justify-between gap-3 shadow-2xs">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div id="reportFileIcon" class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                                        PDF
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p id="reportFileName" class="text-xs font-bold text-slate-900 truncate"></p>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <span id="reportFileSize" class="text-[11px] text-slate-500 font-medium"></span>
-                                            <span id="pdfBadge" class="hidden text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">Pratinjau PDF Siap</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
-                                        Ganti Berkas
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- HARMONIZED LIVE DOCUMENT PREVIEW CANVAS (LIGHT CORPORATE THEME) -->
-                            <div id="documentPreviewContainer" class="hidden mt-4 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
-                                <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        </div>
-                                        <span id="previewHeaderTitle" class="text-xs font-bold text-slate-800 tracking-tight">Pratinjau Dokumen Naskah</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span id="docxStatusBadge" class="hidden text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg">
-                                            Live Word Renderer
-                                        </span>
-                                        <a id="pdfOpenTabBtn" href="#" target="_blank" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
-                                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                            <span>Tab Baru</span>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <div class="p-4 sm:p-6 bg-slate-50/60">
-                                    <!-- PDF Viewer Frame -->
-                                    <div id="pdfViewerWrapper" class="hidden w-full h-[520px] rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-xs relative">
-                                        <iframe id="pdfPreviewIframe" class="w-full h-full rounded-2xl border-0" src="about:blank"></iframe>
-                                    </div>
-
-                                    <!-- DOCX Live Render Box -->
-                                    <div id="docxViewerWrapper" class="hidden w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 p-4 sm:p-6 space-y-3">
-                                        <div id="docxLoadingState" class="p-6 text-center text-xs text-slate-500 font-medium">
-                                            Mengurai teks & struktur dokumen Word (.docx)...
-                                        </div>
-                                        <div id="docxPreviewOutput" class="hidden bg-white text-slate-800 p-6 sm:p-10 rounded-2xl border border-slate-200 font-sans max-h-[500px] overflow-y-auto leading-relaxed shadow-sm">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="bg-slate-50 px-5 py-2.5 border-t border-slate-200/80 text-center">
-                                    <p class="text-[11px] text-slate-500 italic">
-                                        *Inspeksi lembar naskah & format dokumen di atas secara langsung sebelum menekan tombol simpan.
-                                    </p>
-                                </div>
-                            </div>
+                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Periode Magang Diajukan</span>
+                            <strong class="text-slate-800 font-bold block mt-0.5">
+                                {{ $application->start_date ? \Carbon\Carbon::parse($application->start_date)->format('d M Y') : '-' }} s/d {{ $application->end_date ? \Carbon\Carbon::parse($application->end_date)->format('d M Y') : '-' }}
+                            </strong>
                         </div>
+                        <div>
+                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Tanggal Diajukan</span>
+                            <strong class="text-amber-700 font-bold block mt-0.5">{{ $application->created_at ? $application->created_at->format('d F Y') : '-' }}</strong>
+                        </div>
+                    </div>
 
-                        <div class="pt-3 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
-                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
-                                Batal
-                            </a>
-                            <button type="submit" class="w-full sm:w-auto px-7 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
-                                {{ $finalReport ? 'Unggah Ulang Naskah Revisi' : 'Kirim Laporan Akhir' }}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            @else
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-xs space-y-6">
-                    <div class="p-6 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 rounded-2xl text-center space-y-3 shadow-2xs">
-                        <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <h3 class="font-black text-lg sm:text-xl text-emerald-950">Laporan Akhir Anda Telah Disetujui Secara Resmi (ACC)</h3>
-                        <p class="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
-                            Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan (DPL) dan Mentor Instansi Pemerintah Kota Surabaya.
+                    <!-- Kotak Petunjuk Akses -->
+                    <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-blue-50/60 border border-blue-100 flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-xs text-blue-900 leading-relaxed">
+                            <strong>Informasi Akses Laporan Akhir:</strong><br>
+                            Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan terbuka secara otomatis setelah status permohonan magang Anda disetujui (diterima) oleh pihak instansi kedinasan.
                         </p>
                     </div>
+                </div>
 
-                    @php
-                        $univ = $evaluation?->getUniversity();
-                        $scheme = $evaluation?->evaluation_scheme ?? ($univ->evaluation_scheme ?? 'dual_evaluation');
-                        $isMentorOnly = ($scheme === 'mentor_only');
+            {{-- KONDISI 2: JIKA SUDAH MEMILIKI PENEMPATAN AKTIF (BISA UNGGAH / LIHAT STATUS LAPORAN) --}}
+            @else
 
-                        $hasMentorScore = $evaluation && ($evaluation->nilai_pembimbing ?? 0) > 0;
-                        $hasDosenScore = $evaluation && (($evaluation->nilai_dosen_calculated ?? 0) > 0 || ($evaluation->nilai_dosen ?? 0) > 0 || ($evaluation->nilai_akademik ?? 0) > 0);
+                <!-- Informational Banner for Early & Parallel Upload -->
+                <div class="p-3.5 sm:p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl flex items-start gap-3 text-blue-900 text-xs sm:text-sm font-medium leading-relaxed shadow-2xs">
+                    <div class="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="space-y-0.5">
+                        <span class="font-bold block text-blue-950 text-xs sm:text-sm">Informasi Pengunggahan Laporan Akhir</span>
+                        <p class="text-[11px] sm:text-xs text-blue-900">Anda dapat mengunggah atau memperbarui draf naskah laporan ilmiah & repositori proyek magang Anda <strong>kapan saja</strong> selama periode magang berlangsung. Pastikan juga untuk tetap mengisi logbook kegiatan harian secara teratur.</p>
+                    </div>
+                </div>
 
-                        $isEvalComplete = $evaluation && $evaluation->is_complete;
-                    @endphp
-
-                    @if ($isEvalComplete)
-                        <!-- Rekapitulasi Nilai Kelulusan Mahasiswa -->
-                        <div class="space-y-4 pt-2">
-                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-                                <div>
-                                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang MBKM</span>
-                                    <h4 class="font-black text-base text-gray-900">Rekapitulasi Nilai Kelulusan & Prestasi</h4>
-                                </div>
-                                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-full border border-emerald-200">
-                                    Lulus Magang
-                                </span>
+                <!-- 1. STATUS LAPORAN SAAT INI -->
+                @if ($finalReport)
+                    <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-slate-200/80 shadow-xs space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-slate-100">
+                            <div class="min-w-0">
+                                <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block">Status Verifikasi Naskah</span>
+                                <h3 class="font-black text-base sm:text-lg text-slate-900 mt-0.5 break-words">
+                                    <span>{{ $finalReport->title ?? 'Naskah Laporan Akhir Magang' }}</span>
+                                </h3>
+                                @if($finalReport->repository_url)
+                                    <a href="{{ $finalReport->repository_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 font-semibold mt-1 inline-flex items-center gap-1.5 break-all">
+                                        <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                        <span>Tautan Proyek: {{ $finalReport->repository_url }}</span>
+                                    </a>
+                                @endif
                             </div>
 
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Disiplin</span>
-                                    <span class="text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_disiplin ?? 0, 1) }}</span>
-                                    <span class="text-[10px] text-slate-400">Kehadiran & Tata Tertib</span>
-                                </div>
-                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Kinerja</span>
-                                    <span class="text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_kinerja ?? 0, 1) }}</span>
-                                    <span class="text-[10px] text-slate-400">Keahlian & Inisiatif</span>
-                                </div>
-                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Laporan</span>
-                                    <span class="text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_laporan ?? 0, 1) }}</span>
-                                    <span class="text-[10px] text-slate-400">Kualitas Naskah</span>
-                                </div>
-                                <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 text-center">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Nilai Akhir</span>
-                                    <span class="text-xl font-black text-indigo-950 mt-1 block">
-                                        {{ number_format($evaluation->nilai_akhir > 0 ? $evaluation->nilai_akhir : ($evaluation->final_score ?? 0), 1) }}
-                                        <span class="text-xs font-bold text-indigo-600 font-mono">({{ $evaluation->grade ?? 'A' }})</span>
+                            <div class="shrink-0">
+                                @if($finalReport->status === 'approved')
+                                    <span class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Laporan Disetujui (ACC)</span>
                                     </span>
-                                    <span class="text-[10px] text-indigo-600 font-semibold">Predikat Kelulusan</span>
-                                </div>
-                            </div>
-
-                            @if($evaluation->catatan || $evaluation->feedback_dosen)
-                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
-                                    @if($evaluation->catatan)
-                                        <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->catatan }}"</span></p>
-                                    @endif
-                                    @if($evaluation->feedback_dosen)
-                                        <p class="text-slate-700"><strong class="text-slate-900">Ulasan Dosen Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
-                                    @endif
-                                </div>
-                            @endif
-
-                            <!-- Action Button: Cetak & Download Sertifikat -->
-                            <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-3">
-                                <a href="{{ route('student.certificate.show', $placement->id) }}" target="_blank"
-                                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl text-xs transition shadow-md shadow-blue-600/20 active:scale-95 cursor-pointer">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <span>Pratinjau E-Sertifikat Resmi</span>
-                                </a>
-
-                                <a href="{{ route('student.certificate.download', $placement->id) }}" target="_blank"
-                                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs transition shadow-md shadow-emerald-600/20 active:scale-95 cursor-pointer">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    <span>Unduh E-Sertifikat & Transkrip</span>
-                                </a>
+                                @elseif($finalReport->status === 'revision')
+                                    <span class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-black bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-1.5 shadow-2xs">
+                                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        <span>Perlu Perbaikan (Revisi)</span>
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-black bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5 shadow-2xs">
+                                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>Menunggu Verifikasi DPL / Mentor</span>
+                                    </span>
+                                @endif
                             </div>
                         </div>
-                    @else
-                        <div class="p-5 rounded-2xl bg-amber-50/90 border border-amber-200 text-center space-y-2">
-                            <div class="w-10 h-10 mx-auto rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+
+                        <!-- Detail & Unduh File -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100">
+                            <div class="text-xs text-slate-600">
+                                Terakhir diunggah: <strong>{{ $finalReport->updated_at ? $finalReport->updated_at->format('d F Y, H:i') : '-' }}</strong>
                             </div>
-                            <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian Akhir</span>
-                            <p class="text-xs text-amber-800 max-w-md mx-auto leading-relaxed">
-                                @if($hasMentorScore && !$isMentorOnly && !$hasDosenScore)
-                                    Nilai dari Pembimbing Lapangan Instansi telah selesai diinput. Saat ini sedang menunggu input lembar evaluasi akademik dari <strong>Dosen Pembimbing Lapangan (DPL)</strong> perguruan tinggi Anda sebelum E-Sertifikat dapat diterbitkan.
-                                @elseif(!$hasMentorScore && $hasDosenScore)
-                                    Nilai akademik dari DPL kampus telah tercatat. Saat ini sedang menunggu input nilai kinerja dari <strong>Pembimbing Lapangan Instansi Dinas</strong>.
-                                @else
-                                    Pembimbing lapangan instansi dinas dan DPL kampus sedang memproses lembar penilaian evaluasi akhir magang Anda.
-                                @endif
+                            <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Buka / Unduh Berkas Laporan</span>
+                            </a>
+                        </div>
+
+                        <!-- Feedback / Catatan Revisi jika ada -->
+                        @if ($finalReport->feedback)
+                            <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl {{ $finalReport->status === 'revision' ? 'bg-rose-50/80 border-rose-200 text-rose-900' : 'bg-emerald-50/80 border-emerald-200 text-emerald-900' }} border text-xs space-y-1">
+                                <span class="font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                                    {{ $finalReport->status === 'revision' ? 'Catatan Perbaikan / Masukan Revisi:' : 'Catatan Pembimbing:' }}
+                                </span>
+                                <p class="whitespace-pre-line leading-relaxed italic">
+                                    "{{ $finalReport->feedback }}"
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                <!-- 2. FORM UNGGAH / PERBAHARUI LAPORAN -->
+                @if (!$finalReport || $finalReport->status !== 'approved')
+                    <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-slate-200/80 shadow-xs space-y-5 sm:space-y-6">
+                        <div class="border-b border-slate-100 pb-3">
+                            <h3 class="font-black text-sm sm:text-base text-slate-900">
+                                {{ $finalReport ? 'Perbarui / Unggah Ulang Laporan Revisi' : 'Formulir Pengunggahan Laporan Akhir' }}
+                            </h3>
+                        </div>
+
+                        <form action="{{ route('student.final_report.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-5">
+                            @csrf
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Judul Naskah Laporan Akhir Magang
+                                </label>
+                                <input type="text" name="title" value="{{ old('title', $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM') }}" placeholder="Contoh: Rancang Bangun Sistem Monitoring Layanan Publik..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5 gap-2">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider truncate">
+                                        Tautan Repositori Proyek / Luaran Kerja (Opsional)
+                                    </label>
+                                    <span id="repoUrlBadge" class="hidden text-[10px] sm:text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 shrink-0">
+                                        ✓ Valid
+                                    </span>
+                                </div>
+                                <div class="relative flex items-center">
+                                    <input type="url" name="repository_url" id="repository_url" value="{{ old('repository_url', $finalReport->repository_url ?? '') }}" 
+                                           oninput="handleRepoUrlChange(this)"
+                                           placeholder="https://github.com/username/project atau link Google Drive" 
+                                           class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono pr-24 sm:pr-28">
+                                    <a id="repoTestBtn" href="#" target="_blank" class="hidden absolute right-1.5 px-2.5 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition items-center gap-1 shadow-xs">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span>Uji</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Himbauan Format Penamaan Berkas Responsif Mobile -->
+                            <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3 shadow-2xs">
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs space-y-1.5 flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-bold text-slate-900 text-xs sm:text-sm">Himbauan Format Penamaan Berkas</span>
+                                        <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider shrink-0">Format Baku</span>
+                                    </div>
+                                    <p class="text-slate-600 leading-relaxed text-[11px] sm:text-xs">
+                                        Agar memudahkan DPL dan Pembimbing Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
+                                    </p>
+                                    <div class="p-2 sm:p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
+                                        <div class="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-blue-700">
+                                            <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            <span class="truncate">Format: Laporan_Akhir_[NIM]_[Nama].[ext]</span>
+                                        </div>
+                                        <div class="text-[10px] sm:text-[11px] text-slate-500 break-all leading-normal">
+                                            Contoh: <strong class="text-slate-800 font-mono">Laporan_Akhir_{{ preg_replace('/[^A-Za-z0-9]/', '', Auth::user()->studentProfile->nim ?? '22051204001') }}_{{ \Illuminate\Support\Str::slug(Auth::user()->name, '_') }}.pdf</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Drag & Drop Dropzone -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5 gap-2">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider truncate">
+                                        Unggah File Naskah Laporan (PDF / DOCX) 
+                                        @if(!$finalReport || !$finalReport->file_path)
+                                            <span class="text-rose-500">*</span>
+                                        @endif
+                                    </label>
+                                    @if($finalReport && $finalReport->file_path)
+                                        <span class="text-[10px] sm:text-[11px] text-blue-600 font-medium shrink-0">
+                                            Berkas tersimpan tersedia
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div id="dropzoneArea" 
+                                     onclick="document.getElementById('file_laporan').click()"
+                                     ondragover="handleDragOver(event)" 
+                                     ondragleave="handleDragLeave(event)" 
+                                     ondrop="handleFileDrop(event)"
+                                     class="relative border-2 border-dashed border-slate-300 hover:border-blue-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bg-slate-50/50 hover:bg-blue-50/40 transition cursor-pointer text-center group space-y-2 sm:space-y-3">
+                                    <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,.doc,.docx" 
+                                           {{ $finalReport && $finalReport->file_path ? '' : 'required' }}
+                                           onchange="handleFinalReportPreview(this)"
+                                           class="hidden">
+                                    
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-xl sm:rounded-2xl bg-blue-50 group-hover:bg-blue-600 text-blue-600 group-hover:text-white border border-blue-100 flex items-center justify-center transition shadow-2xs">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <p class="text-xs sm:text-sm font-bold text-slate-800">
+                                            <span class="text-blue-600 underline">Pilih berkas</span> atau tarik & lepas di sini
+                                        </p>
+                                        <p class="text-[10px] sm:text-[11px] text-slate-400">
+                                            Format: <strong>PDF, DOC, DOCX</strong> (Maksimal 10 MB)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- File Info Box -->
+                                <div id="reportFileBox" class="hidden mt-3 sm:mt-4 p-3 sm:p-4 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl items-center justify-between gap-3 shadow-2xs">
+                                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                        <div id="reportFileIcon" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0 shadow-xs">
+                                            PDF
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p id="reportFileName" class="text-xs font-bold text-slate-900 truncate"></p>
+                                            <div class="flex items-center gap-2 mt-0.5">
+                                                <span id="reportFileSize" class="text-[10px] sm:text-[11px] text-slate-500 font-medium"></span>
+                                                <span id="pdfBadge" class="hidden text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">Pratinjau PDF Siap</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-2.5 sm:px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
+                                            Ganti
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Document Preview Canvas -->
+                                <div id="documentPreviewContainer" class="hidden mt-4 bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
+                                    <div class="bg-slate-50 px-4 sm:px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            </div>
+                                            <span id="previewHeaderTitle" class="text-xs font-bold text-slate-800 tracking-tight">Pratinjau Dokumen Naskah</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span id="docxStatusBadge" class="hidden text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg">
+                                                Live DOCX
+                                            </span>
+                                            <a id="pdfOpenTabBtn" href="#" target="_blank" class="px-2.5 sm:px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                <span>Tab Baru</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 sm:p-6 bg-slate-50/60">
+                                        <div id="pdfViewerWrapper" class="hidden w-full h-[400px] sm:h-[520px] rounded-xl sm:rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-xs relative">
+                                            <iframe id="pdfPreviewIframe" class="w-full h-full rounded-xl sm:rounded-2xl border-0" src="about:blank"></iframe>
+                                        </div>
+
+                                        <div id="docxViewerWrapper" class="hidden w-full rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 p-3 sm:p-6 space-y-3">
+                                            <div id="docxLoadingState" class="p-4 sm:p-6 text-center text-xs text-slate-500 font-medium">
+                                                Mengurai teks & struktur dokumen Word (.docx)...
+                                            </div>
+                                            <div id="docxPreviewOutput" class="hidden bg-white text-slate-800 p-4 sm:p-8 rounded-xl sm:rounded-2xl border border-slate-200 font-sans max-h-[420px] overflow-y-auto leading-relaxed shadow-sm text-xs sm:text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-slate-50 px-4 py-2 border-t border-slate-200/80 text-center">
+                                        <p class="text-[10px] sm:text-[11px] text-slate-500 italic">
+                                            *Inspeksi lembar naskah & format dokumen di atas secara langsung sebelum menekan tombol simpan.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
+                                <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
+                                    Batal
+                                </a>
+                                <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
+                                    {{ $finalReport ? 'Unggah Ulang Naskah Revisi' : 'Kirim Laporan Akhir' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @else
+                    <!-- TAMPILAN JIKA SUDAH ACC LAPORAN (LULUS & TAMPIL NILAI) -->
+                    <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-emerald-200 shadow-xs space-y-5 sm:space-y-6">
+                        <div class="p-5 sm:p-6 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 rounded-2xl text-center space-y-2.5 shadow-2xs">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <h3 class="font-black text-base sm:text-xl text-emerald-950">Laporan Akhir Anda Telah Disetujui Secara Resmi (ACC)</h3>
+                            <p class="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
+                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan (DPL) dan Mentor Instansi Pemerintah Kota Surabaya.
                             </p>
                         </div>
-                    @endif
-                </div>
+
+                        @php
+                            $univ = $evaluation?->getUniversity();
+                            $scheme = $evaluation?->evaluation_scheme ?? ($univ->evaluation_scheme ?? 'dual_evaluation');
+                            $isMentorOnly = ($scheme === 'mentor_only');
+
+                            $hasMentorScore = $evaluation && ($evaluation->nilai_pembimbing ?? 0) > 0;
+                            $hasDosenScore = $evaluation && (($evaluation->nilai_dosen_calculated ?? 0) > 0 || ($evaluation->nilai_dosen ?? 0) > 0 || ($evaluation->nilai_akademik ?? 0) > 0);
+
+                            $isEvalComplete = $evaluation && $evaluation->is_complete;
+                        @endphp
+
+                        @if ($isEvalComplete)
+                            <div class="space-y-4 pt-1">
+                                <div class="flex items-center justify-between border-b border-gray-100 pb-3 gap-2">
+                                    <div>
+                                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang MBKM</span>
+                                        <h4 class="font-black text-sm sm:text-base text-gray-900">Rekapitulasi Nilai Kelulusan & Prestasi</h4>
+                                    </div>
+                                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[11px] sm:text-xs rounded-full border border-emerald-200 shrink-0">
+                                        Lulus Magang
+                                    </span>
+                                </div>
+
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Disiplin</span>
+                                        <span class="text-lg sm:text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_disiplin ?? 0, 1) }}</span>
+                                        <span class="text-[10px] text-slate-400">Kehadiran</span>
+                                    </div>
+                                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Kinerja</span>
+                                        <span class="text-lg sm:text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_kinerja ?? 0, 1) }}</span>
+                                        <span class="text-[10px] text-slate-400">Keahlian</span>
+                                    </div>
+                                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nilai Laporan</span>
+                                        <span class="text-lg sm:text-xl font-black text-slate-800 mt-1 block">{{ number_format($evaluation->nilai_laporan ?? 0, 1) }}</span>
+                                        <span class="text-[10px] text-slate-400">Kualitas Naskah</span>
+                                    </div>
+                                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-indigo-50 border border-indigo-100 text-center">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Nilai Akhir</span>
+                                        <span class="text-lg sm:text-xl font-black text-indigo-950 mt-1 block">
+                                            {{ number_format($evaluation->nilai_akhir > 0 ? $evaluation->nilai_akhir : ($evaluation->final_score ?? 0), 1) }}
+                                            <span class="text-xs font-bold text-indigo-600 font-mono">({{ $evaluation->grade ?? 'A' }})</span>
+                                        </span>
+                                        <span class="text-[10px] text-indigo-600 font-semibold">Predikat</span>
+                                    </div>
+                                </div>
+
+                                @if($evaluation->catatan || $evaluation->feedback_dosen)
+                                    <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                                        @if($evaluation->catatan)
+                                            <p class="text-slate-700"><strong class="text-slate-900">Ulasan Pembimbing Lapangan:</strong> <span class="italic text-slate-600">"{{ $evaluation->catatan }}"</span></p>
+                                        @endif
+                                        @if($evaluation->feedback_dosen)
+                                            <p class="text-slate-700"><strong class="text-slate-900">Ulasan Dosen Pembimbing:</strong> <span class="italic text-slate-600">"{{ $evaluation->feedback_dosen }}"</span></p>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-2.5 sm:gap-3">
+                                    <a href="{{ route('student.certificate.show', $placement->id) }}" target="_blank"
+                                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-md shadow-blue-600/20 active:scale-95 cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span>Pratinjau E-Sertifikat</span>
+                                    </a>
+
+                                    <a href="{{ route('student.certificate.download', $placement->id) }}" target="_blank"
+                                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-600/20 active:scale-95 cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <span>Unduh E-Sertifikat & Transkrip</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-amber-50/90 border border-amber-200 text-center space-y-2">
+                                <div class="w-9 h-9 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian Akhir</span>
+                                <p class="text-[11px] sm:text-xs text-amber-800 max-w-md mx-auto leading-relaxed">
+                                    @if($hasMentorScore && !$isMentorOnly && !$hasDosenScore)
+                                        Nilai dari Pembimbing Lapangan Instansi telah selesai diinput. Saat ini sedang menunggu input lembar evaluasi akademik dari <strong>DPL</strong> perguruan tinggi Anda sebelum E-Sertifikat dapat diterbitkan.
+                                    @elseif(!$hasMentorScore && $hasDosenScore)
+                                        Nilai akademik dari DPL kampus telah tercatat. Saat ini sedang menunggu input nilai kinerja dari <strong>Pembimbing Lapangan Instansi Dinas</strong>.
+                                    @else
+                                        Pembimbing lapangan instansi dinas dan DPL kampus sedang memproses lembar penilaian evaluasi akhir magang Anda.
+                                    @endif
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
             @endif
 
         </div>
@@ -565,7 +660,6 @@
             }
         }
 
-        // Initialize repository URL listener on page load
         document.addEventListener('DOMContentLoaded', () => {
             const repoInput = document.getElementById('repository_url');
             if (repoInput && repoInput.value) {
