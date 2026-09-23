@@ -105,4 +105,46 @@ class Application extends Model
     {
         return $this->is_active_internship;
     }
+
+    public function getHasApprovedReportAttribute(): bool
+    {
+        $placement = $this->placement;
+        return (bool)($placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']));
+    }
+
+    public function getHasCompleteEvaluationAttribute(): bool
+    {
+        $eval = $this->placement?->evaluation;
+        if (!$eval) {
+            return false;
+        }
+
+        if ((float)($eval->final_score ?? 0) > 0) {
+            return true;
+        }
+
+        $hasMentor = ($eval->nilai_disiplin > 0 && $eval->nilai_kinerja > 0 && $eval->nilai_laporan > 0);
+        $hasDosen = ($eval->nilai_dosen > 0 || $eval->nilai_akademik > 0 || ($eval->score_mastery > 0 && $eval->score_report > 0 && $eval->score_attitude > 0));
+
+        $univ = $eval->getUniversity();
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        if ($scheme === 'mentor_only') {
+            return $hasMentor;
+        }
+
+        return ($hasMentor && $hasDosen) || $eval->is_complete;
+    }
+
+    public function getCanCompleteAttribute(): bool
+    {
+        if (strtolower($this->status) === 'completed') {
+            return true;
+        }
+
+        if (strtolower($this->status) !== 'accepted') {
+            return false;
+        }
+
+        return $this->has_approved_report && $this->has_complete_evaluation;
+    }
 }

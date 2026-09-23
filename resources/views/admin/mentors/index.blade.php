@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-8">
+    <div class="py-6 sm:py-8" x-data="{}">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
 
             <!-- Flash Alert -->
@@ -139,12 +139,17 @@
                                             </a>
 
                                             <!-- Reset Password -->
-                                            <form action="{{ route('admin.mentors.reset_password', $m->id) }}" method="POST" onsubmit="return confirm('Reset password mentor {{ $m->name }} ke default (password)?');" class="btn-action-form">
-                                                @csrf
-                                                <button type="submit" class="btn-action-reset">
-                                                    Reset
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    @click="$dispatch('open-reset-modal', {
+                                                        action: '{{ route('admin.mentors.reset_password', $m->id) }}',
+                                                        name: '{{ addslashes($m->name) }}',
+                                                        email: '{{ addslashes($m->email) }}',
+                                                        role: 'MENTOR LAPANGAN'
+                                                    })" 
+                                                    class="btn-action-reset" 
+                                                    title="Reset password ke default: password">
+                                                Reset
+                                            </button>
 
                                             <!-- Hapus -->
                                             <button type="button" 
@@ -152,7 +157,7 @@
                                                         action: '{{ route('admin.mentors.destroy', $m->id) }}',
                                                         title: 'Hapus Mentor Lapangan',
                                                         name: '{{ addslashes($m->name) }}',
-                                                        desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile->agency_name ?? 'Dinas Terkait') }}'
+                                                        desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile?->agency_name ?? 'Dinas Terkait') }}'
                                                     })" 
                                                     class="btn-action-delete"
                                                     title="Hapus Mentor">
@@ -247,15 +252,19 @@
                                     <span>Edit</span>
                                 </a>
 
-                                <!-- Reset Password -->
-                                <form action="{{ route('admin.mentors.reset_password', $m->id) }}" method="POST" onsubmit="return confirm('Reset password mentor {{ $m->name }} ke default (password)?');" class="inline-block m-0">
-                                    @csrf
-                                    <button type="submit" 
-                                            class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer">
-                                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                                        <span>Reset</span>
-                                    </button>
-                                </form>
+                                <!-- Reset Password (Double Confirmation Modal) -->
+                                <button type="button" 
+                                        @click="$dispatch('open-reset-modal', {
+                                            action: '{{ route('admin.mentors.reset_password', $m->id) }}',
+                                            name: '{{ addslashes($m->name) }}',
+                                            email: '{{ addslashes($m->email) }}',
+                                            role: 'MENTOR LAPANGAN'
+                                        })" 
+                                        class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
+                                        title="Reset Password">
+                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                    <span>Reset</span>
+                                </button>
 
                                 <!-- Hapus -->
                                 <button type="button" 
@@ -263,7 +272,7 @@
                                             action: '{{ route('admin.mentors.destroy', $m->id) }}',
                                             title: 'Hapus Mentor Lapangan',
                                             name: '{{ addslashes($m->name) }}',
-                                            desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile->agency_name ?? 'Dinas Terkait') }}'
+                                            desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile?->agency_name ?? 'Dinas Terkait') }}'
                                         })" 
                                         class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
                                         title="Hapus Mentor">

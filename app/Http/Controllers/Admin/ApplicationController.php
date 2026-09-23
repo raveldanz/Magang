@@ -26,6 +26,9 @@ class ApplicationController extends Controller
         $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
 
+        $isPgsql = DB::connection()->getDriverName() === 'pgsql';
+        $currentDateSql = $isPgsql ? 'CURRENT_DATE' : 'CURDATE()';
+
         $query = Application::with([
             'user.studentProfile', 
             'unit.agencyProfile', 
@@ -35,7 +38,44 @@ class ApplicationController extends Controller
             'placement.mentor', 
             'placement.pembimbing', 
             'placement.academicAdvisor'
-        ])->latest();
+        ]);
+
+        // Prioritas Pengurutan Berdasarkan Kebutuhan Tindakan (Action-Driven Priority):
+        // 1. Mahasiswa Baru yang Perlu Verifikasi Berkas & Penerimaan (PENDING / VERIFIED / SUBMITTED) -> Teratas
+        // 2. Mahasiswa yang Perlu Aksi Kelulusan (ACCEPTED dengan Laporan Disetujui *DAN* Nilai Evaluasi Lengkap) -> Siap Diluluskan
+        // 3. Mahasiswa yang Sedang Magang Aktif (ACCEPTED normal, baik aktif berkegiatan atau masih menunggu penilaian)
+        // 4. Mahasiswa yang Sudah Selesai & Lulus (COMPLETED) -> Dikebawahkan
+        // 5. Berkas Ditolak atau Mengundurkan Diri (REJECTED / RESIGNED / CANCELED) -> Paling bawah
+        $query->orderByRaw("
+            CASE 
+                WHEN applications.status IN ('pending', 'verified', 'submitted') THEN 1
+                WHEN applications.status = 'accepted' 
+                  AND EXISTS (
+                      SELECT 1 FROM placements p 
+                      JOIN final_reports fr ON fr.placement_id = p.id 
+                      WHERE p.application_id = applications.id 
+                        AND LOWER(fr.status) IN ('approved', 'disetujui')
+                  )
+                  AND EXISTS (
+                      SELECT 1 FROM placements p 
+                      JOIN evaluations ev ON ev.placement_id = p.id 
+                      WHERE p.application_id = applications.id 
+                        AND (
+                            COALESCE(ev.final_score, 0) > 0 
+                            OR (
+                                COALESCE(ev.nilai_disiplin, 0) > 0 
+                                AND COALESCE(ev.nilai_kinerja, 0) > 0 
+                                AND COALESCE(ev.nilai_laporan, 0) > 0
+                                AND (COALESCE(ev.nilai_dosen, 0) > 0 OR COALESCE(ev.nilai_akademik, 0) > 0)
+                            )
+                        )
+                  ) THEN 2
+                WHEN applications.status = 'accepted' THEN 3
+                WHEN applications.status = 'completed' THEN 4
+                WHEN applications.status IN ('rejected', 'resigned', 'canceled') THEN 5
+                ELSE 6
+            END ASC, applications.created_at DESC
+        ");
 
         // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
         if ($agencyId) {
@@ -191,13 +231,16 @@ class ApplicationController extends Controller
 
         // Strict Validation for COMPLETED status
         if ($newStatus === 'completed' && $oldStatus !== 'completed') {
-            $placement = $application->placement;
-            $hasApprovedReport = $placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']);
-            $eval = $placement?->evaluation;
-            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
-
-            if (!$hasApprovedReport || !$hasCompleteEval) {
-                return redirect()->back()->with('error', "Gagal menyelesaikan magang: Mahasiswa belum melengkapi Laporan Akhir (disetujui) atau Penilaian (Mentor & DPL) belum tuntas.");
+            if (!$application->can_complete) {
+                $missing = [];
+                if (!$application->has_approved_report) {
+                    $missing[] = "Laporan Akhir belum disetujui";
+                }
+                if (!$application->has_complete_evaluation) {
+                    $missing[] = "Penilaian (Mentor & DPL) belum tuntas diisi";
+                }
+                $missingStr = implode(' dan ', $missing);
+                return redirect()->back()->with('error', "Gagal menyelesaikan magang: {$missingStr}.");
             }
         }
 
