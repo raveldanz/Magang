@@ -373,7 +373,9 @@
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition">
+                                                <a href="{{ asset('storage/' . $log->attachment) }}" 
+                                                   @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                                   target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                                     <span>Buka Lampiran</span>
                                                 </a>
@@ -441,6 +443,14 @@
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
                                         </span>
                                     </div>
+                                    @if ($log->attachment)
+                                        <a href="{{ asset('storage/' . $log->attachment) }}" 
+                                           @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                           target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                            <span>Lampiran</span>
+                                        </a>
+                                    @endif
                                 </div>
 
                                 <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -492,6 +502,34 @@
 
             @endif
 
+        </div>
+    </div>
+
+    <!-- Lightbox Image Viewer Modal -->
+    <div x-data="{ openLightbox: false, lightboxUrl: '', lightboxTitle: '' }"
+         @open-lightbox.window="openLightbox = true; lightboxUrl = $event.detail.url; lightboxTitle = $event.detail.title || 'Lampiran Dokumen Logbook'">
+        <div x-show="openLightbox" x-cloak class="fixed inset-0 z-[9999] overflow-y-auto">
+            <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs transition-opacity" @click="openLightbox = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all max-w-3xl w-full p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 class="text-sm font-bold text-slate-800" x-text="lightboxTitle"></h3>
+                        <button type="button" @click="openLightbox = false" class="text-slate-400 hover:text-slate-600 text-base p-1 cursor-pointer">✕</button>
+                    </div>
+                    <div class="bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center p-2 min-h-[300px] max-h-[70vh]">
+                        <template x-if="lightboxUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i)">
+                            <img :src="lightboxUrl" alt="Preview Lampiran" class="max-h-[65vh] w-auto object-contain rounded-xl shadow-md">
+                        </template>
+                        <template x-if="!lightboxUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i)">
+                            <iframe :src="lightboxUrl" class="w-full h-[60vh] rounded-xl border-0"></iframe>
+                        </template>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <a :href="lightboxUrl" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">Buka Berkas Utama</a>
+                        <button type="button" @click="openLightbox = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">Tutup</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>
