@@ -80,12 +80,12 @@
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-4">Nama Mentor</th>
-                                <th class="py-3.5 px-4">Email Resmi / Login</th>
-                                <th class="py-3.5 px-4">Instansi Dinas</th>
+                                <th class="py-3.5 px-4 ">Nama Mentor</th>
+                                <th class="py-3.5 px-4 text-center">Email Resmi / Login</th>
+                                <th class="py-3.5 px-4 text-center">Instansi Dinas</th>
                                 <th class="py-3.5 px-4 text-center">Beban Bimbingan</th>
                                 <th class="py-3.5 px-4 text-center">Status</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -122,6 +122,16 @@
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <div class="btn-action-group">
                                             
+                                            <!-- Login As -->
+                                            @if($isSuperAdmin && $m->id !== auth()->id())
+                                                <form action="{{ route('admin.impersonate', $m->id) }}" method="POST" class="btn-action-form">
+                                                    @csrf
+                                                    <button type="submit" title="Masuk sebagai {{ $m->name }} (Login As)" class="btn-action-login">
+                                                        Login As
+                                                    </button>
+                                                </form>
+                                            @endif
+
                                             <!-- Edit -->
                                             <a href="{{ route('admin.mentors.edit', $m->id) }}" 
                                                class="btn-action-edit">
@@ -223,6 +233,18 @@
 
                             <!-- Tombol Aksi Mobile (Touch-Friendly) -->
                             <div class="pt-2 border-t border-gray-100 flex flex-wrap items-center gap-2 justify-end">
+                                <!-- Login As -->
+                                @if($isSuperAdmin && $m->id !== auth()->id())
+                                    <form action="{{ route('admin.impersonate', $m->id) }}" method="POST" class="inline-block m-0">
+                                        @csrf
+                                        <button type="submit" title="Masuk sebagai {{ $m->name }} (Login As)"
+                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                                            <span>Login As</span>
+                                        </button>
+                                    </form>
+                                @endif
+
                                 <!-- Edit -->
                                 <a href="{{ route('admin.mentors.edit', $m->id) }}" 
                                    class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95">

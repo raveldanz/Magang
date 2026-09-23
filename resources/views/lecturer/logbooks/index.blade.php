@@ -211,7 +211,7 @@
                                         <!-- Tombol Aksi Evaluasi -->
                                         <td class="py-4 px-4 align-top text-right">
                                             <button type="button" 
-                                                    @click="openModal({{ json_encode($bundle) }})"
+                                                    @click="openModal({{ json_encode($bundle['modal_data']) }})"
                                                     class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-xs transition active:scale-95 cursor-pointer inline-flex items-center gap-1">
                                                 <span>Lihat Detail & Evaluasi</span>
                                                 <span></span>
