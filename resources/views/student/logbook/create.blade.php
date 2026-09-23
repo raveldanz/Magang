@@ -11,7 +11,7 @@
 
                 <div class="mb-6 pb-4 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-gray-800">Input Catatan Kegiatan Harian</h3>
-                    <p class="text-sm text-gray-500 mt-1">Isi logbook kegiatan magang Anda untuk hari ini. Logbook akan direview oleh Admin/Pembimbing.</p>
+                    <p class="text-sm text-gray-500 mt-1">Isi logbook kegiatan magang Anda. Logbook akan direview oleh Pembimbing.</p>
                 </div>
 
                 {{-- Alert Error jika Validasi Gagal --}}
@@ -43,29 +43,62 @@
                         <p class="text-xs text-gray-400 mt-1">Minimal 10 karakter</p>
                     </div>
 
-                    {{-- Lampiran --}}
-                    <div>
-                        <label for="attachment" class="block font-semibold text-sm text-gray-700 mb-1">Lampiran (Opsional)</label>
-                        <input id="attachment" name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                               onchange="handleAttachmentPreview(this)"
-                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
-                        <p class="text-xs text-gray-400 mt-1">Format: PDF, JPG, PNG. Maksimal 3MB.</p>
+{{-- Lampiran Logbook --}}
+<div x-data="{ 
+        fileUrl: null,
+        handleAttachment(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 3 * 1024 * 1024) {
+                    alert('Ukuran berkas lampiran maksimal 3MB.');
+                    e.target.value = '';
+                    if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
+                    this.fileUrl = null;
+                    return;
+                }
+                if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
+                this.fileUrl = URL.createObjectURL(file);
+            } else {
+                if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
+                this.fileUrl = null;
+            }
+        }
+     }" 
+     class="space-y-1">
 
-                        <!-- Preview Container -->
-                        <div id="attachmentPreviewBox" class="hidden mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl items-center gap-3">
-                            <div id="previewImageWrapper" class="hidden w-16 h-16 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-white">
-                                <img id="previewImage" src="" alt="Pratinjau Berkas" class="w-full h-full object-cover">
-                            </div>
-                            <div id="previewDocWrapper" class="hidden w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p id="previewFileName" class="text-xs font-bold text-slate-800 truncate"></p>
-                                <p id="previewFileSize" class="text-[11px] text-slate-500"></p>
-                            </div>
-                        </div>
-                    </div>
+    <label for="attachment" class="block font-semibold text-xs sm:text-sm text-gray-700">
+        Lampiran (Opsional)
+    </label>
 
+    <input id="attachment" 
+           name="attachment" 
+           type="file" 
+           accept=".pdf,.jpg,.jpeg,.png"
+           @change="handleAttachment($event)"
+           class="block w-full text-xs sm:text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+
+    <!-- Baris Status & Aksi -->
+    <div class="flex items-center justify-between pt-0.5 text-xs">
+        <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 3MB)</p>
+        
+        <a x-show="fileUrl" 
+           x-cloak 
+           :href="fileUrl" 
+           target="_blank" 
+           class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <span>Lihat Berkas</span>
+        </a>
+    </div>
+
+    <x-input-error :messages="$errors->get('attachment')" class="mt-1" />
+</div>
+
+    <x-input-error :messages="$errors->get('attachment')" class="mt-1" />
+</div>
                     {{-- Tombol Submit --}}
                     <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:space-x-3 gap-2.5 sm:gap-0 pt-4 border-t border-gray-100">
                         <a href="{{ route('student.logbook.index') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-bold text-gray-700 uppercase tracking-wider hover:bg-gray-200 transition text-center justify-center flex items-center">
