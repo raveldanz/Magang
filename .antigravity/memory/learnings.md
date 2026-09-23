@@ -348,6 +348,24 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-018] Perapian Pratinjau Berkas Laporan Akhir, Lightbox Logbook, Eliminasi View Duplicate, & Checklist Evaluasi 3-Sisi
+- **Tanggal**: 2026-09-23
+- **Komponen**: `resources/views/student/final_report.blade.php`, `resources/views/student/logbook/index.blade.php`, `resources/views/student/dashboard.blade.php` (Deleted)
+- **Problem / Symptom**: 
+  1. Halaman unggah laporan akhir mahasiswa tidak memiliki tombol `Lihat Berkas` langsung pada box status file yang baru dipilih.
+  2. Gambar lampiran logbook di smartphone tidak dapat diperbesar penuh.
+  3. Berkas view `student/dashboard.blade.php` tidak terpakai (orphan) yang mengabaikan master layout app.
+  4. Indikator kelayakan E-Sertifikat tidak menampilkan checklist 3-sisi (Pembimbing Dinas, DPL Kampus, ACC Naskah Laporan).
+- **Root Cause**: Ketiadaan handler URL Object di tombol box status laporan akhir, ketiadaan modal Lightbox Alpine.js pada view logbook, serta layout duplicate.
+- **Fix Applied**: 
+  1. Menambahkan tombol `Lihat Berkas` interaktif berbasis `URL.createObjectURL` di `resources/views/student/final_report.blade.php`.
+  2. Menambahkan modal Lightbox Image Viewer Alpine.js universal di `resources/views/student/logbook/index.blade.php`.
+  3. Menghapus berkas redundan `resources/views/student/dashboard.blade.php`.
+  4. Menyajikan *3-Item Progress Checklist* pada modul evaluasi laporan akhir.
+- **Prevention Rule**: Setiap modul input berkas (file uploader) wajib dilengkapi tombol pratinjau `Lihat Berkas` secara live sebelum pengguna mengeklik tombol submit. Seluruh lampiran gambar pada antarmuka mobile wajib dilindungi modal Lightbox preview.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
@@ -359,4 +377,3 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
-

@@ -243,54 +243,16 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 shrink-0">
+                                    <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span>Lihat Berkas</span>
+                                    </a>
                                     <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
                                         Ganti Berkas
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- HARMONIZED LIVE DOCUMENT PREVIEW CANVAS (LIGHT CORPORATE THEME) -->
-                            <div id="documentPreviewContainer" class="hidden mt-4 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
-                                <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        </div>
-                                        <span id="previewHeaderTitle" class="text-xs font-bold text-slate-800 tracking-tight">Pratinjau Dokumen Naskah</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span id="docxStatusBadge" class="hidden text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg">
-                                            Live Word Renderer
-                                        </span>
-                                        <a id="pdfOpenTabBtn" href="#" target="_blank" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
-                                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                            <span>Tab Baru</span>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <div class="p-4 sm:p-6 bg-slate-50/60">
-                                    <!-- PDF Viewer Frame -->
-                                    <div id="pdfViewerWrapper" class="hidden w-full h-[520px] rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-xs relative">
-                                        <iframe id="pdfPreviewIframe" class="w-full h-full rounded-2xl border-0" src="about:blank"></iframe>
-                                    </div>
-
-                                    <!-- DOCX Live Render Box -->
-                                    <div id="docxViewerWrapper" class="hidden w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 p-4 sm:p-6 space-y-3">
-                                        <div id="docxLoadingState" class="p-6 text-center text-xs text-slate-500 font-medium">
-                                            Mengurai teks & struktur dokumen Word (.docx)...
-                                        </div>
-                                        <div id="docxPreviewOutput" class="hidden bg-white text-slate-800 p-6 sm:p-10 rounded-2xl border border-slate-200 font-sans max-h-[500px] overflow-y-auto leading-relaxed shadow-sm">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="bg-slate-50 px-5 py-2.5 border-t border-slate-200/80 text-center">
-                                    <p class="text-[11px] text-slate-500 italic">
-                                        *Inspeksi lembar naskah & format dokumen di atas secara langsung sebelum menekan tombol simpan.
-                                    </p>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="pt-3 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
@@ -392,20 +354,66 @@
                             </div>
                         </div>
                     @else
-                        <div class="p-5 rounded-2xl bg-amber-50/90 border border-amber-200 text-center space-y-2">
-                            <div class="w-10 h-10 mx-auto rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div class="p-5 rounded-2xl bg-amber-50/90 border border-amber-200 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div>
+                                    <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian & Verifikasi</span>
+                                    <p class="text-xs text-amber-800 leading-relaxed">
+                                        E-Sertifikat resmi akan otomatis terbit begitu seluruh 3 indikator kelengkapan di bawah terpenuhi.
+                                    </p>
+                                </div>
                             </div>
-                            <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian Akhir</span>
-                            <p class="text-xs text-amber-800 max-w-md mx-auto leading-relaxed">
-                                @if($hasMentorScore && !$isMentorOnly && !$hasDosenScore)
-                                    Nilai dari Pembimbing Lapangan Instansi telah selesai diinput. Saat ini sedang menunggu input lembar evaluasi akademik dari <strong>Dosen Pembimbing Lapangan (DPL)</strong> perguruan tinggi Anda sebelum E-Sertifikat dapat diterbitkan.
-                                @elseif(!$hasMentorScore && $hasDosenScore)
-                                    Nilai akademik dari DPL kampus telah tercatat. Saat ini sedang menunggu input nilai kinerja dari <strong>Pembimbing Lapangan Instansi Dinas</strong>.
-                                @else
-                                    Pembimbing lapangan instansi dinas dan DPL kampus sedang memproses lembar penilaian evaluasi akhir magang Anda.
-                                @endif
-                            </p>
+
+                            <!-- 3-Item Progress Checklist -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                                <div class="p-3 rounded-xl border {{ $hasMentorScore ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
+                                    <div class="flex items-center gap-1.5 font-bold">
+                                        @if($hasMentorScore)
+                                            <span class="text-emerald-600 font-bold">✓</span>
+                                            <span>1. Pembimbing Lapangan</span>
+                                        @else
+                                            <span class="text-amber-500 font-bold">⏳</span>
+                                            <span>1. Pembimbing Lapangan</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[11px] {{ $hasMentorScore ? 'text-emerald-700' : 'text-slate-500' }}">
+                                        {{ $hasMentorScore ? 'Selesai Menilai' : 'Menunggu Penilaian Dinas' }}
+                                    </p>
+                                </div>
+
+                                <div class="p-3 rounded-xl border {{ ($hasDosenScore || $isMentorOnly) ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
+                                    <div class="flex items-center gap-1.5 font-bold">
+                                        @if($hasDosenScore || $isMentorOnly)
+                                            <span class="text-emerald-600 font-bold">✓</span>
+                                            <span>2. DPL Kampus</span>
+                                        @else
+                                            <span class="text-amber-500 font-bold">⏳</span>
+                                            <span>2. DPL Kampus</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
+                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Akademik DPL') }}
+                                    </p>
+                                </div>
+
+                                <div class="p-3 rounded-xl border {{ ($finalReport && $finalReport->status === 'approved') ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
+                                    <div class="flex items-center gap-1.5 font-bold">
+                                        @if($finalReport && $finalReport->status === 'approved')
+                                            <span class="text-emerald-600 font-bold">✓</span>
+                                            <span>3. Naskah Laporan Akhir</span>
+                                        @else
+                                            <span class="text-amber-500 font-bold">⏳</span>
+                                            <span>3. Naskah Laporan Akhir</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[11px] {{ ($finalReport && $finalReport->status === 'approved') ? 'text-emerald-700' : 'text-slate-500' }}">
+                                        {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui (ACC)' : 'Menunggu Persetujuan Naskah' }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -469,19 +477,7 @@
             const nameEl = document.getElementById('reportFileName');
             const sizeEl = document.getElementById('reportFileSize');
             const iconEl = document.getElementById('reportFileIcon');
-            const pdfBadge = document.getElementById('pdfBadge');
-
-            const docContainer = document.getElementById('documentPreviewContainer');
-            const headerTitle = document.getElementById('previewHeaderTitle');
-            
-            const pdfWrapper = document.getElementById('pdfViewerWrapper');
-            const pdfIframe = document.getElementById('pdfPreviewIframe');
-            const pdfOpenTabBtn = document.getElementById('pdfOpenTabBtn');
-
-            const docxWrapper = document.getElementById('docxViewerWrapper');
-            const docxLoading = document.getElementById('docxLoadingState');
-            const docxOutput = document.getElementById('docxPreviewOutput');
-            const docxBadge = document.getElementById('docxStatusBadge');
+            const viewFileBtn = document.getElementById('reportViewFileBtn');
 
             if (currentObjectUrl) {
                 URL.revokeObjectURL(currentObjectUrl);
@@ -495,7 +491,6 @@
                     input.value = '';
                     box.classList.add('hidden');
                     box.classList.remove('flex');
-                    docContainer.classList.add('hidden');
                     return;
                 }
 
@@ -504,64 +499,16 @@
                 sizeEl.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
                 iconEl.textContent = ext.toUpperCase();
 
+                currentObjectUrl = URL.createObjectURL(file);
+                if (viewFileBtn) {
+                    viewFileBtn.href = currentObjectUrl;
+                }
+
                 box.classList.remove('hidden');
                 box.classList.add('flex');
-                docContainer.classList.remove('hidden');
-
-                if (ext === 'pdf') {
-                    pdfBadge.classList.remove('hidden');
-                    docxBadge.classList.add('hidden');
-                    headerTitle.textContent = 'Pratinjau Berkas PDF';
-
-                    pdfWrapper.classList.remove('hidden');
-                    docxWrapper.classList.add('hidden');
-
-                    currentObjectUrl = URL.createObjectURL(file);
-                    pdfIframe.src = currentObjectUrl;
-                    pdfOpenTabBtn.href = currentObjectUrl;
-                    pdfOpenTabBtn.classList.remove('hidden');
-                } else if (ext === 'docx' || ext === 'doc') {
-                    pdfBadge.classList.add('hidden');
-                    docxBadge.classList.remove('hidden');
-                    headerTitle.textContent = 'Pratinjau Teks Dokumen Word (.docx)';
-
-                    pdfWrapper.classList.add('hidden');
-                    docxWrapper.classList.remove('hidden');
-                    pdfOpenTabBtn.classList.add('hidden');
-
-                    if (ext === 'docx' && window.mammoth) {
-                        docxLoading.classList.remove('hidden');
-                        docxOutput.classList.add('hidden');
-                        docxOutput.innerHTML = '';
-
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const arrayBuffer = e.target.result;
-                            mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-                                .then(function(result) {
-                                    docxLoading.classList.add('hidden');
-                                    docxOutput.innerHTML = result.value || '<p class="text-slate-400 italic">Dokumen kosong atau tidak berisi teks utama.</p>';
-                                    docxOutput.classList.remove('hidden');
-                                })
-                                .catch(function(err) {
-                                    docxLoading.classList.add('hidden');
-                                    docxOutput.innerHTML = '<p class="text-rose-500 font-bold">Gagal mengurai dokumen Word. Silakan unggah format PDF untuk pratinjau penuh.</p>';
-                                    docxOutput.classList.remove('hidden');
-                                });
-                        };
-                        reader.readAsArrayBuffer(file);
-                    } else {
-                        docxLoading.classList.add('hidden');
-                        docxOutput.innerHTML = '<div class="p-4 bg-amber-50 text-amber-800 rounded-xl text-xs font-medium">Format <strong>.doc</strong> lama terdeteksi. Silakan gunakan format <strong>.docx</strong> atau <strong>.pdf</strong> untuk pratinjau langsung.</div>';
-                        docxOutput.classList.remove('hidden');
-                    }
-                } else {
-                    docContainer.classList.add('hidden');
-                }
             } else {
                 box.classList.add('hidden');
                 box.classList.remove('flex');
-                docContainer.classList.add('hidden');
             }
         }
 
