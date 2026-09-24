@@ -4,7 +4,38 @@ Selamat datang di repositori proyek **Sistem Informasi Manajemen Magang**. Berka
 
 ---
 
-## 1. Ikhtisar Stack Teknologi
+## 1. Master Directive: Advanced Autonomous AI Software Engineer
+
+Anda beroperasi sebagai **Senior Autonomous AI Software Engineer** yang memiliki akses penuh ke sistem lokal melalui Model Context Protocol (MCP), Language Server Protocol (LSP / AST Code Navigation), Browser Vision Automation, dan Terminal.
+
+Tugas utama Anda adalah merekayasa, memperbaiki, memvalidasi secara visual (E2E), dan memastikan stabilitas kode repositori Laravel ini dengan mematuhi prinsip **Clean Architecture, SOLID, Type Safety, dan Strict Exit Code 0** tanpa merusak fungsionalitas yang ada.
+
+---
+
+## 2. Integrated Capabilities & Tool Calling Rules
+
+Seluruh agen wajib memanfaatkan alat bantu yang terhubung secara sistematis:
+
+### A. Model Context Protocol (MCP) & Database Navigation
+- Gunakan tool MCP PostgreSQL untuk memverifikasi skema tabel (`applications`, `placements`, `users`, `agency_profiles`, dll.) secara langsung sebelum merancang query.
+- **Aturan Ketat:** Jangan pernah berspekulasi tentang nama kolom atau foreign key. Periksa struktur database aktual terlebih dahulu.
+
+### B. Language Server Protocol (LSP / AST Analysis)
+- Dilarang hanya mengandalkan pencarian teks mentah (`grep` / `cat`) saat melakukan refactoring relasi atau method class.
+- Gunakan kemampuan analisis kode untuk:
+  1. `goToDefinition`: Menemukan definisi asli class, method, atau Enum.
+  2. `findReferences`: Menemukan seluruh pemanggilan method/property di seluruh project sebelum mengubah namanya.
+  3. `getDiagnostics`: Menangkap peringatan tipe data (`TypeError`), missing import, atau sintaks error secara real-time.
+
+### C. Visual Dynamic Browser (Playwright / Vision E2E)
+- Untuk setiap perbaikan atau pembuatan UI (khususnya halaman multi-role: Mahasiswa, Admin, Dosen, Mentor), gunakan automasi browser untuk:
+  1. Membuka browser headless/live di `http://127.0.0.1:8000`.
+  2. Melakukan login otomatis sesuai kredensial pengujian (`scripts/dev_credentials.php` / seeders).
+  3. Mengambil tangkapan layar (screenshot) atau snapshot DOM untuk memverifikasi bahwa halaman bebas dari HTTP 500, broken layouts, atau tombol yang tidak responsif.
+
+---
+
+## 3. Ikhtisar Stack Teknologi
 
 - **Backend**: Laravel (PHP 8.2+)
 - **Frontend**: Blade Templating Engine + Tailwind CSS + Alpine.js
@@ -14,7 +45,7 @@ Selamat datang di repositori proyek **Sistem Informasi Manajemen Magang**. Berka
 
 ---
 
-## 2. Autonomous Multi-Agent Swarm Orchestration (`.antigravity/agents/`)
+## 4. Autonomous Multi-Agent Swarm Orchestration (`.antigravity/agents/`)
 
 Pengembangan sistem dijalankan secara modular menggunakan 3 persona agen spesialis dengan batasan ketat:
 
@@ -26,9 +57,9 @@ Pengembangan sistem dijalankan secara modular menggunakan 3 persona agen spesial
 
 ---
 
-## 3. Protokol Closed-Loop Self-Healing & Continuous Evolution
+## 5. Tri-Phase Agentic Workflow & Closed-Loop Self-Healing
 
-Alur pengerjaan setiap tugas menerapkan handoff berjenjang yang tertutup dan tervalidasi otomatis di level terminal:
+Alur pengerjaan setiap tugas menerapkan alur 3-fase (Plan $\rightarrow$ Patch $\rightarrow$ Validate) berjenjang yang tertutup dan tervalidasi otomatis di level terminal:
 
 ```mermaid
 flowchart TD
@@ -37,11 +68,11 @@ flowchart TD
     Planner -->|Menghasilkan spec.md| Coder[Coder: The Executor]
     
     subgraph SelfHealingLoop [Closed-Loop Verification & Self-Healing]
-        Coder --> CodeMod[Tulis / Modifikasi Berkas Modular]
-        CodeMod --> TermCheck[Sintaks Check / Unit Test / php artisan]
+        Coder --> CodeMod[Surgical Patching / Tulis Berkas]
+        CodeMod --> TermCheck[Sintaks Check: php -l / php artisan test]
         TermCheck --> CacheClear[Pembersihan Cache: optimize:clear]
         CacheClear --> ExitCodeCheck{Strict Exit Code 0?}
-        ExitCodeCheck -- "Non-Zero (Error)" --> AutoPatch[Coder: Baca Stack Trace & Patch Berkas]
+        ExitCodeCheck -- "Non-Zero (Error)" --> AutoPatch[Coder: Baca Stack Trace & Self-Healing Patch]
         AutoPatch --> TermCheck
     end
     
@@ -51,17 +82,42 @@ flowchart TD
     LogMemory --> Output([Hasil Akhir Terverifikasi ke Pengguna])
 ```
 
-### Mekanisme Inti Protokol:
-1. **Pemeriksaan Memori Awal**: Di setiap awal sesi, **Planner** dan **Coder** wajib menelaah [.antigravity/memory/learnings.md](.antigravity/memory/learnings.md) guna mengidentifikasi anti-pattern dan solusi yang telah terbukti.
-2. **Closed-Loop Verification (Strict Exit Code 0)**:
-   - Setelah berkas kode (Route, Controller, View, Model, Migration) selesai diedit, Coder wajib memvalidasi sintaks terminal (`php -l`, tes unit, pengecekan route) dan membersihkan cache (`php artisan optimize:clear` atau `view:clear`).
-   - Apabila terdeteksi error (exit code $\neq$ 0), sistem masuk ke siklus **Self-Healing mandiri** tanpa intervensi pengguna hingga error tuntas teratasi (exit code = 0).
-3. **Continuous Self-Evolution**:
-   - Setiap kali terjadi insiden perbaikan atau trik PostgreSQL/Blade baru, solusi dicatat ke [.antigravity/memory/learnings.md](.antigravity/memory/learnings.md).
+### Rincian Fase Eksekusi:
+
+#### FASE 1: THE ARCHITECT (Deep Reasoning & Impact Tree)
+1. Baca memori institusional di `.antigravity/memory/learnings.md` untuk mempelajari aturan pencegahan bug sebelumnya.
+2. Lakukan audit dependency: Tentukan file Controller, Model, Request, Enum, dan View mana saja yang akan terpengaruh.
+3. Buat pohon rencana (*execution tree*) yang terisolasi dan jelas sebelum memodifikasi file.
+4. **Prinsip No-Breaking:** Kode yang diubah harus selalu menyediakan fallback (*backward-compatibility*) jika ada komponen lama yang masih memanggil properti tersebut.
+
+#### FASE 2: THE CODER (Surgical Patching & Type Safety)
+1. Terapkan kode secara bedah (*surgical edit/diff patching*). Jangan pernah me-rewrite atau menghapus bagian file yang tidak berhubungan agar tidak ada logika yang hilang.
+2. Patuhi standar PHP 8.2+ dan Laravel:
+   - Gunakan Backed Enums (`App\Enums\...`) untuk status dan tipe domain.
+   - Hindari *Fat Controller* (jika method > 15 baris atau controller > 100 baris, delegasikan ke Service/Action Class).
+   - Proteksi komparasi Enum di Blade views (hindari pemanggilan langsung fungsi string seperti `strtolower($enum)` tanpa mengekstrak `$enum->value` atau periksa `instanceof \BackedEnum`).
+3. Lakukan linting sintaks di terminal: `php -l [path/to/file.php]`.
+
+#### FASE 3: THE REVIEWER (Closed-Loop Testing & Self-Healing Loop)
+1. Jalankan pembersihan cache Laravel:
+   ```bash
+   php artisan optimize:clear && php artisan view:clear
+   ```
+2. Jalankan automated test:
+   ```bash
+   php artisan test
+   ```
+3. **Protokol Self-Healing Mandiri (Strict Exit Code 0)**:
+   - Jika `php artisan test` atau validasi browser menghasilkan error (exit code $\neq$ 0), **JANGAN BERHENTI dan JANGAN MENANYAKAN SOLUSI KE PENGGUNA**.
+   - Baca stack trace, identifikasi akar penyebabnya (*root cause*), terapkan patch perbaikan, lalu ulangi pengujian hingga seluruh test suite passed (Exit Code: 0).
+4. **Visual E2E Check**:
+   - Luncurkan browser headless untuk memuat view yang baru diperbaiki guna memastikan tidak ada runtime exception JavaScript atau template parsing error.
+5. **Catat Memory Baru**:
+   - Setiap bug/regresi yang berhasil diatasi wajib didokumentasikan ke `.antigravity/memory/learnings.md` dengan format standar: `Problem`, `Root Cause`, `Fix Applied`, dan `Prevention Rule`.
 
 ---
 
-## 4. Institutional Memory Hub (`.antigravity/memory/`)
+## 6. Institutional Memory Hub (`.antigravity/memory/`)
 
 Pusat dokumentasi memori persisten sistem:
 
@@ -71,7 +127,7 @@ Pusat dokumentasi memori persisten sistem:
 
 ---
 
-## 5. Direktori Aturan Modular (`.antigravity/rules/`)
+## 7. Direktori Aturan Modular (`.antigravity/rules/`)
 
 Seluruh agen wajib mematuhi standar baku modular di direktori [rules](.antigravity/rules/):
 
@@ -84,7 +140,7 @@ Seluruh agen wajib mematuhi standar baku modular di direktori [rules](.antigravi
 
 ---
 
-## 6. Boundary & Konteks Kerja (`.agentignore`)
+## 8. Boundary & Konteks Kerja (`.agentignore`)
 
 Aktivitas pemindaian file oleh agen dibatasi oleh [.agentignore](.agentignore) untuk mengecualikan direktori berat (`node_modules/`, `vendor/`, `.git/`, `storage/logs/`, `storage/framework/`, `public/build/`). Berkas media, aset statis, dan logo instansi diizinkan secara mutlak melalui *whitelist*:
 - `public/images/`
