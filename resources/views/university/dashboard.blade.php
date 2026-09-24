@@ -364,18 +364,8 @@
                         $dosen = $placement?->academicAdvisor;
                         $mentor = $placement?->mentor ?? $placement?->pembimbing;
 
-                        $status = strtoupper($app->lifecycle_status ?? $app->status);
-                        $today = \Carbon\Carbon::now();
-                        $start = $app->start_date ? \Carbon\Carbon::parse($app->start_date) : null;
-
-                        if (in_array($status, ['ACCEPTED', 'VERIFIED']) && $start && $today->gte($start)) {
-                            $status = 'ACTIVE';
-                        }
-                        if (($app->finalReport?->status === 'approved' || strtoupper($app->finalReport?->status ?? '') === 'APPROVED') || ($placement?->finalreport?->status === 'approved')) {
-                            if ((($app->evaluation?->nilai_akademik ?? 0) > 0) || (($placement?->evaluation?->nilai_akademik ?? 0) > 0)) {
-                                $status = 'COMPLETED';
-                            }
-                        }
+                        $appStatus = $app->status;
+                        $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
                     @endphp
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="px-5 py-4">
@@ -391,28 +381,43 @@
                             <div class="text-xs text-slate-500">{{ $app->unit->name ?? '-' }}</div>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            @if($status === 'SUBMITTED' || $status === 'PENDING')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                    Menunggu Verifikasi
-                                </span>
-                            @elseif($status === 'ACCEPTED' || $status === 'VERIFIED')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
-                                    Diterima
-                                </span>
-                            @elseif($status === 'ACTIVE')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            @if($rawStatus === 'active')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                     <span>Sedang Magang</span>
                                 </span>
-                            @elseif($status === 'COMPLETED')
-                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                            @elseif($rawStatus === 'accepted')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                    <span>Diterima</span>
+                                </span>
+                            @elseif($rawStatus === 'verified')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                    <span>Lolos Berkas</span>
+                                </span>
+                            @elseif($rawStatus === 'completed')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                                     <span>Lulus</span>
                                 </span>
-                            @elseif($status === 'REJECTED')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
-                                    Ditolak
+                            @elseif($rawStatus === 'pending')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    <span>Menunggu Verifikasi</span>
+                                </span>
+                            @elseif($rawStatus === 'resigned')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                                    <span>Mengundurkan Diri</span>
+                                </span>
+                            @elseif($rawStatus === 'rejected')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                    <span>Ditolak</span>
                                 </span>
                             @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ $status }}</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ strtoupper($rawStatus) }}</span>
                             @endif
                         </td>
                         <td class="px-5 py-4">

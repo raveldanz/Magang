@@ -81,12 +81,13 @@ class DashboardController extends Controller
         $allApplications = $applicationsQuery->latest()->get();
         $allPlacements = $placementsQuery->latest()->get();
 
-        // Metrik Statistik Kampus
-        $totalStudents = $allApplications->count();
-        $totalAccepted = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['ACCEPTED', 'ACTIVE', 'COMPLETED']))->count();
-        $totalCompleted = $allApplications->filter(fn($app) => $app->lifecycle_status === 'COMPLETED')->count();
-        $totalPending = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['SUBMITTED', 'DRAFT']))->count();
-        $totalResigned = $allApplications->filter(fn($app) => $app->lifecycle_status === 'RESIGNED')->count();
+        // Metrik Statistik Kampus (Direct Database Query Aggregation)
+        $totalStudents = (clone $applicationsQuery)->count();
+        $totalActive = (clone $applicationsQuery)->where('status', 'active')->count();
+        $totalAccepted = (clone $applicationsQuery)->whereIn('status', ['accepted', 'active', 'completed'])->count();
+        $totalCompleted = (clone $applicationsQuery)->where('status', 'completed')->count();
+        $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalResigned = (clone $applicationsQuery)->where('status', 'resigned')->count();
 
         // Sebaran Dinas / Instansi Penempatan
         $agencies = AgencyProfile::orderBy('agency_name')->get();
@@ -133,9 +134,11 @@ class DashboardController extends Controller
 
         $stats = [
             'total_students' => $totalStudents,
+            'total_active' => $totalActive,
             'total_accepted' => $totalAccepted,
             'total_completed' => $totalCompleted,
             'total_pending' => $totalPending,
+            'total_resigned' => $totalResigned,
         ];
 
         return view('university.dashboard', compact(
@@ -305,7 +308,7 @@ class DashboardController extends Controller
                     $dosen?->name ?? 'Belum Ditentukan',
                     $mentor?->name ?? 'Belum Diplot',
                     $periode,
-                    strtoupper($app->lifecycle_status ?? $app->status),
+                    strtoupper($app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : (string)$app->status),
                     $mentorScore,
                     $dosenScore,
                     $finalScore,
