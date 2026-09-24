@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ApplicationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
@@ -9,8 +10,11 @@ class Application extends Model
 {
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'status' => ApplicationStatus::class,
+    ];
+
     protected $appends = [
-        'lifecycle_status',
         'is_active_internship',
         'is_eligible_for_logbook',
     ];
@@ -51,54 +55,20 @@ class Application extends Model
     }
 
     /**
-     * Computed dynamic lifecycle status
-     * Statuses: REJECTED | SUBMITTED | ACCEPTED | ACTIVE | COMPLETED | DRAFT
+     * Backward-compatible accessor untuk lifecycle status
+     * Menghilangkan virtual calculation di RAM dan merefleksikan status fisik database secara type-safe
      */
     public function getLifecycleStatusAttribute(): string
     {
-        $rawStatus = strtolower($this->status ?? 'draft');
-
-        if ($rawStatus === 'rejected' || $rawStatus === 'canceled') {
-            return 'REJECTED';
+        if ($this->status instanceof ApplicationStatus) {
+            return strtoupper($this->status->value);
         }
-        
-        if ($rawStatus === 'resigned') {
-            return 'RESIGNED';
-        }
-
-        $placement = $this->placement;
-        $hasApprovedReport = $placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']);
-        $eval = $placement?->evaluation;
-        $hasCompleteEval = $eval && $eval->is_complete;
-
-        // 2. COMPLETED
-        if ($rawStatus === 'completed' || ($rawStatus === 'accepted' && $hasApprovedReport && $hasCompleteEval)) {
-            return 'COMPLETED';
-        }
-
-        $today = Carbon::now()->toDateString();
-
-        // 3. ACTIVE / ACCEPTED
-        if ($rawStatus === 'accepted') {
-            $startDate = !empty($this->start_date) ? Carbon::parse($this->start_date)->toDateString() : null;
-            if (!$startDate || $today >= $startDate) {
-                return 'ACTIVE';
-            }
-            return 'ACCEPTED';
-        }
-
-        // 4. SUBMITTED / PENDING / VERIFIED
-        if (in_array($rawStatus, ['submitted', 'pending', 'verified'])) {
-            return 'SUBMITTED';
-        }
-
-        // 5. DRAFT
-        return 'DRAFT';
+        return strtoupper((string)($this->status ?? 'PENDING'));
     }
 
     public function getIsActiveInternshipAttribute(): bool
     {
-        return $this->lifecycle_status === 'ACTIVE';
+        return $this->status === ApplicationStatus::ACTIVE || $this->status === 'active';
     }
 
     public function getIsEligibleForLogbookAttribute(): bool
@@ -109,7 +79,7 @@ class Application extends Model
     public function getHasApprovedReportAttribute(): bool
     {
         $placement = $this->placement;
-        return (bool)($placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']));
+        return (bool)($placement && $placement->finalreport && strtolower($placement->finalreport->status ?? '') === 'approved');
     }
 
     public function getHasCompleteEvaluationAttribute(): bool
@@ -137,11 +107,13 @@ class Application extends Model
 
     public function getCanCompleteAttribute(): bool
     {
-        if (strtolower($this->status) === 'completed') {
+        $rawStatus = $this->status instanceof ApplicationStatus ? $this->status->value : strtolower((string)$this->status);
+
+        if ($rawStatus === 'completed') {
             return true;
         }
 
-        if (strtolower($this->status) !== 'accepted') {
+        if (!in_array($rawStatus, ['accepted', 'active'])) {
             return false;
         }
 

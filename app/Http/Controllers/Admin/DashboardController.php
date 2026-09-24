@@ -42,14 +42,14 @@ class DashboardController extends Controller
 
         $allApplications = $appQuery->latest()->get();
 
-        // Metrik Agregat Mahasiswa
-        $totalStudents = $allApplications->count();
-        $totalPending = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['SUBMITTED', 'DRAFT']))->count();
-        $totalAccepted = $allApplications->filter(fn($app) => in_array($app->lifecycle_status, ['ACCEPTED']))->count();
-        $totalRejected = $allApplications->filter(fn($app) => $app->lifecycle_status === 'REJECTED')->count();
-        $totalActive = $allApplications->filter(fn($app) => $app->lifecycle_status === 'ACTIVE')->count();
-        $totalCompleted = $allApplications->filter(fn($app) => $app->lifecycle_status === 'COMPLETED')->count();
-        $totalResigned = $allApplications->filter(fn($app) => $app->lifecycle_status === 'RESIGNED')->count();
+        // Metrik Agregat Mahasiswa (Direct Database Query Aggregation)
+        $totalStudents = (clone $appQuery)->count();
+        $totalPending = (clone $appQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalAccepted = (clone $appQuery)->where('status', 'accepted')->count();
+        $totalActive = (clone $appQuery)->where('status', 'active')->count();
+        $totalCompleted = (clone $appQuery)->where('status', 'completed')->count();
+        $totalRejected = (clone $appQuery)->where('status', 'rejected')->count();
+        $totalResigned = (clone $appQuery)->where('status', 'resigned')->count();
 
         // Kuota Unit Magang
         $unitsQuery = Unit::with('agencyProfile');

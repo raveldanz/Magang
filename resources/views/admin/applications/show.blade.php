@@ -157,9 +157,12 @@
                     </div>
                     <div class="text-xs text-slate-600 flex items-center gap-2">
                         <span class="text-slate-400">Status Validasi Laporan:</span>
+                        @php
+                            $frStatus = $application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '');
+                        @endphp
                         <span class="px-2.5 py-0.5 rounded-full font-bold uppercase text-[11px]
-                            {{ strtolower($application->placement->finalreport->status) === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                            {{ $application->placement->finalreport->status }}
+                            {{ strtolower($frStatus) === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                            {{ $frStatus }}
                         </span>
                     </div>
                 </div>
@@ -218,9 +221,13 @@
             @endif
 
             <!-- 5. Form Aksi Verifikasi & Seleksi (Modern Alpine.js Segmented Selector) -->
+            @php
+                $currentStatus = $application->status instanceof \BackedEnum ? $application->status->value : (string)$application->status;
+                $currentStatusVal = $currentStatus;
+            @endphp
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
-                     status: '{{ old('status', $application->status) }}' 
+                     status: '{{ old('status', $currentStatusVal) }}' 
                  }">
                 
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
@@ -239,12 +246,14 @@
                     <div class="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/60 self-start sm:self-auto">
                         <span>Status Saat Ini:</span>
                         <span class="font-extrabold uppercase text-[11px]
-                            {{ $application->status === 'accepted' ? 'text-emerald-700' : '' }}
-                            {{ $application->status === 'completed' ? 'text-indigo-700' : '' }}
-                            {{ $application->status === 'pending' ? 'text-amber-700' : '' }}
-                            {{ $application->status === 'rejected' ? 'text-rose-700' : '' }}
-                            {{ $application->status === 'resigned' ? 'text-slate-700' : '' }}">
-                            {{ $application->status }}
+                            {{ $currentStatusVal === 'accepted' ? 'text-indigo-700' : '' }}
+                            {{ $currentStatusVal === 'active' ? 'text-emerald-700' : '' }}
+                            {{ $currentStatusVal === 'verified' ? 'text-sky-700' : '' }}
+                            {{ $currentStatusVal === 'completed' ? 'text-blue-700' : '' }}
+                            {{ $currentStatusVal === 'pending' ? 'text-amber-700' : '' }}
+                            {{ $currentStatusVal === 'rejected' ? 'text-rose-700' : '' }}
+                            {{ $currentStatusVal === 'resigned' ? 'text-slate-700' : '' }}">
+                            {{ $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->label() : strtoupper($application->status) }}
                         </span>
                     </div>
                 </div>
@@ -253,64 +262,123 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Hidden Input to submit active status to backend -->
-                    <input type="hidden" name="status" :value="status">
-
-                    <!-- Modern Interactive Status Selection Cards -->
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                            Pilih Status Keputusan Pengajuan
+                    <!-- Dropdown Form Verifikasi Admin (7 Status Pipeline Baku) -->
+                    <div class="mb-5">
+                        <label for="status-select" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
                         </label>
+                        <select id="status-select" name="status" x-model="status" @change="if(typeof toggleFields === 'function') toggleFields()" class="w-full text-xs font-bold border-slate-300 rounded-xl py-2.5 px-3 focus:border-blue-500 focus:ring-blue-500 bg-white shadow-2xs">
+                            <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>PENDING (Menunggu Verifikasi Berkas)</option>
+                            <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>VERIFIED (Berkas Lolos Administrasi)</option>
+                            <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang & Terbitkan Surat)</option>
+                            <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>ACTIVE (Mahasiswa Aktif Magang)</option>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                            @php
+                                $canComplete = false;
+                                if ($application->placement) {
+                                    $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
+                                    $eval = $application->placement->evaluation;
+                                    $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
+                                    $canComplete = $hasApprovedReport && $hasCompleteEval;
+                                }
+                            @endphp
+
+                            <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>
+                                COMPLETED (Selesai Magang & Lulus) {{ !$canComplete && $currentStatus != 'completed' ? ' - [Syarat Belum Tuntas]' : '' }}
+                            </option>
+                            <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>REJECTED (Tolak Pengajuan)</option>
+                            <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
+                        </select>
+                    </div>
+
+                    <!-- Modern Interactive Status Selection Cards (7 Status Pipeline) -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                            Pilihan Cepat Status Visual:
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
                             
                             <!-- 1. PENDING -->
                             <button type="button" 
                                     @click="status = 'pending'"
                                     :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20'"
-                                    class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
-                                <div class="flex items-center justify-between mb-2">
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
                                     <span :class="status === 'pending' ? 'opacity-100 text-amber-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                     </span>
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight">PENDING</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">Dalam proses verifikasi & antrean</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Menunggu Verifikasi Berkas</div>
                                 </div>
                             </button>
 
-                            <!-- 2. ACCEPTED -->
+                            <!-- 2. VERIFIED -->
+                            <button type="button" 
+                                    @click="status = 'verified'"
+                                    :class="status === 'verified' ? 'border-sky-400 bg-sky-50/70 ring-2 ring-sky-400/20 shadow-xs' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/20'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                                    <span :class="status === 'verified' ? 'opacity-100 text-sky-600' : 'opacity-0'" class="transition-opacity">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">VERIFIED</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Berkas Valid & Lolos Seleksi</div>
+                                </div>
+                            </button>
+
+                            <!-- 3. ACCEPTED -->
                             <button type="button" 
                                     @click="status = 'accepted'"
-                                    :class="status === 'accepted' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20'"
-                                    class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                    <span :class="status === 'accepted' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                    <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                     </span>
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight">ACCEPTED</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">Diterima magang & plot mentor</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Diterima / Terbit Surat Tugas</div>
                                 </div>
                             </button>
 
-                            <!-- 3. COMPLETED -->
+                            <!-- 4. ACTIVE -->
+                            <button type="button" 
+                                    @click="status = 'active'"
+                                    :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span :class="status === 'active' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">ACTIVE</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Aktif Magang & Buka Logbook</div>
+                                </div>
+                            </button>
+
+                            <!-- 5. COMPLETED -->
                             @php
                                 $canComplete = $application->can_complete;
-                                $isCompleteDisabled = !$canComplete && $application->status !== 'completed';
+                                $isCompleteDisabled = !$canComplete && $currentStatusVal !== 'completed';
 
-                                $completedSubtitle = 'Magang selesai & siap kelulusan';
+                                $completedSubtitle = 'Magang Selesai & Lulus';
                                 if ($isCompleteDisabled) {
                                     if (!$application->has_approved_report && !$application->has_complete_evaluation) {
                                         $completedSubtitle = 'Laporan & Nilai Belum Lengkap';
                                     } elseif (!$application->has_approved_report) {
-                                        $completedSubtitle = 'Laporan Akhir Belum Disetujui';
+                                        $completedSubtitle = 'Laporan Belum Disetujui';
                                     } elseif (!$application->has_complete_evaluation) {
-                                        $completedSubtitle = 'Nilai Belum Diinput Lengkap';
+                                        $completedSubtitle = 'Nilai Belum Lengkap';
                                     } else {
                                         $completedSubtitle = 'Syarat Belum Terpenuhi';
                                     }
@@ -324,12 +392,12 @@
                                         disabled
                                         title="{{ $completedSubtitle }}"
                                     @endif
-                                    :class="status === 'completed' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-60 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
-                                    class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                                    <span :class="status === 'completed' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-60 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                                    <span :class="status === 'completed' ? 'opacity-100 text-blue-600' : 'opacity-0'" class="transition-opacity">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                     </span>
                                 </div>
                                 <div>
@@ -339,55 +407,56 @@
                                             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                         @endif
                                     </div>
-                                    <div class="text-[11px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
+                                    <div class="text-[10px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
                                         {{ $completedSubtitle }}
                                     </div>
                                 </div>
                             </button>
 
-                            <!-- 4. REJECTED -->
+                            <!-- 6. REJECTED -->
                             <button type="button" 
                                     @click="status = 'rejected'"
                                     :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20'"
-                                    class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
-                                <div class="flex items-center justify-between mb-2">
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                                     <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                     </span>
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight">REJECTED</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">Tolak pengajuan dengan alasan</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Tolak Berkas / Pendaftaran</div>
                                 </div>
                             </button>
 
-                            <!-- 5. RESIGNED -->
+                            <!-- 7. RESIGNED -->
                             <button type="button" 
                                     @click="status = 'resigned'"
                                     :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'"
-                                    class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
-                                <div class="flex items-center justify-between mb-2">
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
                                     <span :class="status === 'resigned' ? 'opacity-100 text-slate-700' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                     </span>
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight">RESIGNED</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">Mengundurkan diri / drop out</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Mengundurkan Diri / DO</div>
                                 </div>
                             </button>
 
                         </div>
                     </div>
 
-                    <!-- Container Khusus Jika Status = ACCEPTED / COMPLETED -->
-                    <div x-show="status === 'accepted' || status === 'completed'" 
+                    <!-- Container Khusus Jika Status = ACCEPTED / ACTIVE / COMPLETED -->
+                    <div id="acceptance-box"
+                         x-show="status === 'accepted' || status === 'active' || status === 'completed'" 
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-4 mb-5 p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 shadow-2xs">
+                         class="space-y-4 mb-5 p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 shadow-2xs {{ in_array($currentStatus, ['accepted', 'active', 'completed']) ? '' : 'hidden' }}">
                         <div class="flex items-center gap-2 border-b border-emerald-200/60 pb-3">
                             <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                             <h4 class="font-bold text-emerald-900 text-xs sm:text-sm">Data Balasan Penerimaan & Penempatan Magang</h4>
@@ -444,11 +513,12 @@
                     </div>
 
                     <!-- Field Alasan Penolakan (Tampil KHUSUS kalau REJECTED) -->
-                    <div x-show="status === 'rejected'"
+                    <div id="rejection-box"
+                         x-show="status === 'rejected'"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="mb-5 p-4 rounded-2xl bg-rose-50/70 border border-rose-200 shadow-2xs">
+                         class="mb-5 p-4 rounded-2xl bg-rose-50/70 border border-rose-200 shadow-2xs {{ $currentStatus === 'rejected' ? '' : 'hidden' }}">
                         <label class="block text-xs font-bold text-rose-800 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             <span>Alasan Penolakan Pengajuan</span>
@@ -465,7 +535,7 @@
                             <span>Simpan Perubahan Status</span>
                         </button>
 
-                        @if (in_array($application->status, ['accepted', 'completed']))
+                        @if (in_array($currentStatus, ['accepted', 'active', 'completed']))
                             <a href="{{ route('admin.applications.letter', $application->id) }}" target="_blank" 
                                 class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -473,7 +543,7 @@
                             </a>
                         @endif
 
-                        @if ($application->placement && ($application->status === 'completed' || $application->placement->evaluation))
+                        @if ($application->placement && ($currentStatus === 'completed' || $application->placement->evaluation))
                             <a href="{{ route('admin.certificates.show', $application->placement->id) }}" target="_blank" 
                                 class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
@@ -491,4 +561,33 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusSelect = document.getElementById('status-select');
+            const acceptanceBox = document.getElementById('acceptance-box');
+            const rejectionBox = document.getElementById('rejection-box');
+
+            function toggleFields() {
+                if (!statusSelect || !acceptanceBox || !rejectionBox) return;
+                if (statusSelect.value === 'rejected') {
+                    rejectionBox.classList.remove('hidden');
+                    acceptanceBox.classList.add('hidden');
+                } else if (['accepted', 'active', 'completed'].includes(statusSelect.value)) {
+                    acceptanceBox.classList.remove('hidden');
+                    rejectionBox.classList.add('hidden');
+                } else {
+                    rejectionBox.classList.add('hidden');
+                    acceptanceBox.classList.add('hidden');
+                }
+            }
+
+            window.toggleFields = toggleFields;
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', toggleFields);
+                toggleFields();
+            }
+        });
+    </script>
 </x-app-layout>

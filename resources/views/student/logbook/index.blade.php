@@ -26,7 +26,8 @@
             @endif
 
             @php
-                $lifecycle = $application?->lifecycle_status ?? 'NONE';
+                $appStatus = $application?->status;
+                $lifecycle = $appStatus instanceof \App\Enums\ApplicationStatus ? strtoupper($appStatus->value) : strtoupper((string)($appStatus ?? 'NONE'));
             @endphp
 
             {{-- ========================================================================= --}}
@@ -215,7 +216,7 @@
                     </div>
                 </div>
 
-            @elseif ($lifecycle === 'RESIGNED' || ($application && $application->status === 'resigned'))
+            @elseif ($lifecycle === 'RESIGNED')
                 <div class="bg-slate-50 border-l-4 border-slate-500 p-6 rounded-2xl shadow-xs">
                     <div class="flex items-start justify-between flex-wrap gap-4">
                         <div class="flex items-start gap-3">
