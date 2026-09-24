@@ -36,7 +36,8 @@ class FinalReportController extends Controller
         return redirect()->route('dashboard')->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
     }
 
-    $lifecycle = strtoupper($application->status ?? 'NONE');
+    $rawStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)($application->status ?? 'NONE');
+    $lifecycle = strtoupper($rawStatus);
     $placement = $application->placement;
     $finalReport = null;
     $evaluation = null;

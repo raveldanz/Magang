@@ -284,8 +284,8 @@ class NotificationService
         elseif ($role === 'mahasiswa') {
             $latestApp = Application::where('user_id', $user->id)->latest()->first();
             if ($latestApp) {
-                $status = strtolower($latestApp->status);
-                if ($status === 'pending' || $status === 'submitted') {
+                $status = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : strtolower((string)$latestApp->status);
+                if (in_array($status, ['pending', 'submitted', 'verified'])) {
                     $actionable[] = [
                         'id' => 'student_app_pending',
                         'type' => 'warning',
@@ -297,7 +297,7 @@ class NotificationService
                         'action_label' => 'Pantau Status',
                         'is_action_required' => false,
                     ];
-                } elseif ($status === 'accepted') {
+                } elseif (in_array($status, ['accepted', 'active'])) {
                     $placement = Placement::where('application_id', $latestApp->id)->first();
                     if (!$placement || empty($placement->academic_advisor_id)) {
                         $actionable[] = [

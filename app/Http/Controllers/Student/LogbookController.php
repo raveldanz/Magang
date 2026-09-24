@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Logbook;
@@ -46,7 +47,7 @@ public function index()
     }
 
     // 3. Tentukan status lifecycle pengajuan
-    $lifecycle = strtoupper($application->status ?? 'NONE');
+    $lifecycle = $application->status instanceof ApplicationStatus ? strtoupper($application->status->value) : strtoupper((string)$application->status);
 
     // 4. Inisialisasi variabel penempatan & logbook
     $placement = null;
@@ -89,10 +90,16 @@ public function index()
     {
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
-        $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
+
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+        }
+
+        $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$application || !$application->is_active_internship || !$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
+        if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
                 ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
         }
@@ -104,10 +111,16 @@ public function index()
     {
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
-        $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
+
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+        }
+
+        $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$application || !$application->is_active_internship || !$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
+        if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
                 ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
         }
@@ -170,9 +183,9 @@ public function index()
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (!$application || !$application->is_active_internship) {
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
 
         $logbook = Logbook::findOrFail($id);
@@ -195,9 +208,9 @@ public function index()
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (!$application || !$application->is_active_internship) {
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
 
         $request->validate([
