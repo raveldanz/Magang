@@ -30,10 +30,10 @@ class ApplicationController extends Controller
                 ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu sebelum mengajukan magang.');
         }
 
-        // 2. Cek apakah ada pengajuan yang sedang berjalan atau aktif (pending, verified, accepted, completed)
+        // 2. Cek apakah ada pengajuan yang sedang berjalan atau aktif (pending, verified, accepted, active, completed)
         $activeApplication = Application::with(['unit.agencyProfile', 'placement'])
             ->where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'verified', 'accepted', 'completed'])
+            ->whereIn('status', ['pending', 'verified', 'accepted', 'active', 'completed'])
             ->latest()
             ->first();
 
@@ -59,13 +59,14 @@ class ApplicationController extends Controller
 
         // 2. Cegah pengajuan ganda jika sudah ada pengajuan aktif / diterima / selesai
         $existingActive = Application::where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'verified', 'accepted', 'completed'])
+            ->whereIn('status', ['pending', 'verified', 'accepted', 'active', 'completed'])
             ->first();
 
         if ($existingActive) {
-            $msg = match ($existingActive->status) {
+            $existingStatusVal = $existingActive->status instanceof \BackedEnum ? $existingActive->status->value : (string)$existingActive->status;
+            $msg = match ($existingStatusVal) {
                 'pending', 'verified' => 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.',
-                'accepted' => 'Akses ditolak: Anda sudah memiliki penempatan magang aktif yang sedang berjalan.',
+                'accepted', 'active' => 'Akses ditolak: Anda sudah memiliki penempatan magang aktif yang sedang berjalan.',
                 'completed' => 'Anda telah menyelesaikan program magang MBKM pada instansi sebelumnya.',
                 default => 'Anda sudah memiliki pengajuan magang aktif.'
             };

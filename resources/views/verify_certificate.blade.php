@@ -8,9 +8,10 @@
         $student = $placement->application?->user;
         $profile = $student?->studentProfile;
         $app = $placement->application;
-        $lifecycle = $app?->lifecycle_status;
-        $isCompleted = ($lifecycle === 'COMPLETED' || $app?->status === 'completed');
-        $isResigned = in_array(strtolower($app?->status ?? ''), ['resigned', 'canceled', 'rejected']);
+        $appStatus = $app?->status;
+        $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
+        $isCompleted = ($rawStatus === 'completed');
+        $isResigned = in_array($rawStatus, ['resigned', 'canceled', 'rejected']);
 
         $eval = $placement->evaluation;
         $rataRata = $eval ? ($eval->final_score ?? $eval->nilai_akhir ?? 0) : 0;

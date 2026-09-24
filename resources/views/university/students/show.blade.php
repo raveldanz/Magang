@@ -13,7 +13,11 @@
 
             <!-- Baris 2: Tombol Aksi (Mobile: Full Width Stack, Desktop: Baris Kanan) -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:self-end">
-                @if (in_array(strtoupper($application->lifecycle_status ?? $application->status), ['ACCEPTED', 'ACTIVE', 'COMPLETED', 'VERIFIED']))
+                @php
+                    $appStatus = $application->status;
+                    $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
+                @endphp
+                @if (in_array($rawStatus, ['accepted', 'active', 'completed', 'verified']))
                     <a href="{{ route('university.students.letter', $application->id) }}" target="_blank"
                        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,17 +100,27 @@
                         <div class="flex justify-between items-center pt-1">
                             <span class="text-slate-400">Status:</span>
                             @php
-                                $uAppStatus = strtoupper($application->lifecycle_status ?? $application->status ?? '');
-                                $uBadgeClass = match($uAppStatus) {
-                                    'ACTIVE', 'ACCEPTED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    'COMPLETED' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                    'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                    'RESIGNED' => 'bg-slate-100 text-slate-700 border-slate-300',
+                                $uBadgeClass = match($rawStatus) {
+                                    'active' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                    'accepted' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                                    'verified' => 'bg-sky-50 text-sky-700 border-sky-200',
+                                    'completed' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                    'rejected' => 'bg-rose-50 text-rose-700 border-rose-200',
+                                    'resigned' => 'bg-slate-100 text-slate-700 border-slate-300',
                                     default => 'bg-amber-50 text-amber-700 border-amber-200',
+                                };
+                                $uLabel = match($rawStatus) {
+                                    'active' => 'AKTIF',
+                                    'accepted' => 'DITERIMA',
+                                    'verified' => 'LOLOS BERKAS',
+                                    'completed' => 'LULUS',
+                                    'rejected' => 'DITOLAK',
+                                    'resigned' => 'MENGUNDURKAN DIRI',
+                                    default => 'DALAM PROSES',
                                 };
                             @endphp
                             <span class="px-2 py-0.5 text-[10px] font-bold rounded-full border uppercase {{ $uBadgeClass }}">
-                                {{ $application->lifecycle_status ?? $application->status }}
+                                {{ $uLabel }}
                             </span>
                         </div>
                     </div>

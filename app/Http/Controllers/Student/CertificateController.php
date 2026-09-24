@@ -135,7 +135,8 @@ class CertificateController extends Controller
         }
 
         // Proteksi Ketat Kelulusan: E-Sertifikat hanya sah diakses jika mahasiswa telah berstatus COMPLETED
-        if ($application->lifecycle_status !== 'COMPLETED' && $application->status !== 'completed') {
+        $statusVal = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)$application->status;
+        if ($statusVal !== 'completed') {
             abort(403, 'Akses Dibatasi: E-Sertifikat dan Transkrip Nilai resmi hanya dapat diterbitkan dan diunduh setelah mahasiswa dinyatakan lulus (status COMPLETED) dengan naskah laporan akhir yang telah disetujui (ACC) serta lembar evaluasi yang telah lengkap.');
         }
 
