@@ -228,7 +228,14 @@
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
                      status: '{{ old('status', $currentStatusVal) }}' 
-                 }">
+                 }"
+                 x-init="$watch('status', val => {
+                     const sel = document.getElementById('status-select');
+                     if (sel) {
+                         sel.value = val;
+                         sel.dispatchEvent(new Event('change'));
+                     }
+                 })">
                 
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
                     <div class="flex items-center gap-2.5">
@@ -262,39 +269,33 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Dropdown Form Verifikasi Admin (7 Status Pipeline Baku) -->
-                    <div class="mb-5">
-                        <label for="status-select" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
-                        </label>
-                        <select id="status-select" name="status" x-model="status" @change="if(typeof toggleFields === 'function') toggleFields()" class="w-full text-xs font-bold border-slate-300 rounded-xl py-2.5 px-3 focus:border-blue-500 focus:ring-blue-500 bg-white shadow-2xs">
-                            <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>PENDING (Menunggu Verifikasi Berkas)</option>
-                            <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>VERIFIED (Berkas Lolos Administrasi)</option>
-                            <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang & Terbitkan Surat)</option>
-                            <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>ACTIVE (Mahasiswa Aktif Magang)</option>
+                    @php
+                        $canComplete = false;
+                        if ($application->placement) {
+                            $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
+                            $eval = $application->placement->evaluation;
+                            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
+                            $canComplete = $hasApprovedReport && $hasCompleteEval;
+                        }
+                    @endphp
 
-                            @php
-                                $canComplete = false;
-                                if ($application->placement) {
-                                    $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
-                                    $eval = $application->placement->evaluation;
-                                    $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
-                                    $canComplete = $hasApprovedReport && $hasCompleteEval;
-                                }
-                            @endphp
+                    <!-- Form Status Pipeline (Synchronized with visual cards) -->
+                    <select id="status-select" name="status" x-model="status" class="hidden" aria-hidden="true">
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>PENDING (Menunggu Verifikasi Berkas)</option>
+                        <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>VERIFIED (Berkas Lolos Administrasi)</option>
+                        <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang & Terbitkan Surat)</option>
+                        <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>ACTIVE (Mahasiswa Aktif Magang)</option>
+                        <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>
+                            COMPLETED (Selesai Magang & Lulus)
+                        </option>
+                        <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>REJECTED (Tolak Pengajuan)</option>
+                        <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
+                    </select>
 
-                            <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>
-                                COMPLETED (Selesai Magang & Lulus) {{ !$canComplete && $currentStatus != 'completed' ? ' - [Syarat Belum Tuntas]' : '' }}
-                            </option>
-                            <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>REJECTED (Tolak Pengajuan)</option>
-                            <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
-                        </select>
-                    </div>
-
-                    <!-- Modern Interactive Status Selection Cards (7 Status Pipeline) -->
+                    <!-- Interactive Status Selection Cards (7 Status Pipeline Baku) -->
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                            Pilihan Cepat Status Visual:
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
+                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
                             
