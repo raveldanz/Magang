@@ -53,30 +53,34 @@
                     }
                 }
 
+                $appStatusVal = $application ? ($application->status instanceof \BackedEnum ? $application->status->value : $application->status) : null;
+                $rawSt = strtolower($appStatusVal ?? '');
+
+                $finalReportStatusVal = $finalReport ? ($finalReport->status instanceof \BackedEnum ? $finalReport->status->value : $finalReport->status) : null;
+                $rawFinalSt = strtolower($finalReportStatusVal ?? '');
+
                 $isPassed = $application && (
-                    $application->status === 'completed' ||
-                    ($application->status === 'accepted' && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && optional($finalReport)->status === 'approved')
+                    $rawSt === 'completed' ||
+                    (in_array($rawSt, ['accepted', 'active']) && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && $rawFinalSt === 'approved')
                 );
 
                 // Status mapping untuk banner dan tracking
                 $appStatusLabel = 'Registrasi Akun';
                 if ($application) {
-                    $rawSt = strtolower($application->status);
-                    $lifeSt = strtoupper($application->lifecycle_status ?? '');
-                    if ($lifeSt === 'RESIGNED' || $rawSt === 'resigned') {
+                    if ($rawSt === 'resigned') {
                         $appStatusLabel = 'Mengundurkan Diri';
-                    } elseif ($lifeSt === 'ACTIVE' || $rawSt === 'accepted') {
+                    } elseif ($rawSt === 'active') {
                         $appStatusLabel = 'Magang Aktif';
-                    } elseif ($lifeSt === 'COMPLETED' || $rawSt === 'completed') {
+                    } elseif ($rawSt === 'completed') {
                         $appStatusLabel = 'Lulus Magang';
-                    } elseif ($lifeSt === 'ACCEPTED') {
+                    } elseif ($rawSt === 'accepted') {
                         $appStatusLabel = 'Diterima (Calon Peserta)';
-                    } elseif ($lifeSt === 'REJECTED' || $rawSt === 'rejected' || $rawSt === 'canceled') {
+                    } elseif ($rawSt === 'rejected' || $rawSt === 'canceled') {
                         $appStatusLabel = 'Ditolak';
                     } elseif ($rawSt === 'verified') {
-                        $appStatusLabel = 'Terverifikasi Dinas';
+                        $appStatusLabel = 'Lolos Berkas Administrasi';
                     } else {
-                        $appStatusLabel = 'Dalam Proses';
+                        $appStatusLabel = 'Dalam Proses Verifikasi';
                     }
                 }
 
@@ -84,15 +88,15 @@
                 $stepCount = 0;
                 if (!empty($profile?->nim))
                     $stepCount++;
-                if (!empty($application) && !in_array($application->status, ['resigned', 'rejected', 'canceled']))
+                if (!empty($application) && !in_array($rawSt, ['resigned', 'rejected', 'canceled']))
                     $stepCount++;
-                if ($application && in_array($application->status, ['accepted', 'completed']))
+                if ($application && in_array($rawSt, ['accepted', 'active', 'completed']))
                     $stepCount++;
-                if (!empty($academicAdvisor) && !in_array($application->status ?? '', ['resigned', 'rejected', 'canceled']))
+                if (!empty($academicAdvisor) && !in_array($rawSt, ['resigned', 'rejected', 'canceled']))
                     $stepCount++;
                 if ($logbooksCount > 0)
                     $stepCount++;
-                if ($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
+                if ($finalReport && $rawFinalSt === 'approved')
                     $stepCount++;
                 if ($isPassed)
                     $stepCount++;
@@ -177,7 +181,7 @@
                 <div x-show="showDetailModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto"
                     aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     @php
-                        $isAccepted = !empty($application) && in_array(strtolower($application->status ?? ''), ['accepted', 'completed', 'verified']);
+                        $isAccepted = !empty($application) && in_array(strtolower($appStatusVal ?? ''), ['accepted', 'active', 'completed', 'verified']);
                         $canProceed = $isAccepted && !empty($academicAdvisor);
                     @endphp
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -232,11 +236,11 @@
                                             <p class="text-slate-700 leading-relaxed font-medium">
                                                 @if(empty($profile?->nim))
                                                     Lengkapi biodata dan Nomor Induk Mahasiswa (NIM) terlebih dahulu.
-                                                @elseif(!$application || in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
+                                                @elseif(!$application || in_array(strtolower($appStatusVal ?? ''), ['resigned', 'rejected', 'canceled']))
                                                     Status pengajuan Anda saat ini:
                                                     <strong>{{ $appStatusLabel ?? 'Belum Mengajukan' }}</strong>.
                                                     Silakan buat permohonan magang baru untuk melanjutkan program magang.
-                                                @elseif(!in_array(strtolower($application->status), ['accepted', 'completed', 'verified']))
+                                                @elseif(!in_array(strtolower($appStatusVal ?? ''), ['accepted', 'active', 'completed', 'verified']))
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
                                                 @elseif(!$academicAdvisor)
                                                     Pengajuan diterima! Silakan <strong>pilih Dosen Pembimbing Lapangan
@@ -245,7 +249,7 @@
                                                     Terus catat aktivitas kerja harian Anda (sudah terisi
                                                     <strong>{{ $logbooksCount }} hari</strong>, tersisa
                                                     <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
-                                                @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
+                                                @elseif(!$finalReport || $rawFinalSt !== 'approved')
                                                     Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas
                                                     harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta
                                                     mengunggah/mencicil draf Laporan Akhir kapan saja.
@@ -263,12 +267,12 @@
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
                                                     Lengkapi Profil
                                                 </a>
-                                            @elseif(!$application || in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
+                                            @elseif(!$application || in_array($rawSt, ['resigned', 'rejected', 'canceled']))
                                                 <a href="{{ route('student.application.create') }}"
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
                                                     Daftar Magang
                                                 </a>
-                                            @elseif(!in_array(strtolower($application->status), ['accepted', 'completed', 'verified']))
+                                            @elseif(!in_array($rawSt, ['accepted', 'active', 'completed', 'verified']))
                                                 <span
                                                     class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
                                                     Dalam Peninjauan
@@ -283,7 +287,7 @@
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
                                                     + Isi Logbook
                                                 </a>
-                                            @elseif(!$finalReport || !in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
+                                            @elseif(!$finalReport || $rawFinalSt !== 'approved')
                                                 <a href="{{ route('student.final_report.index') }}"
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
                                                     Unggah Laporan
@@ -327,11 +331,11 @@
         <div class="text-slate-500 mt-0.5">Pemilihan instansi dinas dan divisi penempatan magang</div>
     </div>
     <div class="shrink-0">
-        @if($application && in_array(strtolower($application->status), ['accepted', 'completed', 'verified']))
+        @if($application && in_array(strtolower($appStatusVal ?? ''), ['accepted', 'active', 'completed', 'verified']))
             <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                 Diterima ({{ $application->unit->name ?? 'Instansi Dinas' }})
             </span>
-        @elseif($application && in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']))
+        @elseif($application && in_array(strtolower($appStatusVal ?? ''), ['resigned', 'rejected', 'canceled']))
             <a href="{{ route('student.application.create') }}"
                 class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
                 Buat Pengajuan Baru
@@ -427,7 +431,7 @@
                                                 <span>Unggah Laporan</span>
                                                 
                                             </button>
-                                        @elseif ($finalReport && in_array(strtolower($finalReport->status ?? ''), ['approved', 'disetujui']))
+                                        @elseif ($finalReport && $rawFinalSt === 'approved')
                                             <span
                                                 class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                                                 Disetujui & Disahkan
@@ -560,7 +564,7 @@
                 @endif
 
                 <!-- 3. Form / Modal Pemilihan Dosen Pembimbing Kampus (Jika Diterima) -->
-                @if ($application && $application->status === 'accepted')
+                @if ($application && in_array($appStatusVal, ['accepted', 'active', 'completed']))
                     <div
                         class="bg-white rounded-3xl p-6 border-2 {{ $academicAdvisor ? 'border-emerald-200' : 'border-blue-300 bg-blue-50/20' }} shadow-sm space-y-4">
                         <div
@@ -902,13 +906,17 @@
                     </div>
 
                     <!-- Card 2: Status Pengajuan & Lifecycle -->
+                    @php
+                        $rawAppSt = $rawSt;
+                    @endphp
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 
-                    {{ optional($application)->lifecycle_status === 'ACTIVE' ? 'border-l-emerald-500' : '' }}
-                    {{ optional($application)->lifecycle_status === 'COMPLETED' ? 'border-l-blue-600' : '' }}
-                    {{ optional($application)->lifecycle_status === 'ACCEPTED' ? 'border-l-sky-500' : '' }}
-                    {{ optional($application)->lifecycle_status === 'PENDING' ? 'border-l-amber-500' : '' }}
-                    {{ optional($application)->lifecycle_status === 'REJECTED' ? 'border-l-rose-500' : '' }}
-                    {{ (optional($application)->lifecycle_status === 'RESIGNED' || optional($application)->status === 'resigned') ? 'border-l-slate-400' : '' }}
+                    {{ $rawAppSt === 'active' ? 'border-l-emerald-500' : '' }}
+                    {{ $rawAppSt === 'completed' ? 'border-l-blue-600' : '' }}
+                    {{ $rawAppSt === 'accepted' ? 'border-l-indigo-500' : '' }}
+                    {{ $rawAppSt === 'verified' ? 'border-l-sky-500' : '' }}
+                    {{ $rawAppSt === 'pending' ? 'border-l-amber-500' : '' }}
+                    {{ $rawAppSt === 'rejected' ? 'border-l-rose-500' : '' }}
+                    {{ $rawAppSt === 'resigned' ? 'border-l-slate-400' : '' }}
                     {{ !$application ? 'border-l-slate-300' : '' }} flex flex-col justify-between">
                         <div>
                             <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Magang
@@ -919,28 +927,33 @@
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200">
                                         Belum Mengajukan
                                     </span>
-                                @elseif($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
+                                @elseif($rawAppSt === 'active')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                                         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                         AKTIF (Sedang Magang)
                                     </span>
-                                @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
+                                @elseif($rawAppSt === 'completed')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
                                         LULUS
                                     </span>
-                                @elseif($application->lifecycle_status === 'ACCEPTED')
+                                @elseif($rawAppSt === 'accepted')
                                     <span
-                                        class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
+                                        class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700 border border-indigo-200">
                                         DITERIMA (Calon Peserta)
                                     </span>
-                                @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
+                                @elseif($rawAppSt === 'verified')
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-700 border border-sky-200">
+                                        LOLOS SELEKSI BERKAS
+                                    </span>
+                                @elseif($rawAppSt === 'rejected')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700 border border-rose-200">
                                         DITOLAK
                                     </span>
-                                @elseif($application->lifecycle_status === 'RESIGNED' || $application->status === 'resigned')
+                                @elseif($rawAppSt === 'resigned')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 border border-slate-300">
                                         <span class="h-2 w-2 rounded-full bg-slate-400"></span>
@@ -955,10 +968,10 @@
                             </div>
                         </div>
                         <div class="mt-4 pt-2">
-                            @if(!$application || in_array(strtolower($application->status), ['resigned', 'rejected', 'canceled']) || in_array(strtoupper($application->lifecycle_status ?? ''), ['RESIGNED', 'REJECTED']))
+                            @if(!$application || in_array($rawAppSt, ['resigned', 'rejected', 'canceled']))
                                 <a href="{{ route('student.application.create') }}"
                                     class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800">
-                                    <span>Buat Pengajuan Baru;</span>
+                                    <span>Buat Pengajuan Baru</span>
                                 </a>
                             @else
                                 <div class="text-xs text-slate-500">Unit:
@@ -1008,7 +1021,7 @@
                     <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <h4 class="font-bold text-slate-800 text-base">Detail Penempatan Magang</h4>
-                            @if ($application->status === 'accepted')
+                            @if (in_array($appStatusVal, ['accepted', 'active', 'completed']))
                                 <a href="{{ route('student.application.letter', $application->id) }}" target="_blank"
                                     class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
                                     <span>Unduh Surat Balasan Dinas</span>
@@ -1027,28 +1040,33 @@
                                     {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</strong>
                             </p>
                             <p><span class="text-slate-500">Status Saat Ini:</span>
-                                @if($application->lifecycle_status === 'ACTIVE' || $application->status === 'accepted')
+                                @if($rawAppSt === 'active')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 border border-emerald-200">
                                         <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                         AKTIF (Sedang Magang)
                                     </span>
-                                @elseif($application->lifecycle_status === 'COMPLETED' || $application->status === 'completed')
+                                @elseif($rawAppSt === 'completed')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 border border-blue-200">
                                         LULUS
                                     </span>
-                                @elseif($application->lifecycle_status === 'ACCEPTED')
+                                @elseif($rawAppSt === 'accepted')
                                     <span
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800 border border-sky-200">
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-bold text-indigo-800 border border-indigo-200">
                                         DITERIMA (Calon Peserta)
                                     </span>
-                                @elseif($application->lifecycle_status === 'REJECTED' || $application->status === 'rejected')
+                                @elseif($rawAppSt === 'verified')
+                                    <span
+                                        class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-bold text-sky-800 border border-sky-200">
+                                        LOLOS SELEKSI BERKAS
+                                    </span>
+                                @elseif($rawAppSt === 'rejected')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
                                         DITOLAK
                                     </span>
-                                @elseif($application->lifecycle_status === 'RESIGNED' || $application->status === 'resigned')
+                                @elseif($rawAppSt === 'resigned')
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700 border border-slate-300">
                                         <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
@@ -1061,13 +1079,13 @@
                                     </span>
                                 @endif
                             </p>
-                            @if ($application->status === 'rejected' || $application->lifecycle_status === 'REJECTED' || $application->status === 'canceled')
+                            @if (in_array($rawAppSt, ['rejected', 'canceled']))
                                 <div
                                     class="col-span-1 md:col-span-2 p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs">
                                     <strong>Catatan Penolakan:</strong>
                                     {{ $application->rejection_reason ?? $application->rejection_note }}
                                 </div>
-                            @elseif ($application->status === 'resigned' || $application->lifecycle_status === 'RESIGNED')
+                            @elseif ($rawAppSt === 'resigned')
                                 <div
                                     class="col-span-1 md:col-span-2 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                                     <div>

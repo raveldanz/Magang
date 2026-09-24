@@ -59,11 +59,11 @@ class DashboardController extends Controller
             $status = strtolower($request->report_status);
             if ($status === 'pending') {
                 $query->whereHas('finalreport', function ($q) {
-                    $q->whereIn('status', ['pending', 'submitted', 'menunggu', 'revision']);
+                    $q->whereIn('status', ['pending', 'revision']);
                 });
             } elseif ($status === 'approved') {
                 $query->whereHas('finalreport', function ($q) {
-                    $q->whereIn('status', ['approved', 'disetujui']);
+                    $q->where('status', 'approved');
                 });
             } elseif ($status === 'none') {
                 $query->whereDoesntHave('finalreport');

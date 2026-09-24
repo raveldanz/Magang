@@ -700,7 +700,7 @@ class UniversityController extends Controller
                     $dosen?->name ?? 'Belum Ditentukan',
                     $mentor?->name ?? 'Belum Diplot',
                     $periode,
-                    strtoupper($app->lifecycle_status ?? $app->status),
+                    strtoupper($app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : (string)$app->status),
                     $mentorScore,
                     $dosenScore,
                     $finalScore,

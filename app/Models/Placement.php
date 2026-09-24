@@ -14,7 +14,6 @@ class Placement extends Model
         'mentor_id',
         'academic_advisor_id',
         'pembimbing_id',
-        'status',
         'certificate_number',
         'certificate_hash',
     ];
@@ -89,8 +88,14 @@ class Placement extends Model
         }
 
         if ($eval && $eval->is_complete) {
-            if ($app->status !== 'completed' && !in_array($app->status, ['resigned', 'canceled', 'rejected'])) {
-                $app->update(['status' => 'completed']);
+            $rawStatus = $app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : strtolower((string)$app->status);
+            if ($rawStatus !== 'completed' && !in_array($rawStatus, ['resigned', 'canceled', 'rejected'])) {
+                $app->update(['status' => \App\Enums\ApplicationStatus::COMPLETED]);
+                
+                \App\Models\AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [
+                    'student_name' => $app->user?->name,
+                    'reason' => 'Laporan akhir disetujui dan nilai evaluasi lengkap.',
+                ]);
             }
             return true;
         }

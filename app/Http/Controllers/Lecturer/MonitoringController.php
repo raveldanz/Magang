@@ -19,19 +19,11 @@ class MonitoringController extends Controller
         $lecturer = Auth::user();
         $lecturerId = $lecturer->id;
 
-        $query = Placement::with([
-            'application.user.studentProfile',
-            'application.unit.agencyProfile',
-            'mentor',
-            'pembimbing',
-            'logbooks',
-            'finalreport',
-            'evaluation',
-        ])->where('academic_advisor_id', $lecturerId);
+        $baseQuery = Placement::where('academic_advisor_id', $lecturerId);
 
         if ($request->filled('search')) {
             $search = strtolower($request->search);
-            $query->whereHas('application.user', function ($q) use ($search) {
+            $baseQuery->whereHas('application.user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhereHas('studentProfile', function ($sp) use ($search) {
                       $sp->where('nim', 'like', "%{$search}%");
@@ -40,32 +32,38 @@ class MonitoringController extends Controller
         }
 
         if ($request->filled('agency_id')) {
-            $query->whereHas('application.unit', function ($q) use ($request) {
+            $baseQuery->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });
         }
 
-        $allPlacements = $query->latest()->get();
-
-        // Pisahkan data bimbingan dosen berdasarkan lifecycle
-        $activeStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'ACTIVE');
-        $completedStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'COMPLETED');
-        $upcomingStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'ACCEPTED');
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'active' => (clone $baseQuery)->whereRelation('application', 'status', 'active')->count(),
+            'completed' => (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count(),
+            'upcoming' => (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count(),
+        ];
 
         $tab = $request->get('tab', 'active');
-        $placements = match ($tab) {
-            'completed' => $completedStudents,
-            'upcoming' => $upcomingStudents,
-            'all' => $allPlacements,
-            default => $activeStudents,
+
+        $query = (clone $baseQuery)->with([
+            'application.user.studentProfile',
+            'application.unit.agencyProfile',
+            'mentor',
+            'pembimbing',
+            'logbooks',
+            'finalreport',
+            'evaluation',
+        ]);
+
+        $query = match ($tab) {
+            'completed' => $query->whereRelation('application', 'status', 'completed'),
+            'upcoming' => $query->whereRelation('application', 'status', 'accepted'),
+            'all' => $query,
+            default => $query->whereRelation('application', 'status', 'active'),
         };
 
-        $stats = [
-            'total' => $allPlacements->count(),
-            'active' => $activeStudents->count(),
-            'completed' => $completedStudents->count(),
-            'upcoming' => $upcomingStudents->count(),
-        ];
+        $placements = $query->latest()->paginate(10)->withQueryString();
 
         $agencies = AgencyProfile::all();
 
