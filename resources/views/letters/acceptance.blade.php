@@ -371,8 +371,19 @@
         $pembimbingName = $pembimbing?->name ?? 'Pembimbing Lapangan / Unit Kerja Terkait';
         $pembimbingPhone = $pembimbing?->phone ?? $pembimbing?->studentProfile?->phone ?? $phone ?? '-';
 
-        // QR Code Verifikasi Dokumen
+        // Bersihkan nama mahasiswa dari embel-embel debug/seeder seperti (Accepted Future Date)
+        $cleanStudentName = preg_replace('/\s*\([^)]*\)/', '', $application->user?->name ?? '-');
+
+        // QR Code Verifikasi Dokumen (Lokal SVG Tanpa Ketergantungan Eksternal)
         $verifyUrl = route('verify.letter', $application->letter_token ?? $application->id);
+        $qrSvg = null;
+        if (class_exists('SimpleSoftwareIO\QrCode\Facades\QrCode')) {
+            try {
+                $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(68)->margin(0)->generate($verifyUrl);
+            } catch (\Throwable $e) {
+                $qrSvg = null;
+            }
+        }
         $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
 
         // Logo BSrE Base64
@@ -392,7 +403,7 @@
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
     <div class="no-print">
         <div style="font-size: 13px; font-weight: 500;">
-            Surat Penerimaan Magang - {{ $application->user?->name ?? 'Mahasiswa' }}
+            Surat Penerimaan Magang - {{ $cleanStudentName }}
         </div>
         <div class="btn-group">
             <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="btn btn-secondary">
@@ -490,7 +501,7 @@
                 <tbody>
                     <tr>
                         <td style="text-align: center;">1</td>
-                        <td style="font-weight: bold;">{{ $application->user?->name ?? '-' }}</td>
+                        <td style="font-weight: bold;">{{ $cleanStudentName }}</td>
                         <td style="text-align: center;">{{ $nim }}</td>
                         <td>{{ $jurusan }}</td>
                         <td>{{ $fakultas }}</td>
@@ -501,7 +512,7 @@
 
             <!-- 5. PARAGRAF PELAKSANAAN & NARAHUBUNG -->
             <p>
-                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Informasi lebih lanjut dapat menghubungi Sdr. <strong>{{ $pembimbingName }}</strong> dengan Nomor HP. <strong>{{ $pembimbingPhone }}</strong>.
+                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Informasi lebih lanjut dapat menghubungi Sdr. <strong>{{ $pembimbingName }}</strong> dengan Kontak/HP: <strong>{{ $pembimbingPhone }}</strong>.
             </p>
 
             <p>
@@ -514,12 +525,18 @@
             <table class="tte-table">
                 <tr>
                     <td class="tte-qr-cell">
-                        <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi TTE" class="tte-qr-img">
+                        @if(!empty($qrSvg))
+                            <div style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                {!! $qrSvg !!}
+                            </div>
+                        @else
+                            <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi TTE" class="tte-qr-img">
+                        @endif
                     </td>
                     <td class="tte-text-cell">
-                        <div style="font-size: 8pt; color: #111;">Surat ini Ditandatangani Elektronik Oleh :</div>
+                        <div style="font-size: 8pt; color: #111; margin-bottom: 2px;">Surat ini Ditandatangani Elektronik Oleh :</div>
                         <div style="font-weight: bold; text-transform: uppercase;">{{ $signeePosition }},</div>
-                        <div style="margin-top: 2px;"><b><u>{{ $signeeName }}</u></b></div>
+                        <div style="margin-top: 2px; font-size: 9.5pt;"><b><u>{{ $signeeName }}</u></b></div>
                         <div>Pembina Utama Muda / IV/c</div>
                         @if (!empty($signeeNip))
                             <div>NIP. {{ $signeeNip }}</div>
