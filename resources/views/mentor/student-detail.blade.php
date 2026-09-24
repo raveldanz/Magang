@@ -129,11 +129,14 @@
                                 Laporan Akhir Magang
                             </h3>
                             @if ($placement->finalreport)
+                                @php
+                                    $frSt = $placement->finalreport->status instanceof \BackedEnum ? $placement->finalreport->status->value : (string)($placement->finalreport->status ?? '');
+                                @endphp
                                 <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                    {{ $placement->finalreport->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $placement->finalreport->status === 'revision' ? 'bg-rose-100 text-rose-800' : '' }}
-                                    {{ $placement->finalreport->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
-                                    {{ strtoupper($placement->finalreport->status) }}
+                                    {{ $frSt === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
+                                    {{ $frSt === 'revision' ? 'bg-rose-100 text-rose-800' : '' }}
+                                    {{ $frSt === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
+                                    {{ strtoupper($frSt) }}
                                 </span>
                             @else
                                 <span class="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">

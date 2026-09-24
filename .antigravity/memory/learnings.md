@@ -35,6 +35,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-018** | 2026-09-23 | Graduation Verification & Evaluation Precondition | Label 'Aksi Kelulusan' muncul prematur saat nilai evaluasi magang belum diinput | RESOLVED |
 | **LRN-019** | 2026-09-23 | Laporan Akhir & Lightbox Logbook | Pratinjau berkas live, lightbox modal, checklist 3-sisi & eliminasi orphan view | RESOLVED |
 | **LRN-020** | 2026-09-23 | DPL Logbook & Serialization Memory Leak | Memory limit 512MB exhausted saat json_encode Eloquent model dengan recursive accessor | RESOLVED |
+| **LRN-021** | 2026-09-24 | Status Pipeline & Architecture Standardization | Fragmentasi dualisme status virtual RAM, zombie placement status & filtering RAM collection | RESOLVED |
+| **LRN-022** | 2026-09-24 | BackedEnum Type-Safety & View Hardening | TypeError strtolower()/strtoupper() saat menerima enum ApplicationStatus di Blade & Services | RESOLVED |
 
 ---
 
@@ -394,6 +396,46 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Menambahkan array `modal_data` di dalam `$bundle` pada `LecturerLogbookController`, yang *hanya* diekstrak menjadi primitive values (string, integer, array dasar).
   3. Mengubah trigger modal di `index.blade.php` menjadi `json_encode($bundle['modal_data'])`.
 - **Prevention Rule**: DILARANG KERAS mengeksekusi `json_encode()` pada objek Eloquent Model secara utuh di dalam file Blade/Alpine JS. Terutama jika model tersebut memiliki `$appends` atau relasi bersarang. Selalu gunakan DTO (Data Transfer Object) atau mapping array primitif ringan (`map->toArray()`) khusus untuk konsumsi JSON front-end.
+
+### [LRN-021] Standarisasi Pipeline Status Sistem Magang (Single Source of Truth) & Query-Level Filtering
+- **Tanggal**: 2026-09-24
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `app/Enums/ReviewStatus.php`, `app/Models/Application.php`, `app/Models/Placement.php`, `app/Console/Commands/SyncInternshipStatus.php`, `routes/console.php`, Seluruh Controller Multi-Role (`Admin`, `Mentor`, `Lecturer`, `University`, `Student`)
+- **Problem / Symptom**: 
+  1. Terjadi fragmentasi dan dualisme status di mana status riil di database (`applications.status`) berbeda dengan status virtual di RAM (`lifecycle_status`).
+  2. Akibatnya, Controller Mentor (`Mentor\DashboardController`) dan Dosen (`Lecturer\MonitoringController`) harus mengambil seluruh data dan mem-filternya di RAM (`$allPlacements->filter(...)`), tidak bisa di-paginate di level database SQL.
+  3. Form Admin (`resources/views/admin/applications/show.blade.php`) dan index filter kekurangan opsi `verified` dan `active`.
+  4. Adanya toleransi campur kode string bahasa Indonesia (`'disetujui'`, `'menunggu'`) di controller dan Blade views.
+- **Root Cause**: Ketiadaan Backed Enum resmi PHP 8.1 dan perancangan awal yang menaruh komputasi status pada accessor model Eloquent (`$appends = ['lifecycle_status']`).
+- **Fix Applied**: 
+  1. Dibuat PHP 8.1 Backed Enums: `ApplicationStatus` (`pending`, `verified`, `accepted`, `active`, `completed`, `rejected`, `resigned`) dan `ReviewStatus` (`pending`, `approved`, `rejected`, `revision`) dengan helper `label()`, `badgeColor()`, `isOngoing()`, `canLogbook()`.
+  2. Menghapus accessor `lifecycle_status` dari `$appends` pada `Application.php` dan mencasting `status` langsung ke `ApplicationStatus::class`.
+  3. Menghapus zombie status pada `Placement` dan memperbarui `syncCompletionStatus()` untuk otomatis memperbarui status aplikasi ke `completed`.
+  4. Membuat Artisan command `app:sync-internship-status` yang menjadwalkan transisi otomatis aplikasi `accepted` ke `active` saat `start_date <= today` dan mencatatnya ke `AuditLog`.
+  5. Mengubah query controller Mentor, Dosen, dan Kampus menjadi database-level query dengan pagination (`paginate(10)->withQueryString()`) menggunakan relasi `whereRelation('application', 'status', ...)`.
+  6. Memperbaiki Blade views Admin (semua 7 status berurutan dengan kartu Alpine), Mahasiswa (proteksi logbook aktif), Mentor, Dosen, dan Kampus dengan badge seragam Tailwind CSS.
+  7. Menghapus seluruh string bahasa Indonesia `'disetujui'` dan `'menunggu'` dari logic controller dan query.
+---
+
+### [LRN-022] BackedEnum Type-Safety & Blade Views / Service Hardening
+- **Tanggal**: 2026-09-24
+- **Komponen**: `resources/views/dashboard.blade.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/student/application/create.blade.php`, `resources/views/admin/universities/show.blade.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/student/logbook/index.blade.php`, `resources/views/mentor/student-detail.blade.php`, `app/Services/NotificationService.php`, `app/Http/Controllers/Student/FinalReportController.php`, `app/Http/Controllers/Student/ApplicationController.php`
+- **Problem / Symptom**: 
+  1. Internal Server Error (HTTP 500) `TypeError: strtolower(): Argument #1 ($string) must be of type string, App\Enums\ApplicationStatus given` di Dashboard Mahasiswa dan seluruh halaman ber-navbar.
+  2. Dropdown dan form verifikasi Admin belum menyediakan 7 alur status baku secara berurutan dan kontainer *acceptance-box* tertutup untuk status `active`.
+  3. Komparasi strict string PHP (`=== 'accepted'`, `in_array($app->status, ['accepted', 'completed'])`) mengevaluasi `false` saat model mengembalikan enum `ApplicationStatus::ACCEPTED`.
+- **Root Cause**: 
+  - Fungsi string native PHP (`strtolower()`, `strtoupper()`) dan `match()` operator menerima objek BackedEnum langsung dari atribut Eloquent (`$application->status`) tanpa ekstraksi properti `->value`.
+  - Service `NotificationService::getNotificationsForUser` dipanggil oleh navbar di seluruh halaman dan memanggil `strtolower($latestApp->status)` secara mentah.
+- **Fix Applied**: 
+  1. Standarisasi ekstraksi status aman di Blade dan Service:
+     `$appStatusVal = $application ? ($application->status instanceof \BackedEnum ? $application->status->value : (string)$application->status) : null;`
+     `$rawSt = strtolower($appStatusVal ?? '');`
+  2. Merombak form Admin di `resources/views/admin/applications/show.blade.php` dengan dropdown `<select id="status-select" name="status">` berisi 7 status lengkap (`pending`, `verified`, `accepted`, `active`, `completed`, `rejected`, `resigned`), proteksi syarat kelulusan `$canComplete`, sinkronisasi visual kartu Alpine.js, penamaan ID `#acceptance-box` & `#rejection-box`, serta fungsi `toggleFields()`.
+  3. Mengamankan seluruh pemanggilan `strtolower()` dan `strtoupper()` di `NotificationService.php`, `FinalReportController.php`, `Student/ApplicationController.php`, dan semua Blade views.
+  4. Menambahkan 3 skenario tes komprehensif pada `ApplicationStatusArchitectureTest.php` untuk merender seluruh halaman dengan 7 status enum (100% pass, 33/33 total tests pass).
+- **Prevention Rule**: 
+  - JANGAN PERNAH mengoper atribut status Eloquent langsung ke fungsi string native PHP seperti `strtolower()` atau `strtoupper()` tanpa mengecek `instanceof \BackedEnum ? ->value : (string)`.
+  - Jangan gunakan komparasi identitas strict (`=== 'string'`) terhadap atribut status model; selalu bandingkan dengan enum instance (`=== ApplicationStatus::ACCEPTED`) atau ekstrak nilai string `->value` terlebih dahulu.
 
 ---
 

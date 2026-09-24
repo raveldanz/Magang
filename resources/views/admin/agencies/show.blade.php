@@ -418,13 +418,16 @@
                                         </td>
                                         <td class="py-3.5 px-4 text-center">
                                             @php
-                                                $status = strtolower($app->status ?? 'submitted');
+                                                $status = strtolower($app->status instanceof \BackedEnum ? $app->status->value : (string)($app->status ?? 'submitted'));
                                                 $badgeClasses = [
+                                                    'pending' => 'bg-amber-50 text-amber-700 border-amber-200',
                                                     'submitted' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                                    'verified' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                                    'accepted' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                                    'verified' => 'bg-sky-50 text-sky-700 border-sky-200',
+                                                    'accepted' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                                                    'active' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                                    'completed' => 'bg-blue-50 text-blue-700 border-blue-200',
                                                     'rejected' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                                    'completed' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                                    'resigned' => 'bg-slate-100 text-slate-700 border-slate-300',
                                                 ];
                                             @endphp
                                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black border {{ $badgeClasses[$status] ?? 'bg-slate-100 text-slate-700 border-slate-200' }}">

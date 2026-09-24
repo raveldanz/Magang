@@ -506,21 +506,28 @@
                                         <td class="p-3.5">
                                             @if($latestApp)
                                                 <div class="space-y-1">
-                                                    @if($latestApp->status === 'accepted')
+                                                    @php
+                                                        $latestAppSt = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : (string)$latestApp->status;
+                                                    @endphp
+                                                    @if(in_array($latestAppSt, ['accepted', 'active']))
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                             Aktif Magang
                                                         </span>
-                                                    @elseif($latestApp->status === 'completed')
+                                                    @elseif($latestAppSt === 'completed')
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                                             Selesai / Lulus
                                                         </span>
-                                                    @elseif($latestApp->status === 'pending')
+                                                    @elseif($latestAppSt === 'pending')
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
                                                             Menunggu Seleksi
                                                         </span>
+                                                    @elseif($latestAppSt === 'verified')
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                                            Lolos Seleksi Berkas
+                                                        </span>
                                                     @else
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                                            {{ strtoupper($latestApp->status) }}
+                                                            {{ strtoupper($latestAppSt) }}
                                                         </span>
                                                     @endif
 

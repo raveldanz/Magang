@@ -173,7 +173,8 @@
                                     $report = $place->finalreport;
                                     $totalLog = $place->logbooks->count();
                                     $pendingLog = $place->logbooks->where('status', 'pending')->count();
-                                    $lifecycle = $place->application?->lifecycle_status ?? 'ACCEPTED';
+                                    $appStatus = $place->application?->status;
+                                    $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
                                     
                                     $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1) : null;
                                 @endphp
@@ -201,16 +202,39 @@
                                         </div>
                                     </td>
 
-                                    <!-- Status Lifecycle -->
+                                    <!-- Status Magang -->
                                     <td class="py-4 px-4 text-center">
-                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
-                                            {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                                            {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}
-                                            {{ $lifecycle === 'RESIGNED' ? 'bg-slate-100 text-slate-700 border border-slate-300' : '' }}
-                                            {{ $lifecycle === 'REJECTED' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
-                                            {{ $lifecycle }}
-                                        </span>
+                                        @if($rawStatus === 'active')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                <span>ACTIVE</span>
+                                            </span>
+                                        @elseif($rawStatus === 'accepted')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                                <span>ACCEPTED</span>
+                                            </span>
+                                        @elseif($rawStatus === 'completed')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                                <span>COMPLETED</span>
+                                            </span>
+                                        @elseif($rawStatus === 'resigned')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                                                <span>RESIGNED</span>
+                                            </span>
+                                        @elseif($rawStatus === 'rejected')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                <span>REJECTED</span>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                <span>{{ strtoupper($rawStatus) }}</span>
+                                            </span>
+                                        @endif
                                     </td>
 
                                     <!-- Status Logbook -->
@@ -304,6 +328,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if(method_exists($placements, 'hasPages') && $placements->hasPages())
+                    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+                        {{ $placements->links() }}
+                    </div>
+                @endif
             </div>
 
         </div>

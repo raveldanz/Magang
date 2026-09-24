@@ -108,7 +108,8 @@
                                     $finalReport = $placement->finalreport;
                                     $eval = $placement->evaluation;
                                     $hasEval = ($eval?->nilai_akademik ?? 0) > 0 || ($eval?->nilai_dosen ?? 0) > 0;
-                                    $lifecycle = $placement->application?->lifecycle_status ?? 'ACCEPTED';
+                                    $appStatus = $placement->application?->status;
+                                    $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
 
                                     $univ = $eval?->getUniversity();
                                     if (!$univ && $student) {
@@ -137,13 +138,37 @@
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
-                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
-                                            {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                                            {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}
-                                            {{ $lifecycle === 'RESIGNED' ? 'bg-slate-200 text-slate-800 border border-slate-300' : '' }}">
-                                            {{ $lifecycle }}
-                                        </span>
+                                        @if($rawStatus === 'active')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                <span>ACTIVE</span>
+                                            </span>
+                                        @elseif($rawStatus === 'accepted')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                                <span>ACCEPTED</span>
+                                            </span>
+                                        @elseif($rawStatus === 'completed')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                                <span>COMPLETED</span>
+                                            </span>
+                                        @elseif($rawStatus === 'resigned')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                                                <span>RESIGNED</span>
+                                            </span>
+                                        @elseif($rawStatus === 'rejected')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                <span>REJECTED</span>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                <span>{{ strtoupper($rawStatus) }}</span>
+                                            </span>
+                                        @endif
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
@@ -154,12 +179,16 @@
 
                                     <td class="py-4 px-4 text-center">
                                         @if ($finalReport && $finalReport->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
                                                  Disetujui
                                             </span>
+                                        @elseif ($finalReport && $finalReport->status === 'revision')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 text-rose-700 text-xs font-bold rounded-full border border-rose-200">
+                                                 Revisi
+                                            </span>
                                         @elseif ($finalReport)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200">
-                                                 Menunggu
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-200">
+                                                 Pending
                                             </span>
                                         @else
                                             <span class="text-xs text-gray-400 italic">Belum Ada</span>
@@ -231,6 +260,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if(method_exists($placements, 'hasPages') && $placements->hasPages())
+                    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+                        {{ $placements->links() }}
+                    </div>
+                @endif
             </div>
 
         </div>
