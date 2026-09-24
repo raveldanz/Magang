@@ -37,6 +37,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-020** | 2026-09-23 | DPL Logbook & Serialization Memory Leak | Memory limit 512MB exhausted saat json_encode Eloquent model dengan recursive accessor | RESOLVED |
 | **LRN-021** | 2026-09-24 | Status Pipeline & Architecture Standardization | Fragmentasi dualisme status virtual RAM, zombie placement status & filtering RAM collection | RESOLVED |
 | **LRN-022** | 2026-09-24 | BackedEnum Type-Safety & View Hardening | TypeError strtolower()/strtoupper() saat menerima enum ApplicationStatus di Blade & Services | RESOLVED |
+| **LRN-023** | 2026-09-24 | Admin Selection Reactivity & Offline TTE Letter | Konflik kelas Tailwind hidden dengan Alpine x-show, QR TTE rusak (eksternal API) & nama seeder | RESOLVED |
 
 ---
 
@@ -436,6 +437,35 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**: 
   - JANGAN PERNAH mengoper atribut status Eloquent langsung ke fungsi string native PHP seperti `strtolower()` atau `strtoupper()` tanpa mengecek `instanceof \BackedEnum ? ->value : (string)`.
   - Jangan gunakan komparasi identitas strict (`=== 'string'`) terhadap atribut status model; selalu bandingkan dengan enum instance (`=== ApplicationStatus::ACCEPTED`) atau ekstrak nilai string `->value` terlebih dahulu.
+
+---
+
+### [LRN-023] Admin Selection Reactivity & Offline Vector TTE Letter Generation
+- **Tanggal**: 2026-09-24
+- **Komponen**: `resources/views/admin/applications/show.blade.php`, `resources/views/letters/acceptance.blade.php`, `routes/web.php`, `app/Http/Controllers/Student/ApplicationController.php`, `composer.json`
+- **Problem / Symptom**: 
+  1. Pada halaman verifikasi admin (`admin/applications/{id}`), saat admin mengklik kartu status `ACCEPTED` dari posisi `pending` atau `verified`, kotak plotting pembimbing dan nomor surat tidak langsung muncul di layar secara interaktif.
+  2. Gambar QR code pada kotak Tanda Tangan Elektronik (TTE) surat balasan (`/admin/applications/{id}/letter`) rusak/pecah (*broken image placeholder*).
+  3. Nama mahasiswa di surat penerimaan mengandung teks pengujian dari database seeder (misal: `Nanda Kartika (Accepted Future Date)`).
+  4. Admin kesulitan meninjau surat pengantar/proposal asli dari kampus mahasiswa saat akan memplot pembimbing dinas.
+  5. Label tombol aksi di view admin masih bertuliskan `Pratinjau / Cetak Surat PDF` (diinginkan lebih ringkas).
+  6. Rute verifikasi surat `/verify-letter/{token}` dan download surat mahasiswa mengembalikan 404 ketika status pengajuan telah bergeser ke `active`.
+- **Root Cause**: 
+  1. Kontainer `#acceptance-box` di-render dengan kelas Tailwind `hidden` secara hardcoded via PHP ternary. Di Tailwind CSS, class `.hidden` memiliki aturan `display: none !important;` yang menimpa manipulasi `style="display: block;"` bawaan directive `x-show` Alpine.js sebelum halaman di-reload.
+  2. Template surat mengandalkan generator QR Code eksternal (`api.qrserver.com`) melalui tag `<img>`. Di lingkungan localhost/offline atau saat koneksi dibatasi firewall, request HTTP gagal dan menghasilkan icon gambar pecah.
+  3. Atribut nama mahasiswa (`$application->user->name`) dicetak secara mentah tanpa sanitasi string kurung `(...)`.
+  4. Rute verifikasi publik dan download mahasiswa membatasi filter status hanya pada `['accepted', 'completed']` tanpa menyertakan status `active`.
+- **Fix Applied**: 
+  1. Menghapus kelas `hidden` bawaan PHP pada `#acceptance-box` dan `#rejection-box`, menyerahkan kendali visibilitas sepenuhnya pada Alpine.js (`x-show="status === 'accepted' || status === 'active' || status === 'completed'"`) serta menyelaraskan fungsi vanilla JS `toggleFields()` dengan properti inline `style.display`.
+  2. Menambahkan kartu pratinjau cepat *Surat Pengantar Kampus* di dalam `#acceptance-box` dengan tombol `Lihat Surat Pengantar` yang langsung membuka berkas asli mahasiswa di tab baru.
+  3. Mengubah label tombol aksi menjadi `Cetak Surat Balasan`.
+  4. Menginstal library `simplesoftwareio/simple-qrcode` (`^4.2`) dan merender QR Code TTE secara lokal sebagai inline vector SVG (`QrCode::size(68)->margin(0)->generate($verifyUrl)`), 100% bebas dari ketergantungan API internet.
+  5. Melakukan sanitasi regex nama mahasiswa: `preg_replace('/\s*\([^)]*\)/', '', ...)`.
+  6. Memperbarui klausa `whereIn('status', ['accepted', 'active', 'completed'])` pada rute verifikasi surat dan controller mahasiswa.
+- **Prevention Rule**: 
+  - JANGAN PERNAH mencampur class CSS Tailwind `.hidden` dengan direktif Alpine.js `x-show` pada elemen yang sama karena `.hidden` menerapkan `display: none !important`.
+  - Dokumen resmi berharga hukum (seperti Surat Balasan Magang / TTE) tidak boleh bergantung pada API gambar pihak ketiga eksternal; selalu generate QR Code secara lokal dalam format SVG/Base64.
+  - Setiap rute dokumen yang diterbitkan saat status `accepted` harus tetap dapat diakses dan diverifikasi secara konsisten saat status berjalan di tahap `active` hingga `completed`.
 
 ---
 
