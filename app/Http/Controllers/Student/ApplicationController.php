@@ -156,7 +156,7 @@ class ApplicationController extends Controller
     {
         $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
             ->where('user_id', Auth::id())
-            ->whereIn('status', ['accepted', 'completed'])
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->findOrFail($id);
 
         return view('letters.acceptance', compact('application'));
