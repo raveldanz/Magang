@@ -1,4 +1,7 @@
 <x-app-layout>
+    <x-responsive-table-style />
+    <x-mobile-list-style />
+    <x-control-center-style />
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -6,30 +9,32 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </a>
                 <div>
-                    <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                        <span>Pusat Kendali Perguruan Tinggi: {{ $university->name }}</span>
+                    <h2 class="cc-title font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
+                        <span>Pusat Kendali Perguruan Tinggi<span class="cc-hide-m">: {{ $university->name }}</span></span>
                     </h2>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+                    <p class="hidden sm:block text-xs sm:text-sm text-gray-500 mt-0.5">
                         Manajemen terpadu Dosen Pembimbing (DPL), Mahasiswa, Akun Admin Portal, dan Kebijakan Penilaian
                     </p>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2.5">
+            <div class="cc-head-actions flex flex-wrap items-center gap-2.5">
                 <a href="{{ route('admin.universities.export_students', $university->id) }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span>Export Rekap (.CSV)</span>
+                    <span class="whitespace-nowrap">Export Rekap (.CSV)</span>
                 </a>
 
+                @if($isSuperAdmin)
                 <a href="{{ route('admin.universities.edit', $university->id) }}" class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition active:scale-95 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     <span>Edit Profil & Kebijakan</span>
                 </a>
+                @endif
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="{ 
+    <div class="cc-wrap py-8" x-data="{ 
         activeTab: '{{ request('tab', $activeTab ?? 'dosen') }}',
         showAddDosenModal: false,
         showAssignAdvisorModal: false,
@@ -83,10 +88,13 @@
                     } elseif (str_contains($uName, 'unitomo') || str_contains($uCode, 'unitomo') || str_contains($uName, 'soetomo')) {
                         $univLogoUrl = asset('images/logos/unitomo.png');
                     }
+                    if ($univLogoUrl && !file_exists(public_path(ltrim(parse_url($univLogoUrl, PHP_URL_PATH) ?? '', '/')))) {
+                        $univLogoUrl = null;
+                    }
                 }
             @endphp
 
-            <div class="relative overflow-hidden rounded-3xl shadow-xl border border-blue-400/30 p-6 sm:p-8"
+            <div class="cc-hero relative overflow-hidden rounded-3xl shadow-xl border border-blue-400/30 p-6 sm:p-8"
                  style="background: linear-gradient(135deg, #09172e 0%, #0d2857 50%, #07152c 100%) !important; color: #ffffff !important;">
                 
                 <!-- Watermark Lambang Perisai Kedinasan Pemkot Surabaya -->
@@ -98,8 +106,8 @@
 
                 <div class="relative z-10 flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                     <!-- Sisi Kiri: Logo Resmi, Nama & Informasi Kontak -->
-                    <div class="flex items-start gap-4 sm:gap-6 flex-1">
-                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-3 shadow-md flex items-center justify-center shrink-0 overflow-hidden border border-white/20"
+                    <div class="cc-hero-main flex items-start gap-4 sm:gap-6 flex-1 min-w-0">
+                        <div class="cc-logo w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-3 shadow-md flex items-center justify-center shrink-0 overflow-hidden border border-white/20"
                              style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; max-width: 88px; max-height: 88px;">
                             @if($univLogoUrl)
                                 <img src="{{ $univLogoUrl }}" alt="Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;">
@@ -108,8 +116,8 @@
                             @endif
                         </div>
 
-                        <div class="space-y-2">
-                            <div class="flex flex-wrap items-center gap-2">
+                        <div class="space-y-2 min-w-0">
+                            <div class="cc-badges flex flex-wrap items-center gap-2">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-500/30 text-blue-200 border border-blue-400/30">
                                     {{ $university->code }}
                                 </span>
@@ -143,7 +151,7 @@
                                 {{ $university->address ?? 'Alamat kampus belum diatur.' }}
                             </p>
 
-                            <div class="flex flex-wrap items-center gap-4 text-xs text-blue-200/90 pt-1">
+                            <div class="cc-contacts flex flex-wrap items-center gap-4 text-xs text-blue-200/90 pt-1">
                                 @if($university->email)
                                     <div class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -161,7 +169,7 @@
                     </div>
 
                     <!-- Sisi Kanan: Kartu PIC Rektorat & Quick Action Login As -->
-                    <div class="w-full lg:w-80 p-4 rounded-2xl bg-slate-900/60 border border-blue-400/20 backdrop-blur-md space-y-3 shrink-0">
+                    <div class="cc-side w-full lg:w-80 p-4 rounded-2xl bg-slate-900/60 border border-blue-400/20 backdrop-blur-md space-y-3 shrink-0">
                         <div class="flex items-center justify-between border-b border-blue-400/10 pb-2">
                             <span class="text-[11px] font-bold uppercase tracking-wider text-blue-300 flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -183,6 +191,7 @@
                             @endif
                         </div>
 
+                        @if($isSuperAdmin)
                         <div class="pt-2 border-t border-blue-400/10 flex items-center gap-2">
                             @if($university->universityAdmin)
                                 @if($isSuperAdmin)
@@ -195,6 +204,7 @@
                                     </form>
                                 @endif
                             @else
+                                @if($isSuperAdmin)
                                 <form action="{{ route('admin.universities.create_account', $university->id) }}" method="POST" class="w-full m-0">
                                     @csrf
                                     <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer active:scale-95">
@@ -202,48 +212,50 @@
                                         <span>Buatkan Akun Admin Kampus</span>
                                     </button>
                                 </form>
+                                @endif
                             @endif
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <!-- 5 Macro Metrik Kampus -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Mahasiswa</span>
+            <div class="cc-stats grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+                <div class="cc-stat bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                    <span class="cc-stat-label text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Mahasiswa</span>
                     <div class="mt-2 flex items-baseline gap-1.5">
                         <span class="text-2xl font-black text-slate-900">{{ $stats['total_students'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Orang</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Dosen DPL</span>
+                <div class="cc-stat bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                    <span class="cc-stat-label text-[11px] font-bold uppercase tracking-wider text-slate-400">Dosen DPL</span>
                     <div class="mt-2 flex items-baseline gap-1.5">
                         <span class="text-2xl font-black text-indigo-600">{{ $stats['total_dosens'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Terdaftar</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Aktif Magang</span>
+                <div class="cc-stat bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                    <span class="cc-stat-label text-[11px] font-bold uppercase tracking-wider text-slate-400">Aktif Magang</span>
                     <div class="mt-2 flex items-baseline gap-1.5">
                         <span class="text-2xl font-black text-blue-600">{{ $stats['active_interns'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Di Dinas</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Lulus / Selesai</span>
+                <div class="cc-stat bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+                    <span class="cc-stat-label text-[11px] font-bold uppercase tracking-wider text-slate-400">Lulus / Selesai</span>
                     <div class="mt-2 flex items-baseline gap-1.5">
                         <span class="text-2xl font-black text-emerald-600">{{ $stats['completed_interns'] }}</span>
                         <span class="text-xs text-slate-500 font-medium">Alumni</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs col-span-2 sm:col-span-1">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rata-Rata Nilai</span>
+                <div class="cc-stat bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs col-span-2 sm:col-span-1">
+                    <span class="cc-stat-label text-[11px] font-bold uppercase tracking-wider text-slate-400">Rata-Rata Nilai</span>
                     <div class="mt-2 flex items-baseline gap-1.5">
                         <span class="text-2xl font-black text-amber-600">{{ $stats['average_score'] ?? '-' }}</span>
                         <span class="text-xs text-slate-500 font-medium">Skala 100</span>
@@ -252,37 +264,33 @@
             </div>
 
             <!-- Tab Navigasi Manajemen Terpadu -->
-            <div class="border-b border-slate-200">
-                <nav class="flex flex-nowrap space-x-2 sm:space-x-4 overflow-x-auto pb-px scrollbar-none" aria-label="Tabs">
+            <div class="cc-tabs-bare border-b border-slate-200">
+                <nav class="cc-tabs flex flex-nowrap space-x-2 sm:space-x-4 overflow-x-auto pb-px scrollbar-none" aria-label="Tabs">
                     <!-- Tab 1: Dosen Pembimbing (DPL) -->
                     <button type="button" 
                             @click="activeTab = 'dosen'" 
-                            :class="activeTab === 'dosen' ? 'border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
-                            class="whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
+                            :class="activeTab === 'dosen' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
+                            class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <span>Dosen Pembimbing (DPL)</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" :class="activeTab === 'dosen' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'">
-                            {{ $dosens->count() }}
-                        </span>
+                        <span class="cc-count">{{ $dosens->count() }}</span>
                     </button>
 
                     <!-- Tab 2: Mahasiswa Terdaftar & Status Magang -->
                     <button type="button" 
                             @click="activeTab = 'mahasiswa'" 
-                            :class="activeTab === 'mahasiswa' ? 'border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
-                            class="whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
+                            :class="activeTab === 'mahasiswa' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
+                            class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         <span>Mahasiswa Kampus</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" :class="activeTab === 'mahasiswa' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'">
-                            {{ $students->count() }}
-                        </span>
+                        <span class="cc-count">{{ $students->count() }}</span>
                     </button>
 
                     <!-- Tab 3: Akun Admin Portal Kampus -->
                     <button type="button" 
                             @click="activeTab = 'admin'" 
-                            :class="activeTab === 'admin' ? 'border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
-                            class="whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
+                            :class="activeTab === 'admin' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
+                            class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         <span>Akun Admin Kampus</span>
                     </button>
@@ -290,8 +298,8 @@
                     <!-- Tab 4: Kebijakan Penilaian & Dokumen -->
                     <button type="button" 
                             @click="activeTab = 'policy'" 
-                            :class="activeTab === 'policy' ? 'border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
-                            class="whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
+                            :class="activeTab === 'policy' ? 'cc-active border-blue-600 text-blue-600 font-black' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold'"
+                            class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <span>Kebijakan Penilaian</span>
                     </button>
@@ -301,24 +309,26 @@
             <!-- ============================================================== -->
             <!-- TAB 1: DOSEN PEMBIMBING LAPANGAN (DPL) KAMPUS                  -->
             <!-- ============================================================== -->
-            <div x-show="activeTab === 'dosen'" class="space-y-4" style="display: none;">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs">
+            <div x-show="activeTab === 'dosen'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
+                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-slate-100">
     <div>
         <h3 class="text-sm font-black text-slate-900">Dosen Pembimbing Lapangan (DPL) Terdaftar</h3>
         <p class="text-xs text-slate-500">Kelola akun dosen pembimbing akademik dari {{ $university->name }} yang memantau & menilai logbook mahasiswa</p>
     </div>
 
     <!-- Tombol Tambah DPL (Mengarah ke form create & otomatis kembali ke sini) -->
+    @if($isSuperAdmin)
     <a href="{{ route('admin.users.create', ['university_id' => $university->id, 'role' => 'dosen', 'return_to' => url()->current()]) }}" 
-       class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+       class="cc-head-actions inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
         <span>Tambah DPL Baru</span>
     </a>
+    @endif
 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
+                <div class="d-only">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
+                        <table class="rtable w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                                     <th class="p-3.5 pl-4">Dosen Pembimbing</th>
@@ -326,13 +336,15 @@
                                     <th class="p-3.5 text-center">Bimbingan Aktif</th>
                                     <th class="p-3.5 text-center">Bimbingan Selesai</th>
                                     <th class="p-3.5 text-center">Total Mahasiswa</th>
-                                    <th class="p-3.5 pr-4 text-right">Aksi Super Admin</th>
+                                    @if($isSuperAdmin)
+                                    <th class="p-3.5 pr-4 text-right">Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                                 @forelse($dosens as $dosen)
                                     <tr class="hover:bg-slate-50/80 transition">
-                                        <td class="p-3.5 pl-4">
+                                        <td class="rt-title p-3.5 pl-4" data-label="Dosen Pembimbing">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs shrink-0">
                                                     {{ strtoupper(substr($dosen->name, 0, 2)) }}
@@ -343,24 +355,25 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="p-3.5">
+                                        <td class="p-3.5" data-label="Email &amp; Kontak">
                                             <div class="font-mono text-slate-800">{{ $dosen->email }}</div>
                                             <div class="text-[11px] text-slate-400">{{ $dosen->phone ?? 'Nomor telp belum diisi' }}</div>
                                         </td>
-                                        <td class="p-3.5 text-center">
+                                        <td class="p-3.5 text-center" data-label="Bimbingan Aktif">
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-black {{ $dosen->active_students_count > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-50 text-slate-500' }}">
                                                 {{ $dosen->active_students_count }} Mhs
                                             </span>
                                         </td>
-                                        <td class="p-3.5 text-center">
+                                        <td class="p-3.5 text-center" data-label="Bimbingan Selesai">
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-black {{ $dosen->completed_students_count > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-50 text-slate-500' }}">
                                                 {{ $dosen->completed_students_count }} Mhs
                                             </span>
                                         </td>
-                                        <td class="p-3.5 text-center font-bold text-slate-900">
+                                        <td class="p-3.5 text-center font-bold text-slate-900" data-label="Total Mahasiswa">
                                             {{ $dosen->total_students_count }}
                                         </td>
-                                        <td class="p-3.5 pr-4 text-right">
+                                        @if($isSuperAdmin)
+                                        <td class="rt-actions p-3.5 pr-4 text-right" data-label="Aksi">
                                             <div class="inline-flex items-center gap-1.5">
                                                 @if($isSuperAdmin)
                                                     <form action="{{ route('admin.impersonate', $dosen->id) }}" method="POST" class="inline-block m-0">
@@ -372,6 +385,7 @@
                                                     </form>
                                                 @endif
 
+                                                @if($isSuperAdmin)
                                                 <form action="{{ route('admin.universities.dosens.reset_password', [$university->id, $dosen->id]) }}" method="POST" class="inline-block m-0" onsubmit="return confirm('Reset password Dosen {{ $dosen->name }} ke password default (\'password\')?');">
                                                     @csrf
                                                     <button type="submit" class="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition cursor-pointer" title="Reset Password ke default ('password')">
@@ -390,12 +404,14 @@
                                                         title="Hapus Dosen Pembimbing">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                 </button>
+                                                @endif
                                             </div>
                                         </td>
+                                        @endif
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="p-8 text-center text-slate-400">
+                                        <td colspan="{{ $isSuperAdmin ? 6 : 5 }}" class="p-8 text-center text-slate-400">
                                             <div class="flex flex-col items-center justify-center gap-2">
                                                 <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                                 <p class="font-bold text-slate-600">Belum ada Dosen Pembimbing (DPL) terdaftar untuk kampus ini</p>
@@ -408,21 +424,67 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Versi HP: kartu dosen DPL -->
+                <div class="m-only mlist">
+                    @forelse($dosens as $dosen)
+                        <div class="mcard">
+                            <div class="mcard-head">
+                                <div class="mavatar mavatar-indigo">{{ strtoupper(substr($dosen->name, 0, 2)) }}</div>
+                                <div class="mcard-main">
+                                    <div class="mcard-title">{{ $dosen->name }}</div>
+                                    <div class="mcard-sub"><span class="mono" style="overflow-wrap:anywhere">{{ $dosen->email }}</span><br>{{ $dosen->phone ?? 'Nomor telp belum diisi' }}</div>
+                                </div>
+                            </div>
+                            <div class="mcard-body">
+                                <div class="cc-stat3">
+                                    <div><b style="color:#2563eb">{{ $dosen->active_students_count }}</b><span>Aktif</span></div>
+                                    <div><b style="color:#059669">{{ $dosen->completed_students_count }}</b><span>Selesai</span></div>
+                                    <div><b>{{ $dosen->total_students_count }}</b><span>Total Mhs</span></div>
+                                </div>
+                            </div>
+                            @if($isSuperAdmin)
+                                <div class="mcard-foot">
+                                    <div class="cc-actions">
+                                        <form action="{{ route('admin.impersonate', $dosen->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="mbtn mbtn-green">Login As</button>
+                                        </form>
+                                        <form action="{{ route('admin.universities.dosens.reset_password', [$university->id, $dosen->id]) }}" method="POST" onsubmit="return confirm('Reset password Dosen {{ $dosen->name }} ke password default (\'password\')?');">
+                                            @csrf
+                                            <button type="submit" class="mbtn mbtn-amber">Reset</button>
+                                        </form>
+                                        <button type="button"
+                                                @click="$dispatch('open-delete-modal', {
+                                                    action: '{{ route('admin.universities.dosens.destroy', [$university->id, $dosen->id]) }}',
+                                                    title: 'Hapus Dosen Pembimbing',
+                                                    name: '{{ addslashes($dosen->name) }}',
+                                                    desc: 'Email: {{ $dosen->email }} &bull; {{ $dosen->total_students_count }} Mahasiswa Bimbingan'
+                                                })"
+                                                class="mbtn mbtn-danger">Hapus</button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="mempty">Belum ada Dosen Pembimbing (DPL) terdaftar untuk kampus ini.</div>
+                    @endforelse
+                </div>
             </div>
 
             <!-- ============================================================== -->
             <!-- TAB 2: MAHASISWA KAMPUS TERDAFTAR & STATUS MAGANG              -->
             <!-- ============================================================== -->
-            <div x-show="activeTab === 'mahasiswa'" class="space-y-4" style="display: none;">
+            <div x-show="activeTab === 'mahasiswa'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
                 <!-- Filter Status Mahasiswa & Bilah Pencarian -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-2xs space-y-3">
+                <div class="cc-panel-head p-4 space-y-3 border-b border-slate-100">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-sm font-black text-slate-900">Daftar Mahasiswa Asal {{ $university->name }}</h3>
                             <p class="text-xs text-slate-500">Pantau status pendaftaran, instansi penempatan, DPL pembimbing, dan perkembangan nilai</p>
                         </div>
 
-                        <div class="flex items-center gap-2">
+                        <div class="cc-head-actions flex items-center gap-2">
                             <a href="{{ route('admin.applications.index', ['university_id' => $university->id]) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200 transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                 <span>Buka di Pengajuan Masuk</span>
@@ -463,9 +525,9 @@
                 </div>
 
                 <!-- Table Mahasiswa -->
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
+                <div class="d-only">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
+                        <table class="rtable w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                                     <th class="p-3.5 pl-4">Mahasiswa</th>
@@ -488,7 +550,7 @@
                                         $eval = $placement?->evaluation;
                                     @endphp
                                     <tr class="hover:bg-slate-50/80 transition">
-                                        <td class="p-3.5 pl-4">
+                                        <td class="rt-title p-3.5 pl-4" data-label="Mahasiswa">
                                             <div class="flex items-center gap-2.5">
                                                 <div class="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">
                                                     {{ strtoupper(substr($student->name, 0, 2)) }}
@@ -499,11 +561,11 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="p-3.5">
+                                        <td class="p-3.5" data-label="Program Studi / NIM">
                                             <div class="font-bold text-slate-800">{{ $profile?->jurusan ?? '-' }}</div>
-                                            <div class="text-[11px] font-mono text-slate-500">NIM: {{ $profile?->nim ?? '-' }} (Smt {{ $profile?->semester ?? '-' }})</div>
+                                            <div class="text-[11px] font-mono text-slate-500 whitespace-nowrap">NIM: {{ $profile?->nim ?? '-' }} (Smt {{ $profile?->semester ?? '-' }})</div>
                                         </td>
-                                        <td class="p-3.5">
+                                        <td class="p-3.5" data-label="Status &amp; Penempatan">
                                             @if($latestApp)
                                                 <div class="space-y-1">
                                                     @php
@@ -542,19 +604,19 @@
                                                 <span class="text-[11px] text-slate-400 italic">Belum Mengajukan</span>
                                             @endif
                                         </td>
-                                        <td class="p-3.5">
+                                        <td class="p-3.5" data-label="Dosen DPL">
                                             @if($dosen)
                                                 <div class="text-xs font-bold text-indigo-700 flex items-center gap-1">
                                                     <span>{{ $dosen->name }}</span>
                                                 </div>
-                                                @if($latestApp)
+                                                @if($isSuperAdmin && $latestApp)
                                                     <button type="button" 
                                                             @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
                                                             class="text-[10px] text-blue-600 hover:underline cursor-pointer">
                                                         Ganti DPL
                                                     </button>
                                                 @endif
-                                            @elseif($latestApp && $latestApp->status === 'accepted')
+                                            @elseif($isSuperAdmin && $latestApp && $latestApp->status === 'accepted')
                                                 <button type="button" 
                                                         @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
                                                         class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold border border-indigo-200 transition cursor-pointer">
@@ -565,7 +627,7 @@
                                                 <span class="text-[11px] text-slate-400">-</span>
                                             @endif
                                         </td>
-                                        <td class="p-3.5">
+                                        <td class="p-3.5" data-label="Mentor Dinas">
                                             @if($mentor)
                                                 <div class="text-xs font-bold text-slate-800">{{ $mentor->name }}</div>
                                                 <div class="text-[10px] text-slate-400">Mentor Kedinasan</div>
@@ -573,7 +635,7 @@
                                                 <span class="text-[11px] text-slate-400 italic">Belum Diplot</span>
                                             @endif
                                         </td>
-                                        <td class="p-3.5 text-center">
+                                        <td class="p-3.5 text-center" data-label="Nilai Akhir">
                                             @if($eval && ($eval->final_score > 0 || $eval->nilai_akademik > 0 || $eval->nilai_pembimbing > 0))
                                                 @php
                                                     $fScore = $eval->final_score;
@@ -592,7 +654,7 @@
                                                 <span class="text-slate-300 font-bold">-</span>
                                             @endif
                                         </td>
-                                        <td class="p-3.5 pr-4 text-right">
+                                        <td class="rt-actions p-3.5 pr-4 text-right" data-label="Aksi">
                                             <div class="inline-flex items-center gap-1.5">
                                                 @if($latestApp)
                                                     <a href="{{ route('admin.applications.show', $latestApp->id) }}" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Lihat Detail Pengajuan">
@@ -618,13 +680,93 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Versi HP: kartu mahasiswa -->
+                <div class="m-only mlist">
+                    @forelse($students as $student)
+                        @php
+                            $profile = $student->studentProfile;
+                            $latestApp = $student->applications->first();
+                            $placement = $latestApp?->placement;
+                            $dosen = $placement?->academicAdvisor;
+                            $mentor = $placement?->mentor ?? $placement?->pembimbing;
+                            $eval = $placement?->evaluation;
+                            $mScore = null;
+                            if ($eval && ($eval->final_score > 0 || $eval->nilai_akademik > 0 || $eval->nilai_pembimbing > 0)) {
+                                $mScore = $eval->final_score;
+                                if (!$mScore && $eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
+                                    $mScore = round(($eval->nilai_pembimbing * ($university->weight_mentor ?? 40) / 100) + ($eval->nilai_akademik * ($university->weight_lecturer ?? 60) / 100), 2);
+                                } elseif (!$mScore && $university->evaluation_scheme === 'mentor_only') {
+                                    $mScore = $eval->nilai_pembimbing;
+                                }
+                            }
+                            $mSt = $latestApp ? ($latestApp->status instanceof \BackedEnum ? $latestApp->status->value : (string) $latestApp->status) : null;
+                            [$mStLabel, $mStPill] = match (true) {
+                                $mSt === null => ['Belum Mengajukan', 'mpill-slate'],
+                                in_array($mSt, ['accepted', 'active']) => ['Aktif Magang', 'mpill-green'],
+                                $mSt === 'completed' => ['Selesai / Lulus', 'mpill-blue'],
+                                $mSt === 'pending' => ['Menunggu Seleksi', 'mpill-amber'],
+                                $mSt === 'verified' => ['Lolos Seleksi Berkas', 'mpill-sky'],
+                                default => [strtoupper($mSt), 'mpill-red'],
+                            };
+                        @endphp
+                        <div class="mcard">
+                            <div class="mcard-head">
+                                <div class="mavatar">{{ strtoupper(substr($student->name, 0, 2)) }}</div>
+                                <div class="mcard-main">
+                                    <div class="mcard-title">{{ $student->name }}</div>
+                                    <div class="mcard-sub">{{ $profile?->jurusan ?? '-' }}<br><span class="mono">NIM {{ $profile?->nim ?? '-' }}</span> &middot; Smt {{ $profile?->semester ?? '-' }}</div>
+                                </div>
+                                @if($mScore)
+                                    <div class="mscore"><b>{{ number_format($mScore, 1) }}</b><span>Nilai</span></div>
+                                @endif
+                            </div>
+                            <div class="mcard-body cc-grid2">
+                                <div class="cc-span2">
+                                    <span class="mpill {{ $mStPill }}">{{ $mStLabel }}</span>
+                                    @if($latestApp)
+                                        <div class="mfield-value" style="margin-top:6px">{{ $latestApp->unit?->agencyProfile?->agency_name ?? 'Pemerintah Kota Surabaya' }}</div>
+                                        <div class="text-[11px] text-slate-400">Divisi: {{ $latestApp->unit?->name ?? '-' }}</div>
+                                    @endif
+                                </div>
+                                <div>
+                                    <div class="mfield-label">Dosen DPL</div>
+                                    <div class="mfield-value">{{ $dosen->name ?? '-' }}</div>
+                                    @if($isSuperAdmin && $latestApp && ($dosen || $latestApp->status === 'accepted'))
+                                        <button type="button"
+                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
+                                                class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti DPL' : '+ Tugaskan DPL' }}</button>
+                                    @endif
+                                </div>
+                                <div>
+                                    <div class="mfield-label">Mentor Dinas</div>
+                                    <div class="mfield-value">{{ $mentor->name ?? 'Belum Diplot' }}</div>
+                                </div>
+                            </div>
+                            @if($latestApp || $placement)
+                                <div class="mcard-foot">
+                                    <div class="cc-actions">
+                                        @if($latestApp)
+                                            <a href="{{ route('admin.applications.show', $latestApp->id) }}" class="mbtn mbtn-soft">Detail Pengajuan</a>
+                                        @endif
+                                        @if($placement)
+                                            <a href="{{ route('admin.logbooks.show', $placement->id) }}" class="mbtn mbtn-indigo">Logbook</a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="mempty">Tidak ada data mahasiswa terdaftar.</div>
+                    @endforelse
+                </div>
             </div>
 
             <!-- ============================================================== -->
             <!-- TAB 3: AKUN ADMIN PORTAL KAMPUS                                -->
             <!-- ============================================================== -->
             <div x-show="activeTab === 'admin'" class="space-y-4" style="display: none;">
-                <div class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs space-y-6">
+                <div class="cc-box bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                         <div>
                             <h3 class="font-black text-lg text-slate-900">Akun Resmi Administrator Portal Universitas</h3>
@@ -665,6 +807,7 @@
                             </div>
                         </div>
 
+                        @if($isSuperAdmin)
                         <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
                             @if($isSuperAdmin)
                                 <form action="{{ route('admin.impersonate', $adminAccount->id) }}" method="POST" class="m-0">
@@ -676,6 +819,7 @@
                                 </form>
                             @endif
 
+                            @if($isSuperAdmin)
                             <form action="{{ route('admin.users.reset_password', $adminAccount->id) }}" method="POST" class="m-0" onsubmit="return confirm('Reset password akun Admin Kampus {{ $adminAccount->email }} ke default (\'password\')?');">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
@@ -683,7 +827,9 @@
                                     <span>Reset Password ke Default ('password')</span>
                                 </button>
                             </form>
+                            @endif
                         </div>
+                        @endif
                     @else
                         <div class="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-3">
                             <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
@@ -691,6 +837,7 @@
                             </div>
                             <h4 class="font-bold text-amber-900 text-sm">Universitas Ini Belum Memiliki Akun Admin Portal</h4>
                             <p class="text-xs text-amber-700 max-w-md mx-auto">Buatkan akun admin kampus sekarang agar perwakilan rektorat/kemahasiswaan dapat login dan mengelola plotting DPL secara mandiri.</p>
+                            @if($isSuperAdmin)
                             <form action="{{ route('admin.universities.create_account', $university->id) }}" method="POST" class="inline-block pt-2">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">
@@ -698,6 +845,7 @@
                                     <span>Buatkan Akun Admin Portal Sekarang</span>
                                 </button>
                             </form>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -707,17 +855,19 @@
             <!-- TAB 4: KEBIJAKAN PENILAIAN & DOKUMEN                           -->
             <!-- ============================================================== -->
             <div x-show="activeTab === 'policy'" class="space-y-4" style="display: none;">
-                <div class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs space-y-6">
+                <div class="cc-box bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                         <div>
                             <h3 class="font-black text-lg text-slate-900">Kebijakan Evaluasi & Skema Penilaian Magang MBKM</h3>
                             <p class="text-xs text-slate-500 mt-1">Konfigurasi formula bobot penilaian akhir dan keterlibatan Dosen Pembimbing Lapangan (DPL)</p>
                         </div>
 
+                        @if($isSuperAdmin)
                         <a href="{{ route('admin.universities.edit', $university->id) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs self-start">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             <span>Ubah Kebijakan Penilaian</span>
                         </a>
+                        @endif
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

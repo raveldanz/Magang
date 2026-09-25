@@ -401,8 +401,8 @@
                                     <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-indigo-50 border border-indigo-100 text-center">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Nilai Akhir</span>
                                         <span class="text-lg sm:text-xl font-black text-indigo-950 mt-1 block">
-                                            {{ number_format($evaluation->nilai_akhir > 0 ? $evaluation->nilai_akhir : ($evaluation->final_score ?? 0), 1) }}
-                                            <span class="text-xs font-bold text-indigo-600 font-mono">({{ $evaluation->grade ?? 'A' }})</span>
+                                            {{ number_format((float) $evaluation->nilai_akhir, 1) }}
+                                            <span class="text-xs font-bold text-indigo-600 font-mono">({{ $evaluation->grade_calculated }})</span>
                                         </span>
                                         <span class="text-[10px] text-indigo-600 font-semibold">Predikat</span>
                                     </div>

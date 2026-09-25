@@ -282,17 +282,11 @@ class DashboardController extends Controller
                 $mentorScore = ($eval && $eval->nilai_pembimbing) ? number_format($eval->nilai_pembimbing, 2) : '-';
                 $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
                 
-                $finalScore = '-';
-                if ($eval && $eval->final_score) {
-                    $finalScore = number_format($eval->final_score, 2);
-                } elseif ($eval && $eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
-                    $weighted = ($eval->nilai_pembimbing * 0.4) + ($eval->nilai_akademik * 0.6);
-                    $finalScore = number_format($weighted, 2);
-                } elseif ($eval && $eval->nilai_akademik > 0) {
-                    $finalScore = number_format($eval->nilai_akademik, 2);
-                } elseif ($eval && $eval->nilai_pembimbing > 0) {
-                    $finalScore = number_format($eval->nilai_pembimbing, 2);
-                }
+                // Pakai accessor nilai_akhir: menghormati bobot & skema penilaian kampus
+                // (sebelumnya bobot 40/60 di-hardcode dan nilai setengah jadi ikut dianggap nilai akhir)
+                $finalScore = ($eval && (float) $eval->nilai_akhir > 0)
+                    ? number_format((float) $eval->nilai_akhir, 2)
+                    : '-';
 
                 $periode = ($app->start_date && $app->end_date)
                     ? date('d/m/Y', strtotime($app->start_date)) . ' s.d. ' . date('d/m/Y', strtotime($app->end_date))

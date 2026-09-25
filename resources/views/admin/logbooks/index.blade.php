@@ -1,4 +1,17 @@
 <x-app-layout>
+    <x-responsive-table-style />
+    <style>
+        /* Filter logbook: di desktop 3 dropdown berjajar rapi dengan lebar tetap (teks panjang dipotong ...) */
+        @media (min-width: 768px) {
+            .lb-filter-selects { flex-wrap: nowrap; }
+            .lb-filter-selects select { width: 200px !important; max-width: 200px; text-overflow: ellipsis; }
+        }
+        @media (min-width: 768px) and (max-width: 1100px) {
+            .lb-filter { flex-direction: column; align-items: stretch; }
+            .lb-filter-selects select { width: 100% !important; max-width: none; flex: 1 1 0; min-width: 0; }
+            .lb-filter > div:last-child { width: 100%; }
+        }
+    </style>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -110,12 +123,12 @@
 
             <!-- Filter & Search Controls -->
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-                <form method="GET" action="{{ route('admin.logbooks.index') }}" class="flex flex-col md:flex-row items-center justify-between gap-3">
+                <form method="GET" action="{{ route('admin.logbooks.index') }}" class="lb-filter flex flex-col md:flex-row items-center justify-between gap-3">
                     
-                    <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
+                    <div class="lb-filter-selects w-full md:w-auto flex flex-wrap items-center gap-3">
                         <!-- Filter Universitas -->
                         @if(isset($universities))
-                            <select name="university_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                            <select name="university_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">-- Semua Kampus --</option>
                                 @foreach ($universities as $unv)
                                     <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
@@ -126,7 +139,7 @@
                         @endif
 
                         <!-- Filter Unit -->
-                        <select name="unit_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                        <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Unit Penempatan --</option>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
@@ -136,7 +149,7 @@
                         </select>
 
                         <!-- Filter Status Logbook -->
-                        <select name="status_filter" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                        <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
                             <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}> Memiliki Logbook Pending</option>
                             <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}> Memiliki Logbook Approved</option>
@@ -255,7 +268,7 @@
             <!-- Tabel Rekapitulasi Agregat per Mahasiswa -->
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="rtable w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
@@ -283,11 +296,11 @@
                                     $isSelected = $selectedPlacement && $selectedPlacement->id === $placement->id;
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors {{ $isSelected ? 'bg-blue-50/40 font-semibold' : '' }}">
-                                    <td class="py-4 px-4 text-center text-xs text-gray-500">
+                                    <td class="rt-hide-mobile py-4 px-4 text-center text-xs text-gray-500" data-label="No">
                                         {{ $placements->firstItem() + $index }}
                                     </td>
 
-                                    <td class="py-4 px-4">
+                                    <td class="rt-title py-4 px-4" data-label="Mahasiswa">
                                         <div class="font-bold text-gray-900 leading-snug">{{ $student->name }}</div>
                                         <div class="text-xs text-gray-500 mt-0.5 font-mono">
                                             NIM: {{ $profile->nim ?? '-' }}
@@ -297,14 +310,14 @@
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4">
+                                    <td class="py-4 px-4" data-label="Unit &amp; Pembimbing">
                                         <div class="text-xs font-bold text-gray-800"> {{ $unit->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-4 text-center" data-label="Rekap Logbook">
                                         <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
                                             <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md" title="Total Kegiatan">
                                                  {{ $totalStudentLogs }} Total
@@ -327,7 +340,7 @@
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-4 text-center" data-label="Progres Disetujui">
                                         <div class="w-32 mx-auto">
                                             <div class="flex justify-between text-[10px] text-gray-500 font-bold mb-1">
                                                 <span>{{ $approvedCount }}/{{ $totalStudentLogs }}</span>
@@ -339,7 +352,7 @@
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center whitespace-nowrap text-xs text-gray-600">
+                                    <td class="py-4 px-4 text-center whitespace-nowrap text-xs text-gray-600" data-label="Logbook Terakhir">
                                         @if ($latestLog)
                                             <span class="font-mono">{{ \Carbon\Carbon::parse($latestLog->date)->format('d M Y') }}</span>
                                         @else
@@ -347,7 +360,7 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-right whitespace-nowrap">
+                                    <td class="rt-actions py-4 px-4 text-right whitespace-nowrap" data-label="Aksi">
                                         <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $isSelected ? 'bg-blue-700 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }} text-xs font-bold rounded-xl transition shadow-xs">
                                             <span>Lihat Riwayat</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

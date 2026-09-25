@@ -3,6 +3,12 @@
 .env
 .env.backup
 .env.production
+.env.agents
+.env.agents.*
+!.env.agents.example
+.aider*
+!.aider.conf.yml
+.claude/
 .phpactor.json
 .phpunit.result.cache
 /.codex

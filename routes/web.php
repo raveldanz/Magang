@@ -49,22 +49,24 @@ Route::get('/dashboard', [StudentDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Route Publik Verifikasi QR Code Surat Balasan (Mendukung Hash Token Unik & Numeric ID Fallback)
+// Route Publik Verifikasi QR Code Surat Balasan (Hash Token Unik; fallback ID angka opsional via VERIFY_NUMERIC_FALLBACK)
 Route::get('/verify-letter/{token}', function ($token) {
     $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor'])
         ->whereIn('status', ['accepted', 'active', 'completed'])
         ->where(function ($q) use ($token) {
             $q->where('letter_token', $token);
-            if (is_numeric($token)) {
+            // Fallback ID angka hanya untuk dokumen lama & harus diaktifkan eksplisit (VERIFY_NUMERIC_FALLBACK=true),
+            // karena ID berurutan memungkinkan siapa pun menebak & melihat data mahasiswa lain.
+            if (config('app.verify_numeric_fallback') && ctype_digit((string) $token)) {
                 $q->orWhere('id', (int) $token);
             }
         })
         ->firstOrFail();
 
     return view('verify_letter', compact('application'));
-})->name('verify.letter');
+})->middleware('throttle:verify-qr')->name('verify.letter');
 
-// Route Publik Verifikasi QR Code Sertifikat Magang (Mendukung Hash Token Unik & Numeric ID Fallback)
+// Route Publik Verifikasi QR Code Sertifikat Magang (Hash Token Unik; fallback ID angka opsional via VERIFY_NUMERIC_FALLBACK)
 Route::get('/verify-certificate/{token}', function ($token) {
     $placement = \App\Models\Placement::with([
         'application.user.studentProfile', 
@@ -76,7 +78,8 @@ Route::get('/verify-certificate/{token}', function ($token) {
     ])
         ->where(function ($q) use ($token) {
             $q->where('certificate_hash', $token);
-            if (is_numeric($token)) {
+            // Fallback ID angka hanya untuk dokumen lama & harus diaktifkan eksplisit (VERIFY_NUMERIC_FALLBACK=true)
+            if (config('app.verify_numeric_fallback') && ctype_digit((string) $token)) {
                 $q->orWhere('id', (int) $token)
                   ->orWhere('application_id', (int) $token);
             }
@@ -84,7 +87,7 @@ Route::get('/verify-certificate/{token}', function ($token) {
         ->firstOrFail();
 
     return view('verify_certificate', compact('placement'));
-})->name('verify.certificate');
+})->middleware('throttle:verify-qr')->name('verify.certificate');
 
 /*
 |--------------------------------------------------------------------------
@@ -116,6 +119,9 @@ Route::middleware('auth')->group(function () {
 
     // Naskah Laporan Akhir (Akses Terpusat & Unduhan Multi-Role dengan Format Nama Baku)
     Route::get('/final-reports/{id}/file', [StudentFinalReportController::class, 'showFile'])->name('final_reports.show');
+
+    // Dokumen Persyaratan Pengajuan (CV, Transkrip, KTM, Surat Pengantar) — akses terotorisasi, bukan URL publik
+    Route::get('/documents/applications/{id}', [\App\Http\Controllers\DocumentController::class, 'showApplicationDocument'])->name('documents.application');
 
     // ==========================================
     // 1. ROUTE KHUSUS MAHASISWA

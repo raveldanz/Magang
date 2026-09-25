@@ -8,6 +8,27 @@ class AgencyProfile extends Model
 {
     protected $guarded = ['id'];
 
+    /**
+     * URL logo instansi yang benar-benar ada.
+     * Logo bisa tersimpan di public/ (mis. "images/logos/diskominfo.png") atau di disk public
+     * (storage/app/public, diakses lewat /storage/...). Fallback ke logo default.
+     */
+    public function getLogoUrlAttribute(): string
+    {
+        $logo = ltrim((string) ($this->attributes['logo'] ?? ''), '/');
+
+        if ($logo !== '') {
+            if (is_file(public_path($logo))) {
+                return asset($logo);
+            }
+            if (is_file(public_path('storage/' . $logo)) || is_file(storage_path('app/public/' . $logo))) {
+                return asset('storage/' . $logo);
+            }
+        }
+
+        return asset('images/default-agency.svg');
+    }
+
     public function units()
     {
         return $this->hasMany(Unit::class, 'agency_profile_id');

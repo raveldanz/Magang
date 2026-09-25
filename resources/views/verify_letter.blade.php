@@ -1,4 +1,5 @@
 <x-guest-layout>
+    <x-verify-detail-style />
     @php
         $agency = $application->unit?->agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
@@ -11,8 +12,8 @@
             
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
-                @if(!empty($agency->logo))
-                    <img src="{{ asset('storage/' . $agency->logo) }}" alt="Logo Instansi" class="w-16 h-16 mx-auto mb-2 object-contain">
+                @if($agency)
+                    <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-16 h-16 mx-auto mb-2 object-contain">
                 @endif
                 <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
                 <h1 class="text-xl font-extrabold text-blue-900 uppercase">{{ $agencyName }}</h1>
@@ -20,15 +21,15 @@
             </div>
 
             <!-- Badge Status Verifikasi Sah -->
-            <div class="mt-6 flex items-center space-x-4 bg-green-50 p-4 rounded-xl border border-green-200 shadow-sm">
-                <div class="flex-shrink-0 bg-green-500 text-white p-3 rounded-full shadow-md">
+            <div class="vstatus mt-6 flex items-center space-x-4 bg-green-50 p-4 rounded-xl border border-green-200 shadow-sm">
+                <div class="vstatus-icon flex-shrink-0 bg-green-500 text-white p-3 rounded-full shadow-md">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
                 <div>
-                    <span class="inline-block px-2.5 py-0.5 text-xs font-bold bg-green-200 text-green-800 rounded-full mb-1">
-                        STATUS: TERVERIFIKASI SAH
+                    <span class="vbadge inline-block px-2.5 py-0.5 text-xs font-bold bg-green-200 text-green-800 rounded-full mb-1">
+                        TERVERIFIKASI SAH
                     </span>
                     <h3 class="font-extrabold text-green-900 text-base leading-tight">DOKUMEN SURAT BALASAN RESMI</h3>
                     <p class="text-xs text-green-700 mt-0.5">Surat Keterangan Diterima Magang ini terdaftar dan tercatat valid pada database sistem.</p>
@@ -39,46 +40,51 @@
             <div class="mt-6">
                 <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wider border-b pb-2 mb-3">Detail Informasi Surat Penerimaan</h4>
                 
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">Nomor Surat Balasan:</span>
-                        <span class="font-bold text-blue-700 font-mono">{{ $application->letter_number ?? '-' }}</span>
+                
+                @php
+                    $fmtDate = fn ($d) => $d ? \Carbon\Carbon::parse($d)->locale('id')->translatedFormat('d F Y') : '-';
+                    $sp = $application->user?->studentProfile;
+                @endphp
+                <dl class="vlist">
+                    <div class="vrow">
+                        <dt class="vlabel">Nomor Surat Balasan</dt>
+                        <dd class="vvalue is-accent is-mono">{{ $application->letter_number ?? '-' }}</dd>
                     </div>
                     @if($application->letter_token)
-                        <div class="flex justify-between py-2 border-b border-gray-100">
-                            <span class="text-gray-500 font-medium">Kode Keamanan Digital:</span>
-                            <span class="font-mono text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded font-semibold">{{ substr($application->letter_token, 0, 16) }}...</span>
+                        <div class="vrow">
+                            <dt class="vlabel">Kode Verifikasi</dt>
+                            <dd class="vvalue"><span class="vcode">@foreach (str_split($application->letter_token, 4) as $chunk)<span>{{ $chunk }}</span>@endforeach</span></dd>
                         </div>
                     @endif
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">Tanggal Terbit Surat:</span>
-                        <span class="font-semibold text-gray-800">{{ $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->translatedFormat('d F Y') : '-' }}</span>
+                    <div class="vrow">
+                        <dt class="vlabel">Tanggal Terbit Surat</dt>
+                        <dd class="vvalue">{{ $fmtDate($application->letter_date) }}</dd>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">Nama Mahasiswa:</span>
-                        <span class="font-bold text-gray-900">{{ $application->user->name }}</span>
+                    <div class="vrow">
+                        <dt class="vlabel">Nama Mahasiswa</dt>
+                        <dd class="vvalue">{{ $application->user->name }}</dd>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">NIM / NPM:</span>
-                        <span class="font-semibold text-gray-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</span>
+                    <div class="vrow">
+                        <dt class="vlabel">NIM / NPM</dt>
+                        <dd class="vvalue is-mono">{{ $sp?->nim ?? '-' }}</dd>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">Universitas / Jurusan:</span>
-                        <span class="font-semibold text-gray-800 text-right">{{ $application->user?->studentProfile?->universitas ?? '-' }} <br><span class="text-xs text-gray-500">({{ $application->user?->studentProfile?->jurusan ?? '-' }})</span></span>
+                    <div class="vrow">
+                        <dt class="vlabel">Universitas / Jurusan</dt>
+                        <dd class="vvalue">{{ $sp?->universitas ?? '-' }}<span class="vsub">{{ $sp?->jurusan ?? '-' }}</span></dd>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">Unit Kerja Tujuan:</span>
-                        <span class="font-bold text-green-700">{{ $application->unit->name ?? '-' }}</span>
+                    <div class="vrow">
+                        <dt class="vlabel">Unit Kerja Tujuan</dt>
+                        <dd class="vvalue is-green">{{ $application->unit->name ?? '-' }}</dd>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 font-medium">Periode Magang:</span>
-                        <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</span>
+                    <div class="vrow">
+                        <dt class="vlabel">Periode Magang</dt>
+                        <dd class="vvalue">{{ $fmtDate($application->start_date) }} s/d {{ $fmtDate($application->end_date) }}</dd>
                     </div>
-                    <div class="flex justify-between py-2">
-                        <span class="text-gray-500 font-medium">Pembimbing Lapangan:</span>
-                        <span class="font-semibold text-gray-800">{{ $application->placement?->pembimbing?->name ?? $application->placement?->mentor?->name ?? '-' }}</span>
+                    <div class="vrow">
+                        <dt class="vlabel">Pembimbing Lapangan</dt>
+                        <dd class="vvalue">{{ $application->placement?->pembimbing?->name ?? $application->placement?->mentor?->name ?? '-' }}</dd>
                     </div>
-                </div>
+                </dl>
             </div>
 
             <!-- Footer Keamanan -->
