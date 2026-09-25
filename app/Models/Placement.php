@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Placement extends Model
 {
@@ -17,6 +18,35 @@ class Placement extends Model
         'certificate_number',
         'certificate_hash',
     ];
+
+    /**
+     * Hash acak untuk QR verifikasi sertifikat (/verify-certificate/{hash}).
+     * Dibuat otomatis bila masih kosong, agar QR tidak pernah berisi ID angka yang mudah ditebak.
+     */
+    public function ensureCertificateHash(): string
+    {
+        if (empty($this->certificate_hash)) {
+            // Atomic: hanya mengisi jika masih kosong, supaya dua cetak bersamaan
+            // tidak saling menimpa hash (QR yang sudah tercetak tetap valid).
+            static::whereKey($this->getKey())
+                ->where(fn ($q) => $q->whereNull('certificate_hash')->orWhere('certificate_hash', ''))
+                ->update(['certificate_hash' => Str::random(32)]);
+
+            $this->certificate_hash = static::whereKey($this->getKey())->value('certificate_hash');
+            $this->syncOriginalAttribute('certificate_hash');
+        }
+
+        return $this->certificate_hash;
+    }
+
+    /**
+     * Kode verifikasi sertifikat yang mudah dibaca & dicocokkan manual,
+     * mis. "SXGZ-95Jf-b0sc-csj7-GQKJ-OwGH-3pZo-VaID" (huruf besar/kecil tetap sama dengan hash asli).
+     */
+    public function getVerificationCodeAttribute(): string
+    {
+        return implode('-', str_split((string) $this->certificate_hash, 4));
+    }
 
     public function application()
     {

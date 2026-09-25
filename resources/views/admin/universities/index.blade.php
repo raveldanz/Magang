@@ -10,6 +10,7 @@
                 </p>
             </div>
 
+            @if($isSuperAdmin)
             <a href="{{ route('admin.universities.create') }}"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,6 +18,7 @@
                 </svg>
                 <span>Tambah Universitas Baru</span>
             </a>
+            @endif
         </div>
     </x-slot>
 
@@ -328,7 +330,7 @@
 
                         <!-- Action Footer Sejajar (Format Baku: Tombol Sekunder & Tombol Primer) -->
                         <div class="flex items-center gap-2 pt-2">
-                            @if(!$univ->universityAdmin)
+                            @if($isSuperAdmin && !$univ->universityAdmin)
                                 <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}"
                                     class="w-1/3 m-0"
                                     onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($univ->name) }}?')">

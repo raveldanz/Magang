@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-mobile-list-style />
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -151,7 +152,74 @@
                     <p class="text-xs text-gray-500 mt-0.5">Ketik angka kuota langsung atau klik tombol +/- untuk penyesuaian instan</p>
                 </div>
 
-                <div class="overflow-x-auto">
+{{-- Tampilan HP: kartu --}}
+                <div class="m-only mlist">
+                    @forelse ($units as $unit)
+                        @php
+                            $acceptedCount = $unit->applications->where('status', 'accepted')->count();
+                            $remaining = max(0, $unit->quota - $acceptedCount);
+                            $percent = $unit->quota > 0 ? min(100, round(($acceptedCount / $unit->quota) * 100)) : 100;
+                            $barColor = $percent >= 100 ? '#f43f5e' : ($percent >= 75 ? '#f59e0b' : '#10b981');
+                        @endphp
+                        <div class="mcard">
+                            <div class="mcard-head">
+                                <div class="mcard-main">
+                                    <div class="mcard-title">{{ $unit->name }}</div>
+                                    <div class="mcard-sub">{{ \Illuminate\Support\Str::limit($unit->description ?? 'Tidak ada deskripsi', 110) }}</div>
+                                </div>
+                                <span data-quota-remaining="{{ $unit->id }}" data-compact="1">
+                                    @if ($remaining > 0)
+                                        <span class="mpill mpill-green">{{ $remaining }} slot</span>
+                                    @else
+                                        <span class="mpill mpill-red">Penuh</span>
+                                    @endif
+                                </span>
+                            </div>
+
+                            <div class="mcard-body">
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#475569;margin-bottom:6px">
+                                        <span><b style="color:#0f172a">{{ $acceptedCount }}</b> terisi</span>
+                                        <span>dari <b style="color:#0f172a" data-quota-total="{{ $unit->id }}" data-compact="1">{{ $unit->quota }}</b> kuota</span>
+                                    </div>
+                                    <div class="mbar"><i data-quota-bar="{{ $unit->id }}" data-compact="1" style="width: {{ $percent }}%; background: {{ $barColor }}"></i></div>
+                                </div>
+                                @if ($unit->agencyProfile?->agency_name)
+                                    <div class="mcard-sub" style="margin-top:0">{{ $unit->agencyProfile->agency_name }}</div>
+                                @endif
+                            </div>
+
+                            <div class="mcard-foot" style="justify-content:space-between">
+                                <div class="quota-ctrl mstepper">
+                                    <button type="button" onclick="adjustQuota({{ $unit->id }}, -1, this)" aria-label="Kurangi kuota">−</button>
+                                    <input type="number" inputmode="numeric" class="quota-input" value="{{ $unit->quota }}" min="{{ $acceptedCount }}" max="500"
+                                           data-unit-id="{{ $unit->id }}" data-current-val="{{ $unit->quota }}" data-filled="{{ $acceptedCount }}"
+                                           onchange="updateQuotaValue({{ $unit->id }}, this.value, this)" onkeydown="if(event.key === 'Enter'){ this.blur(); }" aria-label="Kuota {{ $unit->name }}">
+                                    <button type="button" onclick="adjustQuota({{ $unit->id }}, 1, this)" aria-label="Tambah kuota">+</button>
+                                </div>
+                                <div style="display:flex;gap:6px">
+                                    <a href="{{ route('admin.units.edit', $unit->id) }}" class="mbtn mbtn-soft">Edit</a>
+                                    <button type="button"
+                                            @click="$dispatch('open-delete-modal', {
+                                                action: '{{ route('admin.units.destroy', $unit->id) }}',
+                                                title: 'Hapus Divisi / Lowongan Magang',
+                                                name: '{{ addslashes($unit->name) }}',
+                                                desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
+                                            })"
+                                            class="mbtn mbtn-danger">Hapus</button>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="mempty">
+                            <p style="font-weight:700;color:#475569">Belum Ada Divisi / Lowongan Magang</p>
+                            <p style="margin-top:4px">Klik tombol "Tambah Divisi Baru" untuk membuka lowongan.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                {{-- Tampilan desktop: tabel --}}
+                <div class="d-only overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
@@ -190,16 +258,16 @@
                                         <div class="space-y-1">
                                             <div class="flex justify-between text-xs font-bold text-gray-700">
                                                 <span>{{ $acceptedCount }} Terisi</span>
-                                                <span id="unit-total-quota-{{ $unit->id }}">{{ $unit->quota }} Total</span>
+                                                <span id="unit-total-quota-{{ $unit->id }}" data-quota-total="{{ $unit->id }}">{{ $unit->quota }} Total</span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                <div id="unit-progress-bar-{{ $unit->id }}" class="h-2 rounded-full {{ $percent >= 100 ? 'bg-rose-500' : ($percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}" style="width: {{ $percent }}%"></div>
+                                                <div id="unit-progress-bar-{{ $unit->id }}" data-quota-bar="{{ $unit->id }}" class="h-2 rounded-full {{ $percent >= 100 ? 'bg-rose-500' : ($percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}" style="width: {{ $percent }}%"></div>
                                             </div>
                                         </div>
                                     </td>
 
                                     <!-- Sisa Kuota & Status -->
-                                    <td class="py-4 px-4 text-center" id="unit-remaining-badge-{{ $unit->id }}">
+                                    <td class="py-4 px-4 text-center" id="unit-remaining-badge-{{ $unit->id }}" data-quota-remaining="{{ $unit->id }}">
                                         @if ($remaining > 0)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">
                                                 {{ $remaining }} Slot Tersedia
@@ -213,10 +281,10 @@
 
                                     <!-- Aksi Cepat Kuota (Inline Editable Number Input + Sync Buttons) -->
                                     <td class="py-4 px-4 text-center">
-                                        <div class="inline-flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-xs relative">
+                                        <div class="quota-ctrl inline-flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200 shadow-xs relative">
                                             <!-- Kurang (-1) -->
                                             <button type="button" 
-                                                    onclick="adjustQuota({{ $unit->id }}, -1)"
+                                                    onclick="adjustQuota({{ $unit->id }}, -1, this)"
                                                     title="Kurangi Kuota (-1)" 
                                                     class="btn-decrement w-7 h-7 flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg border border-slate-200 transition text-sm shadow-xs active:scale-95">
                                                 -
@@ -233,19 +301,19 @@
                                                    data-unit-id="{{ $unit->id }}"
                                                    data-current-val="{{ $unit->quota }}"
                                                    data-filled="{{ $acceptedCount }}"
-                                                   onchange="updateQuotaValue({{ $unit->id }}, this.value)"
+                                                   onchange="updateQuotaValue({{ $unit->id }}, this.value, this)"
                                                    onkeydown="if(event.key === 'Enter'){ this.blur(); }">
 
                                             <!-- Tambah (+1) -->
                                             <button type="button" 
-                                                    onclick="adjustQuota({{ $unit->id }}, 1)"
+                                                    onclick="adjustQuota({{ $unit->id }}, 1, this)"
                                                     title="Tambah Kuota (+1)" 
                                                     class="btn-increment w-7 h-7 flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-lg border border-slate-200 transition text-sm shadow-xs active:scale-95">
                                                 +
                                             </button>
 
                                             <!-- Save Indicator Icon -->
-                                            <span id="save-indicator-{{ $unit->id }}" class="hidden absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full p-0.5 shadow-sm">
+                                            <span id="save-indicator-{{ $unit->id }}" data-quota-saved="{{ $unit->id }}" class="hidden absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full p-0.5 shadow-sm">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -293,8 +361,14 @@
 
     <!-- Quick Quota AJAX Handler Script -->
     <script>
-        async function updateQuotaValue(unitId, newValue) {
-            const input = document.getElementById(`quota-input-${unitId}`);
+        // Tabel desktop & kartu HP sama-sama tampil di DOM, jadi semua elemen per unit
+        // dicari lewat atribut data-* lalu diperbarui bersamaan.
+        function quotaEls(attr, unitId) {
+            return Array.from(document.querySelectorAll(`[data-${attr}="${unitId}"]`));
+        }
+
+        async function updateQuotaValue(unitId, newValue, sourceEl) {
+            const input = sourceEl || document.getElementById(`quota-input-${unitId}`);
             const indicator = document.getElementById(`save-indicator-${unitId}`);
             const filled = parseInt(input.dataset.filled || 0);
             let val = parseInt(newValue);
@@ -332,8 +406,10 @@
                 input.classList.remove('opacity-50');
 
                 if (response.ok && data.success) {
-                    input.dataset.currentVal = val;
-                    input.value = val;
+                    document.querySelectorAll(`.quota-input[data-unit-id="${unitId}"]`).forEach((el) => {
+                        el.dataset.currentVal = val;
+                        el.value = val;
+                    });
                     
                     // Show visual feedback checkmark
                     if (indicator) {
@@ -344,25 +420,32 @@
                     }
 
                     // Update UI Progress & Remaining
-                    const totalLabel = document.getElementById(`unit-total-quota-${unitId}`);
-                    if (totalLabel) totalLabel.innerText = `${val} Total`;
+                    quotaEls('quota-total', unitId).forEach((el) => {
+                        el.innerText = el.dataset.compact ? `${val}` : `${val} Total`;
+                    });
 
-                    const remainingBadge = document.getElementById(`unit-remaining-badge-${unitId}`);
                     const remaining = Math.max(0, val - filled);
-                    if (remainingBadge) {
-                        if (remaining > 0) {
-                            remainingBadge.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">${remaining} Slot Tersedia</span>`;
+                    quotaEls('quota-remaining', unitId).forEach((el) => {
+                        if (el.dataset.compact) {
+                            el.innerHTML = remaining > 0
+                                ? `<span class="mpill mpill-green">${remaining} slot</span>`
+                                : `<span class="mpill mpill-red">Penuh</span>`;
+                        } else if (remaining > 0) {
+                            el.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">${remaining} Slot Tersedia</span>`;
                         } else {
-                            remainingBadge.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-black rounded-full">PENUH</span>`;
+                            el.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-black rounded-full">PENUH</span>`;
                         }
-                    }
+                    });
 
-                    const progressBar = document.getElementById(`unit-progress-bar-${unitId}`);
-                    if (progressBar) {
-                        const percent = val > 0 ? Math.min(100, Math.round((filled / val) * 100)) : 100;
-                        progressBar.style.width = `${percent}%`;
-                        progressBar.className = `h-2 rounded-full ${percent >= 100 ? 'bg-rose-500' : (percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500')}`;
-                    }
+                    const percent = val > 0 ? Math.min(100, Math.round((filled / val) * 100)) : 100;
+                    quotaEls('quota-bar', unitId).forEach((el) => {
+                        el.style.width = `${percent}%`;
+                        if (el.dataset.compact) {
+                            el.style.background = percent >= 100 ? '#f43f5e' : (percent >= 75 ? '#f59e0b' : '#10b981');
+                        } else {
+                            el.className = `h-2 rounded-full ${percent >= 100 ? 'bg-rose-500' : (percent >= 75 ? 'bg-amber-500' : 'bg-emerald-500')}`;
+                        }
+                    });
 
                     // Show toast notification
                     showToast(data.message || 'Kuota berhasil diperbarui!');
@@ -378,13 +461,14 @@
             }
         }
 
-        function adjustQuota(unitId, change) {
-            const input = document.getElementById(`quota-input-${unitId}`);
+        function adjustQuota(unitId, change, btn) {
+            const input = (btn && btn.closest('.quota-ctrl')?.querySelector('.quota-input'))
+                || document.getElementById(`quota-input-${unitId}`);
             let current = parseInt(input.value || 0);
             let nextVal = current + change;
             if (nextVal < 0) nextVal = 0;
             input.value = nextVal;
-            updateQuotaValue(unitId, nextVal);
+            updateQuotaValue(unitId, nextVal, input);
         }
 
         function showToast(message) {

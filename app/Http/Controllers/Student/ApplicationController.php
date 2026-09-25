@@ -10,6 +10,7 @@ use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
@@ -108,13 +109,41 @@ class ApplicationController extends Controller
                 ->withErrors(['unit_id' => 'Kuota untuk instansi/unit ini sudah penuh. Silakan pilih unit kerja lain.']);
         }
 
-        // Upload Berkas
-        $proposalPath = $request->file('surat_pengantar') ? $request->file('surat_pengantar')->store('documents/applications', 'public') : null;
-        $cvPath = $request->file('cv') ? $request->file('cv')->store('documents/applications', 'public') : null;
-        $transcriptPath = $request->file('transkrip') ? $request->file('transkrip')->store('documents/applications', 'public') : null;
-        $idCardPath = $request->file('id_card') ? $request->file('id_card')->store('documents/applications', 'public') : null;
+        // Upload Berkas (disk 'local' = storage/app/private, TIDAK bisa diakses publik;
+        // dibuka lewat route documents.application yang terotorisasi)
+        $proposalPath = $request->file('surat_pengantar') ? $request->file('surat_pengantar')->store('documents/applications', 'local') : null;
+        $cvPath = $request->file('cv') ? $request->file('cv')->store('documents/applications', 'local') : null;
+        $transcriptPath = $request->file('transkrip') ? $request->file('transkrip')->store('documents/applications', 'local') : null;
+        $idCardPath = $request->file('id_card') ? $request->file('id_card')->store('documents/applications', 'local') : null;
 
-        // Simpan Data Pengajuan
+        // Simpan Data Pengajuan dalam transaksi + kunci baris user, supaya klik ganda /
+        // dua tab yang submit bersamaan tidak menghasilkan 2 pengajuan aktif sekaligus.
+        $application = DB::transaction(function () use ($request, $user, $proposalPath, $cvPath, $transcriptPath, $idCardPath) {
+            User::whereKey($user->id)->lockForUpdate()->first();
+
+            $alreadyActive = Application::where('user_id', $user->id)
+                ->whereIn('status', ['pending', 'verified', 'accepted', 'active', 'completed'])
+                ->exists();
+            if ($alreadyActive) {
+                return null;
+            }
+
+            return $this->createApplicationRecords($request, $proposalPath, $cvPath, $transcriptPath, $idCardPath);
+        });
+
+        if (!$application) {
+            return redirect()->route('student.application.create')
+                ->with('error', 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.');
+        }
+
+        return redirect()->back()->with('success', 'Pengajuan magang dan dokumen persyaratan berhasil dikirim!');
+    }
+
+    /**
+     * Buat record pengajuan + dokumen persyaratan (dipanggil di dalam transaksi).
+     */
+    private function createApplicationRecords(Request $request, ?string $proposalPath, ?string $cvPath, ?string $transcriptPath, ?string $idCardPath): Application
+    {
         $application = Application::create([
             'user_id'              => Auth::id(),
             'unit_id'              => $request->unit_id,
@@ -148,7 +177,7 @@ class ApplicationController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Pengajuan magang dan dokumen persyaratan berhasil dikirim!');
+        return $application;
     }
 
     // Download / Print Surat Penerimaan Magang untuk Mahasiswa
@@ -156,7 +185,7 @@ class ApplicationController extends Controller
     {
         $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing'])
             ->where('user_id', Auth::id())
-            ->whereIn('status', ['accepted', 'completed'])
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->findOrFail($id);
 
         return view('letters.acceptance', compact('application'));

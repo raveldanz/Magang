@@ -15,6 +15,58 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     /**
+     * Role yang terikat ke instansi (agency_profile_id). Admin Dinas hanya boleh
+     * mengelola akun dengan role ini jika berada di instansinya sendiri.
+     */
+    private const AGENCY_SCOPED_ROLES = ['admin', 'mentor', 'pembimbing'];
+
+    /**
+     * Role pihak kampus. Hanya Super Admin yang boleh membuat/mengubah/mereset akun ini
+     * (akun dosen dapat memberi nilai akademik & menyetujui logbook/laporan mahasiswa).
+     */
+    private const CAMPUS_ROLES = ['dosen', 'academic_advisor', 'universitas'];
+
+    /**
+     * Apakah pengguna aktif boleh mengelola (edit/reset/hapus) akun $target?
+     * - Super Admin: boleh semua.
+     * - Admin Dinas: tidak boleh menyentuh Super Admin / Admin Sistem, dan untuk
+     *   akun Admin/Mentor hanya yang berada di instansinya sendiri.
+     */
+    private function canManageUser(User $target): bool
+    {
+        $current = Auth::user();
+
+        if ($this->currentUserIsSuperAdmin($current)) {
+            return true;
+        }
+
+        if ($target->isSuperAdmin()) {
+            return false;
+        }
+
+        // Akun pihak kampus (dosen/DPL & admin universitas) hanya dikelola Super Admin
+        if (in_array($target->role, self::CAMPUS_ROLES, true)) {
+            return false;
+        }
+
+        if (in_array($target->role, self::AGENCY_SCOPED_ROLES, true)) {
+            return $current->agency_profile_id !== null
+                && (int) $target->agency_profile_id === (int) $current->agency_profile_id;
+        }
+
+        return true;
+    }
+
+    private function authorizeManageUser(User $target): void
+    {
+        abort_unless(
+            $this->canManageUser($target),
+            403,
+            'Anda tidak memiliki hak akses untuk mengelola akun ini. Admin Dinas hanya dapat mengelola akun di instansinya sendiri.'
+        );
+    }
+
+    /**
      * Master Data Seluruh Pengguna Sistem SIP-MAGANG (Multi-Role)
      */
     public function index(Request $request)
@@ -107,13 +159,20 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'role' => 'required|in:admin,mentor,dosen,universitas,mahasiswa',
+            'role' => 'required|in:' . ($this->currentUserIsSuperAdmin() ? 'admin,mentor,dosen,universitas,mahasiswa' : 'admin,mentor,mahasiswa'),
             'password' => 'nullable|string|min:6',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
             'status' => 'nullable|string|in:active,on_leave,inactive',
             'return_to' => 'nullable|string',
         ]);
+
+        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
+        // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
+        $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
+        if (!$this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+            $agencyProfileId = Auth::user()->agency_profile_id;
+        }
 
         $password = $request->filled('password') ? $request->password : 'password';
 
@@ -122,7 +181,7 @@ class UserController extends Controller
             'email' => strtolower(trim($request->email)),
             'password' => Hash::make($password),
             'role' => $request->role,
-            'agency_profile_id' => in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null,
+            'agency_profile_id' => $agencyProfileId,
             'university_id' => in_array($request->role, ['universitas', 'dosen', 'mahasiswa']) ? $request->university_id : null,
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
@@ -137,8 +196,9 @@ class UserController extends Controller
         $successMsg = "Akun '{$user->name}' ({$user->role}) berhasil dibuat!";
 
         // 1. Prioritas return_to dari halaman pemanggil
-        if ($request->filled('return_to') && !str_contains($request->return_to, 'users/create')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        $safeReturn = $this->safeReturnTo($request->return_to);
+        if ($safeReturn && !str_contains($safeReturn, 'users/create')) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         // 2. Fallback: Balik ke Instansi jika memiliki agency_profile_id
@@ -169,6 +229,7 @@ class UserController extends Controller
     public function edit(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
         $agencies = AgencyProfile::all();
         $universities = University::all();
         $returnTo = $request->query('return_to', url()->previous());
@@ -182,11 +243,13 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
+        $isSuperAdmin = $this->currentUserIsSuperAdmin();
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,mentor,dosen,universitas,mahasiswa,super_admin',
+            'role' => 'required|in:' . ($isSuperAdmin ? 'admin,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
             'status' => 'nullable|string|in:active,on_leave,inactive',
@@ -194,11 +257,18 @@ class UserController extends Controller
             'return_to' => 'nullable|string',
         ]);
 
+        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
+        // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
+        $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
+        if (!$this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+            $agencyProfileId = Auth::user()->agency_profile_id;
+        }
+
         $updateData = [
             'name' => $request->name,
             'email' => strtolower(trim($request->email)),
             'role' => $request->role,
-            'agency_profile_id' => in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null,
+            'agency_profile_id' => $agencyProfileId,
             'university_id' => in_array($request->role, ['universitas', 'dosen', 'mahasiswa']) ? $request->university_id : null,
             'status' => $request->status ?? 'active',
         ];
@@ -217,8 +287,9 @@ class UserController extends Controller
         $successMsg = "Data pengguna '{$user->name}' berhasil diperbarui!";
 
         // 1. Prioritas return_to dari halaman pemanggil
-        if ($request->filled('return_to') && !str_contains($request->return_to, 'users/' . $id . '/edit')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        $safeReturn = $this->safeReturnTo($request->return_to);
+        if ($safeReturn && !str_contains($safeReturn, 'users/' . $id . '/edit')) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         // 2. Fallback: Balik ke Instansi jika memiliki agency_profile_id
@@ -241,6 +312,7 @@ class UserController extends Controller
     public function resetPassword($id)
     {
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
         $user->update(['password' => Hash::make('password')]);
 
         AuditLog::record('USER_PASSWORD_RESET', 'User', $user->id, [
@@ -277,6 +349,9 @@ class UserController extends Controller
             })
             ->get();
 
+        // Admin Dinas hanya boleh menyentuh akun yang berada dalam wewenangnya
+        $users = $users->filter(fn (User $u) => $this->canManageUser($u))->values();
+
         if ($users->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada akun valid yang dapat direset.');
         }
@@ -307,6 +382,7 @@ class UserController extends Controller
     {
         $currentUser = Auth::user();
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
 
         // Proteksi: tidak bisa hapus diri sendiri
         if ($user->id === $currentUser->id) {
@@ -349,8 +425,8 @@ class UserController extends Controller
         $successMsg = "Akun '{$deletedName}' ({$deletedRole}) berhasil dihapus.";
 
         // Kembalikan ke halaman asal jika ada parameter return_to atau redirect back
-        if ($request->filled('return_to')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if ($safeReturn = $this->safeReturnTo($request->return_to)) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         return redirect()->back()->with('success', $successMsg);
@@ -380,6 +456,9 @@ class UserController extends Controller
                   });
             })
             ->get();
+
+        // Admin Dinas hanya boleh menyentuh akun yang berada dalam wewenangnya
+        $users = $users->filter(fn (User $u) => $this->canManageUser($u))->values();
 
         if ($users->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada akun yang diizinkan untuk dihapus (akun Super Admin dilindungi).');
