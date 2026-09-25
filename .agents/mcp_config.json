@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "subagents": {
+      "command": "node",
+      "args": [
+        "./scripts/mcp-agents-server.mjs"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
