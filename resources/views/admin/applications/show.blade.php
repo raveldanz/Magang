@@ -121,7 +121,7 @@
                                     <div class="text-[11px] text-slate-400 mt-0.5">Format dokumen terverifikasi</div>
                                 </div>
                             </div>
-                            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank"
+                            <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 <span>Lihat PDF</span>
@@ -200,8 +200,8 @@
                         <div class="p-3.5 bg-indigo-50 rounded-xl border border-indigo-100 text-center">
                             <div class="text-[11px] font-bold text-indigo-700 uppercase">Nilai Akhir (Predikat)</div>
                             <div class="text-lg font-black text-indigo-900 mt-1">
-                                {{ number_format($eval->final_score ?? $eval->nilai_akhir ?? $eval->nilai_pembimbing ?? 0, 1) }}
-                                <span class="text-xs font-bold text-indigo-600 font-mono">({{ $eval->grade ?? 'A' }})</span>
+                                {{ number_format((float) $eval->nilai_akhir, 1) }}
+                                <span class="text-xs font-bold text-indigo-600 font-mono">({{ $eval->grade_calculated }})</span>
                             </div>
                         </div>
                     </div>
@@ -480,7 +480,7 @@
                                         <div class="text-[11px] text-slate-500">Tinjau permohonan resmi dari perguruan tinggi sebelum menetapkan balasan</div>
                                     </div>
                                 </div>
-                                <a href="{{ asset('storage/' . $suratPengantar->file_path) }}" target="_blank"
+                                <a href="{{ route('documents.application', $suratPengantar->id) }}" target="_blank"
                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     <span>Lihat Surat Pengantar</span>

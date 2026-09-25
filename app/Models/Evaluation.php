@@ -43,6 +43,23 @@ class Evaluation extends Model
     }
 
     /**
+     * Nilai per aspek DPL (score_mastery / score_report / score_attitude) untuk ditampilkan.
+     * Kolom aspek default-nya 0 (bukan null), jadi operator ?? tidak pernah jatuh ke fallback.
+     * Jika aspek belum diisi (mis. data lama/dummy hanya punya nilai_akademik), tampilkan nilai DPL rata-rata.
+     */
+    public function dosenAspectScore(string $field): ?float
+    {
+        $value = (float) ($this->attributes[$field] ?? 0);
+        if ($value > 0) {
+            return $value;
+        }
+
+        $fallback = (float) $this->nilai_dosen_calculated;
+
+        return $fallback > 0 ? $fallback : null;
+    }
+
+    /**
      * Dapatkan data Universitas asal Mahasiswa
      */
     public function getUniversity()

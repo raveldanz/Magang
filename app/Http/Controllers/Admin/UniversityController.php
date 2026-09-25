@@ -70,11 +70,13 @@ class UniversityController extends Controller
 
     public function create()
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         return view('admin.universities.create');
     }
 
     public function store(Request $request)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:universities,code',
@@ -123,12 +125,14 @@ class UniversityController extends Controller
 
     public function edit($id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $university = University::findOrFail($id);
         return view('admin.universities.edit', compact('university'));
     }
 
     public function update(Request $request, $id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $univ = University::findOrFail($id);
 
         $request->validate([
@@ -206,6 +210,7 @@ class UniversityController extends Controller
      */
     public function createAccount(Request $request, $id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $univ = University::findOrFail($id);
 
         $existingAccount = User::where('role', 'universitas')
@@ -258,6 +263,7 @@ class UniversityController extends Controller
 
     public function destroy($id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $univ = University::withCount(['students', 'dosens'])->findOrFail($id);
 
         // 1. Proteksi Mahasiswa: Jika ada mahasiswa terdaftar, jangan hapus
@@ -466,6 +472,7 @@ class UniversityController extends Controller
      */
     public function storeDosen(Request $request, $id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $university = University::findOrFail($id);
 
         $request->validate([
@@ -513,6 +520,7 @@ class UniversityController extends Controller
      */
     public function resetDosenPassword(Request $request, $univId, $dosenId)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $university = University::findOrFail($univId);
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -539,6 +547,7 @@ class UniversityController extends Controller
      */
     public function destroyDosen(Request $request, $univId, $dosenId)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $university = University::findOrFail($univId);
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -576,6 +585,7 @@ class UniversityController extends Controller
      */
     public function assignAdvisor(Request $request, $id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $university = University::findOrFail($id);
 
         $request->validate([

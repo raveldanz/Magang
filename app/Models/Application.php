@@ -5,10 +5,31 @@ namespace App\Models;
 use App\Enums\ApplicationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class Application extends Model
 {
     protected $guarded = ['id'];
+
+    /**
+     * Token acak untuk QR verifikasi surat balasan (/verify-letter/{token}).
+     * Dibuat otomatis bila masih kosong, agar QR tidak pernah berisi ID angka yang mudah ditebak.
+     */
+    public function ensureLetterToken(): string
+    {
+        if (empty($this->letter_token)) {
+            // Atomic: hanya mengisi jika masih kosong, supaya dua cetak bersamaan
+            // tidak saling menimpa token (QR yang sudah tercetak tetap valid).
+            static::whereKey($this->getKey())
+                ->where(fn ($q) => $q->whereNull('letter_token')->orWhere('letter_token', ''))
+                ->update(['letter_token' => Str::random(32)]);
+
+            $this->letter_token = static::whereKey($this->getKey())->value('letter_token');
+            $this->syncOriginalAttribute('letter_token');
+        }
+
+        return $this->letter_token;
+    }
 
     protected $casts = [
         'status' => ApplicationStatus::class,
