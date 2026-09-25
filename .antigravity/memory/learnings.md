@@ -38,6 +38,9 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-021** | 2026-09-24 | Status Pipeline & Architecture Standardization | Fragmentasi dualisme status virtual RAM, zombie placement status & filtering RAM collection | RESOLVED |
 | **LRN-022** | 2026-09-24 | BackedEnum Type-Safety & View Hardening | TypeError strtolower()/strtoupper() saat menerima enum ApplicationStatus di Blade & Services | RESOLVED |
 | **LRN-023** | 2026-09-24 | Admin Selection Reactivity & Offline TTE Letter | Konflik kelas Tailwind hidden dengan Alpine x-show, QR TTE rusak (eksternal API) & nama seeder | RESOLVED |
+| **LRN-024** | 2026-09-25 | Mobile-First Responsive Tables & Dashboard Card Hardening | Tabel data dashboard terpotong di layar HP (< 640px) pada peran Mentor & Dosen, serta clipping teks kartu distribusi | RESOLVED |
+| **LRN-025** | 2026-09-25 | Native MCP Sub-Agents & Stdio Bridge | Mock ANTHROPIC_API_KEY menimpa sesi Claude, timeout Ollama CPU inference, dan lifecycle handshake MCP | RESOLVED |
+
 
 ---
 
@@ -469,7 +472,45 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-024] Mobile-First Responsive Tables & Dashboard Card Hardening
+- **Tanggal**: 2026-09-25
+- **Komponen**: `resources/views/mentor/dashboard.blade.php`, `resources/views/lecturer/dashboard.blade.php`, `resources/views/admin/dashboard.blade.php`
+- **Problem / Symptom**: 
+  1. Tampilan tabel bimbingan mahasiswa pada dashboard Mentor dan Dosen Pembimbing Lapangan terpotong (*clipped*) pada viewport seluler (375x812), di mana kolom krusial (Logbook, Laporan Akhir, Nilai, dan Tombol Aksi Detail) berada di luar batas layar tanpa card view khusus.
+  2. Pada dashboard Super Admin, teks judul kartu distribusi penempatan dan kampus terpotong (*truncated*) menjadi `Distribusi Penempatan Ins...` dan `Distribusi Asal Kampus S...` saat diakses pada resolusi mobile.
+- **Root Cause**: 
+  1. Tabel HTML multi-kolom (> 6 kolom) dirender secara langsung tanpa mobile card pattern (`block sm:hidden divide-y divide-slate-100`), sehingga memaksa tabel melebar dan menyembunyikan kolom kanan dari pandangan visual.
+  2. Pada admin dashboard, header kartu menggunakan `flex items-center justify-between` dengan kelas `truncate` statis pada judul, menyebabkan flex container memangkas teks judul pada layar sempit (< 640px).
+- **Fix Applied**: 
+  1. Menambahkan pola presentasi mobile card view (`block sm:hidden divide-y divide-slate-100`) pada `mentor/dashboard.blade.php` dan `lecturer/dashboard.blade.php` yang menyajikan ringkasan data mahasiswa, avatar inisial, badge status, progres logbook, nilai akhir/dinas, dan tombol aksi dengan touch target yang ramah jari seluler.
+  2. Membungkus tabel data desktop dalam `hidden sm:block overflow-x-auto` agar tata letak tabel penuh tetap terjaga rapi pada layar tablet dan desktop.
+  3. Mengubah header kartu distribusi di `admin/dashboard.blade.php` menggunakan `flex-col sm:flex-row sm:items-center` dan menghilangkan pemotongan `truncate` pada judul agar teks tampil utuh dan tombol kelola berposisi rapi.
+- **Prevention Rule**: Seluruh tabel multi-kolom di view utama wajib menerapkan arsitektur adaptif: mobile card view (`block sm:hidden`) untuk layar seluler (< 640px/768px) dan tabel berbasis scroll (`hidden sm:block overflow-x-auto`) untuk desktop. Jangan gunakan class `truncate` pada judul komponen utama tanpa container pembungkus yang fleksibel.
+
+---
+
+### [LRN-025] Native Sub-Agents MCP Bridge (Claude Code & Ollama Qwen)
+- **Tanggal**: 2026-09-25
+- **Komponen**: `scripts/mcp-agents-server.mjs`, `~/.gemini/config/mcp_config.json`, `.antigravity/rules.md`
+- **Problem / Symptom**: 
+  1. Claude Code CLI mengembalikan pesan `Invalid API key · Fix external API key` saat dieksekusi melalui wrapper script.
+  2. Eksekusi lokal Ollama Qwen 2.5 Coder 7B mengalami latensi tinggi (63 detik untuk 100 token) dan rawan timeout pada pengujian berbasis pipe PowerShell / CLI dengan spinner braille.
+  3. Pemanggilan tool MCP via Stdio membutuhkan penanganan siklus hidup JSON-RPC 2.0 yang presisi (`initialize` $\rightarrow$ `notifications/initialized` $\rightarrow$ `tools/call`).
+- **Root Cause**: 
+  1. Berkas `.env.agents` memuat kunci tiruan/mock `ANTHROPIC_API_KEY=apikey_...` yang jika dimuat mentah ke `process.env` akan menimpa kredensial sesi OAuth resmi `claude login` yang aktif.
+  2. Ollama CLI mencetak karakter braille spinner ke `stderr` dan berjalan pada CPU 100%, sehingga eksekusi multi-paragraf memerlukan waktu lebih lama daripada inferensi GPU.
+  3. Server MCP berbasis SDK resmi `@modelcontextprotocol/sdk` mensyaratkan notifikasi `initialized` dari client sebelum merespons panggilan `tools/call`.
+- **Fix Applied**: 
+  1. Memodifikasi `scripts/mcp-agents-server.mjs` untuk memvalidasi `ANTHROPIC_API_KEY`. Jika formatnya bukan kunci resmi (`sk-ant-`), environment variable diabaikan agar Claude CLI secara otomatis memanfaatkan sesi login OAuth aktifnya.
+  2. Mengimplementasikan koneksi langsung ke Ollama REST API (`http://127.0.0.1:11434/api/generate`) dengan fallback otomatis ke CLI spawn, pembersihan karakter braille/ANSI, serta peningkatan timeout menjadi 3 menit.
+  3. Mendaftarkan server `subagents` ke `~/.gemini/config/mcp_config.json`, `.antigravity/mcp_config.json`, dan `.agents/mcp_config.json`, serta mempublikasikan skema tool ke `.gemini/antigravity-ide/mcp/subagents/`.
+  4. Menambahkan arahan sistem refleks ke `.antigravity/rules.md` dan `AGENTS.md`.
+- **Prevention Rule**: Selalu lindungi sesi OAuth bawaan tool CLI dari overwrite placeholder env. Gunakan direct HTTP API untuk inferensi lokal Ollama guna menghindari hambatan terminal spinner dan selalu terapkan timeout yang memadai untuk komputasi CPU.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
+
 
 ```markdown
 ### [LRN-XXX] [Judul Singkat Masalah / Fitur]

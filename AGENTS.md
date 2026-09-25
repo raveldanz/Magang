@@ -33,6 +33,12 @@ Seluruh agen wajib memanfaatkan alat bantu yang terhubung secara sistematis:
   2. Melakukan login otomatis sesuai kredensial pengujian (`scripts/dev_credentials.php` / seeders).
   3. Mengambil tangkapan layar (screenshot) atau snapshot DOM untuk memverifikasi bahwa halaman bebas dari HTTP 500, broken layouts, atau tombol yang tidak responsif.
 
+### D. Sub-Agents Delegation via Native MCP Tools (`subagents`)
+- Gunakan native MCP tools sub-agen secara proaktif & refleks sebelum memvalidasi kode akhir:
+  1. `delegate_to_claude(prompt)`: Panggil untuk deep reasoning, tinjauan arsitektur repositori multi-file, root cause analysis bug kompleks, dan perancangan domain layer.
+  2. `delegate_to_qwen(prompt)`: Panggil untuk pembuatan fungsi helper modular, unit testing (PHPUnit/Pest), transformasi data, dan kode utilitas terisolasi secara offline (Ollama Qwen 2.5 Coder 7B, 0 token cost).
+
+
 ---
 
 ## 3. Ikhtisar Stack Teknologi
