@@ -252,8 +252,8 @@
                                             @if($hasEval)
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
                                                     {{ $eval->nilai_dosen_calculated }}/100
-                                                    @if($eval->grade)
-                                                        ({{ $eval->grade }})
+                                                    @if($eval->grade_calculated !== '-')
+                                                        ({{ $eval->grade_calculated }})
                                                     @endif
                                                 </span>
                                             @else

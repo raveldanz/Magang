@@ -155,11 +155,13 @@ class AgencyController extends Controller
 
     public function create()
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menambah instansi baru.');
         return view('admin.agencies.create');
     }
 
     public function store(Request $request)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menambah instansi baru.');
         $request->validate([
             'agency_name' => 'required|string|max:255',
             'government_name' => 'required|string|max:255',
@@ -212,12 +214,14 @@ class AgencyController extends Controller
 
     public function edit($id)
     {
+        abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
         $agency = AgencyProfile::with('units')->findOrFail($id);
         return view('admin.agencies.edit', compact('agency'));
     }
 
     public function update(Request $request, $id)
     {
+        abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
         $agency = AgencyProfile::findOrFail($id);
 
         $request->validate([
@@ -271,6 +275,7 @@ class AgencyController extends Controller
 
     public function destroy($id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menghapus instansi.');
         $agency = AgencyProfile::with(['units'])->findOrFail($id);
 
         // 1. Proteksi Unit dengan Mahasiswa Aktif
@@ -323,6 +328,7 @@ class AgencyController extends Controller
      */
     public function createAccount(Request $request, $id)
     {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat membuat akun Admin Dinas.');
         $agency = AgencyProfile::findOrFail($id);
 
         $existingAdmin = User::where('role', 'admin')
