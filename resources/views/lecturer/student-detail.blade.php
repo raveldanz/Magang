@@ -19,9 +19,9 @@
 
     @php
         $nilaiDinas = $evaluation?->nilai_pembimbing ?? 0;
-        $evalMastery = old('score_mastery', $evaluation?->score_mastery ?? ($evaluation?->nilai_akademik ?? 85));
-        $evalReport = old('score_report', $evaluation?->score_report ?? ($evaluation?->nilai_akademik ?? 85));
-        $evalAttitude = old('score_attitude', $evaluation?->score_attitude ?? ($evaluation?->nilai_akademik ?? 85));
+        $evalMastery = old('score_mastery', $evaluation?->dosenAspectScore('score_mastery') ?? 85);
+        $evalReport = old('score_report', $evaluation?->dosenAspectScore('score_report') ?? 85);
+        $evalAttitude = old('score_attitude', $evaluation?->dosenAspectScore('score_attitude') ?? 85);
 
         $univ = $evaluation?->getUniversity();
         if (!$univ && isset($student)) {
