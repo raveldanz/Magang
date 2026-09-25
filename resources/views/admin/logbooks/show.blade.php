@@ -118,9 +118,7 @@
                 <!-- Deskripsi Kegiatan -->
                 <div>
                     <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5">Deskripsi Kegiatan Harian:</span>
-                    <div class="p-4 bg-slate-50 rounded-xl text-gray-800 text-sm leading-relaxed border border-gray-100 whitespace-pre-wrap font-sans">
-                        {{ $logbook->activity }}
-                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl text-gray-800 text-sm leading-relaxed border border-gray-100 whitespace-pre-line font-sans">{{ trim($logbook->activity) }}</div>
                 </div>
 
                 <!-- Berkas Lampiran Bukti Kegiatan -->

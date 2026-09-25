@@ -121,7 +121,7 @@
                                     <div class="text-[11px] text-slate-400 mt-0.5">Format dokumen terverifikasi</div>
                                 </div>
                             </div>
-                            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank"
+                            <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 <span>Lihat PDF</span>
@@ -200,8 +200,8 @@
                         <div class="p-3.5 bg-indigo-50 rounded-xl border border-indigo-100 text-center">
                             <div class="text-[11px] font-bold text-indigo-700 uppercase">Nilai Akhir (Predikat)</div>
                             <div class="text-lg font-black text-indigo-900 mt-1">
-                                {{ number_format($eval->final_score ?? $eval->nilai_akhir ?? $eval->nilai_pembimbing ?? 0, 1) }}
-                                <span class="text-xs font-bold text-indigo-600 font-mono">({{ $eval->grade ?? 'A' }})</span>
+                                {{ number_format((float) $eval->nilai_akhir, 1) }}
+                                <span class="text-xs font-bold text-indigo-600 font-mono">({{ $eval->grade_calculated }})</span>
                             </div>
                         </div>
                     </div>
@@ -228,7 +228,14 @@
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
                      status: '{{ old('status', $currentStatusVal) }}' 
-                 }">
+                 }"
+                 x-init="$watch('status', val => {
+                     const sel = document.getElementById('status-select');
+                     if (sel) {
+                         sel.value = val;
+                         sel.dispatchEvent(new Event('change'));
+                     }
+                 })">
                 
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-6 gap-3">
                     <div class="flex items-center gap-2.5">
@@ -262,39 +269,33 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Dropdown Form Verifikasi Admin (7 Status Pipeline Baku) -->
-                    <div class="mb-5">
-                        <label for="status-select" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
-                        </label>
-                        <select id="status-select" name="status" x-model="status" @change="if(typeof toggleFields === 'function') toggleFields()" class="w-full text-xs font-bold border-slate-300 rounded-xl py-2.5 px-3 focus:border-blue-500 focus:ring-blue-500 bg-white shadow-2xs">
-                            <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>PENDING (Menunggu Verifikasi Berkas)</option>
-                            <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>VERIFIED (Berkas Lolos Administrasi)</option>
-                            <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang & Terbitkan Surat)</option>
-                            <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>ACTIVE (Mahasiswa Aktif Magang)</option>
+                    @php
+                        $canComplete = false;
+                        if ($application->placement) {
+                            $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
+                            $eval = $application->placement->evaluation;
+                            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
+                            $canComplete = $hasApprovedReport && $hasCompleteEval;
+                        }
+                    @endphp
 
-                            @php
-                                $canComplete = false;
-                                if ($application->placement) {
-                                    $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
-                                    $eval = $application->placement->evaluation;
-                                    $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
-                                    $canComplete = $hasApprovedReport && $hasCompleteEval;
-                                }
-                            @endphp
+                    <!-- Form Status Pipeline (Synchronized with visual cards) -->
+                    <select id="status-select" name="status" x-model="status" class="hidden" aria-hidden="true">
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>PENDING (Menunggu Verifikasi Berkas)</option>
+                        <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>VERIFIED (Berkas Lolos Administrasi)</option>
+                        <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang & Terbitkan Surat)</option>
+                        <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>ACTIVE (Mahasiswa Aktif Magang)</option>
+                        <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>
+                            COMPLETED (Selesai Magang & Lulus)
+                        </option>
+                        <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>REJECTED (Tolak Pengajuan)</option>
+                        <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
+                    </select>
 
-                            <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>
-                                COMPLETED (Selesai Magang & Lulus) {{ !$canComplete && $currentStatus != 'completed' ? ' - [Syarat Belum Tuntas]' : '' }}
-                            </option>
-                            <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>REJECTED (Tolak Pengajuan)</option>
-                            <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
-                        </select>
-                    </div>
-
-                    <!-- Modern Interactive Status Selection Cards (7 Status Pipeline) -->
+                    <!-- Interactive Status Selection Cards (7 Status Pipeline Baku) -->
                     <div class="mb-6">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                            Pilihan Cepat Status Visual:
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
+                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
                             
@@ -456,12 +457,37 @@
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="space-y-4 mb-5 p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 shadow-2xs {{ in_array($currentStatus, ['accepted', 'active', 'completed']) ? '' : 'hidden' }}">
+                         class="space-y-4 mb-5 p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 shadow-2xs">
                         <div class="flex items-center gap-2 border-b border-emerald-200/60 pb-3">
                             <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                             <h4 class="font-bold text-emerald-900 text-xs sm:text-sm">Data Balasan Penerimaan & Penempatan Magang</h4>
                         </div>
                         
+                        <!-- Surat Pengantar dari Kampus untuk Pengecekan Cepat Admin -->
+                        @php
+                            $suratPengantar = $application->documents->first(function($doc) {
+                                return stripos($doc->document_type, 'pengantar') !== false || stripos($doc->document_type, 'proposal') !== false;
+                            }) ?? $application->documents->first();
+                        @endphp
+                        @if ($suratPengantar)
+                            <div class="p-3.5 bg-white rounded-xl border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="text-xs font-bold text-emerald-950 truncate">Surat Pengantar Kampus: {{ $suratPengantar->document_type }}</div>
+                                        <div class="text-[11px] text-slate-500">Tinjau permohonan resmi dari perguruan tinggi sebelum menetapkan balasan</div>
+                                    </div>
+                                </div>
+                                <a href="{{ route('documents.application', $suratPengantar->id) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    <span>Lihat Surat Pengantar</span>
+                                </a>
+                            </div>
+                        @endif
+
                         <!-- Dropdown Pembimbing Lapangan -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
@@ -518,7 +544,7 @@
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="mb-5 p-4 rounded-2xl bg-rose-50/70 border border-rose-200 shadow-2xs {{ $currentStatus === 'rejected' ? '' : 'hidden' }}">
+                         class="mb-5 p-4 rounded-2xl bg-rose-50/70 border border-rose-200 shadow-2xs">
                         <label class="block text-xs font-bold text-rose-800 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             <span>Alasan Penolakan Pengajuan</span>
@@ -539,7 +565,7 @@
                             <a href="{{ route('admin.applications.letter', $application->id) }}" target="_blank" 
                                 class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                                <span>Pratinjau / Cetak Surat PDF</span>
+                                <span>Cetak Surat Balasan</span>
                             </a>
                         @endif
 
@@ -570,15 +596,16 @@
 
             function toggleFields() {
                 if (!statusSelect || !acceptanceBox || !rejectionBox) return;
-                if (statusSelect.value === 'rejected') {
-                    rejectionBox.classList.remove('hidden');
-                    acceptanceBox.classList.add('hidden');
-                } else if (['accepted', 'active', 'completed'].includes(statusSelect.value)) {
-                    acceptanceBox.classList.remove('hidden');
-                    rejectionBox.classList.add('hidden');
+                const val = statusSelect.value;
+                if (val === 'rejected') {
+                    rejectionBox.style.display = '';
+                    acceptanceBox.style.display = 'none';
+                } else if (['accepted', 'active', 'completed'].includes(val)) {
+                    acceptanceBox.style.display = '';
+                    rejectionBox.style.display = 'none';
                 } else {
-                    rejectionBox.classList.add('hidden');
-                    acceptanceBox.classList.add('hidden');
+                    rejectionBox.style.display = 'none';
+                    acceptanceBox.style.display = 'none';
                 }
             }
 
@@ -586,7 +613,6 @@
 
             if (statusSelect) {
                 statusSelect.addEventListener('change', toggleFields);
-                toggleFields();
             }
         });
     </script>

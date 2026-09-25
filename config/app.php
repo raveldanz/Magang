@@ -55,6 +55,14 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
 
     /*
+    | Verifikasi QR (/verify-letter & /verify-certificate): izinkan pencarian dengan
+    | ID angka untuk dokumen lama yang QR-nya masih berisi ID. Default MATI karena
+    | ID berurutan bisa ditebak. Aktifkan sementara hanya jika ada dokumen lama
+    | yang sudah dicetak/dibagikan dengan QR berbasis ID.
+    */
+    'verify_numeric_fallback' => (bool) env('VERIFY_NUMERIC_FALLBACK', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
