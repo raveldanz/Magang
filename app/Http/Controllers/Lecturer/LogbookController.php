@@ -23,7 +23,7 @@ class LogbookController extends Controller
         $supervisedPlacements = Placement::with(['application.user.studentProfile', 'application.unit.agencyProfile'])
             ->where('academic_advisor_id', $lecturerId)
             ->whereHas('application', function ($q) {
-                $q->whereIn('status', ['accepted', 'completed']);
+                $q->whereIn('status', ['accepted', 'active', 'completed']);
             })
             ->get();
 

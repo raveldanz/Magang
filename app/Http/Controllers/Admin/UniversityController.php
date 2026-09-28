@@ -334,15 +334,17 @@ class UniversityController extends Controller
 
         foreach ($dosens as $dosen) {
             $activeCount = $dosen->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && !$isPassed;
+                $status = optional($p->application)->status;
+                $val = $status instanceof \App\Enums\ApplicationStatus ? $status->value : (string)$status;
+                $isPassed = $val === 'completed' || (optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0);
+                return in_array($val, ['accepted', 'active']) && !$isPassed;
             })->count();
 
             $completedCount = $dosen->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && $isPassed;
+                $status = optional($p->application)->status;
+                $val = $status instanceof \App\Enums\ApplicationStatus ? $status->value : (string)$status;
+                $isPassed = $val === 'completed' || (optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0);
+                return $val === 'completed' || (in_array($val, ['accepted', 'active']) && $isPassed);
             })->count();
 
             $dosen->active_students_count = $activeCount;
