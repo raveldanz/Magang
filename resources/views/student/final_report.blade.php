@@ -339,20 +339,68 @@
                                 </div>
                             </div>
 
+                            <!-- Rekomendasi Format PDF vs DOCX -->
+                            <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-50/90 via-orange-50/60 to-amber-50/90 border border-amber-200/90 shadow-2xs space-y-2.5">
+                                <div class="flex items-start gap-2.5 sm:gap-3">
+                                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-2 flex-1 min-w-0">
+                                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                                            <h4 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                                                <span>Panduan Format: Mengapa Sangat Disarankan Menjadikan PDF?</span>
+                                            </h4>
+                                            <span class="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-950 text-[10px] font-extrabold uppercase tracking-wider">Tips Naskah Rapi</span>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs">
+                                            <div class="p-2.5 rounded-xl bg-white/90 border border-emerald-200/90 shadow-2xs space-y-1">
+                                                <div class="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px] sm:text-xs">
+                                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                                                    Format PDF (.pdf) — Paling Rapi & Siap Baca
+                                                </div>
+                                                <p class="text-[11px] text-slate-600 leading-relaxed">
+                                                    Tata letak, margin, gambar, dan nomor halaman terkunci rapi (tidak berantakan). DPL & Pembimbing Dinas dapat <strong>langsung membaca di layar browser tanpa harus men-download berkas</strong>.
+                                                </p>
+                                            </div>
+                                            <div class="p-2.5 rounded-xl bg-white/90 border border-amber-200/90 shadow-2xs space-y-1">
+                                                <div class="flex items-center gap-1.5 font-bold text-amber-900 text-[11px] sm:text-xs">
+                                                    <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                                                    Format Word (.docx / .doc)
+                                                </div>
+                                                <p class="text-[11px] text-slate-600 leading-relaxed">
+                                                    Tetap didukung, namun browser akan <strong>otomatis mengunduh (download)</strong> berkas ke komputer penguji untuk dibuka melalui aplikasi Microsoft Word/WPS Office.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p class="text-[11px] text-amber-900 leading-relaxed">
+                                            💡 <em>Cara Praktis: Di Microsoft Word atau Google Docs, klik menu <strong>File &gt; Save As / Export &gt; Download as PDF (.pdf)</strong> sebelum mengunggah.</em>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Interactive Drag & Drop Dropzone -->
                             <div>
-                                <div class="flex items-center justify-between mb-1.5 gap-2">
+                                <div class="flex items-center justify-between mb-1.5 gap-2 flex-wrap">
                                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider truncate">
-                                        Unggah File Naskah Laporan (PDF / DOCX) 
+                                        Unggah File Naskah Laporan
                                         @if(!$finalReport || !$finalReport->file_path)
                                             <span class="text-rose-500">*</span>
                                         @endif
                                     </label>
-                                    @if($finalReport && $finalReport->file_path)
-                                        <span class="text-[10px] sm:text-[11px] text-blue-600 font-medium shrink-0">
-                                            Berkas tersimpan tersedia
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] sm:text-[11px] font-bold">
+                                            <svg class="w-3 h-3 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            Disarankan: PDF
                                         </span>
-                                    @endif
+                                        @if($finalReport && $finalReport->file_path)
+                                            <span class="text-[10px] sm:text-[11px] text-blue-600 font-medium">
+                                                (Berkas tersimpan tersedia)
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div id="dropzoneArea" 
@@ -375,31 +423,34 @@
                                         <p class="text-xs sm:text-sm font-bold text-slate-800">
                                             <span class="text-blue-600 underline">Pilih berkas</span> atau tarik & lepas di sini
                                         </p>
-                                        <p class="text-[10px] sm:text-[11px] text-slate-400">
-                                            Format: <strong>PDF, DOC, DOCX</strong> (Maksimal 10 MB)
+                                        <p class="text-[10px] sm:text-[11px] text-slate-500">
+                                            Format: <strong class="text-emerald-700">PDF (Sangat Disarankan)</strong>, DOC, DOCX (Maksimal 10 MB)
                                         </p>
                                     </div>
                                 </div>
                                 <!-- Selected File Preview Feedback Card -->
-                                <div id="reportFileBox" class="hidden mt-3 p-3.5 sm:p-4 bg-blue-50/70 border border-blue-200 rounded-2xl items-center justify-between gap-3 shadow-2xs">
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs uppercase" id="reportFileIcon">
-                                            PDF
+                                <div id="reportFileBox" class="hidden mt-3 p-3.5 sm:p-4 bg-blue-50/70 border border-blue-200 rounded-2xl flex-col gap-2.5 shadow-2xs">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs uppercase" id="reportFileIcon">
+                                                PDF
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <p id="reportFileName" class="text-xs sm:text-sm font-bold text-slate-800 truncate"></p>
+                                                <p id="reportFileSize" class="text-[10px] sm:text-xs text-slate-500 font-mono"></p>
+                                            </div>
                                         </div>
-                                        <div class="min-w-0 flex-1">
-                                            <p id="reportFileName" class="text-xs sm:text-sm font-bold text-slate-800 truncate"></p>
-                                            <p id="reportFileSize" class="text-[10px] sm:text-xs text-slate-500 font-mono"></p>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                <span>Lihat Berkas</span>
+                                            </a>
+                                            <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
+                                                Ganti Berkas
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            <span>Lihat Berkas</span>
-                                        </a>
-                                        <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
-                                            Ganti Berkas
-                                        </button>
-                                    </div>
+                                    <div id="reportFileTip" class="pt-2 border-t border-blue-200/70 text-[11px] leading-relaxed"></div>
                                 </div>
                             </div>
 
@@ -627,6 +678,7 @@
             const sizeEl = document.getElementById('reportFileSize');
             const iconEl = document.getElementById('reportFileIcon');
             const viewFileBtn = document.getElementById('reportViewFileBtn');
+            const tipEl = document.getElementById('reportFileTip');
 
             if (currentObjectUrl) {
                 URL.revokeObjectURL(currentObjectUrl);
@@ -647,6 +699,18 @@
                 nameEl.textContent = file.name;
                 sizeEl.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
                 iconEl.textContent = ext.toUpperCase();
+
+                if (ext === 'pdf') {
+                    iconEl.className = 'w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-rose-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs uppercase';
+                    if (tipEl) {
+                        tipEl.innerHTML = '<span class="text-emerald-700 font-bold inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 inline shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Format PDF Terpilih (Sangat Disarankan):</span> <span class="text-slate-600">Tata letak terkunci rapi dan penguji (DPL / Pembimbing Dinas) dapat langsung membaca naskah di layar browser tanpa harus men-download.</span>';
+                    }
+                } else {
+                    iconEl.className = 'w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs uppercase';
+                    if (tipEl) {
+                        tipEl.innerHTML = '<span class="text-amber-800 font-bold">ℹ Berkas Word (.' + ext + ') Terpilih:</span> <span class="text-slate-600">Berkas ini akan otomatis diunduh (download) saat dibuka oleh penguji. Agar lebih rapi dan bisa dibaca langsung di browser, pertimbangkan untuk menyimpannya sebagai <strong>PDF</strong> terlebih dahulu.</span>';
+                    }
+                }
 
                 currentObjectUrl = URL.createObjectURL(file);
                 if (viewFileBtn) {
