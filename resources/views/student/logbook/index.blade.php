@@ -408,9 +408,18 @@
                                         </td>
                                         <td class="p-4 text-center">
                                             @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected' || strtolower($log->lecturer_status ?? '') === 'rejected'))
-                                                <a href="{{ route('student.logbook.edit', $log->id) }}" class="btn-action-edit">
-                                                    Edit
-                                                </a>
+                                                <div class="flex items-center justify-center gap-1.5">
+                                                    <a href="{{ route('student.logbook.edit', $log->id) }}" class="btn-action-edit">
+                                                        Edit
+                                                    </a>
+                                                    <form action="{{ route('student.logbook.destroy', $log->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus catatan logbook ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition cursor-pointer" title="Hapus Logbook">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             @else
                                                 <span class="text-gray-400 text-xs">—</span>
                                             @endif
@@ -484,9 +493,18 @@
                                 </div>
 
                                 @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected' || strtolower($log->lecturer_status ?? '') === 'rejected'))
-                                    <a href="{{ route('student.logbook.edit', $log->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
-                                        <span>Perbaiki / Edit Logbook</span>
-                                    </a>
+                                    <div class="flex items-center gap-2 pt-1">
+                                        <a href="{{ route('student.logbook.edit', $log->id) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                                            <span>Edit Logbook</span>
+                                        </a>
+                                        <form action="{{ route('student.logbook.destroy', $log->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus catatan logbook ini?')" class="shrink-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
                                 @endif
                             </div>
                         @empty

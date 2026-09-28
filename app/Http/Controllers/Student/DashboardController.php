@@ -134,7 +134,7 @@ class DashboardController extends Controller
         ]);
 
         $application = Application::where('user_id', $user->id)
-            ->whereIn('status', ['accepted', 'completed'])
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->latest()
             ->firstOrFail();
 
@@ -169,7 +169,7 @@ class DashboardController extends Controller
         ]);
 
         $application = Application::where('user_id', $user->id)
-            ->whereIn('status', ['accepted', 'completed'])
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->latest()
             ->firstOrFail();
 
