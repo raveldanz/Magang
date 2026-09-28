@@ -1,8 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-xl text-slate-800 leading-tight">
-            {{ __('Dashboard Aktivitas & Logbook Magang') }}
-        </h2>
+        <div>
+            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+                {{ __('Logbook & Aktivitas Magang') }}
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+                Catat dan pantau aktivitas harian pelaksanaan program magang MBKM Anda
+            </p>
+        </div>
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
