@@ -42,6 +42,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-025** | 2026-09-25 | Native MCP Sub-Agents & Stdio Bridge | Mock ANTHROPIC_API_KEY menimpa sesi Claude, timeout Ollama CPU inference, dan lifecycle handshake MCP | RESOLVED |
 | **LRN-026** | 2026-09-28 | Lifecycle Pipeline, Quota Harmony & Logbook Destroy | Inkonsistensi status 'active' pada DPL/Admin/Mentor, disparitas kuota Unit vs Dinas, 403 sertifikat admin & missing method destroy logbook | RESOLVED |
 | **LRN-027** | 2026-09-28 | Student Portal Layout Standardization | Disparitas lebar container halaman (max-w-4xl vs max-w-7xl) antara Profil, Laporan Akhir, dan Logbook Mahasiswa | RESOLVED |
+| **LRN-028** | 2026-09-26 | Testing Architecture & Visual QA Guard | Evaluasi buta meloloskan unstyled HTML (Times New Roman & default grey button) akibat stale public/hot | RESOLVED |
+| **LRN-029** | 2026-09-26 | Seleksi Pengajuan Admin & State Validation | Validasi state ketat alur seleksi (hanya pending yang dapat diubah) & kewajiban alasan penolakan | RESOLVED |
 
 ---
 
@@ -549,6 +551,55 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Menyelaraskan teks judul header, subtitle, banner status verifikasi (nama instansi, badge status, stepper tracker 4-langkah, rincian data 4-kolom), dan kartu biru "Informasi Penempatan Magang" antara `student/logbook/index.blade.php` dan `student/final_report.blade.php` sehingga konten dan terminologi 100% konsisten.
   4. Memverifikasi seluruh halaman terkompilasi dan lulus 69 unit/feature tests (Exit Code 0).
 - **Prevention Rule**: Seluruh halaman portal utama (Dashboard, Logbook, Profil, Laporan Akhir, Pendaftaran) wajib menggunakan container baku `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6` dan struktur header/kartu data penempatan terstandar agar konsistensi visual serta keselarasan teks terjaga di seluruh navigasi aplikasi.
+
+---
+
+### [LRN-028] Hard Visual Guard & Mandat Multimodal Vision Browser Automation
+- **Tanggal**: 2026-09-26
+- **Komponen**: `scripts/visual-guard.mjs`, `scripts/tier1_puppeteer_audit.mjs`, `scripts/tier3_playwright_audit.mjs`, `.antigravity/rules.md`
+- **Problem / Symptom**: 
+  1. Runner pengujian visual sebelumnya melaporkan status **PASS** secara keliru (*false positive*) pada halaman login yang sama sekali belum ter-styling (HTML mentah polos dengan font Times New Roman dan tombol default abu-abu `rgb(240, 240, 240)`).
+  2. Berkas `public/hot` tertinggal (*stale*) di repositori dari sesi Vite yang mati, menyebabkan tag `@vite(...)` di template Blade merujuk ke server lokal `5173` yang tidak aktif alih-alih merujuk aset kompilasi `public/build/manifest.json`.
+- **Root Cause**:
+  1. Ketiadaan asersi computed style pada runner pengujian; audit hanya menguji status HTTP 200 dan accessibility tree secara buta tanpa menganalisis font-family dan background color tombol.
+  2. Model AI tidak membuka dan mengevaluasi berkas tangkapan layar (screenshot PNG) secara visual menggunakan kapabilitas multimodal vision sebelum menyimpulkan hasil.
+- **Fix Applied**:
+  1. Membuat modul Hard Visual Guard [`scripts/visual-guard.mjs`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/scripts/visual-guard.mjs) yang wajib diimpor oleh seluruh runner:
+     - `assertManifestBuilt()`: Membatalkan pengujian seketika dengan status **FAIL (Vite unbuilt)** jika `public/build/manifest.json` tidak ada, serta membersihkan file `public/hot` usang.
+     - `assertVisualStyles()`: Melempar `UNSTYLED_HTML_DETECTED` jika font-family elemen `body` bernilai Times New Roman/raw serif, dan melempar `DEFAULT_BUTTON_DETECTED` jika tombol utama bernilai background default `rgb(240, 240, 240)`.
+  2. Memperbarui `scripts/tier1_puppeteer_audit.mjs` dan membuat runner otonom `scripts/tier3_playwright_audit.mjs` terintegrasi guard.
+  3. Menanamkan mandat mutlak di `.antigravity/rules.md`: dilarang keras meloloskan status visual berdasarkan HTTP 200/AXTree, dan AI WAJIB membuka berkas gambar via `view_file` untuk memvalidasi rendering Tailwind layaknya mata manusia.
+  4. Menjalankan kompilasi produksi `npm run build`, audit Tier 1 & Tier 3, serta pengambilan screenshot Playwright MCP yang terverifikasi rapi dan presisi 100%.
+- **Prevention Rule**: Seluruh runner pengujian visual wajib memiliki asersi computed style terhadap token desain utama (font sans Figtree/Inter dan background Tailwind) serta memvalidasi manifest Vite. Dilarang menyimpulkan tampilan UI aman tanpa membuka raster screenshot dan memverifikasi keselarasan visual secara multimodal.
+
+---
+
+### [LRN-029] Validasi State Ketat Alur Seleksi Pengajuan Admin & Form Input Alasan Penolakan
+- **Tanggal**: 2026-09-26
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/admin/applications/index.blade.php`, `database/seeders/AdminWorkflowSeeder.php`, `tests/Feature/AdminWorkflowSelectionTest.php`, `scripts/tier3_playwright_audit.mjs`
+- **Problem / Symptom**: 
+  1. Aksi persetujuan (*Approve*) dan penolakan (*Reject*) tidak memiliki batasan status asal (*state transition guard*), sehingga pengajuan yang sudah berstatus `accepted` dapat di-reject secara sewenang-wenang atau pengajuan yang sudah `rejected` dapat di-approve kembali tanpa validasi alur seleksi yang ketat.
+  2. Input alasan penolakan (`rejection_note`) bersifat opsional (`nullable`), memungkinkan admin menolak permohonan magang mahasiswa tanpa memberikan keterangan atau feedback yang konstruktif.
+  3. Runner pengujian visual otomatis `npm run test:visual` sebelumnya hanya menguji portal login dan belum memvalidasi rendering tabel pengajuan admin multi-role desktop dan mobile.
+- **Root Cause**:
+  1. Ketiadaan *guard clause* pemeriksaan `$oldStatus === 'pending'` sebelum mengubah status menjadi `accepted` atau `rejected` di controller admin.
+  2. Rule validasi Form Request tidak menerapkan `required` dinamis saat status bernilai `rejected`.
+  3. Ketiadaan kartu interaktif kondisional dan pelindung penonaktifan tombol (*disabled state*) pada view `show.blade.php`.
+- **Fix Applied**:
+  1. **Strict State Guard Backend**: Menambahkan validasi transisi status di `ApplicationController::updateStatus`:
+     - Aksi `accepted` (Approve) dan `rejected` (Reject) DITOLAK jika status aplikasi saat ini bukan `pending`.
+     - Pengajuan yang berstatus `rejected` dikunci secara permanen dan tidak dapat diubah kembali statusnya.
+  2. **Mandatory Rejection Reason**: Menerapkan rule validasi backend dinamis: `'rejection_note' => 'required|string|min:5'` ketika status `rejected`, disertai pesan error kustom dalam Bahasa Indonesia yang ramah pengguna.
+  3. **Visual & UX Hardening di Blade View**:
+     - Menambahkan banner peringatan status final bila pengajuan telah ditolak, serta menonaktifkan tombol submit dan opsi status lainnya.
+     - Mengunci tombol `ACCEPTED` dan `REJECTED` dengan tooltip informatif jika status saat ini bukan `pending`.
+     - Mengintegrasikan banner kesalahan validasi `@if ($errors->any())` dan display inline `@error('rejection_note')`.
+     - Menambahkan atribut `:required="status === 'rejected'"` pada textarea alasan penolakan di Alpine.js.
+     - Menambahkan tooltip alasan penolakan pada tabel desktop dan kartu ringkasan alasan penolakan pada tampilan mobile `index.blade.php`.
+  4. **Dedicated Feature Test & Visual Audit Runner**:
+     - Membuat test suite lengkap [`tests/Feature/AdminWorkflowSelectionTest.php`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/tests/Feature/AdminWorkflowSelectionTest.php) menguji seluruh siklus `AdminWorkflowSeeder` (7/7 PASS, Strict Exit Code 0).
+     - Mengembangkan `scripts/tier3_playwright_audit.mjs` untuk mengotomatisasi login Admin QA, navigasi tabel desktop & mobile, inspeksi status badges, evaluasi rejection-box, dan capture screenshot beresolusi tinggi dengan Hard Visual Guard.
+- **Prevention Rule**: Seluruh aksi perubahan siklus hidup entitas bisnis (*state machine transitions*) wajib memvalidasi status asal secara eksplisit di level controller sebelum eksekusi transaksi database. Setiap tindakan yang berdampak penolakan atau pembatalan hak pengguna wajib mewajibkan input alasan minimal yang jelas dan informatif.
 
 ---
 
