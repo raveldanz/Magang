@@ -1,9 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-xl text-slate-800 leading-tight">
+        <div>
+            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
                 {{ __('Dashboard Mahasiswa') }}
             </h2>
+            <p class="text-xs text-slate-500 mt-1">
+                Ringkasan perkembangan alur magang, penugasan pembimbing, dan aktivitas terkini
+            </p>
         </div>
     </x-slot>
 
