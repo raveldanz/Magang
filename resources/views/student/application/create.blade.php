@@ -1,9 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-bold text-xl text-slate-800 leading-tight">
-                {{ __('Pengajuan Magang & Riwayat') }}
+        <div>
+            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+                {{ __('Pengajuan Magang') }}
             </h2>
+            <p class="text-xs text-slate-500 mt-1">
+                Pilih instansi dinas, divisi penempatan, dan pantau riwayat pengajuan magang
+            </p>
         </div>
     </x-slot>
 
