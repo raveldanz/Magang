@@ -44,6 +44,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-027** | 2026-09-28 | Student Portal Layout Standardization | Disparitas lebar container halaman (max-w-4xl vs max-w-7xl) antara Profil, Laporan Akhir, dan Logbook Mahasiswa | RESOLVED |
 | **LRN-028** | 2026-09-26 | Testing Architecture & Visual QA Guard | Evaluasi buta meloloskan unstyled HTML (Times New Roman & default grey button) akibat stale public/hot | RESOLVED |
 | **LRN-029** | 2026-09-26 | Seleksi Pengajuan Admin & State Validation | Validasi state ketat alur seleksi (hanya pending yang dapat diubah) & kewajiban alasan penolakan | RESOLVED |
+| **LRN-030** | 2026-09-28 | Card Action Button Harmony & Single-Line Layout | Mismatch styling tombol 'Buat Akun' (border hitam gelap) vs 'Login As', teks terlipat 2 baris (w-1/3) pada card Universitas & Dinas | RESOLVED |
 
 ---
 
@@ -600,6 +601,25 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
      - Membuat test suite lengkap [`tests/Feature/AdminWorkflowSelectionTest.php`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/tests/Feature/AdminWorkflowSelectionTest.php) menguji seluruh siklus `AdminWorkflowSeeder` (7/7 PASS, Strict Exit Code 0).
      - Mengembangkan `scripts/tier3_playwright_audit.mjs` untuk mengotomatisasi login Admin QA, navigasi tabel desktop & mobile, inspeksi status badges, evaluasi rejection-box, dan capture screenshot beresolusi tinggi dengan Hard Visual Guard.
 - **Prevention Rule**: Seluruh aksi perubahan siklus hidup entitas bisnis (*state machine transitions*) wajib memvalidasi status asal secara eksplisit di level controller sebelum eksekusi transaksi database. Setiap tindakan yang berdampak penolakan atau pembatalan hak pengguna wajib mewajibkan input alasan minimal yang jelas dan informatif.
+
+---
+
+### [LRN-030] Penyelarasan Desain & Layout Tombol Aksi Kartu (Buat Akun vs Login As)
+- **Tanggal**: 2026-09-28
+- **Komponen**: `resources/views/admin/universities/index.blade.php`, `resources/views/admin/agencies/index.blade.php`
+- **Problem / Symptom**:
+  1. Tombol "Buat Akun" pada kartu Universitas dan Instansi Dinas yang belum memiliki akun admin portal terlihat sangat kontras dan tidak selaras (*style mismatch*): tombol bergaris batas hitam tebal (`border-slate-900 text-slate-900`) dan berubah menjadi hitam pekat saat di-hover (`hover:bg-slate-900 hover:text-white`), sedangkan kartu yang sudah memiliki akun menampilkan tombol "Login As" dengan gaya outline abu-abu lembut (`border-slate-200 text-slate-700 bg-white hover:bg-slate-50`).
+  2. Pembungkus form tombol sekunder menggunakan lebar statis `w-1/3`, sehingga pada grid 4-kolom kartu yang sempit teks "Buat Akun" (9 karakter) tidak muat dalam 1 baris dan terpotong/terlipat menjadi 2 baris ("Buat \n Akun"), menyebabkan tinggi tombol membesar dan tata letak footer kartu menjadi tidak rapi (*layout jumping/misalignment*).
+- **Root Cause**:
+  1. Penulisan styling tombol "Buat Akun" dilakukan secara terpisah dengan token warna gelap yang tidak mengikuti design system tombol sekunder sistem.
+  2. Ketiadaan kelas `whitespace-nowrap` dan penggunaan lebar fraksional `w-1/3` yang kaku alih-alih `shrink-0` dengan auto-width berbasis konten.
+- **Fix Applied**:
+  1. Menyelaraskan seluruh styling tombol "Buat Akun" pada `admin/universities/index.blade.php` dan `admin/agencies/index.blade.php` ke format tombol sekunder baku: `border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs shadow-2xs`.
+  2. Mengganti `w-1/3` pada form pembungkus dengan `shrink-0 m-0` serta menambahkan `whitespace-nowrap` pada tombol, sehingga teks "Buat Akun" dan "Login As" dijamin selalu 1 baris.
+  3. Menambahkan `min-w-0 truncate whitespace-nowrap` pada tombol primer "Kelola Kampus" dan "Kelola Dinas", menjamin ketinggian kedua tombol sejajar presisi (`py-2.5` = 38px).
+  4. Menambahkan konfirmasi interaktif `onsubmit="return confirm(...)"` dan atribut `title` yang deskriptif pada form pembuatan akun dinas.
+  5. Memvalidasi tampilan visual langsung via Playwright headless engine dan `view_file` (terverifikasi 100% presisi dan rapi).
+- **Prevention Rule**: Seluruh tombol aksi sekunder pada kartu ringkasan (grid cards) wajib menggunakan token outline baku `border-slate-200 text-slate-700 bg-white hover:bg-slate-50`, selalu menyematkan `whitespace-nowrap` jika berada di dalam flex container berdampingan, serta menghindari lebar fraksional kaku `w-1/3` yang rentan menyebabkan wrapping teks pada viewport sempit.
 
 ---
 
