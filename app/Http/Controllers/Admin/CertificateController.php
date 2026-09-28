@@ -18,7 +18,18 @@ class CertificateController extends Controller
     {
         $user = Auth::user();
 
-        // Ambil aplikasi yang sudah accepted, punya placement, nilai lengkap, dan laporan disetujui
+        // 1. Sinkronisasi otomatis mahasiswa yang sudah ACC laporan & tuntas evaluasi agar statusnya lulus (completed)
+        $candidates = Placement::whereHas('application', function ($q) {
+            $q->whereIn('status', ['accepted', 'active']);
+        })->whereHas('finalreport', function ($subQuery) {
+            $subQuery->where('status', 'approved');
+        })->whereHas('evaluation')->get();
+
+        foreach ($candidates as $cand) {
+            $cand->syncCompletionStatus();
+        }
+
+        // 2. Ambil aplikasi yang sudah berstatus completed dan siap cetak sertifikat
         $query = Application::with([
             'user.studentProfile', 
             'unit.agencyProfile', 
@@ -26,7 +37,7 @@ class CertificateController extends Controller
             'placement.finalreport', 
             'placement.pembimbing'
         ])
-            ->whereIn('status', ['accepted', 'completed'])
+            ->where('status', 'completed')
             ->whereHas('placement', function ($query) {
                 $query->whereHas('evaluation')
                       ->whereHas('finalreport', function ($subQuery) {
