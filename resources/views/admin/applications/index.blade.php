@@ -209,7 +209,8 @@
                                                 <span>COMPLETED</span>
                                             </span>
                                         @elseif($rawStatus === 'rejected')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs"
+                                                  title="{{ $app->rejection_note ? 'Alasan: ' . $app->rejection_note : 'Pengajuan Ditolak' }}">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                 <span>REJECTED</span>
                                             </span>
@@ -295,7 +296,8 @@
                                             <span>COMPLETED</span>
                                         </span>
                                     @elseif($rawStatus === 'rejected')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs"
+                                              title="{{ $app->rejection_note ? 'Alasan: ' . $app->rejection_note : 'Pengajuan Ditolak' }}">
                                             <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                             <span>REJECTED</span>
                                         </span>
@@ -328,6 +330,13 @@
                                     <span class="font-mono text-slate-500">{{ $app->created_at->format('d M Y, H:i') }}</span>
                                 </div>
                             </div>
+
+                            @if($rawStatus === 'rejected' && $app->rejection_note)
+                                <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100 text-xs text-rose-800">
+                                    <span class="font-bold text-[11px] uppercase tracking-wider block text-rose-900 mb-0.5">Alasan Penolakan:</span>
+                                    <p class="italic text-[11px] text-rose-700">"{{ $app->rejection_note }}"</p>
+                                </div>
+                            @endif
 
                             <a href="{{ route('admin.applications.show', $app->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs active:scale-95 cursor-pointer group">
                                 <span>Lihat Detail Pengajuan</span>
