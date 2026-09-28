@@ -209,16 +209,33 @@ class ApplicationController extends Controller
         $statusInput = strtolower($request->status);
         $request->merge(['status' => $statusInput]);
 
-        $request->validate([
+        if ($request->filled('rejection_reason') && !$request->filled('rejection_note')) {
+            $request->merge(['rejection_note' => $request->rejection_reason]);
+        }
+
+        $rules = [
             'status' => 'required|in:pending,verified,accepted,active,completed,rejected,resigned',
-            'rejection_note' => 'nullable|string',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',
             'letter_number' => 'nullable|string|max:100',
             'letter_date' => 'nullable|date',
             'override_reason' => 'nullable|string',
-        ]);
+        ];
+
+        // Validasi ketat: Alasan penolakan wajib diisi jika status diubah menjadi 'rejected'
+        if ($statusInput === 'rejected') {
+            $rules['rejection_note'] = 'required|string|min:5';
+        } else {
+            $rules['rejection_note'] = 'nullable|string';
+        }
+
+        $messages = [
+            'rejection_note.required' => 'Alasan penolakan wajib diisi jika status diubah menjadi ditolak (rejected).',
+            'rejection_note.min' => 'Alasan penolakan minimal 5 karakter agar informatif bagi pemohon.',
+        ];
+
+        $request->validate($rules, $messages);
 
         $application = Application::with(['unit', 'placement', 'user'])->findOrFail($id);
         $oldStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : strtolower((string)$application->status);
@@ -227,6 +244,25 @@ class ApplicationController extends Controller
         // Multi-Tenant Authorization Check
         if (!$isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
+        }
+
+        // Validasi State Ketat: Aksi persetujuan (Approve) dan penolakan (Reject) hanya dapat dilakukan pada status 'pending'
+        if ($newStatus === 'accepted' && $oldStatus !== 'pending' && $oldStatus !== 'accepted') {
+            return redirect()->back()
+                ->with('error', "Gagal menyetujui pengajuan: Aksi persetujuan (Approve) hanya dapat dilakukan pada pengajuan yang berstatus 'pending'. Status saat ini: '{$oldStatus}'.")
+                ->withInput();
+        }
+
+        if ($newStatus === 'rejected' && $oldStatus !== 'pending') {
+            return redirect()->back()
+                ->with('error', "Gagal menolak pengajuan: Aksi penolakan (Reject) hanya dapat dilakukan pada pengajuan yang berstatus 'pending'. Status saat ini: '{$oldStatus}'.")
+                ->withInput();
+        }
+
+        if ($oldStatus === 'rejected' && $newStatus !== 'rejected') {
+            return redirect()->back()
+                ->with('error', "Gagal mengubah status: Pengajuan yang telah ditolak tidak dapat diubah statusnya kembali.")
+                ->withInput();
         }
 
         $unit = $application->unit;

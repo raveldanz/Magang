@@ -53,6 +53,20 @@
                 </div>
             @endif
 
+            @if ($errors->any())
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-sm font-medium space-y-1">
+                    <div class="font-bold flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Terdapat kesalahan validasi pada formulir:</span>
+                    </div>
+                    <ul class="list-disc list-inside text-xs text-rose-700 pl-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <!-- 1. Data Profil & Pengajuan Mahasiswa -->
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
                 <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100 mb-5">
@@ -292,6 +306,24 @@
                         <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
                     </select>
 
+                    @php
+                        $isAlreadyRejected = ($currentStatusVal === 'rejected');
+                        $isAcceptDisabled = ($currentStatusVal !== 'pending' && $currentStatusVal !== 'accepted');
+                        $isRejectDisabled = ($currentStatusVal !== 'pending' && $currentStatusVal !== 'rejected');
+                    @endphp
+
+                    @if($isAlreadyRejected)
+                        <div class="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3">
+                            <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div>
+                                <h4 class="text-xs font-bold text-rose-900 uppercase tracking-wider">Status Pengajuan Final (Ditolak)</h4>
+                                <p class="text-xs text-rose-800 mt-0.5 leading-relaxed">
+                                    Pengajuan magang ini telah ditolak dengan catatan: <em>"{{ $application->rejection_note }}"</em>. Status seleksi tidak dapat diubah kembali.
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Interactive Status Selection Cards (7 Status Pipeline Baku) -->
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
@@ -301,9 +333,10 @@
                             
                             <!-- 1. PENDING -->
                             <button type="button" 
-                                    @click="status = 'pending'"
-                                    :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                    @if(!$isAlreadyRejected) @click="status = 'pending'" @endif
+                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                    :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
                                     <span :class="status === 'pending' ? 'opacity-100 text-amber-600' : 'opacity-0'" class="transition-opacity">
@@ -318,9 +351,10 @@
 
                             <!-- 2. VERIFIED -->
                             <button type="button" 
-                                    @click="status = 'verified'"
-                                    :class="status === 'verified' ? 'border-sky-400 bg-sky-50/70 ring-2 ring-sky-400/20 shadow-xs' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/20'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                    @if(!$isAlreadyRejected) @click="status = 'verified'" @endif
+                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                    :class="status === 'verified' ? 'border-sky-400 bg-sky-50/70 ring-2 ring-sky-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
                                     <span :class="status === 'verified' ? 'opacity-100 text-sky-600' : 'opacity-0'" class="transition-opacity">
@@ -335,9 +369,10 @@
 
                             <!-- 3. ACCEPTED -->
                             <button type="button" 
-                                    @click="status = 'accepted'"
-                                    :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                    @if(!$isAcceptDisabled) @click="status = 'accepted'" @endif
+                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING"' : '' }}
+                                    :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $isAcceptDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
                                     <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
@@ -346,15 +381,18 @@
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight">ACCEPTED</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Diterima / Terbit Surat Tugas</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">
+                                        {{ $isAcceptDisabled && $currentStatusVal !== 'accepted' ? 'Hanya dari status Pending' : 'Diterima / Terbit Surat Tugas' }}
+                                    </div>
                                 </div>
                             </button>
 
                             <!-- 4. ACTIVE -->
                             <button type="button" 
-                                    @click="status = 'active'"
-                                    :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                    @if(!$isAlreadyRejected) @click="status = 'active'" @endif
+                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                    :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                                     <span :class="status === 'active' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
@@ -370,10 +408,12 @@
                             <!-- 5. COMPLETED -->
                             @php
                                 $canComplete = $application->can_complete;
-                                $isCompleteDisabled = !$canComplete && $currentStatusVal !== 'completed';
+                                $isCompleteDisabled = (!$canComplete && $currentStatusVal !== 'completed') || $isAlreadyRejected;
 
                                 $completedSubtitle = 'Magang Selesai & Lulus';
-                                if ($isCompleteDisabled) {
+                                if ($isAlreadyRejected) {
+                                    $completedSubtitle = 'Pengajuan Ditolak';
+                                } elseif ($isCompleteDisabled) {
                                     if (!$application->has_approved_report && !$application->has_complete_evaluation) {
                                         $completedSubtitle = 'Laporan & Nilai Belum Lengkap';
                                     } elseif (!$application->has_approved_report) {
@@ -393,7 +433,7 @@
                                         disabled
                                         title="{{ $completedSubtitle }}"
                                     @endif
-                                    :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-60 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
+                                    :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
                                     class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
@@ -416,9 +456,10 @@
 
                             <!-- 6. REJECTED -->
                             <button type="button" 
-                                    @click="status = 'rejected'"
-                                    :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                    @if(!$isRejectDisabled) @click="status = 'rejected'" @endif
+                                    {{ $isRejectDisabled ? 'disabled title="Aksi penolakan hanya dapat dilakukan pada pengajuan berstatus PENDING"' : '' }}
+                                    :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : '{{ $isRejectDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                                     <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
@@ -427,15 +468,18 @@
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight">REJECTED</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Tolak Berkas / Pendaftaran</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">
+                                        {{ $isRejectDisabled && $currentStatusVal !== 'rejected' ? 'Hanya dari status Pending' : 'Tolak Berkas / Pendaftaran' }}
+                                    </div>
                                 </div>
                             </button>
 
                             <!-- 7. RESIGNED -->
                             <button type="button" 
-                                    @click="status = 'resigned'"
-                                    :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group cursor-pointer">
+                                    @if(!$isAlreadyRejected) @click="status = 'resigned'" @endif
+                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                    :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
                                     <span :class="status === 'resigned' ? 'opacity-100 text-slate-700' : 'opacity-0'" class="transition-opacity">
@@ -547,19 +591,32 @@
                          class="mb-5 p-4 rounded-2xl bg-rose-50/70 border border-rose-200 shadow-2xs">
                         <label class="block text-xs font-bold text-rose-800 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            <span>Alasan Penolakan Pengajuan</span>
+                            <span>Alasan Penolakan Pengajuan <span class="text-rose-600 text-xs font-bold">* (Wajib Diisi)</span></span>
                         </label>
-                        <textarea name="rejection_note" rows="3" placeholder="Tuliskan alasan pengajuan ditolak agar dapat dipahami oleh pihak mahasiswa..."
-                            class="w-full text-xs border-rose-200 rounded-xl focus:ring-rose-500 focus:border-rose-500 bg-white">{{ $application->rejection_note }}</textarea>
+                        <textarea name="rejection_note" rows="3" 
+                            :required="status === 'rejected'"
+                            placeholder="Tuliskan alasan pengajuan ditolak secara jelas (minimal 5 karakter) agar dapat dipahami oleh pihak mahasiswa..."
+                            class="w-full text-xs border-rose-200 rounded-xl focus:ring-rose-500 focus:border-rose-500 bg-white">{{ old('rejection_note', $application->rejection_note) }}</textarea>
+                        @error('rejection_note')
+                            <p class="text-xs text-rose-600 font-semibold mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-3">
-                        <button type="submit" 
-                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            <span>Simpan Perubahan Status</span>
-                        </button>
+                        @if(!$isAlreadyRejected)
+                            <button type="submit" 
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                <span>Simpan Perubahan Status</span>
+                            </button>
+                        @else
+                            <button type="button" disabled
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-200 text-slate-500 text-xs font-bold rounded-xl shadow-none cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                <span>Status Final (Tidak Dapat Diubah)</span>
+                            </button>
+                        @endif
 
                         @if (in_array($currentStatus, ['accepted', 'active', 'completed']))
                             <a href="{{ route('admin.applications.letter', $application->id) }}" target="_blank" 
