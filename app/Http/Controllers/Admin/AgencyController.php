@@ -26,9 +26,11 @@ class AgencyController extends Controller
 
         $query = AgencyProfile::with(['units', 'users', 'agencyAdmin'])
             ->withCount('units')
-            ->withExists(['users as has_admin_account' => function ($q) {
-                $q->where('role', 'admin');
-            }])
+            ->withExists([
+                'users as has_admin_account' => function ($q) {
+                    $q->where('role', 'admin');
+                }
+            ])
             ->orderBy('has_admin_account', 'asc')
             ->orderBy('updated_at', 'desc');
 
@@ -37,9 +39,9 @@ class AgencyController extends Controller
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('agency_name', $like, "%{$search}%")
-                  ->orWhere('government_name', $like, "%{$search}%")
-                  ->orWhere('email', $like, "%{$search}%")
-                  ->orWhere('city', $like, "%{$search}%");
+                    ->orWhere('government_name', $like, "%{$search}%")
+                    ->orWhere('email', $like, "%{$search}%")
+                    ->orWhere('city', $like, "%{$search}%");
             });
         }
 
@@ -76,15 +78,17 @@ class AgencyController extends Controller
         $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
 
         // Multi-Tenant Check: Non-superadmin hanya boleh mengakses dinasnya sendiri
-        if (!$isSuperAdmin && (int)$user->agency_profile_id !== (int)$id) {
+        if (!$isSuperAdmin && (int) $user->agency_profile_id !== (int) $id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
         }
 
         $agency = AgencyProfile::with([
             'units' => function ($uq) {
-                $uq->withCount(['applications as accepted_count' => function ($aq) {
-                    $aq->where('status', 'accepted');
-                }])->orderBy('name');
+                $uq->withCount([
+                    'applications as accepted_count' => function ($aq) {
+                        $aq->where('status', 'accepted');
+                    }
+                ])->orderBy('name');
             },
             'users' => function ($uq) {
                 $uq->whereIn('role', ['admin', 'mentor', 'pembimbing'])->orderBy('name');

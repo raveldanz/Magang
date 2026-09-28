@@ -1,16 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <div>
-                <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>Pengunggahan Laporan Akhir Magang MBKM</span>
-                </h2>
-            </div>
+        <div>
+            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+                {{ __('Laporan Akhir Magang') }}
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+                Unggah naskah laporan ilmiah akhir dan pantau hasil evaluasi penilaian magang MBKM
+            </p>
         </div>
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
-        <div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Flash Success / Error Messages -->
             @if (session('success'))
@@ -40,104 +41,160 @@
                 </div>
             @endif
 
+            {{-- KONDISI 0: BELUM ADA PENGAJUAN MAGANG SAMA SEKALI --}}
+            @if (!$application || $lifecycle === 'NONE' || $lifecycle === 'DRAFT')
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between flex-wrap gap-4">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h4 class="font-bold text-amber-900 text-sm">Belum Ada Pengajuan Magang Aktif</h4>
+                                <p class="text-xs text-amber-700 mt-0.5">Anda belum mengajukan permohonan magang. Silakan lakukan pendaftaran magang terlebih dahulu untuk membuka fitur laporan akhir.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
+                            Ajukan Magang Sekarang 
+                        </a>
+                    </div>
+                </div>
+
             {{-- KONDISI 1: JIKA STATUS MASIH DALAM VERIFIKASI SELEKSI INSTANSI --}}
-            @if (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'SUBMITTED', 'VERIFIED']) || !$placement)
+            @elseif (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'SUBMITTED', 'VERIFIED']) || !$placement)
                 
                 <!-- Status Banner Kuning / Amber -->
-                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xs space-y-3">
-                    <div class="flex items-start justify-between flex-wrap gap-3">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-amber-900 text-sm sm:text-base leading-snug">Pengajuan Magang Sedang Diverifikasi</h4>
-                            <p class="text-xs sm:text-sm text-amber-700 leading-relaxed">
-                                Pengajuan magang Anda saat ini sedang dalam proses verifikasi dan seleksi oleh instansi <strong>{{ $application->unit->name ?? 'Dinas Perpustakaan Dan Kearsipan' }}</strong>.
-                            </p>
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between flex-wrap gap-4">
+                        <div class="flex items-start gap-3">
+                            <div>
+                                <h4 class="font-bold text-amber-900 text-sm sm:text-base">Pengajuan Magang Sedang Diverifikasi</h4>
+                                <p class="text-xs sm:text-sm text-amber-700 mt-0.5">
+                                    Pengajuan magang Anda saat ini sedang dalam proses verifikasi dan seleksi oleh instansi <strong>{{ $application?->unit?->agencyProfile?->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong>.
+                                </p>
+                            </div>
                         </div>
-                        <span class="px-3 py-1 bg-amber-200 text-amber-900 text-[10px] sm:text-xs font-black rounded-full uppercase tracking-wider shrink-0">
-                            STATUS: {{ $lifecycle ?? 'SUBMITTED' }}
+                        <span class="px-3 py-1 bg-amber-200 text-amber-900 text-xs font-black rounded-full uppercase tracking-wider">
+                            Status: {{ $lifecycle }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Stepper Alur Proses Magang Terpadu -->
-                <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-slate-200/80 shadow-xs space-y-5 sm:space-y-6">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">Alur Proses & Informasi Pengajuan Magang</h3>
-                        <a href="{{ route('dashboard') }}" class="text-[11px] sm:text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline shrink-0">
-                            Buka Dashboard Utama
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h3 class="font-black text-base text-gray-900">Alur Proses & Informasi Pengajuan Magang</h3>
+                            </div>
+                        </div>
+                        <a href="{{ route('dashboard') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
+                            Buka Dashboard Utama 
                         </a>
                     </div>
 
                     <!-- 4 Steps Timeline Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-emerald-200 bg-emerald-50/50">
-                            <span class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                Berkas Dikirim
-                            </span>
-                            <p class="text-[11px] text-emerald-600 mt-1">Formulir, CV, & Transkrip terkirim ke sistem.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">✓</span>
+                                <h4 class="font-bold text-xs text-emerald-900">Berkas Dikirim</h4>
+                            </div>
+                            <p class="text-[11px] text-emerald-700">Formulir, CV, & Transkrip terkirim ke sistem.</p>
                         </div>
 
-                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-amber-400 bg-amber-50/60 shadow-2xs">
-                            <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                                <span class="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-black">2</span>
-                                Verifikasi Dinas
-                            </span>
-                            <p class="text-[11px] text-amber-800 mt-1">Pemeriksaan berkas & kualifikasi oleh admin dinas.</p>
+                        <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-400 shadow-xs space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center animate-pulse">2</span>
+                                <h4 class="font-bold text-xs text-amber-900">Verifikasi Dinas</h4>
+                            </div>
+                            <p class="text-[11px] text-amber-700">Pemeriksaan berkas & kualifikasi oleh admin dinas.</p>
                         </div>
 
-                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 text-slate-400">
-                            <span class="text-xs font-bold flex items-center gap-1.5">
-                                <span class="w-4 h-4 rounded-full bg-slate-300 text-white flex items-center justify-center text-[10px] font-black">3</span>
-                                Penugasan Pembimbing
-                            </span>
-                            <p class="text-[11px] mt-1">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan (DPL).</p>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
+                                <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan (DPL).</p>
                         </div>
 
-                        <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 text-slate-400">
-                            <span class="text-xs font-bold flex items-center gap-1.5">
-                                <span class="w-4 h-4 rounded-full bg-slate-300 text-white flex items-center justify-center text-[10px] font-black">4</span>
-                                Laporan Akhir Magang
-                            </span>
-                            <p class="text-[11px] mt-1">Pengunggahan naskah laporan & penilaian akhir.</p>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">4</span>
+                                <h4 class="font-bold text-xs text-slate-700">Laporan Akhir Magang</h4>
+                            </div>
+                            <p class="text-[11px] text-slate-500">Pengunggahan naskah laporan & penilaian akhir magang.</p>
                         </div>
                     </div>
 
-                    <!-- Ringkasan Info Penempatan -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 text-xs">
-                        <div>
-                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Instansi Penempatan</span>
-                            <strong class="text-slate-800 font-bold block mt-0.5 truncate">{{ $application->unit->name ?? 'Dinas Terkait' }}</strong>
+                    <!-- Detail Pendaftaran Mahasiswa -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs pt-2">
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Instansi Penempatan</span>
+                            <span class="font-bold text-slate-800 text-sm block">{{ $application?->unit?->agencyProfile?->agency_name ?? 'Instansi Dinas' }}</span>
+                            <span class="text-slate-500 text-xs mt-0.5 block">{{ $application?->unit?->name ?? '-' }}</span>
                         </div>
-                        <div>
-                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Universitas / Kampus</span>
-                            <strong class="text-slate-800 font-bold block mt-0.5 truncate">{{ $application->user->studentProfile->universitas ?? Auth::user()->university ?? 'UPN Veteran Jawa Timur' }}</strong>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Universitas / Kampus</span>
+                            <span class="font-bold text-slate-800 text-sm block">{{ Auth::user()?->studentProfile?->universitas ?? Auth::user()?->university ?? '-' }}</span>
+                            <span class="text-slate-500 text-xs mt-0.5 block">{{ Auth::user()?->studentProfile?->jurusan ?? '-' }}</span>
                         </div>
-                        <div>
-                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Periode Magang Diajukan</span>
-                            <strong class="text-slate-800 font-bold block mt-0.5">
-                                {{ $application->start_date ? \Carbon\Carbon::parse($application->start_date)->format('d M Y') : '-' }} s/d {{ $application->end_date ? \Carbon\Carbon::parse($application->end_date)->format('d M Y') : '-' }}
-                            </strong>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Periode Magang Diajukan</span>
+                            <span class="font-bold text-slate-800 text-xs block">{{ $application?->start_date ? \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') : '-' }}</span>
+                            <span class="text-slate-500 text-xs block">s/d {{ $application?->end_date ? \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') : '-' }}</span>
                         </div>
-                        <div>
-                            <span class="text-slate-400 font-medium block text-[10px] uppercase">Tanggal Diajukan</span>
-                            <strong class="text-amber-700 font-bold block mt-0.5">{{ $application->created_at ? $application->created_at->format('d F Y') : '-' }}</strong>
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Tanggal Diajukan</span>
+                            <span class="font-bold text-slate-800 text-xs block">{{ $application?->created_at ? $application->created_at->translatedFormat('d F Y, H:i') : '-' }}</span>
+                            <span class="text-amber-600 font-semibold text-[11px] block mt-1">Menunggu Keputusan</span>
                         </div>
                     </div>
 
-                    <!-- Kotak Petunjuk Akses -->
-                    <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-blue-50/60 border border-blue-100 flex items-start gap-3">
-                        <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <p class="text-xs text-blue-900 leading-relaxed">
-                            <strong>Informasi Akses Laporan Akhir:</strong><br>
-                            Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan terbuka secara otomatis setelah status permohonan magang Anda disetujui (diterima) oleh pihak instansi kedinasan.
-                        </p>
+                    <!-- Notice Information Box -->
+                    <div class="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        <div class="text-xs text-blue-900 space-y-1">
+                            <p class="font-bold">Informasi Akses Laporan Akhir:</p>
+                            <p class="text-blue-800 leading-relaxed">
+                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data DPL telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
             {{-- KONDISI 2: JIKA SUDAH MEMILIKI PENEMPATAN AKTIF (BISA UNGGAH / LIHAT STATUS LAPORAN) --}}
             @else
+
+                {{-- Card 1: Informasi Penempatan Magang (Identik dengan Logbook) --}}
+                <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                    <div class="flex items-center justify-between mb-4 border-b border-blue-500 pb-3">
+                        <h3 class="text-base font-bold flex items-center gap-2">
+                            Informasi Penempatan Magang
+                        </h3>
+                        <span class="text-xs font-bold px-3 py-1 bg-white/20 text-white rounded-full">
+                            Status: {{ $lifecycle }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Instansi & Unit Kerja</p>
+                            <p class="font-bold text-sm text-white">{{ $application?->unit?->agencyProfile?->agency_name ?? '-' }}</p>
+                            <p class="text-blue-200 font-medium">{{ $application?->unit?->name ?? '-' }}</p>
+                        </div>
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Mentor Lapangan Dinas</p>
+                            <p class="font-bold text-sm text-white">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditentukan' }}</p>
+                        </div>
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing (DPL)</p>
+                            <p class="font-bold text-sm text-white">{{ $placement?->academicAdvisor?->name ?? 'Belum Ditentukan' }}</p>
+                        </div>
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
+                            <p class="font-bold text-sm text-white">{{ $application?->start_date ? \Carbon\Carbon::parse($application->start_date)->format('d M Y') : '-' }} s/d {{ $application?->end_date ? \Carbon\Carbon::parse($application->end_date)->format('d M Y') : '-' }}</p>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Informational Banner for Early & Parallel Upload -->
                 <div class="p-3.5 sm:p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl flex items-start gap-3 text-blue-900 text-xs sm:text-sm font-medium leading-relaxed shadow-2xs">
@@ -323,18 +380,28 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        <span>Lihat Berkas</span>
-                                    </a>
-                                    <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
-                                        Ganti Berkas
-                                    </button>
+                                <!-- Selected File Preview Feedback Card -->
+                                <div id="reportFileBox" class="hidden mt-3 p-3.5 sm:p-4 bg-blue-50/70 border border-blue-200 rounded-2xl items-center justify-between gap-3 shadow-2xs">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs uppercase" id="reportFileIcon">
+                                            PDF
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p id="reportFileName" class="text-xs sm:text-sm font-bold text-slate-800 truncate"></p>
+                                            <p id="reportFileSize" class="text-[10px] sm:text-xs text-slate-500 font-mono"></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <a id="reportViewFileBtn" href="#" target="_blank" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 rounded-xl text-xs font-bold transition shadow-2xs inline-flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat Berkas</span>
+                                        </a>
+                                        <button type="button" onclick="document.getElementById('file_laporan').click()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs">
+                                            Ganti Berkas
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
-                        </div>
 
                             <div class="pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
                                 <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
@@ -498,6 +565,7 @@
                         </div>
                     @endif
                 </div>
+            @endif
             @endif
 
         </div>
