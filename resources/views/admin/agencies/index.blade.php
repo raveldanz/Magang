@@ -307,21 +307,23 @@
 
                         <!-- Action Footer Sejajar (Format Baku: Tombol Sekunder & Tombol Primer) -->
                         <div class="flex items-center gap-2 pt-2">
-                            @if(($agency->total_admins ?? 0) === 0)
+                            @if($isSuperAdmin && ($agency->total_admins ?? 0) === 0)
                                 <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}"
-                                    class="w-1/3 m-0">
+                                    class="shrink-0 m-0"
+                                    onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($agency->agency_name) }}?')">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full py-2.5 px-3 rounded-xl border border-slate-900 text-slate-900 bg-white hover:bg-slate-900 hover:text-white font-bold text-xs transition cursor-pointer active:scale-95">
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs transition cursor-pointer active:scale-95 shadow-2xs"
+                                        title="Buatkan Akun Admin Dinas">
                                         Buat Akun
                                     </button>
                                 </form>
                             @elseif($isSuperAdmin && $firstAdmin)
                                 <form action="{{ route('admin.impersonate', $firstAdmin->id) }}" method="POST"
-                                    class="w-1/3 m-0">
+                                    class="shrink-0 m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold text-xs transition cursor-pointer active:scale-95"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs transition cursor-pointer active:scale-95 shadow-2xs"
                                         title="Masuk Sebagai Admin Dinas">
                                         Login As
                                     </button>
@@ -329,7 +331,7 @@
                             @endif
 
                             <a href="{{ route('admin.agencies.show', $agency->id) }}"
-                                class="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer">
+                                class="flex-1 min-w-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer whitespace-nowrap truncate">
                                 Kelola Dinas
                             </a>
                         </div>
