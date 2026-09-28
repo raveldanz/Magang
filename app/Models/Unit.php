@@ -26,7 +26,7 @@ class Unit extends Model
     {
         $today = date('Y-m-d');
         $occupiedCount = $this->applications()
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'active'])
             ->where(function ($q) use ($today) {
                 $q->whereNull('end_date')
                   ->orWhere('end_date', '>=', $today);

@@ -54,11 +54,15 @@ public function getRemainingQuotaAttribute()
     // Hitung total kapasitas seluruh unit kerja
     $totalQuota = $this->units->sum('quota');
 
-    // Hitung total mahasiswa yang diterima/aktif di bawah dinas ini
-    // Mengambil dari relasi unit -> applications yang berstatus accepted/completed
+    // Hitung total mahasiswa yang diterima/aktif di bawah dinas ini saat ini
+    $today = date('Y-m-d');
     $filledQuota = \App\Models\Application::whereHas('unit', function ($query) {
         $query->where('agency_profile_id', $this->id);
-    })->whereIn('status', ['accepted', 'completed'])->count();
+    })->whereIn('status', ['accepted', 'active'])
+      ->where(function ($q) use ($today) {
+          $q->whereNull('end_date')
+            ->orWhere('end_date', '>=', $today);
+      })->count();
 
     return max(0, $totalQuota - $filledQuota);
 }

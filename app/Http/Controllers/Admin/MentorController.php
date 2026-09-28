@@ -41,7 +41,7 @@ class MentorController extends Controller
             $m->active_students_count = Placement::where(function($q) use ($m) {
                 $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
             })->whereHas('application', function ($aq) {
-                $aq->whereIn('status', ['accepted', 'verified']);
+                $aq->whereIn('status', ['accepted', 'active']);
             })->count();
 
             $m->completed_students_count = Placement::where(function($q) use ($m) {

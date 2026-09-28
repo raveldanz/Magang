@@ -258,4 +258,34 @@ public function index()
         return redirect()->route('student.logbook.index')
             ->with('success', 'Logbook kegiatan berhasil diperbarui!');
     }
+
+    /**
+     * Hapus entri logbook kegiatan (hanya untuk logbook yang belum disetujui)
+     */
+    public function destroy($id)
+    {
+        $logbook = Logbook::findOrFail($id);
+
+        // Pastikan logbook milik penempatan mahasiswa yang sedang login
+        if ($logbook->placement?->application?->user_id !== Auth::id()) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        // Keamanan: Logbook yang sudah approved oleh mentor/dosen tidak boleh dihapus
+        if (strtolower($logbook->status) === 'approved') {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook yang sudah disetujui tidak dapat dihapus.');
+        }
+
+        // Hapus file lampiran jika ada
+        if ($logbook->attachment && Storage::disk('public')->exists($logbook->attachment)) {
+            Storage::disk('public')->delete($logbook->attachment);
+        }
+
+        $logbook->delete();
+
+        return redirect()->route('student.logbook.index')
+            ->with('success', 'Entri logbook berhasil dihapus.');
+    }
 }
+
