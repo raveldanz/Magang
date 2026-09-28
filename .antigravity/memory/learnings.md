@@ -41,6 +41,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-024** | 2026-09-25 | Mobile-First Responsive Tables & Dashboard Card Hardening | Tabel data dashboard terpotong di layar HP (< 640px) pada peran Mentor & Dosen, serta clipping teks kartu distribusi | RESOLVED |
 | **LRN-025** | 2026-09-25 | Native MCP Sub-Agents & Stdio Bridge | Mock ANTHROPIC_API_KEY menimpa sesi Claude, timeout Ollama CPU inference, dan lifecycle handshake MCP | RESOLVED |
 | **LRN-026** | 2026-09-28 | Lifecycle Pipeline, Quota Harmony & Logbook Destroy | Inkonsistensi status 'active' pada DPL/Admin/Mentor, disparitas kuota Unit vs Dinas, 403 sertifikat admin & missing method destroy logbook | RESOLVED |
+| **LRN-027** | 2026-09-28 | Student Portal Layout Standardization | Disparitas lebar container halaman (max-w-4xl vs max-w-7xl) antara Profil, Laporan Akhir, dan Logbook Mahasiswa | RESOLVED |
 
 ---
 
@@ -532,6 +533,22 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Menambahkan rangkaian pengujian otomatis `tests/Feature/SystemAuditFixesTest.php` yang memvalidasi seluruh perbaikan secara menyeluruh (passed 100%).
 - **Prevention Rule**:
   Setiap query yang berkaitan dengan peserta magang aktif wajib menyertakan status `['accepted', 'active']` (atau `['accepted', 'active', 'completed']` jika relevan dengan riwayat). Jangan pernah menghitung status `completed` sebagai beban kuota aktif. Setiap route yang didaftarkan di `routes/web.php` wajib diverifikasi keberadaan method-nya di Controller.
+
+---
+
+### [LRN-027] Penyelarasan Standar Lebar Layout Halaman Portal Mahasiswa (Max-W-7xl)
+- **Tanggal**: 2026-09-28
+- **Komponen**: `resources/views/student/profile/edit.blade.php`, `resources/views/student/final_report.blade.php`, `resources/views/student/logbook/index.blade.php`, `resources/views/layouts/app.blade.php`
+- **Problem / Symptom**: Terjadi ketidaksinkronan lebar halaman (*layout width jumping*) saat mahasiswa berpindah antara Dashboard/Logbook (`max-w-7xl` / 1280px) dengan Profil Siswa dan Laporan Akhir (`max-w-4xl` / 896px). Konten Profil dan Laporan Akhir menyempit drastis ke tengah dan menyisakan ruang kosong besar di sisi kiri dan kanan, tidak selaras dengan header navigasi aplikasi.
+- **Root Cause**: Desain awal halaman Profil dan Laporan Akhir memakai container sempit `max-w-4xl`, sedangkan `layouts/app.blade.php` mendefinisikan header di `max-w-7xl` dan halaman Logbook Mahasiswa serta Pengajuan Magang menggunakan `max-w-7xl`. Selain itu, pada `student/final_report.blade.php` terdapat referensi properti `$application->start_date` tanpa operator null-safe `?->` jika mahasiswa belum memiliki pengajuan.
+- **Fix Applied**:
+  1. Menyelaraskan container utama `student/final_report.blade.php` ke `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6`, serta melengkapi seluruh pemanggilan relasi `$application` dengan operator null-safe `?->`.
+  2. Merestrukturisasi `student/profile/edit.blade.php` ke standar `max-w-7xl` dengan layout 2-kolom responsif:
+     - Kolom kiri (`lg:col-span-4`): Kartu Ringkasan Akun (Inisial, Nama, NIM, Universitas, Prodi, Semester) dan Kartu Ketentuan Data Profil.
+     - Kolom kanan (`lg:col-span-8`): Kartu Formulir Pembaruan Data Profil (Identitas, PT, Kontak Pribadi, Kontak Darurat).
+  3. Menyelaraskan teks judul header, subtitle, banner status verifikasi (nama instansi, badge status, stepper tracker 4-langkah, rincian data 4-kolom), dan kartu biru "Informasi Penempatan Magang" antara `student/logbook/index.blade.php` dan `student/final_report.blade.php` sehingga konten dan terminologi 100% konsisten.
+  4. Memverifikasi seluruh halaman terkompilasi dan lulus 69 unit/feature tests (Exit Code 0).
+- **Prevention Rule**: Seluruh halaman portal utama (Dashboard, Logbook, Profil, Laporan Akhir, Pendaftaran) wajib menggunakan container baku `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6` dan struktur header/kartu data penempatan terstandar agar konsistensi visual serta keselarasan teks terjaga di seluruh navigasi aplikasi.
 
 ---
 
