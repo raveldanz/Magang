@@ -28,7 +28,7 @@ class LogbookController extends Controller
                 $q->orderBy('date', 'desc');
             }
         ])->whereHas('application', function ($q) {
-            $q->where('status', 'accepted');
+            $q->whereIn('status', ['accepted', 'active', 'completed']);
         });
 
         // Multi-Tenant Isolation untuk Admin Dinas

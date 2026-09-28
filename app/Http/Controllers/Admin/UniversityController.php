@@ -23,9 +23,11 @@ class UniversityController extends Controller
     {
         $query = University::with(['universityAdmin'])
             ->withCount(['users', 'dosens', 'students'])
-            ->withExists(['users as has_admin_account' => function ($q) {
-                $q->where('role', 'universitas');
-            }])
+            ->withExists([
+                'users as has_admin_account' => function ($q) {
+                    $q->where('role', 'universitas');
+                }
+            ])
             ->orderBy('has_admin_account', 'asc')
             ->orderBy('updated_at', 'desc');
 
@@ -34,9 +36,9 @@ class UniversityController extends Controller
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhere('code', $like, "%{$search}%")
-                  ->orWhere('email', $like, "%{$search}%")
-                  ->orWhere('pic_name', $like, "%{$search}%");
+                    ->orWhere('code', $like, "%{$search}%")
+                    ->orWhere('email', $like, "%{$search}%")
+                    ->orWhere('pic_name', $like, "%{$search}%");
             });
         }
 
@@ -50,7 +52,7 @@ class UniversityController extends Controller
         $totalStudents = User::where('role', 'mahasiswa')
             ->where(function ($q) {
                 $q->whereNotNull('university_id')
-                  ->orWhereNotNull('university');
+                    ->orWhereNotNull('university');
             })->count();
         $totalDosens = User::whereIn('role', ['dosen', 'academic_advisor'])->count();
         $totalActiveInterns = Application::where('status', 'accepted')->count();
@@ -320,8 +322,8 @@ class UniversityController extends Controller
         $dosens = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
                 $q->where('university_id', $university->id)
-                  ->orWhere('university', $university->name)
-                  ->orWhere('university', $university->code);
+                    ->orWhere('university', $university->name)
+                    ->orWhere('university', $university->code);
             })
             ->with(['academicPlacements.application.user', 'academicPlacements.finalreport', 'academicPlacements.evaluation'])
             ->orderBy('name', 'asc')
@@ -332,15 +334,17 @@ class UniversityController extends Controller
 
         foreach ($dosens as $dosen) {
             $activeCount = $dosen->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && !$isPassed;
+                $status = optional($p->application)->status;
+                $val = $status instanceof \App\Enums\ApplicationStatus ? $status->value : (string)$status;
+                $isPassed = $val === 'completed' || (optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0);
+                return in_array($val, ['accepted', 'active']) && !$isPassed;
             })->count();
 
             $completedCount = $dosen->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && $isPassed;
+                $status = optional($p->application)->status;
+                $val = $status instanceof \App\Enums\ApplicationStatus ? $status->value : (string)$status;
+                $isPassed = $val === 'completed' || (optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0);
+                return $val === 'completed' || (in_array($val, ['accepted', 'active']) && $isPassed);
             })->count();
 
             $dosen->active_students_count = $activeCount;
@@ -355,11 +359,11 @@ class UniversityController extends Controller
         $studentsQuery = User::where('role', 'mahasiswa')
             ->where(function ($q) use ($university) {
                 $q->where('university_id', $university->id)
-                  ->orWhere('university', $university->name)
-                  ->orWhereHas('studentProfile', function ($sp) use ($university) {
-                      $sp->where('university_id', $university->id)
-                         ->orWhere('universitas', 'like', "%{$university->name}%");
-                  });
+                    ->orWhere('university', $university->name)
+                    ->orWhereHas('studentProfile', function ($sp) use ($university) {
+                        $sp->where('university_id', $university->id)
+                            ->orWhere('universitas', 'like', "%{$university->name}%");
+                    });
             })
             ->with([
                 'studentProfile',
@@ -385,7 +389,7 @@ class UniversityController extends Controller
             } elseif ($st === 'completed') {
                 $studentsQuery->whereHas('applications', function ($aq) {
                     $aq->where('status', 'completed')
-                      ->orWhereHas('placement.finalreport', fn($fr) => $fr->where('status', 'approved'));
+                        ->orWhereHas('placement.finalreport', fn($fr) => $fr->where('status', 'approved'));
                 });
             } elseif ($st === 'pending') {
                 $studentsQuery->whereHas('applications', function ($aq) {
@@ -401,8 +405,8 @@ class UniversityController extends Controller
             $sSearch = strtolower($request->student_search);
             $studentsQuery->where(function ($q) use ($sSearch) {
                 $q->where('name', 'like', "%{$sSearch}%")
-                  ->orWhere('email', 'like', "%{$sSearch}%")
-                  ->orWhereHas('studentProfile', fn($sp) => $sp->where('nim', 'like', "%{$sSearch}%")->orWhere('jurusan', 'like', "%{$sSearch}%"));
+                    ->orWhere('email', 'like', "%{$sSearch}%")
+                    ->orWhereHas('studentProfile', fn($sp) => $sp->where('nim', 'like', "%{$sSearch}%")->orWhere('jurusan', 'like', "%{$sSearch}%"));
             });
         }
 
@@ -525,7 +529,7 @@ class UniversityController extends Controller
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
                 $q->where('university_id', $university->id)
-                  ->orWhere('university', $university->name);
+                    ->orWhere('university', $university->name);
             })
             ->findOrFail($dosenId);
 
@@ -552,7 +556,7 @@ class UniversityController extends Controller
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
                 $q->where('university_id', $university->id)
-                  ->orWhere('university', $university->name);
+                    ->orWhere('university', $university->name);
             })
             ->findOrFail($dosenId);
 
@@ -634,11 +638,11 @@ class UniversityController extends Controller
             'placement.evaluation'
         ])->whereHas('user', function ($uq) use ($university) {
             $uq->where('university_id', $university->id)
-              ->orWhere('university', $university->name)
-              ->orWhereHas('studentProfile', fn($sp) => $sp->where('university_id', $university->id)->orWhere('universitas', 'like', "%{$university->name}%"));
+                ->orWhere('university', $university->name)
+                ->orWhereHas('studentProfile', fn($sp) => $sp->where('university_id', $university->id)->orWhere('universitas', 'like', "%{$university->name}%"));
         })
-        ->latest()
-        ->get();
+            ->latest()
+            ->get();
 
         $cleanUnivName = preg_replace('/[^A-Za-z0-9_]/', '_', $university->name);
         $filename = 'Rekap_Mahasiswa_' . $cleanUnivName . '_' . date('Ymd_His') . '.csv';
@@ -653,7 +657,7 @@ class UniversityController extends Controller
 
         return response()->stream(function () use ($applications, $university) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // UTF-8 BOM
 
             fputcsv($handle, [
                 'No',
@@ -682,7 +686,7 @@ class UniversityController extends Controller
 
                 $mentorScore = ($eval && $eval->nilai_pembimbing) ? number_format($eval->nilai_pembimbing, 2) : '-';
                 $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
-                
+
                 $finalScore = '-';
                 if ($eval) {
                     if ($eval->final_score > 0) {
@@ -710,7 +714,7 @@ class UniversityController extends Controller
                     $dosen?->name ?? 'Belum Ditentukan',
                     $mentor?->name ?? 'Belum Diplot',
                     $periode,
-                    strtoupper($app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : (string)$app->status),
+                    strtoupper($app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : (string) $app->status),
                     $mentorScore,
                     $dosenScore,
                     $finalScore,
