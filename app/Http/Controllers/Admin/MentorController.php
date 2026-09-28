@@ -33,18 +33,18 @@ class MentorController extends Controller
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhere('email', $like, "%{$search}%");
+                    ->orWhere('email', $like, "%{$search}%");
             });
         }
 
         $mentors = $query->orderBy('name')->get()->map(function ($m) {
-            $m->active_students_count = Placement::where(function($q) use ($m) {
+            $m->active_students_count = Placement::where(function ($q) use ($m) {
                 $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
             })->whereHas('application', function ($aq) {
                 $aq->whereIn('status', ['accepted', 'verified']);
             })->count();
 
-            $m->completed_students_count = Placement::where(function($q) use ($m) {
+            $m->completed_students_count = Placement::where(function ($q) use ($m) {
                 $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
             })->whereHas('finalreport', function ($fq) {
                 $fq->where('status', 'approved');
@@ -185,7 +185,7 @@ class MentorController extends Controller
         }
 
         // Cek bimbingan aktif
-        $activeCount = Placement::where(function($q) use ($mentor) {
+        $activeCount = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)->orWhere('pembimbing_id', $mentor->id);
         })->whereHas('application', function ($aq) {
             $aq->whereIn('status', ['accepted', 'verified']);
