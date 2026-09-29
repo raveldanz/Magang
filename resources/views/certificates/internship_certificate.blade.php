@@ -275,10 +275,10 @@
         <!-- 3. FOOTER TANDA TANGAN DUA PIHAK & VERIFIKASI DIGITAL (Bagian Bawah) -->
         <div class="relative z-10 grid grid-cols-3 gap-4 items-end px-8 pb-4 text-center text-xs">
             
-            <!-- TTD 1: Dosen Pembimbing Lapangan (DPL) / Kampus -->
+            <!-- TTD 1: Dosen Pembimbing Lapangan / Kampus -->
             <div>
                 <p class="text-slate-500 font-medium text-[10.5px]">Mengetahui & Menyetujui,</p>
-                <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing Lapangan (DPL)</p>
+                <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing Lapangan</p>
                 <p class="text-[10px] text-slate-500 truncate">{{ $profile->universitas ?? ($university->name ?? 'Universitas') }}</p>
                 
                 <div class="h-12 flex items-center justify-center my-0.5">

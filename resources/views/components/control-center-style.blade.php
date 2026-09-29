@@ -13,7 +13,7 @@
     .cc-stat3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .cc-stat3 > div { background: #f8fafc; border: 1px solid #eef2f7; border-radius: 12px; padding: 8px 6px; text-align: center; }
     .cc-stat3 b { display: block; font-size: 17px; line-height: 1.15; font-weight: 800; color: #0f172a; }
-    .cc-stat3 span { display: block; margin-top: 2px; font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #94a3b8; }
+    .cc-stat3 span { display: block; margin-top: 2px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #94a3b8; }
     .cc-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
     .cc-grid2 .cc-span2 { grid-column: span 2 / span 2; }
     .cc-pills { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -22,6 +22,8 @@
     .cc-actions > form { margin: 0; flex: 1 1 0; display: flex; }
     .cc-actions > a, .cc-actions > button, .cc-actions > form > button { flex: 1 1 0; }
     .cc-actions .mbtn { padding: 10px 10px; font-size: 12.5px; white-space: nowrap; }
+    .mbtn-login { background: #ffffff; color: #334155; border: 1px solid #e2e8f0; }
+    .mbtn-login:hover { background: #f8fafc; border-color: #cbd5e1; }
     .mbtn-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
     .mbtn-amber { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
     .mbtn-indigo { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; }
@@ -33,6 +35,38 @@
     .mavatar-indigo { background: #eef2ff; color: #4338ca; }
     .cc-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .cc-link { font-size: 12px; font-weight: 700; color: #2563eb; }
+
+    /* Tabel mahasiswa kampus (desktop): tiap sel maksimal 2 baris supaya tidak bertumpuk */
+    .stt { table-layout: fixed; }
+    .stt td { vertical-align: middle; overflow: hidden; }
+    .stt-title { font-weight: 700; color: #0f172a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .stt-meta { margin-top: 2px; font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stt-mono { margin-top: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; color: #94a3b8; }
+    .stt-sub { font-size: 12px; color: #94a3b8; font-weight: 500; }
+    .stt-line { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
+    .stt-clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+    .stt-place .stt-sub { margin-top: 2px; }
+    .stt-empty { font-size: 12.5px; color: #94a3b8; font-style: italic; font-weight: 500; }
+    .stt-hint { margin-top: 7px; display: flex; align-items: flex-start; gap: 6px; font-size: 12px; font-weight: 600; line-height: 1.35; color: #b45309; }
+    .stt-hint::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 5px; border-radius: 999px; background: #f59e0b; }
+    .stt-people { display: grid; gap: 7px; }
+    .stt-person { display: flex; align-items: flex-start; gap: 8px; min-width: 0; font-size: 12.5px; line-height: 1.35; }
+    .stt-role { flex: none; width: 54px; padding-top: 1px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #94a3b8; }
+    .stt-name { flex: 0 1 auto; min-width: 0; font-weight: 600; color: #1e293b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .stt-link { flex: none; color: #2563eb; cursor: pointer; }
+    .stt-assign { flex: none; padding: 2px 8px; border-radius: 8px; border: 1px solid #c7d2fe; background: #eef2ff; color: #4338ca; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .stt-assign:hover { background: #e0e7ff; }
+    .stt-actions { display: flex; flex-wrap: nowrap; justify-content: flex-end; gap: 6px; }
+    .stt-link { display: inline-flex; padding: 2px; border-radius: 6px; }
+    .stt-link:hover { background: #eff6ff; }
+    @media (max-width: 1199px) { .stt-wide { display: none !important; } }
+    @media (min-width: 1200px) { .stt-cards { display: none !important; } }
+    @media (min-width: 768px) and (max-width: 1199px) {
+        .stt-cards { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 16px; align-items: start; }
+    }
+    .stt-score { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border-radius: 10px; background: #ecfdf5; border: 1px solid #a7f3d0; white-space: nowrap; }
+    .stt-score b { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; color: #047857; }
+    .stt-score span { font-size: 11.5px; font-weight: 700; color: #059669; }
 
     /* ---------- Khusus HP (< 768px) ---------- */
     @media (max-width: 767px) {
@@ -55,14 +89,14 @@
         .cc-logo img { width: 40px !important; height: 40px !important; max-width: 40px !important; max-height: 40px !important; }
         .cc-hero h1 { font-size: 17px !important; line-height: 1.3 !important; }
         .cc-badges { gap: 6px !important; }
-        .cc-badges > span { font-size: 10.5px !important; padding: 2px 8px !important; }
+        .cc-badges > span { font-size: 12px !important; padding: 2px 8px !important; }
         .cc-contacts { display: grid !important; gap: 6px !important; padding-top: 4px !important; }
         .cc-side { padding: 12px 14px !important; border-radius: 14px !important; }
 
         /* Kartu statistik */
         .cc-stats { gap: 10px !important; }
         .cc-stat { padding: 12px !important; border-radius: 14px !important; }
-        .cc-stat-label { display: block; font-size: 10px !important; letter-spacing: .04em !important; line-height: 1.3 !important; }
+        .cc-stat-label { display: block; font-size: 11px !important; letter-spacing: .04em !important; line-height: 1.3 !important; }
         .cc-stat .text-2xl { font-size: 22px !important; line-height: 1.2 !important; }
 
         /* Tab menjadi chip yang bisa digeser */

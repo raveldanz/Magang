@@ -156,7 +156,7 @@
                 <div class="m-only mlist">
                     @forelse ($units as $unit)
                         @php
-                            $acceptedCount = $unit->applications->where('status', 'accepted')->count();
+                            $acceptedCount = $unit->occupied_count;
                             $remaining = max(0, $unit->quota - $acceptedCount);
                             $percent = $unit->quota > 0 ? min(100, round(($acceptedCount / $unit->quota) * 100)) : 100;
                             $barColor = $percent >= 100 ? '#f43f5e' : ($percent >= 75 ? '#f59e0b' : '#10b981');
@@ -234,7 +234,7 @@
                         <tbody class="divide-y divide-gray-100 text-sm">
                             @forelse ($units as $unit)
                                 @php
-                                    $acceptedCount = $unit->applications->where('status', 'accepted')->count();
+                                    $acceptedCount = $unit->occupied_count;
                                     $remaining = max(0, $unit->quota - $acceptedCount);
                                     $percent = $unit->quota > 0 ? min(100, round(($acceptedCount / $unit->quota) * 100)) : 100;
                                 @endphp
@@ -323,8 +323,10 @@
 
                                     <!-- Aksi Edit & Hapus -->
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="btn-action-group">
-                                            <a href="{{ route('admin.units.edit', $unit->id) }}" class="btn-action-edit" title="Edit Divisi">
+                                        <div class="inline-flex items-center justify-end gap-1.5 align-middle">
+                                            <a href="{{ route('admin.units.edit', $unit->id) }}" 
+                                               class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white" 
+                                               title="Edit Divisi">
                                                 Edit
                                             </a>
 
@@ -335,7 +337,7 @@
                                                         name: '{{ addslashes($unit->name) }}',
                                                         desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
                                                     })" 
-                                                    class="btn-action-delete"
+                                                    class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
                                                     title="Hapus Divisi">
                                                 Hapus
                                             </button>
@@ -379,7 +381,7 @@
             }
 
             if (val < filled) {
-                alert(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sudah diterima (${filled} orang).`);
+                notify(`Kuota tidak boleh kurang dari jumlah mahasiswa yang sudah diterima (${filled} orang).`);
                 input.value = input.dataset.currentVal;
                 return;
             }
@@ -450,13 +452,13 @@
                     // Show toast notification
                     showToast(data.message || 'Kuota berhasil diperbarui!');
                 } else {
-                    alert(data.message || 'Gagal memperbarui kuota.');
+                    notify(data.message || 'Gagal memperbarui kuota.');
                     input.value = input.dataset.currentVal;
                 }
             } catch (error) {
                 input.classList.remove('opacity-50');
                 console.error(error);
-                alert('Terjadi kesalahan saat memperbarui kuota.');
+                notify('Terjadi kesalahan saat memperbarui kuota.');
                 input.value = input.dataset.currentVal;
             }
         }

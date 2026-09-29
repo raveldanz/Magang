@@ -51,6 +51,15 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // Akun Nonaktif (dicabut aksesnya, datanya tetap diarsipkan) tidak boleh masuk
+        if (Auth::user()?->isInactive()) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => \App\Http\Middleware\EnsureAccountIsActive::MESSAGE,
+            ]);
+        }
     }
 
     /**

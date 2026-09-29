@@ -57,14 +57,9 @@ class DashboardController extends Controller
 
         if ($request->filled('report_status')) {
             $status = strtolower($request->report_status);
-            if ($status === 'pending') {
-                $query->whereHas('finalreport', function ($q) {
-                    $q->whereIn('status', ['pending', 'revision']);
-                });
-            } elseif ($status === 'approved') {
-                $query->whereHas('finalreport', function ($q) {
-                    $q->where('status', 'approved');
-                });
+            // Filter per kode status laporan (sama dengan badge yang tampil)
+            if (\App\Enums\ReviewStatus::tryFrom($status)) {
+                $query->whereHas('finalreport', fn ($q) => $q->where('status', $status));
             } elseif ($status === 'none') {
                 $query->whereDoesntHave('finalreport');
             }
@@ -134,7 +129,7 @@ class DashboardController extends Controller
         $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
 
         if (!$isAssignedAdvisor && !$isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan (DPL) yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
         }
 
         $student = $placement->application->user;

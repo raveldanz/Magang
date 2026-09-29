@@ -332,11 +332,19 @@
                         <div class="flex items-center gap-2 pt-2">
                             @if($isSuperAdmin && !$univ->universityAdmin)
                                 <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}"
-                                    class="shrink-0 m-0"
-                                    onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($univ->name) }}?')">
+                                    class="shrink-0 m-0">
                                     @csrf
-                                    <button type="submit"
-                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs transition cursor-pointer active:scale-95 shadow-2xs"
+                                    <button type="button"
+                                        @click="$dispatch('open-confirm-modal', {
+                                            form: $el.form,
+                                            title: 'Buat Akun Admin Kampus',
+                                            message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola dosen pembimbing secara mandiri.',
+                                            label: 'Perguruan tinggi:',
+                                            name: @js($univ->name),
+                                            desc: 'Password awal: password',
+                                            confirmText: 'Ya, Buat Akun'
+                                        })"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Buatkan Akun Admin Kampus">
                                         Buat Akun
                                     </button>
@@ -346,7 +354,7 @@
                                     class="shrink-0 m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs transition cursor-pointer active:scale-95 shadow-2xs"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Masuk Sebagai Admin Kampus">
                                         Login As
                                     </button>

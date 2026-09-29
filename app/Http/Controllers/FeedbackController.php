@@ -191,7 +191,7 @@ class FeedbackController extends Controller
         $feedback = SystemFeedback::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:pending,in_progress,resolved,closed',
+            'status' => ['required', \Illuminate\Validation\Rule::in(\App\Enums\FeedbackStatus::values())],
             'admin_response' => 'required|string|max:5000',
         ]);
 

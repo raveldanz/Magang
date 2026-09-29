@@ -35,19 +35,19 @@ class AdminWorkflowSelectionTest extends TestCase
 
         // Pastikan nama mahasiswa pending dari seeder tampil di halaman
         $response->assertSee('Ahmad Pending QA');
-        $response->assertSee('PENDING');
+        $response->assertSee(ApplicationStatus::PENDING->label());
 
         // Filter status ACCEPTED
         $responseAccepted = $this->actingAs($adminQa)->get(route('admin.applications.index', ['status' => 'accepted']));
         $responseAccepted->assertStatus(200);
         $responseAccepted->assertSee('Budi Approved QA');
-        $responseAccepted->assertSee('ACCEPTED');
+        $responseAccepted->assertSee(ApplicationStatus::ACCEPTED->label());
 
         // Filter status REJECTED
         $responseRejected = $this->actingAs($adminQa)->get(route('admin.applications.index', ['status' => 'rejected']));
         $responseRejected->assertStatus(200);
         $responseRejected->assertSee('Citra Rejected QA');
-        $responseRejected->assertSee('REJECTED');
+        $responseRejected->assertSee(ApplicationStatus::REJECTED->label());
 
         // Pencarian dengan keyword 'QA' menampilkan data seeder
         $responseSearch = $this->actingAs($adminQa)->get(route('admin.applications.index', ['search' => 'QA']));
@@ -82,6 +82,35 @@ class AdminWorkflowSelectionTest extends TestCase
         // Pastikan placement terbentuk otomatis saat disetujui
         $placement = Placement::where('application_id', $appPending->id)->first();
         $this->assertNotNull($placement);
+    }
+
+    /**
+     * 2b. Alur resmi pending → verified → accepted: pengajuan VERIFIED dapat langsung diterima atau ditolak.
+     */
+    public function test_admin_can_accept_or_reject_verified_application(): void
+    {
+        $adminQa = User::where('email', 'admin.qa@test.local')->firstOrFail();
+        $mhsPending = User::where('email', 'mhs.qa.pending@test.local')->firstOrFail();
+        $app = Application::where('user_id', $mhsPending->id)->firstOrFail();
+
+        $app->update(['status' => 'verified']);
+        $this->actingAs($adminQa)->put(route('admin.applications.updateStatus', $app->id), [
+            'status' => 'accepted',
+            'letter_number' => '500.12.1/TEST-VER/2026',
+            'letter_date' => now()->toDateString(),
+        ])->assertSessionHas('success');
+        $this->assertEquals(ApplicationStatus::ACCEPTED, $app->fresh()->status);
+        $this->assertNotNull(Placement::where('application_id', $app->id)->first());
+
+        // Pengajuan kedua yang juga VERIFIED, langsung ditolak
+        $app = $app->replicate(['letter_number', 'letter_token']);
+        $app->status = 'verified';
+        $app->save();
+        $this->actingAs($adminQa)->put(route('admin.applications.updateStatus', $app->id), [
+            'status' => 'rejected',
+            'rejection_note' => 'Kuota divisi sudah penuh.',
+        ])->assertSessionHas('success');
+        $this->assertEquals(ApplicationStatus::REJECTED, $app->fresh()->status);
     }
 
     /**

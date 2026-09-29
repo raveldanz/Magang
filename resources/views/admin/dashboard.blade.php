@@ -236,40 +236,40 @@
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Menunggu dinas</div>
+                <div class="text-[11px] text-slate-500 mt-1">PENDING dan VERIFIED</div>
             </div>
 
             {{-- Diterima --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Diterima</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</span>
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_accepted'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Persiapan magang</div>
+                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}</div>
             </div>
 
             {{-- Aktif --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Aktif</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</span>
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_active'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Sedang di lapangan</div>
+                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
             </div>
 
             {{-- Lulus --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lulus</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_completed'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Tersertifikasi</div>
+                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</div>
             </div>
 
             {{-- Sisa Kuota --}}
