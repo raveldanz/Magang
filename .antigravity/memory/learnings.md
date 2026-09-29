@@ -42,6 +42,12 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-025** | 2026-09-25 | Native MCP Sub-Agents & Stdio Bridge | Mock ANTHROPIC_API_KEY menimpa sesi Claude, timeout Ollama CPU inference, dan lifecycle handshake MCP | RESOLVED |
 | **LRN-026** | 2026-09-28 | Lifecycle Pipeline, Quota Harmony & Logbook Destroy | Inkonsistensi status 'active' pada DPL/Admin/Mentor, disparitas kuota Unit vs Dinas, 403 sertifikat admin & missing method destroy logbook | RESOLVED |
 | **LRN-027** | 2026-09-28 | Student Portal Layout Standardization | Disparitas lebar container halaman (max-w-4xl vs max-w-7xl) antara Profil, Laporan Akhir, dan Logbook Mahasiswa | RESOLVED |
+| **LRN-028** | 2026-09-26 | Testing Architecture & Visual QA Guard | Evaluasi buta meloloskan unstyled HTML (Times New Roman & default grey button) akibat stale public/hot | RESOLVED |
+| **LRN-029** | 2026-09-26 | Seleksi Pengajuan Admin & State Validation | Validasi state ketat alur seleksi (hanya pending yang dapat diubah) & kewajiban alasan penolakan | RESOLVED |
+| **LRN-030** | 2026-09-28 | Card Action Button Harmony & Single-Line Layout | Mismatch styling tombol 'Buat Akun' (border hitam gelap) vs 'Login As', teks terlipat 2 baris (w-1/3) pada card Universitas & Dinas | RESOLVED |
+| **LRN-031** | 2026-09-28 | Table Action Button Sizing & Visual Contrast | Tombol aksi tabel terlalu kecil (h-[30px]) dan kurang kontras; standardisasi ke h-[34px] px-3.5 dengan border crisp dan shadow | RESOLVED |
+| **LRN-032** | 2026-09-28 | Agency Control Center Visual Parity & Clean Badging | Desain show dinas kurang selaras dengan univ; kontak terhimpit, dan badge/tab memuat angka redundan (Akun Terdaftar (3) & Personil 7) | RESOLVED |
+| **LRN-033** | 2026-09-28 | Browser Engine, Driver 404 & Local Chrome Lockdown | Driver Playwright internal 1.57.0 404 CDN di IDE; penguncian ke channel 'chrome' lokal & protokol Mata Manusia | RESOLVED |
 
 ---
 
@@ -549,6 +555,223 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Menyelaraskan teks judul header, subtitle, banner status verifikasi (nama instansi, badge status, stepper tracker 4-langkah, rincian data 4-kolom), dan kartu biru "Informasi Penempatan Magang" antara `student/logbook/index.blade.php` dan `student/final_report.blade.php` sehingga konten dan terminologi 100% konsisten.
   4. Memverifikasi seluruh halaman terkompilasi dan lulus 69 unit/feature tests (Exit Code 0).
 - **Prevention Rule**: Seluruh halaman portal utama (Dashboard, Logbook, Profil, Laporan Akhir, Pendaftaran) wajib menggunakan container baku `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6` dan struktur header/kartu data penempatan terstandar agar konsistensi visual serta keselarasan teks terjaga di seluruh navigasi aplikasi.
+
+---
+
+### [LRN-028] Hard Visual Guard & Mandat Multimodal Vision Browser Automation
+- **Tanggal**: 2026-09-26
+- **Komponen**: `scripts/visual-guard.mjs`, `scripts/tier1_puppeteer_audit.mjs`, `scripts/tier3_playwright_audit.mjs`, `.antigravity/rules.md`
+- **Problem / Symptom**: 
+  1. Runner pengujian visual sebelumnya melaporkan status **PASS** secara keliru (*false positive*) pada halaman login yang sama sekali belum ter-styling (HTML mentah polos dengan font Times New Roman dan tombol default abu-abu `rgb(240, 240, 240)`).
+  2. Berkas `public/hot` tertinggal (*stale*) di repositori dari sesi Vite yang mati, menyebabkan tag `@vite(...)` di template Blade merujuk ke server lokal `5173` yang tidak aktif alih-alih merujuk aset kompilasi `public/build/manifest.json`.
+- **Root Cause**:
+  1. Ketiadaan asersi computed style pada runner pengujian; audit hanya menguji status HTTP 200 dan accessibility tree secara buta tanpa menganalisis font-family dan background color tombol.
+  2. Model AI tidak membuka dan mengevaluasi berkas tangkapan layar (screenshot PNG) secara visual menggunakan kapabilitas multimodal vision sebelum menyimpulkan hasil.
+- **Fix Applied**:
+  1. Membuat modul Hard Visual Guard [`scripts/visual-guard.mjs`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/scripts/visual-guard.mjs) yang wajib diimpor oleh seluruh runner:
+     - `assertManifestBuilt()`: Membatalkan pengujian seketika dengan status **FAIL (Vite unbuilt)** jika `public/build/manifest.json` tidak ada, serta membersihkan file `public/hot` usang.
+     - `assertVisualStyles()`: Melempar `UNSTYLED_HTML_DETECTED` jika font-family elemen `body` bernilai Times New Roman/raw serif, dan melempar `DEFAULT_BUTTON_DETECTED` jika tombol utama bernilai background default `rgb(240, 240, 240)`.
+  2. Memperbarui `scripts/tier1_puppeteer_audit.mjs` dan membuat runner otonom `scripts/tier3_playwright_audit.mjs` terintegrasi guard.
+  3. Menanamkan mandat mutlak di `.antigravity/rules.md`: dilarang keras meloloskan status visual berdasarkan HTTP 200/AXTree, dan AI WAJIB membuka berkas gambar via `view_file` untuk memvalidasi rendering Tailwind layaknya mata manusia.
+  4. Menjalankan kompilasi produksi `npm run build`, audit Tier 1 & Tier 3, serta pengambilan screenshot Playwright MCP yang terverifikasi rapi dan presisi 100%.
+- **Prevention Rule**: Seluruh runner pengujian visual wajib memiliki asersi computed style terhadap token desain utama (font sans Figtree/Inter dan background Tailwind) serta memvalidasi manifest Vite. Dilarang menyimpulkan tampilan UI aman tanpa membuka raster screenshot dan memverifikasi keselarasan visual secara multimodal.
+
+---
+
+### [LRN-029] Validasi State Ketat Alur Seleksi Pengajuan Admin & Form Input Alasan Penolakan
+- **Tanggal**: 2026-09-26
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/admin/applications/index.blade.php`, `database/seeders/AdminWorkflowSeeder.php`, `tests/Feature/AdminWorkflowSelectionTest.php`, `scripts/tier3_playwright_audit.mjs`
+- **Problem / Symptom**: 
+  1. Aksi persetujuan (*Approve*) dan penolakan (*Reject*) tidak memiliki batasan status asal (*state transition guard*), sehingga pengajuan yang sudah berstatus `accepted` dapat di-reject secara sewenang-wenang atau pengajuan yang sudah `rejected` dapat di-approve kembali tanpa validasi alur seleksi yang ketat.
+  2. Input alasan penolakan (`rejection_note`) bersifat opsional (`nullable`), memungkinkan admin menolak permohonan magang mahasiswa tanpa memberikan keterangan atau feedback yang konstruktif.
+  3. Runner pengujian visual otomatis `npm run test:visual` sebelumnya hanya menguji portal login dan belum memvalidasi rendering tabel pengajuan admin multi-role desktop dan mobile.
+- **Root Cause**:
+  1. Ketiadaan *guard clause* pemeriksaan `$oldStatus === 'pending'` sebelum mengubah status menjadi `accepted` atau `rejected` di controller admin.
+  2. Rule validasi Form Request tidak menerapkan `required` dinamis saat status bernilai `rejected`.
+  3. Ketiadaan kartu interaktif kondisional dan pelindung penonaktifan tombol (*disabled state*) pada view `show.blade.php`.
+- **Fix Applied**:
+  1. **Strict State Guard Backend**: Menambahkan validasi transisi status di `ApplicationController::updateStatus`:
+     - Aksi `accepted` (Approve) dan `rejected` (Reject) DITOLAK jika status aplikasi saat ini bukan `pending`.
+     - Pengajuan yang berstatus `rejected` dikunci secara permanen dan tidak dapat diubah kembali statusnya.
+  2. **Mandatory Rejection Reason**: Menerapkan rule validasi backend dinamis: `'rejection_note' => 'required|string|min:5'` ketika status `rejected`, disertai pesan error kustom dalam Bahasa Indonesia yang ramah pengguna.
+  3. **Visual & UX Hardening di Blade View**:
+     - Menambahkan banner peringatan status final bila pengajuan telah ditolak, serta menonaktifkan tombol submit dan opsi status lainnya.
+     - Mengunci tombol `ACCEPTED` dan `REJECTED` dengan tooltip informatif jika status saat ini bukan `pending`.
+     - Mengintegrasikan banner kesalahan validasi `@if ($errors->any())` dan display inline `@error('rejection_note')`.
+     - Menambahkan atribut `:required="status === 'rejected'"` pada textarea alasan penolakan di Alpine.js.
+     - Menambahkan tooltip alasan penolakan pada tabel desktop dan kartu ringkasan alasan penolakan pada tampilan mobile `index.blade.php`.
+  4. **Dedicated Feature Test & Visual Audit Runner**:
+     - Membuat test suite lengkap [`tests/Feature/AdminWorkflowSelectionTest.php`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/tests/Feature/AdminWorkflowSelectionTest.php) menguji seluruh siklus `AdminWorkflowSeeder` (7/7 PASS, Strict Exit Code 0).
+     - Mengembangkan `scripts/tier3_playwright_audit.mjs` untuk mengotomatisasi login Admin QA, navigasi tabel desktop & mobile, inspeksi status badges, evaluasi rejection-box, dan capture screenshot beresolusi tinggi dengan Hard Visual Guard.
+- **Prevention Rule**: Seluruh aksi perubahan siklus hidup entitas bisnis (*state machine transitions*) wajib memvalidasi status asal secara eksplisit di level controller sebelum eksekusi transaksi database. Setiap tindakan yang berdampak penolakan atau pembatalan hak pengguna wajib mewajibkan input alasan minimal yang jelas dan informatif.
+
+---
+
+### [LRN-030] Penyelarasan Desain & Layout Tombol Aksi Kartu (Buat Akun vs Login As)
+- **Tanggal**: 2026-09-28
+- **Komponen**: `resources/views/admin/universities/index.blade.php`, `resources/views/admin/agencies/index.blade.php`
+- **Problem / Symptom**:
+  1. Tombol "Buat Akun" pada kartu Universitas dan Instansi Dinas yang belum memiliki akun admin portal terlihat sangat kontras dan tidak selaras (*style mismatch*): tombol bergaris batas hitam tebal (`border-slate-900 text-slate-900`) dan berubah menjadi hitam pekat saat di-hover (`hover:bg-slate-900 hover:text-white`), sedangkan kartu yang sudah memiliki akun menampilkan tombol "Login As" dengan gaya outline abu-abu lembut (`border-slate-200 text-slate-700 bg-white hover:bg-slate-50`).
+  2. Pembungkus form tombol sekunder menggunakan lebar statis `w-1/3`, sehingga pada grid 4-kolom kartu yang sempit teks "Buat Akun" (9 karakter) tidak muat dalam 1 baris dan terpotong/terlipat menjadi 2 baris ("Buat \n Akun"), menyebabkan tinggi tombol membesar dan tata letak footer kartu menjadi tidak rapi (*layout jumping/misalignment*).
+- **Root Cause**:
+  1. Penulisan styling tombol "Buat Akun" dilakukan secara terpisah dengan token warna gelap yang tidak mengikuti design system tombol sekunder sistem.
+  2. Ketiadaan kelas `whitespace-nowrap` dan penggunaan lebar fraksional `w-1/3` yang kaku alih-alih `shrink-0` dengan auto-width berbasis konten.
+- **Fix Applied**:
+  1. Menyelaraskan seluruh styling tombol "Buat Akun" pada `admin/universities/index.blade.php` dan `admin/agencies/index.blade.php` ke format tombol sekunder baku: `border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs shadow-2xs`.
+  2. Mengganti `w-1/3` pada form pembungkus dengan `shrink-0 m-0` serta menambahkan `whitespace-nowrap` pada tombol, sehingga teks "Buat Akun" dan "Login As" dijamin selalu 1 baris.
+  3. Menambahkan `min-w-0 truncate whitespace-nowrap` pada tombol primer "Kelola Kampus" dan "Kelola Dinas", menjamin ketinggian kedua tombol sejajar presisi (`py-2.5` = 38px).
+  4. Menambahkan konfirmasi interaktif `onsubmit="return confirm(...)"` dan atribut `title` yang deskriptif pada form pembuatan akun dinas.
+  5. Memvalidasi tampilan visual langsung via Playwright headless engine dan `view_file` (terverifikasi 100% presisi dan rapi).
+- **Prevention Rule**: Seluruh tombol aksi sekunder pada kartu ringkasan (grid cards) wajib menggunakan token outline baku `border-slate-200 text-slate-700 bg-white hover:bg-slate-50`, selalu menyematkan `whitespace-nowrap` jika berada di dalam flex container berdampingan, serta menghindari lebar fraksional kaku `w-1/3` yang rentan menyebabkan wrapping teks pada viewport sempit.
+
+### [LRN-031] Harmonisasi Gaya Tombol Aksi Tabel & Isolasi Tema Nomor Halaman (Pagination)
+- **Tanggal**: 2026-09-28
+- **Komponen**: `resources/views/vendor/pagination/tailwind.blade.php`, `tailwind.config.js`, `app/Providers/AppServiceProvider.php`, `resources/css/app.css`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/units/index.blade.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/admin/universities/show.blade.php`, `resources/views/student/logbook/index.blade.php`
+- **Problem / Symptom**:
+  1. Nomor halaman (pagination) tampil dalam kotak hitam/gelap pekat (*pitch black*) yang mengganggu estetika tema pemerintahan Surabaya (biru/slate), serta memakai teks bahasa Inggris ("Showing 1 to 10 of 28 results") yang tidak konsisten dengan Bahasa Indonesia sistem.
+  2. Tombol-tombol aksi pada tabel admin (khususnya "Login As") tampil dengan gradien oranye/merah neon yang mencolok (`linear-gradient(to right, #f59e0b, #f43f5e)`), sementara tombol Edit, Reset, dan Hapus memiliki ukuran ketinggian, border-radius, dan padding yang berbeda-beda antar halaman (`admin/users`, `admin/mentors`, `admin/units`, `admin/agencies`, `admin/universities`).
+- **Root Cause**:
+  1. Tailwind CSS diatur pada mode dark default (`media`), sehingga ketika OS pengguna mengaktifkan mode gelap Windows, kelas `dark:bg-gray-800 dark:border-gray-600` pada template bawaan vendor Laravel langsung diaktifkan secara otomatis.
+  2. Kelas `.btn-action-login` pada `resources/css/app.css` secara historis di-hardcode dengan warna gradien oranye menyala, dan beberapa tabel masih menggunakan tombol icon-only atau kelas CSS ad-hoc (`.mbtn-green`, dll.) alih-alih utility class Tailwind eksplisit.
+- **Fix Applied**:
+  1. Menambahkan `darkMode: 'class'` pada `tailwind.config.js` sehingga dark mode bawaan OS tidak lagi membajak styling komponen antarmuka.
+  2. Membuat custom pagination template resmi [`resources/views/vendor/pagination/tailwind.blade.php`](file:///resources/views/vendor/pagination/tailwind.blade.php) ber-bahasa Indonesia ("Menampilkan X sampai Y dari Z hasil"), tombol nomor halaman `rounded-xl`, dan indikator aktif `bg-blue-600` dengan shadow lembut.
+  3. Mendaftarkan `\Illuminate\Pagination\Paginator::useTailwind()` secara eksplisit pada `app/Providers/AppServiceProvider.php`.
+  4. Menstandardisasi seluruh tombol aksi tabel (`Login As`, `Edit`, `Reset`, `Hapus`) ke tinggi baku `h-[30px]`, font `text-xs font-bold`, border-radius `rounded-xl`, dan palet selaras tema dinas:
+     - `Login As`: `border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 shadow-2xs`
+     - `Edit`: `border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white shadow-2xs`
+     - `Reset`: `border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-600 hover:text-white shadow-2xs`
+     - `Hapus`: `border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white shadow-2xs`
+  5. Menjalankan `npm run build`, pembersihan cache (`optimize:clear`, `view:clear`), dan visual verification Playwright headless yang divalidasi langsung via multimodal screenshot inspection. Seluruh 78 unit/feature test lulus tanpa regresi (Strict Exit Code 0).
+- **Prevention Rule**: Hindari penggunaan `prefers-color-scheme: dark` tanpa konfigurasi `darkMode: 'class'`, selalu gunakan template paginasi lokal berbahasa Indonesia, dan seragamkan seluruh tombol aksi baris tabel ke spesifikasi utility baku `h-[30px] px-3 text-xs font-bold rounded-xl` untuk menjaga konsistensi visual di seluruh modul.
+
+---
+
+### [LRN-031] Standardisasi Dimensi & Kontras Tombol Aksi Tabel (`h-[34px] px-3.5`)
+- **Tanggal**: 2026-09-28
+- **Komponen**: Blade Views (`admin/users/`, `admin/mentors/`, `admin/units/`, `admin/universities/`, `admin/agencies/`, `student/logbook/`)
+- **Problem / Symptom**: Tombol aksi standar tabel (`h-[30px] px-3`) terasa terlalu kecil, sempit saat disentuh/diklik, dan batas bordernya kurang kontras pada tabel dengan densitas data tinggi.
+- **Root Cause**: Ukuran tinggi 30px dan padding horizontal 12px terlalu minimalis untuk tombol teks deskriptif seperti `Login As`, `Reset`, `Edit`, dan `Hapus`, serta penggunaan kelas `border-slate-200` terlihat menyatu dengan background putih.
+- **Fix Applied**: 
+  - Meningkatkan tinggi tombol aksi menjadi `h-[34px]`, padding horizontal `px-3.5` (14px), font `text-xs font-bold`, border-radius `rounded-xl`, dan menambahkan tactile shadow `shadow-xs`.
+  - Mempertegas border tiap varian warna:
+    * `Login As`: `border-slate-300 text-slate-800 bg-white hover:bg-slate-100`
+    * `Edit`: `border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white`
+    * `Reset`: `border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-600 hover:text-white`
+    * `Hapus`: `border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white`
+  - Memperbarui seluruh tabel di modul Users, Mentors, Units, Universities Show, Agencies Show, dan Student Logbook.
+- **Prevention Rule**: Selalu gunakan ukuran baku `h-[34px] px-3.5 text-xs font-bold rounded-xl shadow-xs` untuk tombol aksi baris tabel utama dan perjelas kontras border minimal skala 300 (`border-*-300`).
+
+---
+
+### [LRN-032] Penyelarasan Pusat Kendali Instansi Dinas dengan Gaya Simpel Universitas & Pembersihan Badging Redundan
+- **Tanggal**: 2026-09-28
+- **Komponen**: Blade View (`resources/views/admin/agencies/show.blade.php`), Hero & Tab Navigation
+- **Problem / Symptom**: 
+  1. Halaman detail instansi dinas terasa tidak selaras dengan halaman perguruan tinggi (universities show);
+  2. Data kontak (email, telepon, website) bertumpuk/terhimpit tanpa pemisah yang jelas (`diskominfo@surabaya.go.id(031) 5312144diskominfo.surabaya.go.id`);
+  3. Badge memuat angka yang membingungkan `Akun Terdaftar (3)` dan tab memuat angka statis `Personil & Akun Kedinasan 7`.
+- **Root Cause**: Tampilan `admin/agencies/show.blade.php` sebelumnya menggunakan kartu putih biasa tanpa hirarki pejabat yang rapi, elemen kontak tidak dibungkus flex item terisolasi dengan ikon SVG, dan badge/tab masih menyertakan count statis/redundant di labelnya.
+- **Fix Applied**: 
+  1. Mengadopsi tata letak Pusat Kendali Universitas dengan Hero Card gradien navy resmi (`linear-gradient(135deg, #09172e 0%, #0d2857 50%, #07152c 100%)`) dilengkapi watermark perisai kedinasan Pemkot Surabaya.
+  2. Menghapus angka `(3)` pada badge instansi menjadi `● Akun Terdaftar` yang bersih dengan dot pulse status.
+  3. Menghapus angka `7` pada tab `Personil & Akun Kedinasan` dan menstandardisasi tab menjadi bare navigation bar di atas garis pembatas border yang rapi.
+  4. Mengisolasi kontak (email, telepon, website) ke dalam wadah flex berjarak longgar (`gap-4`) dengan ikon SVG masing-masing dan teks host domain yang bersih.
+  5. Mengintegrasikan kartu Pejabat Penandatangan Resmi di sisi kanan hero card lengkap dengan tombol primer `Masuk Sebagai Admin Dinas (Login As)`.
+- **Prevention Rule**: Desain pusat kendali entitas mitra (Dinas maupun Universitas) wajib konsisten dalam hirarki visual hero card, tidak boleh menampilkan angka mentah berulang pada badge/tab jika sudah diwakili oleh kartu metrik ringkasan, dan kontak wajib memiliki layout modular ber-ikon.
+
+---
+
+### [LRN-033] Ekosistem Browser: Penguncian Google Chrome Lokal (channel: chrome) & Eliminasi Driver 404 IDE
+- **Tanggal**: 2026-09-28
+- **Komponen**: Testing Engine (`scripts/tier3_playwright_audit.mjs`, `scripts/browser-runner.mjs`, `scripts/verify_buttons.mjs`, `.antigravity/rules.md`, `AGENTS.md`)
+- **Problem / Symptom**: 
+  1. Tool browser bawaan IDE (`open_browser_url`) mengalami kegagalan fatal saat mengunduh driver Playwright 1.57.0 karena URL CDN Microsoft sudah berstatus HTTP 404.
+  2. Agen keliru memanggil tool bawaan yang rusak tersebut alih-alih runner lokal, menyebabkan kegagalan observasi visual antarmuka nyata.
+- **Root Cause**: Driver internal Playwright di IDE terikat pada versi statis 1.57.0 yang sudah kadaluwarsa di repositori CDN Microsoft, sedangkan runner lokal di terminal memiliki akses langsung ke executable Google Chrome Windows (`channel: 'chrome'`).
+- **Fix Applied**: 
+  1. Mengunci opsi peluncuran Chromium pada seluruh runner (`scripts/browser-runner.mjs`, `scripts/tier3_playwright_audit.mjs`, `scripts/verify_buttons.mjs`) menggunakan `{ headless: true, channel: 'chrome' }` tanpa mengunduh driver eksternal.
+  2. Menambahkan `PROTOKOL MATA MANUSIA ASLI & LARANGAN TOOL 404` ke dalam `.antigravity/rules.md` dan `AGENTS.md`: melarang keras pemanggilan tool bawaan `open_browser_url` dan mewajibkan runner lokal `npm run test:visual` atau `node scripts/browser-runner.mjs`.
+  3. Mengarahkan output tangkapan layar langsung ke `public/test-artifacts/` sekaligus disalin ke folder artefak aktif.
+  4. Memvalidasi secara visual (Multimodal Vision `view_file`) untuk rute `/login`, `/admin/applications`, dan `/admin/users` (desktop 1920x1080 dan mobile 375x812) dengan Strict Exit Code 0.
+- **Prevention Rule**: Jangan pernah memanggil tool bawaan `open_browser_url`. Setiap pengujian UI wajib menggunakan runner skrip lokal berbasis Node.js dengan opsi `channel: 'chrome'`, dan agen wajib menyajikan bukti tangkapan layar langsung (inline Markdown image) di chat.
+
+---
+
+### [LRN-034] Hero Pusat Kendali Univ & Dinas: Navy Gelap → Kartu Putih Bersih (Menggantikan LRN-032)
+- **Tanggal**: 2026-09-29
+- **Komponen**: Blade View (`resources/views/admin/universities/show.blade.php`, `resources/views/admin/agencies/show.blade.php`)
+- **Problem / Symptom**: Hero card gradien navy (`#09172e → #0d2857`) terlalu mencolok dan tidak selaras dengan tema terang aplikasi kedinasan; tab universitas masih memuat badge angka (`cc-count`); tombol aksi tabel tidak seragam (hover border hilang, tabel Mahasiswa memakai ikon polos, DPL tanpa Edit, Personil Dinas tanpa Hapus).
+- **Root Cause**: LRN-032 menetapkan hero navy sebagai standar; varian tombol ditulis manual per baris sehingga tiap tabel menyimpang.
+- **Fix Applied**:
+  1. Hero: `bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8 shadow-xs`, soft badge (`bg-*-50 text-*-700 border-*-200/60`), ikon kontak `text-slate-400`, logo `border border-slate-200 rounded-xl p-2 bg-white shadow-2xs`, kartu PIC `bg-slate-50 border border-slate-200/80 rounded-xl p-5`, tombol Login As `bg-emerald-600 hover:bg-emerald-700 ... rounded-lg shadow-xs transition-colors`. Watermark perisai dihapus.
+  2. Tab murni teks + ikon (span `cc-count` dihapus).
+  3. Tombol aksi baris: base `inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150` + varian Login As (slate), Edit (blue), Reset (amber-50/700 → hover amber-500), Hapus (rose), semuanya dengan `hover:border-*`. DPL mendapat Edit (`admin.users.edit` + `return_to`), Personil Dinas mendapat Hapus (`admin.users.destroy` + `return_to`), tabel Mahasiswa memakai tombol teks `Detail` / `Logbook`.
+- **Tambahan (Keterbacaan)**: Badge status 10px, header tabel 10–11px, dan label status berbahasa Inggris (`ucfirst($status)` → "Rejected") sulit dibaca. Skala baru: badan tabel `text-[13px]`, header/badge/teks sekunder minimal `text-xs` (12px) dengan `whitespace-nowrap` pada pill, angka kuota `text-base font-bold`, label status via `ApplicationStatus::tryFrom($s)?->label()`. Setelah menaikkan ukuran, ukur `table.scrollWidth` vs lebar wadah di 1280/1440/1920 agar kolom tidak terpotong.
+- **Prevention Rule**: Hero pusat kendali entitas mitra wajib kartu putih netral (bukan gradien gelap). Jangan pakai `text-[10px]`/`text-[11px]` untuk teks informatif di desktop. Tombol aksi baris tabel di halaman show memakai base style tombol `Detail` di atas — ini menggantikan ukuran `h-[34px] rounded-xl font-bold` (LRN-031) khusus untuk halaman pusat kendali.
+
+---
+
+### [LRN-035] Standarisasi Konfirmasi Aksi: Hapus Semua `confirm()` / `alert()` Bawaan Browser
+- **Tanggal**: 2026-09-29
+- **Komponen**: `resources/views/components/confirm-action-modal.blade.php` (baru), `layouts/app.blade.php`, `resources/js/app.js`, serta view admin/agencies, admin/universities, lecturer/logbooks, student/logbook, university/lecturers
+- **Problem / Symptom**: Tombol Reset/Hapus/Buat Akun/Minta Revisi di beberapa halaman masih memakai `onsubmit="return confirm(...)"` sehingga muncul popup bawaan browser ("127.0.0.1:8000 says"), tidak selaras dengan modal konfirmasi resmi di halaman Users. Validasi berkas juga memakai `alert()`.
+- **Root Cause**: Modal global (`confirm-reset-modal`, `confirm-delete-modal`) hanya dipakai di sebagian halaman; belum ada modal untuk aksi non-destruktif, dan belum ada helper notifikasi.
+- **Fix Applied**:
+  1. Reset password → `$dispatch('open-reset-modal', {action, name, email, role})`; Hapus → `$dispatch('open-delete-modal', {action, title, name, desc})`.
+  2. Komponen baru `x-confirm-action-modal` (event `open-confirm-modal`) untuk aksi non-destruktif. Bisa kirim ke URL (`action`) atau form yang sudah ada (`form: $el.form`, `submitter: $el` agar `name/value` tombol ikut terkirim). Memakai `form.submit()` (bukan `requestSubmit`) supaya modal tidak terbuka ulang.
+  3. `window.notify(message, type)` di `app.js` → toast layout (`[data-toast-root]`); menggantikan 20 `alert()`.
+- **Prevention Rule**: Dilarang memakai `confirm()`, `alert()`, `prompt()` bawaan browser. Gunakan 3 modal global di atas dan `notify()`. Untuk URL di payload `$dispatch`, tulis `'{{ route(...) }}'` (bukan `@js(route(...))`) karena `@js` meng-escape `/` menjadi `\/` sehingga test `assertSee/assertDontSee($url)` menjadi tidak valid; `@js()` tetap dipakai untuk teks bebas (nama, deskripsi).
+
+---
+
+### [LRN-036] Prioritas Tindakan, Nilai Resmi, & Bug Enum vs String di Pusat Kendali Dinas/Kampus
+- **Tanggal**: 2026-09-29
+- **Komponen**: `Application` (actionPriority/actionHint/statusValue/scopeOccupyingQuota), `Evaluation` (memo getUniversity), `Unit` (occupied_count), `Admin\{University,Agency,Unit}Controller`, view `admin/universities/show`, `admin/agencies/show`, `admin/units/*`, `admin/applications/show`
+- **Problem / Symptom**:
+  1. Daftar mahasiswa/pengajuan diurutkan `latest()` saja, sehingga yang butuh tindakan tercecer di tengah.
+  2. Kolom Nilai di detail kampus tampil `0.0` untuk mahasiswa lulus (seharusnya 95.0 / 91.7).
+  3. Metrik "Aktif Magang" = 0, "menunggu seleksi" = 0, tombol "Tugaskan DPL" tak pernah muncul, tab Mahasiswa Aktif dinas & "terisi" divisi tidak menghitung status `active`, halaman Divisi selalu "0 terisi".
+  4. Divisi berisi mahasiswa `active` bisa dihapus → `applications.unit_id ON DELETE CASCADE` ikut menghapus pengajuannya.
+- **Root Cause**:
+  1. Kolom decimal `final_score` bernilai string `"0.00"` yang *truthy*, jadi `!$fScore` tidak pernah jatuh ke rumus bobot; view juga menghitung ulang nilai sendiri dari kolom lama `nilai_akademik`.
+  2. `status` di-cast ke `ApplicationStatus`: `$app->status === 'accepted'` dan `Collection::where('status', 'accepted')` selalu false/0.
+  3. Kode lama menganggap "aktif" = `accepted` (sebelum status `active` ada).
+- **Fix Applied**:
+  1. `Application::actionPriority($requireAdvisor)` + `actionHint()` (1 verifikasi → 2 siap diluluskan → 3 pembimbing belum ada → 4 aktif → 5 diterima → 6 selesai → 7 belum mengajukan → 8 ditolak/mundur); daftar di kedua pusat kendali diurutkan dengan ini + filter "Perlu Tindakan".
+  2. Nilai tabel/rata-rata/CSV memakai accessor resmi `nilai_akhir`, `nilai_dosen_calculated`, `grade_calculated`, `is_complete`; nilai belum lengkap tampil "Menunggu nilai dosen/mentor".
+  3. Semua perbandingan status memakai `$app->statusValue()`; kuota terisi = `Application::scopeOccupyingQuota()` / `Unit::occupied_count`; guard hapus divisi & validasi kuota server-side memakai `Application::QUOTA_STATUSES`.
+  4. `Evaluation::getUniversity()` di-memo per instance + `useUniversity($univ)` untuk halaman kampus (menghilangkan query berantai per baris).
+  5. Regresi: `tests/Feature/ActionPriorityDisplayTest.php`.
+- **Prevention Rule**: Jangan hitung nilai akhir di view/controller — selalu pakai accessor `Evaluation`. Jangan bandingkan `status` dengan string secara langsung (termasuk `Collection::where`); pakai `statusValue()` atau enum case. Definisi "aktif" = status `active`; "menempati kuota" = `accepted` + `active` yang belum berakhir (`scopeOccupyingQuota`).
+
+---
+
+### [LRN-037] Perlindungan Arsip Alumni, Status Nonaktif, & Standar Urutan Prioritas Lintas Halaman
+- **Tanggal**: 2026-09-29
+- **Komponen**: `User` (hasInternshipHistory/isInactive/pembimbingPlacements), `EnsureAccountIsActive` (middleware web + alias `active` di API), `LoginRequest`, `Api\AuthController`, controller hapus (`Unit`, `Agency`, `Mentor`, `University@destroyDosen`, `University\LecturerController`, `UserController`, `ProfileController`), `Application` (actionPrioritySql/scopeOrderByActionPriority/scopeRequiringAction/actionSortKey), `Admin\ApplicationController@index`, view `admin/applications/index`, `student/application/create`
+- **Problem / Symptom**:
+  1. Menghapus divisi/instansi yang punya alumni ikut menghapus pengajuan, logbook, nilai, dan sertifikat (`applications.unit_id ON DELETE CASCADE`); guard hanya mengecek status accepted/verified/pending. Mahasiswa alumni bisa menghapus akunnya sendiri (cascade seluruh arsip). Menghapus mentor/dosen yang pernah membimbing mengosongkan namanya di arsip (`SET NULL`). `UserController` tidak memeriksa `pembimbing_id`.
+  2. Status "Nonaktif" tidak mencegah login, jadi tidak ada cara mencabut akses akun yang wajib diarsipkan.
+  3. Halaman Pengajuan utama memakai urutan SQL berbeda dari pusat kendali (tanpa tingkat "pembimbing belum ditetapkan", terbaru dulu untuk antrean) dan badge Inggris ("PENDING").
+  4. Sisa bug enum vs string: banner ditolak/mengundurkan diri & warna status di halaman pengajuan mahasiswa tak pernah benar; notifikasi "belum ada DPL" mengabaikan status `active`.
+- **Fix Applied**:
+  1. Semua jalur hapus menolak bila ada riwayat magang apa pun (bukan hanya yang aktif): divisi/instansi (`applications` apa pun), mentor/dosen/user/profil (`User::hasInternshipHistory()` = pengajuan + mentor_id + pembimbing_id + academic_advisor_id). Pesan mengarahkan ke alternatif: kuota 0 (tutup pendaftaran) atau status Nonaktif.
+  2. `User::isInactive()` (Super Admin/Admin Sistem dikecualikan agar tidak terkunci) diblokir di form login, login API, dan setiap request (middleware memutus sesi & "Ingat saya"; "Login As" tetap boleh).
+  3. Satu standar prioritas: `Application::actionPriority()` (PHP, untuk keterangan) = `actionPrioritySql()` (SQL, untuk halaman berpaginasi), dikunci test kesetaraan per tingkat & urutan. Tingkat 1–3 (perlu tindakan) diurutkan antrean terlama dulu; lainnya terbaru dulu. DPL wajib mengikuti `universities.require_dpl` mahasiswa. Dipakai di halaman Pengajuan, pusat kendali dinas & kampus; filter "Perlu Tindakan" di halaman Pengajuan & kampus.
+- **Prevention Rule**: Data magang yang sudah punya riwayat tidak boleh dihapus permanen — tambahkan guard `hasInternshipHistory()`/riwayat pengajuan pada setiap fitur hapus baru, dan gunakan status Nonaktif untuk mencabut akses. Urutan daftar pengajuan wajib memakai `orderByActionPriority()` (SQL) atau `Application::actionSortKey()` (koleksi); jangan menulis `orderByRaw` prioritas sendiri. Bila mengubah `actionPriority()`, ubah `actionPrioritySql()` bersamaan (test `ActionPriorityDisplayTest` akan gagal bila berbeda).
+
+### [LRN-038] Nama status pengajuan berbeda di tiap role & nilai status hantu
+- **Tanggal**: 2026-09-29
+- **Komponen**: `App\Enums\ApplicationStatus`, `components/status-badge.blade.php`, 13 view lintas role, `NotificationService`, `tailwind.config.js`
+- **Problem / Symptom**:
+  1. Satu status tampil dengan 5–6 nama tergantung halaman (mis. `active` = "ACTIVE" di mentor/dosen, "Sedang Magang" di kampus, "AKTIF (Sedang Magang)" di mahasiswa, "Magang Aktif" di admin). Halaman Pengajuan lama bahkan menimpa status dengan "SIAP LULUS"/"MENUNGGU NILAI" yang tidak ada di sistem.
+  2. Dashboard mahasiswa menganggap `verified` = diterima ("Pengajuan diterima! Silakan pilih DPL") padahal memilih DPL baru bisa setelah `accepted`.
+  3. Notifikasi logbook (admin dinas, mentor) & laporan akhir (dosen) mencari status `submitted` yang tidak pernah disimpan (yang tersimpan `pending`) → notifikasi tidak pernah muncul. Nilai `canceled`/`submitted` pengajuan dicek di 10 file padahal bukan status resmi.
+- **Root Cause**: Tiap view menulis daftar nama & warna status sendiri; tidak ada satu komponen render. Warna badge ada di enum PHP yang tidak dipindai Tailwind.
+- **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
+- **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
+- **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
 
 ---
 

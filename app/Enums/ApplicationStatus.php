@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\DisplaysStatusCode;
+
 enum ApplicationStatus: string
 {
+    use DisplaysStatusCode;
+
     case PENDING = 'pending';
     case VERIFIED = 'verified';
     case ACCEPTED = 'accepted';
@@ -13,17 +17,18 @@ enum ApplicationStatus: string
     case RESIGNED = 'resigned';
 
     /**
-     * Label representasi resmi Bahasa Indonesia untuk antarmuka pengguna
+     * Keterangan Bahasa Indonesia untuk kode status. Tampil sebagai baris kedua di area
+     * yang lapang (kartu/panel) dan sebagai tooltip pada badge ringkas di tabel.
      */
-    public function label(): string
+    public function description(): string
     {
         return match ($this) {
-            self::PENDING => 'Menunggu Verifikasi',
-            self::VERIFIED => 'Terverifikasi Berkas',
-            self::ACCEPTED => 'Diterima Magang',
-            self::ACTIVE => 'Magang Aktif',
+            self::PENDING => 'Menunggu Verifikasi Berkas',
+            self::VERIFIED => 'Berkas Lolos Verifikasi',
+            self::ACCEPTED => 'Diterima, Belum Mulai Magang',
+            self::ACTIVE => 'Aktif Magang',
             self::COMPLETED => 'Selesai Magang',
-            self::REJECTED => 'Ditolak',
+            self::REJECTED => 'Pengajuan Ditolak',
             self::RESIGNED => 'Mengundurkan Diri',
         };
     }
@@ -74,13 +79,5 @@ enum ApplicationStatus: string
     public function canLogbook(): bool
     {
         return $this === self::ACTIVE;
-    }
-
-    /**
-     * Kembalikan seluruh nilai raw string enum
-     */
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
     }
 }

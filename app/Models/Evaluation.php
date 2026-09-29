@@ -60,9 +60,43 @@ class Evaluation extends Model
     }
 
     /**
+     * Cache hasil getUniversity() per instance: accessor nilai_akhir, is_complete, dan
+     * grade_calculated masing-masing memanggilnya, sehingga tanpa cache satu baris tabel
+     * bisa memicu 3+ query yang sama. false = belum pernah di-resolve.
+     */
+    protected $resolvedUniversity = false;
+
+    /**
      * Dapatkan data Universitas asal Mahasiswa
      */
     public function getUniversity()
+    {
+        if ($this->resolvedUniversity !== false) {
+            return $this->resolvedUniversity;
+        }
+
+        return $this->resolvedUniversity = $this->findUniversity();
+    }
+
+    /**
+     * Tetapkan universitas yang sudah diketahui pemanggil (mis. halaman detail kampus),
+     * agar accessor nilai tidak perlu menelusuri placement → application → user lagi.
+     */
+    public function useUniversity(?University $university): static
+    {
+        $this->resolvedUniversity = $university;
+
+        return $this;
+    }
+
+    public function refresh()
+    {
+        $this->resolvedUniversity = false;
+
+        return parent::refresh();
+    }
+
+    private function findUniversity(): ?University
     {
         $student = $this->placement?->application?->user;
         if (!$student) return null;

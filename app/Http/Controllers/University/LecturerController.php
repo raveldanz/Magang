@@ -154,7 +154,7 @@ class LecturerController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $lecturer->id,
             'nidn' => 'nullable|string|max:50',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
         ], [
             'name.required' => 'Nama lengkap dosen wajib diisi.',
             'email.required' => 'Email resmi dosen wajib diisi.',
@@ -232,16 +232,13 @@ class LecturerController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus dosen kampus lain.');
         }
 
-        // Periksa apakah dosen masih membimbing mahasiswa aktif
-        $activePlacementsCount = $lecturer->academicPlacements()
-            ->whereHas('application', function ($q) {
-                $q->whereIn('status', ['accepted', 'pending']);
-            })
-            ->count();
+        // Periksa riwayat bimbingan (aktif maupun alumni): placements.academic_advisor_id ON DELETE SET NULL
+        // akan mengosongkan nama DPL pada arsip nilai & sertifikat alumni.
+        $historyCount = $lecturer->academicPlacements()->count();
 
-        if ($activePlacementsCount > 0) {
+        if ($historyCount > 0) {
             return redirect()->route('university.lecturers.index')
-                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena masih membimbing {$activePlacementsCount} mahasiswa aktif. Silakan alihkan bimbingan ke dosen lain terlebih dahulu.");
+                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status dosen menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $lecturerName = $lecturer->name;

@@ -163,7 +163,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:6',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
             'return_to' => 'nullable|string',
         ]);
 
@@ -252,7 +252,7 @@ class UserController extends Controller
             'role' => 'required|in:' . ($isSuperAdmin ? 'admin,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
             'password' => 'nullable|string|min:6',
             'return_to' => 'nullable|string',
         ]);
@@ -399,13 +399,9 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Akun Admin Sistem tidak dapat dihapus melalui panel ini.');
         }
 
-        // Proteksi: cek relasi data aktif (pengajuan, penempatan dosen/mentor)
-        $hasRelations = ($user->applications()->count() > 0
-            || $user->academicPlacements()->count() > 0
-            || $user->mentorPlacements()->count() > 0);
-
-        if ($hasRelations) {
-            return redirect()->back()->with('error', "Akun '{$user->name}' tidak dapat dihapus karena memiliki relasi data magang/penempatan aktif.");
+        // Proteksi arsip: akun dengan riwayat magang (pengajuan, bimbingan mentor/pembimbing/dosen) dipertahankan
+        if ($user->hasInternshipHistory()) {
+            return redirect()->back()->with('error', "Akun '{$user->name}' tidak dapat dihapus karena menyimpan riwayat magang (termasuk arsip alumni & sertifikat). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $deletedName = $user->name;
@@ -470,12 +466,8 @@ class UserController extends Controller
         $skippedNames = [];
 
         foreach ($users as $user) {
-            // Cek proteksi relasi aktif (pengajuan magang, penempatan mentor/dosen)
-            $hasRelations = ($user->applications()->count() > 0 
-                || $user->academicPlacements()->count() > 0 
-                || $user->mentorPlacements()->count() > 0);
-
-            if ($hasRelations) {
+            // Proteksi arsip: akun dengan riwayat magang (pengajuan, bimbingan mentor/pembimbing/dosen) dilewati
+            if ($user->hasInternshipHistory()) {
                 $skippedCount++;
                 $skippedNames[] = $user->name;
                 continue;

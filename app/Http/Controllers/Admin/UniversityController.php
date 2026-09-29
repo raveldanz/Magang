@@ -55,7 +55,8 @@ class UniversityController extends Controller
                     ->orWhereNotNull('university');
             })->count();
         $totalDosens = User::whereIn('role', ['dosen', 'academic_advisor'])->count();
-        $totalActiveInterns = Application::where('status', 'accepted')->count();
+        // "Sedang magang di dinas" = status active (selaras dengan metrik Aktif Magang di detail kampus)
+        $totalActiveInterns = Application::where('status', 'active')->count();
 
         $macroStats = [
             'total_universities' => $totalUniversities,
@@ -277,7 +278,7 @@ class UniversityController extends Controller
         $activeDosenCount = $univ->dosens()
             ->whereHas('academicPlacements', function ($q) {
                 $q->whereHas('application', function ($aq) {
-                    $aq->whereIn('status', ['accepted', 'verified']);
+                    $aq->whereIn('status', ['verified', ...Application::QUOTA_STATUSES]);
                 });
             })->count();
 
@@ -318,7 +319,7 @@ class UniversityController extends Controller
         $user = Auth::user();
         $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
 
-        // 1. Query Seluruh Dosen Pembimbing (DPL) Kampus Ini
+        // 1. Query Seluruh Dosen Pembimbing Kampus Ini
         $dosens = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
                 $q->where('university_id', $university->id)
@@ -332,19 +333,22 @@ class UniversityController extends Controller
         $totalDosenActive = 0;
         $totalDosenCompleted = 0;
 
+        // Lulus = status completed, atau laporan disetujui + lembar nilai lengkap (accessor is_complete,
+        // bukan kolom lama nilai_akademik yang kosong bila DPL menilai lewat aspek score_*).
+        $isPassed = function ($p, string $val) use ($university) {
+            return $val === 'completed'
+                || (optional($p->finalreport)->status === 'approved' && (bool) $p->evaluation?->useUniversity($university)->is_complete);
+        };
+
         foreach ($dosens as $dosen) {
-            $activeCount = $dosen->academicPlacements->filter(function ($p) {
-                $status = optional($p->application)->status;
-                $val = $status instanceof \App\Enums\ApplicationStatus ? $status->value : (string)$status;
-                $isPassed = $val === 'completed' || (optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0);
-                return in_array($val, ['accepted', 'active']) && !$isPassed;
+            $activeCount = $dosen->academicPlacements->filter(function ($p) use ($isPassed) {
+                $val = $p->application?->statusValue() ?? '';
+                return in_array($val, ['accepted', 'active']) && !$isPassed($p, $val);
             })->count();
 
-            $completedCount = $dosen->academicPlacements->filter(function ($p) {
-                $status = optional($p->application)->status;
-                $val = $status instanceof \App\Enums\ApplicationStatus ? $status->value : (string)$status;
-                $isPassed = $val === 'completed' || (optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0);
-                return $val === 'completed' || (in_array($val, ['accepted', 'active']) && $isPassed);
+            $completedCount = $dosen->academicPlacements->filter(function ($p) use ($isPassed) {
+                $val = $p->application?->statusValue() ?? '';
+                return $val === 'completed' || (in_array($val, ['accepted', 'active']) && $isPassed($p, $val));
             })->count();
 
             $dosen->active_students_count = $activeCount;
@@ -379,25 +383,11 @@ class UniversityController extends Controller
                 'applications.placement.logbooks',
             ]);
 
-        // Filter Status Mahasiswa jika ada
-        if ($request->filled('student_status')) {
-            $st = $request->student_status;
-            if ($st === 'active') {
-                $studentsQuery->whereHas('applications', function ($aq) {
-                    $aq->where('status', 'accepted');
-                });
-            } elseif ($st === 'completed') {
-                $studentsQuery->whereHas('applications', function ($aq) {
-                    $aq->where('status', 'completed')
-                        ->orWhereHas('placement.finalreport', fn($fr) => $fr->where('status', 'approved'));
-                });
-            } elseif ($st === 'pending') {
-                $studentsQuery->whereHas('applications', function ($aq) {
-                    $aq->where('status', 'pending');
-                });
-            } elseif ($st === 'no_application') {
-                $studentsQuery->doesntHave('applications');
-            }
+        // Filter status: 'no_application' di query; 'action' & kode status disaring di bawah
+        // terhadap pengajuan terbaru — sama dengan badge yang tampil di tabel.
+        $statusFilter = (string) $request->input('student_status', '');
+        if ($statusFilter === 'no_application') {
+            $studentsQuery->doesntHave('applications');
         }
 
         // Search Mahasiswa
@@ -410,53 +400,50 @@ class UniversityController extends Controller
             });
         }
 
-        $students = $studentsQuery->latest()->get();
+        $students = $studentsQuery->get();
 
-        // 3. Hitung Metrik Statistik Kampus
-        $totalStudents = $students->count();
-        $totalDosens = $dosens->count();
-
-        $activeInterns = $students->filter(function ($s) {
-            $latestApp = $s->applications->first();
-            return $latestApp && $latestApp->status === 'accepted';
-        })->count();
-
-        $completedInterns = $students->filter(function ($s) {
-            $latestApp = $s->applications->first();
-            return $latestApp && ($latestApp->status === 'completed' || optional($latestApp->placement?->finalreport)->status === 'approved');
-        })->count();
-
-        $pendingApplications = $students->filter(function ($s) {
-            $latestApp = $s->applications->first();
-            return $latestApp && $latestApp->status === 'pending';
-        })->count();
-
-        // Rata-rata nilai akhir
-        $scores = [];
+        // Semua mahasiswa di daftar ini berasal dari kampus ini: tetapkan langsung agar accessor
+        // nilai (nilai_akhir, is_complete) memakai kebijakan kampus tanpa query berantai per baris.
         foreach ($students as $s) {
-            $latestApp = $s->applications->first();
-            $eval = optional($latestApp?->placement)->evaluation;
-            if ($eval) {
-                if ($eval->final_score > 0) {
-                    $scores[] = (float) $eval->final_score;
-                } elseif ($eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
-                    $wM = $university->weight_mentor ?? 40;
-                    $wL = $university->weight_lecturer ?? 60;
-                    $scores[] = round(($eval->nilai_pembimbing * $wM / 100) + ($eval->nilai_akademik * $wL / 100), 2);
-                } elseif ($eval->nilai_pembimbing > 0 && $university->evaluation_scheme === 'mentor_only') {
-                    $scores[] = (float) $eval->nilai_pembimbing;
-                }
-            }
+            $s->applications->each(fn ($a) => $a->placement?->evaluation?->useUniversity($university));
         }
-        $averageScore = count($scores) > 0 ? round(array_sum($scores) / count($scores), 1) : null;
+
+        // Urutan standar prioritas tindakan (sama dengan halaman Pengajuan & pusat kendali dinas):
+        // tingkat 1–3 antrean terlama dulu, tingkat lain terbaru dulu. Mahasiswa tanpa pengajuan = tingkat 7.
+        $requireAdvisor = (bool) ($university->require_dpl ?? true);
+        $priorities = $students->mapWithKeys(fn ($s) => [
+            $s->id => $s->applications->first()?->actionPriority($requireAdvisor) ?? 7,
+        ]);
+        $sortKey = function ($s) use ($priorities) {
+            $app = $s->applications->first();
+
+            return Application::actionSortKey($priorities[$s->id], $app?->created_at ?? $s->created_at, $app?->id ?? 0);
+        };
+        $students = $students->sort(fn ($a, $b) => $sortKey($a) <=> $sortKey($b))->values();
+
+        if ($statusFilter === 'action') {
+            $students = $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->values();
+        } elseif (\App\Enums\ApplicationStatus::tryFrom($statusFilter)) {
+            $students = $students->filter(fn ($s) => $s->applications->first()?->statusValue() === $statusFilter)->values();
+        }
+
+        // 3. Hitung Metrik Statistik Kampus (status dibandingkan sebagai string, bukan enum vs string)
+        $latestStatus = fn ($s) => $s->applications->first()?->statusValue();
+
+        $scores = $students
+            ->map(fn ($s) => $s->applications->first()?->placement?->evaluation)
+            ->filter()
+            ->map(fn ($eval) => (float) $eval->nilai_akhir)
+            ->filter(fn ($score) => $score > 0);
 
         $stats = [
-            'total_students' => $totalStudents,
-            'total_dosens' => $totalDosens,
-            'active_interns' => $activeInterns,
-            'completed_interns' => $completedInterns,
-            'pending_applications' => $pendingApplications,
-            'average_score' => $averageScore,
+            'total_students' => $students->count(),
+            'total_dosens' => $dosens->count(),
+            'active_interns' => $students->filter(fn ($s) => $latestStatus($s) === 'active')->count(),
+            'completed_interns' => $students->filter(fn ($s) => $latestStatus($s) === 'completed')->count(),
+            'pending_applications' => $students->filter(fn ($s) => in_array($latestStatus($s), ['pending', 'verified'], true))->count(),
+            'needs_action' => $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->count(),
+            'average_score' => $scores->isNotEmpty() ? round($scores->avg(), 1) : null,
         ];
 
         $activeTab = $request->query('tab', 'dosen');
@@ -467,7 +454,8 @@ class UniversityController extends Controller
             'students',
             'stats',
             'isSuperAdmin',
-            'activeTab'
+            'activeTab',
+            'requireAdvisor'
         ));
     }
 
@@ -560,16 +548,13 @@ class UniversityController extends Controller
             })
             ->findOrFail($dosenId);
 
-        // Periksa apakah dosen masih membimbing mahasiswa aktif
-        $activePlacementsCount = $dosen->academicPlacements()
-            ->whereHas('application', function ($q) {
-                $q->whereIn('status', ['accepted', 'pending']);
-            })
-            ->count();
+        // Periksa riwayat bimbingan (aktif maupun alumni): placements.academic_advisor_id ON DELETE SET NULL
+        // akan mengosongkan nama DPL pada arsip nilai & sertifikat alumni.
+        $historyCount = $dosen->academicPlacements()->count();
 
-        if ($activePlacementsCount > 0) {
+        if ($historyCount > 0) {
             return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-                ->with('error', "Dosen '{$dosen->name}' tidak dapat dihapus karena masih membimbing {$activePlacementsCount} mahasiswa aktif.");
+                ->with('error', "Dosen '{$dosen->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $name = $dosen->name;
@@ -634,6 +619,7 @@ class UniversityController extends Controller
             'user.studentProfile',
             'unit.agencyProfile',
             'placement.mentor',
+            'placement.pembimbing',
             'placement.academicAdvisor',
             'placement.evaluation'
         ])->whereHas('user', function ($uq) use ($university) {
@@ -666,7 +652,7 @@ class UniversityController extends Controller
                 'Program Studi',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
-                'Dosen Pembimbing (DPL)',
+                'Dosen Pembimbing',
                 'Mentor Dinas',
                 'Periode Magang',
                 'Status Magang',
@@ -682,23 +668,12 @@ class UniversityController extends Controller
                 $placement = $app->placement;
                 $dosen = $placement?->academicAdvisor;
                 $mentor = $placement?->mentor ?? $placement?->pembimbing;
-                $eval = $placement?->evaluation;
+                $eval = $placement?->evaluation?->useUniversity($university);
 
-                $mentorScore = ($eval && $eval->nilai_pembimbing) ? number_format($eval->nilai_pembimbing, 2) : '-';
-                $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
-
-                $finalScore = '-';
-                if ($eval) {
-                    if ($eval->final_score > 0) {
-                        $finalScore = number_format($eval->final_score, 2);
-                    } elseif ($eval->nilai_pembimbing > 0 && $eval->nilai_akademik > 0) {
-                        $wM = $university->weight_mentor ?? 40;
-                        $wL = $university->weight_lecturer ?? 60;
-                        $finalScore = number_format(($eval->nilai_pembimbing * $wM / 100) + ($eval->nilai_akademik * $wL / 100), 2);
-                    } elseif ($eval->nilai_pembimbing > 0 && $university->evaluation_scheme === 'mentor_only') {
-                        $finalScore = number_format($eval->nilai_pembimbing, 2);
-                    }
-                }
+                // Sumber nilai sama dengan tabel & sertifikat: accessor resmi di model Evaluation
+                $mentorScore = ($eval && $eval->nilai_pembimbing > 0) ? number_format($eval->nilai_pembimbing, 2) : '-';
+                $dosenScore = ($eval && $eval->nilai_dosen_calculated > 0) ? number_format($eval->nilai_dosen_calculated, 2) : '-';
+                $finalScore = ($eval && $eval->nilai_akhir > 0) ? number_format($eval->nilai_akhir, 2) : '-';
 
                 $periode = ($app->start_date && $app->end_date)
                     ? date('d/m/Y', strtotime($app->start_date)) . ' s.d. ' . date('d/m/Y', strtotime($app->end_date))
@@ -714,7 +689,7 @@ class UniversityController extends Controller
                     $dosen?->name ?? 'Belum Ditentukan',
                     $mentor?->name ?? 'Belum Diplot',
                     $periode,
-                    strtoupper($app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : (string) $app->status),
+                    \App\Enums\ApplicationStatus::tryFrom($app->statusValue())?->label() ?? ucfirst($app->statusValue()),
                     $mentorScore,
                     $dosenScore,
                     $finalScore,

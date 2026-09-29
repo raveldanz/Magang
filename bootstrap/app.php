@@ -15,7 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
         'role' => \App\Http\Middleware\CheckRole::class,
+        'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
         ]);
+
+    // Akun berstatus Nonaktif diputus sesinya di seluruh halaman web (termasuk sesi "Ingat saya")
+    $middleware->web(append: [
+        \App\Http\Middleware\EnsureAccountIsActive::class,
+    ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

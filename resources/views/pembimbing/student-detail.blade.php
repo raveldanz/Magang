@@ -79,12 +79,7 @@
                     <div class="border p-4 rounded-lg bg-gray-50 space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-gray-700">Tanggal: {{ $log->date }}</span>
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                {{ $log->status === 'approved' ? 'bg-green-100 text-green-800' : '' }}
-                                {{ $log->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                {{ $log->status === 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
-                                {{ strtoupper($log->status) }}
-                            </span>
+                            <x-status-badge type="review" :status="$log->status" />
                         </div>
 
                         <p class="text-sm text-gray-800">{{ $log->activity }}</p>
