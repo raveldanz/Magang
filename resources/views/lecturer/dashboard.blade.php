@@ -96,8 +96,11 @@
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <select name="report_status" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
                             <option value="">Semua Status Laporan</option>
-                            <option value="pending" {{ request('report_status') == 'pending' ? 'selected' : '' }}>Menunggu Review DPL</option>
-                            <option value="approved" {{ request('report_status') == 'approved' ? 'selected' : '' }}>Disetujui (Approved)</option>
+                            <optgroup label="Status Laporan">
+                                @foreach([\App\Enums\ReviewStatus::PENDING, \App\Enums\ReviewStatus::REVISION, \App\Enums\ReviewStatus::APPROVED] as $reviewCase)
+                                    <option value="{{ $reviewCase->value }}" {{ request('report_status') == $reviewCase->value ? 'selected' : '' }}>{{ $reviewCase->label() }}</option>
+                                @endforeach
+                            </optgroup>
                             <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah</option>
                         </select>
 
@@ -179,12 +182,8 @@
                                     <span class="text-slate-500">Laporan Akhir:
                                         @if(!$finalReport)
                                             <span class="text-slate-400 italic">Belum Unggah</span>
-                                        @elseif($finalReport->status === 'approved')
-                                            <span class="text-emerald-700 font-bold">Disetujui</span>
-                                        @elseif($finalReport->status === 'revision')
-                                            <span class="text-rose-700 font-bold">Revisi</span>
                                         @else
-                                            <span class="text-amber-700 font-bold">Menunggu Review</span>
+                                            <x-status-badge type="review" :status="$finalReport->status" />
                                         @endif
                                     </span>
                                     <span class="text-slate-500">Nilai DPL:
@@ -295,18 +294,8 @@
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500">
                                                 Belum Unggah
                                             </span>
-                                        @elseif($finalReport->status === 'approved')
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Disetujui
-                                            </span>
-                                        @elseif($finalReport->status === 'revision')
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                                Perlu Revisi
-                                            </span>
                                         @else
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                Menunggu Review
-                                            </span>
+                                            <x-status-badge type="review" :status="$finalReport->status" />
                                         @endif
                                     </td>
 

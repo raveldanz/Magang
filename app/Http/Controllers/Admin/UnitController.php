@@ -45,9 +45,8 @@ class UnitController extends Controller
         // Hitung statistik kuota
         $totalUnits = $units->count();
         $totalQuota = $units->sum('quota');
-        $totalFilled = $units->sum(function ($u) {
-            return $u->applications->where('status', 'accepted')->count();
-        });
+        // Unit::occupied_count membandingkan status sebagai string (Collection::where('status', ...) pada enum selalu 0)
+        $totalFilled = $units->sum(fn ($u) => $u->occupied_count);
         $totalRemaining = max(0, $totalQuota - $totalFilled);
 
         $stats = [
@@ -162,12 +161,15 @@ class UnitController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
         }
 
+        $occupied = $unit->occupied_count;
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'quota' => 'required|integer|min:0|max:500',
+            'quota' => 'required|integer|min:' . $occupied . '|max:500',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'return_to' => 'nullable|string',
+        ], [
+            'quota.min' => "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).",
         ]);
 
         $updateData = [
@@ -213,6 +215,15 @@ class UnitController extends Controller
         }
 
         $action = $request->input('action');
+        $occupied = $unit->occupied_count;
+        $belowOccupied = "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).";
+
+        if ($action === 'decrement' && $unit->quota - 1 < $occupied) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $belowOccupied], 422);
+            }
+            return redirect()->back()->with('error', $belowOccupied);
+        }
 
         if ($action === 'increment') {
             $unit->increment('quota', 1);
@@ -234,6 +245,12 @@ class UnitController extends Controller
                     return response()->json(['success' => false, 'message' => 'Jumlah kuota harus antara 0 dan 500.'], 422);
                 }
                 return redirect()->back()->with('error', 'Jumlah kuota harus antara 0 dan 500.');
+            }
+            if ($newQuota < $occupied) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $belowOccupied], 422);
+                }
+                return redirect()->back()->with('error', $belowOccupied);
             }
             $unit->update(['quota' => $newQuota]);
             $msg = "Kuota divisi '{$unit->name}' berhasil diubah menjadi {$unit->quota}";
@@ -263,16 +280,17 @@ class UnitController extends Controller
     {
         $user = Auth::user();
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
-        $unit = Unit::withCount(['applications' => function ($q) {
-            $q->where('status', 'accepted');
-        }])->findOrFail($id);
+        // applications.unit_id ON DELETE CASCADE: menghapus divisi ikut menghapus seluruh pengajuan,
+        // penempatan, logbook, nilai, dan sertifikat di dalamnya. Divisi yang punya riwayat apa pun
+        // (termasuk alumni) wajib dipertahankan sebagai arsip.
+        $unit = Unit::withCount('applications')->findOrFail($id);
 
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus unit instansi lain.');
         }
 
         if ($unit->applications_count > 0) {
-            return redirect()->back()->with('error', "Divisi '{$unit->name}' tidak dapat dihapus karena masih memiliki {$unit->applications_count} mahasiswa yang aktif magang.");
+            return redirect()->back()->with('error', "Divisi '{$unit->name}' tidak dapat dihapus karena menyimpan {$unit->applications_count} riwayat pengajuan magang (termasuk arsip alumni & sertifikat). Untuk menutup pendaftaran, atur kuota divisi menjadi 0.");
         }
 
         $unit->delete();

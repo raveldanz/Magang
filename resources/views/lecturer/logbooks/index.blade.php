@@ -85,9 +85,9 @@
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Verifikasi Dosen:</label>
                         <select name="lecturer_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Dosen --</option>
-                            <option value="pending" {{ request('lecturer_status') === 'pending' ? 'selected' : '' }}>Menunggu (Pending)</option>
-                            <option value="approved" {{ request('lecturer_status') === 'approved' ? 'selected' : '' }}>Disetujui (Approved)</option>
-                            <option value="rejected" {{ request('lecturer_status') === 'rejected' ? 'selected' : '' }}>Minta Revisi (Rejected)</option>
+                            <option value="pending" {{ request('lecturer_status') === 'pending' ? 'selected' : '' }}>PENDING</option>
+                            <option value="approved" {{ request('lecturer_status') === 'approved' ? 'selected' : '' }}>APPROVED</option>
+                            <option value="rejected" {{ request('lecturer_status') === 'rejected' ? 'selected' : '' }}>REJECTED</option>
                         </select>
                     </div>
 
@@ -96,9 +96,9 @@
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Mentor Dinas:</label>
                         <select name="mentor_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Mentor --</option>
-                            <option value="pending" {{ request('mentor_status') === 'pending' ? 'selected' : '' }}>Pending Mentor</option>
-                            <option value="approved" {{ request('mentor_status') === 'approved' ? 'selected' : '' }}>Approved Mentor</option>
-                            <option value="rejected" {{ request('mentor_status') === 'rejected' ? 'selected' : '' }}>Rejected Mentor</option>
+                            <option value="pending" {{ request('mentor_status') === 'pending' ? 'selected' : '' }}>PENDING</option>
+                            <option value="approved" {{ request('mentor_status') === 'approved' ? 'selected' : '' }}>APPROVED</option>
+                            <option value="rejected" {{ request('mentor_status') === 'rejected' ? 'selected' : '' }}>REJECTED</option>
                         </select>
                     </div>
 
@@ -193,19 +193,7 @@
 
                                         <!-- Status DPL -->
                                         <td class="py-4 px-4 align-top text-center">
-                                            @if ($bundle['status'] === 'approved')
-                                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
-                                                    Disetujui DPL
-                                                </span>
-                                            @elseif ($bundle['status'] === 'rejected')
-                                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200 inline-block">
-                                                    Minta Revisi
-                                                </span>
-                                            @else
-                                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200 inline-block">
-                                                    Menunggu Review
-                                                </span>
-                                            @endif
+                                            <x-status-badge type=\"review\" :status=\"$bundle['status']\" />
                                         </td>
 
                                         <!-- Tombol Aksi Evaluasi -->
@@ -315,7 +303,15 @@
                                     </div>
 
                                     <div class="flex items-center justify-end gap-2 pt-1">
-                                        <button type="submit" name="action" value="rejected" onclick="return confirm('Minta revisi untuk paket logbook ini?')"
+                                        <button type="submit" name="action" value="rejected"
+                                                @click.prevent="$dispatch('open-confirm-modal', {
+                                                    form: $el.form,
+                                                    submitter: $el,
+                                                    title: 'Minta Revisi Paket Logbook',
+                                                    message: 'Seluruh catatan harian dalam paket 7 hari ini akan dikembalikan ke mahasiswa untuk diperbaiki. Catatan evaluasi yang Anda tulis ikut terkirim.',
+                                                    confirmText: 'Ya, Minta Revisi',
+                                                    tone: 'rose'
+                                                })"
                                                 class="px-4 py-2 bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-bold rounded-lg transition shadow-2xs cursor-pointer">
                                             Minta Revisi Paket
                                         </button>

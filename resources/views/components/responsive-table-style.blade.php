@@ -43,7 +43,7 @@
             content: attr(data-label);
             display: block;
             margin-bottom: 3px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: .05em;
             text-transform: uppercase;

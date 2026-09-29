@@ -309,11 +309,19 @@
                         <div class="flex items-center gap-2 pt-2">
                             @if($isSuperAdmin && ($agency->total_admins ?? 0) === 0)
                                 <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}"
-                                    class="shrink-0 m-0"
-                                    onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($agency->agency_name) }}?')">
+                                    class="shrink-0 m-0">
                                     @csrf
-                                    <button type="submit"
-                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs transition cursor-pointer active:scale-95 shadow-2xs"
+                                    <button type="button"
+                                        @click="$dispatch('open-confirm-modal', {
+                                            form: $el.form,
+                                            title: 'Buat Akun Admin Dinas',
+                                            message: 'Sistem akan membuat akun login untuk PIC dinas agar dapat mengelola divisi, kuota, dan pengajuan magang.',
+                                            label: 'Instansi:',
+                                            name: @js($agency->agency_name),
+                                            desc: 'Password awal: password',
+                                            confirmText: 'Ya, Buat Akun'
+                                        })"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Buatkan Akun Admin Dinas">
                                         Buat Akun
                                     </button>
@@ -323,7 +331,7 @@
                                     class="shrink-0 m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 font-bold text-xs transition cursor-pointer active:scale-95 shadow-2xs"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Masuk Sebagai Admin Dinas">
                                         Login As
                                     </button>

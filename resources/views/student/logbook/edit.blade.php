@@ -35,7 +35,7 @@
 
                     @if($lecturerFeedback)
                         <div class="rounded-2xl bg-white p-4 border border-rose-100 shadow-2xs space-y-1">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">Masukan Dosen Pembimbing Lapangan (DPL):</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700 block">Masukan Dosen Pembimbing Lapangan:</span>
                             <p class="text-xs sm:text-sm text-slate-700 leading-relaxed italic whitespace-pre-line">"{{ $lecturerFeedback }}"</p>
                         </div>
                     @endif
@@ -99,7 +99,7 @@
                                 const file = e.target.files[0];
                                 if (file) {
                                     if (file.size > 3 * 1024 * 1024) {
-                                        alert('Ukuran berkas lampiran maksimal 3MB.');
+                                        notify('Ukuran berkas lampiran maksimal 3MB.');
                                         e.target.value = '';
                                         if (this.newFileUrl) URL.revokeObjectURL(this.newFileUrl);
                                         this.newFileUrl = null;

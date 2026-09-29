@@ -19,14 +19,7 @@
 
             <!-- Current Status Badge in Header -->
             <div class="flex items-center gap-2">
-                <span class="px-3 py-1 text-xs font-black rounded-full border shadow-2xs uppercase tracking-wider
-                    {{ $application->status === 'accepted' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : '' }}
-                    {{ $application->status === 'completed' ? 'bg-indigo-50 text-indigo-700 border-indigo-300' : '' }}
-                    {{ $application->status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-300' : '' }}
-                    {{ $application->status === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-300' : '' }}
-                    {{ $application->status === 'resigned' ? 'bg-slate-100 text-slate-700 border-slate-300' : '' }}">
-                    ● {{ $application->status }}
-                </span>
+                <x-status-badge :status="$application->status" />
             </div>
         </div>
     </x-slot>
@@ -171,13 +164,7 @@
                     </div>
                     <div class="text-xs text-slate-600 flex items-center gap-2">
                         <span class="text-slate-400">Status Validasi Laporan:</span>
-                        @php
-                            $frStatus = $application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '');
-                        @endphp
-                        <span class="px-2.5 py-0.5 rounded-full font-bold uppercase text-[11px]
-                            {{ strtolower($frStatus) === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                            {{ $frStatus }}
-                        </span>
+                        <x-status-badge type="review" :status="$application->placement->finalreport->status" />
                     </div>
                 </div>
             @endif
@@ -220,7 +207,7 @@
                         </div>
                     </div>
                 </div>
-            @elseif($application->placement && $application->status === 'accepted' && $application->has_approved_report)
+            @elseif($application->placement && in_array($application->statusValue(), ['accepted', 'active'], true) && $application->has_approved_report)
                 <div class="bg-amber-50/80 p-5 sm:p-6 rounded-2xl border border-amber-200/90 flex items-start gap-3.5">
                     <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -264,18 +251,9 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/60 self-start sm:self-auto">
-                        <span>Status Saat Ini:</span>
-                        <span class="font-extrabold uppercase text-[11px]
-                            {{ $currentStatusVal === 'accepted' ? 'text-indigo-700' : '' }}
-                            {{ $currentStatusVal === 'active' ? 'text-emerald-700' : '' }}
-                            {{ $currentStatusVal === 'verified' ? 'text-sky-700' : '' }}
-                            {{ $currentStatusVal === 'completed' ? 'text-blue-700' : '' }}
-                            {{ $currentStatusVal === 'pending' ? 'text-amber-700' : '' }}
-                            {{ $currentStatusVal === 'rejected' ? 'text-rose-700' : '' }}
-                            {{ $currentStatusVal === 'resigned' ? 'text-slate-700' : '' }}">
-                            {{ $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->label() : strtoupper($application->status) }}
-                        </span>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 self-start sm:self-auto">
+                        <span>Status saat ini</span>
+                        <x-status-badge :status="$application->status" />
                     </div>
                 </div>
 
@@ -295,21 +273,19 @@
 
                     <!-- Form Status Pipeline (Synchronized with visual cards) -->
                     <select id="status-select" name="status" x-model="status" class="hidden" aria-hidden="true">
-                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>PENDING (Menunggu Verifikasi Berkas)</option>
-                        <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>VERIFIED (Berkas Lolos Administrasi)</option>
-                        <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima Magang & Terbitkan Surat)</option>
-                        <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>ACTIVE (Mahasiswa Aktif Magang)</option>
-                        <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>
-                            COMPLETED (Selesai Magang & Lulus)
-                        </option>
-                        <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>REJECTED (Tolak Pengajuan)</option>
-                        <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>RESIGNED (Mengundurkan Diri / Drop Out)</option>
+                        <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::PENDING->label() }}</option>
+                        <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::VERIFIED->label() }}</option>
+                        <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</option>
+                        <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</option>
+                        <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</option>
+                        <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</option>
+                        <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</option>
                     </select>
 
                     @php
                         $isAlreadyRejected = ($currentStatusVal === 'rejected');
-                        $isAcceptDisabled = ($currentStatusVal !== 'pending' && $currentStatusVal !== 'accepted');
-                        $isRejectDisabled = ($currentStatusVal !== 'pending' && $currentStatusVal !== 'rejected');
+                        $isAcceptDisabled = !in_array($currentStatusVal, ['pending', 'verified', 'accepted'], true);
+                        $isRejectDisabled = !in_array($currentStatusVal, ['pending', 'verified', 'rejected'], true);
                     @endphp
 
                     @if($isAlreadyRejected)
@@ -344,8 +320,8 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">PENDING</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Menunggu Verifikasi Berkas</div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::PENDING->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::PENDING->description() }}</div>
                                 </div>
                             </button>
 
@@ -362,15 +338,15 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">VERIFIED</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Berkas Valid & Lolos Seleksi</div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::VERIFIED->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::VERIFIED->description() }}</div>
                                 </div>
                             </button>
 
                             <!-- 3. ACCEPTED -->
                             <button type="button" 
                                     @if(!$isAcceptDisabled) @click="status = 'accepted'" @endif
-                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING"' : '' }}
+                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
                                     :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $isAcceptDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
                                     class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
@@ -380,9 +356,9 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">ACCEPTED</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">
-                                        {{ $isAcceptDisabled && $currentStatusVal !== 'accepted' ? 'Hanya dari status Pending' : 'Diterima / Terbit Surat Tugas' }}
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                        {{ $isAcceptDisabled && $currentStatusVal !== 'accepted' ? 'Hanya dari PENDING atau VERIFIED' : \App\Enums\ApplicationStatus::ACCEPTED->description() }}
                                     </div>
                                 </div>
                             </button>
@@ -400,8 +376,8 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">ACTIVE</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Aktif Magang & Buka Logbook</div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
                                 </div>
                             </button>
 
@@ -410,7 +386,7 @@
                                 $canComplete = $application->can_complete;
                                 $isCompleteDisabled = (!$canComplete && $currentStatusVal !== 'completed') || $isAlreadyRejected;
 
-                                $completedSubtitle = 'Magang Selesai & Lulus';
+                                $completedSubtitle = \App\Enums\ApplicationStatus::COMPLETED->description();
                                 if ($isAlreadyRejected) {
                                     $completedSubtitle = 'Pengajuan Ditolak';
                                 } elseif ($isCompleteDisabled) {
@@ -443,12 +419,12 @@
                                 </div>
                                 <div>
                                     <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1">
-                                        <span>COMPLETED</span>
+                                        <span>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
                                         @if($isCompleteDisabled)
                                             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                         @endif
                                     </div>
-                                    <div class="text-[10px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
+                                    <div class="text-[11px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
                                         {{ $completedSubtitle }}
                                     </div>
                                 </div>
@@ -457,7 +433,7 @@
                             <!-- 6. REJECTED -->
                             <button type="button" 
                                     @if(!$isRejectDisabled) @click="status = 'rejected'" @endif
-                                    {{ $isRejectDisabled ? 'disabled title="Aksi penolakan hanya dapat dilakukan pada pengajuan berstatus PENDING"' : '' }}
+                                    {{ $isRejectDisabled ? 'disabled title="Aksi penolakan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
                                     :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : '{{ $isRejectDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer' }}'"
                                     class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                 <div class="flex items-center justify-between mb-1.5">
@@ -467,9 +443,9 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">REJECTED</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">
-                                        {{ $isRejectDisabled && $currentStatusVal !== 'rejected' ? 'Hanya dari status Pending' : 'Tolak Berkas / Pendaftaran' }}
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                        {{ $isRejectDisabled && $currentStatusVal !== 'rejected' ? 'Hanya dari PENDING atau VERIFIED' : \App\Enums\ApplicationStatus::REJECTED->description() }}
                                     </div>
                                 </div>
                             </button>
@@ -487,8 +463,8 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">RESIGNED</div>
-                                    <div class="text-[10px] text-slate-500 mt-0.5 leading-snug">Mengundurkan Diri / DO</div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::RESIGNED->description() }}</div>
                                 </div>
                             </button>
 

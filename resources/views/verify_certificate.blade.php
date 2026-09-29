@@ -12,7 +12,7 @@
         $appStatus = $app?->status;
         $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
         $isCompleted = ($rawStatus === 'completed');
-        $isResigned = in_array($rawStatus, ['resigned', 'canceled', 'rejected']);
+        $isResigned = in_array($rawStatus, ['resigned', 'rejected']);
 
         $eval = $placement->evaluation;
         // final_score bernilai 0 (bukan null) bila belum dihitung, jadi pakai accessor nilai_akhir
