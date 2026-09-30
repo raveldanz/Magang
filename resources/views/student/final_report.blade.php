@@ -1,13 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
-                {{ __('Laporan Akhir Magang') }}
-            </h2>
-            <p class="text-xs text-slate-500 mt-1">
-                Unggah naskah laporan ilmiah akhir dan pantau hasil evaluasi penilaian magang MBKM
-            </p>
-        </div>
+        <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+            {{ __('Laporan Akhir Magang') }}
+        </h2>
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
