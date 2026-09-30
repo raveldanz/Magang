@@ -5,9 +5,6 @@
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
                     {{ __('Monitoring Mahasiswa Bimbingan Kampus') }}
                 </h2>
-                <p class="text-xs text-gray-500 mt-1">
-                    Kampus: <strong>{{ $lecturer->university }}</strong> &bull; Dosen Pembimbing: {{ $lecturer->name }}
-                </p>
             </div>
 
             <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200 flex items-center gap-1.5">
