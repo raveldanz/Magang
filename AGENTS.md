@@ -27,15 +27,16 @@ Seluruh agen wajib memanfaatkan alat bantu yang terhubung secara sistematis:
   2. `findReferences`: Menemukan seluruh pemanggilan method/property di seluruh project sebelum mengubah namanya.
   3. `getDiagnostics`: Menangkap peringatan tipe data (`TypeError`), missing import, atau sintaks error secara real-time.
 
-### C. Visual Dynamic Browser (Playwright / Vision E2E & YOLO Mode)
-- Untuk setiap perbaikan atau pembuatan UI (khususnya halaman multi-role: Mahasiswa, Admin, Dosen, Mentor), gunakan automasi browser untuk:
-  1. Membuka browser headless di `http://127.0.0.1:8000`.
-  2. Melakukan login otomatis sesuai kredensial pengujian (`scripts/dev_credentials.php` / seeders).
-  3. Mengambil tangkapan layar (screenshot) dan memverifikasi rendering via Multimodal Vision (Hard Visual Guard).
-- **Zero-Prompt / YOLO Autonomous Execution**:
-  * Untuk menghindari pop-up izin per-tool yang berulang pada MCP, gunakan runner skrip otonom terintegrasi via terminal:
-    `node scripts/tier3_playwright_audit.mjs` atau `node scripts/browser-runner.mjs --url /login` (atau `npm run test:visual`).
-  * Runner ini mengeksekusi Playwright headless secara penuh dalam satu siklus terminal (Exit Code 0) tanpa interupsi modal dialog.
+### C. Visual Dynamic Browser (Playwright / Vision E2E, Chrome Channel & YOLO Mode)
+- **Larangan Keras Tool Internal 404**: Dilarang keras memanggil tool `open_browser_url` bawaan IDE karena driver CDN internal mengalami HTTP 404.
+- Setiap pengujian antarmuka WAJIB menggunakan runner lokal yang mengunci ke Google Chrome sistem (`channel: 'chrome'`):
+  * `npm run test:visual` atau `node scripts/tier3_playwright_audit.mjs`
+  * `node scripts/browser-runner.mjs --url /login`
+- **Zero-Prompt / YOLO Autonomous Execution**: Runner mengeksekusi Playwright headless secara penuh dalam satu siklus terminal (Exit Code 0) tanpa interupsi modal dialog.
+- **Verifikasi Mata Manusia (Multimodal Vision)**:
+  1. Simpan tangkapan layar di `public/test-artifacts/*.png`.
+  2. Buka gambar via multimodal vision (`view_file`).
+  3. Render gambar inline di chat obrolan (`![Deskripsi](path/gambar.png)`) sebagai bukti fisik nyata kepada pengguna.
 
 
 ### D. Sub-Agents Delegation via Native MCP Tools (`subagents`)
