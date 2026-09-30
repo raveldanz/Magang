@@ -85,9 +85,9 @@
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Verifikasi Dosen:</label>
                         <select name="lecturer_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Dosen --</option>
-                            <option value="pending" {{ request('lecturer_status') === 'pending' ? 'selected' : '' }}>PENDING</option>
-                            <option value="approved" {{ request('lecturer_status') === 'approved' ? 'selected' : '' }}>APPROVED</option>
-                            <option value="rejected" {{ request('lecturer_status') === 'rejected' ? 'selected' : '' }}>REJECTED</option>
+                            @foreach([\App\Enums\ReviewStatus::PENDING, \App\Enums\ReviewStatus::APPROVED, \App\Enums\ReviewStatus::REJECTED] as $reviewCase)
+                                <option value="{{ $reviewCase->value }}" {{ request('lecturer_status') === $reviewCase->value ? 'selected' : '' }}>{{ $reviewCase->label() }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -96,9 +96,9 @@
                         <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Status Mentor Dinas:</label>
                         <select name="mentor_status" onchange="this.form.submit()" class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Mentor --</option>
-                            <option value="pending" {{ request('mentor_status') === 'pending' ? 'selected' : '' }}>PENDING</option>
-                            <option value="approved" {{ request('mentor_status') === 'approved' ? 'selected' : '' }}>APPROVED</option>
-                            <option value="rejected" {{ request('mentor_status') === 'rejected' ? 'selected' : '' }}>REJECTED</option>
+                            @foreach([\App\Enums\ReviewStatus::PENDING, \App\Enums\ReviewStatus::APPROVED, \App\Enums\ReviewStatus::REJECTED] as $reviewCase)
+                                <option value="{{ $reviewCase->value }}" {{ request('mentor_status') === $reviewCase->value ? 'selected' : '' }}>{{ $reviewCase->label() }}</option>
+                            @endforeach
                         </select>
                     </div>
 
