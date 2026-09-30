@@ -48,6 +48,9 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-031** | 2026-09-28 | Table Action Button Sizing & Visual Contrast | Tombol aksi tabel terlalu kecil (h-[30px]) dan kurang kontras; standardisasi ke h-[34px] px-3.5 dengan border crisp dan shadow | RESOLVED |
 | **LRN-032** | 2026-09-28 | Agency Control Center Visual Parity & Clean Badging | Desain show dinas kurang selaras dengan univ; kontak terhimpit, dan badge/tab memuat angka redundan (Akun Terdaftar (3) & Personil 7) | RESOLVED |
 | **LRN-033** | 2026-09-28 | Browser Engine, Driver 404 & Local Chrome Lockdown | Driver Playwright internal 1.57.0 404 CDN di IDE; penguncian ke channel 'chrome' lokal & protokol Mata Manusia | RESOLVED |
+| **LRN-039** | 2026-09-30 | Fitur Chat & Error JSON Endpoint Web | Validasi endpoint fetch `/chat/api/*` membalas redirect 302 (bukan 422 JSON) karena `shouldRenderJsonWhen` hanya `api/*` | RESOLVED |
+| **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
+| **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
 
 ---
 
@@ -772,6 +775,52 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
+
+---
+
+### [LRN-039] Fitur Chat Antar Role & Error JSON pada Endpoint Fetch di Route Web
+- **Tanggal**: 2026-09-30
+- **Komponen**: `bootstrap/app.php`, `app/Services/Chat/*`, `app/Http/Controllers/Chat/*`, `resources/js/chat.js`, `resources/js/chat-notifier.js`, `resources/views/chat/index.blade.php`, `tests/Feature/Chat/*`
+- **Problem / Symptom**: Saat membangun fitur chat, request `fetch` ke `/chat/api/...` dengan `Accept: application/json` yang gagal validasi dibalas **302 redirect** ke halaman sebelumnya, bukan 422 JSON. Test `assertUnprocessable()` gagal dengan `Call to a member function all() on array`, dan di browser pesan error tidak bisa ditampilkan.
+- **Root Cause**: `withExceptions()->shouldRenderJsonWhen(fn ($r) => $r->is('api/*'))` **menggantikan** deteksi bawaan `expectsJson()`. Semua route di luar `api/*` selalu dirender sebagai HTML/redirect walaupun klien meminta JSON.
+- **Fix Applied**: Kondisi diperluas menjadi `$r->is('api/*') || ($r->is('chat/*') && $r->expectsJson())`. Fitur chat tahap 1: percakapan 1-on-1 berdasarkan relasi magang (`ChatContactDirectory`, dua arah), satu lampiran per pesan di disk private, polling adaptif (tanpa WebSocket), badge navbar + toast + entri lonceng yang digabung per percakapan (`ChatNotifier`), dan mode Login As hanya-baca. Tercakup 23 test di `tests/Feature/Chat`.
+- **Prevention Rule**: Endpoint JSON baru yang dipanggil via `fetch` dari halaman web wajib ditambahkan ke kondisi `shouldRenderJsonWhen` di `bootstrap/app.php` (atau diletakkan di `routes/api.php`). Aturan siapa-boleh-chat-siapa hanya boleh diubah di `ChatContactDirectory`, dan test simetri `ChatContactDirectoryTest` wajib tetap hijau. Batas upload chat mengikuti `upload_max_filesize` php.ini (default 2 MB). Jangan menaikkan `config/chat.php` tanpa menaikkan php.ini juga.
+
+---
+
+### [LRN-040] Chat Tahap Lengkap: `:style` String Menimpa `x-show`, Observer Penempatan, & Vite Dev Server Basi
+- **Tanggal**: 2026-09-30
+- **Komponen**: `resources/views/chat/partials/*.blade.php`, `resources/js/chat/*`, `app/Observers/PlacementChatObserver.php`, `app/Services/Chat/ChatGroupService.php`, `database/migrations/2026_09_30_010000_upgrade_chat_full_features.php`
+- **Problem / Symptom**:
+  1. Di grup, nama pengirim (teks berwarna) muncul di atas gelembung pesan **milik sendiri**, padahal `x-show="item.showName"` bernilai false.
+  2. Setelah file JS diganti/dipindah (`resources/js/chat.js` → `resources/js/chat/app.js`), halaman memunculkan puluhan error Alpine `listFilter is not defined`, `$store.chatPrefs` undefined. Vite dev server yang sedang berjalan masih menyajikan `app.js` lama, bahkan file yang sudah dihapus.
+- **Root Cause**:
+  1. Binding Alpine `:style` berbentuk **string** (`` :style="`color: ${x}`" ``) memanggil `setAttribute('style', …)` dan menimpa `display: none` yang dipasang `x-show` pada elemen yang sama.
+  2. Watcher Vite (chokidar) di path Windows ber-spasi/berkurung tidak mendeteksi perubahan, sehingga cache transform lama tetap disajikan selama `public/hot` ada.
+- **Fix Applied**:
+  1. Semua `:style` di tampilan chat & toast layout memakai **bentuk objek** (`:style="{ color: x }"`, `{ backgroundColor: x }`), yang menggabungkan style tanpa menghapus `display` dari `x-show`.
+  2. Uji browser memakai hasil `npm run build` (intersep aset dev server di Playwright). Pengembang cukup me-restart `npm run dev` / `composer dev` setelah menarik perubahan struktur JS.
+  3. Fitur tahap lengkap: grup buatan staf (admin grup, tambah/keluarkan anggota, keluar grup, promosi admin otomatis), **Grup Bimbingan otomatis** per penempatan via `Placement::observe(PlacementChatObserver)` (`ShouldHandleEventsAfterCommit` + try/catch, sehingga alur inti seleksi tidak ikut gagal), balas/kutip, hapus untuk semua (isi & file dibuang, tersisa penanda), laporkan pesan → tiket `laporan_chat` + panel moderasi Super Admin di `feedbacks/show`, maks. 5 lampiran/pesan (tabel `chat_attachments`), voice note (MediaRecorder), status dibaca per anggota, online/terakhir dilihat, sedang mengetik (cache), bisukan/sematkan, notifikasi desktop + suara, serta tombol "Chat" kontekstual (`<x-chat-button>`, `<x-chat-group-button>`).
+- **Prevention Rule**: Jangan pernah memakai `:style` berbentuk string pada elemen yang juga memakai `x-show`; gunakan bentuk objek. Setelah mengganti/memindah file JS, restart Vite dev server atau hapus `public/hot` usang sebelum menguji. Setiap efek samping lintas modul yang dipicu event model (observer) wajib `ShouldHandleEventsAfterCommit` + try/catch + `report()` agar tidak membatalkan transaksi inti.
+
+---
+
+### [LRN-041] Info Kontak Chat Berbasis Hubungan Magang, Nomor Staf yang Terbuang, & Perbaikan Notifikasi Chat
+- **Tanggal**: 2026-09-30
+- **Komponen**: `ChatContactDirectory::personalDetailsVisibleTo()`, `ChatPresenter::contactDetails()`, `resources/views/chat/partials/contact-details.blade.php`, `ProfileController@updatePhone` (`profile.phone.update`), migrasi `2026_09_30_030000_add_phone_to_users_table`, `resources/js/chat/notifier.js`, `resources/views/chat/partials/sidebar.blade.php`, `layouts/navigation.blade.php`
+- **Problem / Symptom**:
+  1. Info Kontak chat belum menampilkan email & telepon, dan nomor dosen yang diisi Super Admin di form tambah dosen (`storeDosen`) **tidak pernah tersimpan**.
+  2. Dropdown "Pengaturan notifikasi" di halaman chat terpotong di sisi kiri ("otifikasi desktop").
+  3. Penanda pesan terakhir yang sudah di-toast disimpan di satu kunci localStorage untuk semua akun, jadi saat "Login As" atau ganti akun di browser yang sama, toast bisa hilang atau salah. Pesan chat di lonceng navbar juga tenggelam di bawah pemberitahuan otomatis (hanya 4 teratas yang tampil).
+- **Root Cause**:
+  1. Tabel `users` tidak punya kolom `phone`; `User::create([... 'phone' => ...])` diam-diam membuang atribut yang tidak ada di `$fillable`.
+  2. Panel `absolute right-0 w-72` di tombol kecil melewati tepi kiri kartu yang `overflow-hidden`.
+  3. Kunci `chat:last-seen-message-id` tidak memuat id pengguna; `array_slice(..., 0, 4)` pada urutan bawaan NotificationService (item otomatis dulu, notifikasi DB terakhir).
+- **Fix Applied**:
+  1. Kolom `users.phone` (nullable) + `$fillable`; staf mengisi nomor di kartu "Nomor Kontak untuk Chat" di Pengaturan Akun (mahasiswa tetap memakai `student_profiles.phone`). Data per role: mahasiswa = email, HP, NIM, prodi, fakultas, semester; staf = email & nomor akun; plus kontak resmi dinas/kampus (selalu tampil).
+  2. **Privasi**: data pribadi hanya dikirim server bila `personalDetailsVisibleTo()` mengizinkan, yaitu mode ketat `contactsQuery(strict: true)`. Aturannya sama dengan aturan kontak chat, tetapi dosen ↔ mahasiswa sekampus hanya bila dosen tersebut DPL-nya. Super Admin melihat semua. Tanpa izin, API mengirim `visible=false` dan email/telepon/NIM `null` (bukan sekadar disembunyikan di tampilan).
+  3. Panel notifikasi diposisikan selebar sidebar (`absolute left-3 right-3` terhadap header), berisi status izin browser & tombol tes suara. Kunci localStorage/sessionStorage memuat `data-chat-user`. Toast ringkasan "Anda memiliki N pesan belum dibaca" muncul sekali per sesi. Notifikasi desktop juga muncul saat jendela tidak fokus. Pesan chat belum dibaca didahulukan di lonceng navbar. Saat Login As, jumlah belum dibaca di daftar tidak di-nol-kan (konsisten dengan badge navbar).
+- **Prevention Rule**: Data pribadi (email, telepon, NIM, alamat) di fitur apa pun wajib difilter di server lewat `personalDetailsVisibleTo()` (atau aturan setara), bukan dengan menyembunyikan elemen di Blade/Alpine. Setiap `Model::create()` dengan field baru wajib dicek kolom & `$fillable`-nya, karena atribut yang tidak dikenal dibuang tanpa error. Kunci localStorage/sessionStorage yang menyimpan status per pengguna wajib memuat id pengguna. Dropdown di dalam kontainer `overflow-hidden` wajib diposisikan relatif ke kontainer yang cukup lebar (atau `fixed`).
 
 ---
 

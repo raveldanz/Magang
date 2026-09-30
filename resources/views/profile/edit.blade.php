@@ -36,6 +36,40 @@
                 </div>
             </div>
 
+            <!-- Card: Nomor kontak untuk fitur Chat (staf; mahasiswa memakai nomor di Profil Saya) -->
+            @if(auth()->user()->role !== 'mahasiswa')
+                <div class="p-5 sm:p-7 bg-white border border-slate-200/80 shadow-xs rounded-2xl sm:rounded-3xl">
+                    <div class="max-w-xl">
+                        <div class="border-b border-slate-100 pb-3 mb-5">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm sm:text-base text-slate-800">Nomor Kontak untuk Chat</h3>
+                                    <p class="text-xs text-slate-500">Tampil di Info Kontak chat hanya bagi pihak yang memiliki hubungan magang langsung dengan Anda</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ route('profile.phone.update') }}" class="space-y-4">
+                            @csrf
+                            @method('PATCH')
+                            <div>
+                                <label for="chat-phone" class="block text-xs font-bold text-slate-600 mb-1">Nomor Telepon / WhatsApp (opsional)</label>
+                                <input id="chat-phone" name="phone" type="tel" value="{{ old('phone', auth()->user()->phone) }}" autocomplete="tel" placeholder="Contoh: 0812 3456 7890"
+                                       class="w-full h-11 px-3.5 rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
+                                @error('phone')
+                                    <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                                @enderror
+                                <p class="mt-1.5 text-xs text-slate-500">Kosongkan bila tidak ingin nomor Anda ditampilkan. Email akun tetap terlihat oleh pihak yang berhubungan.</p>
+                            </div>
+                            <x-primary-button>Simpan Nomor</x-primary-button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
             <!-- Card 2: Hapus Akun (HANYA DITAMPILKAN JIKA BUKAN ADMIN / SUPER ADMIN) -->
             @if(!in_array(auth()->user()->role, ['admin', 'super_admin']))
                 <div class="p-5 sm:p-7 bg-white border border-rose-200 shadow-xs rounded-2xl sm:rounded-3xl">

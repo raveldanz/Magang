@@ -13,6 +13,13 @@
                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
                     NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }} &bull; Penempatan: {{ $agencyProfile->agency_name ?? '-' }}
                 </p>
+                <div class="flex flex-wrap items-center gap-2 mt-3">
+                    <x-chat-button :user="$student" label="Chat Mahasiswa" />
+                    @if ($placement->mentor ?? $placement->pembimbing)
+                        <x-chat-button :user="$placement->mentor ?? $placement->pembimbing" label="Chat Mentor" />
+                    @endif
+                    <x-chat-group-button :placement="$placement" />
+                </div>
             </div>
         </div>
     </x-slot>

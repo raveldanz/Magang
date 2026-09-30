@@ -77,6 +77,11 @@
                     Feedback
                 </a>
 
+                <a href="{{ route('notifications.index', ['category' => 'chat']) }}"
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'chat' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Pesan Chat
+                </a>
+
                 @if(Auth::user() && (Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin'))
                     <a href="{{ route('notifications.index', ['category' => 'audit']) }}" 
                        class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'audit' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
