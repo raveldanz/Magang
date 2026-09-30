@@ -18,7 +18,6 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => $request->user(),
-            'hasInternshipHistory' => $request->user()->hasInternshipHistory(),
         ]);
     }
 
@@ -48,12 +47,6 @@ class ProfileController extends Controller
     // Blokir jika yang mencoba menghapus akun adalah Admin
     if (in_array($user->role, ['admin', 'super_admin'])) {
         return back()->with('error', 'Akun Administrator tidak dapat dihapus secara mandiri demi keamanan sistem.');
-    }
-
-    // Arsip: menghapus akun mahasiswa ikut menghapus (cascade) pengajuan, logbook, nilai & sertifikat;
-    // menghapus akun pembimbing mengosongkan namanya pada arsip alumni.
-    if ($user->hasInternshipHistory()) {
-        return back()->with('error', 'Akun Anda menyimpan riwayat magang (logbook, nilai, dan sertifikat) yang wajib diarsipkan, sehingga tidak dapat dihapus. Hubungi admin bila akun perlu dinonaktifkan.');
     }
 
     $request->validateWithBag('userDeletion', [
