@@ -5,9 +5,6 @@
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
                     {{ __('Rekapitulasi & Feed Logbook Bimbingan') }}
                 </h2>
-                <p class="text-xs text-gray-500 mt-1">
-                    Monitoring & Verifikasi Aktivitas Harian Mahasiswa Bimbingan &bull; <strong>{{ $user->university ?? 'Perguruan Tinggi' }}</strong>
-                </p>
             </div>
 
             <div class="flex items-center gap-2">
@@ -193,7 +190,7 @@
 
                                         <!-- Status DPL -->
                                         <td class="py-4 px-4 align-top text-center">
-                                            <x-status-badge type=\"review\" :status=\"$bundle['status']\" />
+                                            <x-status-badge type="review" :status="$bundle['status']" />
                                         </td>
 
                                         <!-- Tombol Aksi Evaluasi -->

@@ -10,9 +10,6 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Monitoring & Penilaian: {{ $student->name }}</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
-                    NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }} &bull; Penempatan: {{ $agencyProfile->agency_name ?? '-' }}
-                </p>
             </div>
         </div>
     </x-slot>
