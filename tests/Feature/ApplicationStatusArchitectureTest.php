@@ -47,7 +47,8 @@ class ApplicationStatusArchitectureTest extends TestCase
         $this->assertEquals('rejected', ReviewStatus::REJECTED->value);
         $this->assertEquals('revision', ReviewStatus::REVISION->value);
 
-        $this->assertEquals('Disetujui', ReviewStatus::APPROVED->label());
+        $this->assertEquals('APPROVED', ReviewStatus::APPROVED->label());
+        $this->assertEquals('Disetujui', ReviewStatus::APPROVED->description());
     }
 
     protected function createUnit(): Unit

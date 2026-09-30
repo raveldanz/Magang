@@ -275,7 +275,7 @@
                     <td class="py-1">{{ $unit?->name ?? 'Bidang Terkait' }}</td>
                 </tr>
                 <tr class="py-1">
-                    <td class="py-1 font-semibold">Dosen Pembimbing (DPL)</td>
+                    <td class="py-1 font-semibold">Dosen Pembimbing</td>
                     <td class="py-1">:</td>
                     <td class="py-1 font-semibold">{{ $dosen?->name ?? 'Dosen Pembimbing Lapangan Terdaftar' }}</td>
                 </tr>

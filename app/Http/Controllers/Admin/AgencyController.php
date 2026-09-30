@@ -62,7 +62,7 @@ class AgencyController extends Controller
             'total_agencies' => AgencyProfile::count(),
             'total_units' => Unit::count(),
             'total_quota' => Unit::sum('quota'),
-            'total_filled' => Application::where('status', 'accepted')->count(),
+            'total_filled' => Application::occupyingQuota()->count(),
             'total_staff' => User::whereNotNull('agency_profile_id')->whereIn('role', ['admin', 'mentor', 'pembimbing'])->count(),
         ];
 
@@ -84,10 +84,10 @@ class AgencyController extends Controller
 
         $agency = AgencyProfile::with([
             'units' => function ($uq) {
+                // Kuota terisi = definisi yang sama dengan Unit::occupied_count
+                // (diterima/aktif dan masa magangnya belum berakhir)
                 $uq->withCount([
-                    'applications as accepted_count' => function ($aq) {
-                        $aq->where('status', 'accepted');
-                    }
+                    'applications as accepted_count' => fn ($aq) => $aq->occupyingQuota(),
                 ])->orderBy('name');
             },
             'users' => function ($uq) {
@@ -95,31 +95,39 @@ class AgencyController extends Controller
             },
         ])->findOrFail($id);
 
-        // Ambil data pengajuan magang yang masuk ke unit-unit dinas ini
+        // Ambil data pengajuan magang yang masuk ke unit-unit dinas ini,
+        // diurutkan dari yang paling butuh tindakan (Application::actionPriority), lalu terbaru.
         $unitIds = $agency->units->pluck('id');
         $applications = Application::with([
             'user.studentProfile',
+            'user.universityRelation',
             'unit',
             'placement.mentor',
-            'placement.pembimbing'
+            'placement.pembimbing',
+            'placement.finalreport',
+            'placement.evaluation',
         ])
             ->whereIn('unit_id', $unitIds)
-            ->latest()
+            ->orderByActionPriority()
             ->get();
 
-        // Ambil mahasiswa yang berstatus aktif (accepted)
+        $priorities = $applications->mapWithKeys(fn ($app) => [$app->id => $app->actionPriority()]);
+
+        // Mahasiswa yang sedang magang di lapangan (status active); yang mentornya belum ada ditaruh di atas
         $activePlacements = Placement::with([
             'application.user.studentProfile',
             'application.unit',
             'mentor',
             'pembimbing',
-            'logbooks'
         ])
+            ->withCount('logbooks')
             ->whereHas('application', function ($aq) use ($unitIds) {
-                $aq->whereIn('unit_id', $unitIds)->where('status', 'accepted');
+                $aq->whereIn('unit_id', $unitIds)->where('status', 'active');
             })
             ->latest()
-            ->get();
+            ->get()
+            ->sortBy(fn ($p) => ($p->mentor_id || $p->pembimbing_id) ? 1 : 0)
+            ->values();
 
         // Metrik khusus dinas ini
         $totalUnits = $agency->units->count();
@@ -130,8 +138,9 @@ class AgencyController extends Controller
         $adminUsers = $agency->users->where('role', 'admin')->values();
         $mentorUsers = $agency->users->whereIn('role', ['mentor', 'pembimbing'])->values();
 
-        $pendingAppsCount = $applications->where('status', 'submitted')->count();
-        $acceptedAppsCount = $applications->where('status', 'accepted')->count();
+        // Bandingkan sebagai string: status di-cast ke enum, sehingga where('status', '...') pada Collection selalu 0
+        $pendingAppsCount = $applications->filter(fn ($app) => in_array($app->statusValue(), ['pending', 'verified'], true))->count();
+        $acceptedAppsCount = $applications->filter(fn ($app) => $app->statusValue() === 'accepted')->count();
 
         $stats = [
             'total_units' => $totalUnits,
@@ -144,6 +153,7 @@ class AgencyController extends Controller
             'pending_applications' => $pendingAppsCount,
             'accepted_applications' => $acceptedAppsCount,
             'active_students' => $activePlacements->count(),
+            'needs_action' => $priorities->filter(fn ($p) => $p <= Application::ACTION_THRESHOLD)->count(),
         ];
 
         return view('admin.agencies.show', compact(
@@ -282,19 +292,18 @@ class AgencyController extends Controller
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menghapus instansi.');
         $agency = AgencyProfile::with(['units'])->findOrFail($id);
 
-        // 1. Proteksi Unit dengan Mahasiswa Aktif
-        $activeUnitAppsCount = \App\Models\Application::whereIn('unit_id', $agency->units->pluck('id'))
-            ->whereIn('status', ['accepted', 'verified'])
-            ->count();
+        // 1. Proteksi Arsip: menghapus instansi ikut menghapus semua divisinya, dan applications.unit_id
+        //    ON DELETE CASCADE menghapus seluruh pengajuan, logbook, nilai, serta sertifikat alumni.
+        $historyCount = \App\Models\Application::whereIn('unit_id', $agency->units->pluck('id'))->count();
 
-        if ($activeUnitAppsCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Instansi '{$agency->agency_name}' masih memiliki {$activeUnitAppsCount} mahasiswa aktif pada unit kerjanya.");
+        if ($historyCount > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Instansi '{$agency->agency_name}' menyimpan {$historyCount} riwayat pengajuan magang (termasuk arsip alumni & sertifikat) yang wajib dipertahankan.");
         }
 
         // 2. Proteksi Mentor dengan Bimbingan Aktif
         $activeMentorsCount = \App\Models\Placement::whereIn('mentor_id', User::where('agency_profile_id', $agency->id)->whereIn('role', ['mentor', 'pembimbing'])->pluck('id'))
             ->whereHas('application', function ($aq) {
-                $aq->whereIn('status', ['accepted', 'verified']);
+                $aq->whereIn('status', ['verified', ...\App\Models\Application::QUOTA_STATUSES]);
             })->count();
 
         if ($activeMentorsCount > 0) {
@@ -304,7 +313,7 @@ class AgencyController extends Controller
         $name = $agency->agency_name;
 
         \DB::transaction(function () use ($agency) {
-            // Hapus unit kerja kosong
+            // Hapus unit kerja (sudah dipastikan tanpa riwayat pengajuan di atas)
             $agency->units()->delete();
 
             // Hapus akun admin dinas yang terafiliasi dengan instansi ini

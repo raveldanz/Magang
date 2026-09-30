@@ -133,7 +133,7 @@
                 
                 // Validasi tipe file
                 if (!file.type.startsWith('image/')) {
-                    alert('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
+                    notify('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
                     input.value = '';
                     preview.src = defaultSrc;
                     return;
@@ -141,7 +141,7 @@
 
                 // Validasi ukuran file (maks 2MB)
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Ukuran berkas logo terlalu besar (maksimal 2MB).');
+                    notify('Ukuran berkas logo terlalu besar (maksimal 2MB).');
                     input.value = '';
                     preview.src = defaultSrc;
                     return;

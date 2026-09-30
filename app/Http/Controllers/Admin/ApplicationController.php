@@ -26,58 +26,22 @@ class ApplicationController extends Controller
         $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
 
-        $isPgsql = DB::connection()->getDriverName() === 'pgsql';
-        $currentDateSql = $isPgsql ? 'CURRENT_DATE' : 'CURDATE()';
-
         $query = Application::with([
-            'user.studentProfile', 
-            'unit.agencyProfile', 
-            'documents', 
-            'placement.evaluation', 
-            'placement.finalreport', 
-            'placement.mentor', 
-            'placement.pembimbing', 
+            'user.studentProfile',
+            'user.universityRelation',
+            'unit.agencyProfile',
+            'documents',
+            'placement.evaluation',
+            'placement.finalreport',
+            'placement.mentor',
+            'placement.pembimbing',
             'placement.academicAdvisor'
         ]);
 
-        // Prioritas Pengurutan Berdasarkan Kebutuhan Tindakan (Action-Driven Priority):
-        // 1. Mahasiswa Baru yang Perlu Verifikasi Berkas & Penerimaan (PENDING / VERIFIED / SUBMITTED) -> Teratas
-        // 2. Mahasiswa yang Perlu Aksi Kelulusan (ACCEPTED/ACTIVE dengan Laporan Disetujui *DAN* Nilai Evaluasi Lengkap) -> Siap Diluluskan
-        // 3. Mahasiswa yang Sedang Magang Aktif (ACTIVE normal di lapangan)
-        // 4. Mahasiswa yang Diterima / Calon Peserta (ACCEPTED mendatang)
-        // 5. Mahasiswa yang Sudah Selesai & Lulus (COMPLETED) -> Dikebawahkan
-        // 6. Berkas Ditolak atau Mengundurkan Diri (REJECTED / RESIGNED / CANCELED) -> Paling bawah
-        $query->orderByRaw("
-            CASE 
-                WHEN applications.status IN ('pending', 'verified', 'submitted') THEN 1
-                WHEN applications.status IN ('accepted', 'active') 
-                  AND EXISTS (
-                      SELECT 1 FROM placements p 
-                      JOIN final_reports fr ON fr.placement_id = p.id 
-                      WHERE p.application_id = applications.id 
-                        AND LOWER(fr.status) = 'approved'
-                  )
-                  AND EXISTS (
-                      SELECT 1 FROM placements p 
-                      JOIN evaluations ev ON ev.placement_id = p.id 
-                      WHERE p.application_id = applications.id 
-                        AND (
-                            COALESCE(ev.final_score, 0) > 0 
-                            OR (
-                                COALESCE(ev.nilai_disiplin, 0) > 0 
-                                AND COALESCE(ev.nilai_kinerja, 0) > 0 
-                                AND COALESCE(ev.nilai_laporan, 0) > 0
-                                AND (COALESCE(ev.nilai_dosen, 0) > 0 OR COALESCE(ev.nilai_akademik, 0) > 0)
-                            )
-                        )
-                  ) THEN 2
-                WHEN applications.status = 'active' THEN 3
-                WHEN applications.status = 'accepted' THEN 4
-                WHEN applications.status = 'completed' THEN 5
-                WHEN applications.status IN ('rejected', 'resigned', 'canceled') THEN 6
-                ELSE 7
-            END ASC, applications.created_at DESC
-        ");
+        // Urutan standar prioritas tindakan (lihat Application::actionPrioritySql): verifikasi → siap lulus →
+        // pembimbing belum ada (antrean terlama dulu) → aktif → diterima → selesai → ditolak (terbaru dulu).
+        // Sama persis dengan pusat kendali dinas & kampus.
+        $query->orderByActionPriority();
 
         // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
         if ($agencyId) {
@@ -99,9 +63,11 @@ class ApplicationController extends Controller
             });
         }
 
-        // 2. Filter Berdasarkan Status Pengajuan
+        // 2. Filter Berdasarkan Status Pengajuan ('action' = semua yang butuh tindakan admin, tingkat 1–3)
         if ($request->filled('status')) {
-            $query->where('status', strtolower($request->status));
+            $request->status === 'action'
+                ? $query->requiringAction()
+                : $query->where('status', strtolower($request->status));
         }
 
         // 3. Filter Berdasarkan Unit / Divisi Kerja
@@ -209,16 +175,33 @@ class ApplicationController extends Controller
         $statusInput = strtolower($request->status);
         $request->merge(['status' => $statusInput]);
 
-        $request->validate([
+        if ($request->filled('rejection_reason') && !$request->filled('rejection_note')) {
+            $request->merge(['rejection_note' => $request->rejection_reason]);
+        }
+
+        $rules = [
             'status' => 'required|in:pending,verified,accepted,active,completed,rejected,resigned',
-            'rejection_note' => 'nullable|string',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',
             'letter_number' => 'nullable|string|max:100',
             'letter_date' => 'nullable|date',
             'override_reason' => 'nullable|string',
-        ]);
+        ];
+
+        // Validasi ketat: Alasan penolakan wajib diisi jika status diubah menjadi 'rejected'
+        if ($statusInput === 'rejected') {
+            $rules['rejection_note'] = 'required|string|min:5';
+        } else {
+            $rules['rejection_note'] = 'nullable|string';
+        }
+
+        $messages = [
+            'rejection_note.required' => 'Alasan penolakan wajib diisi jika status diubah menjadi ditolak (rejected).',
+            'rejection_note.min' => 'Alasan penolakan minimal 5 karakter agar informatif bagi pemohon.',
+        ];
+
+        $request->validate($rules, $messages);
 
         $application = Application::with(['unit', 'placement', 'user'])->findOrFail($id);
         $oldStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : strtolower((string)$application->status);
@@ -227,6 +210,27 @@ class ApplicationController extends Controller
         // Multi-Tenant Authorization Check
         if (!$isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
+        }
+
+        // Validasi State Ketat: keputusan terima/tolak hanya dari tahap seleksi (PENDING atau VERIFIED),
+        // sesuai alur resmi pending → verified → accepted.
+        $decisionStatuses = ['pending', 'verified'];
+        if ($newStatus === 'accepted' && !in_array($oldStatus, [...$decisionStatuses, 'accepted'], true)) {
+            return redirect()->back()
+                ->with('error', "Gagal menyetujui pengajuan: Aksi persetujuan (Approve) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->withInput();
+        }
+
+        if ($newStatus === 'rejected' && !in_array($oldStatus, $decisionStatuses, true)) {
+            return redirect()->back()
+                ->with('error', "Gagal menolak pengajuan: Aksi penolakan (Reject) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->withInput();
+        }
+
+        if ($oldStatus === 'rejected' && $newStatus !== 'rejected') {
+            return redirect()->back()
+                ->with('error', "Gagal mengubah status: Pengajuan yang telah ditolak tidak dapat diubah statusnya kembali.")
+                ->withInput();
         }
 
         $unit = $application->unit;

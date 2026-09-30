@@ -159,19 +159,7 @@
                     <div class="p-4 rounded-xl border {{ $logbook->status === 'approved' ? 'bg-emerald-50/50 border-emerald-200' : ($logbook->status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200') }} space-y-2.5">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-gray-700">Mentor Lapangan Dinas</span>
-                            @if ($logbook->status === 'approved')
-                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                     Disetujui
-                                </span>
-                            @elseif ($logbook->status === 'rejected')
-                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                                     Ditolak
-                                </span>
-                            @else
-                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                     Menunggu Persetujuan
-                                </span>
-                            @endif
+                            <x-status-badge type="review" :status="$logbook->status ?? 'pending'" />
                         </div>
 
                         <div>
@@ -189,20 +177,8 @@
                     <!-- Panel Status Dosen Kampus -->
                     <div class="p-4 rounded-xl border {{ $logbook->lecturer_status === 'approved' ? 'bg-emerald-50/50 border-emerald-200' : ($logbook->lecturer_status === 'rejected' ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/50 border-amber-200') }} space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-gray-700">Dosen Pembimbing (DPL)</span>
-                            @if ($logbook->lecturer_status === 'approved')
-                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                     Disetujui
-                                </span>
-                            @elseif ($logbook->lecturer_status === 'rejected')
-                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                                     Perlu Revisi
-                                </span>
-                            @else
-                                <span class="px-2.5 py-0.5 text-[11px] font-black rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                                     Menunggu Persetujuan
-                                </span>
-                            @endif
+                            <span class="text-xs font-bold text-gray-700">Dosen Pembimbing</span>
+                            <x-status-badge type="review" :status="$logbook->lecturer_status ?? 'pending'" />
                         </div>
 
                         <div>
@@ -269,7 +245,7 @@
                 </div>
 
             @elseif ($isLecturer)
-                <!-- FORM KHUSUS DOSEN PEMBIMBING KAMPUS (DPL) -->
+                <!-- FORM KHUSUS DOSEN PEMBIMBING KAMPUS -->
                 <div class="bg-white rounded-2xl p-6 border-2 border-blue-400 shadow-sm space-y-4 bg-blue-50/10">
                     <div class="flex items-center justify-between border-b border-blue-100 pb-3">
                         <h3 class="text-base font-bold text-blue-950 flex items-center gap-2">
@@ -278,12 +254,10 @@
                             </svg>
                             Aksi Verifikasi & Feedback Dosen Kampus
                         </h3>
-                        <span class="text-xs font-bold px-3 py-1 rounded-full
-                            {{ $logbook->lecturer_status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                            {{ $logbook->lecturer_status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
-                            {{ $logbook->lecturer_status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
-                            Status Dosen: {{ strtoupper($logbook->lecturer_status ?? 'PENDING') }}
-                        </span>
+                        <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <span>Status dosen</span>
+                            <x-status-badge type="review" :status="$logbook->lecturer_status ?? 'pending'" />
+                        </div>
                     </div>
 
                     <form action="{{ route('lecturer.logbooks.updateStatus', $logbook->id) }}" method="POST" class="space-y-4">

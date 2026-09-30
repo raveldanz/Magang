@@ -57,7 +57,7 @@
                                 <option value="mahasiswa">Mahasiswa Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas / Superadmin</option>
                                 <option value="mentor">Mentor Lapangan Dinas</option>
-                                <option value="dosen">Dosen Pembimbing (DPL)</option>
+                                <option value="dosen">Dosen Pembimbing</option>
                                 <option value="universitas">Admin Universitas</option>
                             </select>
                         </div>
@@ -67,10 +67,11 @@
                                 Status Keaktifan Akun
                             </label>
                             <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                <option value="active" {{ old('status', $user->status) === 'active' ? 'selected' : '' }}> Aktif</option>
-                                <option value="on_leave" {{ old('status', $user->status) === 'on_leave' ? 'selected' : '' }}> Cuti</option>
-                                <option value="inactive" {{ old('status', $user->status) === 'inactive' ? 'selected' : '' }}> Non-Aktif</option>
+                                @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
+                                    <option value="{{ $accountCase->value }}" {{ old('status', $user->status ?? 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
+                                @endforeach
                             </select>
+                            <x-status-legend type="account" />
                         </div>
                     </div>
 

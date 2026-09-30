@@ -73,7 +73,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">Disetujui (Approved)</span>
+                        <span class="text-xs font-bold text-emerald-600 uppercase">APPROVED</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -86,7 +86,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase">Menunggu Review</span>
+                        <span class="text-xs font-bold text-amber-600 uppercase">PENDING</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -151,8 +151,8 @@
                         <!-- Filter Status Logbook -->
                         <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
-                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}> Memiliki Logbook Pending</option>
-                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}> Memiliki Logbook Approved</option>
+                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Ada logbook PENDING</option>
+                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Ada logbook APPROVED</option>
                             <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}> Belum Mengisi Logbook</option>
                         </select>
                     </div>
@@ -228,12 +228,7 @@
                                         <span class="text-xs font-bold font-mono text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md">
                                              {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
                                         </span>
-                                        <span class="px-2.5 py-0.5 text-xs font-bold rounded-full
-                                            {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : '' }}
-                                            {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-200' : '' }}
-                                            {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-200' : '' }}">
-                                            {{ strtoupper($log->status) }}
-                                        </span>
+                                        <x-status-badge type="review" :status="$log->status" />
                                     </div>
                                     <p class="text-xs text-gray-700 leading-relaxed line-clamp-2">
                                         {{ $log->activity }}

@@ -113,7 +113,7 @@ async function executeQwen(prompt) {
   // Metode 1: HTTP API lokal Ollama (cepat, stabil, teks bersih tanpa ANSI/braille spinner)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 menit timeout untuk toleransi CPU inference
+    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 menit timeout untuk toleransi CPU inference
 
 
     const res = await fetch("http://127.0.0.1:11434/api/generate", {

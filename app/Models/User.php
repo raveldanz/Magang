@@ -76,4 +76,36 @@ class User extends Authenticatable
     {
         return $this->hasMany(Placement::class, 'mentor_id');
     }
+
+    public function pembimbingPlacements()
+    {
+        return $this->hasMany(Placement::class, 'pembimbing_id');
+    }
+
+    /**
+     * Jumlah riwayat magang yang melekat pada akun: pengajuan (mahasiswa) atau penempatan
+     * yang pernah dibimbing (mentor / pembimbing / dosen). Akun dengan riwayat wajib dipertahankan
+     * sebagai arsip — menghapusnya ikut menghapus (cascade) atau mengosongkan data alumni & sertifikat.
+     */
+    public function internshipHistoryCount(): int
+    {
+        return $this->applications()->count()
+            + $this->mentorPlacements()->count()
+            + $this->pembimbingPlacements()->count()
+            + $this->academicPlacements()->count();
+    }
+
+    public function hasInternshipHistory(): bool
+    {
+        return $this->internshipHistoryCount() > 0;
+    }
+
+    /**
+     * Akun berstatus Nonaktif tidak boleh login. Super Admin / Admin Sistem dikecualikan
+     * agar sistem tidak pernah terkunci tanpa administrator.
+     */
+    public function isInactive(): bool
+    {
+        return \App\Enums\AccountStatus::resolve($this->status) === \App\Enums\AccountStatus::INACTIVE && !$this->isSuperAdmin();
+    }
 }

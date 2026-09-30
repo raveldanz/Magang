@@ -72,10 +72,11 @@
                             Status Keaktifan
                         </label>
                         <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                            <option value="active" {{ old('status', $mentor->status) === 'active' ? 'selected' : '' }}> Aktif (Tersedia Membimbing)</option>
-                            <option value="on_leave" {{ old('status', $mentor->status) === 'on_leave' ? 'selected' : '' }}> Cuti (Tidak Menerima Bimbingan)</option>
-                            <option value="inactive" {{ old('status', $mentor->status) === 'inactive' ? 'selected' : '' }}> Non-Aktif</option>
+                            @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
+                                <option value="{{ $accountCase->value }}" {{ old('status', $mentor->status ?? 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
+                            @endforeach
                         </select>
+                        <x-status-legend type="account" />
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">

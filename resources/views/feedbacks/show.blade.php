@@ -37,9 +37,7 @@
                             <span class="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200">
                                 {{ strtoupper($feedback->category) }}
                             </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-black {{ $feedback->status === 'resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                                STATUS: {{ strtoupper($feedback->status) }}
-                            </span>
+                            <x-status-badge type="feedback" :status="$feedback->status" />
                             <span class="text-xs text-slate-400">
                                 Dibuat {{ $feedback->created_at->translatedFormat('d F Y, H:i') }} ({{ $feedback->created_at->diffForHumans() }})
                             </span>
@@ -135,11 +133,11 @@
                             Perbarui Status Tiket <span class="text-rose-500">*</span>
                         </label>
                         <select name="status" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="pending" {{ $feedback->status === 'pending' ? 'selected' : '' }}>Menunggu (Pending)</option>
-                            <option value="in_progress" {{ $feedback->status === 'in_progress' ? 'selected' : '' }}>Sedang Diproses (In Progress)</option>
-                            <option value="resolved" {{ $feedback->status === 'resolved' ? 'selected' : '' }}>Selesai & Terjawab (Resolved)</option>
-                            <option value="closed" {{ $feedback->status === 'closed' ? 'selected' : '' }}>Ditutup (Closed)</option>
+                            @foreach(\App\Enums\FeedbackStatus::cases() as $feedbackCase)
+                                <option value="{{ $feedbackCase->value }}" {{ $feedback->status == $feedbackCase->value ? 'selected' : '' }}>{{ $feedbackCase->label() }}</option>
+                            @endforeach
                         </select>
+                        <x-status-legend type="feedback" />
                     </div>
 
                     <div>

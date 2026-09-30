@@ -62,21 +62,21 @@
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-emerald-500 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Diterima / Aktif</span>
+                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Diterima</span>
                     <p class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_accepted'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Sedang magang</span>
+                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">ACCEPTED, ACTIVE, dan COMPLETED</span>
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-teal-600 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai Magang</span>
+                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
                     <p class="text-xl sm:text-2xl font-black text-teal-700 mt-1">{{ $stats['total_completed'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Lulus & dinilai</span>
+                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</span>
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-amber-500 flex flex-col justify-between">
                     <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Menunggu Seleksi</span>
                     <p class="text-xl sm:text-2xl font-black text-amber-600 mt-1">{{ $stats['total_pending'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Proses verifikasi</span>
+                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">PENDING dan VERIFIED</span>
                 </div>
             </div>
 
@@ -381,44 +381,7 @@
                             <div class="text-xs text-slate-500">{{ $app->unit->name ?? '-' }}</div>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            @if($rawStatus === 'active')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    <span>Sedang Magang</span>
-                                </span>
-                            @elseif($rawStatus === 'accepted')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                    <span>Diterima</span>
-                                </span>
-                            @elseif($rawStatus === 'verified')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                    <span>Lolos Berkas</span>
-                                </span>
-                            @elseif($rawStatus === 'completed')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                    <span>Lulus</span>
-                                </span>
-                            @elseif($rawStatus === 'pending')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                    <span>Menunggu Verifikasi</span>
-                                </span>
-                            @elseif($rawStatus === 'resigned')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                                    <span>Mengundurkan Diri</span>
-                                </span>
-                            @elseif($rawStatus === 'rejected')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                    <span>Ditolak</span>
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ strtoupper($rawStatus) }}</span>
-                            @endif
+                            <x-status-badge :status="$app->status" />
                         </td>
                         <td class="px-5 py-4">
                             @if ($dosen)
@@ -506,7 +469,7 @@
                     
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Pilih Dosen Pembimbing (DPL) <span class="text-rose-500">*</span>
+                            Pilih Dosen Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" x-model="assignModal.currentAdvisorId" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
