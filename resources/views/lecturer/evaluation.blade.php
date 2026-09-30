@@ -10,9 +10,6 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Formulir Penilaian Akademik DPL</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
-                    Evaluasi bimbingan akademik, mutu laporan ilmiah, dan keaktifan mahasiswa magang
-                </p>
             </div>
         </div>
     </x-slot>

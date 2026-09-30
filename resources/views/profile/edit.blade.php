@@ -1,14 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1.5">
-            <div>
-                <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
-                    {{ __('Pengaturan Akun') }}
-                </h2>
-                <p class="text-xs text-slate-500 mt-0.5">
-                    Kelola keamanan kata sandi dan pengaturan akun Anda
-                </p>
-            </div>
+            <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
+                {{ __('Pengaturan Akun') }}
+            </h2>
         </div>
     </x-slot>
 
