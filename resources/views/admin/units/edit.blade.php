@@ -77,7 +77,7 @@
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required
                         >
-                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->applications->where('status', 'accepted')->count() }}</strong> mahasiswa diterima.</p>
+                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->occupied_count }}</strong> mahasiswa diterima/aktif menempati kuota ini.</p>
                         @error('quota')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror

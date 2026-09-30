@@ -1,14 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1.5">
-            <div>
-                <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
-                    {{ __('Pengaturan Akun') }}
-                </h2>
-                <p class="text-xs text-slate-500 mt-0.5">
-                    Kelola keamanan kata sandi dan pengaturan akun Anda
-                </p>
-            </div>
+            <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
+                {{ __('Pengaturan Akun') }}
+            </h2>
         </div>
     </x-slot>
 
@@ -54,7 +49,14 @@
                             </div>
                         </div>
 
-                        @include('profile.partials.delete-user-form')
+                        @if($hasInternshipHistory ?? false)
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 leading-relaxed">
+                                Akun ini menyimpan riwayat magang (logbook, nilai, dan sertifikat) yang wajib diarsipkan,
+                                sehingga tidak dapat dihapus. Hubungi admin dinas atau kampus bila akun perlu dinonaktifkan.
+                            </div>
+                        @else
+                            @include('profile.partials.delete-user-form')
+                        @endif
                     </div>
                 </div>
             @endif

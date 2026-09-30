@@ -1,13 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
-                {{ __('Pengajuan Magang') }}
-            </h2>
-            <p class="text-xs text-slate-500 mt-1">
-                Pilih instansi dinas, divisi penempatan, dan pantau riwayat pengajuan magang
-            </p>
-        </div>
+        <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+            {{ __('Pengajuan Magang') }}
+        </h2>
     </x-slot>
 
     <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
@@ -36,7 +31,7 @@
             @endif
 
             <!-- Alert Penolakan dari Admin -->
-            @if ($applicationHistory->first() && $applicationHistory->first()->status === 'rejected')
+            @if ($applicationHistory->first()?->statusValue() === 'rejected')
                 <div class="p-5 bg-red-50 border border-red-200 rounded-2xl shadow-sm space-y-2">
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +52,7 @@
             @endif
 
             <!-- Alert Pengunduran Diri -->
-            @if ($applicationHistory->first() && $applicationHistory->first()->status === 'resigned')
+            @if ($applicationHistory->first()?->statusValue() === 'resigned')
                 <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm space-y-2">
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,23 +72,24 @@
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8 space-y-6">
 
                 @if ($activeApplication)
-                    <div class="p-5 rounded-2xl border {{ $activeApplication->status === 'accepted' ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($activeApplication->status === 'completed' ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-amber-50 border-amber-200 text-amber-950') }} shadow-xs space-y-2">
-                        <div class="flex items-center gap-2 font-bold text-sm">
+                    @php $actSt = $activeApplication->statusValue(); @endphp
+                    <div class="p-5 rounded-2xl border {{ in_array($actSt, ['accepted', 'active'], true) ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($actSt === 'completed' ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-amber-50 border-amber-200 text-amber-950') }} shadow-xs space-y-2">
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-2 font-bold text-sm">
                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            @php
-                                $actSt = $activeApplication->status instanceof \BackedEnum ? $activeApplication->status->value : (string)$activeApplication->status;
-                            @endphp
                             <span>
                                 @if(in_array($actSt, ['pending', 'verified']))
-                                    Pengajuan Magang Sedang Diproses (Status: {{ strtoupper($actSt) }})
-                                @elseif(in_array($actSt, ['accepted', 'active']))
-                                    Anda Sudah Memiliki Penempatan Magang Aktif
+                                    Pengajuan Magang Sedang Diproses
+                                @elseif($actSt === 'accepted')
+                                    Pengajuan Magang Anda Telah Diterima
+                                @elseif($actSt === 'active')
+                                    Anda Sedang Menjalani Magang
                                 @elseif($actSt === 'completed')
                                     Program Magang MBKM Telah Selesai
                                 @endif
                             </span>
+                            <x-status-badge :status="$activeApplication->status" class="sm:ml-auto" />
                         </div>
                         <p class="text-xs leading-relaxed">
                             @if(in_array($actSt, ['pending', 'verified']))
@@ -397,16 +393,9 @@
                                     </td>
                                     <td class="py-4 px-5 whitespace-nowrap">
                                         @php
-                                            $st = strtolower($app->status instanceof \BackedEnum ? $app->status->value : (string)($app->status ?? ''));
+                                            $st = $app->statusValue();
                                         @endphp
-                                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-full border
-                                            {{ in_array($st, ['accepted', 'active', 'completed']) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                                            {{ $st === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}
-                                            {{ $st === 'verified' ? 'bg-blue-50 text-blue-700 border-blue-200' : '' }}
-                                            {{ $st === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' : '' }}
-                                            {{ $st === 'resigned' ? 'bg-slate-100 text-slate-700 border-slate-300' : '' }}">
-                                            {{ strtoupper($st) }}
-                                        </span>
+                                        <x-status-badge :status="$app->status" />
                                     </td>
                                     <td class="py-4 px-5 text-xs">
                                         @if ($st === 'rejected')
@@ -450,16 +439,9 @@
                                     {{ $app->created_at->format('d M Y, H:i') }}
                                 </div>
                                 @php
-                                    $st = strtolower($app->status instanceof \BackedEnum ? $app->status->value : (string)($app->status ?? ''));
+                                    $st = $app->statusValue();
                                 @endphp
-                                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border
-                                    {{ in_array($st, ['accepted', 'active', 'completed']) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                                    {{ $st === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}
-                                    {{ $st === 'verified' ? 'bg-blue-50 text-blue-700 border-blue-200' : '' }}
-                                    {{ $st === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' : '' }}
-                                    {{ $st === 'resigned' ? 'bg-slate-100 text-slate-700 border-slate-300' : '' }}">
-                                    {{ strtoupper($st) }}
-                                </span>
+                                <x-status-badge :status="$app->status" />
                             </div>
 
                             <!-- Body: Unit -->

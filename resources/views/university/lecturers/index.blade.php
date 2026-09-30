@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
                 <h2 class="font-bold text-lg sm:text-2xl text-slate-800 leading-tight">
-                    {{ __('Daftar Dosen Pembimbing Lapangan (DPL)') }}
+                    {{ __('Daftar Dosen Pembimbing Lapangan') }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
                     Portal Pengelolaan Dosen Pembimbing Kampus &bull; <strong class="text-slate-700">{{ $univName ?? 'Universitas' }}</strong>
@@ -105,12 +105,7 @@
                                         {{ $l->email }}
                                     </p>
                                 </div>
-                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0
-                                    {{ $l->status === 'on_leave' ? 'bg-amber-50 text-amber-700 border border-amber-200' : '' }}
-                                    {{ $l->status === 'inactive' ? 'bg-slate-100 text-slate-600 border border-slate-200' : '' }}
-                                    {{ $l->status === 'active' || !$l->status ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}">
-                                    {{ $l->status === 'on_leave' ? 'Cuti' : ($l->status === 'inactive' ? 'Nonaktif' : 'Aktif') }}
-                                </span>
+                                <x-status-badge type="account" :status="$l->status ?? 'active'" class="shrink-0" />
                             </div>
 
                             <!-- Baris 2: Beban Bimbingan (Kiri) & Tombol Aksi Sejajar (Kanan) -->
@@ -138,13 +133,16 @@
                                         Edit
                                     </button>
 
-                                    <form action="{{ route('university.lecturers.reset_password', $l->id) }}" method="POST" onsubmit="return confirm('Reset password dosen {{ $l->name }} ke default?');" class="inline-flex m-0 p-0">
-                                        @csrf
-                                        <button type="submit" 
+                                    <button type="button"
+                                            @click="$dispatch('open-reset-modal', {
+                                                action: '{{ route('university.lecturers.reset_password', $l->id) }}',
+                                                name: @js($l->name),
+                                                email: @js($l->email),
+                                                role: 'Dosen Pembimbing'
+                                            })"
                                                 class="inline-flex items-center justify-center h-6 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-[10px] rounded-lg transition">
                                             Reset
                                         </button>
-                                    </form>
 
                                     <button type="button" 
                                             @click="$dispatch('open-delete-modal', {
@@ -195,13 +193,7 @@
                                         </div>
                                     </td>
                                     <td class="py-4 px-4 text-center whitespace-nowrap">
-                                        @if($l->status === 'on_leave')
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Cuti</span>
-                                        @elseif($l->status === 'inactive')
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Non-Aktif</span>
-                                        @else
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
-                                        @endif
+                                        <x-status-badge type="account" :status="$l->status ?? 'active'" />
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <div class="inline-flex items-center gap-1.5 justify-end">
@@ -217,12 +209,16 @@
                                                 Edit
                                             </button>
 
-                                            <form action="{{ route('university.lecturers.reset_password', $l->id) }}" method="POST" onsubmit="return confirm('Reset password dosen {{ $l->name }} ke default?');" class="inline-flex m-0 p-0 items-center">
-                                                @csrf
-                                                <button type="submit" class="inline-flex items-center justify-center h-7 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold rounded-lg text-xs transition cursor-pointer">
+                                            <button type="button"
+                                                    @click="$dispatch('open-reset-modal', {
+                                                        action: '{{ route('university.lecturers.reset_password', $l->id) }}',
+                                                        name: @js($l->name),
+                                                        email: @js($l->email),
+                                                        role: 'Dosen Pembimbing'
+                                                    })"
+                                                    class="inline-flex items-center justify-center h-7 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold rounded-lg text-xs transition cursor-pointer">
                                                     Reset
                                                 </button>
-                                            </form>
 
                                             <button type="button" 
                                                     @click="$dispatch('open-delete-modal', {
@@ -356,10 +352,11 @@
                             Status Keaktifan Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="status" x-model="editLecturer.status" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                            <option value="active">Aktif (Tersedia untuk Membimbing)</option>
-                            <option value="on_leave">Cuti (Sedang Cuti)</option>
-                            <option value="inactive">Non-Aktif (Tidak Membimbing)</option>
+                            @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
+                                <option value="{{ $accountCase->value }}">{{ $accountCase->label() }}</option>
+                            @endforeach
                         </select>
+                        <x-status-legend type="account" />
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">

@@ -1,0 +1,186 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Enums\AccountStatus;
+use App\Enums\ApplicationStatus;
+use App\Enums\FeedbackStatus;
+use App\Enums\ReviewStatus;
+use App\Models\AgencyProfile;
+use App\Models\Application;
+use App\Models\FinalReport;
+use App\Models\Logbook;
+use App\Models\Placement;
+use App\Models\Unit;
+use App\Models\University;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+/**
+ * Satu status = satu nama di semua role. Nama resmi = kode sistem (ApplicationStatus::label),
+ * dirender lewat <x-status-badge>. Dulu tiap halaman menulis nama sendiri, mis. `active`
+ * tampil "ACTIVE", "Sedang Magang", "AKTIF (Sedang Magang)" dan "Magang Aktif".
+ */
+class StatusLabelConsistencyTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_status_names_equal_system_codes(): void
+    {
+        foreach (ApplicationStatus::cases() as $case) {
+            $this->assertSame(strtoupper($case->value), $case->label());
+            $this->assertNotSame('', $case->description());
+            $this->assertSame($case, ApplicationStatus::resolve(' ' . strtoupper($case->value)));
+        }
+        $this->assertNull(ApplicationStatus::resolve('canceled'));
+    }
+
+    public function test_same_application_shows_same_status_name_for_every_role(): void
+    {
+        $univ = University::create(['name' => 'Universitas Selaras', 'code' => 'USL']);
+        $agency = AgencyProfile::create(['agency_name' => 'Dinas Selaras']);
+        $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Selaras', 'quota' => 5]);
+
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $mentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $agency->id]);
+        $dosen = User::factory()->create(['role' => 'dosen', 'university_id' => $univ->id]);
+        $univAdmin = User::factory()->create(['role' => 'universitas', 'university_id' => $univ->id]);
+        $student = User::factory()->create(['role' => 'mahasiswa', 'university_id' => $univ->id]);
+        $student->studentProfile()->create(['nim' => '22081010777', 'universitas' => $univ->name, 'jurusan' => 'TI', 'phone' => '08']);
+
+        $application = Application::create([
+            'user_id' => $student->id,
+            'unit_id' => $unit->id,
+            'status' => 'active',
+            'start_date' => now()->subWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+        ]);
+        $placement = Placement::create([
+            'application_id' => $application->id,
+            'mentor_id' => $mentor->id,
+            'academic_advisor_id' => $dosen->id,
+        ]);
+
+        $pages = [
+            'admin: pengajuan' => [$superAdmin, route('admin.applications.index')],
+            'admin: detail pengajuan' => [$superAdmin, route('admin.applications.show', $application->id)],
+            'admin: pusat kendali dinas' => [$superAdmin, route('admin.agencies.show', $agency->id)],
+            'admin: pusat kendali kampus' => [$superAdmin, route('admin.universities.show', ['university' => $univ->id, 'tab' => 'mahasiswa'])],
+            'mentor: dashboard' => [$mentor, route('mentor.dashboard')],
+            'dosen: monitoring' => [$dosen, route('lecturer.monitoring.index')],
+            'kampus: dashboard' => [$univAdmin, route('university.dashboard')],
+            'kampus: detail mahasiswa' => [$univAdmin, route('university.students.show', $placement->id)],
+            'mahasiswa: dashboard' => [$student, '/dashboard'],
+            'mahasiswa: pengajuan' => [$student, route('student.application.create')],
+        ];
+
+        foreach ($pages as $page => [$user, $url]) {
+            $response = $this->actingAs($user)->get($url);
+            $response->assertOk();
+            $html = $response->getContent();
+
+            $this->assertStringContainsString('data-status="active"', $html, "{$page}: badge standar tidak dipakai");
+            $this->assertStringContainsString('ACTIVE', $html, "{$page}: nama status bukan kode sistem");
+            foreach (['AKTIF (Sedang Magang)', '>Sedang Magang<', 'Magang Aktif'] as $legacy) {
+                $this->assertStringNotContainsString($legacy, $html, "{$page}: masih memakai nama lama \"{$legacy}\"");
+            }
+        }
+    }
+
+    public function test_review_status_names_equal_system_codes(): void
+    {
+        foreach (ReviewStatus::cases() as $case) {
+            $this->assertSame(strtoupper($case->value), $case->label());
+            $this->assertNotSame('', $case->description());
+        }
+    }
+
+    public function test_every_status_enum_shares_the_same_display_standard(): void
+    {
+        foreach ([ApplicationStatus::class, ReviewStatus::class, AccountStatus::class, FeedbackStatus::class] as $enum) {
+            foreach ($enum::cases() as $case) {
+                $this->assertSame(str_replace('_', ' ', strtoupper($case->value)), $case->label());
+                $this->assertNotSame('', $case->description());
+                $this->assertSame($case, $enum::resolve(strtoupper($case->value)));
+            }
+            $this->assertSame(array_column($enum::cases(), 'value'), $enum::values());
+        }
+        $this->assertSame('ON LEAVE', AccountStatus::ON_LEAVE->label());
+        $this->assertSame('IN PROGRESS', FeedbackStatus::IN_PROGRESS->label());
+    }
+
+    public function test_account_and_feedback_status_use_standard_badges(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $agency = AgencyProfile::create(['agency_name' => 'Dinas Akun']);
+        // Dulu akun cuti tampil "Non-Aktif" di pusat kendali dinas
+        $onLeave = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $agency->id, 'status' => 'on_leave', 'name' => 'Mentor Cuti']);
+
+        foreach ([route('admin.users.index'), route('admin.agencies.show', $agency->id), route('admin.mentors.index')] as $url) {
+            $html = $this->actingAs($superAdmin)->get($url)->assertOk()->getContent();
+            $this->assertStringContainsString('data-status="on_leave"', $html, $url);
+            $this->assertStringContainsString('ON LEAVE', $html, $url);
+            $this->assertStringNotContainsString('Non-Aktif', $html, $url);
+        }
+        $this->assertFalse($onLeave->isInactive(), 'Cuti tidak boleh memblokir login');
+
+        $feedback = \App\Models\SystemFeedback::create([
+            'user_id' => $onLeave->id, 'sender_name' => $onLeave->name, 'sender_email' => $onLeave->email,
+            'sender_role' => 'mentor', 'category' => 'pertanyaan', 'subject' => 'Tanya', 'message' => 'Isi', 'status' => 'in_progress',
+        ]);
+        foreach ([route('admin.feedbacks.index'), route('feedbacks.show', $feedback->id)] as $url) {
+            $html = $this->actingAs($superAdmin)->get($url)->assertOk()->getContent();
+            $this->assertStringContainsString('data-status="in_progress"', $html, $url);
+            $this->assertStringContainsString('IN PROGRESS', $html, $url);
+        }
+    }
+
+    public function test_logbook_and_report_show_same_review_status_for_every_role(): void
+    {
+        $univ = University::create(['name' => 'Universitas Review', 'code' => 'URV']);
+        $agency = AgencyProfile::create(['agency_name' => 'Dinas Review']);
+        $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Review', 'quota' => 5]);
+
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $mentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $agency->id]);
+        $dosen = User::factory()->create(['role' => 'dosen', 'university_id' => $univ->id]);
+        $univAdmin = User::factory()->create(['role' => 'universitas', 'university_id' => $univ->id]);
+        $student = User::factory()->create(['role' => 'mahasiswa', 'university_id' => $univ->id]);
+        $student->studentProfile()->create(['nim' => '22081010888', 'universitas' => $univ->name, 'jurusan' => 'TI', 'phone' => '08']);
+
+        $application = Application::create([
+            'user_id' => $student->id, 'unit_id' => $unit->id, 'status' => 'active',
+            'start_date' => now()->subWeek()->toDateString(), 'end_date' => now()->addMonth()->toDateString(),
+        ]);
+        $placement = Placement::create(['application_id' => $application->id, 'mentor_id' => $mentor->id, 'academic_advisor_id' => $dosen->id]);
+        // Mentor menolak, dosen belum meninjau
+        $logbook = Logbook::create([
+            'placement_id' => $placement->id, 'date' => now()->subDay()->toDateString(), 'activity' => 'Menyusun arsip',
+            'status' => 'rejected', 'lecturer_status' => 'pending',
+        ]);
+        FinalReport::create(['placement_id' => $placement->id, 'file_path' => 'laporan.pdf', 'status' => 'revision']);
+
+        $pages = [
+            'admin: detail logbook' => [$superAdmin, route('admin.logbooks.show', $logbook->id), ['rejected', 'pending']],
+            'mentor: logbook' => [$mentor, route('mentor.logbooks.index'), ['rejected']],
+            'kampus: detail mahasiswa' => [$univAdmin, route('university.students.show', $placement->id), ['rejected', 'pending']],
+            'mahasiswa: logbook' => [$student, route('student.logbook.index'), ['rejected', 'pending']],
+            'mahasiswa: laporan akhir' => [$student, route('student.final_report.index'), ['revision']],
+            'mentor: dashboard' => [$mentor, route('mentor.dashboard', ['tab' => 'all']), ['revision']],
+            'dosen: monitoring' => [$dosen, route('lecturer.monitoring.index'), ['revision']],
+            'dosen: dashboard' => [$dosen, route('lecturer.dashboard'), ['revision']],
+        ];
+
+        foreach ($pages as $page => [$user, $url, $codes]) {
+            $html = $this->actingAs($user)->get($url)->assertOk()->getContent();
+            foreach ($codes as $code) {
+                $this->assertStringContainsString("data-status=\"{$code}\"", $html, "{$page}: badge {$code} tidak dipakai");
+                $this->assertStringContainsString(strtoupper($code), $html, "{$page}: nama {$code} bukan kode sistem");
+            }
+            foreach (['Mentor: Pending', 'Laporan Disetujui (ACC)', 'Perlu Perbaikan (Revisi)', 'Minta Revisi (Rejected)'] as $legacy) {
+                $this->assertStringNotContainsString($legacy, $html, "{$page}: masih memakai nama lama \"{$legacy}\"");
+            }
+        }
+    }
+}

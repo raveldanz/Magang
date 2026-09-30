@@ -177,26 +177,7 @@
                                     </div>
                                 </div>
                                 <div class="shrink-0">
-                                    @if($rawStatus === 'active')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            <span>ACTIVE</span>
-                                        </span>
-                                    @elseif($rawStatus === 'accepted')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                            <span>ACCEPTED</span>
-                                        </span>
-                                    @elseif($rawStatus === 'completed')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                            <span>COMPLETED</span>
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-300">
-                                            <span>{{ strtoupper($rawStatus) }}</span>
-                                        </span>
-                                    @endif
+                                    <x-status-badge :status="$appStatus" />
                                 </div>
                             </div>
 
@@ -295,37 +276,7 @@
 
                                     <!-- Status Magang -->
                                     <td class="py-4 px-4 text-center">
-                                        @if($rawStatus === 'active')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                <span>ACTIVE</span>
-                                            </span>
-                                        @elseif($rawStatus === 'accepted')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                                <span>ACCEPTED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'completed')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                                <span>COMPLETED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'resigned')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                                                <span>RESIGNED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'rejected')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                <span>REJECTED</span>
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                <span>{{ strtoupper($rawStatus) }}</span>
-                                            </span>
-                                        @endif
+                                        <x-status-badge :status="$appStatus" />
                                     </td>
 
                                     <!-- Status Logbook -->
@@ -346,21 +297,8 @@
 
                                     <!-- Laporan Akhir -->
                                     <td class="py-4 px-4 text-center">
-                                        @if ($report && $report->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                Disetujui
-                                            </span>
-                                        @elseif ($report && $report->status === 'revision')
-                                            <span class="px-2.5 py-1 bg-rose-50 text-rose-700 text-xs font-bold rounded-full border border-rose-200">
-                                                Revisi
-                                            </span>
-                                        @elseif ($report)
-                                            <span class="px-2.5 py-1 bg-yellow-50 text-yellow-800 text-xs font-medium rounded-full border border-yellow-200">
-                                                Terkirim
-                                            </span>
+                                        @if ($report)
+                                            <x-status-badge type="review" :status="$report->status" />
                                         @else
                                             <span class="text-xs text-gray-400 italic">Belum Ada</span>
                                         @endif

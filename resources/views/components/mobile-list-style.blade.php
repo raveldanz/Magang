@@ -22,13 +22,13 @@
     .mcard-sub { margin-top: 3px; font-size: 12px; color: #64748b; line-height: 1.45; }
     .mcard-sub .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #2563eb; }
     .mcard-body { margin-top: 12px; display: grid; gap: 10px; }
-    .mfield-label { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #94a3b8; }
+    .mfield-label { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #94a3b8; }
     .mfield-value { margin-top: 2px; font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.4; }
     .mcard-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9; display: flex; gap: 8px; align-items: center; }
     .mscore { flex: none; min-width: 54px; padding: 5px 8px; border-radius: 12px; background: #ecfdf5; border: 1px solid #a7f3d0; text-align: center; }
     .mscore b { display: block; font-size: 17px; line-height: 1.1; color: #047857; }
-    .mscore span { font-size: 10px; font-weight: 700; color: #059669; }
-    .mpill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .mscore span { font-size: 11px; font-weight: 700; color: #059669; }
+    .mpill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
     .mpill-green { background: #d1fae5; color: #065f46; }
     .mpill-red { background: #ffe4e6; color: #9f1239; }
     .mpill-blue { background: #eff6ff; color: #1d4ed8; }

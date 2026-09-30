@@ -307,21 +307,31 @@
 
                         <!-- Action Footer Sejajar (Format Baku: Tombol Sekunder & Tombol Primer) -->
                         <div class="flex items-center gap-2 pt-2">
-                            @if(($agency->total_admins ?? 0) === 0)
+                            @if($isSuperAdmin && ($agency->total_admins ?? 0) === 0)
                                 <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}"
-                                    class="w-1/3 m-0">
+                                    class="shrink-0 m-0">
                                     @csrf
-                                    <button type="submit"
-                                        class="w-full py-2.5 px-3 rounded-xl border border-slate-900 text-slate-900 bg-white hover:bg-slate-900 hover:text-white font-bold text-xs transition cursor-pointer active:scale-95">
+                                    <button type="button"
+                                        @click="$dispatch('open-confirm-modal', {
+                                            form: $el.form,
+                                            title: 'Buat Akun Admin Dinas',
+                                            message: 'Sistem akan membuat akun login untuk PIC dinas agar dapat mengelola divisi, kuota, dan pengajuan magang.',
+                                            label: 'Instansi:',
+                                            name: @js($agency->agency_name),
+                                            desc: 'Password awal: password',
+                                            confirmText: 'Ya, Buat Akun'
+                                        })"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
+                                        title="Buatkan Akun Admin Dinas">
                                         Buat Akun
                                     </button>
                                 </form>
                             @elseif($isSuperAdmin && $firstAdmin)
                                 <form action="{{ route('admin.impersonate', $firstAdmin->id) }}" method="POST"
-                                    class="w-1/3 m-0">
+                                    class="shrink-0 m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold text-xs transition cursor-pointer active:scale-95"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Masuk Sebagai Admin Dinas">
                                         Login As
                                     </button>
@@ -329,7 +339,7 @@
                             @endif
 
                             <a href="{{ route('admin.agencies.show', $agency->id) }}"
-                                class="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer">
+                                class="flex-1 min-w-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer whitespace-nowrap truncate">
                                 Kelola Dinas
                             </a>
                         </div>
