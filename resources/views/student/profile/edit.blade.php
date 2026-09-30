@@ -39,7 +39,7 @@
                                 <h3 class="font-bold text-base text-slate-900 truncate">{{ $user->name }}</h3>
                                 <p class="text-xs text-slate-500 truncate">{{ $user->email }}</p>
                                 <span class="inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                    Mahasiswa MBKM
+                                    Mahasiswa MBK
                                 </span>
                             </div>
                         </div>
