@@ -20,8 +20,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\TK ABA SBY 69 (3)\\.gemini\\antigravity-ide\\brain\\ed9247fc-cc69-4353-a531-61712e0581f1';
+const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\TK ABA SBY 69 (3)\\.gemini\\antigravity-ide\\brain\\915a2d56-5924-4c37-aae7-696a537252dc';
+const publicTestArtifactsDir = path.resolve(projectRoot, 'public/test-artifacts');
 
+if (!fs.existsSync(publicTestArtifactsDir)) {
+    fs.mkdirSync(publicTestArtifactsDir, { recursive: true });
+}
 if (!fs.existsSync(artifactDir)) {
     fs.mkdirSync(artifactDir, { recursive: true });
 }
@@ -43,22 +47,41 @@ const baseUrl = targetPath.startsWith('http') ? targetPath : `http://127.0.0.1:8
 const takeScreenshot = hasFlag('--screenshot') || true;
 const role = getArg('--role', null);
 
+async function authenticateIfNeeded(page, targetRole) {
+    if (!targetRole && !targetPath.startsWith('/admin')) {
+        return;
+    }
+    const roleName = targetRole || 'admin';
+    const email = roleName === 'admin' ? 'admin.qa@test.local' : `${roleName}@test.local`;
+    const password = 'password';
+
+    console.log(`[YOLO] Otentikasi otomatis sebagai [${roleName}] (${email})...`);
+    await page.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
+    await page.fill('input[name="email"]', email);
+    await page.fill('input[name="password"]', password);
+    await page.click('button[type="submit"]');
+    await page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
+}
+
 async function runYolo() {
     console.log('================================================================');
     console.log('  AUTONOMOUS BROWSER RUNNER (YOLO / ZERO-PROMPT EXECUTION MODE) ');
     console.log('================================================================');
     console.log(`[YOLO] Target URL : ${baseUrl}`);
-    console.log(`[YOLO] Mode       : Autonomous Headless Engine (Strict Exit Code 0)`);
+    console.log(`[YOLO] Mode       : Google Chrome Local System (channel: chrome)`);
 
     // 1. HARD VISUAL GUARD
     assertManifestBuilt(projectRoot);
     console.log('[YOLO] [+] Manifest Vite valid & siap uji.');
 
     const browser = await chromium.launch({
-        headless: true
+        headless: true,
+        channel: 'chrome' // Menggunakan Google Chrome bawaan sistem lokal Windows
     });
 
     try {
+        const cleanName = targetPath.replace(/[^a-zA-Z0-9_-]/g, '_');
+
         // --- 1. DESKTOP RUN ---
         console.log('[YOLO] Eksekusi Desktop Viewport (1920x1080)...');
         const contextDesktop = await browser.newContext({
@@ -66,6 +89,7 @@ async function runYolo() {
             deviceScaleFactor: 1
         });
         const pageDesktop = await contextDesktop.newPage();
+        await authenticateIfNeeded(pageDesktop, role);
         await pageDesktop.goto(baseUrl, { waitUntil: 'networkidle' });
 
         const desktopGuard = await assertVisualStyles(pageDesktop);
@@ -75,10 +99,11 @@ async function runYolo() {
             console.log(`[YOLO] Desktop WCAG AA     : ${desktopGuard.wcagPass ? 'PASS (' + desktopGuard.contrastRatio + ':1)' : 'FAIL'}`);
         }
 
-        const cleanName = targetPath.replace(/[^a-zA-Z0-9_-]/g, '_');
-        const desktopShot = path.join(artifactDir, `yolo_${cleanName}_desktop.png`);
-        await pageDesktop.screenshot({ path: desktopShot, fullPage: true });
-        console.log(`[YOLO] [+] Desktop Screenshot tersimpan: ${desktopShot}`);
+        const publicDesktopShot = path.join(publicTestArtifactsDir, `yolo_${cleanName}_desktop.png`);
+        const brainDesktopShot = path.join(artifactDir, `yolo_${cleanName}_desktop.png`);
+        await pageDesktop.screenshot({ path: publicDesktopShot, fullPage: true });
+        try { fs.copyFileSync(publicDesktopShot, brainDesktopShot); } catch (_) {}
+        console.log(`[YOLO] [+] Desktop Screenshot tersimpan: ${publicDesktopShot}`);
         await contextDesktop.close();
 
         // --- 2. MOBILE RUN ---
@@ -90,14 +115,17 @@ async function runYolo() {
             hasTouch: true
         });
         const pageMobile = await contextMobile.newPage();
+        await authenticateIfNeeded(pageMobile, role);
         await pageMobile.goto(baseUrl, { waitUntil: 'networkidle' });
 
         const mobileGuard = await assertVisualStyles(pageMobile);
         console.log(`[YOLO] Mobile Horizontal Scroll : ${mobileGuard.hasHorizontalScroll ? 'ADA OVERFLOW (FAIL)' : 'TIDAK ADA (PASS)'}`);
 
-        const mobileShot = path.join(artifactDir, `yolo_${cleanName}_mobile.png`);
-        await pageMobile.screenshot({ path: mobileShot, fullPage: true });
-        console.log(`[YOLO] [+] Mobile Screenshot tersimpan : ${mobileShot}`);
+        const publicMobileShot = path.join(publicTestArtifactsDir, `yolo_${cleanName}_mobile.png`);
+        const brainMobileShot = path.join(artifactDir, `yolo_${cleanName}_mobile.png`);
+        await pageMobile.screenshot({ path: publicMobileShot, fullPage: true });
+        try { fs.copyFileSync(publicMobileShot, brainMobileShot); } catch (_) {}
+        console.log(`[YOLO] [+] Mobile Screenshot tersimpan : ${publicMobileShot}`);
         await contextMobile.close();
 
         console.log('================================================================');

@@ -2,8 +2,9 @@
  * Tier 3 - Autonomous Playwright Visual Audit Runner
  * Lokasi: scripts/tier3_playwright_audit.mjs
  * 
- * Menguji rendering antarmuka login dan tabel pengajuan admin (desktop & mobile)
- * menggunakan Playwright Engine dengan Hard Visual Guard.
+ * Menguji rendering antarmuka login, tabel pengajuan admin, detail pengajuan,
+ * dan manajemen pengguna admin (desktop & mobile) menggunakan Google Chrome Lokal (channel: chrome)
+ * dengan Hard Visual Guard.
  */
 
 import { chromium } from 'playwright';
@@ -16,15 +17,30 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\TK ABA SBY 69 (3)\\.gemini\\antigravity-ide\\brain\\e1ebafff-a3cb-4b1c-826c-c650860360c2';
+const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\TK ABA SBY 69 (3)\\.gemini\\antigravity-ide\\brain\\915a2d56-5924-4c37-aae7-696a537252dc';
+const publicTestArtifactsDir = path.resolve(projectRoot, 'public/test-artifacts');
 
+if (!fs.existsSync(publicTestArtifactsDir)) {
+    fs.mkdirSync(publicTestArtifactsDir, { recursive: true });
+}
 if (!fs.existsSync(artifactDir)) {
     fs.mkdirSync(artifactDir, { recursive: true });
+}
+
+async function saveDualScreenshot(page, filename, brainFilename = null) {
+    const publicPath = path.join(publicTestArtifactsDir, filename);
+    const brainPath = path.join(artifactDir, brainFilename || filename);
+    await page.screenshot({ path: publicPath, fullPage: true });
+    try {
+        fs.copyFileSync(publicPath, brainPath);
+    } catch (_) {}
+    return publicPath;
 }
 
 async function runTier3PlaywrightAudit() {
     console.log('========================================================================');
     console.log('  TIER 3: AUTONOMOUS PLAYWRIGHT VISUAL AUDIT & HARD VISUAL GUARD');
+    console.log('  Mode: Google Chrome Local System (channel: chrome)');
     console.log('========================================================================');
 
     // 1. HARD VISUAL GUARD: Verifikasi Manifest Build
@@ -33,11 +49,12 @@ async function runTier3PlaywrightAudit() {
     console.log('[Tier 3] [+] Manifest build terverifikasi aktif.');
 
     const browser = await chromium.launch({
-        headless: true
+        headless: true,
+        channel: 'chrome' // Menggunakan Google Chrome bawaan sistem Windows lokal
     });
 
     const report = {
-        tier: 'Tier 3 (Playwright Engine)',
+        tier: 'Tier 3 (Playwright Engine - Channel Chrome)',
         timestamp: new Date().toISOString(),
         login: {
             desktop: null,
@@ -51,6 +68,10 @@ async function runTier3PlaywrightAudit() {
             desktop: null,
             mobile: null
         },
+        adminUsersTable: {
+            desktop: null,
+            mobile: null
+        },
         wcagPass: false,
         overflowPass: false,
         visualGuardPass: false
@@ -60,7 +81,7 @@ async function runTier3PlaywrightAudit() {
         // =====================================================================
         // FASE 1: AUDIT LOGIN PORTAL (DESKTOP & MOBILE)
         // =====================================================================
-        console.log('\n[Tier 3] [1/3] Menguji Antarmuka Login Portal...');
+        console.log('\n[Tier 3] [1/4] Menguji Antarmuka Login Portal (/login)...');
 
         // 1A. Login Desktop (1920x1080)
         const contextLoginDesktop = await browser.newContext({
@@ -71,8 +92,7 @@ async function runTier3PlaywrightAudit() {
         await pageLoginDesktop.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
 
         const loginDesktopVisual = await assertVisualStyles(pageLoginDesktop);
-        const loginDesktopShot = path.join(artifactDir, 'tier3_playwright_desktop_1920x1080.png');
-        await pageLoginDesktop.screenshot({ path: loginDesktopShot, fullPage: true });
+        const loginDesktopShot = await saveDualScreenshot(pageLoginDesktop, 'login_desktop.png', 'tier3_playwright_desktop_1920x1080.png');
 
         report.login.desktop = {
             viewport: '1920x1080',
@@ -96,8 +116,7 @@ async function runTier3PlaywrightAudit() {
         await pageLoginMobile.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
 
         const loginMobileVisual = await assertVisualStyles(pageLoginMobile);
-        const loginMobileShot = path.join(artifactDir, 'tier3_playwright_mobile_375x812.png');
-        await pageLoginMobile.screenshot({ path: loginMobileShot, fullPage: true });
+        const loginMobileShot = await saveDualScreenshot(pageLoginMobile, 'login_mobile.png', 'tier3_playwright_mobile_375x812.png');
 
         report.login.mobile = {
             viewport: '375x812',
@@ -113,7 +132,7 @@ async function runTier3PlaywrightAudit() {
         // =====================================================================
         // FASE 2: AUDIT TABEL PENGAJUAN ADMIN (DESKTOP VIEWPORT 1920x1080)
         // =====================================================================
-        console.log('\n[Tier 3] [2/3] Menguji Tabel Pengajuan Magang Admin (Desktop 1920x1080)...');
+        console.log('\n[Tier 3] [2/4] Menguji Tabel Pengajuan Magang Admin (/admin/applications)...');
 
         const contextAdminDesktop = await browser.newContext({
             viewport: { width: 1920, height: 1080 },
@@ -133,8 +152,7 @@ async function runTier3PlaywrightAudit() {
 
         // Evaluasi Hard Visual Guard pada Tabel Desktop
         const tableDesktopVisual = await assertVisualStyles(pageAdminDesktop);
-        const tableDesktopShot = path.join(artifactDir, 'admin_applications_desktop_1920x1080.png');
-        await pageAdminDesktop.screenshot({ path: tableDesktopShot, fullPage: true });
+        const tableDesktopShot = await saveDualScreenshot(pageAdminDesktop, 'admin_applications_desktop.png', 'admin_applications_desktop_1920x1080.png');
 
         // Cek Keberadaan Elemen Kunci Tabel
         const hasDesktopTable = await pageAdminDesktop.locator('table').count() > 0;
@@ -163,7 +181,6 @@ async function runTier3PlaywrightAudit() {
         // FASE 3: AUDIT DETAIL VERIFIKASI SELEKSI & PENOLAKAN
         // =====================================================================
         console.log('[Tier 3] Menguji Halaman Verifikasi Detail Pengajuan (Desktop)...');
-        // Cari tombol detail pertama menuju show
         const detailLink = pageAdminDesktop.locator('a[href*="/admin/applications/"]:visible').first();
         if (await detailLink.count() > 0) {
             await detailLink.click();
@@ -175,14 +192,12 @@ async function runTier3PlaywrightAudit() {
             if (await rejectedCardBtn.count() > 0) {
                 await rejectedCardBtn.click();
                 await pageAdminDesktop.waitForTimeout(300);
-                const rejectionShot = path.join(artifactDir, 'admin_application_rejection_box.png');
-                await pageAdminDesktop.screenshot({ path: rejectionShot, fullPage: true });
+                const rejectionShot = await saveDualScreenshot(pageAdminDesktop, 'admin_application_rejection_box.png');
                 report.adminApplicationDetail.rejectionBoxScreenshot = rejectionShot;
             }
 
             const detailDesktopVisual = await assertVisualStyles(pageAdminDesktop);
-            const detailDesktopShot = path.join(artifactDir, 'admin_application_detail_desktop.png');
-            await pageAdminDesktop.screenshot({ path: detailDesktopShot, fullPage: true });
+            const detailDesktopShot = await saveDualScreenshot(pageAdminDesktop, 'admin_application_detail_desktop.png');
 
             report.adminApplicationDetail.desktop = {
                 viewport: '1920x1080',
@@ -193,12 +208,34 @@ async function runTier3PlaywrightAudit() {
                 screenshot: detailDesktopShot
             };
         }
+
+        // =====================================================================
+        // FASE 4: AUDIT MASTER PENGGUNA ADMIN (DESKTOP VIEWPORT 1920x1080)
+        // =====================================================================
+        console.log('\n[Tier 3] [3/4] Menguji Halaman Master Pengguna Admin (/admin/users)...');
+        await pageAdminDesktop.goto('http://127.0.0.1:8000/admin/users', { waitUntil: 'networkidle' });
+
+        const usersDesktopVisual = await assertVisualStyles(pageAdminDesktop);
+        const usersDesktopShot = await saveDualScreenshot(pageAdminDesktop, 'admin_users_desktop.png', 'admin_users_desktop_1920x1080.png');
+        const hasUsersTable = await pageAdminDesktop.locator('table').count() > 0;
+
+        report.adminUsersTable.desktop = {
+            viewport: '1920x1080',
+            bodyFont: usersDesktopVisual.bodyFont,
+            primaryBtn: usersDesktopVisual.primaryBtn,
+            contrastRatio: usersDesktopVisual.contrastRatio,
+            wcagPass: usersDesktopVisual.wcagPass,
+            hasHorizontalScroll: usersDesktopVisual.hasHorizontalScroll,
+            hasTable: hasUsersTable,
+            screenshot: usersDesktopShot
+        };
+
         await contextAdminDesktop.close();
 
         // =====================================================================
-        // FASE 4: AUDIT TABEL PENGAJUAN ADMIN (MOBILE VIEWPORT 375x812)
+        // FASE 5: AUDIT TABEL PENGAJUAN & USERS (MOBILE VIEWPORT 375x812)
         // =====================================================================
-        console.log('\n[Tier 3] [3/3] Menguji Tabel Pengajuan Magang Admin (Mobile 375x812)...');
+        console.log('\n[Tier 3] [4/4] Menguji Tabel Pengajuan & Master Pengguna Admin (Mobile 375x812)...');
 
         const contextAdminMobile = await browser.newContext({
             viewport: { width: 375, height: 812 },
@@ -215,15 +252,11 @@ async function runTier3PlaywrightAudit() {
         await pageAdminMobile.click('button[type="submit"]');
         await pageAdminMobile.waitForURL(url => url.pathname.includes('/admin') || url.pathname.includes('/dashboard'), { timeout: 15000 });
 
-        // Navigasi ke Daftar Pengajuan Magang Admin
+        // Navigasi ke Daftar Pengajuan Magang Admin Mobile
         await pageAdminMobile.goto('http://127.0.0.1:8000/admin/applications', { waitUntil: 'networkidle' });
 
-        // Evaluasi Hard Visual Guard pada Mobile Cards
         const tableMobileVisual = await assertVisualStyles(pageAdminMobile);
-        const tableMobileShot = path.join(artifactDir, 'admin_applications_mobile_375x812.png');
-        await pageAdminMobile.screenshot({ path: tableMobileShot, fullPage: true });
-
-        // Cek Elemen Mobile Cards
+        const tableMobileShot = await saveDualScreenshot(pageAdminMobile, 'admin_applications_mobile.png', 'admin_applications_mobile_375x812.png');
         const hasMobileCards = await pageAdminMobile.locator('.md\\:hidden').count() > 0;
 
         report.adminApplicationsTable.mobile = {
@@ -242,8 +275,7 @@ async function runTier3PlaywrightAudit() {
             await pageAdminMobile.waitForLoadState('networkidle');
 
             const detailMobileVisual = await assertVisualStyles(pageAdminMobile);
-            const detailMobileShot = path.join(artifactDir, 'admin_application_detail_mobile.png');
-            await pageAdminMobile.screenshot({ path: detailMobileShot, fullPage: true });
+            const detailMobileShot = await saveDualScreenshot(pageAdminMobile, 'admin_application_detail_mobile.png');
 
             report.adminApplicationDetail.mobile = {
                 viewport: '375x812',
@@ -252,20 +284,36 @@ async function runTier3PlaywrightAudit() {
                 screenshot: detailMobileShot
             };
         }
+
+        // Navigasi ke Manajemen Pengguna Admin Mobile (/admin/users)
+        await pageAdminMobile.goto('http://127.0.0.1:8000/admin/users', { waitUntil: 'networkidle' });
+        const usersMobileVisual = await assertVisualStyles(pageAdminMobile);
+        const usersMobileShot = await saveDualScreenshot(pageAdminMobile, 'admin_users_mobile.png', 'admin_users_mobile_375x812.png');
+
+        report.adminUsersTable.mobile = {
+            viewport: '375x812',
+            bodyFont: usersMobileVisual.bodyFont,
+            hasHorizontalScroll: usersMobileVisual.hasHorizontalScroll,
+            screenshot: usersMobileShot
+        };
+
         await contextAdminMobile.close();
 
         // Simpulkan Status Keseluruhan
         report.wcagPass = report.login.desktop.wcagPass && 
                           report.login.mobile.wcagPass && 
-                          report.adminApplicationsTable.desktop.wcagPass;
+                          report.adminApplicationsTable.desktop.wcagPass &&
+                          report.adminUsersTable.desktop.wcagPass;
         report.overflowPass = !report.login.desktop.hasHorizontalScroll && 
                               !report.login.mobile.hasHorizontalScroll && 
                               !report.adminApplicationsTable.desktop.hasHorizontalScroll && 
-                              !report.adminApplicationsTable.mobile.hasHorizontalScroll;
+                              !report.adminApplicationsTable.mobile.hasHorizontalScroll &&
+                              !report.adminUsersTable.desktop.hasHorizontalScroll &&
+                              !report.adminUsersTable.mobile.hasHorizontalScroll;
         report.visualGuardPass = true;
 
         console.log('\n========================================================================');
-        console.log('  [PASS] HASIL AUDIT VISUAL RESMI PLAYWRIGHT TIER 3:');
+        console.log('  [PASS] HASIL AUDIT VISUAL RESMI PLAYWRIGHT TIER 3 (CHROME CHANNEL):');
         console.log('========================================================================');
         console.log(JSON.stringify(report, null, 2));
 
