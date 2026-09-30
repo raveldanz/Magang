@@ -67,7 +67,7 @@ class NotificationService
             }
 
             // C. Pengajuan Magang Baru Menunggu Verifikasi
-            $pendingAppsCount = Application::whereIn('status', ['submitted', 'pending'])->count();
+            $pendingAppsCount = Application::where('status', 'pending')->count();
             if ($pendingAppsCount > 0) {
                 $actionable[] = [
                     'id' => 'apps_pending',
@@ -124,7 +124,7 @@ class NotificationService
 
             // D. Penetapan Pembimbing Belum Lengkap (Mahasiswa Diterima tapi Belum Ada DPL)
             $unassignedDpl = Placement::whereNull('academic_advisor_id')
-                ->whereHas('application', fn($q) => $q->where('status', 'accepted'))
+                ->whereHas('application', fn($q) => $q->whereIn('status', \App\Models\Application::QUOTA_STATUSES))
                 ->count();
             if ($unassignedDpl > 0) {
                 $actionable[] = [
@@ -132,7 +132,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'academic',
                     'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki DPL",
-                    'message' => "Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan (DPL) belum ditentukan.",
+                    'message' => "Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan belum ditentukan.",
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Lihat Penempatan',
@@ -143,7 +143,7 @@ class NotificationService
 
         // 2. ADMIN DINAS NOTIFICATIONS
         elseif ($isAdminDinas) {
-            $agencyAppsCount = Application::whereIn('status', ['submitted', 'pending'])
+            $agencyAppsCount = Application::where('status', 'pending')
                 ->whereHas('unit', fn($q) => $q->where('agency_profile_id', $agencyId))
                 ->count();
             if ($agencyAppsCount > 0) {
@@ -159,7 +159,7 @@ class NotificationService
                 ];
             }
 
-            $pendingLogbooks = Logbook::where('status', 'submitted')
+            $pendingLogbooks = Logbook::where('status', 'pending')
                 ->whereHas('placement.application.unit', fn($q) => $q->where('agency_profile_id', $agencyId))
                 ->count();
             if ($pendingLogbooks > 0) {
@@ -177,7 +177,7 @@ class NotificationService
             }
         }
 
-        // 3. DOSEN (DPL) NOTIFICATIONS
+        // 3. DOSEN PEMBIMBING NOTIFICATIONS
         elseif ($role === 'dosen' || $role === 'academic_advisor') {
             // Mahasiswa Bimbingan Baru
             $placements = Placement::where('academic_advisor_id', $user->id)
@@ -207,7 +207,7 @@ class NotificationService
 
             // Laporan Akhir Siap Dinilai
             $pendingReportsCount = FinalReport::whereIn('placement_id', $placements->pluck('id'))
-                ->where('status', 'submitted')
+                ->where('status', 'pending')
                 ->count();
 
             if ($pendingReportsCount > 0) {
@@ -247,7 +247,7 @@ class NotificationService
                     }
                 })->get();
 
-            $pendingMentorLogbooks = Logbook::where('status', 'submitted')
+            $pendingMentorLogbooks = Logbook::where('status', 'pending')
                 ->whereIn('placement_id', $mentorPlacements->pluck('id'))
                 ->count();
 
@@ -285,7 +285,7 @@ class NotificationService
             $latestApp = Application::where('user_id', $user->id)->latest()->first();
             if ($latestApp) {
                 $status = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : strtolower((string)$latestApp->status);
-                if (in_array($status, ['pending', 'submitted', 'verified'])) {
+                if (in_array($status, ['pending', 'verified'])) {
                     $actionable[] = [
                         'id' => 'student_app_pending',
                         'type' => 'warning',
@@ -305,7 +305,7 @@ class NotificationService
                             'type' => 'urgent',
                             'category' => 'academic',
                             'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih DPL',
-                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing Lapangan (DPL) pada dashboard.',
+                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing Lapangan pada dashboard.',
                             'time' => 'Tindakan diperlukan',
                             'action_url' => route('dashboard'),
                             'action_label' => 'Pilih DPL',
@@ -386,7 +386,7 @@ class NotificationService
                         'id' => 'univ_no_dosen',
                         'type' => 'warning',
                         'category' => 'university',
-                        'title' => 'Belum Ada Dosen Pembimbing (DPL) Terdaftar',
+                        'title' => 'Belum Ada Dosen Pembimbing Terdaftar',
                         'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih DPL dengan mudah.',
                         'time' => 'Perlu kelengkapan',
                         'action_url' => route('university.lecturers.index'),

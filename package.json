@@ -9,7 +9,10 @@
         "autopilot:watch": "node scripts/hermes_autopilot.mjs --watch",
         "live": "node scripts/hermes_live_browser.mjs",
         "student:7days": "node scripts/hermes_live_student_7days.mjs",
-        "test:hermes": "node scripts/hermes_all_roles_test.mjs"
+        "test:hermes": "node scripts/hermes_all_roles_test.mjs",
+        "test:visual": "node scripts/visual-guard.mjs && node scripts/tier3_playwright_audit.mjs",
+        "test:tier1": "node scripts/tier1_puppeteer_audit.mjs",
+        "test:playwright": "node scripts/tier3_playwright_audit.mjs"
     },
     "devDependencies": {
         "@modelcontextprotocol/sdk": "^1.30.1",
@@ -19,6 +22,7 @@
         "autoprefixer": "^10.4.2",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^3.1",
+        "playwright": "^1.63.0",
         "postcss": "^8.4.31",
         "puppeteer-core": "^25.11.0",
         "tailwindcss": "^3.1.0",

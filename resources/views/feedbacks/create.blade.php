@@ -197,7 +197,7 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('Ukuran berkas melebihi batas maksimal 5MB.');
+                    notify('Ukuran berkas melebihi batas maksimal 5MB.');
                     input.value = '';
                     box.classList.add('hidden');
                     box.classList.remove('flex');

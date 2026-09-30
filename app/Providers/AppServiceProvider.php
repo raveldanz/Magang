@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Pagination\Paginator::useTailwind();
         // Login API: 5 percobaan/menit per (email + IP) agar brute force satu akun tertahan,
         // tapi ratusan mahasiswa di satu jaringan kampus (IP sama) tetap bisa login bersamaan.
         // Batas longgar per IP (300/menit) hanya untuk menahan serangan massal.

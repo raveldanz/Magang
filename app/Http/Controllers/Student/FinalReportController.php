@@ -21,13 +21,13 @@ class FinalReportController extends Controller
     // 1. Ambil pengajuan magang yang aktif / terbaru
     $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
         ->where('user_id', Auth::id())
-        ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+        ->whereNotIn('status', ['rejected', 'resigned'])
         ->whereHas('placement')
         ->latest()
         ->first()
         ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
-            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+            ->whereNotIn('status', ['rejected', 'resigned'])
             ->latest()
             ->first();
 
@@ -46,7 +46,7 @@ class FinalReportController extends Controller
     if ($placement) {
         // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
         }
 
         $finalReport = $placement->finalreport;
@@ -67,13 +67,13 @@ class FinalReportController extends Controller
         // Prioritaskan pengajuan aktif yang belum resigned/rejected
         $application = Application::with('placement')
             ->where('user_id', $user->id)
-            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+            ->whereNotIn('status', ['rejected', 'resigned'])
             ->whereHas('placement')
             ->latest()
             ->first()
             ?? Application::with('placement')
                 ->where('user_id', $user->id)
-                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+                ->whereNotIn('status', ['rejected', 'resigned'])
                 ->latest()
                 ->first();
         
@@ -85,7 +85,7 @@ class FinalReportController extends Controller
 
         // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu.');
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;

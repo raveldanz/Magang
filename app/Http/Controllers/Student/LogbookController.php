@@ -16,17 +16,17 @@ class LogbookController extends Controller
 {
     /**
      * Helper untuk mengambil pengajuan magang yang aktif / berjalan
-     * Mencegah pembajakan data oleh pengajuan lama yang sudah resigned/rejected/canceled
+     * Mencegah pembajakan data oleh pengajuan lama yang sudah resigned/rejected
      */
     protected function getActiveInternship($userId)
     {
         return Application::where('user_id', $userId)
-            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+            ->whereNotIn('status', ['rejected', 'resigned'])
             ->whereHas('placement')
             ->latest()
             ->first()
             ?? Application::where('user_id', $userId)
-                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+                ->whereNotIn('status', ['rejected', 'resigned'])
                 ->latest()
                 ->first()
             ?? Application::where('user_id', $userId)->latest()->first();
@@ -101,7 +101,7 @@ public function index()
 
         if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan telah terdaftar.');
         }
 
         return view('student.logbook.create', compact('application'));
@@ -122,7 +122,7 @@ public function index()
 
         if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan telah terdaftar.');
         }
 
         $request->validate([
