@@ -16,8 +16,11 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'hasInternshipHistory' => $user?->hasInternshipHistory() ?? false,
         ]);
     }
 
@@ -41,13 +44,17 @@ class ProfileController extends Controller
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    // Blokir jika yang mencoba menghapus akun adalah Admin
-    if (in_array($user->role, ['admin', 'super_admin'])) {
-        return back()->with('error', 'Akun Administrator tidak dapat dihapus secara mandiri demi keamanan sistem.');
-    }
+        // Blokir jika yang mencoba menghapus akun adalah Admin
+        if (in_array($user->role, ['admin', 'super_admin'])) {
+            return back()->with('error', 'Akun Administrator tidak dapat dihapus secara mandiri demi keamanan sistem.');
+        }
+
+        if ($user->hasInternshipHistory()) {
+            return back()->with('error', 'Akun ini menyimpan riwayat magang yang wajib diarsipkan sehingga tidak dapat dihapus.');
+        }
 
     $request->validateWithBag('userDeletion', [
         'password' => ['required', 'current_password'],

@@ -556,6 +556,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Memverifikasi seluruh halaman terkompilasi dan lulus 69 unit/feature tests (Exit Code 0).
 - **Prevention Rule**: Seluruh halaman portal utama (Dashboard, Logbook, Profil, Laporan Akhir, Pendaftaran) wajib menggunakan container baku `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6` dan struktur header/kartu data penempatan terstandar agar konsistensi visual serta keselarasan teks terjaga di seluruh navigasi aplikasi.
 
+
 ---
 
 ### [LRN-028] Hard Visual Guard & Mandat Multimodal Vision Browser Automation
