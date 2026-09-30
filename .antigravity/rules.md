@@ -39,6 +39,14 @@ Browser agent beroperasi secara mandiri (*fully autonomous*) dengan standar:
 
 ## Protokol Kerja "Human-Eye Visual Audit" & Mandat Multimodal Vision (Wajib Diikuti)
 
+### PROTOKOL MATA MANUSIA ASLI & LARANGAN TOOL 404
+1. DILARANG KERAS memanggil tool `open_browser_url` bawaan IDE karena driver CDN internal mengalami HTTP 404.
+2. Setiap pengujian antarmuka WAJIB menggunakan runner lokal: `npm run test:visual` atau `node scripts/browser-runner.mjs`.
+3. VERIFIKASI MATA MANUSIA (MULTIMODAL VISION):
+   - Setelah runner menghasilkan tangkapan layar di `public/test-artifacts/*.png`, AI WAJIB membaca file gambar tersebut via multimodal vision.
+   - AI WAJIB menyalin dan merender gambar secara inline di obrolan (`![Deskripsi](path/gambar.png)`) agar pengguna dapat melihat bukti visualnya secara langsung.
+   - Evaluasi visual WAJIB mencakup: layout kartu terpusat, ketajaman teks/font modern Figtree, warna primer Tailwind, dan ketiadaan elemen HTML mentah/unstyled.
+
 ### 1. Larangan Evaluasi Buta & Siklus Observasi Ganda
 - **LARANGAN MUTLAK**: Dilarang keras menyatakan status pengujian visual 'PASS' hanya berdasarkan status HTTP 200, validitas kode HTML/CSS, atau teks accessibility tree (AXTree) semata.
 - **MANDAT MULTIMODAL VISION WAJIB**: Setiap kali Playwright atau Puppeteer mengambil tangkapan layar (screenshot PNG), AI WAJIB membuka berkas gambar tersebut (menggunakan tool `view_file`) dan memvalidasi pixel/spatial rendering komponen (warna primer Tailwind misal `bg-blue-600`, layout terpusat, kartu login rapi, typography sans Figtree/Inter) layaknya mata seorang designer/QA manusia melihat layar.
