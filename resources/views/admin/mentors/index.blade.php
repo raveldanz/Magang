@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    <div class="py-6 sm:py-8">
+    <div class="py-6 sm:py-8" x-data="{}">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
 
             <!-- Flash Alert -->
@@ -111,22 +111,17 @@
                                         </div>
                                     </td>
                                     <td class="py-4 px-4 text-center whitespace-nowrap">
-                                        @if($m->status === 'on_leave')
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Cuti</span>
-                                        @elseif($m->status === 'inactive')
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Non-Aktif</span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
-                                        @endif
+                                        <x-status-badge type="account" :status="$m->status ?? 'active'" />
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="btn-action-group">
+                                        <div class="inline-flex items-center justify-end gap-1.5 align-middle">
                                             
                                             <!-- Login As -->
                                             @if($isSuperAdmin && $m->id !== auth()->id())
-                                                <form action="{{ route('admin.impersonate', $m->id) }}" method="POST" class="btn-action-form">
+                                                <form action="{{ route('admin.impersonate', $m->id) }}" method="POST" class="inline-flex items-center m-0 p-0 align-middle">
                                                     @csrf
-                                                    <button type="submit" title="Masuk sebagai {{ $m->name }} (Login As)" class="btn-action-login">
+                                                    <button type="submit" title="Masuk sebagai {{ $m->name }} (Login As)"
+                                                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800">
                                                         Login As
                                                     </button>
                                                 </form>
@@ -134,17 +129,22 @@
 
                                             <!-- Edit -->
                                             <a href="{{ route('admin.mentors.edit', $m->id) }}" 
-                                               class="btn-action-edit">
+                                               class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white">
                                                 Edit
                                             </a>
 
                                             <!-- Reset Password -->
-                                            <form action="{{ route('admin.mentors.reset_password', $m->id) }}" method="POST" onsubmit="return confirm('Reset password mentor {{ $m->name }} ke default (password)?');" class="btn-action-form">
-                                                @csrf
-                                                <button type="submit" class="btn-action-reset">
-                                                    Reset
-                                                </button>
-                                            </form>
+                                            <button type="button" 
+                                                    @click="$dispatch('open-reset-modal', {
+                                                        action: '{{ route('admin.mentors.reset_password', $m->id) }}',
+                                                        name: '{{ addslashes($m->name) }}',
+                                                        email: '{{ addslashes($m->email) }}',
+                                                        role: 'MENTOR LAPANGAN'
+                                                    })" 
+                                                    class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white" 
+                                                    title="Reset password ke default: password">
+                                                Reset
+                                            </button>
 
                                             <!-- Hapus -->
                                             <button type="button" 
@@ -152,9 +152,9 @@
                                                         action: '{{ route('admin.mentors.destroy', $m->id) }}',
                                                         title: 'Hapus Mentor Lapangan',
                                                         name: '{{ addslashes($m->name) }}',
-                                                        desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile->agency_name ?? 'Dinas Terkait') }}'
+                                                        desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile?->agency_name ?? 'Dinas Terkait') }}'
                                                     })" 
-                                                    class="btn-action-delete"
+                                                    class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
                                                     title="Hapus Mentor">
                                                 Hapus
                                             </button>
@@ -197,13 +197,7 @@
 
                                 <!-- Status Badge -->
                                 <div class="shrink-0">
-                                    @if($m->status === 'on_leave')
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Cuti</span>
-                                    @elseif($m->status === 'inactive')
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Non-Aktif</span>
-                                    @else
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
-                                    @endif
+                                    <x-status-badge type="account" :status="$m->status ?? 'active'" />
                                 </div>
                             </div>
 
@@ -233,8 +227,8 @@
                                     <form action="{{ route('admin.impersonate', $m->id) }}" method="POST" class="inline-block m-0">
                                         @csrf
                                         <button type="submit" title="Masuk sebagai {{ $m->name }} (Login As)"
-                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 font-bold text-xs rounded-xl shadow-2xs transition active:scale-95 cursor-pointer">
+                                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                                             <span>Login As</span>
                                         </button>
                                     </form>
@@ -242,20 +236,24 @@
 
                                 <!-- Edit -->
                                 <a href="{{ route('admin.mentors.edit', $m->id) }}" 
-                                   class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95">
-                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                   class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-xl transition active:scale-95">
+                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     <span>Edit</span>
                                 </a>
 
-                                <!-- Reset Password -->
-                                <form action="{{ route('admin.mentors.reset_password', $m->id) }}" method="POST" onsubmit="return confirm('Reset password mentor {{ $m->name }} ke default (password)?');" class="inline-block m-0">
-                                    @csrf
-                                    <button type="submit" 
-                                            class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer">
-                                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                                        <span>Reset</span>
-                                    </button>
-                                </form>
+                                <!-- Reset Password (Double Confirmation Modal) -->
+                                <button type="button" 
+                                        @click="$dispatch('open-reset-modal', {
+                                            action: '{{ route('admin.mentors.reset_password', $m->id) }}',
+                                            name: '{{ addslashes($m->name) }}',
+                                            email: '{{ addslashes($m->email) }}',
+                                            role: 'MENTOR LAPANGAN'
+                                        })" 
+                                        class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
+                                        title="Reset Password">
+                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                    <span>Reset</span>
+                                </button>
 
                                 <!-- Hapus -->
                                 <button type="button" 
@@ -263,7 +261,7 @@
                                             action: '{{ route('admin.mentors.destroy', $m->id) }}',
                                             title: 'Hapus Mentor Lapangan',
                                             name: '{{ addslashes($m->name) }}',
-                                            desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile->agency_name ?? 'Dinas Terkait') }}'
+                                            desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile?->agency_name ?? 'Dinas Terkait') }}'
                                         })" 
                                         class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
                                         title="Hapus Mentor">

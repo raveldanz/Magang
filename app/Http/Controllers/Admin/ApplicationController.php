@@ -27,15 +27,21 @@ class ApplicationController extends Controller
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
 
         $query = Application::with([
-            'user.studentProfile', 
-            'unit.agencyProfile', 
-            'documents', 
-            'placement.evaluation', 
-            'placement.finalreport', 
-            'placement.mentor', 
-            'placement.pembimbing', 
+            'user.studentProfile',
+            'user.universityRelation',
+            'unit.agencyProfile',
+            'documents',
+            'placement.evaluation',
+            'placement.finalreport',
+            'placement.mentor',
+            'placement.pembimbing',
             'placement.academicAdvisor'
-        ])->latest();
+        ]);
+
+        // Urutan standar prioritas tindakan (lihat Application::actionPrioritySql): verifikasi → siap lulus →
+        // pembimbing belum ada (antrean terlama dulu) → aktif → diterima → selesai → ditolak (terbaru dulu).
+        // Sama persis dengan pusat kendali dinas & kampus.
+        $query->orderByActionPriority();
 
         // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
         if ($agencyId) {
@@ -57,9 +63,11 @@ class ApplicationController extends Controller
             });
         }
 
-        // 2. Filter Berdasarkan Status Pengajuan
+        // 2. Filter Berdasarkan Status Pengajuan ('action' = semua yang butuh tindakan admin, tingkat 1–3)
         if ($request->filled('status')) {
-            $query->where('status', strtolower($request->status));
+            $request->status === 'action'
+                ? $query->requiringAction()
+                : $query->where('status', strtolower($request->status));
         }
 
         // 3. Filter Berdasarkan Unit / Divisi Kerja
@@ -167,19 +175,36 @@ class ApplicationController extends Controller
         $statusInput = strtolower($request->status);
         $request->merge(['status' => $statusInput]);
 
-        $request->validate([
-            'status' => 'required|in:pending,verified,accepted,rejected,completed,resigned',
-            'rejection_note' => 'nullable|string',
+        if ($request->filled('rejection_reason') && !$request->filled('rejection_note')) {
+            $request->merge(['rejection_note' => $request->rejection_reason]);
+        }
+
+        $rules = [
+            'status' => 'required|in:pending,verified,accepted,active,completed,rejected,resigned',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',
             'letter_number' => 'nullable|string|max:100',
             'letter_date' => 'nullable|date',
             'override_reason' => 'nullable|string',
-        ]);
+        ];
+
+        // Validasi ketat: Alasan penolakan wajib diisi jika status diubah menjadi 'rejected'
+        if ($statusInput === 'rejected') {
+            $rules['rejection_note'] = 'required|string|min:5';
+        } else {
+            $rules['rejection_note'] = 'nullable|string';
+        }
+
+        $messages = [
+            'rejection_note.required' => 'Alasan penolakan wajib diisi jika status diubah menjadi ditolak (rejected).',
+            'rejection_note.min' => 'Alasan penolakan minimal 5 karakter agar informatif bagi pemohon.',
+        ];
+
+        $request->validate($rules, $messages);
 
         $application = Application::with(['unit', 'placement', 'user'])->findOrFail($id);
-        $oldStatus = strtolower($application->status);
+        $oldStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : strtolower((string)$application->status);
         $newStatus = $request->status;
 
         // Multi-Tenant Authorization Check
@@ -187,25 +212,49 @@ class ApplicationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
         }
 
+        // Validasi State Ketat: keputusan terima/tolak hanya dari tahap seleksi (PENDING atau VERIFIED),
+        // sesuai alur resmi pending → verified → accepted.
+        $decisionStatuses = ['pending', 'verified'];
+        if ($newStatus === 'accepted' && !in_array($oldStatus, [...$decisionStatuses, 'accepted'], true)) {
+            return redirect()->back()
+                ->with('error', "Gagal menyetujui pengajuan: Aksi persetujuan (Approve) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->withInput();
+        }
+
+        if ($newStatus === 'rejected' && !in_array($oldStatus, $decisionStatuses, true)) {
+            return redirect()->back()
+                ->with('error', "Gagal menolak pengajuan: Aksi penolakan (Reject) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->withInput();
+        }
+
+        if ($oldStatus === 'rejected' && $newStatus !== 'rejected') {
+            return redirect()->back()
+                ->with('error', "Gagal mengubah status: Pengajuan yang telah ditolak tidak dapat diubah statusnya kembali.")
+                ->withInput();
+        }
+
         $unit = $application->unit;
 
         // Strict Validation for COMPLETED status
         if ($newStatus === 'completed' && $oldStatus !== 'completed') {
-            $placement = $application->placement;
-            $hasApprovedReport = $placement && $placement->finalreport && in_array(strtolower($placement->finalreport->status ?? ''), ['approved', 'disetujui']);
-            $eval = $placement?->evaluation;
-            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
-
-            if (!$hasApprovedReport || !$hasCompleteEval) {
-                return redirect()->back()->with('error', "Gagal menyelesaikan magang: Mahasiswa belum melengkapi Laporan Akhir (disetujui) atau Penilaian (Mentor & DPL) belum tuntas.");
+            if (!$application->can_complete) {
+                $missing = [];
+                if (!$application->has_approved_report) {
+                    $missing[] = "Laporan Akhir belum disetujui";
+                }
+                if (!$application->has_complete_evaluation) {
+                    $missing[] = "Penilaian (Mentor & DPL) belum tuntas diisi";
+                }
+                $missingStr = implode(' dan ', $missing);
+                return redirect()->back()->with('error', "Gagal menyelesaikan magang: {$missingStr}.");
             }
         }
 
-        // Time-Aware Quota Lifecycle Engine: Cek irisan tanggal
-        if ($newStatus === 'accepted' && $oldStatus !== 'accepted') {
+        // Time-Aware Quota Lifecycle Engine: Cek irisan tanggal jika status diterima / diaktifkan
+        if (in_array($newStatus, ['accepted', 'active']) && !in_array($oldStatus, ['accepted', 'active'])) {
             if ($unit) {
                 $overlappingInterns = $unit->applications()
-                    ->where('status', 'accepted')
+                    ->whereIn('status', ['accepted', 'active'])
                     ->where('id', '!=', $application->id)
                     ->where(function ($query) use ($application) {
                         $query->where('start_date', '<=', $application->end_date)
@@ -213,7 +262,7 @@ class ApplicationController extends Controller
                     })->count();
 
                 if ($overlappingInterns >= $unit->quota) {
-                    return redirect()->back()->with('error', "Gagal menerima pengajuan: Kuota unit kerja '{$unit->name}' penuh pada rentang tanggal magang pemohon (Kapasitas: {$unit->quota}, Terisi: {$overlappingInterns} pada rentang tersebut).");
+                    return redirect()->back()->with('error', "Gagal menerima/mengaktifkan pengajuan: Kuota unit kerja '{$unit->name}' penuh pada rentang tanggal magang pemohon (Kapasitas: {$unit->quota}, Terisi: {$overlappingInterns} pada rentang tersebut).");
                 }
             }
         }
@@ -223,15 +272,16 @@ class ApplicationController extends Controller
         $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
         $letterToken = $application->letter_token ?: Str::random(32);
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
+        $placementEligibleStatuses = ['accepted', 'active', 'completed'];
 
-        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin) {
+        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses) {
             $application->update([
                 'status' => $newStatus,
                 'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
                 'rejection_reason' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
-                'letter_number' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
-                'letter_date' => in_array($newStatus, ['accepted', 'completed']) ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
-                'letter_token' => in_array($newStatus, ['accepted', 'completed']) ? $letterToken : $application->letter_token,
+                'letter_number' => in_array($newStatus, $placementEligibleStatuses) ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
+                'letter_date' => in_array($newStatus, $placementEligibleStatuses) ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
+                'letter_token' => in_array($newStatus, $placementEligibleStatuses) ? $letterToken : $application->letter_token,
             ]);
 
             $placementData = [];
@@ -244,13 +294,13 @@ class ApplicationController extends Controller
                 $placementData['academic_advisor_id'] = $request->academic_advisor_id;
             }
 
-            if (in_array($newStatus, ['accepted', 'completed'])) {
+            if (in_array($newStatus, $placementEligibleStatuses)) {
                 $existingPlacement = Placement::where('application_id', $application->id)->first();
                 $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
                 $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
             }
 
-            if (!empty($placementData) || in_array($newStatus, ['accepted', 'completed'])) {
+            if (!empty($placementData) || in_array($newStatus, $placementEligibleStatuses)) {
                 Placement::updateOrCreate(
                     ['application_id' => $application->id],
                     $placementData
@@ -286,7 +336,7 @@ class ApplicationController extends Controller
             'placement.pembimbing',
             'placement.mentor'
         ])
-            ->whereIn('status', ['accepted', 'completed'])
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->findOrFail($id);
 
         // Multi-Tenant Authorization Check

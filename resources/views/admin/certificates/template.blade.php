@@ -248,7 +248,7 @@
         $logoSrc = $logoData ? 'data:' . $mime . ';base64,' . base64_encode($logoData) : '';
 
         // 2. QR Code Verifikasi TTE URL
-        $verifyUrl = route('verify.certificate', $placement->id ?? 1);
+        $verifyUrl = route('verify.certificate', isset($placement) ? $placement->ensureCertificateHash() : 'tidak-valid');
         $qrBase64 = '';
         if (class_exists('SimpleSoftwareIO\QrCode\Facades\QrCode')) {
             $qrBase64 = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(80)->generate($verifyUrl));

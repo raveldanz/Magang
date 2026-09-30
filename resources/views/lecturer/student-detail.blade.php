@@ -19,9 +19,9 @@
 
     @php
         $nilaiDinas = $evaluation?->nilai_pembimbing ?? 0;
-        $evalMastery = old('score_mastery', $evaluation?->score_mastery ?? ($evaluation?->nilai_akademik ?? 85));
-        $evalReport = old('score_report', $evaluation?->score_report ?? ($evaluation?->nilai_akademik ?? 85));
-        $evalAttitude = old('score_attitude', $evaluation?->score_attitude ?? ($evaluation?->nilai_akademik ?? 85));
+        $evalMastery = old('score_mastery', $evaluation?->dosenAspectScore('score_mastery') ?? 85);
+        $evalReport = old('score_report', $evaluation?->dosenAspectScore('score_report') ?? 85);
+        $evalAttitude = old('score_attitude', $evaluation?->dosenAspectScore('score_attitude') ?? 85);
 
         $univ = $evaluation?->getUniversity();
         if (!$univ && isset($student)) {
@@ -114,7 +114,7 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-200/80 text-blue-900 border border-blue-300">Aturan Universitas</span>
                         </div>
                         <p class="text-xs text-blue-900 leading-relaxed">
-                            Perguruan tinggi <strong>{{ $profile->universitas ?? $univ?->name ?? 'Mahasiswa' }}</strong> memberlakukan peraturan penilaian magang <strong>100% penuh dari Pembimbing Lapangan Dinas</strong>. Dosen Pembimbing Lapangan (DPL) berfokus mendampingi bimbingan akademik, memonitor logbook aktivitas harian, dan memverifikasi laporan akhir. <strong>Dosen tidak diwajibkan menginput formulir nilai angka</strong>.
+                            Perguruan tinggi <strong>{{ $profile->universitas ?? $univ?->name ?? 'Mahasiswa' }}</strong> memberlakukan peraturan penilaian magang <strong>100% penuh dari Pembimbing Lapangan Dinas</strong>. Dosen Pembimbing Lapangan berfokus mendampingi bimbingan akademik, memonitor logbook aktivitas harian, dan memverifikasi laporan akhir. <strong>Dosen tidak diwajibkan menginput formulir nilai angka</strong>.
                         </p>
                     </div>
                 </div>
@@ -200,12 +200,8 @@
                     <div>
                         @if(!$finalReport)
                             <span class="px-4 py-2 rounded-2xl text-xs font-black bg-gray-100 text-gray-500">Belum Mengunggah Laporan</span>
-                        @elseif($finalReport->status === 'approved')
-                            <span class="px-4 py-2 rounded-2xl text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">Laporan Disetujui (ACC)</span>
-                        @elseif($finalReport->status === 'revision')
-                            <span class="px-4 py-2 rounded-2xl text-xs font-black bg-rose-100 text-rose-800 border border-rose-300">Perlu Perbaikan (Revisi)</span>
                         @else
-                            <span class="px-4 py-2 rounded-2xl text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">Menunggu Review DPL</span>
+                            <x-status-badge type="review" :status="$finalReport->status" stacked />
                         @endif
                     </div>
                 </div>
@@ -481,15 +477,8 @@
                                     <span class="text-xs text-gray-400 ml-2">({{ \Carbon\Carbon::parse($lb->date)->diffForHumans() }})</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    @if($lb->status === 'approved')
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                            Mentor: ACC
-                                        </span>
-                                    @else
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                                            Mentor: Pending
-                                        </span>
-                                    @endif
+                                    <span class="text-[11px] font-semibold text-gray-500">Mentor</span>
+                                    <x-status-badge type="review" :status="$lb->status" />
                                 </div>
                             </div>
 

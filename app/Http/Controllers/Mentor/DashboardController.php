@@ -18,61 +18,70 @@ class DashboardController extends Controller
     {
         $mentor = Auth::user();
 
-        // Ambil seluruh penempatan yang diplot ke mentor ini
-        $query = Placement::with([
-            'application.user.studentProfile',
-            'application.unit.agencyProfile',
-            'logbooks',
-            'evaluation',
-            'finalreport',
-            'academicAdvisor'
-        ])->where(function ($q) use ($mentor) {
+        // Base query penempatan yang diplot ke mentor ini
+        $baseQuery = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
               ->orWhere('pembimbing_id', $mentor->id);
         });
 
         // Multi-Tenant Isolation: Scoping ke instansi jika mentor terikat ke agency tertentu
         if ($mentor->agency_profile_id !== null) {
-            $query->whereHas('application.unit', function ($q) use ($mentor) {
+            $baseQuery->whereHas('application.unit', function ($q) use ($mentor) {
                 $q->where('agency_profile_id', $mentor->agency_profile_id);
             });
         }
 
-        $allPlacements = $query->latest()->get();
+        // Hitung statistik langsung dari database
+        $totalStudents = (clone $baseQuery)->count();
+        $activeCount = (clone $baseQuery)->whereRelation('application', 'status', 'active')->count();
+        $upcomingCount = (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count();
+        $completedCount = (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count();
 
-        // Pisahkan data berdasarkan computed lifecycle
-        $activeStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'ACTIVE');
-        $upcomingStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'ACCEPTED');
-        $completedStudents = $allPlacements->filter(fn($p) => $p->application?->lifecycle_status === 'COMPLETED');
+        $pendingLogbooksCount = \App\Models\Logbook::whereHas('placement', function ($q) use ($mentor) {
+            $q->where(function ($sq) use ($mentor) {
+                $sq->where('mentor_id', $mentor->id)
+                   ->orWhere('pembimbing_id', $mentor->id);
+            });
+            if ($mentor->agency_profile_id !== null) {
+                $q->whereHas('application.unit', function ($sq) use ($mentor) {
+                    $sq->where('agency_profile_id', $mentor->agency_profile_id);
+                });
+            }
+        })->where('status', 'pending')->count();
 
-        $tab = $request->get('tab', 'active');
-        $placements = match ($tab) {
-            'upcoming' => $upcomingStudents,
-            'completed' => $completedStudents,
-            'all' => $allPlacements,
-            default => $activeStudents,
-        };
-
-        // Hitung statistik ringkasan untuk dashboard cards
-        $totalStudents = $allPlacements->count();
-        $activeCount = $activeStudents->count();
-        $pendingLogbooksCount = $allPlacements->sum(function ($placement) {
-            return $placement->logbooks->where('status', 'pending')->count();
-        });
-        $evaluatedStudentsCount = $allPlacements->filter(function ($placement) {
-            return $placement->evaluation !== null;
-        })->count();
-        $pendingEvaluationsCount = $totalStudents - $evaluatedStudentsCount;
+        $evaluatedStudentsCount = (clone $baseQuery)->has('evaluation')->count();
+        $pendingEvaluationsCount = max(0, $totalStudents - $evaluatedStudentsCount);
 
         $stats = [
             'total_students' => $totalStudents,
             'active_students' => $activeCount,
-            'upcoming_students' => $upcomingStudents->count(),
-            'completed_students' => $completedStudents->count(),
+            'upcoming_students' => $upcomingCount,
+            'completed_students' => $completedCount,
             'pending_logbooks' => $pendingLogbooksCount,
             'evaluated_students' => $evaluatedStudentsCount,
             'pending_evaluations' => $pendingEvaluationsCount,
         ];
+
+        $tab = $request->get('tab', 'active');
+
+        // Query penempatan dengan relasi lengkap
+        $query = (clone $baseQuery)->with([
+            'application.user.studentProfile',
+            'application.unit.agencyProfile',
+            'logbooks',
+            'evaluation',
+            'finalreport',
+            'academicAdvisor'
+        ]);
+
+        $query = match ($tab) {
+            'upcoming' => $query->whereRelation('application', 'status', 'accepted'),
+            'completed' => $query->whereRelation('application', 'status', 'completed'),
+            'all' => $query,
+            default => $query->whereRelation('application', 'status', 'active'),
+        };
+
+        $placements = $query->latest()->paginate(10)->withQueryString();
 
         return view('mentor.dashboard', compact('placements', 'stats', 'tab'));
     }

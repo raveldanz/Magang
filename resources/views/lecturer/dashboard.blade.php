@@ -96,8 +96,11 @@
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <select name="report_status" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
                             <option value="">Semua Status Laporan</option>
-                            <option value="pending" {{ request('report_status') == 'pending' ? 'selected' : '' }}>Menunggu Review DPL</option>
-                            <option value="approved" {{ request('report_status') == 'approved' ? 'selected' : '' }}>Disetujui (Approved)</option>
+                            <optgroup label="Status Laporan">
+                                @foreach([\App\Enums\ReviewStatus::PENDING, \App\Enums\ReviewStatus::REVISION, \App\Enums\ReviewStatus::APPROVED] as $reviewCase)
+                                    <option value="{{ $reviewCase->value }}" {{ request('report_status') == $reviewCase->value ? 'selected' : '' }}>{{ $reviewCase->label() }}</option>
+                                @endforeach
+                            </optgroup>
                             <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah</option>
                         </select>
 
@@ -132,7 +135,86 @@
                     <span class="text-xs text-gray-400 font-mono">{{ $placements->count() }} Mahasiswa</span>
                 </div>
 
-                <div class="overflow-x-auto">
+                <!-- 1. TAMPILAN KHUSUS MOBILE (< 640px) -->
+                <div class="block sm:hidden divide-y divide-slate-100">
+                    @forelse($placements as $p)
+                        @php
+                            $student = $p->application?->user;
+                            $profile = $student?->studentProfile;
+                            $unit = $p->application?->unit;
+                            $agency = $unit?->agencyProfile;
+                            $mentor = $p->mentor ?? $p->pembimbing;
+                            $eval = $p->evaluation;
+                            $hasEval = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0);
+                            $finalReport = $p->finalreport;
+                            $logbooksCount = $p->logbooks->count();
+                            $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
+                        @endphp
+                        <div class="p-4 space-y-3 hover:bg-slate-50/60 transition">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">
+                                        {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-xs sm:text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        <p class="text-[11px] text-slate-500 font-mono mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}</p>
+                                    </div>
+                                </div>
+                                <div class="shrink-0">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                        {{ $logbooksCount }} Entri
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs space-y-1.5">
+                                <div class="text-[11px] text-slate-700 font-medium">
+                                    <strong class="text-slate-900 font-bold">Instansi:</strong> {{ $agency->agency_name ?? '-' }} ({{ $unit->name ?? '-' }})
+                                </div>
+                                <div class="text-[11px] text-slate-700 font-medium">
+                                    <strong class="text-slate-900 font-bold">Mentor:</strong> {{ $mentor->name ?? 'Belum Ditugaskan' }}
+                                    @if($nilaiDinas > 0)
+                                        <span class="text-emerald-700 font-bold ml-1">• Skor: {{ $nilaiDinas }}/100</span>
+                                    @endif
+                                </div>
+                                <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200/60">
+                                    <span class="text-slate-500">Laporan Akhir:
+                                        @if(!$finalReport)
+                                            <span class="text-slate-400 italic">Belum Unggah</span>
+                                        @else
+                                            <x-status-badge type="review" :status="$finalReport->status" />
+                                        @endif
+                                    </span>
+                                    <span class="text-slate-500">Nilai DPL:
+                                        @if($hasEval)
+                                            <span class="text-blue-700 font-bold">Sudah Dinilai</span>
+                                        @else
+                                            <span class="text-amber-700 font-bold">Belum Dinilai</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="pt-1">
+                                <a href="{{ route('lecturer.students.show', $p->id) }}" 
+                                   class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition border border-blue-200 shadow-2xs">
+                                    <span>Detail & Evaluasi</span>
+                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-6 text-center text-gray-400 text-xs">
+                            Belum ada mahasiswa bimbingan magang yang ditugaskan kepada Anda.
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- 2. TAMPILAN KHUSUS DESKTOP (Tabel Lengkap) -->
+                <div class="hidden sm:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
@@ -212,18 +294,8 @@
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500">
                                                 Belum Unggah
                                             </span>
-                                        @elseif($finalReport->status === 'approved')
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Disetujui
-                                            </span>
-                                        @elseif($finalReport->status === 'revision')
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                                Perlu Revisi
-                                            </span>
                                         @else
-                                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                Menunggu Review
-                                            </span>
+                                            <x-status-badge type="review" :status="$finalReport->status" />
                                         @endif
                                     </td>
 
@@ -252,8 +324,8 @@
                                             @if($hasEval)
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
                                                     {{ $eval->nilai_dosen_calculated }}/100
-                                                    @if($eval->grade)
-                                                        ({{ $eval->grade }})
+                                                    @if($eval->grade_calculated !== '-')
+                                                        ({{ $eval->grade_calculated }})
                                                     @endif
                                                 </span>
                                             @else

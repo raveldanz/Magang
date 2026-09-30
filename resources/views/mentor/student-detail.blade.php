@@ -129,12 +129,7 @@
                                 Laporan Akhir Magang
                             </h3>
                             @if ($placement->finalreport)
-                                <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                    {{ $placement->finalreport->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $placement->finalreport->status === 'revision' ? 'bg-rose-100 text-rose-800' : '' }}
-                                    {{ $placement->finalreport->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
-                                    {{ strtoupper($placement->finalreport->status) }}
-                                </span>
+                                <x-status-badge type="review" :status="$placement->finalreport->status" />
                             @else
                                 <span class="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
                                     Belum Diunggah
@@ -211,12 +206,7 @@
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="px-3 py-1 text-xs font-bold rounded-full 
-                                        {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                        {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                        {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                        {{ strtoupper($log->status) }}
-                                    </span>
+                                    <x-status-badge type="review" :status="$log->status" />
                                     <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                                         Detail 
                                     </a>

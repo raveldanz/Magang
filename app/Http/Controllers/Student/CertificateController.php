@@ -135,7 +135,8 @@ class CertificateController extends Controller
         }
 
         // Proteksi Ketat Kelulusan: E-Sertifikat hanya sah diakses jika mahasiswa telah berstatus COMPLETED
-        if ($application->lifecycle_status !== 'COMPLETED' && $application->status !== 'completed') {
+        $statusVal = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)$application->status;
+        if ($statusVal !== 'completed') {
             abort(403, 'Akses Dibatasi: E-Sertifikat dan Transkrip Nilai resmi hanya dapat diterbitkan dan diunduh setelah mahasiswa dinyatakan lulus (status COMPLETED) dengan naskah laporan akhir yang telah disetujui (ACC) serta lembar evaluasi yang telah lengkap.');
         }
 
@@ -185,8 +186,22 @@ class CertificateController extends Controller
 
         $regNumber = $placement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
         $certificateHash = $placement?->certificate_hash;
-        $verifyCertificateUrl = route('verify.certificate', $certificateHash ?: ($placement ? $placement->id : $application->id));
-        $qrVerifyUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyCertificateUrl);
+        // QR selalu memakai hash acak (bukan ID angka) agar sertifikat lain tidak bisa ditebak
+        $verifyCertificateUrl = $certificateHash ? route('verify.certificate', $certificateHash) : null;
+
+        // QR dibuat lokal (SVG) — URL verifikasi tidak dikirim ke layanan pihak ketiga
+        $qrSvg = null;
+        if ($verifyCertificateUrl && class_exists(\SimpleSoftwareIO\QrCode\Facades\QrCode::class)) {
+            try {
+                $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(64)->margin(0)->generate($verifyCertificateUrl);
+            } catch (\Throwable $e) {
+                $qrSvg = null;
+            }
+        }
+        // Cadangan jika library QR lokal tidak tersedia (URL gambar, bukan URL verifikasi)
+        $qrVerifyUrl = $verifyCertificateUrl
+            ? 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=' . urlencode($verifyCertificateUrl)
+            : null;
 
         return compact(
             'application',
@@ -202,7 +217,8 @@ class CertificateController extends Controller
             'regNumber',
             'certificateHash',
             'verifyCertificateUrl',
-            'qrVerifyUrl'
+            'qrVerifyUrl',
+            'qrSvg'
         );
     }
 

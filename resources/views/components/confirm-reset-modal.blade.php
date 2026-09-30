@@ -82,10 +82,10 @@ x-cloak>
 
             <!-- Target User Details Box -->
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Akun yang akan direset:</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Akun yang akan direset:</span>
                 <div class="flex items-center justify-between gap-2">
                     <div class="font-black text-sm text-slate-900 break-words" x-text="name"></div>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700" x-text="role"></span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-slate-200 text-slate-700" x-text="role"></span>
                 </div>
                 <div class="text-xs text-slate-500 font-medium break-words" x-text="email"></div>
                 <div class="pt-2 border-t border-slate-200/60 text-xs text-slate-600 flex items-center gap-1.5">

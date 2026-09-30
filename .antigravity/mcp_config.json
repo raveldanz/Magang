@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "subagents": {
+      "command": "node",
+      "args": [
+        "./scripts/mcp-agents-server.mjs"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ],
+      "env": {
+        "HEADLESS": "true"
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Logbook;
@@ -15,17 +16,17 @@ class LogbookController extends Controller
 {
     /**
      * Helper untuk mengambil pengajuan magang yang aktif / berjalan
-     * Mencegah pembajakan data oleh pengajuan lama yang sudah resigned/rejected/canceled
+     * Mencegah pembajakan data oleh pengajuan lama yang sudah resigned/rejected
      */
     protected function getActiveInternship($userId)
     {
         return Application::where('user_id', $userId)
-            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+            ->whereNotIn('status', ['rejected', 'resigned'])
             ->whereHas('placement')
             ->latest()
             ->first()
             ?? Application::where('user_id', $userId)
-                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+                ->whereNotIn('status', ['rejected', 'resigned'])
                 ->latest()
                 ->first()
             ?? Application::where('user_id', $userId)->latest()->first();
@@ -46,7 +47,7 @@ public function index()
     }
 
     // 3. Tentukan status lifecycle pengajuan
-    $lifecycle = strtoupper($application->status ?? 'NONE');
+    $lifecycle = $application->status instanceof ApplicationStatus ? strtoupper($application->status->value) : strtoupper((string)$application->status);
 
     // 4. Inisialisasi variabel penempatan & logbook
     $placement = null;
@@ -89,12 +90,18 @@ public function index()
     {
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
-        $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
+
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+        }
+
+        $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$application || !$application->is_active_internship || !$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
+        if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan telah terdaftar.');
         }
 
         return view('student.logbook.create', compact('application'));
@@ -104,12 +111,18 @@ public function index()
     {
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
-        $placement = $application ? Placement::where('application_id', $application->id)->first() : null;
+
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+        }
+
+        $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$application || !$application->is_active_internship || !$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
+        if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan (DPL) telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan telah terdaftar.');
         }
 
         $request->validate([
@@ -170,9 +183,9 @@ public function index()
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (!$application || !$application->is_active_internship) {
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
 
         $logbook = Logbook::findOrFail($id);
@@ -195,9 +208,9 @@ public function index()
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (!$application || !$application->is_active_internship) {
+        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan DPL telah terdaftar.');
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
 
         $request->validate([
@@ -245,4 +258,34 @@ public function index()
         return redirect()->route('student.logbook.index')
             ->with('success', 'Logbook kegiatan berhasil diperbarui!');
     }
+
+    /**
+     * Hapus entri logbook kegiatan (hanya untuk logbook yang belum disetujui)
+     */
+    public function destroy($id)
+    {
+        $logbook = Logbook::findOrFail($id);
+
+        // Pastikan logbook milik penempatan mahasiswa yang sedang login
+        if ($logbook->placement?->application?->user_id !== Auth::id()) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        // Keamanan: Logbook yang sudah approved oleh mentor/dosen tidak boleh dihapus
+        if (strtolower($logbook->status) === 'approved') {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook yang sudah disetujui tidak dapat dihapus.');
+        }
+
+        // Hapus file lampiran jika ada
+        if ($logbook->attachment && Storage::disk('public')->exists($logbook->attachment)) {
+            Storage::disk('public')->delete($logbook->attachment);
+        }
+
+        $logbook->delete();
+
+        return redirect()->route('student.logbook.index')
+            ->with('success', 'Entri logbook berhasil dihapus.');
+    }
 }
+

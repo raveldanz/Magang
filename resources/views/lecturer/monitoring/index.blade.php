@@ -108,7 +108,8 @@
                                     $finalReport = $placement->finalreport;
                                     $eval = $placement->evaluation;
                                     $hasEval = ($eval?->nilai_akademik ?? 0) > 0 || ($eval?->nilai_dosen ?? 0) > 0;
-                                    $lifecycle = $placement->application?->lifecycle_status ?? 'ACCEPTED';
+                                    $appStatus = $placement->application?->status;
+                                    $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
 
                                     $univ = $eval?->getUniversity();
                                     if (!$univ && $student) {
@@ -137,13 +138,7 @@
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
-                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
-                                            {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                                            {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}
-                                            {{ $lifecycle === 'RESIGNED' ? 'bg-slate-200 text-slate-800 border border-slate-300' : '' }}">
-                                            {{ $lifecycle }}
-                                        </span>
+                                        <x-status-badge :status="$appStatus" />
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
@@ -153,14 +148,8 @@
                                     </td>
 
                                     <td class="py-4 px-4 text-center">
-                                        @if ($finalReport && $finalReport->status === 'approved')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
-                                                 Disetujui
-                                            </span>
-                                        @elseif ($finalReport)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-200">
-                                                 Menunggu
-                                            </span>
+                                        @if ($finalReport)
+                                            <x-status-badge type="review" :status="$finalReport->status" />
                                         @else
                                             <span class="text-xs text-gray-400 italic">Belum Ada</span>
                                         @endif
@@ -231,6 +220,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if(method_exists($placements, 'hasPages') && $placements->hasPages())
+                    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+                        {{ $placements->links() }}
+                    </div>
+                @endif
             </div>
 
         </div>

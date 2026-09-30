@@ -236,40 +236,40 @@
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Menunggu dinas</div>
+                <div class="text-[11px] text-slate-500 mt-1">PENDING dan VERIFIED</div>
             </div>
 
             {{-- Diterima --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Diterima</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</span>
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_accepted'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Persiapan magang</div>
+                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}</div>
             </div>
 
             {{-- Aktif --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Aktif</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</span>
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_active'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Sedang di lapangan</div>
+                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
             </div>
 
             {{-- Lulus --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lulus</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
 
                 </div>
                 <div class="text-2xl font-black text-slate-800">{{ $stats['total_completed'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Tersertifikasi</div>
+                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</div>
             </div>
 
             {{-- Sisa Kuota --}}
@@ -290,36 +290,27 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             {{-- Distribusi Penempatan: Instansi (Jika Super Admin) atau Unit Divisi (Jika Admin Dinas) --}}
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
+            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="min-w-0">
-                            @if($isSuperAdmin)
-                                <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Penempatan Instansi Dinas
-                                </h3>
-                                <p class="text-xs text-slate-400 truncate">Sebaran mahasiswa magang di dinas Pemkot Surabaya
-                                </p>
-                            @else
-                                <h3 class="text-sm font-bold text-slate-800 truncate">Distribusi Divisi & Unit Kerja Dinas
-                                </h3>
-                                <p class="text-xs text-slate-400 truncate">Sebaran mahasiswa magang di unit/bidang
-                                    {{ $currentAgency->agency_name ?? 'Dinas' }}
-                                </p>
-                            @endif
-                        </div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
+                    <div class="min-w-0 flex-1">
+                        @if($isSuperAdmin)
+                            <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Penempatan Instansi Dinas</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
+                        @else
+                            <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Divisi & Unit Kerja Dinas</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dinas' }}</p>
+                        @endif
                     </div>
                     @if($isSuperAdmin)
                         <a href="{{ route('admin.agencies.index') }}"
-                            class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
                             <span>Kelola Dinas</span>
-                            <span class="text-sm leading-none"></span>
                         </a>
                     @else
                         <a href="{{ route('admin.units.index') }}"
-                            class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
                             <span>Kelola Unit</span>
-                            <span class="text-sm leading-none"></span>
                         </a>
                     @endif
                 </div>
@@ -336,8 +327,8 @@
                             $itemQuota = is_array($item) ? ($item['quota'] ?? 0) : ($item->quota ?? 0);
                         @endphp
                         <div>
-                            <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
-                                <span class="text-slate-700 font-medium truncate max-w-[240px]">{{ $itemName }}</span>
+                            <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
+                                <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $itemName }}</span>
                                 <span class="text-blue-700 font-bold shrink-0">
                                     {{ $itemCount }} Mahasiswa
                                     @if(!$isSuperAdmin)
@@ -360,24 +351,21 @@
             </div>
 
             {{-- Distribusi Asal Perguruan Tinggi --}}
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
+            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="min-w-0">
-                            <h3 class="text-sm font-bold text-slate-800 truncate">
-                                {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : 'Distribusi Asal Kampus Mahasiswa Dinas' }}
-                            </h3>
-                            <p class="text-xs text-slate-400 truncate">
-                                {{ $isSuperAdmin ? 'Sebaran perguruan tinggi mitra resmi program magang' : 'Sebaran kampus pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini') }}
-                            </p>
-                        </div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-sm font-bold text-slate-800 leading-snug">
+                            {{ $isSuperAdmin ? 'Distribusi Asal Kampus Surabaya' : 'Distribusi Asal Kampus Mahasiswa Dinas' }}
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            {{ $isSuperAdmin ? 'Sebaran perguruan tinggi mitra resmi program magang' : 'Sebaran kampus pendaftar di ' . ($currentAgency->agency_name ?? 'dinas ini') }}
+                        </p>
                     </div>
                     @if($isSuperAdmin)
                         <a href="{{ route('admin.universities.index') }}"
-                            class="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
+                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition border border-sky-200 shadow-2xs">
                             <span>Kelola Kampus</span>
-                            <span class="text-sm leading-none"></span>
                         </a>
                     @endif
                 </div>
