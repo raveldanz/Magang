@@ -43,13 +43,13 @@
                         Semua Status
                     </a>
                     <a href="{{ route('mentor.logbooks.index', ['status' => 'pending']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100' }}">
-                        Pending Review
+                        PENDING
                     </a>
                     <a href="{{ route('mentor.logbooks.index', ['status' => 'approved']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'approved' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100' }}">
-                        Approved
+                        APPROVED
                     </a>
                     <a href="{{ route('mentor.logbooks.index', ['status' => 'rejected']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'rejected' ? 'bg-rose-600 text-white shadow-sm' : 'bg-rose-50 text-rose-800 hover:bg-rose-100' }}">
-                        Rejected
+                        REJECTED
                     </a>
                 </div>
 
@@ -96,12 +96,7 @@
                             </div>
 
                             <div class="flex items-center gap-3">
-                                <span class="px-3 py-1 text-xs font-bold rounded-full 
-                                    {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                    {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                    {{ strtoupper($log->status) }}
-                                </span>
+                                <x-status-badge type="review" :status="$log->status" />
                                 <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                                     Detail & Review 
                                 </a>

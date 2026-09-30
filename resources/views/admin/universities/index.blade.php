@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -10,6 +10,7 @@
                 </p>
             </div>
 
+            @if($isSuperAdmin)
             <a href="{{ route('admin.universities.create') }}"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,6 +18,7 @@
                 </svg>
                 <span>Tambah Universitas Baru</span>
             </a>
+            @endif
         </div>
     </x-slot>
 
@@ -328,22 +330,31 @@
 
                         <!-- Action Footer Sejajar (Format Baku: Tombol Sekunder & Tombol Primer) -->
                         <div class="flex items-center gap-2 pt-2">
-                            @if(!$univ->universityAdmin)
+                            @if($isSuperAdmin && !$univ->universityAdmin)
                                 <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}"
-                                    class="w-1/3 m-0"
-                                    onsubmit="return confirm('Buatkan akun admin untuk {{ addslashes($univ->name) }}?')">
+                                    class="shrink-0 m-0">
                                     @csrf
-                                    <button type="submit"
-                                        class="w-full py-2.5 px-3 rounded-xl border border-slate-900 text-slate-900 bg-white hover:bg-slate-900 hover:text-white font-bold text-xs transition cursor-pointer active:scale-95">
+                                    <button type="button"
+                                        @click="$dispatch('open-confirm-modal', {
+                                            form: $el.form,
+                                            title: 'Buat Akun Admin Kampus',
+                                            message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola dosen pembimbing secara mandiri.',
+                                            label: 'Perguruan tinggi:',
+                                            name: @js($univ->name),
+                                            desc: 'Password awal: password',
+                                            confirmText: 'Ya, Buat Akun'
+                                        })"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
+                                        title="Buatkan Akun Admin Kampus">
                                         Buat Akun
                                     </button>
                                 </form>
                             @elseif($isSuperAdmin && $univ->universityAdmin)
                                 <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST"
-                                    class="w-1/3 m-0">
+                                    class="shrink-0 m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full py-2.5 px-3 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 font-bold text-xs transition cursor-pointer active:scale-95"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
                                         title="Masuk Sebagai Admin Kampus">
                                         Login As
                                     </button>
@@ -351,7 +362,7 @@
                             @endif
 
                             <a href="{{ route('admin.universities.show', $univ->id) }}"
-                                class="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer">
+                                class="flex-1 min-w-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer whitespace-nowrap truncate">
                                 Kelola Kampus
                             </a>
                         </div>

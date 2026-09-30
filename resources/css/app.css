@@ -39,7 +39,7 @@
     font-size: 12px !important;
     font-weight: 700 !important;
     line-height: 1 !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     border-width: 1px !important;
     border-style: solid !important;
     cursor: pointer !important;
@@ -96,11 +96,13 @@
 }
 
 .btn-action-login {
-    background: linear-gradient(to right, #f59e0b, #f43f5e) !important;
-    color: #ffffff !important;
-    border-color: transparent !important;
+    background-color: #ffffff !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
     gap: 4px !important;
 }
 .btn-action-login:hover {
-    background: linear-gradient(to right, #d97706, #e11d48) !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
 }

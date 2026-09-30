@@ -43,9 +43,60 @@ class Evaluation extends Model
     }
 
     /**
+     * Nilai per aspek DPL (score_mastery / score_report / score_attitude) untuk ditampilkan.
+     * Kolom aspek default-nya 0 (bukan null), jadi operator ?? tidak pernah jatuh ke fallback.
+     * Jika aspek belum diisi (mis. data lama/dummy hanya punya nilai_akademik), tampilkan nilai DPL rata-rata.
+     */
+    public function dosenAspectScore(string $field): ?float
+    {
+        $value = (float) ($this->attributes[$field] ?? 0);
+        if ($value > 0) {
+            return $value;
+        }
+
+        $fallback = (float) $this->nilai_dosen_calculated;
+
+        return $fallback > 0 ? $fallback : null;
+    }
+
+    /**
+     * Cache hasil getUniversity() per instance: accessor nilai_akhir, is_complete, dan
+     * grade_calculated masing-masing memanggilnya, sehingga tanpa cache satu baris tabel
+     * bisa memicu 3+ query yang sama. false = belum pernah di-resolve.
+     */
+    protected $resolvedUniversity = false;
+
+    /**
      * Dapatkan data Universitas asal Mahasiswa
      */
     public function getUniversity()
+    {
+        if ($this->resolvedUniversity !== false) {
+            return $this->resolvedUniversity;
+        }
+
+        return $this->resolvedUniversity = $this->findUniversity();
+    }
+
+    /**
+     * Tetapkan universitas yang sudah diketahui pemanggil (mis. halaman detail kampus),
+     * agar accessor nilai tidak perlu menelusuri placement → application → user lagi.
+     */
+    public function useUniversity(?University $university): static
+    {
+        $this->resolvedUniversity = $university;
+
+        return $this;
+    }
+
+    public function refresh()
+    {
+        $this->resolvedUniversity = false;
+
+        return parent::refresh();
+    }
+
+    private function findUniversity(): ?University
     {
         $student = $this->placement?->application?->user;
         if (!$student) return null;

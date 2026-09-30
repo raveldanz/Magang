@@ -21,13 +21,13 @@ class FinalReportController extends Controller
     // 1. Ambil pengajuan magang yang aktif / terbaru
     $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
         ->where('user_id', Auth::id())
-        ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+        ->whereNotIn('status', ['rejected', 'resigned'])
         ->whereHas('placement')
         ->latest()
         ->first()
         ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
-            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+            ->whereNotIn('status', ['rejected', 'resigned'])
             ->latest()
             ->first();
 
@@ -36,7 +36,8 @@ class FinalReportController extends Controller
         return redirect()->route('dashboard')->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
     }
 
-    $lifecycle = strtoupper($application->status ?? 'NONE');
+    $rawStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)($application->status ?? 'NONE');
+    $lifecycle = strtoupper($rawStatus);
     $placement = $application->placement;
     $finalReport = null;
     $evaluation = null;
@@ -45,7 +46,7 @@ class FinalReportController extends Controller
     if ($placement) {
         // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
         }
 
         $finalReport = $placement->finalreport;
@@ -66,13 +67,13 @@ class FinalReportController extends Controller
         // Prioritaskan pengajuan aktif yang belum resigned/rejected
         $application = Application::with('placement')
             ->where('user_id', $user->id)
-            ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+            ->whereNotIn('status', ['rejected', 'resigned'])
             ->whereHas('placement')
             ->latest()
             ->first()
             ?? Application::with('placement')
                 ->where('user_id', $user->id)
-                ->whereNotIn('status', ['rejected', 'resigned', 'canceled'])
+                ->whereNotIn('status', ['rejected', 'resigned'])
                 ->latest()
                 ->first();
         
@@ -84,7 +85,7 @@ class FinalReportController extends Controller
 
         // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
         if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan (DPL) terlebih dahulu.');
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;
@@ -109,12 +110,16 @@ class FinalReportController extends Controller
         $filePath = $finalReport?->file_path;
 
         if ($request->hasFile('file_laporan')) {
-            // Bersihkan file lama jika ada (kecuali file default/template bawaan)
-            if ($finalReport && $finalReport->file_path && Storage::disk('public')->exists($finalReport->file_path)) {
+            // Bersihkan file lama milik mahasiswa ini jika ada (kecuali file default/template bawaan)
+            if ($finalReport && $finalReport->file_path) {
                 $baseOld = basename($finalReport->file_path);
                 if (!in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
-                    Storage::disk('public')->delete($finalReport->file_path);
-                    @unlink(public_path('storage/' . $finalReport->file_path));
+                    if (Storage::disk('local')->exists($finalReport->file_path)) {
+                        Storage::disk('local')->delete($finalReport->file_path);
+                    } elseif (Storage::disk('public')->exists($finalReport->file_path)) {
+                        Storage::disk('public')->delete($finalReport->file_path);
+                        @unlink(public_path('storage/' . $finalReport->file_path));
+                    }
                 }
             }
 
@@ -127,19 +132,9 @@ class FinalReportController extends Controller
             $timestamp = time();
             $customFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}_{$timestamp}.{$ext}";
 
-            $filePath = $file->storeAs('final_reports', $customFilename, 'public');
-
-            // Pastikan salinan juga tersedia di public/storage/final_reports untuk keandalan di Windows
-            try {
-                $publicTarget = public_path('storage/' . $filePath);
-                $publicDir = dirname($publicTarget);
-                if (!file_exists($publicDir)) {
-                    @mkdir($publicDir, 0755, true);
-                }
-                @copy(storage_path('app/public/' . $filePath), $publicTarget);
-            } catch (\Throwable $e) {
-                // Abaikan jika symlink aktif
-            }
+            // Simpan di disk 'local' (storage/app/private) agar TIDAK bisa diakses langsung lewat /storage/...
+            // Berkas hanya dapat dibuka melalui route final_reports.show (showFile) yang memeriksa hak akses.
+            $filePath = $file->storeAs('final_reports', $customFilename, 'local');
         }
 
         $newStatus = ($request->hasFile('file_laporan') || $finalReport?->status === 'revision') ? 'pending' : ($finalReport?->status ?? 'pending');
@@ -230,6 +225,7 @@ class FinalReportController extends Controller
         $realPath = null;
 
         $candidatePaths = [
+            Storage::disk('local')->path($filePath),
             storage_path('app/public/' . $filePath),
             public_path('storage/' . $filePath),
             storage_path('app/public/final_reports/default.pdf'),

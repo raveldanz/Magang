@@ -52,8 +52,9 @@ class ImpersonationController extends Controller
             'target_role' => $targetUser->role,
         ]);
 
-        // Login sebagai target user
+        // Login sebagai target user + buat ID sesi baru (mencegah session fixation)
         Auth::loginUsingId($targetUser->id);
+        $request->session()->regenerate();
 
         // Simpan data impersonator di session setelah login
         $request->session()->put('impersonator_id', $impersonatorUser->id);
@@ -96,8 +97,9 @@ class ImpersonationController extends Controller
             'impersonated_name' => $impersonatedUser?->name,
         ]);
 
-        // Login kembali ke super admin
+        // Login kembali ke super admin + buat ID sesi baru (mencegah session fixation)
         Auth::loginUsingId($originalUser->id);
+        $request->session()->regenerate();
 
         // Hapus session impersonasi
         $request->session()->forget(['impersonator_id', 'impersonator_name', 'impersonator_email']);

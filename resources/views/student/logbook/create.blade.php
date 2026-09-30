@@ -50,7 +50,7 @@
             const file = e.target.files[0];
             if (file) {
                 if (file.size > 3 * 1024 * 1024) {
-                    alert('Ukuran berkas lampiran maksimal 3MB.');
+                    notify('Ukuran berkas lampiran maksimal 3MB.');
                     e.target.value = '';
                     if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
                     this.fileUrl = null;
@@ -128,7 +128,7 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (file.size > 3 * 1024 * 1024) {
-                    alert('Ukuran berkas melebihi batas maksimal 3MB.');
+                    notify('Ukuran berkas melebihi batas maksimal 3MB.');
                     input.value = '';
                     box.classList.add('hidden');
                     box.classList.remove('flex');

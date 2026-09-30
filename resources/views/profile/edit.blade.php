@@ -54,7 +54,14 @@
                             </div>
                         </div>
 
-                        @include('profile.partials.delete-user-form')
+                        @if($hasInternshipHistory ?? false)
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 leading-relaxed">
+                                Akun ini menyimpan riwayat magang (logbook, nilai, dan sertifikat) yang wajib diarsipkan,
+                                sehingga tidak dapat dihapus. Hubungi admin dinas atau kampus bila akun perlu dinonaktifkan.
+                            </div>
+                        @else
+                            @include('profile.partials.delete-user-form')
+                        @endif
                     </div>
                 </div>
             @endif

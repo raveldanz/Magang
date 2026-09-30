@@ -33,18 +33,18 @@ class MentorController extends Controller
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhere('email', $like, "%{$search}%");
+                    ->orWhere('email', $like, "%{$search}%");
             });
         }
 
         $mentors = $query->orderBy('name')->get()->map(function ($m) {
-            $m->active_students_count = Placement::where(function($q) use ($m) {
+            $m->active_students_count = Placement::where(function ($q) use ($m) {
                 $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
             })->whereHas('application', function ($aq) {
-                $aq->whereIn('status', ['accepted', 'verified']);
+                $aq->whereIn('status', ['accepted', 'active']);
             })->count();
 
-            $m->completed_students_count = Placement::where(function($q) use ($m) {
+            $m->completed_students_count = Placement::where(function ($q) use ($m) {
                 $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
             })->whereHas('finalreport', function ($fq) {
                 $fq->where('status', 'approved');
@@ -84,7 +84,7 @@ class MentorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'agency_profile_id' => $isSuperAdmin ? 'required|exists:agency_profiles,id' : 'nullable',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
         ]);
 
         $mentor = User::create([
@@ -136,7 +136,7 @@ class MentorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $mentor->id,
             'agency_profile_id' => $isSuperAdmin ? 'required|exists:agency_profiles,id' : 'nullable',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
         ]);
 
         $mentor->update([
@@ -184,15 +184,14 @@ class MentorController extends Controller
             abort(403, 'Anda tidak memiliki hak akses menghapus mentor dinas lain.');
         }
 
-        // Cek bimbingan aktif
-        $activeCount = Placement::where(function($q) use ($mentor) {
+        // Cek riwayat bimbingan (aktif maupun alumni): placements.mentor_id ON DELETE SET NULL
+        // akan mengosongkan nama mentor pada arsip logbook, nilai, dan sertifikat alumni.
+        $historyCount = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)->orWhere('pembimbing_id', $mentor->id);
-        })->whereHas('application', function ($aq) {
-            $aq->whereIn('status', ['accepted', 'verified']);
         })->count();
 
-        if ($activeCount > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Mentor '{$mentor->name}' masih membimbing {$activeCount} mahasiswa aktif.");
+        if ($historyCount > 0) {
+            return redirect()->back()->with('error', "Gagal menghapus: Mentor '{$mentor->name}' tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $name = $mentor->name;

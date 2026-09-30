@@ -13,7 +13,11 @@
 
             <!-- Baris 2: Tombol Aksi (Mobile: Full Width Stack, Desktop: Baris Kanan) -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:self-end">
-                @if (in_array(strtoupper($application->lifecycle_status ?? $application->status), ['ACCEPTED', 'ACTIVE', 'COMPLETED', 'VERIFIED']))
+                @php
+                    $appStatus = $application->status;
+                    $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
+                @endphp
+                @if (in_array($rawStatus, ['accepted', 'active', 'completed', 'verified']))
                     <a href="{{ route('university.students.letter', $application->id) }}" target="_blank"
                        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,19 +99,7 @@
                         </div>
                         <div class="flex justify-between items-center pt-1">
                             <span class="text-slate-400">Status:</span>
-                            @php
-                                $uAppStatus = strtoupper($application->lifecycle_status ?? $application->status ?? '');
-                                $uBadgeClass = match($uAppStatus) {
-                                    'ACTIVE', 'ACCEPTED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    'COMPLETED' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                    'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                    'RESIGNED' => 'bg-slate-100 text-slate-700 border-slate-300',
-                                    default => 'bg-amber-50 text-amber-700 border-amber-200',
-                                };
-                            @endphp
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full border uppercase {{ $uBadgeClass }}">
-                                {{ $application->lifecycle_status ?? $application->status }}
-                            </span>
+                            <x-status-badge :status="$application->status" />
                         </div>
                     </div>
                 </div>
@@ -128,7 +120,7 @@
 
                     <div class="space-y-2 text-xs">
                         <div>
-                            <span class="text-slate-400 block text-[10px]">Dosen Pembimbing (DPL):</span>
+                            <span class="text-slate-400 block text-[10px]">Dosen Pembimbing:</span>
                             @if ($dosen)
                                 <div class="font-bold text-slate-800 truncate mt-0.5">{{ $dosen->name }}</div>
                             @else
@@ -261,22 +253,12 @@
                             <div class="grid grid-cols-2 gap-2 pt-1">
                                 <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-center">
                                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Mentor Dinas</span>
-                                    <span class="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full border
-                                        {{ $mSt === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                                        {{ $mSt === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' : '' }}
-                                        {{ $mSt === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}">
-                                        {{ strtoupper($log->status ?? 'PENDING') }}
-                                    </span>
+                                    <x-status-badge type="review" :status="$log->status ?? 'pending'" class="mt-1" />
                                 </div>
 
                                 <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-center">
                                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Dosen DPL</span>
-                                    <span class="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full border
-                                        {{ $lSt === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                                        {{ $lSt === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' : '' }}
-                                        {{ $lSt === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}">
-                                        {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
-                                    </span>
+                                    <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" class="mt-1" />
                                 </div>
                             </div>
                         </div>
@@ -323,20 +305,10 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                            {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                            {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}
-                                            {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
-                                            {{ strtoupper($log->status ?? 'PENDING') }}
-                                        </span>
+                                        <x-status-badge type="review" :status="$log->status ?? 'pending'" />
                                     </td>
                                     <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                            {{ $log->lecturer_status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                            {{ $log->lecturer_status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}
-                                            {{ $log->lecturer_status === 'pending' || !$log->lecturer_status ? 'bg-amber-100 text-amber-800' : '' }}">
-                                            {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
-                                        </span>
+                                        <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" />
                                     </td>
                                 </tr>
                             @empty
@@ -380,7 +352,7 @@
                     @csrf
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Pilih Dosen Pembimbing (DPL) <span class="text-rose-500">*</span>
+                            Pilih Dosen Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>

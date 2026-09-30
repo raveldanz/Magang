@@ -22,7 +22,7 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative">
+    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}">
         <div class="min-h-screen bg-[#F5F8FC] w-full overflow-x-hidden flex flex-col">
             
             <header class="sticky top-0 z-50 bg-white w-full border-b border-slate-200/80">
@@ -100,6 +100,7 @@
             }
         }"
         @toast.window="add($event.detail.type || 'info', $event.detail.message)"
+        data-toast-root
         class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-[calc(100vw-2rem)] sm:max-w-sm w-full"
         style="z-index: 99999;">
             <template x-for="t in toasts" :key="t.id">
@@ -130,6 +131,9 @@
 
         <!-- Global Double-Confirmation Reset Password Modal Component -->
         <x-confirm-reset-modal />
+
+        <!-- Global Confirmation Modal untuk aksi non-destruktif (buat akun, minta revisi, dll.) -->
+        <x-confirm-action-modal />
 
         <!-- Global Triple-Confirmation Bulk Action Modal Component -->
         <x-bulk-action-modal />

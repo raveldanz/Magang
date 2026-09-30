@@ -1,0 +1,26 @@
+# ==============================================================================
+# Aider Configuration (.aider.conf.yml)
+# ==============================================================================
+# Automatically loaded whenever aider is executed in this repository.
+
+# Automatically load API keys from .env.agents
+env-file: .env.agents
+
+# Git Integration
+auto-commits: true
+dirty-commits: true
+attribute-author: true
+attribute-committer: true
+show-diffs: true
+
+# Formatting and UI
+pretty: true
+stream: true
+suggest-shell-commands: false
+
+# Repository Map
+map-tokens: 2048
+cache-prompts: true
+
+# Ignore files outside active scope
+gitignore: true

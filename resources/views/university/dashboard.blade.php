@@ -62,21 +62,21 @@
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-emerald-500 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Diterima / Aktif</span>
+                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Diterima</span>
                     <p class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_accepted'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Sedang magang</span>
+                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">ACCEPTED, ACTIVE, dan COMPLETED</span>
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-teal-600 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai Magang</span>
+                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
                     <p class="text-xl sm:text-2xl font-black text-teal-700 mt-1">{{ $stats['total_completed'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Lulus & dinilai</span>
+                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</span>
                 </div>
 
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-amber-500 flex flex-col justify-between">
                     <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Menunggu Seleksi</span>
                     <p class="text-xl sm:text-2xl font-black text-amber-600 mt-1">{{ $stats['total_pending'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Proses verifikasi</span>
+                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">PENDING dan VERIFIED</span>
                 </div>
             </div>
 
@@ -364,18 +364,8 @@
                         $dosen = $placement?->academicAdvisor;
                         $mentor = $placement?->mentor ?? $placement?->pembimbing;
 
-                        $status = strtoupper($app->lifecycle_status ?? $app->status);
-                        $today = \Carbon\Carbon::now();
-                        $start = $app->start_date ? \Carbon\Carbon::parse($app->start_date) : null;
-
-                        if (in_array($status, ['ACCEPTED', 'VERIFIED']) && $start && $today->gte($start)) {
-                            $status = 'ACTIVE';
-                        }
-                        if (($app->finalReport?->status === 'approved' || strtoupper($app->finalReport?->status ?? '') === 'APPROVED') || ($placement?->finalreport?->status === 'approved')) {
-                            if ((($app->evaluation?->nilai_akademik ?? 0) > 0) || (($placement?->evaluation?->nilai_akademik ?? 0) > 0)) {
-                                $status = 'COMPLETED';
-                            }
-                        }
+                        $appStatus = $app->status;
+                        $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
                     @endphp
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="px-5 py-4">
@@ -391,29 +381,7 @@
                             <div class="text-xs text-slate-500">{{ $app->unit->name ?? '-' }}</div>
                         </td>
                         <td class="px-5 py-4 text-center">
-                            @if($status === 'SUBMITTED' || $status === 'PENDING')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                    Menunggu Verifikasi
-                                </span>
-                            @elseif($status === 'ACCEPTED' || $status === 'VERIFIED')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
-                                    Diterima
-                                </span>
-                            @elseif($status === 'ACTIVE')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                    <span>Sedang Magang</span>
-                                </span>
-                            @elseif($status === 'COMPLETED')
-                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                                    <span>Lulus</span>
-                                </span>
-                            @elseif($status === 'REJECTED')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
-                                    Ditolak
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">{{ $status }}</span>
-                            @endif
+                            <x-status-badge :status="$app->status" />
                         </td>
                         <td class="px-5 py-4">
                             @if ($dosen)
@@ -501,7 +469,7 @@
                     
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Pilih Dosen Pembimbing (DPL) <span class="text-rose-500">*</span>
+                            Pilih Dosen Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" x-model="assignModal.currentAdvisorId" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>

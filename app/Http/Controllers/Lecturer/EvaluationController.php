@@ -41,7 +41,7 @@ class EvaluationController extends Controller
         $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
 
         if (!$isAssignedAdvisor && !$isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan (DPL) yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
         }
 
         return $placement;

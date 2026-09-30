@@ -20,19 +20,20 @@ class Unit extends Model
         return $this->hasMany(Application::class);
     }
 
+    // Accessor jumlah kuota terisi: $unit->occupied_count (definisi: Application::scopeOccupyingQuota)
+    // Memakai relasi yang sudah di-eager-load bila ada, agar halaman daftar divisi tidak N+1
+    public function getOccupiedCountAttribute(): int
+    {
+        if (!$this->relationLoaded('applications')) {
+            return $this->applications()->occupyingQuota()->count();
+        }
+
+        return $this->applications->filter(fn ($app) => $app->occupiesQuota())->count();
+    }
+
     // Accessor untuk menghitung sisa kuota dinamis: $unit->remaining_quota
-    // Hanya menghitung mahasiswa berstatus accepted yang rentang magangnya masih aktif saat ini atau ke depan
     public function getRemainingQuotaAttribute()
     {
-        $today = date('Y-m-d');
-        $occupiedCount = $this->applications()
-            ->where('status', 'accepted')
-            ->where(function ($q) use ($today) {
-                $q->whereNull('end_date')
-                  ->orWhere('end_date', '>=', $today);
-            })
-            ->count();
-
-        return max(0, $this->quota - $occupiedCount);
+        return max(0, $this->quota - $this->occupied_count);
     }
 }
