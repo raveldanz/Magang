@@ -5,9 +5,6 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Portal Dosen Pembimbing Lapangan (DPL Kampus)</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Monitoring bimbingan akademik, verifikasi logbook, review laporan akhir, dan evaluasi akademik mahasiswa magang
-                </p>
             </div>
             
             <div class="flex items-center gap-2">
