@@ -10,6 +10,13 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Monitoring & Penilaian: {{ $student->name }}</span>
                 </h2>
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <x-chat-button :user="$student" label="Chat Mahasiswa" />
+                    @if ($placement->mentor ?? $placement->pembimbing)
+                        <x-chat-button :user="$placement->mentor ?? $placement->pembimbing" label="Chat Mentor" />
+                    @endif
+                    <x-chat-group-button :placement="$placement" />
+                </div>
             </div>
         </div>
     </x-slot>

@@ -251,8 +251,27 @@
 
                 @php
                     $navHasUnreadDot = Auth::user() ? \App\Services\NotificationService::hasUnreadDot(Auth::user()) : false;
-                    $navQuickNotifs = Auth::user() ? array_slice(\App\Services\NotificationService::getNotificationsForUser(Auth::user()), 0, 4) : [];
+                    $navAllNotifs = Auth::user() ? \App\Services\NotificationService::getNotificationsForUser(Auth::user()) : [];
+                    // Pesan chat belum dibaca didahulukan agar tidak tenggelam di bawah pemberitahuan otomatis lain
+                    $navIsUnreadChat = fn ($n) => ($n['category'] ?? '') === 'chat' && empty($n['is_read']);
+                    $navQuickNotifs = array_slice(array_merge(
+                        array_values(array_filter($navAllNotifs, $navIsUnreadChat)),
+                        array_values(array_filter($navAllNotifs, fn ($n) => !$navIsUnreadChat($n)))
+                    ), 0, 4);
+                    $navChatUnread = (int) ($chatUnread ?? 0);
+                    $navChatLabel = $navChatUnread > 99 ? '99+' : (string) $navChatUnread;
                 @endphp
+                {{-- Pesan / Chat (badge diperbarui live via Alpine.store('chat')) --}}
+                <a href="{{ route('chat.index') }}" title="Pesan" aria-label="Pesan"
+                   class="relative p-2.5 rounded-full border transition shadow-2xs {{ request()->routeIs('chat.*') ? 'border-blue-200 bg-blue-50 text-blue-600' : 'border-slate-200 hover:border-slate-300 bg-white text-slate-600 hover:text-blue-600' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <span x-show="$store.chat.unread > 0" x-text="$store.chat.label" data-chat-badge
+                          class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-white"
+                          @if($navChatUnread < 1) style="display: none;" @endif>{{ $navChatLabel }}</span>
+                </a>
+
                 <div x-data="{ notifOpen: false }" class="relative" @click.outside="notifOpen = false">
                     <button @click="notifOpen = !notifOpen" 
                             type="button"
@@ -455,6 +474,9 @@
                         @endif
 
                         <div class="pt-1.5 border-t border-slate-100 mt-1.5 space-y-0.5">
+                            <a href="{{ route('chat.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Pesan
+                            </a>
                             <a href="{{ route('notifications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pemberitahuan Sistem
                             </a>
@@ -486,8 +508,14 @@
             </div>
 
             {{-- 4. MOBILE MENU TOGGLE BUTTON --}}
-            <div class="flex items-center md:hidden">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" 
+            <div class="flex items-center gap-1 md:hidden">
+                <a href="{{ route('chat.index') }}" class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition" aria-label="Pesan">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    <span x-show="$store.chat.unread > 0" x-text="$store.chat.label" data-chat-badge
+                          class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-white"
+                          @if(($chatUnread ?? 0) < 1) style="display: none;" @endif>{{ ($chatUnread ?? 0) > 99 ? '99+' : ($chatUnread ?? 0) }}</span>
+                </a>
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
                         type="button" 
                         class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none transition cursor-pointer"
                         aria-label="Buka Menu">
@@ -747,6 +775,15 @@
 
             {{-- Bantuan & Masukan --}}
             <div class="pt-2 border-t border-slate-100 space-y-1">
+                <a href="{{ route('chat.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('chat.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('chat.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    </div>
+                    <span class="flex-1">Pesan</span>
+                    <span x-show="$store.chat.unread > 0" x-text="$store.chat.label"
+                          class="min-w-[20px] h-5 px-1.5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center"
+                          @if(($chatUnread ?? 0) < 1) style="display: none;" @endif>{{ ($chatUnread ?? 0) > 99 ? '99+' : ($chatUnread ?? 0) }}</span>
+                </a>
                 <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('notifications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                     <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('notifications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>

@@ -28,7 +28,11 @@ class SystemFeedback extends Model
         'admin_response',
         'responded_by',
         'responded_at',
+        // Tiket kategori 'laporan_chat': pesan chat yang dilaporkan pengguna
+        'chat_message_id',
     ];
+
+    public const CATEGORY_CHAT_REPORT = 'laporan_chat';
 
     protected $casts = [
         'responded_at' => 'datetime',
