@@ -800,7 +800,7 @@
                                             class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">Kredensial
                                             Akses Dosen</span>
                                         <span
-                                            class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">Aktif</span>
+                                            class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">{{ \App\Enums\AccountStatus::ACTIVE->label() }}</span>
                                     </div>
 
                                     <div class="grid grid-cols-3 gap-1">
