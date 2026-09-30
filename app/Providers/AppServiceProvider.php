@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Enums\AccountStatus;
+use App\Enums\FeedbackStatus;
+use App\Models\SystemFeedback;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -39,5 +43,20 @@ class AppServiceProvider extends ServiceProvider
         // jadi batas ini hanya pengaman beban. Dibuat longgar karena banyak orang bisa
         // scan dari satu jaringan (Wi-Fi kampus / kantor) pada saat yang sama.
         RateLimiter::for('verify-qr', fn (Request $request) => Limit::perMinute(600)->by($request->ip()));
+
+        // Kolom status akun & tiket feedback berjenis teks biasa (tanpa CHECK constraint di database):
+        // tolak nilai di luar enum saat disimpan, agar nilai hantu seperti "on_leave"/"submitted" tidak bisa masuk.
+        // Status pengajuan dijaga cast enum di model; status logbook & laporan dijaga CHECK constraint.
+        // Closure sengaja tanpa nilai kembali: listener saving yang mengembalikan false membatalkan penyimpanan.
+        User::saving(function (User $user): void {
+            if ($user->isDirty('status')) {
+                AccountStatus::assertValid($user->status);
+            }
+        });
+        SystemFeedback::saving(function (SystemFeedback $feedback): void {
+            if ($feedback->isDirty('status')) {
+                FeedbackStatus::assertValid($feedback->status);
+            }
+        });
     }
 }

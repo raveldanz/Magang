@@ -29,6 +29,22 @@ trait DisplaysStatusCode
         return static::tryFrom(strtolower(trim($status)));
     }
 
+    /**
+     * Tolak nilai di luar enum (dipakai penjaga simpan untuk kolom status berjenis teks biasa).
+     */
+    public static function assertValid(mixed $status, string $column = 'status'): void
+    {
+        if ($status === null || $status instanceof static || static::resolve($status) !== null) {
+            return;
+        }
+
+        $value = $status instanceof \BackedEnum ? $status->value : (string) $status;
+
+        throw new \InvalidArgumentException(sprintf(
+            'Nilai %s "%s" tidak dikenal. Nilai yang sah: %s.', $column, $value, implode(', ', static::values())
+        ));
+    }
+
     public static function values(): array
     {
         return array_column(static::cases(), 'value');
