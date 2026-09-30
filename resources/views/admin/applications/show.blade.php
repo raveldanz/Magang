@@ -19,6 +19,7 @@
 
             <!-- Current Status Badge in Header -->
             <div class="flex items-center gap-2">
+                <x-chat-button :user="$application->user" label="Chat Pelamar" />
                 <x-status-badge :status="$application->status" />
             </div>
         </div>

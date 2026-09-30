@@ -12,6 +12,12 @@ use App\Http\Controllers\Admin\MentorController as AdminMentorController;
 use App\Http\Controllers\Admin\UnitController as AdminUnitController;
 use App\Http\Controllers\Admin\UniversityController as AdminUniversityController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Chat\ChatApiController;
+use App\Http\Controllers\Chat\ChatGroupController;
+use App\Http\Controllers\Chat\ChatMessageController;
+use App\Http\Controllers\Chat\ChatModerationController;
+use App\Http\Controllers\Chat\ChatPageController;
+use App\Http\Middleware\EnsureNotImpersonating;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Lecturer\DashboardController as LecturerDashboardController;
 use App\Http\Controllers\Lecturer\EvaluationController as LecturerEvaluationController;
@@ -100,6 +106,7 @@ Route::middleware('auth')->group(function () {
     // Route Profile Akun (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/phone', [ProfileController::class, 'updatePhone'])->name('profile.phone.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Route Impersonation (Login As & Kembali ke Super Admin)
@@ -110,6 +117,44 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
+
+    // Chat antar pengguna (semua role; aturan kontak di App\Services\Chat\ChatContactDirectory)
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/', [ChatPageController::class, 'index'])->name('index');
+        Route::post('/start', [ChatPageController::class, 'start'])->middleware('throttle:chat-send')->name('start');
+        Route::get('/placement/{placement}', [ChatPageController::class, 'placement'])->name('placement');
+        Route::get('/attachments/{attachment}', [ChatMessageController::class, 'attachment'])->name('attachment');
+        Route::delete('/moderation/messages/{message}', [ChatModerationController::class, 'destroy'])
+            ->middleware('role:super_admin')->name('moderation.destroy');
+        Route::get('/{conversation}', [ChatPageController::class, 'show'])->whereNumber('conversation')->name('show');
+
+        Route::prefix('api')->name('api.')->group(function () {
+            // Baca & polling (tetap boleh saat "Login As")
+            Route::middleware('throttle:chat-poll')->group(function () {
+                Route::get('/summary', [ChatApiController::class, 'summary'])->name('summary');
+                Route::get('/conversations', [ChatApiController::class, 'conversations'])->name('conversations');
+                Route::get('/contacts', [ChatApiController::class, 'contacts'])->name('contacts');
+                Route::get('/conversations/{conversation}', [ChatApiController::class, 'show'])->name('conversations.show');
+                Route::get('/conversations/{conversation}/media', [ChatApiController::class, 'media'])->name('conversations.media');
+                Route::get('/conversations/{conversation}/messages', [ChatMessageController::class, 'index'])->name('messages.index');
+                Route::post('/conversations/{conversation}/read', [ChatMessageController::class, 'read'])->name('messages.read');
+                Route::post('/conversations/{conversation}/typing', [ChatMessageController::class, 'typing'])->name('messages.typing');
+            });
+
+            // Aksi tulis (diblokir saat "Login As")
+            Route::middleware(['throttle:chat-send', EnsureNotImpersonating::class])->group(function () {
+                Route::post('/conversations/{conversation}/messages', [ChatMessageController::class, 'store'])->name('messages.store');
+                Route::delete('/messages/{message}', [ChatMessageController::class, 'destroy'])->name('messages.destroy');
+                Route::post('/messages/{message}/report', [ChatMessageController::class, 'report'])->name('messages.report');
+                Route::post('/groups', [ChatGroupController::class, 'store'])->name('groups.store');
+                Route::patch('/conversations/{conversation}', [ChatGroupController::class, 'update'])->name('groups.update');
+                Route::post('/conversations/{conversation}/members', [ChatGroupController::class, 'addMembers'])->name('groups.members.store');
+                Route::delete('/conversations/{conversation}/members/{user}', [ChatGroupController::class, 'removeMember'])->name('groups.members.destroy');
+                Route::post('/conversations/{conversation}/leave', [ChatGroupController::class, 'leave'])->name('groups.leave');
+                Route::post('/conversations/{conversation}/settings', [ChatGroupController::class, 'settings'])->name('conversations.settings');
+            });
+        });
+    });
 
     // Masukan & Laporan Kendala (Feedback / Support Ticket)
     Route::get('/feedbacks/create', [FeedbackController::class, 'create'])->name('feedbacks.create');

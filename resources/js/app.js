@@ -1,6 +1,6 @@
-
-
 import Alpine from 'alpinejs';
+import { chatApp } from './chat/app';
+import { registerChatNotifier } from './chat/notifier';
 
 window.Alpine = Alpine;
 
@@ -13,5 +13,9 @@ window.notify = (message, type = 'error') => {
         window.alert(message);
     }
 };
+
+// Fitur chat: komponen halaman chat + badge/toast/notifikasi desktop pesan baru di semua halaman
+Alpine.data('chatApp', chatApp);
+registerChatNotifier(Alpine);
 
 Alpine.start();

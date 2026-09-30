@@ -590,6 +590,8 @@
                                     </div>
                                 </div>
 
+                                <x-chat-button :user="$academicAdvisor" label="Chat DPL" />
+
                                 <button type="button"
                                     onclick="document.getElementById('change-advisor-box').classList.toggle('hidden')"
                                     class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs transition cursor-pointer">
@@ -942,9 +944,17 @@
                                 {{ $mentor ? $mentor->name : 'Belum Diplot Dinas' }}
                             </p>
                         </div>
-                        <div class="mt-4 pt-2">
+                        <div class="mt-4 pt-2 space-y-3">
                             <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.
                             </p>
+                            @if ($mentor || $academicAdvisor)
+                                <div class="flex flex-wrap gap-2">
+                                    @if ($mentor)
+                                        <x-chat-button :user="$mentor" label="Chat Mentor" />
+                                    @endif
+                                    <x-chat-group-button :placement="$placement" />
+                                </div>
+                            @endif
                         </div>
                     </div>
 
