@@ -126,7 +126,7 @@
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Dinas / Super Admin</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
-                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing (DPL)</option>
+                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing</option>
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
                     </select>
 
@@ -278,31 +278,27 @@
 
                                     <!-- Status -->
                                     <td class="py-4 px-4 text-center whitespace-nowrap">
-                                        @if($u->status === 'on_leave')
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Cuti</span>
-                                        @elseif($u->status === 'inactive')
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Non-Aktif</span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
-                                        @endif
+                                        <x-status-badge type="account" :status="$u->status ?? 'active'" />
                                     </td>
 
                                     <!-- Action Buttons -->
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="btn-action-group">
+                                        <div class="inline-flex items-center justify-end gap-1.5 align-middle">
 
                                             <!-- Tombol Impersonate / Login As -->
                                             @if($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser)
-                                                <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="btn-action-form">
+                                                <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="inline-flex items-center m-0 p-0 align-middle">
                                                     @csrf
-                                                    <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)" class="btn-action-login">
+                                                    <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)"
+                                                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800">
                                                         Login As
                                                     </button>
                                                 </form>
                                             @endif
 
                                             <!-- Tombol Edit -->
-                                            <a href="{{ route('admin.users.edit', $u->id) }}" class="btn-action-edit">
+                                            <a href="{{ route('admin.users.edit', $u->id) }}"
+                                               class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white">
                                                 Edit
                                             </a>
 
@@ -315,7 +311,7 @@
                                                             email: '{{ addslashes($u->email) }}',
                                                             role: '{{ strtoupper($u->role) }}'
                                                         })" 
-                                                        class="btn-action-reset" 
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white" 
                                                         title="Reset password ke default: password">
                                                     Reset
                                                 </button>
@@ -330,7 +326,7 @@
                                                             name: '{{ addslashes($u->name) }}',
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
                                                         })" 
-                                                        class="btn-action-delete" 
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white" 
                                                         title="Hapus Pengguna">
                                                     Hapus
                                                 </button>
@@ -407,13 +403,7 @@
 
                                     <!-- Status Badge -->
                                     <div class="shrink-0">
-                                        @if($u->status === 'on_leave')
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Cuti</span>
-                                        @elseif($u->status === 'inactive')
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Non-Aktif</span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
-                                        @endif
+                                        <x-status-badge type="account" :status="$u->status ?? 'active'" />
                                     </div>
                                 </div>
 
@@ -472,16 +462,16 @@
                                         <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="inline-block m-0">
                                             @csrf
                                             <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)"
-                                                    class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                                                    class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 font-bold text-xs rounded-xl shadow-2xs transition active:scale-95 cursor-pointer">
+                                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                                                 <span>Login As</span>
                                             </button>
                                         </form>
                                     @endif
 
                                     <a href="{{ route('admin.users.edit', $u->id) }}" 
-                                       class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95">
-                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                       class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-xl transition active:scale-95">
+                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         <span>Edit</span>
                                     </a>
 

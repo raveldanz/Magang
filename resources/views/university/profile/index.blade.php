@@ -203,7 +203,7 @@
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Standar</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                        Mahasiswa dibimbing & dinilai oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing (DPL)</strong>. Logbook diverifikasi 2 arah.
+                                        Mahasiswa dibimbing & dinilai oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing</strong>. Logbook diverifikasi 2 arah.
                                     </p>
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
                                         <span>✓ Wajib Pilih DPL</span>
@@ -268,7 +268,7 @@
                             <!-- Bobot DPL Kampus -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <label class="font-bold text-slate-700">Bobot Dosen Pembimbing (DPL)</label>
+                                    <label class="font-bold text-slate-700">Bobot Dosen Pembimbing</label>
                                     <span class="font-mono font-bold text-purple-700 text-sm" x-text="weightLecturer + '%'"></span>
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
@@ -282,7 +282,7 @@
                         <div class="pt-2 border-t border-slate-200 flex items-center gap-2">
                             <input type="checkbox" name="require_dpl" value="1" id="require_dpl" {{ old('require_dpl', $university->require_dpl ?? true) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <label for="require_dpl" class="text-xs text-gray-700 font-medium">
-                                <strong>Kunci Pengisian Logbook</strong> hingga mahasiswa memilih Dosen Pembimbing Lapangan (DPL).
+                                <strong>Kunci Pengisian Logbook</strong> hingga mahasiswa memilih Dosen Pembimbing Lapangan.
                             </label>
                         </div>
                     </div>
@@ -319,14 +319,14 @@
                 const file = input.files[0];
                 
                 if (!file.type.startsWith('image/')) {
-                    alert('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
+                    notify('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
                     input.value = '';
                     preview.src = defaultSrc;
                     return;
                 }
 
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Ukuran berkas logo terlalu besar (maksimal 2MB).');
+                    notify('Ukuran berkas logo terlalu besar (maksimal 2MB).');
                     input.value = '';
                     preview.src = defaultSrc;
                     return;

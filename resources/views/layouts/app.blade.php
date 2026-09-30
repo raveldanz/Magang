@@ -100,6 +100,7 @@
             }
         }"
         @toast.window="add($event.detail.type || 'info', $event.detail.message)"
+        data-toast-root
         class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-[calc(100vw-2rem)] sm:max-w-sm w-full"
         style="z-index: 99999;">
             <template x-for="t in toasts" :key="t.id">
@@ -130,6 +131,9 @@
 
         <!-- Global Double-Confirmation Reset Password Modal Component -->
         <x-confirm-reset-modal />
+
+        <!-- Global Confirmation Modal untuk aksi non-destruktif (buat akun, minta revisi, dll.) -->
+        <x-confirm-action-modal />
 
         <!-- Global Triple-Confirmation Bulk Action Modal Component -->
         <x-bulk-action-modal />

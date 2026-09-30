@@ -77,7 +77,7 @@
 
             <!-- Target Entity Details Box -->
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Objek yang akan
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Objek yang akan
                     dihapus:</span>
                 <div class="font-black text-sm text-slate-900 break-words" x-text="name"></div>
                 <template x-if="desc">

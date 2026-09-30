@@ -1,13 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
-                {{ __('Laporan Akhir Magang') }}
-            </h2>
-            <p class="text-xs text-slate-500 mt-1">
-                Unggah naskah laporan ilmiah akhir dan pantau hasil evaluasi penilaian magang MBKM
-            </p>
-        </div>
+        <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+            {{ __('Laporan Akhir Magang') }}
+        </h2>
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
@@ -58,7 +53,7 @@
                 </div>
 
             {{-- KONDISI 1: JIKA STATUS MASIH DALAM VERIFIKASI SELEKSI INSTANSI --}}
-            @elseif (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'SUBMITTED', 'VERIFIED']) || !$placement)
+            @elseif (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'VERIFIED']) || !$placement)
                 
                 <!-- Status Banner Kuning / Amber -->
                 <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">
@@ -113,7 +108,7 @@
                                 <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
                                 <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
                             </div>
-                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan (DPL).</p>
+                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan.</p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
@@ -186,7 +181,7 @@
                             <p class="font-bold text-sm text-white">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditentukan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing (DPL)</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing</p>
                             <p class="font-bold text-sm text-white">{{ $placement?->academicAdvisor?->name ?? 'Belum Ditentukan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
@@ -227,22 +222,7 @@
                             </div>
 
                             <div class="shrink-0">
-                                @if($finalReport->status === 'approved')
-                                    <span class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
-                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        <span>Laporan Disetujui (ACC)</span>
-                                    </span>
-                                @elseif($finalReport->status === 'revision')
-                                    <span class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-black bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-1.5 shadow-2xs">
-                                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                        <span>Perlu Perbaikan (Revisi)</span>
-                                    </span>
-                                @else
-                                    <span class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-black bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5 shadow-2xs">
-                                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <span>Menunggu Verifikasi DPL / Mentor</span>
-                                    </span>
-                                @endif
+                                <x-status-badge type="review" :status="$finalReport->status" stacked />
                             </div>
                         </div>
 
@@ -422,7 +402,7 @@
                             </div>
                             <h3 class="font-black text-base sm:text-xl text-emerald-950">Laporan Akhir Anda Telah Disetujui Secara Resmi (ACC)</h3>
                             <p class="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
-                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan (DPL) dan Mentor Instansi Pemerintah Kota Surabaya.
+                                Selamat! Naskah laporan ilmiah dan luaran magang Anda telah diverifikasi dan disetujui oleh Dosen Pembimbing Lapangan dan Mentor Instansi Pemerintah Kota Surabaya.
                             </p>
                         </div>
 
@@ -558,7 +538,7 @@
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ ($finalReport && $finalReport->status === 'approved') ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui (ACC)' : 'Menunggu Persetujuan Naskah' }}
+                                        {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui' : 'Menunggu Persetujuan Naskah' }}
                                     </p>
                                 </div>
                             </div>
@@ -636,7 +616,7 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (file.size > 10 * 1024 * 1024) {
-                    alert('Ukuran berkas naskah laporan melebihi batas maksimal 10MB.');
+                    notify('Ukuran berkas naskah laporan melebihi batas maksimal 10MB.');
                     input.value = '';
                     box.classList.add('hidden');
                     box.classList.remove('flex');

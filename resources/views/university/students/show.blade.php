@@ -99,29 +99,7 @@
                         </div>
                         <div class="flex justify-between items-center pt-1">
                             <span class="text-slate-400">Status:</span>
-                            @php
-                                $uBadgeClass = match($rawStatus) {
-                                    'active' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    'accepted' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                    'verified' => 'bg-sky-50 text-sky-700 border-sky-200',
-                                    'completed' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                    'rejected' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                    'resigned' => 'bg-slate-100 text-slate-700 border-slate-300',
-                                    default => 'bg-amber-50 text-amber-700 border-amber-200',
-                                };
-                                $uLabel = match($rawStatus) {
-                                    'active' => 'AKTIF',
-                                    'accepted' => 'DITERIMA',
-                                    'verified' => 'LOLOS BERKAS',
-                                    'completed' => 'LULUS',
-                                    'rejected' => 'DITOLAK',
-                                    'resigned' => 'MENGUNDURKAN DIRI',
-                                    default => 'DALAM PROSES',
-                                };
-                            @endphp
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full border uppercase {{ $uBadgeClass }}">
-                                {{ $uLabel }}
-                            </span>
+                            <x-status-badge :status="$application->status" />
                         </div>
                     </div>
                 </div>
@@ -142,7 +120,7 @@
 
                     <div class="space-y-2 text-xs">
                         <div>
-                            <span class="text-slate-400 block text-[10px]">Dosen Pembimbing (DPL):</span>
+                            <span class="text-slate-400 block text-[10px]">Dosen Pembimbing:</span>
                             @if ($dosen)
                                 <div class="font-bold text-slate-800 truncate mt-0.5">{{ $dosen->name }}</div>
                             @else
@@ -275,22 +253,12 @@
                             <div class="grid grid-cols-2 gap-2 pt-1">
                                 <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-center">
                                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Mentor Dinas</span>
-                                    <span class="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full border
-                                        {{ $mSt === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                                        {{ $mSt === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' : '' }}
-                                        {{ $mSt === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}">
-                                        {{ strtoupper($log->status ?? 'PENDING') }}
-                                    </span>
+                                    <x-status-badge type="review" :status="$log->status ?? 'pending'" class="mt-1" />
                                 </div>
 
                                 <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-center">
                                     <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Dosen DPL</span>
-                                    <span class="inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full border
-                                        {{ $lSt === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                                        {{ $lSt === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' : '' }}
-                                        {{ $lSt === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}">
-                                        {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
-                                    </span>
+                                    <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" class="mt-1" />
                                 </div>
                             </div>
                         </div>
@@ -337,20 +305,10 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                            {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                            {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}
-                                            {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
-                                            {{ strtoupper($log->status ?? 'PENDING') }}
-                                        </span>
+                                        <x-status-badge type="review" :status="$log->status ?? 'pending'" />
                                     </td>
                                     <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                            {{ $log->lecturer_status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                            {{ $log->lecturer_status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}
-                                            {{ $log->lecturer_status === 'pending' || !$log->lecturer_status ? 'bg-amber-100 text-amber-800' : '' }}">
-                                            {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
-                                        </span>
+                                        <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" />
                                     </td>
                                 </tr>
                             @empty
@@ -394,7 +352,7 @@
                     @csrf
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                            Pilih Dosen Pembimbing (DPL) <span class="text-rose-500">*</span>
+                            Pilih Dosen Pembimbing <span class="text-rose-500">*</span>
                         </label>
                         <select name="academic_advisor_id" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Pilih Dosen Pembimbing Kampus --</option>

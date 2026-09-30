@@ -67,7 +67,7 @@
                                 <option value="mahasiswa">Mahasiswa Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas</option>
                                 <option value="mentor">Mentor Lapangan Dinas</option>
-                                <option value="dosen">Dosen Pembimbing (DPL)</option>
+                                <option value="dosen">Dosen Pembimbing</option>
                                 <option value="universitas">Admin Universitas</option>
                             </select>
                         </div>
@@ -78,10 +78,11 @@
                             </label>
                             <select name="status"
                                 class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                <option value="active">Aktif</option>
-                                <option value="on_leave">Cuti</option>
-                                <option value="inactive">Non-Aktif</option>
+                                @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
+                                    <option value="{{ $accountCase->value }}" {{ old('status', 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
+                                @endforeach
                             </select>
+                            <x-status-legend type="account" />
                         </div>
                     </div>
 

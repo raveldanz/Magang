@@ -119,7 +119,7 @@ class Placement extends Model
 
         if ($eval && $eval->is_complete) {
             $rawStatus = $app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : strtolower((string)$app->status);
-            if ($rawStatus !== 'completed' && !in_array($rawStatus, ['resigned', 'canceled', 'rejected'])) {
+            if ($rawStatus !== 'completed' && !in_array($rawStatus, ['resigned', 'rejected'])) {
                 $app->update(['status' => \App\Enums\ApplicationStatus::COMPLETED]);
                 
                 \App\Models\AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [

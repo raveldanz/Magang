@@ -97,13 +97,12 @@
                         <div class="w-full lg:w-44">
                             <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
                                 <option value="">-- Semua Status --</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>PENDING (Menunggu)</option>
-                                <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>VERIFIED (Lolos Berkas)</option>
-                                <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>ACCEPTED (Diterima)</option>
-                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>ACTIVE (Magang Aktif)</option>
-                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>COMPLETED (Lulus)</option>
-                                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>REJECTED (Ditolak)</option>
-                                <option value="resigned" {{ request('status') == 'resigned' ? 'selected' : '' }}>RESIGNED (Undur Diri)</option>
+                                <option value="action" {{ request('status') == 'action' ? 'selected' : '' }}>Perlu Tindakan</option>
+                                <optgroup label="Status Pengajuan">
+                                    @foreach(\App\Enums\ApplicationStatus::cases() as $statusCase)
+                                        <option value="{{ $statusCase->value }}" {{ request('status') == $statusCase->value ? 'selected' : '' }}>{{ $statusCase->label() }}</option>
+                                    @endforeach
+                                </optgroup>
                             </select>
                         </div>
 
@@ -169,60 +168,16 @@
                                     </td>
                                     <td class="p-3 whitespace-nowrap">
                                         @php
-                                            $rawStatus = $app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : strtolower((string)$app->status);
-                                            $isReadyForGraduation = (in_array($rawStatus, ['accepted', 'active']) && $app->can_complete);
-                                            $isWaitingEvaluation = (in_array($rawStatus, ['accepted', 'active']) && $app->has_approved_report && !$app->has_complete_evaluation);
+                                            $actionHint = $app->actionHint();
+                                            $waitingEvaluation = !$actionHint && in_array($app->statusValue(), ['accepted', 'active'], true)
+                                                && $app->has_approved_report && !$app->has_complete_evaluation;
                                         @endphp
-                                        @if($isReadyForGraduation)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-purple-50 text-purple-700 border border-purple-300 shadow-2xs" title="Laporan & Nilai Lengkap">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                                <span>SIAP LULUS</span>
-                                            </span>
-                                        @elseif($isWaitingEvaluation)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs" title="Laporan disetujui, menunggu nilai evaluasi">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                                <span>MENUNGGU NILAI</span>
-                                            </span>
-                                        @elseif($rawStatus === 'pending')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                                <span>PENDING</span>
-                                            </span>
-                                        @elseif($rawStatus === 'verified')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-sky-50 text-sky-700 border border-sky-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                                <span>VERIFIED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'active')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                <span>ACTIVE</span>
-                                            </span>
-                                        @elseif($rawStatus === 'accepted')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                                <span>ACCEPTED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'completed')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                                <span>COMPLETED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'rejected')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                                <span>REJECTED</span>
-                                            </span>
-                                        @elseif($rawStatus === 'resigned')
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                                                <span>RESIGNED</span>
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                                                <span>{{ strtoupper($rawStatus) }}</span>
-                                            </span>
+                                        <x-status-badge :status="$app->status"
+                                            :tooltip="$app->statusValue() === 'rejected' && $app->rejection_note ? 'Alasan: ' . $app->rejection_note : null" />
+                                        @if($actionHint)
+                                            <div class="mt-1.5 text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
+                                        @elseif($waitingEvaluation)
+                                            <div class="mt-1.5 text-xs text-slate-500">Menunggu nilai evaluasi</div>
                                         @endif
                                     </td>
                                     <td class="p-3 text-center whitespace-nowrap">
@@ -248,9 +203,10 @@
                 <div class="md:hidden space-y-3">
                     @forelse ($applications as $app)
                         @php
-                            $rawStatus = $app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : strtolower((string)$app->status);
-                            $isReadyForGraduation = (in_array($rawStatus, ['accepted', 'active']) && $app->can_complete);
-                            $isWaitingEvaluation = (in_array($rawStatus, ['accepted', 'active']) && $app->has_approved_report && !$app->has_complete_evaluation);
+                            $rawStatus = $app->statusValue();
+                            $actionHint = $app->actionHint();
+                            $waitingEvaluation = !$actionHint && in_array($rawStatus, ['accepted', 'active'], true)
+                                && $app->has_approved_report && !$app->has_complete_evaluation;
                         @endphp
                         <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
                             <div class="flex items-start justify-between gap-2">
@@ -259,59 +215,15 @@
                                     <p class="text-xs text-slate-500 mt-0.5">{{ $app->user->studentProfile->universitas ?? '-' }} <span class="text-slate-400">({{ $app->user->studentProfile->jurusan ?? '-' }})</span></p>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    @if($isReadyForGraduation)
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-purple-50 text-purple-700 border border-purple-300 shadow-2xs" title="Laporan & Nilai Lengkap">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                            <span>SIAP LULUS</span>
-                                        </span>
-                                    @elseif($isWaitingEvaluation)
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs" title="Laporan disetujui, menunggu nilai evaluasi">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                            <span>MENUNGGU NILAI</span>
-                                        </span>
-                                    @elseif($rawStatus === 'pending')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            <span>PENDING</span>
-                                        </span>
-                                    @elseif($rawStatus === 'verified')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-sky-50 text-sky-700 border border-sky-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                            <span>VERIFIED</span>
-                                        </span>
-                                    @elseif($rawStatus === 'active')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            <span>ACTIVE</span>
-                                        </span>
-                                    @elseif($rawStatus === 'accepted')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                                            <span>ACCEPTED</span>
-                                        </span>
-                                    @elseif($rawStatus === 'completed')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                            <span>COMPLETED</span>
-                                        </span>
-                                    @elseif($rawStatus === 'rejected')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                            <span>REJECTED</span>
-                                        </span>
-                                    @elseif($rawStatus === 'resigned')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                                            <span>RESIGNED</span>
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                                            <span>{{ strtoupper($rawStatus) }}</span>
-                                        </span>
-                                    @endif
+                                    <x-status-badge :status="$app->status" />
                                 </div>
                             </div>
+
+                            @if($actionHint)
+                                <div class="text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
+                            @elseif($waitingEvaluation)
+                                <div class="text-xs text-slate-500">Menunggu nilai evaluasi</div>
+                            @endif
 
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
                                 <div class="flex items-start justify-between text-slate-600 gap-2">
@@ -328,6 +240,13 @@
                                     <span class="font-mono text-slate-500">{{ $app->created_at->format('d M Y, H:i') }}</span>
                                 </div>
                             </div>
+
+                            @if($rawStatus === 'rejected' && $app->rejection_note)
+                                <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100 text-xs text-rose-800">
+                                    <span class="font-bold text-[11px] uppercase tracking-wider block text-rose-900 mb-0.5">Alasan Penolakan:</span>
+                                    <p class="italic text-[11px] text-rose-700">"{{ $app->rejection_note }}"</p>
+                                </div>
+                            @endif
 
                             <a href="{{ route('admin.applications.show', $app->id) }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs active:scale-95 cursor-pointer group">
                                 <span>Lihat Detail Pengajuan</span>
