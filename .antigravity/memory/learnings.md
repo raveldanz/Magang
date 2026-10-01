@@ -51,6 +51,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-039** | 2026-09-30 | Fitur Chat & Error JSON Endpoint Web | Validasi endpoint fetch `/chat/api/*` membalas redirect 302 (bukan 422 JSON) karena `shouldRenderJsonWhen` hanya `api/*` | RESOLVED |
 | **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
 | **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
+| **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
 
 ---
 
@@ -824,6 +825,23 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. **Privasi**: data pribadi hanya dikirim server bila `personalDetailsVisibleTo()` mengizinkan, yaitu mode ketat `contactsQuery(strict: true)`. Aturannya sama dengan aturan kontak chat, tetapi dosen ↔ mahasiswa sekampus hanya bila dosen tersebut DPL-nya. Super Admin melihat semua. Tanpa izin, API mengirim `visible=false` dan email/telepon/NIM `null` (bukan sekadar disembunyikan di tampilan).
   3. Panel notifikasi diposisikan selebar sidebar (`absolute left-3 right-3` terhadap header), berisi status izin browser & tombol tes suara. Kunci localStorage/sessionStorage memuat `data-chat-user`. Toast ringkasan "Anda memiliki N pesan belum dibaca" muncul sekali per sesi. Notifikasi desktop juga muncul saat jendela tidak fokus. Pesan chat belum dibaca didahulukan di lonceng navbar. Saat Login As, jumlah belum dibaca di daftar tidak di-nol-kan (konsisten dengan badge navbar).
 - **Prevention Rule**: Data pribadi (email, telepon, NIM, alamat) di fitur apa pun wajib difilter di server lewat `personalDetailsVisibleTo()` (atau aturan setara), bukan dengan menyembunyikan elemen di Blade/Alpine. Setiap `Model::create()` dengan field baru wajib dicek kolom & `$fillable`-nya, karena atribut yang tidak dikenal dibuang tanpa error. Kunci localStorage/sessionStorage yang menyimpan status per pengguna wajib memuat id pengguna. Dropdown di dalam kontainer `overflow-hidden` wajib diposisikan relatif ke kontainer yang cukup lebar (atau `fixed`).
+
+---
+
+### [LRN-042] Penanganan Migrasi Fitur Chat Tertunda (`relation "chat_conversations" does not exist`) & Guard Skema
+- **Tanggal**: 2026-10-01
+- **Komponen**: `database/migrations/`, `app/Services/Chat/ChatGroupService.php`, `resources/views/chat/partials/conversation.blade.php`
+- **Problem / Symptom**: Saat pengguna menekan ikon balon chat di samping notifikasi di navbar (mengarah ke `/chat`), muncul halaman error 500 `Illuminate\Database\QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "chat_conversations" does not exist` di `ChatGroupService.php:217`.
+- **Root Cause**:
+  1. Migrasi fitur chat (`2026_09_30_000000_create_chat_tables` dkk) masih berstatus `Pending` di database PostgreSQL aktif (`db_perpusmagang`).
+  2. `ChatGroupService::ensurePlacementGroupsFor()` belum memiliki guard pengecekan keberadaan tabel `chat_conversations`, sehingga langsung melempar SQL exception fatal bila tabel belum dimigrasi.
+  3. Badge status "Nonaktif" di `chat/partials/conversation.blade.php` memicu gagal test `StatusViewGuardTest` karena belum diberi penanda `status-guard:ignore`.
+- **Fix Applied**:
+  1. Menjalankan `php artisan migrate` untuk mengeksekusi seluruh migrasi pending (Batch 7: `create_chat_tables`, `upgrade_chat_full_features`, `merge_on_leave_into_inactive_account_status`, `add_foreign_key_indexes_to_core_tables`, `add_phone_to_users_table`).
+  2. Menambahkan guard `if (!Schema::hasTable('chat_conversations')) { return; }` pada `ChatGroupService::ensurePlacementGroupsFor()` untuk keamanan defensif.
+  3. Menambahkan komentar `{{-- status-guard:ignore --}}` pada badge kontak nonaktif di header chat Blade.
+  4. Membersihkan cache via `php artisan optimize:clear` dan `php artisan view:clear`.
+- **Prevention Rule**: Setiap penambahan migrasi baru wajib segera dijalankan pada database lingkungan lokal/development (`php artisan migrate`). Service yang berinteraksi dengan tabel yang baru diperkenalkan sebaiknya memiliki pengecekan `Schema::hasTable` jika berisiko dipanggil dari halaman umum sebelum migrasi selesai.
 
 ---
 
