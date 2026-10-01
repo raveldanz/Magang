@@ -73,7 +73,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">APPROVED</span>
+                        <span class="text-xs font-bold text-emerald-600 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -86,7 +86,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase">PENDING</span>
+                        <span class="text-xs font-bold text-amber-600 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
