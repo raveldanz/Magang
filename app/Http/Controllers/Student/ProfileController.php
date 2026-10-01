@@ -7,7 +7,7 @@ use App\Models\StudentProfile;
 use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Storage; 
 class ProfileController extends Controller
 {
     public function edit()
@@ -23,6 +23,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        // 2. Tambahkan validasi untuk photo
         $request->validate([
             'name' => 'required|string|max:255',
             'nim' => 'required|string|max:50',
@@ -34,6 +35,7 @@ class ProfileController extends Controller
             'alamat' => 'nullable|string',
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:30',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $universityName = trim($request->input('universitas') ?? $request->input('university_name'));
@@ -57,6 +59,18 @@ class ProfileController extends Controller
         $major = $request->input('jurusan') ?? $request->input('major');
         $address = $request->input('alamat') ?? $request->input('address');
 
+        // Ambil profil saat ini untuk cek foto lama
+        $currentProfile = $user->studentProfile;
+        $photoPath = $currentProfile?->photo;
+
+        // 3. Logika Upload Foto Profil & Hapus Foto Lama jika diganti
+        if ($request->hasFile('photo')) {
+            if ($photoPath && Storage::disk('public')->exists($photoPath)) {
+                Storage::disk('public')->delete($photoPath);
+            }
+            $photoPath = $request->file('photo')->store('profile-photos', 'public');
+        }
+
         StudentProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -74,6 +88,7 @@ class ProfileController extends Controller
                 'address' => $address,
                 'emergency_contact_name' => $request->emergency_contact_name,
                 'emergency_contact_phone' => $request->emergency_contact_phone,
+                'photo' => $photoPath, 
             ]
         );
 
