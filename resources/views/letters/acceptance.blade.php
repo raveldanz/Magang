@@ -524,7 +524,7 @@
         <div class="tte-container">
             <table class="tte-table">
                 <tr>
-                    <td class="tte-qr-cell">
+                    <td class="tte-qr-cell" data-verify-url="{{ $verifyUrl }}">
                         @if(!empty($qrSvg))
                             <div style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                                 {!! $qrSvg !!}
@@ -541,6 +541,9 @@
                         @if (!empty($signeeNip))
                             <div>NIP. {{ $signeeNip }}</div>
                         @endif
+                        <div style="font-size: 7.5pt; color: #555; margin-top: 3px;">
+                            Verifikasi: <a href="{{ $verifyUrl }}" target="_blank" style="color: #0d6efd; text-decoration: none;">{{ $verifyUrl }}</a>
+                        </div>
                     </td>
                 </tr>
             </table>

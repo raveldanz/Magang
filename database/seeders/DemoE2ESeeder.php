@@ -328,6 +328,9 @@ class DemoE2ESeeder extends Seeder
                 'mentor_id' => $mentorKominfo->id,
                 'pembimbing_id' => $mentorKominfo->id,
                 'academic_advisor_id' => $dplUnesa->id,
+                'status' => 'completed',
+                'certificate_number' => 'SERT/001/PEMKOT-SBY/2026',
+                'certificate_hash' => '2nUkl4agLziObPEKxC3JqH9sn34KayDM',
             ]
         );
 
@@ -433,9 +436,10 @@ class DemoE2ESeeder extends Seeder
                 'cv_path' => 'documents/applications/sample_cv.pdf',
                 'transcript_path' => 'documents/applications/sample_transkrip.pdf',
                 'id_card_path' => 'documents/applications/sample_ktm.pdf',
-                'status' => 'accepted',
+                'status' => 'active',
                 'letter_number' => '500.12.2/092/436.7.14/2026',
                 'letter_date' => Carbon::now()->subDays(28)->format('Y-m-d'),
+                'letter_token' => '8jWF5lkveqJNb97rfKgcrBjibOB2HDno',
             ]
         );
 
@@ -445,6 +449,7 @@ class DemoE2ESeeder extends Seeder
                 'mentor_id' => $mentorKominfo->id,
                 'pembimbing_id' => $mentorKominfo->id,
                 'academic_advisor_id' => $dplUnesa->id,
+                'status' => 'active',
             ]
         );
 

@@ -775,6 +775,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Root Cause**: Tiap view menulis daftar nama & warna status sendiri; tidak ada satu komponen render. Warna badge ada di enum PHP yang tidak dipindai Tailwind.
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
+- **Pengecualian (2026-09-30)**: status keaktifan akun disederhanakan menjadi **Aktif / Nonaktif** (`active`/`inactive`) untuk semua role; label Bahasa Indonesia (bukan kode) karena status akun bukan alur kerja dan "ACTIVE" bertabrakan dengan status magang ACTIVE. Cuti pembimbing = Nonaktif, diaktifkan kembali oleh admin. Nilai `on_leave` dihapus (migrasi `2026_09_30_020000` memindahkannya ke `inactive`; validasi menolaknya). Mahasiswa yang mundur dari magang tetap memakai status pengajuan RESIGNED, bukan status akun.
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
 
 ---
@@ -825,6 +826,63 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-042] Audit Menyeluruh Sistem: Migrasi AccountStatus, Template Berkas Laporan Akhir, & Tombol Dinamis Kelulusan Dasbor Mahasiswa
+- **Tanggal**: 2026-10-01
+- **Komponen**: `database/migrations/`, `resources/views/dashboard.blade.php`, `resources/views/letters/acceptance.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `database/seeders/DemoE2ESeeder.php`, `scripts/hermes_all_roles_test.mjs`, `app/Http/Controllers/Student/FinalReportController.php`
+- **Problem / Symptom**:
+  1. Terdapat file migrasi pending `2026_09_30_020000_merge_on_leave_into_inactive_account_status.php` yang belum dieksekusi di database PostgreSQL.
+  2. Unduh naskah laporan akhir (`/final-reports/{id}/file`) menghasilkan redirect 302 dengan pesan error "Berkas tidak ditemukan" karena direktori fisik `storage/app/public/final_reports/` belum ada berkas PDF template bawaan.
+  3. Mahasiswa yang telah menyelesaikan program magang (status `completed` / `$isPassed`) dengan logbook kurang dari 30 hari tetap disajikan tombol aksi cepat "+ Isi Logbook" alih-alih "Unduh Sertifikat".
+  4. Pengujian sintetik multi-role `scripts/hermes_all_roles_test.mjs` mengalami 5 kegagalan akibat ketidaksesuaian ID fallback seeder, regex link download sertifikat, dan ketiadaan teks URL verifikasi pada dokumen cetak surat balasan serta sertifikat.
+- **Root Cause**:
+  1. Migrasi baru ditambahkan tetapi belum dijalankan via `php artisan migrate`.
+  2. Berkas PDF laporan fisik tidak ter-commit ke git (`.agentignore` / storage disk), sehingga controller me-redirect balik saat `Storage::disk('public')->exists()` false.
+  3. Pada `resources/views/dashboard.blade.php`, urutan percabangan `@elseif($logbooksCount < 30)` diletakkan sebelum `@elseif($isPassed)`, sehingga mahasiswa lulus dengan entri logbook < 30 terjebak pada arahan mengisi logbook.
+  4. Script Hermes mencari `/student/certificate/{id}/download` yang berbeda dari URL rute dasar `/student/certificate/{id}`, dan data seeder mahasiswa aktif memiliki status `accepted` sehingga tidak muncul di tab default `active` pada dasbor mentor.
+- **Fix Applied**:
+  1. Menjalankan `php artisan migrate` untuk memperbarui status akun `on_leave` ke `inactive`.
+  2. Menyediakan berkas PDF template valid di `storage/app/public/final_reports/default.pdf` dan `sample_laporan_akhir.pdf`.
+  3. Memindahkan percabangan `@elseif($isPassed)` ke urutan prioritas sebelum pengecekan dosen dan logbook pada arahan serta tombol aksi cepat `dashboard.blade.php`.
+  4. Menyelaraskan status penempatan seeder `Aditya Nugraha` ke `active` lengkap dengan `letter_token`, serta menambahkan URL tautan verifikasi eksplisit pada `letters/acceptance.blade.php` dan `certificates/internship_certificate.blade.php`.
+  5. Menjalankan validasi menyeluruh: Hermes Multi-Role Test Suite lulus 100% (**56/56 PASS**) dan PHPUnit/Pest lulus 100% (**160/160 PASS, 1.273 assertions, Exit Code 0**).
+- **Prevention Rule**: Pastikan selalu menjalankan `php artisan migrate:status` sebelum pengujian. Pada antarmuka berjenjang (stateful workflow), selalu evaluasi status terminal/sukses (`$isPassed` / `completed`) lebih awal dibanding status progres harian (`$logbooksCount`). Setiap endpoint unduh berkas wajib memiliki fallback dokumen fisik di storage disk.
+
+---
+
+### [LRN-043] Smart Workflow-Based Priority Engine & Stage Badges Fitur Chat (Style Dinas)
+- **Tanggal**: 2026-10-01
+- **Komponen**: `app/Services/Chat/ChatPresenter.php`, `app/Services/Chat/ChatService.php`, `resources/js/chat/app.js`, `resources/views/chat/partials/sidebar.blade.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/info-panel.blade.php`, `tests/Feature/Chat/ChatPriorityEngineTest.php`, `scripts/test_chat_priority_ui.mjs`
+- **Problem / Symptom**:
+  1. Ketika admin dinas, mentor, dan staf menerima puluhan hingga ratusan percakapan dari mahasiswa yang berbeda-beda, staf kesulitan membedakan mahasiswa mana yang memerlukan tindakan segera (misalnya: butuh verifikasi seleksi berkas, masa magang mendekati berakhir H-7, atau siap diluluskan) versus obrolan rutin biasa.
+  2. Pendekatan analisis teks regex (misal: mencari kata "urgent", "tolong", "darurat") tidak akurat, rentan false positive, dan mengorbankan privasi obrolan pengguna.
+- **Root Cause**: Ketiadaan pengkaitan status alur kerja magang (*internship lifecycle*) di database relasional PostgreSQL (`Application` dan `Placement`) ke dalam data agregasi presenter percakapan chat.
+- **Fix Applied**:
+  1. **Smart Workflow & Action Urgency Engine**:
+     - Memanfaatkan standar `Application::actionPriority()` dan tanggal magang di `ChatPresenter::stageBadge()` dan `ChatPresenter::applicationStageBadge()`:
+       - `Tingkat 1 (Urgent)`: `pending` atau `verified` $\rightarrow$ Badge `[• Seleksi Masuk]` / `[• Lolos Berkas]` (`theme: urgent`, `is_urgent: true`).
+       - `Tingkat 2 (Urgent)`: `can_complete` $\rightarrow$ Badge `[• Siap Lulus]` (`theme: urgent`, `is_urgent: true`).
+       - `Tingkat 3 (Urgent)`: Pembimbing belum ditetapkan $\rightarrow$ Badge `[• Perlu Pembimbing]` (`theme: urgent`, `is_urgent: true`).
+       - `Tingkat 4 (Warning/Urgent)`: `active` dengan sisa masa magang $\le 7$ hari $\rightarrow$ Badge `[• H-X Selesai]` atau `[• Masa Berakhir]` (`theme: warning|urgent`, `is_urgent: true`).
+       - `Tingkat 5`: `active` normal $\rightarrow$ Badge `[• Aktif Magang]` (`theme: success`, `is_urgent: false`).
+       - `Tingkat 6`: `accepted` $\rightarrow$ Badge `[• Diterima]` (`theme: info`, `is_urgent: false`).
+       - `Tingkat 7`: `completed` $\rightarrow$ Badge `[• Alumni Magang]` (`theme: neutral`, `is_urgent: false`).
+       - Staf / Grup: Label resmi (`Mentor Lapangan`, `DPL Kampus`, `Admin Dinas`, `Grup Koordinasi`).
+  2. **Zero N+1 Query Optimization**:
+     - Mengoptimalkan `ChatService::conversationsFor` dan `ChatService::conversationDetail` dengan eager-loading mendalam pada `placement.application` dan `user.applications` (beserta evaluasi dan laporan akhirnya).
+  3. **Antarmuka Rapi Bergaya Dinas (Style Dinas Pemkot Surabaya)**:
+     - Bilah penyaring (*tab bar*) dengan pill responsif: `Semua`, `Prioritas` (dilengkapi titik indikator & jumlah belum selesai), `Mahasiswa`, `Kedinasan`, `Belum dibaca`, `Grup`.
+     - Ketika tab `Prioritas` dipilih, daftar diurutkan otomatis: pesan belum dibaca di atas, kemudian tingkat urgensi prioritas (rank 1–4), lalu aktivitas percakapan terbaru.
+     - Badge status ditampilkan secara konsisten pada bilah samping (sidebar card), kepala obrolan (conversation header), dan panel informasi samping (info panel).
+  4. **Pengujian Menyeluruh**:
+     - Unit & Feature test `ChatPriorityEngineTest.php` lulus 100% (6/6).
+     - Seluruh suite chat `tests/Feature/Chat` lulus 100% (65/65).
+     - Rangkaian pengujian utama `php artisan test` lulus 100% (**166/166 PASS, 1.309 assertions, Exit Code 0**).
+     - Audit integrasi lintas-role Hermes lulus 100% (**56/56 PASS**).
+     - Visual snapshot E2E browser Google Chrome terverifikasi sempurna.
+- **Prevention Rule**: Penentuan prioritas dalam sistem layanan publik kedinasan wajib berbasis alur status (*state-driven determinism*) dari skema database transaksi, bukan mengandalkan heuristic keyword parsing pada teks pesan. Pastikan relasi model lifecycle di-eager-load secara tepat agar waktu muat daftar chat tetap instan ($<50$ ms).
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 
@@ -837,3 +895,4 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Portal Magang — Pemerintah Kota Surabaya') }}</title>
+        <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang — Pemerintah Kota Surabaya') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

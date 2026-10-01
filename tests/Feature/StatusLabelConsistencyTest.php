@@ -98,35 +98,46 @@ class StatusLabelConsistencyTest extends TestCase
 
     public function test_every_status_enum_shares_the_same_display_standard(): void
     {
-        foreach ([ApplicationStatus::class, ReviewStatus::class, AccountStatus::class, FeedbackStatus::class] as $enum) {
+        // Status alur kerja: nama = kode sistem
+        foreach ([ApplicationStatus::class, ReviewStatus::class, FeedbackStatus::class, AccountStatus::class] as $enum) {
             foreach ($enum::cases() as $case) {
-                $this->assertSame(str_replace('_', ' ', strtoupper($case->value)), $case->label());
+                if ($enum !== AccountStatus::class) {
+                    $this->assertSame(str_replace('_', ' ', strtoupper($case->value)), $case->label());
+                }
                 $this->assertNotSame('', $case->description());
                 $this->assertSame($case, $enum::resolve(strtoupper($case->value)));
             }
             $this->assertSame(array_column($enum::cases(), 'value'), $enum::values());
         }
-        $this->assertSame('ON LEAVE', AccountStatus::ON_LEAVE->label());
         $this->assertSame('IN PROGRESS', FeedbackStatus::IN_PROGRESS->label());
+
+        // Status akun: hanya dua keadaan, label Bahasa Indonesia untuk semua role
+        $this->assertSame(['active', 'inactive'], AccountStatus::values());
+        $this->assertSame(['Aktif', 'Nonaktif'], array_map(fn ($c) => $c->label(), AccountStatus::cases()));
+        $this->assertNull(AccountStatus::resolve('on_leave'));
     }
 
     public function test_account_and_feedback_status_use_standard_badges(): void
     {
         $superAdmin = User::factory()->create(['role' => 'super_admin']);
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Akun']);
-        // Dulu akun cuti tampil "Non-Aktif" di pusat kendali dinas
-        $onLeave = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $agency->id, 'status' => 'on_leave', 'name' => 'Mentor Cuti']);
+        // Pembimbing yang cuti disetel Nonaktif; dulu tampil "Non-Aktif" (dan cuti tampil sebagai Non-Aktif)
+        $mentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $agency->id, 'status' => 'inactive', 'name' => 'Mentor Cuti']);
+        User::factory()->create(['role' => 'mahasiswa', 'status' => 'active']);
 
+        $badge = fn (string $code, string $text) => '/data-status="' . $code . '"[^>]*>\s*<span[^>]*><\/span>\s*' . preg_quote($text, '/') . '\s*</';
         foreach ([route('admin.users.index'), route('admin.agencies.show', $agency->id), route('admin.mentors.index')] as $url) {
             $html = $this->actingAs($superAdmin)->get($url)->assertOk()->getContent();
-            $this->assertStringContainsString('data-status="on_leave"', $html, $url);
-            $this->assertStringContainsString('ON LEAVE', $html, $url);
+            $this->assertMatchesRegularExpression($badge('inactive', 'Nonaktif'), $html, $url);
             $this->assertStringNotContainsString('Non-Aktif', $html, $url);
+            $this->assertStringNotContainsString('Cuti</option>', $html, $url);
         }
-        $this->assertFalse($onLeave->isInactive(), 'Cuti tidak boleh memblokir login');
+        $html = $this->actingAs($superAdmin)->get(route('admin.users.index', ['role' => 'mahasiswa']))->getContent();
+        $this->assertMatchesRegularExpression($badge('active', 'Aktif'), $html);
+        $this->assertTrue($mentor->isInactive(), 'Nonaktif memblokir login');
 
         $feedback = \App\Models\SystemFeedback::create([
-            'user_id' => $onLeave->id, 'sender_name' => $onLeave->name, 'sender_email' => $onLeave->email,
+            'user_id' => $mentor->id, 'sender_name' => $mentor->name, 'sender_email' => $mentor->email,
             'sender_role' => 'mentor', 'category' => 'pertanyaan', 'subject' => 'Tanya', 'message' => 'Isi', 'status' => 'in_progress',
         ]);
         foreach ([route('admin.feedbacks.index'), route('feedbacks.show', $feedback->id)] as $url) {
@@ -134,6 +145,24 @@ class StatusLabelConsistencyTest extends TestCase
             $this->assertStringContainsString('data-status="in_progress"', $html, $url);
             $this->assertStringContainsString('IN PROGRESS', $html, $url);
         }
+    }
+
+    public function test_on_leave_is_no_longer_an_account_status(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super_admin']);
+        $dosen = User::factory()->create(['role' => 'dosen', 'status' => 'active']);
+
+        // Form menolak nilai lama "on_leave"
+        $this->actingAs($superAdmin)
+            ->put(route('admin.users.update', $dosen->id), ['name' => $dosen->name, 'email' => $dosen->email, 'role' => 'dosen', 'status' => 'on_leave'])
+            ->assertSessionHasErrors('status');
+        $this->assertSame('active', $dosen->fresh()->status);
+
+        // Data lama "on_leave" dipindahkan menjadi inactive oleh migrasi
+        $legacy = User::factory()->create(['role' => 'mentor']);
+        \Illuminate\Support\Facades\DB::table('users')->where('id', $legacy->id)->update(['status' => 'on_leave']);
+        (require database_path('migrations/2026_09_30_020000_merge_on_leave_into_inactive_account_status.php'))->up();
+        $this->assertSame('inactive', $legacy->fresh()->status);
     }
 
     public function test_logbook_and_report_show_same_review_status_for_every_role(): void
