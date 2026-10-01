@@ -1,5 +1,5 @@
 {{-- Satu gelembung pesan (dirender di dalam <template x-for="item in timeline">) --}}
-<div :id="`chat-msg-${item.m.id}`" class="group/msg flex items-end gap-2 transition" :class="[item.m.is_mine ? 'justify-end' : 'justify-start', item.grouped ? 'mt-1' : 'mt-3']">
+<div :id="`chat-msg-${item.m.id}`" :data-message-id="item.m.id" class="group/msg flex items-end gap-2 transition" :class="[item.m.is_mine ? 'justify-end' : 'justify-start', item.grouped ? 'mt-1' : 'mt-3']">
     <template x-if="isGroupChat && !item.m.is_mine">
         <span class="w-8 h-8 rounded-full text-white text-xs font-bold flex items-center justify-center shrink-0 self-start mt-0.5"
               :class="item.grouped ? 'invisible' : ''" :style="{ backgroundColor: item.m.sender ? item.m.sender.color : '#94a3b8' }"

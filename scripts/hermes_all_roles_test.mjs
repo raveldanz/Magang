@@ -221,7 +221,7 @@ async function runFullHermesTest() {
     // 3. ROLE 3: MAHASISWA (AKTIF & LULUS)
     // -------------------------------------------------------------------------
     const mhsAktif = new HermesSession('MahasiswaAktif');
-    let appLetterId = '45';
+    let appLetterId = '2';
     try {
         const dash = await mhsAktif.login('mahasiswa.aktif@unesa.ac.id', 'password');
         record('Mahasiswa', 'Login & Dasbor Penempatan Aktif', dash.status === 200 ? 'PASS' : 'FAIL', dash.url);
@@ -284,12 +284,12 @@ async function runFullHermesTest() {
 
     // Mahasiswa Lulus Test (Certificate Download)
     const mhsLulus = new HermesSession('MahasiswaLulus');
-    let certHash = 'XoFjguLTmZ9ScbZWUxuQSENWX8DGZOFO';
+    let certHash = '2nUkl4agLziObPEKxC3JqH9sn34KayDM';
     try {
         const dashLulus = await mhsLulus.login('mahasiswa.lulus@unesa.ac.id', 'password');
         record('Mahasiswa', 'Login Mahasiswa Lulus & Dashboard', dashLulus.status === 200 ? 'PASS' : 'FAIL');
-        const certLinkMatch = dashLulus.html.match(/\/student\/certificate\/(\d+)\/download/);
-        const certPlacementId = certLinkMatch ? certLinkMatch[1] : '37';
+        const certLinkMatch = dashLulus.html.match(/\/student\/certificate\/(\d+)/);
+        const certPlacementId = certLinkMatch ? certLinkMatch[1] : '1';
         const certRes = await mhsLulus.getWithRedirects(`/student/certificate/${certPlacementId}/download`);
         record('Mahasiswa', 'Unduh E-Sertifikat & Transkrip Nilai (2 Halaman)', certRes.status === 200 ? 'PASS' : 'FAIL', `Placement ID ${certPlacementId}`);
         const certHashMatch = certRes.html.match(/\/verify-certificate\/([a-zA-Z0-9_-]+)/);
@@ -307,7 +307,7 @@ async function runFullHermesTest() {
         record('Mentor', 'Login & Dashboard Pembimbing Dinas', dash.status === 200 ? 'PASS' : 'FAIL', dash.url);
 
         const mMatch = dash.html.match(/\/mentor\/students\/(\d+)/);
-        const mentorPlacementId = mMatch ? mMatch[1] : '33';
+        const mentorPlacementId = mMatch ? mMatch[1] : '2';
 
         const mentorEndpoints = [
             [`/mentor/students/${mentorPlacementId}`, 'Detail Profil Mahasiswa Bimbingan'],
@@ -332,7 +332,7 @@ async function runFullHermesTest() {
         record('DPL', 'Login & Dashboard Dosen Pembimbing', dash.status === 200 ? 'PASS' : 'FAIL', dash.url);
 
         const dplMatch = dash.html.match(/\/lecturer\/students\/(\d+)/);
-        const dplPlacementId = dplMatch ? dplMatch[1] : '33';
+        const dplPlacementId = dplMatch ? dplMatch[1] : '2';
 
         const dplEndpoints = [
             ['/lecturer/monitoring', 'Matriks Monitoring Terpadu Mahasiswa'],
@@ -370,7 +370,7 @@ async function runFullHermesTest() {
         record('Universitas', 'Login & Dashboard Portal Kampus Mitra', dash.status === 200 ? 'PASS' : 'FAIL', dash.url);
 
         const uMatch = dash.html.match(/\/university\/students\/(\d+)/);
-        const univPlacementId = uMatch ? uMatch[1] : '33';
+        const univPlacementId = uMatch ? uMatch[1] : '2';
         const uLetMatch = dash.html.match(/\/university\/students\/(\d+)\/letter/);
         const univLetterId = uLetMatch ? uLetMatch[1] : appLetterId;
 
@@ -397,7 +397,7 @@ async function runFullHermesTest() {
         // Public QR Verification for Acceptance Letter
         const vLetterPage = await mhsAktif.getWithRedirects(`/student/application/${appLetterId}/letter`);
         const vTokenMatch = vLetterPage.html.match(/\/verify-letter\/([a-zA-Z0-9_-]+)/);
-        const letterToken = vTokenMatch ? vTokenMatch[1] : 'MUTY8U4Q6TSaGDd6NW4SSts6kYdVALMT';
+        const letterToken = vTokenMatch ? vTokenMatch[1] : '8jWF5lkveqJNb97rfKgcrBjibOB2HDno';
         const vLetter = await fetch(`${BASE_URL}/verify-letter/${letterToken}`);
         record('Security & Public', 'Verifikasi QR Code Surat Balasan (Anti-IDOR)', vLetter.status === 200 ? 'PASS' : 'FAIL', `/verify-letter/${letterToken}`);
 
@@ -408,7 +408,7 @@ async function runFullHermesTest() {
         // Multi-role Centralized File Download for Final Report
         const reportPage = await mhsLulus.getWithRedirects('/student/final-report');
         const reportMatch = reportPage.html.match(/\/final-reports\/(\d+)\/file/);
-        const reportId = reportMatch ? reportMatch[1] : '24';
+        const reportId = reportMatch ? reportMatch[1] : '1';
 
         const reportFileMhs = await mhsLulus.getWithRedirects(`/final-reports/${reportId}/file`);
         record('Cross-Role Doc', 'Mahasiswa Akses Berkas Laporan Terpusat', reportFileMhs.status === 200 ? 'PASS' : 'FAIL', 'Content-Disposition OK');

@@ -228,6 +228,9 @@
                                                     Berkas Anda sudah lolos verifikasi. Menunggu keputusan penerimaan dari instansi dinas terkait.
                                                 @elseif(!in_array($rawSt, ['accepted', 'active', 'completed'], true))
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
+                                                @elseif($isPassed)
+                                                    Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap
+                                                    diunduh.
                                                 @elseif(!$academicAdvisor)
                                                     Pengajuan diterima! Silakan <strong>pilih Dosen Pembimbing Lapangan</strong> dari perguruan tinggi Anda.
                                                 @elseif($logbooksCount < 30)
@@ -262,6 +265,12 @@
                                                     class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
                                                     Dalam Peninjauan
                                                 </span>
+                                            @elseif($isPassed)
+                                                <a href="{{ route('student.certificate.show', $application->id) }}"
+                                                    target="_blank"
+                                                    class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition inline-block">
+                                                    Unduh Sertifikat
+                                                </a>
                                             @elseif(!$academicAdvisor)
                                                 <a href="#change-advisor-box" @click="showDetailModal = false"
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">

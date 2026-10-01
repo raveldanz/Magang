@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Pesan')
     {{-- Data untuk Alpine hanya array primitif dari ChatPresenter (LRN-020) --}}
     <div x-data="chatApp(@js($chatConfig))" class="max-w-7xl mx-auto w-full px-0 sm:px-6 lg:px-8 sm:pt-5">
         <div x-ref="shell"
