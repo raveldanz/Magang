@@ -33,6 +33,27 @@
                             <span class="flex items-center gap-2">
                                 <span class="text-sm font-bold text-slate-900 truncate" x-text="active.title"></span>
                                 <span class="hidden sm:inline-flex"><span x-show="active.type === 'placement'" class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold whitespace-nowrap">Grup Bimbingan</span></span>
+                                <template x-if="active.stage_badge">
+                                    <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"
+                                          :class="{
+                                              'bg-amber-50 text-amber-700 border border-amber-200': active.stage_badge.theme === 'urgent',
+                                              'bg-orange-50 text-orange-700 border border-orange-200': active.stage_badge.theme === 'warning',
+                                              'bg-emerald-50 text-emerald-700 border border-emerald-200': active.stage_badge.theme === 'success',
+                                              'bg-indigo-50 text-indigo-700 border border-indigo-200': active.stage_badge.theme === 'info',
+                                              'bg-slate-100 text-slate-600 border border-slate-200': active.stage_badge.theme === 'neutral'
+                                          }"
+                                          :title="active.stage_badge.hint || active.stage_badge.label">
+                                        <span class="w-1.5 h-1.5 rounded-full shrink-0"
+                                              :class="{
+                                                  'bg-amber-500': active.stage_badge.theme === 'urgent',
+                                                  'bg-orange-500': active.stage_badge.theme === 'warning',
+                                                  'bg-emerald-500': active.stage_badge.theme === 'success',
+                                                  'bg-indigo-500': active.stage_badge.theme === 'info',
+                                                  'bg-slate-400': active.stage_badge.theme === 'neutral'
+                                              }"></span>
+                                        <span x-text="active.stage_badge.label"></span>
+                                    </span>
+                                </template>
                                 <span x-show="active.contact && active.contact.inactive" class="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-600 text-xs font-semibold whitespace-nowrap">Nonaktif</span>{{-- status-guard:ignore --}}
                                 <svg x-show="active.muted" class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Dibisukan"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
                             </span>
@@ -48,7 +69,7 @@
             </div>
 
             {{-- Daftar pesan --}}
-            <div x-ref="scroller" @scroll.passive="onScroll()" class="flex-1 overflow-y-auto min-h-0 px-3 sm:px-6 py-4" aria-live="polite">
+            <div x-ref="scroller" @scroll.passive="onScroll()" class="flex-1 overflow-y-auto min-h-0 px-3 sm:px-6 py-4 scrollbar-thin" aria-live="polite">
                 <div x-show="loadingOlder" class="flex justify-center py-2"><span class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span></div>
                 <p x-show="!hasMore && !loadingMessages && messages.length > 0" class="text-center text-xs text-slate-400 py-2">Awal percakapan</p>
                 <div x-show="loadingMessages" class="flex justify-center py-10"><span class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span></div>

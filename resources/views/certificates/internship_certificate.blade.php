@@ -299,7 +299,7 @@
                 $verifyHost = parse_url(url('/'), PHP_URL_HOST) . (parse_url(url('/'), PHP_URL_PORT) ? ':' . parse_url(url('/'), PHP_URL_PORT) : '');
                 $codeGroups = $placement?->certificate_hash ? str_split($placement->verification_code, 20) : [];
             @endphp
-            <div class="flex flex-col items-center justify-end">
+            <div class="flex flex-col items-center justify-end" data-verify-url="{{ $verifyCertificateUrl }}">
                 <p class="text-[8.5px] font-bold text-slate-800 uppercase tracking-wider mb-1">Verifikasi Keaslian Sertifikat</p>
                 <div class="p-1 bg-white border border-slate-300 rounded-md">
                     @if (!empty($qrSvg))
@@ -310,7 +310,7 @@
                     @endif
                 </div>
                 <p class="text-[8px] text-slate-500 mt-1 leading-snug">
-                    Pindai QR atau buka <span class="font-semibold text-slate-700">{{ $verifyHost }}/verify-certificate</span>
+                    Pindai QR atau buka <a href="{{ $verifyCertificateUrl }}" target="_blank" class="font-semibold text-slate-700 hover:underline">{{ $verifyHost }}/verify-certificate/{{ $certificateHash }}</a>
                 </p>
                 @if (!empty($codeGroups))
                     <p class="text-[7.5px] text-slate-500 mt-0.5 leading-snug">Kode Verifikasi:</p>

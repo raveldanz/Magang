@@ -2,11 +2,13 @@
 
 namespace App\Services\Chat;
 
+use App\Models\Application;
 use App\Models\ChatAttachment;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\ChatParticipant;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -64,6 +66,7 @@ class ChatPresenter
         $contact = $c->isDirect() ? $this->user($other?->user) : null;
         $last = $c->lastMessage;
         $lastIsMine = $last && (int) $last->sender_id === (int) $viewer->id;
+        $stageBadge = $this->stageBadge($c, $other?->user);
 
         return [
             'id' => $c->id,
@@ -80,6 +83,7 @@ class ChatPresenter
             'unread' => $unread,
             'muted' => $me->muted_at !== null,
             'pinned' => $me->pinned_at !== null,
+            'stage_badge' => $stageBadge,
             'last_message' => $last ? [
                 'preview' => $last->preview(),
                 'is_mine' => $lastIsMine,
@@ -90,6 +94,220 @@ class ChatPresenter
                 'created_at' => $last->created_at?->toIso8601String(),
             ] : null,
             'sort_at' => ($c->last_message_at ?? $c->created_at)?->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Menghitung status tahapan alur magang & urgensi percakapan secara deterministik (Smart Priority Engine).
+     */
+    public function stageBadge(ChatConversation $c, ?User $otherUser): ?array
+    {
+        // 1. Grup Bimbingan Penempatan
+        if ($c->type === ChatConversation::TYPE_PLACEMENT) {
+            $app = $c->placement?->application;
+            if ($app) {
+                return $this->applicationStageBadge($app, 'student');
+            }
+
+            return [
+                'code' => 'placement',
+                'label' => 'Bimbingan',
+                'theme' => 'info',
+                'is_urgent' => false,
+                'role_group' => 'student',
+                'priority_rank' => 6,
+                'hint' => 'Grup bimbingan penempatan magang',
+            ];
+        }
+
+        // 2. Grup Koordinasi Umum
+        if ($c->isGroup()) {
+            return [
+                'code' => 'group',
+                'label' => 'Grup Koordinasi',
+                'theme' => 'neutral',
+                'is_urgent' => false,
+                'role_group' => 'group',
+                'priority_rank' => 9,
+                'hint' => 'Grup koordinasi internal',
+            ];
+        }
+
+        // 3. Chat 1-on-1
+        if (!$otherUser) {
+            return null;
+        }
+
+        // Jika lawan bicara adalah Mahasiswa: evaluasi status tahapan pengajuan / magangnya
+        if ($otherUser->role === 'mahasiswa') {
+            $app = $otherUser->relationLoaded('applications')
+                ? $otherUser->applications->first()
+                : $otherUser->applications()->latest('created_at')->first();
+
+            if ($app) {
+                return $this->applicationStageBadge($app, 'student');
+            }
+
+            return [
+                'code' => 'new_student',
+                'label' => 'Mahasiswa',
+                'theme' => 'neutral',
+                'is_urgent' => false,
+                'role_group' => 'student',
+                'priority_rank' => 7,
+                'hint' => 'Akun mahasiswa terdaftar',
+            ];
+        }
+
+        // Jika lawan bicara adalah Staf Kedinasan / Pembimbing / DPL / Kampus
+        $roleGroup = self::roleGroup($otherUser);
+        $roleLabel = self::roleLabel($otherUser);
+
+        return [
+            'code' => 'staff',
+            'label' => $roleLabel,
+            'theme' => 'neutral',
+            'is_urgent' => false,
+            'role_group' => $roleGroup,
+            'priority_rank' => 10,
+            'hint' => $roleLabel,
+        ];
+    }
+
+    /**
+     * Menghasilkan badge status deterministik dari model Application.
+     */
+    public function applicationStageBadge(Application $app, string $roleGroup = 'student'): array
+    {
+        $status = $app->statusValue();
+        $priority = $app->actionPriority();
+
+        // Tingkat 1: Tindakan seleksi / verifikasi masuk (Pending / Verified)
+        if ($priority === 1) {
+            return [
+                'code' => 'urgent',
+                'label' => $status === 'verified' ? 'Lolos Berkas' : 'Seleksi Masuk',
+                'theme' => 'urgent',
+                'is_urgent' => true,
+                'role_group' => $roleGroup,
+                'priority_rank' => 1,
+                'hint' => 'Menunggu verifikasi berkas / seleksi admin',
+            ];
+        }
+
+        // Tingkat 2: Siap diluluskan (laporan disetujui & nilai lengkap)
+        if ($priority === 2) {
+            return [
+                'code' => 'urgent',
+                'label' => 'Siap Lulus',
+                'theme' => 'urgent',
+                'is_urgent' => true,
+                'role_group' => $roleGroup,
+                'priority_rank' => 2,
+                'hint' => 'Laporan & evaluasi lengkap, siap diterbitkan sertifikat',
+            ];
+        }
+
+        // Tingkat 3: Pembimbing belum lengkap
+        if ($priority === 3) {
+            return [
+                'code' => 'urgent',
+                'label' => 'Perlu Pembimbing',
+                'theme' => 'urgent',
+                'is_urgent' => true,
+                'role_group' => $roleGroup,
+                'priority_rank' => 3,
+                'hint' => 'Mentor atau DPL belum ditetapkan',
+            ];
+        }
+
+        // Cek sisa masa magang bila sedang aktif
+        if ($status === 'active') {
+            if (!empty($app->end_date)) {
+                $today = Carbon::now()->startOfDay();
+                $endDate = Carbon::parse($app->end_date)->startOfDay();
+                $days = (int) $today->diffInDays($endDate, false);
+
+                if ($days < 0) {
+                    return [
+                        'code' => 'approaching_end',
+                        'label' => 'Masa Berakhir',
+                        'theme' => 'urgent',
+                        'is_urgent' => true,
+                        'role_group' => $roleGroup,
+                        'priority_rank' => 3,
+                        'hint' => 'Masa magang telah melampaui tanggal selesai',
+                    ];
+                }
+
+                if ($days <= 7) {
+                    return [
+                        'code' => 'approaching_end',
+                        'label' => $days === 0 ? 'Hari Terakhir' : "H-{$days} Selesai",
+                        'theme' => 'warning',
+                        'is_urgent' => true,
+                        'role_group' => $roleGroup,
+                        'priority_rank' => 4,
+                        'hint' => 'Masa magang segera berakhir dalam 7 hari',
+                    ];
+                }
+            }
+
+            return [
+                'code' => 'active',
+                'label' => 'Aktif Magang',
+                'theme' => 'success',
+                'is_urgent' => false,
+                'role_group' => $roleGroup,
+                'priority_rank' => 5,
+                'hint' => 'Sedang aktif menjalani magang',
+            ];
+        }
+
+        if ($status === 'accepted') {
+            return [
+                'code' => 'accepted',
+                'label' => 'Diterima',
+                'theme' => 'info',
+                'is_urgent' => false,
+                'role_group' => $roleGroup,
+                'priority_rank' => 6,
+                'hint' => 'Diterima, menunggu waktu mulai magang',
+            ];
+        }
+
+        if ($status === 'completed') {
+            return [
+                'code' => 'completed',
+                'label' => 'Alumni Magang',
+                'theme' => 'neutral',
+                'is_urgent' => false,
+                'role_group' => $roleGroup,
+                'priority_rank' => 7,
+                'hint' => 'Telah menyelesaikan masa magang',
+            ];
+        }
+
+        if (in_array($status, ['rejected', 'resigned'], true)) {
+            return [
+                'code' => $status,
+                'label' => $status === 'rejected' ? 'Ditolak' : 'Mengundurkan Diri',
+                'theme' => 'neutral',
+                'is_urgent' => false,
+                'role_group' => $roleGroup,
+                'priority_rank' => 8,
+                'hint' => 'Status pengajuan tidak aktif',
+            ];
+        }
+
+        return [
+            'code' => 'other',
+            'label' => strtoupper($status),
+            'theme' => 'neutral',
+            'is_urgent' => false,
+            'role_group' => $roleGroup,
+            'priority_rank' => 9,
+            'hint' => 'Pengajuan magang',
         ];
     }
 

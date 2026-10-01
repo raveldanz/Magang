@@ -28,46 +28,30 @@ class CertificateController extends Controller
         $application = null;
         $placement = null;
 
+        $isNumeric = is_numeric($id);
+
         // 1. Jika user adalah Mahasiswa:
         if ($user && $user->role === 'mahasiswa') {
-            // Coba cari placement milik mahasiswa yang sesuai
-            $placement = Placement::with([
-                'application.user.studentProfile',
-                'application.unit.agencyProfile',
-                'mentor',
-                'pembimbing',
-                'academicAdvisor',
-                'dosen',
-                'evaluation',
-                'finalreport',
-            ])->where('id', $id)
-              ->whereHas('application', function ($aq) use ($user) {
-                  $aq->where('user_id', $user->id);
-              })->first();
-
-            if ($placement) {
-                $application = $placement->application;
-            } else {
-                // Coba cari berdasarkan application_id milik mahasiswa ini
-                $application = Application::with([
-                    'user.studentProfile',
-                    'unit.agencyProfile',
-                    'placement.mentor',
-                    'placement.pembimbing',
-                    'placement.academicAdvisor',
-                    'placement.dosen',
-                    'placement.evaluation',
-                    'placement.finalreport',
-                ])->where('user_id', $user->id)
-                  ->where(function ($q) use ($id) {
-                      $q->where('id', $id)
-                        ->orWhereHas('placement', function ($pq) use ($id) {
-                            $pq->where('id', $id);
-                        });
+            if ($isNumeric) {
+                // Coba cari placement milik mahasiswa yang sesuai
+                $placement = Placement::with([
+                    'application.user.studentProfile',
+                    'application.unit.agencyProfile',
+                    'mentor',
+                    'pembimbing',
+                    'academicAdvisor',
+                    'dosen',
+                    'evaluation',
+                    'finalreport',
+                ])->where('id', (int) $id)
+                  ->whereHas('application', function ($aq) use ($user) {
+                      $aq->where('user_id', $user->id);
                   })->first();
 
-                // Fallback: Ambil aplikasi terbaru milik mahasiswa ini jika ID tidak cocok (misal placement ID berubah)
-                if (!$application) {
+                if ($placement) {
+                    $application = $placement->application;
+                } else {
+                    // Coba cari berdasarkan application_id milik mahasiswa ini
                     $application = Application::with([
                         'user.studentProfile',
                         'unit.agencyProfile',
@@ -77,31 +61,22 @@ class CertificateController extends Controller
                         'placement.dosen',
                         'placement.evaluation',
                         'placement.finalreport',
-                    ])->where('user_id', $user->id)->latest()->first();
-                }
+                    ])->where('user_id', $user->id)
+                      ->where(function ($q) use ($id) {
+                          $q->where('id', (int) $id)
+                            ->orWhereHas('placement', function ($pq) use ($id) {
+                                $pq->where('id', (int) $id);
+                            });
+                      })->first();
 
-                if ($application) {
-                    $placement = $application->placement;
+                    if ($application) {
+                        $placement = $application->placement;
+                    }
                 }
             }
-        } else {
-            // 2. Untuk Admin Dinas, Super Admin, Dosen, atau Mentor:
-            // Coba cari berdasarkan placement_id
-            $placement = Placement::with([
-                'application.user.studentProfile',
-                'application.unit.agencyProfile',
-                'mentor',
-                'pembimbing',
-                'academicAdvisor',
-                'dosen',
-                'evaluation',
-                'finalreport',
-            ])->find($id);
 
-            if ($placement && $placement->application) {
-                $application = $placement->application;
-            } else {
-                // Coba cari berdasarkan application_id
+            // Fallback: Ambil aplikasi terbaru milik mahasiswa ini jika ID tidak cocok atau bukan angka
+            if (!$application) {
                 $application = Application::with([
                     'user.studentProfile',
                     'unit.agencyProfile',
@@ -111,10 +86,45 @@ class CertificateController extends Controller
                     'placement.dosen',
                     'placement.evaluation',
                     'placement.finalreport',
-                ])->find($id);
+                ])->where('user_id', $user->id)->latest()->first();
 
                 if ($application) {
                     $placement = $application->placement;
+                }
+            }
+        } else {
+            // 2. Untuk Admin Dinas, Super Admin, Dosen, atau Mentor:
+            if ($isNumeric) {
+                // Coba cari berdasarkan placement_id
+                $placement = Placement::with([
+                    'application.user.studentProfile',
+                    'application.unit.agencyProfile',
+                    'mentor',
+                    'pembimbing',
+                    'academicAdvisor',
+                    'dosen',
+                    'evaluation',
+                    'finalreport',
+                ])->find((int) $id);
+
+                if ($placement && $placement->application) {
+                    $application = $placement->application;
+                } else {
+                    // Coba cari berdasarkan application_id
+                    $application = Application::with([
+                        'user.studentProfile',
+                        'unit.agencyProfile',
+                        'placement.mentor',
+                        'placement.pembimbing',
+                        'placement.academicAdvisor',
+                        'placement.dosen',
+                        'placement.evaluation',
+                        'placement.finalreport',
+                    ])->find((int) $id);
+
+                    if ($application) {
+                        $placement = $application->placement;
+                    }
                 }
             }
         }
