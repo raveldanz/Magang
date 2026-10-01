@@ -216,7 +216,7 @@
                     <div>
                         <h4 class="text-sm font-bold text-amber-900">Menunggu Input Nilai Evaluasi Magang</h4>
                         <p class="text-xs text-amber-800/90 mt-1 leading-relaxed">
-                            Naskah laporan akhir mahasiswa telah <strong>disetujui (APPROVED)</strong>, namun penilaian magang dari <strong>Pembimbing Lapangan / Dosen Pembimbing</strong> belum diisi secara lengkap. Tombol status keputusan <strong>COMPLETED</strong> di bawah akan otomatis aktif setelah seluruh komponen penilaian diisi.
+                            Naskah laporan akhir mahasiswa telah <strong>disetujui</strong>, namun penilaian magang dari <strong>Pembimbing Lapangan / Dosen Pembimbing</strong> belum diisi secara lengkap. Tombol status keputusan <strong>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</strong> di bawah akan otomatis aktif setelah seluruh komponen penilaian diisi.
                         </p>
                     </div>
                 </div>

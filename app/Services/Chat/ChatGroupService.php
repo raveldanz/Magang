@@ -12,6 +12,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -207,6 +208,10 @@ class ChatGroupService
      */
     public function ensurePlacementGroupsFor(User $user): void
     {
+        if (!Schema::hasTable('chat_conversations')) {
+            return;
+        }
+
         $placements = Placement::query()
             ->whereNotIn('id', ChatConversation::select('placement_id')->whereNotNull('placement_id'))
             ->where(fn ($q) => $q->where('mentor_id', $user->id)
