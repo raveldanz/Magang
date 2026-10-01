@@ -90,13 +90,14 @@ class NotificationService
                     'saran_fitur' => 'Saran Fitur',
                     'pertanyaan' => 'Pertanyaan',
                     'koordinasi' => 'Koordinasi',
+                    'laporan_chat' => 'Laporan Pesan Chat',
                     default => 'Masukan',
                 };
                 $actionable[] = [
                     'id' => 'fb_' . $fb->id,
-                    'type' => $fb->priority === 'urgent' || $fb->category === 'error_bug' ? 'urgent' : 'info',
+                    'type' => $fb->priority === 'urgent' || in_array($fb->category, ['error_bug', 'laporan_chat'], true) ? 'urgent' : 'info',
                     'category' => 'feedback',
-                    'icon' => $fb->category === 'error_bug' ? '⚠️' : '💬',
+                    'icon' => match ($fb->category) { 'error_bug' => '⚠️', 'laporan_chat' => '🚩', default => '💬' },
                     'title' => "Feedback: [{$catLabel}] {$fb->subject}",
                     'message' => "Dari {$fb->sender_name} (" . strtoupper($fb->sender_role) . "): " . \Illuminate\Support\Str::limit($fb->message, 80),
                     'time' => $fb->created_at->diffForHumans(),

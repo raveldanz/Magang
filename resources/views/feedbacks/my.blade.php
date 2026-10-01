@@ -35,6 +35,7 @@
                             'error_bug' => 'Kendala Sistem / Bug',
                             'saran_fitur' => 'Saran Fitur',
                             'pertanyaan' => 'Pertanyaan MBKM',
+                            'laporan_chat' => 'Laporan Pesan Chat',
                             default => 'Masukan',
                         };
 

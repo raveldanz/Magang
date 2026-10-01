@@ -100,7 +100,7 @@
                 @forelse($feedbacks as $fb)
                     @php
                         $catBadge = match($fb->category) {
-                            'error_bug' => 'bg-rose-50 text-rose-700 border-rose-200',
+                            'error_bug', 'laporan_chat' => 'bg-rose-50 text-rose-700 border-rose-200',
                             'saran_fitur' => 'bg-blue-50 text-blue-700 border-blue-200',
                             'pertanyaan' => 'bg-amber-50 text-amber-700 border-amber-200',
                             default => 'bg-slate-50 text-slate-700 border-slate-200',
@@ -111,6 +111,7 @@
                             'saran_fitur' => 'Saran Fitur',
                             'pertanyaan' => 'Pertanyaan',
                             'koordinasi' => 'Koordinasi',
+                            'laporan_chat' => 'Laporan Pesan Chat',
                             default => 'Masukan',
                         };
 

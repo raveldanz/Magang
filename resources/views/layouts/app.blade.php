@@ -22,7 +22,18 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}">
+    @php
+        // Jumlah pesan chat belum dibaca (badge navbar); diperbarui live oleh resources/js/chat/notifier.js
+        $chatUnread = auth()->check() ? app(\App\Services\Chat\ChatService::class)->unreadTotalForNavbar(auth()->user()) : 0;
+    @endphp
+    <body class="font-sans antialiased bg-[#F5F8FC] text-slate-900 overflow-x-hidden w-full relative" x-data="{}"
+          @auth
+          data-chat-summary-url="{{ route('chat.api.summary', [], false) }}"
+          data-chat-user="{{ auth()->id() }}"
+          data-chat-unread="{{ $chatUnread }}"
+          data-chat-poll-visible="{{ config('chat.poll.summary_visible') }}"
+          data-chat-poll-hidden="{{ config('chat.poll.summary_hidden') }}"
+          @endauth>
         <div class="min-h-screen bg-[#F5F8FC] w-full overflow-x-hidden flex flex-col">
             
             <header class="sticky top-0 z-50 bg-white w-full border-b border-slate-200/80">
@@ -125,6 +136,32 @@
                 </div>
             </template>
         </div>
+
+        @auth
+        <!-- Toast Pesan Chat Baru (dipicu chat-notifier.js) -->
+        <div x-data="chatToasts" @chat-toast.window="push($event.detail)"
+             class="fixed top-24 inset-x-3 sm:inset-x-auto sm:right-4 sm:w-96 space-y-2 pointer-events-none" style="z-index: 99998;"
+             aria-live="polite">
+            <template x-for="t in items" :key="t.id">
+                <a :href="t.url" @click="if (window.__chatOpenConversation) { $event.preventDefault(); window.__chatOpenConversation(t.conversation_id); remove(t.id); }"
+                   x-transition:enter="transition ease-out duration-300 transform"
+                   x-transition:enter-start="opacity-0 -translate-y-2 scale-95"
+                   x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                   class="pointer-events-auto flex items-start gap-3 p-3.5 rounded-2xl bg-white/95 border border-blue-100 shadow-xl shadow-blue-500/10 backdrop-blur-md hover:bg-white transition">
+                    <span class="w-10 h-10 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0"
+                          :style="{ backgroundColor: t.sender.color }" x-text="t.sender.initials"></span>
+                    <span class="flex-1 min-w-0">
+                        <span class="block text-xs font-bold text-blue-600">Pesan baru</span>
+                        <span class="block text-sm font-bold text-slate-900 truncate" x-text="t.title"></span>
+                        <span class="block text-xs text-slate-600 line-clamp-2" x-text="t.preview"></span>
+                    </span>
+                    <button type="button" @click.prevent.stop="remove(t.id)" class="shrink-0 text-slate-400 hover:text-slate-600 p-1" aria-label="Tutup">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </a>
+            </template>
+        </div>
+        @endauth
 
         <!-- Global Double-Confirmation Delete Modal Component -->
         <x-confirm-delete-modal />

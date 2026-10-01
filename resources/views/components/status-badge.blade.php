@@ -3,6 +3,7 @@
     Nama = kode sistem (Enum::label), keterangan = Enum::description (lihat App\Enums\StatusType).
 
     <x-status-badge :status="$app->status" />          ringkas: tabel & area sempit, keterangan jadi tooltip
+                                                        (layar sentuh tanpa hover: keterangan tampil di baris kedua badge)
     <x-status-badge :status="$app->status" stacked />  bertingkat: kartu/panel lapang, keterangan di baris kedua
     :tooltip="..."                                      ganti isi tooltip (mis. alasan penolakan)
     type="review" | "account" | "feedback"            status review logbook/laporan, akun pengguna, tiket feedback
@@ -30,8 +31,12 @@
         @endif
     </div>
 @else
-    <span {{ $attributes->class($pill)->merge(['data-status' => $case?->value ?? $raw, 'title' => $tooltip ?: $case?->description()]) }}>
+    <span {{ $attributes->class([$pill, '[@media(hover:none)]:flex-wrap [@media(hover:none)]:gap-y-0.5 [@media(hover:none)]:rounded-xl [@media(hover:none)]:max-w-[11rem]'])->merge(['data-status' => $case?->value ?? $raw, 'title' => $tooltip ?: $case?->description()]) }}>
         <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $dot }}"></span>
         {{ $text }}
+        @if ($case)
+            {{-- Tooltip tidak bisa dibuka di layar sentuh: tampilkan keterangan langsung --}}
+            <span class="hidden [@media(hover:none)]:block basis-full text-left text-[10px] font-medium leading-tight tracking-normal whitespace-normal opacity-80">{{ $case->description() }}</span>
+        @endif
     </span>
 @endif
