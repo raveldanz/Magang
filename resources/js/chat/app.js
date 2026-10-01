@@ -144,11 +144,42 @@ export function chatApp(config) {
         // ================= Daftar percakapan =================
         get filteredConversations() {
             const q = this.search.trim().toLowerCase();
-            return this.conversations.filter((c) => {
+            const list = this.conversations.filter((c) => {
                 if (this.listFilter === 'unread' && !c.unread) return false;
                 if (this.listFilter === 'groups' && c.type === 'direct') return false;
+                if (this.listFilter === 'priority' && !c.stage_badge?.is_urgent) return false;
+                if (this.listFilter === 'students') {
+                    const isStudent = c.stage_badge?.role_group === 'student' || c.type === 'placement' || c.contact?.role_group === 'student';
+                    if (!isStudent) return false;
+                }
+                if (this.listFilter === 'staff') {
+                    const isStaff = c.type === 'direct' && c.contact?.role_group && c.contact.role_group !== 'student';
+                    if (!isStaff) return false;
+                }
                 return !q || [c.title, c.subtitle].join(' ').toLowerCase().includes(q);
             });
+
+            if (this.listFilter === 'priority') {
+                return [...list].sort((a, b) => {
+                    const unreadA = (a.unread > 0 && !a.muted) ? 1 : 0;
+                    const unreadB = (b.unread > 0 && !b.muted) ? 1 : 0;
+                    if (unreadA !== unreadB) return unreadB - unreadA;
+
+                    const rankA = a.stage_badge?.priority_rank ?? 99;
+                    const rankB = b.stage_badge?.priority_rank ?? 99;
+                    if (rankA !== rankB) return rankA - rankB;
+
+                    const timeA = a.last_message ? a.last_message.created_at : a.sort_at;
+                    const timeB = b.last_message ? b.last_message.created_at : b.sort_at;
+                    return (timeB || '').localeCompare(timeA || '');
+                });
+            }
+
+            return list;
+        },
+
+        get totalPriorityCount() {
+            return this.conversations.filter((c) => c.stage_badge?.is_urgent).length;
         },
 
         get totalUnreadGroups() {

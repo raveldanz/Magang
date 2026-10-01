@@ -89,13 +89,27 @@ class ChatService
         $conversations = ChatConversation::whereIn('id', $mine->keys())
             // Chat 1-on-1 baru muncul setelah ada pesan; grup langsung muncul
             ->where(fn ($q) => $q->whereNotNull('last_message_at')->orWhere('type', '!=', ChatConversation::TYPE_DIRECT))
-            ->with(['lastMessage.sender', 'lastMessage.attachments'])
+            ->with([
+                'lastMessage.sender',
+                'lastMessage.attachments',
+                'placement.application.user.universityRelation',
+                'placement.application.placement.finalreport',
+                'placement.application.placement.evaluation',
+            ])
             ->withCount('participants')
             ->get();
 
         $others = ChatParticipant::whereIn('conversation_id', $conversations->where('type', ChatConversation::TYPE_DIRECT)->pluck('id'))
             ->where('user_id', '!=', $user->id)
-            ->with(['user.agencyProfile', 'user.universityRelation'])
+            ->with([
+                'user.agencyProfile',
+                'user.universityRelation',
+                'user.applications' => fn ($q) => $q->latest('created_at')->with([
+                    'placement.finalreport',
+                    'placement.evaluation',
+                    'user.universityRelation',
+                ]),
+            ])
             ->get()
             ->keyBy('conversation_id');
 
@@ -112,11 +126,26 @@ class ChatService
     public function conversationDetail(ChatConversation $conversation, User $viewer): array
     {
         $participants = ChatParticipant::where('conversation_id', $conversation->id)
-            ->with(['user.agencyProfile', 'user.universityRelation', 'user.studentProfile'])
+            ->with([
+                'user.agencyProfile',
+                'user.universityRelation',
+                'user.studentProfile',
+                'user.applications' => fn ($q) => $q->latest('created_at')->with([
+                    'placement.finalreport',
+                    'placement.evaluation',
+                    'user.universityRelation',
+                ]),
+            ])
             ->orderBy('id')
             ->get();
         $me = $participants->firstWhere('user_id', $viewer->id) ?? $this->participantOrFail($conversation, $viewer);
-        $conversation->loadMissing(['lastMessage.sender', 'lastMessage.attachments']);
+        $conversation->loadMissing([
+            'lastMessage.sender',
+            'lastMessage.attachments',
+            'placement.application.user.universityRelation',
+            'placement.application.placement.finalreport',
+            'placement.application.placement.evaluation',
+        ]);
         $unread = (int) ($this->unreadCounts($viewer)[$conversation->id] ?? 0);
         // Satu query untuk semua anggota: siapa yang email/telepon/NIM-nya boleh dilihat
         $visible = $this->contacts->personalDetailsVisibleTo($viewer, $participants->pluck('user_id')->all());

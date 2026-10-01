@@ -39,7 +39,7 @@
                 <div x-show="!contactsLoading" class="mb-2">
                     <p class="px-2 pt-2 pb-1 text-xs font-bold uppercase tracking-wide text-slate-400" x-text="group.label"></p>
                     <template x-for="contact in group.items" :key="contact.id">
-                        <button type="button" @click="pickContact(contact)" :disabled="saving"
+                        <button type="button" @click="pickContact(contact)" :disabled="saving" :data-contact-user-id="contact.id"
                                 class="w-full flex items-center gap-3 p-2.5 rounded-2xl text-left transition disabled:opacity-60 min-h-[56px]"
                                 :class="isSelected(contact) ? 'bg-blue-50' : 'hover:bg-slate-50'">
                             <span class="relative w-10 h-10 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0" :style="{ backgroundColor: contact.color }">

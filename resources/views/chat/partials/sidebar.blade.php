@@ -77,18 +77,51 @@
                    class="w-full h-10 pl-9 pr-3 rounded-xl border-slate-200 text-sm placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500">
         </div>
 
-        <div class="flex items-center gap-1.5 overflow-x-auto" role="tablist" aria-label="Saring percakapan">
-            <template x-for="option in [['all', 'Semua'], ['unread', 'Belum dibaca'], ['groups', 'Grup']]" :key="option[0]">
-                <button type="button" @click="listFilter = option[0]" role="tab" :aria-selected="listFilter === option[0]"
-                        class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition"
-                        :class="listFilter === option[0] ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-                    <span x-text="option[1]"></span><span x-show="option[0] === 'unread' && totalUnreadGroups > 0" x-text="` (${totalUnreadGroups})`"></span>
-                </button>
-            </template>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-hide" role="tablist" aria-label="Saring percakapan">
+            <button type="button" @click="listFilter = 'all'" role="tab" :aria-selected="listFilter === 'all'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    :class="listFilter === 'all' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                Semua
+            </button>
+
+            <button type="button" @click="listFilter = 'priority'" role="tab" :aria-selected="listFilter === 'priority'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1.5 shrink-0"
+                    :class="listFilter === 'priority' ? 'bg-amber-600 text-white shadow-2xs' : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'">
+                <span class="w-1.5 h-1.5 rounded-full" :class="listFilter === 'priority' ? 'bg-white' : 'bg-amber-500'"></span>
+                <span>Prioritas</span>
+                <span x-show="totalPriorityCount > 0" class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
+                      :class="listFilter === 'priority' ? 'bg-white/25 text-white' : 'bg-amber-200/80 text-amber-900'"
+                      x-text="totalPriorityCount"></span>
+            </button>
+
+            <button type="button" @click="listFilter = 'students'" role="tab" :aria-selected="listFilter === 'students'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    :class="listFilter === 'students' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                Mahasiswa
+            </button>
+
+            <button type="button" @click="listFilter = 'staff'" role="tab" :aria-selected="listFilter === 'staff'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    :class="listFilter === 'staff' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                Kedinasan
+            </button>
+
+            <button type="button" @click="listFilter = 'unread'" role="tab" :aria-selected="listFilter === 'unread'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1 shrink-0"
+                    :class="listFilter === 'unread' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                <span>Belum dibaca</span>
+                <span x-show="totalUnreadGroups > 0" x-text="`(${totalUnreadGroups})`"></span>
+            </button>
+
+            <button type="button" @click="listFilter = 'groups'" role="tab" :aria-selected="listFilter === 'groups'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
+                    :class="listFilter === 'groups' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                Grup
+            </button>
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto min-h-0">
+    <div class="flex-1 overflow-y-auto min-h-0 scrollbar-thin">
         <template x-if="convLoading">
             <div class="p-4 space-y-3">
                 <template x-for="i in 5" :key="i">
@@ -111,11 +144,16 @@
         </template>
 
         <template x-if="!convLoading && conversations.length > 0 && filteredConversations.length === 0">
-            <p class="px-6 py-10 text-center text-xs text-slate-500">Tidak ada percakapan yang cocok.</p>
+            <div class="px-6 py-10 text-center space-y-1">
+                <p class="text-xs font-semibold text-slate-600"
+                   x-text="listFilter === 'priority' ? 'Tidak ada percakapan butuh tindakan segera' : 'Tidak ada percakapan yang cocok'"></p>
+                <p class="text-[11px] text-slate-400"
+                   x-text="listFilter === 'priority' ? 'Semua mahasiswa dan grup bimbingan dalam alur status normal.' : 'Coba ubah kata kunci pencarian atau tab filter di atas.'"></p>
+            </div>
         </template>
 
         <template x-for="c in filteredConversations" :key="c.id">
-            <button type="button" @click="open(c.id)"
+            <button type="button" @click="open(c.id)" :data-conv-id="c.id"
                     class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-slate-100/80 transition min-h-[72px]"
                     :class="c.id === activeId ? 'bg-blue-50/80' : 'hover:bg-slate-50'">
                 <span class="relative w-11 h-11 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0"
@@ -134,7 +172,30 @@
                         </span>
                         <span class="text-xs shrink-0" :class="c.unread && !c.muted ? 'text-blue-600 font-bold' : 'text-slate-400'" x-text="listTime(c.last_message ? c.last_message.created_at : c.sort_at)"></span>
                     </span>
-                    <span class="block text-xs text-slate-400 truncate" x-text="c.subtitle"></span>
+                    <span class="flex items-center justify-between gap-2 mt-0.5">
+                        <span class="text-xs text-slate-400 truncate" x-text="c.subtitle"></span>
+                        <template x-if="c.stage_badge">
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 tracking-tight"
+                                  :class="{
+                                      'bg-amber-50 text-amber-700 border border-amber-200': c.stage_badge.theme === 'urgent',
+                                      'bg-orange-50 text-orange-700 border border-orange-200': c.stage_badge.theme === 'warning',
+                                      'bg-emerald-50 text-emerald-700 border border-emerald-200': c.stage_badge.theme === 'success',
+                                      'bg-indigo-50 text-indigo-700 border border-indigo-200': c.stage_badge.theme === 'info',
+                                      'bg-slate-100 text-slate-600 border border-slate-200': c.stage_badge.theme === 'neutral'
+                                  }"
+                                  :title="c.stage_badge.hint || c.stage_badge.label">
+                                <span class="w-1.5 h-1.5 rounded-full shrink-0"
+                                      :class="{
+                                          'bg-amber-500': c.stage_badge.theme === 'urgent',
+                                          'bg-orange-500': c.stage_badge.theme === 'warning',
+                                          'bg-emerald-500': c.stage_badge.theme === 'success',
+                                          'bg-indigo-500': c.stage_badge.theme === 'info',
+                                          'bg-slate-400': c.stage_badge.theme === 'neutral'
+                                      }"></span>
+                                <span x-text="c.stage_badge.label"></span>
+                            </span>
+                        </template>
+                    </span>
                     <span class="flex items-center justify-between gap-2 mt-0.5">
                         <span class="text-xs truncate" :class="c.unread && !c.muted ? 'text-slate-800 font-semibold' : 'text-slate-500'">
                             <span x-show="c.last_message && c.last_message.is_mine" class="text-slate-400">Anda: </span><span x-show="c.last_message && c.last_message.sender_name" class="text-slate-500" x-text="c.last_message ? `${c.last_message.sender_name}: ` : ''"></span><span :class="c.last_message && c.last_message.system ? 'italic' : ''" x-text="c.last_message ? c.last_message.preview : 'Belum ada pesan'"></span>
