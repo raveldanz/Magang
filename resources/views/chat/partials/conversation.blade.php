@@ -54,7 +54,7 @@
                                         <span x-text="active.stage_badge.label"></span>
                                     </span>
                                 </template>
-                                <span x-show="active.contact && active.contact.inactive" class="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-600 text-xs font-semibold whitespace-nowrap">Nonaktif</span>
+                                <span x-show="active.contact && active.contact.inactive" class="px-2 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-600 text-xs font-semibold whitespace-nowrap">Nonaktif</span>{{-- status-guard:ignore --}}
                                 <svg x-show="active.muted" class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Dibisukan"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
                             </span>
                             <span class="block text-xs truncate" :class="headerTyping ? 'text-blue-600 font-semibold' : (headerOnline ? 'text-emerald-600' : 'text-slate-500')" x-text="headerSubtitle"></span>

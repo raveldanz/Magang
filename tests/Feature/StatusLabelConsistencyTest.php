@@ -125,15 +125,14 @@ class StatusLabelConsistencyTest extends TestCase
         $mentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $agency->id, 'status' => 'inactive', 'name' => 'Mentor Cuti']);
         User::factory()->create(['role' => 'mahasiswa', 'status' => 'active']);
 
-        $badge = fn (string $code, string $text) => '/data-status="' . $code . '"[^>]*>\s*<span[^>]*><\/span>\s*' . preg_quote($text, '/') . '\s*</';
         foreach ([route('admin.users.index'), route('admin.agencies.show', $agency->id), route('admin.mentors.index')] as $url) {
             $html = $this->actingAs($superAdmin)->get($url)->assertOk()->getContent();
-            $this->assertMatchesRegularExpression($badge('inactive', 'Nonaktif'), $html, $url);
+            $this->assertContains('Nonaktif', $this->badgeTexts($html, 'inactive'), $url);
             $this->assertStringNotContainsString('Non-Aktif', $html, $url);
             $this->assertStringNotContainsString('Cuti</option>', $html, $url);
         }
         $html = $this->actingAs($superAdmin)->get(route('admin.users.index', ['role' => 'mahasiswa']))->getContent();
-        $this->assertMatchesRegularExpression($badge('active', 'Aktif'), $html);
+        $this->assertContains('Aktif', $this->badgeTexts($html, 'active'));
         $this->assertTrue($mentor->isInactive(), 'Nonaktif memblokir login');
 
         $feedback = \App\Models\SystemFeedback::create([
@@ -211,5 +210,31 @@ class StatusLabelConsistencyTest extends TestCase
                 $this->assertStringNotContainsString($legacy, $html, "{$page}: masih memakai nama lama \"{$legacy}\"");
             }
         }
+    }
+
+    /**
+     * Teks utama (nama status) setiap badge dengan data-status tertentu, tanpa teks elemen anaknya
+     * (titik warna & keterangan layar sentuh).
+     */
+    private function badgeTexts(string $html, string $code): array
+    {
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+        libxml_clear_errors();
+
+        $texts = [];
+        foreach ((new \DOMXPath($dom))->query('//*[@data-status="' . $code . '"]') as $badge) {
+            $pill = $badge->nodeName === 'div' ? $badge->getElementsByTagName('span')->item(0) : $badge;
+            $own = '';
+            foreach ($pill->childNodes as $child) {
+                if ($child->nodeType === XML_TEXT_NODE) {
+                    $own .= $child->textContent;
+                }
+            }
+            $texts[] = trim($own);
+        }
+
+        return $texts;
     }
 }

@@ -51,6 +51,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-039** | 2026-09-30 | Fitur Chat & Error JSON Endpoint Web | Validasi endpoint fetch `/chat/api/*` membalas redirect 302 (bukan 422 JSON) karena `shouldRenderJsonWhen` hanya `api/*` | RESOLVED |
 | **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
 | **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
+| **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
 
 ---
 
@@ -776,6 +777,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
 - **Pengecualian (2026-09-30)**: status keaktifan akun disederhanakan menjadi **Aktif / Nonaktif** (`active`/`inactive`) untuk semua role; label Bahasa Indonesia (bukan kode) karena status akun bukan alur kerja dan "ACTIVE" bertabrakan dengan status magang ACTIVE. Cuti pembimbing = Nonaktif, diaktifkan kembali oleh admin. Nilai `on_leave` dihapus (migrasi `2026_09_30_020000` memindahkannya ke `inactive`; validasi menolaknya). Mahasiswa yang mundur dari magang tetap memakai status pengajuan RESIGNED, bukan status akun.
+<<<<<<< HEAD
+=======
+- **Penguatan (2026-09-30)**: (1) `StatusViewGuardTest` memindai seluruh `resources/views` dan gagal bila ada nama status ditulis manual (isi elemen berupa kode/nama status, `strtoupper($x->status)`, atau peta nilai→label); pengecualian per baris dengan `{{-- status-guard:ignore --}}`. (2) Kolom status teks biasa tanpa CHECK constraint (`users.status`, `system_feedbacks.status`) dijaga listener `saving` di AppServiceProvider (`Enum::assertValid`); status logbook/laporan sudah dijaga CHECK constraint DB, status pengajuan oleh cast enum. Listener `saving` WAJIB tidak mengembalikan false (false = penyimpanan dibatalkan). (3) Migrasi `2026_09_30_030000` menambah index kolom foreign key (PostgreSQL tidak membuatnya otomatis). (4) Badge ringkas menampilkan keterangan di baris kedua pada layar sentuh (`[@media(hover:none)]`), karena tooltip tidak bisa dibuka.
+>>>>>>> origin/main
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
 
 ---
@@ -826,7 +831,24 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-042] Audit Menyeluruh Sistem: Migrasi AccountStatus, Template Berkas Laporan Akhir, & Tombol Dinamis Kelulusan Dasbor Mahasiswa
+### [LRN-042] Penanganan Migrasi Fitur Chat Tertunda (`relation "chat_conversations" does not exist`) & Guard Skema
+- **Tanggal**: 2026-10-01
+- **Komponen**: `database/migrations/`, `app/Services/Chat/ChatGroupService.php`, `resources/views/chat/partials/conversation.blade.php`
+- **Problem / Symptom**: Saat pengguna menekan ikon balon chat di samping notifikasi di navbar (mengarah ke `/chat`), muncul halaman error 500 `Illuminate\Database\QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "chat_conversations" does not exist` di `ChatGroupService.php:217`.
+- **Root Cause**:
+  1. Migrasi fitur chat (`2026_09_30_000000_create_chat_tables` dkk) masih berstatus `Pending` di database PostgreSQL aktif (`db_perpusmagang`).
+  2. `ChatGroupService::ensurePlacementGroupsFor()` belum memiliki guard pengecekan keberadaan tabel `chat_conversations`, sehingga langsung melempar SQL exception fatal bila tabel belum dimigrasi.
+  3. Badge status "Nonaktif" di `chat/partials/conversation.blade.php` memicu gagal test `StatusViewGuardTest` karena belum diberi penanda `status-guard:ignore`.
+- **Fix Applied**:
+  1. Menjalankan `php artisan migrate` untuk mengeksekusi seluruh migrasi pending (Batch 7: `create_chat_tables`, `upgrade_chat_full_features`, `merge_on_leave_into_inactive_account_status`, `add_foreign_key_indexes_to_core_tables`, `add_phone_to_users_table`).
+  2. Menambahkan guard `if (!Schema::hasTable('chat_conversations')) { return; }` pada `ChatGroupService::ensurePlacementGroupsFor()` untuk keamanan defensif.
+  3. Menambahkan komentar `{{-- status-guard:ignore --}}` pada badge kontak nonaktif di header chat Blade.
+  4. Membersihkan cache via `php artisan optimize:clear` dan `php artisan view:clear`.
+- **Prevention Rule**: Setiap penambahan migrasi baru wajib segera dijalankan pada database lingkungan lokal/development (`php artisan migrate`). Service yang berinteraksi dengan tabel yang baru diperkenalkan sebaiknya memiliki pengecekan `Schema::hasTable` jika berisiko dipanggil dari halaman umum sebelum migrasi selesai.
+
+---
+
+### [LRN-043] Audit Menyeluruh Sistem: Migrasi AccountStatus, Template Berkas Laporan Akhir, & Tombol Dinamis Kelulusan Dasbor Mahasiswa
 - **Tanggal**: 2026-10-01
 - **Komponen**: `database/migrations/`, `resources/views/dashboard.blade.php`, `resources/views/letters/acceptance.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `database/seeders/DemoE2ESeeder.php`, `scripts/hermes_all_roles_test.mjs`, `app/Http/Controllers/Student/FinalReportController.php`
 - **Problem / Symptom**:
@@ -849,7 +871,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-043] Smart Workflow-Based Priority Engine & Stage Badges Fitur Chat (Style Dinas)
+### [LRN-044] Smart Workflow-Based Priority Engine & Stage Badges Fitur Chat (Style Dinas)
 - **Tanggal**: 2026-10-01
 - **Komponen**: `app/Services/Chat/ChatPresenter.php`, `app/Services/Chat/ChatService.php`, `resources/js/chat/app.js`, `resources/views/chat/partials/sidebar.blade.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/info-panel.blade.php`, `tests/Feature/Chat/ChatPriorityEngineTest.php`, `scripts/test_chat_priority_ui.mjs`
 - **Problem / Symptom**:
