@@ -48,7 +48,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-031** | 2026-09-28 | Table Action Button Sizing & Visual Contrast | Tombol aksi tabel terlalu kecil (h-[30px]) dan kurang kontras; standardisasi ke h-[34px] px-3.5 dengan border crisp dan shadow | RESOLVED |
 | **LRN-032** | 2026-09-28 | Agency Control Center Visual Parity & Clean Badging | Desain show dinas kurang selaras dengan univ; kontak terhimpit, dan badge/tab memuat angka redundan (Akun Terdaftar (3) & Personil 7) | RESOLVED |
 | **LRN-033** | 2026-09-28 | Browser Engine, Driver 404 & Local Chrome Lockdown | Driver Playwright internal 1.57.0 404 CDN di IDE; penguncian ke channel 'chrome' lokal & protokol Mata Manusia | RESOLVED |
-| **LRN-039** | 2026-10-01 | Dosen Pembimbing (DPL) Flow, Logbook & Grade Sheet | Tab monitoring aktif mencakup accepted & active, eksklusi resigned, verifikasi logbook DPL langsung, dan cetak lembar nilai resmi | RESOLVED |
+| **LRN-039** | 2026-09-30 | Fitur Chat & Error JSON Endpoint Web | Validasi endpoint fetch `/chat/api/*` membalas redirect 302 (bukan 422 JSON) karena `shouldRenderJsonWhen` hanya `api/*` | RESOLVED |
+| **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
+| **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
+| **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
 
 ---
 
@@ -773,34 +776,72 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Root Cause**: Tiap view menulis daftar nama & warna status sendiri; tidak ada satu komponen render. Warna badge ada di enum PHP yang tidak dipindai Tailwind.
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
+- **Pengecualian (2026-09-30)**: status keaktifan akun disederhanakan menjadi **Aktif / Nonaktif** (`active`/`inactive`) untuk semua role; label Bahasa Indonesia (bukan kode) karena status akun bukan alur kerja dan "ACTIVE" bertabrakan dengan status magang ACTIVE. Cuti pembimbing = Nonaktif, diaktifkan kembali oleh admin. Nilai `on_leave` dihapus (migrasi `2026_09_30_020000` memindahkannya ke `inactive`; validasi menolaknya). Mahasiswa yang mundur dari magang tetap memakai status pengajuan RESIGNED, bukan status akun.
+- **Penguatan (2026-09-30)**: (1) `StatusViewGuardTest` memindai seluruh `resources/views` dan gagal bila ada nama status ditulis manual (isi elemen berupa kode/nama status, `strtoupper($x->status)`, atau peta nilai→label); pengecualian per baris dengan `{{-- status-guard:ignore --}}`. (2) Kolom status teks biasa tanpa CHECK constraint (`users.status`, `system_feedbacks.status`) dijaga listener `saving` di AppServiceProvider (`Enum::assertValid`); status logbook/laporan sudah dijaga CHECK constraint DB, status pengajuan oleh cast enum. Listener `saving` WAJIB tidak mengembalikan false (false = penyimpanan dibatalkan). (3) Migrasi `2026_09_30_030000` menambah index kolom foreign key (PostgreSQL tidak membuatnya otomatis). (4) Badge ringkas menampilkan keterangan di baris kedua pada layar sentuh (`[@media(hover:none)]`), karena tooltip tidak bisa dibuka.
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
 
 ---
 
-### [LRN-039] Pembenahan Alur Dosen Pembimbing (DPL): Tab Mahasiswa Aktif, Verifikasi Logbook Langsung, Dropdown Filter Rapi, & Laporan Tab Baru
-- **Tanggal**: 2026-10-01
-- **Komponen**: `Lecturer\MonitoringController`, `Lecturer\DashboardController`, `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `tests/Feature/LecturerFeaturesUpdateTest.php`
-- **Problem / Symptom**:
-  1. Menu Monitoring Dosen (`/lecturer/monitoring`) pada tab default "Mahasiswa Aktif" sering kosong / 0 data, karena mahasiswa yang baru diterima masih berstatus `accepted` dan tersembunyi di tab "Calon Peserta".
-  2. Mahasiswa yang telah mengundurkan diri (`resigned`) atau ditolak masih terhitung dalam metrik "Total Bimbingan" dan muncul di dashboard DPL.
-  3. Pada halaman detail mahasiswa bimbingan (`lecturer/students/{id}`), dosen tidak dapat melihat status verifikasi DPL (`lecturer_status`) dan tidak memiliki tombol verifikasi logbook secara langsung.
-  4. Dropdown filter status laporan di dashboard dosen memiliki indentasi aneh akibat penggunaan tag `<optgroup>`.
-  5. Antarmuka naskah laporan menyajikan live preview inline (`iframe`) yang membebani layout halaman dan tidak ergonomis, serta fitur cetak berita acara yang tidak diinginkan pengguna.
-- **Root Cause**:
-  1. `MonitoringController` memfilter secara kaku hanya `status = 'active'`, padahal mahasiswa berstatus `accepted` sudah berstatus magang aktif di lapangan sebelum sinkronisasi cron otomatis.
-  2. Query `getLecturerPlacementsQuery` pada `DashboardController` tidak memfilter status lifecycle non-aktif (`resigned`, `rejected`).
-  3. Tampilan logbook di `student-detail.blade.php` hanya menyertakan badge mentor tanpa kontrol form `PUT /lecturer/logbooks/{id}`.
-  4. Penggunaan tag `<optgroup label="Status Laporan">` pada tag native `<select>` menggeser opsi ke kanan sehingga tampak aneh.
-  5. Adanya komponen iframe reader di tengah halaman yang memberatkan visual dan interaksi.
-- **Fix Applied**:
-  1. Memperbarui `MonitoringController` sehingga tab `active` mencakup `['active', 'accepted']` dan mengecualikan status non-aktif (`resigned`, `rejected`).
-  2. Menambahkan filter `whereNotIn('status', ['resigned', 'rejected'])` pada `DashboardController`.
-  3. Memperkaya baris logbook di `student-detail.blade.php` dengan dual-badge (Mentor & DPL), preview link lampiran, catatan feedback DPL, serta form inline verifikasi cepat (Setujui ACC / Minta Revisi).
-  4. Merapikan dropdown filter status laporan di `dashboard.blade.php`: menghapus `<optgroup>`, menyajikan opsi rata kiri yang bersih ("Semua Status Laporan", "Menunggu Review (Pending)", "Perlu Revisi", "Disetujui (Approved)", "Belum Unggah Laporan").
-  5. Menghapus live preview inline (`iframe`) dan tombol cetak berita acara; menggantinya dengan tombol langsung "Buka Naskah Laporan (Tab Baru ↗)" (`target="_blank"`) menuju rute resmi `final_reports.show`.
-  6. Menyelaraskan seluruh automated test di `tests/Feature/LecturerFeaturesUpdateTest.php` dan script live E2E dengan hasil 100% PASS (Exit Code 0).
-- **Prevention Rule**: Hindari penggunaan `<optgroup>` pada single select filter jika hanya memiliki satu rumpun opsi agar tidak menciptakan indentasi yang janggal. Hindari penggunaan live iframe reader berukuran besar di halaman detail; gunakan tombol direct view ke tab baru (`target="_blank"`). Seluruh alur monitoring aktif wajib menyertakan status `accepted` dan mengecualikan `resigned`.
+### [LRN-039] Fitur Chat Antar Role & Error JSON pada Endpoint Fetch di Route Web
+- **Tanggal**: 2026-09-30
+- **Komponen**: `bootstrap/app.php`, `app/Services/Chat/*`, `app/Http/Controllers/Chat/*`, `resources/js/chat.js`, `resources/js/chat-notifier.js`, `resources/views/chat/index.blade.php`, `tests/Feature/Chat/*`
+- **Problem / Symptom**: Saat membangun fitur chat, request `fetch` ke `/chat/api/...` dengan `Accept: application/json` yang gagal validasi dibalas **302 redirect** ke halaman sebelumnya, bukan 422 JSON. Test `assertUnprocessable()` gagal dengan `Call to a member function all() on array`, dan di browser pesan error tidak bisa ditampilkan.
+- **Root Cause**: `withExceptions()->shouldRenderJsonWhen(fn ($r) => $r->is('api/*'))` **menggantikan** deteksi bawaan `expectsJson()`. Semua route di luar `api/*` selalu dirender sebagai HTML/redirect walaupun klien meminta JSON.
+- **Fix Applied**: Kondisi diperluas menjadi `$r->is('api/*') || ($r->is('chat/*') && $r->expectsJson())`. Fitur chat tahap 1: percakapan 1-on-1 berdasarkan relasi magang (`ChatContactDirectory`, dua arah), satu lampiran per pesan di disk private, polling adaptif (tanpa WebSocket), badge navbar + toast + entri lonceng yang digabung per percakapan (`ChatNotifier`), dan mode Login As hanya-baca. Tercakup 23 test di `tests/Feature/Chat`.
+- **Prevention Rule**: Endpoint JSON baru yang dipanggil via `fetch` dari halaman web wajib ditambahkan ke kondisi `shouldRenderJsonWhen` di `bootstrap/app.php` (atau diletakkan di `routes/api.php`). Aturan siapa-boleh-chat-siapa hanya boleh diubah di `ChatContactDirectory`, dan test simetri `ChatContactDirectoryTest` wajib tetap hijau. Batas upload chat mengikuti `upload_max_filesize` php.ini (default 2 MB). Jangan menaikkan `config/chat.php` tanpa menaikkan php.ini juga.
 
+---
+
+### [LRN-040] Chat Tahap Lengkap: `:style` String Menimpa `x-show`, Observer Penempatan, & Vite Dev Server Basi
+- **Tanggal**: 2026-09-30
+- **Komponen**: `resources/views/chat/partials/*.blade.php`, `resources/js/chat/*`, `app/Observers/PlacementChatObserver.php`, `app/Services/Chat/ChatGroupService.php`, `database/migrations/2026_09_30_010000_upgrade_chat_full_features.php`
+- **Problem / Symptom**:
+  1. Di grup, nama pengirim (teks berwarna) muncul di atas gelembung pesan **milik sendiri**, padahal `x-show="item.showName"` bernilai false.
+  2. Setelah file JS diganti/dipindah (`resources/js/chat.js` → `resources/js/chat/app.js`), halaman memunculkan puluhan error Alpine `listFilter is not defined`, `$store.chatPrefs` undefined. Vite dev server yang sedang berjalan masih menyajikan `app.js` lama, bahkan file yang sudah dihapus.
+- **Root Cause**:
+  1. Binding Alpine `:style` berbentuk **string** (`` :style="`color: ${x}`" ``) memanggil `setAttribute('style', …)` dan menimpa `display: none` yang dipasang `x-show` pada elemen yang sama.
+  2. Watcher Vite (chokidar) di path Windows ber-spasi/berkurung tidak mendeteksi perubahan, sehingga cache transform lama tetap disajikan selama `public/hot` ada.
+- **Fix Applied**:
+  1. Semua `:style` di tampilan chat & toast layout memakai **bentuk objek** (`:style="{ color: x }"`, `{ backgroundColor: x }`), yang menggabungkan style tanpa menghapus `display` dari `x-show`.
+  2. Uji browser memakai hasil `npm run build` (intersep aset dev server di Playwright). Pengembang cukup me-restart `npm run dev` / `composer dev` setelah menarik perubahan struktur JS.
+  3. Fitur tahap lengkap: grup buatan staf (admin grup, tambah/keluarkan anggota, keluar grup, promosi admin otomatis), **Grup Bimbingan otomatis** per penempatan via `Placement::observe(PlacementChatObserver)` (`ShouldHandleEventsAfterCommit` + try/catch, sehingga alur inti seleksi tidak ikut gagal), balas/kutip, hapus untuk semua (isi & file dibuang, tersisa penanda), laporkan pesan → tiket `laporan_chat` + panel moderasi Super Admin di `feedbacks/show`, maks. 5 lampiran/pesan (tabel `chat_attachments`), voice note (MediaRecorder), status dibaca per anggota, online/terakhir dilihat, sedang mengetik (cache), bisukan/sematkan, notifikasi desktop + suara, serta tombol "Chat" kontekstual (`<x-chat-button>`, `<x-chat-group-button>`).
+- **Prevention Rule**: Jangan pernah memakai `:style` berbentuk string pada elemen yang juga memakai `x-show`; gunakan bentuk objek. Setelah mengganti/memindah file JS, restart Vite dev server atau hapus `public/hot` usang sebelum menguji. Setiap efek samping lintas modul yang dipicu event model (observer) wajib `ShouldHandleEventsAfterCommit` + try/catch + `report()` agar tidak membatalkan transaksi inti.
+
+---
+
+### [LRN-041] Info Kontak Chat Berbasis Hubungan Magang, Nomor Staf yang Terbuang, & Perbaikan Notifikasi Chat
+- **Tanggal**: 2026-09-30
+- **Komponen**: `ChatContactDirectory::personalDetailsVisibleTo()`, `ChatPresenter::contactDetails()`, `resources/views/chat/partials/contact-details.blade.php`, `ProfileController@updatePhone` (`profile.phone.update`), migrasi `2026_09_30_030000_add_phone_to_users_table`, `resources/js/chat/notifier.js`, `resources/views/chat/partials/sidebar.blade.php`, `layouts/navigation.blade.php`
+- **Problem / Symptom**:
+  1. Info Kontak chat belum menampilkan email & telepon, dan nomor dosen yang diisi Super Admin di form tambah dosen (`storeDosen`) **tidak pernah tersimpan**.
+  2. Dropdown "Pengaturan notifikasi" di halaman chat terpotong di sisi kiri ("otifikasi desktop").
+  3. Penanda pesan terakhir yang sudah di-toast disimpan di satu kunci localStorage untuk semua akun, jadi saat "Login As" atau ganti akun di browser yang sama, toast bisa hilang atau salah. Pesan chat di lonceng navbar juga tenggelam di bawah pemberitahuan otomatis (hanya 4 teratas yang tampil).
+- **Root Cause**:
+  1. Tabel `users` tidak punya kolom `phone`; `User::create([... 'phone' => ...])` diam-diam membuang atribut yang tidak ada di `$fillable`.
+  2. Panel `absolute right-0 w-72` di tombol kecil melewati tepi kiri kartu yang `overflow-hidden`.
+  3. Kunci `chat:last-seen-message-id` tidak memuat id pengguna; `array_slice(..., 0, 4)` pada urutan bawaan NotificationService (item otomatis dulu, notifikasi DB terakhir).
+- **Fix Applied**:
+  1. Kolom `users.phone` (nullable) + `$fillable`; staf mengisi nomor di kartu "Nomor Kontak untuk Chat" di Pengaturan Akun (mahasiswa tetap memakai `student_profiles.phone`). Data per role: mahasiswa = email, HP, NIM, prodi, fakultas, semester; staf = email & nomor akun; plus kontak resmi dinas/kampus (selalu tampil).
+  2. **Privasi**: data pribadi hanya dikirim server bila `personalDetailsVisibleTo()` mengizinkan, yaitu mode ketat `contactsQuery(strict: true)`. Aturannya sama dengan aturan kontak chat, tetapi dosen ↔ mahasiswa sekampus hanya bila dosen tersebut DPL-nya. Super Admin melihat semua. Tanpa izin, API mengirim `visible=false` dan email/telepon/NIM `null` (bukan sekadar disembunyikan di tampilan).
+  3. Panel notifikasi diposisikan selebar sidebar (`absolute left-3 right-3` terhadap header), berisi status izin browser & tombol tes suara. Kunci localStorage/sessionStorage memuat `data-chat-user`. Toast ringkasan "Anda memiliki N pesan belum dibaca" muncul sekali per sesi. Notifikasi desktop juga muncul saat jendela tidak fokus. Pesan chat belum dibaca didahulukan di lonceng navbar. Saat Login As, jumlah belum dibaca di daftar tidak di-nol-kan (konsisten dengan badge navbar).
+- **Prevention Rule**: Data pribadi (email, telepon, NIM, alamat) di fitur apa pun wajib difilter di server lewat `personalDetailsVisibleTo()` (atau aturan setara), bukan dengan menyembunyikan elemen di Blade/Alpine. Setiap `Model::create()` dengan field baru wajib dicek kolom & `$fillable`-nya, karena atribut yang tidak dikenal dibuang tanpa error. Kunci localStorage/sessionStorage yang menyimpan status per pengguna wajib memuat id pengguna. Dropdown di dalam kontainer `overflow-hidden` wajib diposisikan relatif ke kontainer yang cukup lebar (atau `fixed`).
+
+---
+
+### [LRN-042] Penanganan Migrasi Fitur Chat Tertunda (`relation "chat_conversations" does not exist`) & Guard Skema
+- **Tanggal**: 2026-10-01
+- **Komponen**: `database/migrations/`, `app/Services/Chat/ChatGroupService.php`, `resources/views/chat/partials/conversation.blade.php`
+- **Problem / Symptom**: Saat pengguna menekan ikon balon chat di samping notifikasi di navbar (mengarah ke `/chat`), muncul halaman error 500 `Illuminate\Database\QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "chat_conversations" does not exist` di `ChatGroupService.php:217`.
+- **Root Cause**:
+  1. Migrasi fitur chat (`2026_09_30_000000_create_chat_tables` dkk) masih berstatus `Pending` di database PostgreSQL aktif (`db_perpusmagang`).
+  2. `ChatGroupService::ensurePlacementGroupsFor()` belum memiliki guard pengecekan keberadaan tabel `chat_conversations`, sehingga langsung melempar SQL exception fatal bila tabel belum dimigrasi.
+  3. Badge status "Nonaktif" di `chat/partials/conversation.blade.php` memicu gagal test `StatusViewGuardTest` karena belum diberi penanda `status-guard:ignore`.
+- **Fix Applied**:
+  1. Menjalankan `php artisan migrate` untuk mengeksekusi seluruh migrasi pending (Batch 7: `create_chat_tables`, `upgrade_chat_full_features`, `merge_on_leave_into_inactive_account_status`, `add_foreign_key_indexes_to_core_tables`, `add_phone_to_users_table`).
+  2. Menambahkan guard `if (!Schema::hasTable('chat_conversations')) { return; }` pada `ChatGroupService::ensurePlacementGroupsFor()` untuk keamanan defensif.
+  3. Menambahkan komentar `{{-- status-guard:ignore --}}` pada badge kontak nonaktif di header chat Blade.
+  4. Membersihkan cache via `php artisan optimize:clear` dan `php artisan view:clear`.
+- **Prevention Rule**: Setiap penambahan migrasi baru wajib segera dijalankan pada database lingkungan lokal/development (`php artisan migrate`). Service yang berinteraksi dengan tabel yang baru diperkenalkan sebaiknya memiliki pengecekan `Schema::hasTable` jika berisiko dipanggil dari halaman umum sebelum migrasi selesai.
 
 ---
 
