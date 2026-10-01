@@ -48,6 +48,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-031** | 2026-09-28 | Table Action Button Sizing & Visual Contrast | Tombol aksi tabel terlalu kecil (h-[30px]) dan kurang kontras; standardisasi ke h-[34px] px-3.5 dengan border crisp dan shadow | RESOLVED |
 | **LRN-032** | 2026-09-28 | Agency Control Center Visual Parity & Clean Badging | Desain show dinas kurang selaras dengan univ; kontak terhimpit, dan badge/tab memuat angka redundan (Akun Terdaftar (3) & Personil 7) | RESOLVED |
 | **LRN-033** | 2026-09-28 | Browser Engine, Driver 404 & Local Chrome Lockdown | Driver Playwright internal 1.57.0 404 CDN di IDE; penguncian ke channel 'chrome' lokal & protokol Mata Manusia | RESOLVED |
+| **LRN-039** | 2026-10-01 | Dosen Pembimbing (DPL) Flow, Logbook & Grade Sheet | Tab monitoring aktif mencakup accepted & active, eksklusi resigned, verifikasi logbook DPL langsung, dan cetak lembar nilai resmi | RESOLVED |
 
 ---
 
@@ -773,6 +774,33 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
+
+---
+
+### [LRN-039] Pembenahan Alur Dosen Pembimbing (DPL): Tab Mahasiswa Aktif, Verifikasi Logbook Langsung, Dropdown Filter Rapi, & Laporan Tab Baru
+- **Tanggal**: 2026-10-01
+- **Komponen**: `Lecturer\MonitoringController`, `Lecturer\DashboardController`, `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `tests/Feature/LecturerFeaturesUpdateTest.php`
+- **Problem / Symptom**:
+  1. Menu Monitoring Dosen (`/lecturer/monitoring`) pada tab default "Mahasiswa Aktif" sering kosong / 0 data, karena mahasiswa yang baru diterima masih berstatus `accepted` dan tersembunyi di tab "Calon Peserta".
+  2. Mahasiswa yang telah mengundurkan diri (`resigned`) atau ditolak masih terhitung dalam metrik "Total Bimbingan" dan muncul di dashboard DPL.
+  3. Pada halaman detail mahasiswa bimbingan (`lecturer/students/{id}`), dosen tidak dapat melihat status verifikasi DPL (`lecturer_status`) dan tidak memiliki tombol verifikasi logbook secara langsung.
+  4. Dropdown filter status laporan di dashboard dosen memiliki indentasi aneh akibat penggunaan tag `<optgroup>`.
+  5. Antarmuka naskah laporan menyajikan live preview inline (`iframe`) yang membebani layout halaman dan tidak ergonomis, serta fitur cetak berita acara yang tidak diinginkan pengguna.
+- **Root Cause**:
+  1. `MonitoringController` memfilter secara kaku hanya `status = 'active'`, padahal mahasiswa berstatus `accepted` sudah berstatus magang aktif di lapangan sebelum sinkronisasi cron otomatis.
+  2. Query `getLecturerPlacementsQuery` pada `DashboardController` tidak memfilter status lifecycle non-aktif (`resigned`, `rejected`).
+  3. Tampilan logbook di `student-detail.blade.php` hanya menyertakan badge mentor tanpa kontrol form `PUT /lecturer/logbooks/{id}`.
+  4. Penggunaan tag `<optgroup label="Status Laporan">` pada tag native `<select>` menggeser opsi ke kanan sehingga tampak aneh.
+  5. Adanya komponen iframe reader di tengah halaman yang memberatkan visual dan interaksi.
+- **Fix Applied**:
+  1. Memperbarui `MonitoringController` sehingga tab `active` mencakup `['active', 'accepted']` dan mengecualikan status non-aktif (`resigned`, `rejected`).
+  2. Menambahkan filter `whereNotIn('status', ['resigned', 'rejected'])` pada `DashboardController`.
+  3. Memperkaya baris logbook di `student-detail.blade.php` dengan dual-badge (Mentor & DPL), preview link lampiran, catatan feedback DPL, serta form inline verifikasi cepat (Setujui ACC / Minta Revisi).
+  4. Merapikan dropdown filter status laporan di `dashboard.blade.php`: menghapus `<optgroup>`, menyajikan opsi rata kiri yang bersih ("Semua Status Laporan", "Menunggu Review (Pending)", "Perlu Revisi", "Disetujui (Approved)", "Belum Unggah Laporan").
+  5. Menghapus live preview inline (`iframe`) dan tombol cetak berita acara; menggantinya dengan tombol langsung "Buka Naskah Laporan (Tab Baru ↗)" (`target="_blank"`) menuju rute resmi `final_reports.show`.
+  6. Menyelaraskan seluruh automated test di `tests/Feature/LecturerFeaturesUpdateTest.php` dan script live E2E dengan hasil 100% PASS (Exit Code 0).
+- **Prevention Rule**: Hindari penggunaan `<optgroup>` pada single select filter jika hanya memiliki satu rumpun opsi agar tidak menciptakan indentasi yang janggal. Hindari penggunaan live iframe reader berukuran besar di halaman detail; gunakan tombol direct view ke tab baru (`target="_blank"`). Seluruh alur monitoring aktif wajib menyertakan status `accepted` dan mengecualikan `resigned`.
+
 
 ---
 
