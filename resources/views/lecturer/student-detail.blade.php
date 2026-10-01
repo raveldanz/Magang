@@ -224,34 +224,10 @@
                             </div>
 
                             <div class="flex items-center gap-2 shrink-0">
-                                <button type="button" @click="showPdf = !showPdf" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <span x-text="showPdf ? 'Tutup Preview' : 'Preview Naskah PDF'">Preview Naskah PDF</span>
-                                </button>
-                                <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-1.5">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    <span>Unduh File</span>
+                                <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    <span>Buka Naskah Laporan (Tab Baru ↗)</span>
                                 </a>
-                            </div>
-                        </div>
-
-                        <!-- Live Inline PDF Viewer Card for DPL -->
-                        <div x-show="showPdf" x-collapse x-cloak class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden space-y-0">
-                            <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-                                <div class="flex items-center gap-2.5 text-slate-800">
-                                    <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    </div>
-                                    <span class="text-xs font-bold tracking-tight">Dokumen Naskah Laporan Mahasiswa (Live Reader)</span>
-                                </div>
-                                <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
-                                    <span>Buka di Tab Baru ↗</span>
-                                </a>
-                            </div>
-                            <div class="p-4 sm:p-5 bg-slate-50/60">
-                                <div class="w-full h-[520px] rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-xs">
-                                    <iframe src="{{ route('final_reports.show', $finalReport->id) }}" class="w-full h-full border-0"></iframe>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -462,11 +438,13 @@
                 <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
-                            
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
                         </div>
                         <div>
                             <h3 class="font-black text-base text-gray-900">Riwayat Logbook Aktivitas Mahasiswa</h3>
-                            <p class="text-xs text-gray-400">Pantau catatan logbook harian/mingguan dan status verifikasi mentor dinas</p>
+                            <p class="text-xs text-gray-400">Pantau catatan logbook harian/mingguan dan berikan verifikasi/catatan DPL</p>
                         </div>
                     </div>
                     <span class="text-xs text-blue-600 font-bold">{{ $logbooks->count() }} Entri Logbook</span>
@@ -474,15 +452,25 @@
 
                 <div class="space-y-4">
                     @forelse($logbooks as $lb)
-                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
-                            <div class="flex items-start justify-between gap-4">
+                        <div x-data="{ openVerify: false }" class="p-5 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div>
-                                    <span class="text-xs font-bold text-gray-900 font-mono"> {{ \Carbon\Carbon::parse($lb->date)->format('d F Y') }}</span>
+                                    <span class="text-xs font-bold text-gray-900 font-mono"> {{ \Carbon\Carbon::parse($lb->date)->translatedFormat('l, d F Y') }}</span>
                                     <span class="text-xs text-gray-400 ml-2">({{ \Carbon\Carbon::parse($lb->date)->diffForHumans() }})</span>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[11px] font-semibold text-gray-500">Mentor</span>
-                                    <x-status-badge type="review" :status="$lb->status" />
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs">
+                                        <span class="text-[10px] uppercase font-bold text-slate-500">Mentor:</span>
+                                        <x-status-badge type="review" :status="$lb->status" />
+                                    </div>
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs">
+                                        <span class="text-[10px] uppercase font-bold text-slate-500">DPL:</span>
+                                        <x-status-badge type="review" :status="$lb->lecturer_status ?? 'pending'" />
+                                    </div>
+                                    <button type="button" @click="openVerify = !openVerify" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        <span x-text="openVerify ? 'Tutup Aksi' : 'Verifikasi DPL'">Verifikasi DPL</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -490,11 +478,50 @@
                                 {{ $lb->activity }}
                             </p>
 
-                            @if($lb->feedback)
-                                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 text-[11px] text-emerald-900">
-                                     <strong>Catatan Mentor Lapangan:</strong> "{{ $lb->feedback }}"
+                            @if($lb->attachment)
+                                <div class="pt-1">
+                                    <a href="{{ asset('storage/' . $lb->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-blue-600 hover:text-blue-800 transition shadow-2xs">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                        <span>Lihat Lampiran Dokumentasi</span>
+                                    </a>
                                 </div>
                             @endif
+
+                            @if($lb->feedback)
+                                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 text-[11px] text-emerald-900">
+                                    <strong>Catatan Mentor Lapangan:</strong> "{{ $lb->feedback }}"
+                                </div>
+                            @endif
+
+                            @if($lb->lecturer_feedback)
+                                <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-[11px] text-blue-950">
+                                    <strong>Catatan Feedback DPL Kampus:</strong> "{{ $lb->lecturer_feedback }}"
+                                    @if($lb->lecturer_verified_at)
+                                        <span class="text-[10px] text-blue-600 block mt-0.5">Diverifikasi: {{ \Carbon\Carbon::parse($lb->lecturer_verified_at)->translatedFormat('d M Y, H:i') }}</span>
+                                    @endif
+                                </div>
+                            @endif
+
+                            <!-- Form Inline Verifikasi DPL -->
+                            <div x-show="openVerify" x-collapse x-cloak class="p-4 bg-white rounded-xl border border-blue-200 shadow-2xs space-y-3 mt-2">
+                                <h5 class="text-xs font-bold text-slate-800">Verifikasi Logbook oleh Dosen Pembimbing</h5>
+                                <form method="POST" action="{{ route('lecturer.logbooks.updateStatus', $lb->id) }}" class="space-y-3">
+                                    @csrf
+                                    @method('PUT')
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Catatan / Arahan Bimbingan DPL (Opsional):</label>
+                                        <textarea name="feedback" rows="2" placeholder="Tuliskan apresiasi, masukan, atau alasan revisi..." class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500">{{ $lb->lecturer_feedback }}</textarea>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button type="submit" name="status" value="rejected" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                            Minta Revisi
+                                        </button>
+                                        <button type="submit" name="status" value="approved" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+                                            Setujui Logbook (ACC)
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     @empty
                         <div class="py-8 text-center text-gray-400 text-xs">

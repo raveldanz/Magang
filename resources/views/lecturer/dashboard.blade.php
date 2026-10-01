@@ -91,14 +91,12 @@
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <select name="report_status" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
+                        <select name="report_status" class="py-2 px-3 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">
                             <option value="">Semua Status Laporan</option>
-                            <optgroup label="Status Laporan">
-                                @foreach([\App\Enums\ReviewStatus::PENDING, \App\Enums\ReviewStatus::REVISION, \App\Enums\ReviewStatus::APPROVED] as $reviewCase)
-                                    <option value="{{ $reviewCase->value }}" {{ request('report_status') == $reviewCase->value ? 'selected' : '' }}>{{ $reviewCase->label() }}</option>
-                                @endforeach
-                            </optgroup>
-                            <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah</option>
+                            <option value="pending" {{ request('report_status') == 'pending' ? 'selected' : '' }}>Menunggu Review (Pending)</option>
+                            <option value="revision" {{ request('report_status') == 'revision' ? 'selected' : '' }}>Perlu Revisi</option>
+                            <option value="approved" {{ request('report_status') == 'approved' ? 'selected' : '' }}>Disetujui (Approved)</option>
+                            <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah Laporan</option>
                         </select>
 
                         <select name="agency_id" class="py-2 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium w-full sm:w-auto">

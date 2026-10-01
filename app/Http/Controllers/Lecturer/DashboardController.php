@@ -25,7 +25,10 @@ class DashboardController extends Controller
             'logbooks',
             'finalreport',
             'evaluation',
-        ])->where('academic_advisor_id', $lecturer->id);
+        ])->where('academic_advisor_id', $lecturer->id)
+          ->whereHas('application', function ($q) {
+              $q->whereNotIn('status', ['resigned', 'rejected']);
+          });
     }
 
     /**
