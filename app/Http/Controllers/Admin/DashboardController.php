@@ -159,7 +159,11 @@ class DashboardController extends Controller
             : collect();
 
         // Kesehatan proses latar belakang (scheduler & queue worker) — hanya untuk Super Admin
-        $systemIssues = $isSuperAdmin ? app(SystemHealth::class)->status()['issues'] : [];
+        // Di environment local (development) scheduler & queue worker biasanya tidak dijalankan,
+        // jadi peringatan ini hanya ditampilkan di server (staging/production).
+        $systemIssues = ($isSuperAdmin && ! app()->environment('local'))
+            ? app(SystemHealth::class)->status()['issues']
+            : [];
 
         $stats = [
             'total_students' => $totalStudents,

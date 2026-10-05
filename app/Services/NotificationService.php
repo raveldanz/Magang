@@ -245,12 +245,11 @@ class NotificationService
 
         // 4. MENTOR LAPANGAN NOTIFICATIONS
         elseif ($role === 'mentor' || $role === 'pembimbing') {
-            $mentorPlacements = Placement::where('mentor_id', $user->id)
-                ->orWhere(function ($q) use ($user) {
-                    if ($user->agency_profile_id) {
-                        $q->whereHas('application.unit', fn ($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
-                    }
-                })->get();
+            // Lingkup sama persis dengan halaman Logbook mentor: mahasiswa bimbingan sendiri
+            // (mentor_id / pembimbing_id) + fallback Kepala Unit — bukan seluruh mahasiswa instansi.
+            $mentorPlacements = Placement::fieldReviewableBy($user)
+                ->whereHas('application', fn ($q) => $q->whereNotIn('status', ['resigned', 'rejected']))
+                ->get();
 
             $pendingMentorLogbooks = Logbook::where('status', 'pending')
                 ->whereIn('placement_id', $mentorPlacements->pluck('id'))

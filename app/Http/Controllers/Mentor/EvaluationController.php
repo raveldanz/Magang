@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\Placement;
+use App\Services\StudentNotifier;
+use App\Support\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,7 +35,10 @@ class EvaluationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
         }
 
-        return view('mentor.evaluation', compact('placement'));
+        // Form tetap bisa dibuka untuk melihat nilai, tetapi terkunci bila magang belum berjalan / sudah selesai.
+        $lockReason = $placement->evaluationLockReason();
+
+        return view('mentor.evaluation', compact('placement', 'lockReason'));
     }
 
     /**
@@ -52,6 +57,10 @@ class EvaluationController extends Controller
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
+        }
+
+        if ($lockReason = $placement->evaluationLockReason()) {
+            return redirect()->route('mentor.students.show', $placement->id)->with('error', $lockReason);
         }
 
         $request->validate([
@@ -87,19 +96,7 @@ class EvaluationController extends Controller
 
         if ($scheme === 'mentor_only') {
             $finalScore = $evaluation->nilai_pembimbing;
-            if ($finalScore >= 85) {
-                $grade = 'A';
-            } elseif ($finalScore >= 75) {
-                $grade = 'AB';
-            } elseif ($finalScore >= 65) {
-                $grade = 'B';
-            } elseif ($finalScore >= 55) {
-                $grade = 'BC';
-            } elseif ($finalScore >= 40) {
-                $grade = 'C';
-            } else {
-                $grade = 'E';
-            }
+            $grade = Grade::letter($finalScore);
 
             $evaluation->update([
                 'final_score' => $finalScore,
@@ -115,20 +112,7 @@ class EvaluationController extends Controller
                 $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
                 $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
                 $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
-
-                if ($finalScore >= 85) {
-                    $grade = 'A';
-                } elseif ($finalScore >= 75) {
-                    $grade = 'AB';
-                } elseif ($finalScore >= 65) {
-                    $grade = 'B';
-                } elseif ($finalScore >= 55) {
-                    $grade = 'BC';
-                } elseif ($finalScore >= 40) {
-                    $grade = 'C';
-                } else {
-                    $grade = 'E';
-                }
+                $grade = Grade::letter($finalScore);
 
                 $evaluation->update([
                     'final_score' => $finalScore,
@@ -147,7 +131,9 @@ class EvaluationController extends Controller
             'nilai_laporan' => $request->nilai_laporan,
         ]);
 
+        StudentNotifier::evaluationSubmitted($placement->application?->user, 'mentor');
+
         return redirect()->route('mentor.students.show', $placement->id)
-            ->with('success', 'Penilaian evaluasi akhir berhasil disimpan! Mahasiswa kini siap diterbitkan sertifikatnya.');
+            ->with('success', 'Nilai evaluasi mahasiswa berhasil disimpan.');
     }
 }
