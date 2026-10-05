@@ -247,46 +247,6 @@
             </div>
         @endif
 
-        {{-- Fase 1: Mahasiswa aktif/diterima yang belum memiliki Mentor Dinas (alokasi baru level unit) --}}
-        @if(isset($unmentoredPlacements) && $unmentoredPlacements->count() > 0)
-            <div class="bg-white border border-amber-200 rounded-2xl shadow-xs overflow-hidden">
-                <div class="p-5 border-b border-amber-100 bg-amber-50/60">
-                    <h4 class="font-bold text-slate-900 text-sm">Mahasiswa Belum Memiliki Mentor Dinas ({{ $unmentoredPlacements->count() }})</h4>
-                    <p class="text-xs text-slate-600 mt-0.5">Mahasiswa sudah ditempatkan di unit, namun mentor teknis belum ditunjuk. Sementara itu logbook dapat divalidasi oleh Admin Dinas melalui menu Logbook.</p>
-                </div>
-                <div class="divide-y divide-slate-100">
-                    @foreach($unmentoredPlacements as $up)
-                        @php
-                            $upApp = $up->application;
-                            $upAgencyId = $upApp?->unit?->agency_profile_id;
-                            $upMentors = $assignableMentors->filter(fn ($m) => $upAgencyId === null || $m->agency_profile_id === null || (int) $m->agency_profile_id === (int) $upAgencyId);
-                        @endphp
-                        <div class="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                            <div class="min-w-0">
-                                <div class="font-bold text-slate-900 text-sm truncate">{{ $upApp?->user?->name ?? '-' }}</div>
-                                <div class="text-xs text-slate-500">
-                                    Unit: {{ $upApp?->unit?->name ?? '-' }} &bull; Status: <x-status-badge :status="$upApp?->status" />
-                                </div>
-                            </div>
-                            @if($upApp)
-                                <form method="POST" action="{{ route('admin.applications.assignment', $upApp->id) }}" class="flex items-center gap-2 m-0 w-full lg:w-auto">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="return_to" value="{{ route('admin.dashboard') }}">
-                                    <select name="mentor_id" required class="flex-1 lg:w-64 text-xs border-slate-200 rounded-xl bg-white py-2">
-                                        <option value="">-- Pilih Mentor Dinas --</option>
-                                        @foreach($upMentors as $m)
-                                            <option value="{{ $m->id }}">{{ $m->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shrink-0 cursor-pointer">Tetapkan</button>
-                                </form>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
 
         {{-- 2. ENAM KARTU METRIK EKSEKUTIF (TERISOLASI OTOMATIS BERDASARKAN DINAS) --}}
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -364,7 +324,8 @@
 
             {{-- Distribusi Penempatan: Instansi (Jika Super Admin) atau Unit Divisi (Jika Admin Dinas) --}}
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
-                style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
+                style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
+                x-data="{ expanded: false }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
                         @if($isSuperAdmin)
@@ -388,10 +349,12 @@
                     @endif
                 </div>
 
+                @php
+                    // Urutkan dari jumlah mahasiswa terbanyak; tampilkan 10 teratas, sisanya bisa dibuka.
+                    $distList = collect($isSuperAdmin ? ($agencyStats ?? []) : ($unitStats ?? []))
+                        ->sortByDesc(fn ($row) => data_get($row, 'count', 0))->values()->all();
+                @endphp
                 <div class="space-y-4 pt-1">
-                    @php
-                        $distList = $isSuperAdmin ? ($agencyStats ?? []) : ($unitStats ?? []);
-                    @endphp
                     @forelse($distList as $item)
                         @php
                             $itemName = is_array($item) ? $item['name'] : ($item->name ?? '-');
@@ -399,7 +362,7 @@
                             $itemPercentage = is_array($item) ? $item['percentage'] : ($item->percentage ?? 0);
                             $itemQuota = is_array($item) ? ($item['quota'] ?? 0) : ($item->quota ?? 0);
                         @endphp
-                        <div>
+                        <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
                                 <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $itemName }}</span>
                                 <span class="text-blue-700 font-bold shrink-0">
@@ -421,11 +384,21 @@
                         <div class="text-center py-6 text-xs text-slate-400">Belum ada data penempatan divisi/unit.</div>
                     @endforelse
                 </div>
+                @if(count($distList) > 10)
+                    <div class="text-center">
+                        <button type="button" @click="expanded = !expanded"
+                            class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-xl transition border border-slate-200 cursor-pointer">
+                            <span x-text="expanded ? 'Tutup' : 'Tampilkan Semua ({{ count($distList) }})'"></span>
+                            <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                    </div>
+                @endif
             </div>
 
             {{-- Distribusi Asal Perguruan Tinggi --}}
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
-                style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
+                style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
+                x-data="{ expanded: false }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-sm font-bold text-slate-800 leading-snug">
@@ -443,14 +416,18 @@
                     @endif
                 </div>
 
+                @php
+                    $campusList = collect($universityStats ?? [])
+                        ->sortByDesc(fn ($row) => data_get($row, 'count', 0))->values()->all();
+                @endphp
                 <div class="space-y-4 pt-1">
-                    @forelse($universityStats as $campus)
+                    @forelse($campusList as $campus)
                         @php
                             $campName = is_array($campus) ? $campus['name'] : ($campus->name ?? '-');
                             $campCount = is_array($campus) ? $campus['count'] : ($campus->count ?? 0);
                             $campPercentage = is_array($campus) ? $campus['percentage'] : ($campus->percentage ?? 0);
                         @endphp
-                        <div>
+                        <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
                                 <span class="text-slate-700 font-medium truncate max-w-[240px]">{{ $campName }}</span>
                                 <span class="text-sky-700 font-bold shrink-0">{{ $campCount }} Mahasiswa <span
@@ -467,6 +444,15 @@
                         <div class="text-center py-6 text-xs text-slate-400">Belum ada data distribusi kampus.</div>
                     @endforelse
                 </div>
+                @if(count($campusList) > 10)
+                    <div class="text-center">
+                        <button type="button" @click="expanded = !expanded"
+                            class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-xl transition border border-slate-200 cursor-pointer">
+                            <span x-text="expanded ? 'Tutup' : 'Tampilkan Semua ({{ count($campusList) }})'"></span>
+                            <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                    </div>
+                @endif
             </div>
 
         </div>

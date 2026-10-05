@@ -21,13 +21,21 @@ class LogbookCompletionRequirementTest extends TestCase
     use RefreshDatabase;
 
     private University $university;
+
     private AgencyProfile $agency;
+
     private Unit $unit;
+
     private User $superAdmin;
+
     private User $mentor;
+
     private User $dosen;
+
     private User $student;
+
     private Application $application;
+
     private Placement $placement;
 
     protected function setUp(): void

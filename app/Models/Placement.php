@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ApplicationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class Placement extends Model
@@ -140,6 +141,66 @@ class Placement extends Model
         return $this->allowsAgencyAdminLogbookFallback($user) || $this->isUnitHead($user);
     }
 
+    /**
+     * Scope penempatan yang menjadi wewenang verifikasi lapangan seorang mentor:
+     *  - mahasiswa bimbingan langsung (mentor_id / pembimbing_id), dan
+     *  - FALLBACK: mahasiswa ACTIVE di unit yang ia pimpin (Kepala Unit) yang belum memiliki mentor teknis.
+     * Selalu dibatasi ke instansi mentor bila mentor terikat ke instansi tertentu.
+     */
+    public function scopeFieldReviewableBy($query, User $user)
+    {
+        $query->where(function ($q) use ($user) {
+            $q->where(function ($own) use ($user) {
+                $own->where('mentor_id', $user->id)
+                    ->orWhere('pembimbing_id', $user->id);
+            })->orWhere(function ($fallback) use ($user) {
+                $fallback->whereNull('mentor_id')
+                    ->whereNull('pembimbing_id')
+                    ->whereHas('application', function ($aq) use ($user) {
+                        $aq->where('status', ApplicationStatus::ACTIVE->value)
+                            ->whereHas('unit', fn ($uq) => $uq->where('head_user_id', $user->id));
+                    });
+            });
+        });
+
+        if ($user->agency_profile_id !== null) {
+            $query->whereHas('application.unit', fn ($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
+        }
+
+        return $query;
+    }
+
+    /**
+     * Alasan form penilaian (Mentor maupun DPL) dikunci, atau null bila boleh diisi/diubah.
+     *  - Belum berjalan: nilai baru bisa diisi saat magang aktif (atau tanggal mulai sudah lewat
+     *    tetapi status belum sempat disinkronkan scheduler).
+     *  - Sudah selesai (COMPLETED): sertifikat sudah dapat diunduh mahasiswa, jadi nilai dikunci
+     *    agar isi sertifikat tidak berbeda dengan data di sistem.
+     */
+    public function evaluationLockReason(): ?string
+    {
+        $app = $this->application;
+        if (! $app) {
+            return 'Data pengajuan magang tidak ditemukan.';
+        }
+
+        $status = $app->status instanceof ApplicationStatus ? $app->status : ApplicationStatus::tryFrom(strtolower((string) $app->status));
+
+        if ($status === ApplicationStatus::COMPLETED) {
+            return 'Nilai sudah dikunci karena magang telah dinyatakan selesai dan sertifikat sudah dapat diunduh mahasiswa. Hubungi Admin Dinas bila perlu koreksi nilai.';
+        }
+
+        if ($status === ApplicationStatus::ACTIVE) {
+            return null;
+        }
+
+        if ($status === ApplicationStatus::ACCEPTED && $app->start_date && Carbon::parse($app->start_date)->startOfDay()->lte(now())) {
+            return null;
+        }
+
+        return 'Penilaian baru dapat diisi setelah magang mahasiswa berjalan (status Aktif).';
+    }
+
     // Relasi ke User (Pembimbing Lapangan Dinas / Mentor)
     public function mentor()
     {
@@ -222,7 +283,7 @@ class Placement extends Model
         }
 
         // Mahasiswa yang tidak mengisi logbook tidak bisa lulus magang
-        if (!$this->has_filled_logbook) {
+        if (! $this->has_filled_logbook) {
             return false;
         }
 

@@ -297,6 +297,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mentor/logbooks', [MentorLogbookController::class, 'index'])->name('mentor.logbooks.index');
         Route::get('/mentor/logbooks/{id}', [MentorLogbookController::class, 'show'])->name('mentor.logbooks.show');
         Route::put('/mentor/logbooks/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('mentor.logbooks.updateStatus');
+        Route::post('/mentor/logbooks/bulk-review', [MentorLogbookController::class, 'bulkReview'])->name('mentor.logbooks.bulk_review');
         Route::get('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('mentor.evaluations.create');
         Route::post('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('mentor.evaluations.store');
         Route::match(['put', 'patch'], '/mentor/final-report/{reportId}', [MentorDashboardController::class, 'updateFinalReportStatus'])->name('mentor.final_report.updateStatus');

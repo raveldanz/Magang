@@ -27,16 +27,12 @@
             {{ $text }}
         </span>
         @if ($case)
-            <span class="text-xs font-medium text-slate-500 leading-snug">{{ $case->description() }}</span>
+            <span class="text-xs font-medium text-slate-500 leading-snug hidden sm:block">{{ $case->description() }}</span>
         @endif
     </div>
 @else
-    <span {{ $attributes->class([$pill, '[@media(hover:none)]:flex-wrap [@media(hover:none)]:gap-y-0.5 [@media(hover:none)]:rounded-xl [@media(hover:none)]:max-w-[11rem]'])->merge(['data-status' => $case?->value ?? $raw, 'title' => $tooltip ?: $case?->description()]) }}>
+    <span {{ $attributes->class($pill)->merge(['data-status' => $case?->value ?? $raw, 'title' => $tooltip ?: $case?->description()]) }}>
         <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $dot }}"></span>
         {{ $text }}
-        @if ($case)
-            {{-- Tooltip tidak bisa dibuka di layar sentuh: tampilkan keterangan langsung --}}
-            <span class="hidden [@media(hover:none)]:block basis-full text-left text-[10px] font-medium leading-tight tracking-normal whitespace-normal opacity-80">{{ $case->description() }}</span>
-        @endif
     </span>
 @endif
