@@ -257,6 +257,9 @@ class ApplicationController extends Controller
         if ($newStatus === 'completed' && $oldStatus !== 'completed') {
             if (! $application->can_complete) {
                 $missing = [];
+                if (! $application->has_filled_logbook) {
+                    $missing[] = 'Logbook aktivitas magang belum pernah diisi';
+                }
                 if (! $application->has_approved_report) {
                     $missing[] = 'Laporan Akhir belum disetujui';
                 }

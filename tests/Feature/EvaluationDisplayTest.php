@@ -6,6 +6,7 @@ use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
@@ -44,6 +45,13 @@ class EvaluationDisplayTest extends TestCase
             'nilai_kinerja' => 93,
             'nilai_laporan' => 90,
             'nilai_akademik' => 97,
+        ]);
+
+        Logbook::create([
+            'placement_id' => $placement->id,
+            'date' => '2026-07-01',
+            'activity' => 'Aktivitas magang mahasiswa terverifikasi',
+            'status' => 'approved',
         ]);
 
         return $placement;
