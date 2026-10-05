@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
@@ -151,6 +152,18 @@ class ApplicationStatusArchitectureTest extends TestCase
             'nilai_akhir' => 90,
             'grade' => 'A',
             'feedback' => 'Sangat baik',
+        ]);
+
+        // Mahasiswa yang tidak mengisi logbook TIDAK BISA lulus magang (syncCompletionStatus returns false)
+        $this->assertFalse($placement->syncCompletionStatus());
+        $this->assertEquals(ApplicationStatus::ACTIVE, $app->fresh()->status);
+
+        // Setelah mengisi logbook, mahasiswa memenuhi seluruh syarat kelulusan
+        Logbook::create([
+            'placement_id' => $placement->id,
+            'date' => Carbon::now()->toDateString(),
+            'activity' => 'Mengembangkan modul sistem informasi magang terintegrasi',
+            'status' => 'approved',
         ]);
 
         $synced = $placement->syncCompletionStatus();

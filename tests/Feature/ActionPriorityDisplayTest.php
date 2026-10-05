@@ -6,6 +6,7 @@ use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
@@ -69,7 +70,7 @@ class ActionPriorityDisplayTest extends TestCase
     }
 
     /** Nilai lama: mentor rata-rata 92 + nilai_akademik 97, final_score kosong (0.00) → 40%·92 + 60%·97 = 95 */
-    private function gradeLegacy(Application $application, bool $approveReport = true): void
+    private function gradeLegacy(Application $application, bool $approveReport = true, bool $withLogbook = true): void
     {
         $placement = $application->placement;
         if ($approveReport) {
@@ -82,6 +83,14 @@ class ActionPriorityDisplayTest extends TestCase
             'nilai_laporan' => 90,
             'nilai_akademik' => 97,
         ]);
+        if ($withLogbook) {
+            Logbook::create([
+                'placement_id' => $placement->id,
+                'date' => now()->toDateString(),
+                'activity' => 'Aktivitas magang harian',
+                'status' => 'approved',
+            ]);
+        }
     }
 
     /**
@@ -102,9 +111,13 @@ class ActionPriorityDisplayTest extends TestCase
         FinalReport::create(['placement_id' => $readyAspects->placement->id, 'file_path' => 'x.pdf', 'status' => 'approved']);
         Evaluation::create(['placement_id' => $readyAspects->placement->id, 'nilai_disiplin' => 80, 'nilai_kinerja' => 80, 'nilai_laporan' => 80,
             'score_mastery' => 85, 'score_report' => 85, 'score_attitude' => 85]);
+        Logbook::create(['placement_id' => $readyAspects->placement->id, 'date' => now()->toDateString(), 'activity' => 'Logbook aspek', 'status' => 'approved']);
+
         $readyMentorOnly = $this->makeApplication('active', 'Siap Lulus Mentor', daysAgo: 13, withMentor: true, withDosen: true, univ: $mentorOnly);
         FinalReport::create(['placement_id' => $readyMentorOnly->placement->id, 'file_path' => 'x.pdf', 'status' => 'approved']);
         Evaluation::create(['placement_id' => $readyMentorOnly->placement->id, 'nilai_disiplin' => 90, 'nilai_kinerja' => 88, 'nilai_laporan' => 86]);
+        Logbook::create(['placement_id' => $readyMentorOnly->placement->id, 'date' => now()->toDateString(), 'activity' => 'Logbook mentor only', 'status' => 'approved']);
+
         $partialMentorOnly = $this->makeApplication('active', 'Nilai Mentor Belum Lengkap', daysAgo: 12, withMentor: true, withDosen: true, univ: $mentorOnly);
         FinalReport::create(['placement_id' => $partialMentorOnly->placement->id, 'file_path' => 'x.pdf', 'status' => 'approved']);
         Evaluation::create(['placement_id' => $partialMentorOnly->placement->id, 'nilai_disiplin' => 90, 'nilai_kinerja' => 88]);
@@ -117,7 +130,7 @@ class ActionPriorityDisplayTest extends TestCase
         $rejected = $this->makeApplication('rejected', 'Ditolak', daysAgo: 6);
         $resigned = $this->makeApplication('resigned', 'Mundur', daysAgo: 8);
 
-        $loaded = Application::with(['placement.finalreport', 'placement.evaluation', 'user.universityRelation'])->get();
+        $loaded = Application::with(['placement.finalreport', 'placement.evaluation', 'placement.logbooks', 'user.universityRelation'])->get();
         $phpTiers = $loaded->mapWithKeys(fn ($a) => [$a->id => $a->actionPriority()])->sortKeys()->all();
         $sqlTiers = Application::query()->selectRaw('id, ' . Application::actionPrioritySql() . ' as tier')->get()
             ->mapWithKeys(fn ($row) => [$row->id => (int) $row->tier])->sortKeys()->all();
@@ -184,6 +197,12 @@ class ActionPriorityDisplayTest extends TestCase
         $this->assertSame([1, null], [$pending->actionPriority(), $pending->actionHint()]);
         $this->assertSame([1, null], [$verified->actionPriority(), $verified->actionHint()]);
         $this->assertSame([2, 'Siap diluluskan'], [$ready->actionPriority(true), $ready->actionHint(true)]);
+
+        // Mahasiswa tanpa logbook tidak bisa siap diluluskan (masuk tingkat 4 / magang aktif)
+        $noLogbook = $this->makeApplication('active', 'Tanpa Logbook', withMentor: true, withDosen: true);
+        $this->gradeLegacy($noLogbook, withLogbook: false);
+        $this->assertSame([4, null], [$noLogbook->actionPriority(true), $noLogbook->actionHint(true)]);
+
         $this->assertSame([3, 'Mentor belum ditetapkan'], [$noMentor->actionPriority(), $noMentor->actionHint()]);
         // Default: mengikuti kebijakan kampus mahasiswa (require_dpl = true)
         $this->assertSame([3, 'Dosen pembimbing belum ditetapkan'], [$noDosen->actionPriority(), $noDosen->actionHint()]);

@@ -59,7 +59,7 @@
 
                 $isPassed = $application && (
                     $rawSt === 'completed' ||
-                    (in_array($rawSt, ['accepted', 'active']) && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && $rawFinalSt === 'approved')
+                    (in_array($rawSt, ['accepted', 'active']) && $logbooksCount > 0 && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && $rawFinalSt === 'approved')
                 );
 
                 // Nama status untuk banner: kode sistem standar (sama di semua role)
