@@ -62,6 +62,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-052** | 2026-10-05 | Master Data Profil & Media Logo Resmi | Standarisasi master data kampus (35) dan OPD (23), sinkronisasi aset logo resmi, optimasi resolusi & Blade accessor | RESOLVED |
 | **LRN-053** | 2026-10-05 | Saluran Pengumuman & Integrasi Logo Chat | Penamaan langsung nama lembaga (tanpa awalan panjang), resolusi dinamis logo resmi dari profil dinas & kampus, perbaikan avatar info panel | RESOLVED |
 | **LRN-055** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
+| **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
 
 ---
 
@@ -1234,6 +1235,20 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   9. Menulis suite pengujian `LogbookCompletionRequirementTest.php` (6/6 lulus) dan menguji seluruh rangkaian test suite (183/183 PASS, Strict Exit Code 0).
 - **Prevention Rule**: Seluruh gerbang kelulusan akhir (*graduation gateway*) dan penerbitan sertifikat resmi negara wajib memverifikasi ketiga rukun pemenuhan magang (Logbook Aktivitas, Laporan Akhir Disetujui, dan Penilaian Lengkap) di level Model (`can_complete`), Controller (`updateStatus`), Service Sync (`syncCompletionStatus`), dan View UI. Jangan pernah mengizinkan transisi status terminal `COMPLETED` tanpa validasi riwayat aktivitas logbook.
 - **Catatan merge (2026-10-05)**: Entri ini berasal dari `main` sebagai LRN-043 dan dinomori ulang menjadi LRN-055 karena nomor LRN-043 sudah dipakai di cabang `AlurPengajuan-Admin-Yasin`. Pada cabang tersebut syarat logbook juga dimasukkan ke `Application::certificateBlockers()`, sehingga halaman sertifikat terkunci (`certificates.locked`, HTTP 403) dan tombol unduh di dasbor mahasiswa ikut menolak jika logbook belum diisi.
+
+---
+
+### [LRN-056] Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Admin\DashboardController.php`, `resources/views/admin/dashboard.blade.php`, `tests/Feature/Phase1OnboardingTest.php`
+- **Problem / Symptom**: Box alert/kartu intervensi darurat *"Mahasiswa Belum Memiliki Mentor Dinas"* dengan tombol dropdown Tetapkan muncul di dashboard Admin (baik Admin Dinas maupun Super Admin). Keberadaan form aksi penugasan cepat ini mengganggu kerapian dashboard eksekutif dan tidak diperlukan karena alur penugasan mentor resmi sudah tersedia di halaman detail pengajuan (`admin.applications.show`).
+- **Root Cause**: Desain fase awal onboarding meletakkan form intervensi cepat penempatan tanpa mentor (`Placement::whereNull('mentor_id')`) langsung di halaman dashboard utama, membebani query database (`$unmentoredPlacements` dan `$assignableMentors`) pada setiap render dasbor.
+- **Fix Applied**:
+  1. Menghapus seluruh blok HTML kartu intervensi "Mahasiswa Belum Memiliki Mentor Dinas" dari [dashboard.blade.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/resources/views/admin/dashboard.blade.php).
+  2. Menghapus query `$unmentoredPlacements` dan `$assignableMentors` serta membersihkan import `Placement` & `PlacementAssignmentService` yang tidak lagi dipakai di [DashboardController.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/app/Http/Controllers/Admin/DashboardController.php).
+  3. Memperbarui assertion pengujian di [Phase1OnboardingTest.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/tests/Feature/Phase1OnboardingTest.php) (`assertDontSee('Mahasiswa Belum Memiliki Mentor Dinas')`).
+  4. Memvalidasi tampilan visual antarmuka via Playwright runner (`scripts/browser-runner.mjs`), memastikan tata letak kartu metrik eksekutif bersih, rapi, dan seluruh 237 pengujian PHPUnit lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**: Pertahankan tujuan halaman Dashboard Admin sebagai pusat ringkasan metrik eksekutif dan analitik agregat. Aksi operasional penetapan perorangan (seperti plotting mentor/dosen) harus tetap terpusat di halaman detail entitas terkait (`admin.applications.show`) agar UI dashboard tidak over-cluttered dan bebas query database yang redundan.
 
 ---
 

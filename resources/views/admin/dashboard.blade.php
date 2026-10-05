@@ -247,46 +247,6 @@
             </div>
         @endif
 
-        {{-- Fase 1: Mahasiswa aktif/diterima yang belum memiliki Mentor Dinas (alokasi baru level unit) --}}
-        @if(isset($unmentoredPlacements) && $unmentoredPlacements->count() > 0)
-            <div class="bg-white border border-amber-200 rounded-2xl shadow-xs overflow-hidden">
-                <div class="p-5 border-b border-amber-100 bg-amber-50/60">
-                    <h4 class="font-bold text-slate-900 text-sm">Mahasiswa Belum Memiliki Mentor Dinas ({{ $unmentoredPlacements->count() }})</h4>
-                    <p class="text-xs text-slate-600 mt-0.5">Mahasiswa sudah ditempatkan di unit, namun mentor teknis belum ditunjuk. Sementara itu logbook dapat divalidasi oleh Admin Dinas melalui menu Logbook.</p>
-                </div>
-                <div class="divide-y divide-slate-100">
-                    @foreach($unmentoredPlacements as $up)
-                        @php
-                            $upApp = $up->application;
-                            $upAgencyId = $upApp?->unit?->agency_profile_id;
-                            $upMentors = $assignableMentors->filter(fn ($m) => $upAgencyId === null || $m->agency_profile_id === null || (int) $m->agency_profile_id === (int) $upAgencyId);
-                        @endphp
-                        <div class="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                            <div class="min-w-0">
-                                <div class="font-bold text-slate-900 text-sm truncate">{{ $upApp?->user?->name ?? '-' }}</div>
-                                <div class="text-xs text-slate-500">
-                                    Unit: {{ $upApp?->unit?->name ?? '-' }} &bull; Status: <x-status-badge :status="$upApp?->status" />
-                                </div>
-                            </div>
-                            @if($upApp)
-                                <form method="POST" action="{{ route('admin.applications.assignment', $upApp->id) }}" class="flex items-center gap-2 m-0 w-full lg:w-auto">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="return_to" value="{{ route('admin.dashboard') }}">
-                                    <select name="mentor_id" required class="flex-1 lg:w-64 text-xs border-slate-200 rounded-xl bg-white py-2">
-                                        <option value="">-- Pilih Mentor Dinas --</option>
-                                        @foreach($upMentors as $m)
-                                            <option value="{{ $m->id }}">{{ $m->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shrink-0 cursor-pointer">Tetapkan</button>
-                                </form>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
 
         {{-- 2. ENAM KARTU METRIK EKSEKUTIF (TERISOLASI OTOMATIS BERDASARKAN DINAS) --}}
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
