@@ -18,12 +18,14 @@ class CertificateController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Sinkronisasi otomatis mahasiswa yang sudah ACC laporan & tuntas evaluasi agar statusnya lulus (completed)
+        // 1. Sinkronisasi otomatis mahasiswa yang sudah ACC laporan, tuntas evaluasi, dan terisi logbook agar statusnya lulus (completed)
         $candidates = Placement::whereHas('application', function ($q) {
             $q->whereIn('status', ['accepted', 'active']);
         })->whereHas('finalreport', function ($subQuery) {
             $subQuery->where('status', 'approved');
-        })->whereHas('evaluation')->get();
+        })->whereHas('evaluation')
+          ->whereHas('logbooks')
+          ->get();
 
         foreach ($candidates as $cand) {
             $cand->syncCompletionStatus();
@@ -42,7 +44,8 @@ class CertificateController extends Controller
                 $query->whereHas('evaluation')
                       ->whereHas('finalreport', function ($subQuery) {
                           $subQuery->where('status', 'approved');
-                      });
+                      })
+                      ->whereHas('logbooks');
             });
 
         // Multi-Tenant Isolation: Admin instansi hanya melihat sertifikat pada unit instansinya sendiri
