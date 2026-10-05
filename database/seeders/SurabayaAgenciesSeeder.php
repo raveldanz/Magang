@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class SurabayaAgenciesSeeder extends Seeder
 {
@@ -499,7 +498,7 @@ class SurabayaAgenciesSeeder extends Seeder
             // Sinkronisasi: Cari instansi yang sudah ada berdasarkan keyword nama atau nama persis
             $query = AgencyProfile::whereRaw('LOWER(agency_name) = ?', [strtolower($item['agency_name'])]);
             if ($keyword) {
-                $query->orWhere('agency_name', 'like', '%' . $keyword . '%');
+                $query->orWhere('agency_name', 'like', '%'.$keyword.'%');
             }
             $agency = $query->first();
 
@@ -514,7 +513,7 @@ class SurabayaAgenciesSeeder extends Seeder
                 ->where('role', 'admin')
                 ->first();
 
-            if (!$existingAdmin) {
+            if (! $existingAdmin) {
                 User::firstOrCreate(
                     ['email' => $adminEmail],
                     [

@@ -1,16 +1,17 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\User;
 use App\Models\AgencyProfile;
 use App\Models\University;
+use App\Models\User;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Hash;
 
-echo "Seeding Admin accounts..." . PHP_EOL;
+echo 'Seeding Admin accounts...'.PHP_EOL;
 
 $defaultPassword = Hash::make('password');
 $admin123 = Hash::make('admin123');
@@ -26,7 +27,7 @@ $adminUtama = User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin@gmail.com | password: admin123" . PHP_EOL;
+echo 'Created/Updated: admin@gmail.com | password: admin123'.PHP_EOL;
 
 $superAdminGov = User::updateOrCreate(
     ['email' => 'admin@surabaya.go.id'],
@@ -38,7 +39,7 @@ $superAdminGov = User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin@surabaya.go.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin@surabaya.go.id | password: password'.PHP_EOL;
 
 // 2. Instansi Pemkot Surabaya
 $kominfo = AgencyProfile::firstOrCreate(
@@ -83,7 +84,7 @@ User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin.kominfo@surabaya.go.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin.kominfo@surabaya.go.id | password: password'.PHP_EOL;
 
 User::updateOrCreate(
     ['email' => 'admin.diskominfo@surabaya.go.id'],
@@ -96,7 +97,7 @@ User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin.diskominfo@surabaya.go.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin.diskominfo@surabaya.go.id | password: password'.PHP_EOL;
 
 User::updateOrCreate(
     ['email' => 'admin.dispusip@surabaya.go.id'],
@@ -109,7 +110,7 @@ User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin.dispusip@surabaya.go.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin.dispusip@surabaya.go.id | password: password'.PHP_EOL;
 
 User::updateOrCreate(
     ['email' => 'admin.dispendukcapil@surabaya.go.id'],
@@ -122,7 +123,7 @@ User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin.dispendukcapil@surabaya.go.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin.dispendukcapil@surabaya.go.id | password: password'.PHP_EOL;
 
 // 4. Admin Universitas
 $unesa = University::firstOrCreate(['code' => 'UNESA'], ['name' => 'Universitas Negeri Surabaya']);
@@ -140,7 +141,7 @@ User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin@unesa.ac.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin@unesa.ac.id | password: password'.PHP_EOL;
 
 User::updateOrCreate(
     ['email' => 'admin@unitomo.ac.id'],
@@ -154,6 +155,6 @@ User::updateOrCreate(
         'email_verified_at' => now(),
     ]
 );
-echo "Created/Updated: admin@unitomo.ac.id | password: password" . PHP_EOL;
+echo 'Created/Updated: admin@unitomo.ac.id | password: password'.PHP_EOL;
 
-echo "Seeding completed successfully!" . PHP_EOL;
+echo 'Seeding completed successfully!'.PHP_EOL;
