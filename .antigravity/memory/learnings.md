@@ -52,6 +52,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
 | **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
 | **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
+| **LRN-043** | 2026-10-05 | Codebase Sanitization & Test Resilience | Eliminasi dead controllers/views Pembimbing, zero-dependency test suite (tanpa PHP GD), dan pengarsipan skrip scratch | RESOLVED |
 
 ---
 
@@ -902,6 +903,27 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
      - Audit integrasi lintas-role Hermes lulus 100% (**56/56 PASS**).
      - Visual snapshot E2E browser Google Chrome terverifikasi sempurna.
 - **Prevention Rule**: Penentuan prioritas dalam sistem layanan publik kedinasan wajib berbasis alur status (*state-driven determinism*) dari skema database transaksi, bukan mengandalkan heuristic keyword parsing pada teks pesan. Pastikan relasi model lifecycle di-eager-load secara tepat agar waktu muat daftar chat tetap instan ($<50$ ms).
+
+---
+
+### [LRN-043] Codebase Sanitization, Dead Code Elimination & Zero-Dependency Test Resilience
+- **Tanggal**: 2026-10-05
+- **Komponen**: `tests/Feature/Chat/ChatAttachmentTest.php`, `App\Http\Controllers\Pembimbing\`, `resources/views/pembimbing/`, `scripts/`
+- **Problem / Symptom**:
+  1. `php artisan test` menghasilkan 3 error di `ChatAttachmentTest` dengan exception: `"GD extension is not installed."` saat dijalankan pada sistem CLI yang tidak mengaktifkan modul GD di `php.ini`.
+  2. Adanya controller dan view mati `Pembimbing` (`app/Http/Controllers/Pembimbing` & `resources/views/pembimbing`) yang tidak pernah di-route dan memakai kolom usang `pembimbing_id`.
+  3. Menumpuknya 50 skrip debugging scratch di folder `scripts/` yang membingungkan alur kerja CI/CD dan pengembang.
+- **Root Cause**:
+  1. Pemanggilan `UploadedFile::fake()->image()` memanggil fungsi C-library GD PHP (`imagecreatetruecolor`), menciptakan *hidden environment dependency* pada unit test.
+  2. Controller dan view `Pembimbing` adalah artefak transisi masa lalu sebelum dipisah menjadi `Mentor/` dan `Lecturer/`.
+- **Fix Applied**:
+  1. Mengubah pemanggilan `UploadedFile::fake()->image()` menjadi `UploadedFile::fake()->create('...', ..., 'image/jpeg')` sehingga pengujian validasi MIME dan ekstensi berjalan tanpa membutuhkan ekstensi GD.
+  2. Menghapus folder `app/Http/Controllers/Pembimbing/` dan `resources/views/pembimbing/`.
+  3. Mengarsipkan seluruh skrip scratch/sekali pakai ke subdirektori `scripts/archive/`.
+  4. Menjalankan full regression test: **177/177 test PASSED (1.365 assertions, Strict Exit Code 0)**.
+- **Prevention Rule**:
+  - Untuk pengujian unggah berkas generik (MIME type, ekstensi, batas ukuran KB), gunakan `UploadedFile::fake()->create($filename, $kilobytes, $mimeType)`. Hindari `fake()->image()` kecuali jika kode yang diuji memang melakukan manipulasi piksel/resize menggunakan library grafis.
+  - Hapus artefak controller dan view yang sudah tidak memiliki rute aktif saat proses refactoring selesai agar tidak terjadi akumulasi utang teknis (*technical debt*).
 
 ---
 
