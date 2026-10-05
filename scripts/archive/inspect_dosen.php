@@ -1,11 +1,13 @@
 <?php
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\User;
 use App\Models\Placement;
+use App\Models\User;
+use Illuminate\Contracts\Console\Kernel;
 
 $dosens = User::where('role', 'dosen')->get();
 echo "=== LIST DOSEN & MAHASISWA BIMBINGAN ===\n";
@@ -19,7 +21,7 @@ foreach ($dosens as $dosen) {
         foreach ($placements as $p) {
             $student = $p->application->user ?? null;
             $status = $p->application->status ?? 'none';
-            $statusVal = $status instanceof \BackedEnum ? $status->value : (string)$status;
+            $statusVal = $status instanceof BackedEnum ? $status->value : (string) $status;
             $lbCount = $p->logbooks->count();
             $pendingLb = $p->logbooks->where('lecturer_status', 'pending')->count();
             $approvedLb = $p->logbooks->where('lecturer_status', 'approved')->count();

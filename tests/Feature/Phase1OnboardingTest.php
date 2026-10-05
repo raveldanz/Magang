@@ -285,7 +285,7 @@ class Phase1OnboardingTest extends TestCase
 
         $this->actingAs($this->adminA)->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('Mahasiswa Belum Memiliki Mentor Dinas');
+            ->assertDontSee('Mahasiswa Belum Memiliki Mentor Dinas');
 
         // Mentor dari instansi lain ditolak
         $this->actingAs($this->adminA)

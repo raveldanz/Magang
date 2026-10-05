@@ -1,35 +1,39 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\University;
 use App\Models\AgencyProfile;
+use App\Models\University;
+use Illuminate\Contracts\Console\Kernel;
 
 echo "========================================================================================================================\n";
 echo "                         AUDIT AKURASI & VALIDASI FAKTUAL RESMI MASTER DATA SURABAYA                                   \n";
 echo "========================================================================================================================\n\n";
 
-function formatBytes($bytes, $precision = 1) {
+function formatBytes($bytes, $precision = 1)
+{
     $units = ['B', 'KB', 'MB', 'GB'];
     $bytes = max($bytes, 0);
     $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
     $pow = min($pow, count($units) - 1);
     $bytes /= pow(1024, $pow);
-    return round($bytes, $precision) . ' ' . $units[$pow];
+
+    return round($bytes, $precision).' '.$units[$pow];
 }
 
-function verifyImageIntegrity($relativePath) {
-    if (!$relativePath) {
+function verifyImageIntegrity($relativePath)
+{
+    if (! $relativePath) {
         return ['status' => 'MISSING', 'res' => '-', 'size' => '0 B', 'type' => 'NONE', 'valid' => false];
     }
 
     $cleanPath = ltrim($relativePath, '/');
     $fullPath = public_path($cleanPath);
-    if (!is_file($fullPath)) {
-        $storagePath = storage_path('app/public/' . $cleanPath);
+    if (! is_file($fullPath)) {
+        $storagePath = storage_path('app/public/'.$cleanPath);
         if (is_file($storagePath)) {
             $fullPath = $storagePath;
         } else {
@@ -76,9 +80,9 @@ function verifyImageIntegrity($relativePath) {
 
 // 1. AUDIT PERGURUAN TINGGI
 echo "### 1. AUDIT PERGURUAN TINGGI (universities)\n";
-echo str_repeat('-', 125) . "\n";
-printf("%-4s | %-48s | %-16s | %-10s | %-12s | %-16s | %-8s\n", "NO", "NAMA KAMPUS RESMI", "AKRONIM", "STATUS LOGO", "UKURAN", "RESOLUSI/FORMAT", "AUDIT");
-echo str_repeat('-', 125) . "\n";
+echo str_repeat('-', 125)."\n";
+printf("%-4s | %-48s | %-16s | %-10s | %-12s | %-16s | %-8s\n", 'NO', 'NAMA KAMPUS RESMI', 'AKRONIM', 'STATUS LOGO', 'UKURAN', 'RESOLUSI/FORMAT', 'AUDIT');
+echo str_repeat('-', 125)."\n";
 
 $univs = University::orderBy('id')->get();
 $univIssues = 0;
@@ -89,29 +93,29 @@ foreach ($univs as $idx => $u) {
     $auditStatus = 'PASS';
     $issues = [];
 
-    if (!$img['valid']) {
-        $issues[] = "LOGO_INVALID";
+    if (! $img['valid']) {
+        $issues[] = 'LOGO_INVALID';
         $auditStatus = 'FAIL';
     }
 
     if (empty($u->acronym)) {
-        $issues[] = "NO_ACRONYM";
+        $issues[] = 'NO_ACRONYM';
         $auditStatus = 'FAIL';
     }
 
     if (stripos($u->name, 'November') !== false) {
-        $issues[] = "WRONG_NOVEMBER";
+        $issues[] = 'WRONG_NOVEMBER';
         $auditStatus = 'FAIL';
     }
 
     if (stripos($u->name, 'UPN Jatim') !== false) {
-        $issues[] = "NOT_BAKU_UPN";
+        $issues[] = 'NOT_BAKU_UPN';
         $auditStatus = 'FAIL';
     }
 
     if ($auditStatus === 'FAIL') {
         $univIssues++;
-        $statusText = "FAIL (" . implode(',', $issues) . ")";
+        $statusText = 'FAIL ('.implode(',', $issues).')';
     }
 
     printf(
@@ -125,14 +129,14 @@ foreach ($univs as $idx => $u) {
         $auditStatus
     );
 }
-echo str_repeat('-', 125) . "\n";
-echo "Total Universitas: " . $univs->count() . " | Lolos Audit: " . ($univs->count() - $univIssues) . " | Gagal: {$univIssues}\n\n";
+echo str_repeat('-', 125)."\n";
+echo 'Total Universitas: '.$univs->count().' | Lolos Audit: '.($univs->count() - $univIssues)." | Gagal: {$univIssues}\n\n";
 
 // 2. AUDIT OPD PEMKOT SURABAYA
 echo "### 2. AUDIT OPD PEMERINTAH KOTA SURABAYA (agency_profiles)\n";
-echo str_repeat('-', 125) . "\n";
-printf("%-4s | %-50s | %-14s | %-10s | %-12s | %-16s | %-8s\n", "NO", "NAMA OPD RESMI PEMKOT SURABAYA", "AKRONIM", "STATUS LOGO", "UKURAN", "RESOLUSI/FORMAT", "AUDIT");
-echo str_repeat('-', 125) . "\n";
+echo str_repeat('-', 125)."\n";
+printf("%-4s | %-50s | %-14s | %-10s | %-12s | %-16s | %-8s\n", 'NO', 'NAMA OPD RESMI PEMKOT SURABAYA', 'AKRONIM', 'STATUS LOGO', 'UKURAN', 'RESOLUSI/FORMAT', 'AUDIT');
+echo str_repeat('-', 125)."\n";
 
 $requiredOPDs = [
     'DSDABM' => 'Dinas Sumber Daya Air dan Bina Marga',
@@ -151,25 +155,25 @@ foreach ($agencies as $idx => $a) {
     $auditStatus = 'PASS';
     $issues = [];
 
-    if (!$img['valid']) {
-        $issues[] = "LOGO_INVALID";
+    if (! $img['valid']) {
+        $issues[] = 'LOGO_INVALID';
         $auditStatus = 'FAIL';
     }
 
     if (empty($a->acronym)) {
-        $issues[] = "NO_ACRONYM";
+        $issues[] = 'NO_ACRONYM';
         $auditStatus = 'FAIL';
     }
 
     if (isset($requiredOPDs[$a->acronym])) {
         if ($a->agency_name !== $requiredOPDs[$a->acronym]) {
-            $issues[] = "NAME_MISMATCH";
+            $issues[] = 'NAME_MISMATCH';
             $auditStatus = 'FAIL';
         }
     }
 
-    if (empty($a->address) || !str_contains($a->address, 'Surabaya')) {
-        $issues[] = "INVALID_ADDR";
+    if (empty($a->address) || ! str_contains($a->address, 'Surabaya')) {
+        $issues[] = 'INVALID_ADDR';
         $auditStatus = 'FAIL';
     }
 
@@ -188,8 +192,8 @@ foreach ($agencies as $idx => $a) {
         $auditStatus
     );
 }
-echo str_repeat('-', 125) . "\n";
-echo "Total OPD: " . $agencies->count() . " | Lolos Audit: " . ($agencies->count() - $agencyIssues) . " | Gagal: {$agencyIssues}\n\n";
+echo str_repeat('-', 125)."\n";
+echo 'Total OPD: '.$agencies->count().' | Lolos Audit: '.($agencies->count() - $agencyIssues)." | Gagal: {$agencyIssues}\n\n";
 
 if ($univIssues === 0 && $agencyIssues === 0) {
     echo "========================================================================================================================\n";
@@ -198,7 +202,7 @@ if ($univIssues === 0 && $agencyIssues === 0) {
     exit(0);
 } else {
     echo "========================================================================================================================\n";
-    echo ">> PERINGATAN: Terdapat " . ($univIssues + $agencyIssues) . " isu validasi yang harus segera diperbaiki! <<\n";
+    echo '>> PERINGATAN: Terdapat '.($univIssues + $agencyIssues)." isu validasi yang harus segera diperbaiki! <<\n";
     echo "========================================================================================================================\n";
     exit(1);
 }
