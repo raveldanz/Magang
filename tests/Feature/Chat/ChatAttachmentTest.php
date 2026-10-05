@@ -20,7 +20,7 @@ class ChatAttachmentTest extends ChatTestCase
     {
         $conversationId = $this->startConversation($this->studentA, $this->mentorX);
 
-        $this->sendMessage($this->studentA, $conversationId, ['files' => [UploadedFile::fake()->image('kegiatan hari ini.jpg', 640, 480)]])
+        $this->sendMessage($this->studentA, $conversationId, ['files' => [UploadedFile::fake()->create('kegiatan hari ini.jpg', 150, 'image/jpeg')]])
             ->assertCreated()
             ->assertJsonPath('message.attachments.0.kind', 'image')
             ->assertJsonPath('message.attachments.0.name', 'kegiatan hari ini.jpg');
@@ -49,7 +49,7 @@ class ChatAttachmentTest extends ChatTestCase
             'body' => 'Draf laporan akhir dan dokumentasi, Bu.',
             'files' => [
                 UploadedFile::fake()->create('Laporan Akhir.pdf', 120, 'application/pdf'),
-                UploadedFile::fake()->image('dokumentasi.png', 300, 200),
+                UploadedFile::fake()->create('dokumentasi.png', 100, 'image/png'),
             ],
         ])->assertCreated()
             ->assertJsonCount(2, 'message.attachments')
@@ -119,7 +119,7 @@ class ChatAttachmentTest extends ChatTestCase
     public function test_deleting_message_removes_its_files(): void
     {
         $conversationId = $this->startConversation($this->studentA, $this->mentorX);
-        $messageId = $this->sendMessage($this->studentA, $conversationId, ['files' => [UploadedFile::fake()->image('salah kirim.jpg')]])
+        $messageId = $this->sendMessage($this->studentA, $conversationId, ['files' => [UploadedFile::fake()->create('salah kirim.jpg', 100, 'image/jpeg')]])
             ->json('message.id');
         $attachment = ChatAttachment::firstOrFail();
 

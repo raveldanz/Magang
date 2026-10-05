@@ -1,4 +1,4 @@
-$php = "C:\Users\TK ABA SBY 69 (3)\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe"
+$php = "php"
 
 Write-Host "1. Checking database connection..."
 & $php artisan db:show
