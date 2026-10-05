@@ -6,11 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
-use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
-use App\Services\PlacementAssignmentService;
 use App\Services\SystemHealth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -160,27 +158,6 @@ class DashboardController extends Controller
             ? University::pendingVerification()->withCount('students')->latest()->take(10)->get()
             : collect();
 
-        // Fase 1: mahasiswa diterima/aktif yang baru terikat di level unit (mentor teknis belum ditunjuk)
-        $unmentoredPlacements = Placement::with(['application.user.studentProfile', 'application.unit'])
-            ->whereNull('mentor_id')
-            ->whereNull('pembimbing_id')
-            ->whereHas('application', function ($q) use ($agencyId) {
-                $q->whereIn('status', PlacementAssignmentService::ASSIGNABLE_STATUSES);
-                if ($agencyId) {
-                    $q->whereHas('unit', fn ($uq) => $uq->where('agency_profile_id', $agencyId));
-                }
-            })
-            ->latest()
-            ->take(10)
-            ->get();
-
-        $assignableMentors = $unmentoredPlacements->isEmpty()
-            ? collect()
-            : User::whereIn('role', ['mentor', 'pembimbing'])
-                ->when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))
-                ->orderBy('name')
-                ->get(['id', 'name', 'agency_profile_id']);
-
         // Kesehatan proses latar belakang (scheduler & queue worker) — hanya untuk Super Admin
         $systemIssues = $isSuperAdmin ? app(SystemHealth::class)->status()['issues'] : [];
 
@@ -221,9 +198,7 @@ class DashboardController extends Controller
             'pendingUniversities',
             'pendingAgencies',
             'unverifiedUniversities',
-            'systemIssues',
-            'unmentoredPlacements',
-            'assignableMentors'
+            'systemIssues'
         ));
     }
 }
