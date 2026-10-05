@@ -29,7 +29,7 @@ class ChatMessageController extends Controller
     {
         $user = $request->user();
         $this->chat->participantOrFail($conversation, $user);
-        if (!$this->impersonating($request)) {
+        if (! $this->impersonating($request)) {
             $this->chat->touchPresence($user);
         }
 
@@ -61,6 +61,28 @@ class ChatMessageController extends Controller
         return response()->json(['message' => $this->presenter->message($message, $request->user())], 201);
     }
 
+    public function comments(Request $request, ChatMessage $message)
+    {
+        $user = $request->user();
+        $this->chat->participantOrFail($message->conversation, $user);
+
+        return response()->json($this->chat->commentsFor($message, $user));
+    }
+
+    public function storeComment(Request $request, ChatMessage $message)
+    {
+        $data = $request->validate([
+            'body' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $comment = $this->messages->sendComment($message, $request->user(), $data['body']);
+
+        return response()->json([
+            'comment' => $this->presenter->message($comment, $request->user()),
+            'comments_count' => (int) $message->fresh()->comments_count,
+        ], 201);
+    }
+
     public function destroy(Request $request, ChatMessage $message)
     {
         $message = $this->messages->delete($message, $request->user());
@@ -80,7 +102,7 @@ class ChatMessageController extends Controller
         $data = $request->validate(['message_id' => ['required', 'integer', 'min:1']]);
 
         // Membuka chat saat menyamar tidak boleh menandai pesan milik pengguna itu sebagai dibaca
-        if (!$this->impersonating($request)) {
+        if (! $this->impersonating($request)) {
             $this->chat->markRead($conversation, $request->user(), (int) $data['message_id']);
         }
 
@@ -89,7 +111,7 @@ class ChatMessageController extends Controller
 
     public function typing(Request $request, ChatConversation $conversation)
     {
-        if (!$this->impersonating($request)) {
+        if (! $this->impersonating($request)) {
             $this->chat->typing($conversation, $request->user());
         }
 
@@ -99,12 +121,12 @@ class ChatMessageController extends Controller
     public function attachment(Request $request, ChatAttachment $attachment)
     {
         $message = $attachment->message;
-        abort_if(!$message || $message->isDeleted(), 404, 'Lampiran tidak ditemukan.');
+        abort_if(! $message || $message->isDeleted(), 404, 'Lampiran tidak ditemukan.');
 
         // Peserta percakapan, atau Super Admin yang meninjau tiket laporan pesan ini
         $reviewingReport = $request->user()->isSuperAdmin()
             && SystemFeedback::where('chat_message_id', $message->id)->exists();
-        if (!$reviewingReport) {
+        if (! $reviewingReport) {
             $this->chat->participantOrFail($message->conversation, $request->user());
         }
 
@@ -112,7 +134,7 @@ class ChatMessageController extends Controller
         abort_unless($path, 404, 'Lampiran tidak ditemukan.');
 
         $name = $attachment->name ?: 'lampiran';
-        $inline = $attachment->isPreviewable() && !$request->boolean('download');
+        $inline = $attachment->isPreviewable() && ! $request->boolean('download');
 
         $response = response()->file($path, [
             'Content-Type' => $attachment->mime ?: 'application/octet-stream',

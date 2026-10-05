@@ -23,6 +23,7 @@ class ChatMessageService
         private ChatService $chat,
         private ChatAttachmentStorage $storage,
         private ChatNotifier $notifier,
+        private ChatChannelService $channels,
     ) {}
 
     /**
@@ -33,7 +34,13 @@ class ChatMessageService
         $participant = $this->chat->participantOrFail($conversation, $sender);
         $this->assertRecipientActive($conversation, $sender);
 
-        if ($replyToId && !ChatMessage::where('conversation_id', $conversation->id)->whereKey($replyToId)->exists()) {
+        if ($conversation->isChannel()) {
+            if (! $this->channels->canPublishAnnouncement($conversation, $sender)) {
+                throw new AuthorizationException('Hanya Pengelola Saluran yang dapat mempublikasikan pengumuman di sini.');
+            }
+        }
+
+        if ($replyToId && ! ChatMessage::where('conversation_id', $conversation->id)->whereKey($replyToId)->exists()) {
             throw ValidationException::withMessages(['reply_to_id' => 'Pesan yang dibalas tidak ditemukan di percakapan ini.']);
         }
 
@@ -73,6 +80,40 @@ class ChatMessageService
     }
 
     /**
+     * Mengirim komentar audiens di bawah pesan siaran pengumuman resmi.
+     */
+    public function sendComment(ChatMessage $parent, User $sender, string $body): ChatMessage
+    {
+        $conversation = $parent->conversation;
+        $this->chat->participantOrFail($conversation, $sender);
+
+        if ($parent->isDeleted()) {
+            throw ValidationException::withMessages(['body' => 'Tidak dapat memberikan komentar pada pengumuman yang telah dihapus.']);
+        }
+
+        $trimmed = trim($body);
+        if ($trimmed === '') {
+            throw ValidationException::withMessages(['body' => 'Komentar tidak boleh kosong.']);
+        }
+
+        $comment = DB::transaction(function () use ($conversation, $parent, $sender, $trimmed) {
+            $comment = ChatMessage::create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $sender->id,
+                'parent_id' => $parent->id,
+                'type' => ChatMessage::TYPE_TEXT,
+                'body' => $trimmed,
+            ]);
+
+            $parent->increment('comments_count');
+
+            return $comment;
+        });
+
+        return $comment->load(['sender', 'parent.sender']);
+    }
+
+    /**
      * Hapus pesan untuk semua orang: isi & lampiran dibuang, tersisa penanda "Pesan ini telah dihapus".
      * Pengirim boleh menghapus pesannya; Super Admin boleh menghapus pesan siapa pun (moderasi).
      * $moderation = true dipakai dari tiket laporan (Super Admin tidak harus anggota percakapan).
@@ -81,10 +122,10 @@ class ChatMessageService
     {
         $isSender = $message->sender_id !== null && (int) $message->sender_id === (int) $actor->id;
 
-        if (!$isSender && !$actor->isSuperAdmin()) {
+        if (! $isSender && ! $actor->isSuperAdmin()) {
             throw new AuthorizationException('Anda hanya dapat menghapus pesan Anda sendiri.');
         }
-        if (!$moderation) {
+        if (! $moderation) {
             $this->chat->participantOrFail($message->conversation, $actor);
         }
         if ($message->isSystem()) {
@@ -98,10 +139,14 @@ class ChatMessageService
         DB::transaction(function () use ($message, $actor) {
             $message->attachments()->delete();
             $message->forceFill(['body' => null, 'deleted_at' => now(), 'deleted_by' => $actor->id])->save();
+
+            if ($message->parent_id) {
+                ChatMessage::whereKey($message->parent_id)->decrement('comments_count');
+            }
         });
         $this->storage->deletePaths($paths);
 
-        if (!$isSender) {
+        if (! $isSender) {
             AuditLog::record('CHAT_MESSAGE_MODERATED', 'ChatMessage', $message->id, [
                 'sender' => $message->sender?->name,
                 'conversation_id' => $message->conversation_id,
@@ -135,15 +180,15 @@ class ChatMessageService
         $attachments = $message->attachments->pluck('name')->implode(', ');
 
         $snapshot = implode("\n", array_filter([
-            "Pelapor: {$reporter->name} (" . ChatPresenter::roleLabel($reporter) . ')',
-            'Pengirim pesan: ' . ($sender ? "{$sender->name} (" . ChatPresenter::roleLabel($sender) . ") · {$sender->email}" : 'Pengguna dihapus'),
-            'Percakapan: ' . ($conversation->isGroup() ? "Grup \"{$conversation->title}\"" : 'Chat 1-on-1') . " (#{$conversation->id})",
-            'Waktu pesan: ' . $message->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB',
+            "Pelapor: {$reporter->name} (".ChatPresenter::roleLabel($reporter).')',
+            'Pengirim pesan: '.($sender ? "{$sender->name} (".ChatPresenter::roleLabel($sender).") · {$sender->email}" : 'Pengguna dihapus'),
+            'Percakapan: '.($conversation->isGroup() ? "Grup \"{$conversation->title}\"" : 'Chat 1-on-1')." (#{$conversation->id})",
+            'Waktu pesan: '.$message->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i').' WIB',
             "Alasan: {$reasonLabel}",
             $note ? "Catatan pelapor: {$note}" : null,
             '',
             'Isi pesan:',
-            '"' . ($message->body ?: '(tanpa teks)') . '"',
+            '"'.($message->body ?: '(tanpa teks)').'"',
             $attachments ? "Lampiran: {$attachments}" : null,
         ], fn ($line) => $line !== null));
 
@@ -163,7 +208,7 @@ class ChatMessageService
 
         SystemNotification::send(
             title: "Laporan Pesan Chat: {$reasonLabel}",
-            message: "Dari {$reporter->name}: pesan " . ($sender?->name ? "{$sender->name} " : '') . 'dilaporkan dan perlu ditinjau.',
+            message: "Dari {$reporter->name}: pesan ".($sender?->name ? "{$sender->name} " : '').'dilaporkan dan perlu ditinjau.',
             userId: null,
             targetRole: 'super_admin',
             actionUrl: route('admin.feedbacks.show', $feedback->id),
@@ -184,7 +229,7 @@ class ChatMessageService
 
     private function assertRecipientActive(ChatConversation $conversation, User $sender): void
     {
-        if (!$conversation->isDirect()) {
+        if (! $conversation->isDirect()) {
             return;
         }
 

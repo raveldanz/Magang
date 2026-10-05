@@ -50,7 +50,7 @@ class ChatGroupTest extends ChatTestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('member_ids');
 
-        $this->assertSame(0, ChatConversation::where('type', 'group')->count());
+        $this->assertSame(0, ChatConversation::where('title', 'Grup Campuran')->count());
     }
 
     public function test_group_message_reaches_all_members_with_one_bell_entry_each(): void
@@ -62,7 +62,7 @@ class ChatGroupTest extends ChatTestCase
             $this->actingAs($member)->getJson(route('chat.api.summary'))->assertJsonPath('unread_total', 1);
         }
 
-        $notifications = SystemNotification::where('category', 'chat')->where('action_url', '/chat/' . $id)->get();
+        $notifications = SystemNotification::where('category', 'chat')->where('action_url', '/chat/'.$id)->get();
         $this->assertCount(2, $notifications);
         $this->assertSame('Pesan baru di Koordinasi Magang Kominfo', $notifications[0]->title);
         $this->assertStringStartsWith('Admin: Rapat koordinasi', $notifications[0]->message);

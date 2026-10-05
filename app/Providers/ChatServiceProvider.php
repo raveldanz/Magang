@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Application;
 use App\Models\Placement;
+use App\Observers\ApplicationChatObserver;
 use App\Observers\PlacementChatObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -13,10 +15,11 @@ class ChatServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // Grup Bimbingan otomatis mengikuti perubahan mentor/DPL pada penempatan
+        // Grup Bimbingan otomatis mengikuti perubahan mentor/DPL pada penempatan dan status aplikasi mahasiswa
         Placement::observe(PlacementChatObserver::class);
+        Application::observe(ApplicationChatObserver::class);
 
-        $key = fn (Request $request) => 'chat:' . ($request->user()?->id ?: $request->ip());
+        $key = fn (Request $request) => 'chat:'.($request->user()?->id ?: $request->ip());
 
         RateLimiter::for('chat-send', fn (Request $request) => Limit::perMinute((int) config('chat.rate_limits.send', 40))
             ->by($key($request))
