@@ -9,7 +9,8 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbookController;
 use App\Http\Controllers\Admin\MentorController as AdminMentorController;
-use App\Http\Controllers\Admin\UnitController as AdminUnitController;
+use App\Http\Controllers\Admin\PlacementAssignmentController;
+use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\UniversityController as AdminUniversityController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Chat\ChatApiController;
@@ -17,7 +18,7 @@ use App\Http\Controllers\Chat\ChatGroupController;
 use App\Http\Controllers\Chat\ChatMessageController;
 use App\Http\Controllers\Chat\ChatModerationController;
 use App\Http\Controllers\Chat\ChatPageController;
-use App\Http\Middleware\EnsureNotImpersonating;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Lecturer\DashboardController as LecturerDashboardController;
 use App\Http\Controllers\Lecturer\EvaluationController as LecturerEvaluationController;
@@ -27,7 +28,9 @@ use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController
 use App\Http\Controllers\Mentor\EvaluationController as MentorEvaluationController;
 use App\Http\Controllers\Mentor\LogbookController as MentorLogbookController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PushController;
 use App\Http\Controllers\Student\ApplicationController as StudentApplicationController;
 use App\Http\Controllers\Student\CertificateController as StudentCertificateController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
@@ -38,6 +41,9 @@ use App\Http\Controllers\University\DashboardController as UniversityDashboardCo
 use App\Http\Controllers\University\LecturerController as UniversityLecturerController;
 use App\Http\Controllers\University\LetterController as UniversityLetterController;
 use App\Http\Controllers\University\ProfileController as UniversityProfileController;
+use App\Http\Middleware\EnsureNotImpersonating;
+use App\Models\Application;
+use App\Models\Placement;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,7 +63,7 @@ Route::get('/dashboard', [StudentDashboardController::class, 'index'])
 
 // Route Publik Verifikasi QR Code Surat Balasan (Hash Token Unik; fallback ID angka opsional via VERIFY_NUMERIC_FALLBACK)
 Route::get('/verify-letter/{token}', function ($token) {
-    $application = \App\Models\Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor'])
+    $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor'])
         ->whereIn('status', ['accepted', 'active', 'completed'])
         ->where(function ($q) use ($token) {
             $q->where('letter_token', $token);
@@ -74,20 +80,20 @@ Route::get('/verify-letter/{token}', function ($token) {
 
 // Route Publik Verifikasi QR Code Sertifikat Magang (Hash Token Unik; fallback ID angka opsional via VERIFY_NUMERIC_FALLBACK)
 Route::get('/verify-certificate/{token}', function ($token) {
-    $placement = \App\Models\Placement::with([
-        'application.user.studentProfile', 
-        'application.unit.agencyProfile', 
-        'evaluation', 
-        'pembimbing', 
-        'mentor', 
-        'academicAdvisor'
+    $placement = Placement::with([
+        'application.user.studentProfile',
+        'application.unit.agencyProfile',
+        'evaluation',
+        'pembimbing',
+        'mentor',
+        'academicAdvisor',
     ])
         ->where(function ($q) use ($token) {
             $q->where('certificate_hash', $token);
             // Fallback ID angka hanya untuk dokumen lama & harus diaktifkan eksplisit (VERIFY_NUMERIC_FALLBACK=true)
             if (config('app.verify_numeric_fallback') && ctype_digit((string) $token)) {
                 $q->orWhere('id', (int) $token)
-                  ->orWhere('application_id', (int) $token);
+                    ->orWhere('application_id', (int) $token);
             }
         })
         ->firstOrFail();
@@ -108,6 +114,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/phone', [ProfileController::class, 'updatePhone'])->name('profile.phone.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Web Push Notifications
+    Route::post('/push-subscriptions', [PushController::class, 'store'])->name('push.store');
 
     // Route Impersonation (Login As & Kembali ke Super Admin)
     Route::post('/admin/impersonate/leave', [ImpersonationController::class, 'leave'])->name('admin.impersonate.leave');
@@ -137,6 +146,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/conversations/{conversation}', [ChatApiController::class, 'show'])->name('conversations.show');
                 Route::get('/conversations/{conversation}/media', [ChatApiController::class, 'media'])->name('conversations.media');
                 Route::get('/conversations/{conversation}/messages', [ChatMessageController::class, 'index'])->name('messages.index');
+                Route::get('/messages/{message}/comments', [ChatMessageController::class, 'comments'])->name('messages.comments.index');
                 Route::post('/conversations/{conversation}/read', [ChatMessageController::class, 'read'])->name('messages.read');
                 Route::post('/conversations/{conversation}/typing', [ChatMessageController::class, 'typing'])->name('messages.typing');
             });
@@ -144,6 +154,7 @@ Route::middleware('auth')->group(function () {
             // Aksi tulis (diblokir saat "Login As")
             Route::middleware(['throttle:chat-send', EnsureNotImpersonating::class])->group(function () {
                 Route::post('/conversations/{conversation}/messages', [ChatMessageController::class, 'store'])->name('messages.store');
+                Route::post('/messages/{message}/comments', [ChatMessageController::class, 'storeComment'])->name('messages.comments.store');
                 Route::delete('/messages/{message}', [ChatMessageController::class, 'destroy'])->name('messages.destroy');
                 Route::post('/messages/{message}/report', [ChatMessageController::class, 'report'])->name('messages.report');
                 Route::post('/groups', [ChatGroupController::class, 'store'])->name('groups.store');
@@ -166,7 +177,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/final-reports/{id}/file', [StudentFinalReportController::class, 'showFile'])->name('final_reports.show');
 
     // Dokumen Persyaratan Pengajuan (CV, Transkrip, KTM, Surat Pengantar) — akses terotorisasi, bukan URL publik
-    Route::get('/documents/applications/{id}', [\App\Http\Controllers\DocumentController::class, 'showApplicationDocument'])->name('documents.application');
+    Route::get('/documents/applications/{id}', [DocumentController::class, 'showApplicationDocument'])->name('documents.application');
+    Route::get('/documents/applications/{id}/download', [DocumentController::class, 'downloadApplicationDocument'])->name('documents.application.download');
+
+    // Berkas pribadi di disk privat (lampiran logbook, foto profil, lampiran tiket) — akses terotorisasi
+    Route::get('/files/logbooks/{logbook}/attachment', [PrivateFileController::class, 'logbookAttachment'])->name('logbooks.attachment');
+    Route::get('/files/students/{userId}/photo', [PrivateFileController::class, 'studentPhoto'])->whereNumber('userId')->name('student.photo');
+    Route::get('/files/feedbacks/{id}/attachment', [PrivateFileController::class, 'feedbackAttachment'])->name('feedbacks.attachment');
 
     // ==========================================
     // 1. ROUTE KHUSUS MAHASISWA
@@ -175,7 +192,7 @@ Route::middleware('auth')->group(function () {
         // Profil Mahasiswa
         Route::get('/student/profile', [StudentProfileController::class, 'edit'])->name('student.profile.edit');
         Route::post('/student/profile', [StudentProfileController::class, 'update'])->name('student.profile.update');
-        
+
         // Pengajuan Magang
         Route::get('/student/application', [StudentApplicationController::class, 'create'])->name('student.application.create');
         Route::post('/student/application', [StudentApplicationController::class, 'store'])->name('student.application.store');
@@ -209,15 +226,17 @@ Route::middleware('auth')->group(function () {
 
         // Verifikasi Pengajuan Magang
         Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
+        Route::post('/admin/applications/bulk-update', [AdminApplicationController::class, 'bulkUpdateStatus'])->name('admin.applications.bulk_update');
         Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show');
         Route::match(['put', 'patch'], '/admin/applications/{id}', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus');
         Route::get('/admin/applications/{id}/letter', [AdminApplicationController::class, 'downloadLetter'])->name('admin.applications.letter');
+        Route::patch('/admin/applications/{id}/assignment', [PlacementAssignmentController::class, 'update'])->name('admin.applications.assignment');
 
         // Review Logbook Mahasiswa
         Route::get('/admin/logbooks', [AdminLogbookController::class, 'index'])->name('admin.logbooks.index');
         Route::get('/admin/logbooks/{id}', [AdminLogbookController::class, 'show'])->name('admin.logbooks.show');
         Route::match(['put', 'patch'], '/admin/logbooks/{id}/review', [AdminLogbookController::class, 'review'])->name('admin.logbooks.review');
-        
+
         // Penerbitan Sertifikat
         Route::get('/admin/certificates', [AdminCertificateController::class, 'index'])->name('admin.certificates.index');
         Route::get('/admin/certificates/{placementId}/preview', [AdminCertificateController::class, 'show'])->name('admin.certificates.show');
@@ -228,8 +247,8 @@ Route::middleware('auth')->group(function () {
         Route::match(['put', 'patch', 'post'], '/admin/agency-profile', [AdminAgencyProfileController::class, 'update'])->name('admin.agency_profile.update');
 
         // Manajemen Master Unit & Kuota Magang
-        Route::resource('/admin/units', \App\Http\Controllers\Admin\UnitController::class)->names('admin.units');
-        Route::patch('/admin/units/{id}/quota', [\App\Http\Controllers\Admin\UnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
+        Route::resource('/admin/units', UnitController::class)->names('admin.units');
+        Route::patch('/admin/units/{id}/quota', [UnitController::class, 'updateQuota'])->name('admin.units.updateQuota');
 
         // Master Instansi Dinas
         Route::post('/admin/agencies/{id}/create-account', [AdminAgencyController::class, 'createAccount'])->name('admin.agencies.create_account');
@@ -243,6 +262,8 @@ Route::middleware('auth')->group(function () {
 
         // Master Perguruan Tinggi (Universitas)
         Route::post('/admin/universities/{id}/create-account', [AdminUniversityController::class, 'createAccount'])->name('admin.universities.create_account');
+        Route::post('/admin/universities/{id}/verify', [AdminUniversityController::class, 'verify'])->name('admin.universities.verify');
+        Route::post('/admin/universities/{id}/merge', [AdminUniversityController::class, 'merge'])->name('admin.universities.merge');
         Route::post('/admin/universities/{id}/dosens', [AdminUniversityController::class, 'storeDosen'])->name('admin.universities.dosens.store');
         Route::post('/admin/universities/{id}/dosens/{dosenId}/reset-password', [AdminUniversityController::class, 'resetDosenPassword'])->name('admin.universities.dosens.reset_password');
         Route::delete('/admin/universities/{id}/dosens/{dosenId}', [AdminUniversityController::class, 'destroyDosen'])->name('admin.universities.dosens.destroy');
@@ -274,7 +295,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index'])->name('mentor.dashboard');
         Route::get('/mentor/students/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('mentor.students.show');
         Route::get('/mentor/logbooks', [MentorLogbookController::class, 'index'])->name('mentor.logbooks.index');
-        Route::get('/mentor/logbooks/{id}', [AdminLogbookController::class, 'show'])->name('mentor.logbooks.show');
+        Route::get('/mentor/logbooks/{id}', [MentorLogbookController::class, 'show'])->name('mentor.logbooks.show');
         Route::put('/mentor/logbooks/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('mentor.logbooks.updateStatus');
         Route::get('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('mentor.evaluations.create');
         Route::post('/mentor/students/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('mentor.evaluations.store');
@@ -283,7 +304,7 @@ Route::middleware('auth')->group(function () {
         // Backward compatibility
         Route::get('/pembimbing/dashboard', [MentorDashboardController::class, 'index'])->name('pembimbing.dashboard');
         Route::get('/pembimbing/student/{placementId}', [MentorDashboardController::class, 'showStudent'])->name('pembimbing.student.detail');
-        Route::get('/pembimbing/logbook/{id}', [AdminLogbookController::class, 'show'])->name('pembimbing.logbook.show');
+        Route::get('/pembimbing/logbook/{id}', [MentorLogbookController::class, 'show'])->name('pembimbing.logbook.show');
         Route::put('/pembimbing/logbook/{logbookId}', [MentorLogbookController::class, 'updateStatus'])->name('pembimbing.logbook.updateStatus');
         Route::get('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'create'])->name('pembimbing.evaluation.create');
         Route::post('/pembimbing/student/{placementId}/evaluation', [MentorEvaluationController::class, 'store'])->name('pembimbing.evaluation.store');
@@ -316,7 +337,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/university/students/{placementId}', [UniversityDashboardController::class, 'showStudent'])->name('university.students.show');
         Route::post('/university/students/{application}/assign-advisor', [UniversityDashboardController::class, 'assignAdvisor'])->name('university.students.assign_advisor');
         Route::get('/university/students/{application}/letter', [UniversityLetterController::class, 'generateLetter'])->name('university.students.letter');
-        
+
         // Profil & Kop Surat Kampus
         Route::get('/university/profile', [UniversityProfileController::class, 'index'])->name('university.profile.index');
         Route::match(['put', 'patch', 'post'], '/university/profile', [UniversityProfileController::class, 'update'])->name('university.profile.update');

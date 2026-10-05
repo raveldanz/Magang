@@ -63,7 +63,7 @@
                 $user = auth()->user();
                 $dashboardUrl = route('dashboard');
                 if ($user) {
-                    if ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id))) {
+                    if ($user->isSuperAdmin()) {
                         $dashboardUrl = route('admin.dashboard');
                     } elseif ($user->role === 'admin') {
                         $dashboardUrl = route('admin.applications.index');

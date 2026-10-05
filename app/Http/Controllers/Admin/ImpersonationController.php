@@ -19,9 +19,9 @@ class ImpersonationController extends Controller
         $originalSuperAdminId = $request->session()->get('impersonator_id');
 
         // Verifikasi hak Super Admin (baik akun asli maupun sesi penyamaran aktif dari Super Admin)
-        $isSuperAdmin = ($currentUser && ($currentUser->role === 'super_admin' || ($currentUser->role === 'admin' && is_null($currentUser->agency_profile_id))));
+        $isSuperAdmin = ($currentUser?->isSuperAdmin() ?? false);
 
-        if (!$isSuperAdmin && !$originalSuperAdminId) {
+        if (! $isSuperAdmin && ! $originalSuperAdminId) {
             abort(403, 'Hanya Super Administrator yang berhak menggunakan fitur penyamaran (Login As).');
         }
 
@@ -37,7 +37,7 @@ class ImpersonationController extends Controller
         }
 
         // Larang impersonate sesama Super Admin
-        $isTargetSuperAdmin = ($targetUser->role === 'super_admin' || ($targetUser->role === 'admin' && is_null($targetUser->agency_profile_id)));
+        $isTargetSuperAdmin = $targetUser->isSuperAdmin();
         if ($isTargetSuperAdmin) {
             return redirect()->back()->with('error', 'Tidak dapat melakukan penyamaran (impersonasi) ke akun Super Admin lain.');
         }
@@ -73,7 +73,7 @@ class ImpersonationController extends Controller
         };
 
         return redirect()->to($targetRoute)
-            ->with('info', "Anda sekarang masuk sebagai {$targetUser->name} (" . strtoupper($role) . ")");
+            ->with('info', "Anda sekarang masuk sebagai {$targetUser->name} (".strtoupper($role).')');
     }
 
     /**
@@ -81,7 +81,7 @@ class ImpersonationController extends Controller
      */
     public function leave(Request $request)
     {
-        if (!$request->session()->has('impersonator_id')) {
+        if (! $request->session()->has('impersonator_id')) {
             return redirect()->route('dashboard');
         }
 
@@ -109,4 +109,3 @@ class ImpersonationController extends Controller
             ->with('success', "Sesi penyamaran berakhir. Selamat datang kembali, {$originalUser->name}!");
     }
 }
-

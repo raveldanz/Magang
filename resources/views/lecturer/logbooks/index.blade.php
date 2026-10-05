@@ -268,7 +268,7 @@
                                                         <div x-text="entry.activity"></div>
                                                         <template x-if="entry.attachment">
                                                             <div class="mt-1">
-                                                                <a :href="'/storage/' + entry.attachment" target="_blank" class="text-[11px] text-blue-600 font-semibold hover:underline">
+                                                                <a :href="entry.attachment_url" target="_blank" class="text-[11px] text-blue-600 font-semibold hover:underline">
                                                                      Unduh Dokumen Bukti Lampiran
                                                                 </a>
                                                             </div>

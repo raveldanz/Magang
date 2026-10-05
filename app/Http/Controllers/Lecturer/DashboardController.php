@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Lecturer;
 
+use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Placement;
@@ -42,10 +43,10 @@ class DashboardController extends Controller
 
             $query->whereHas('application.user', function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
-                      $sp->where('nim', $like, "%{$search}%")
-                         ->orWhere('jurusan', $like, "%{$search}%");
-                  });
+                    ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
+                        $sp->where('nim', $like, "%{$search}%")
+                            ->orWhere('jurusan', $like, "%{$search}%");
+                    });
             });
         }
 
@@ -58,7 +59,7 @@ class DashboardController extends Controller
         if ($request->filled('report_status')) {
             $status = strtolower($request->report_status);
             // Filter per kode status laporan (sama dengan badge yang tampil)
-            if (\App\Enums\ReviewStatus::tryFrom($status)) {
+            if (ReviewStatus::tryFrom($status)) {
                 $query->whereHas('finalreport', fn ($q) => $q->where('status', $status));
             } elseif ($status === 'none') {
                 $query->whereDoesntHave('finalreport');
@@ -71,12 +72,15 @@ class DashboardController extends Controller
         $totalStudents = $placements->count();
         $totalEvaluated = $placements->filter(function ($p) {
             $eval = $p->evaluation;
-            if (!$eval) return false;
+            if (! $eval) {
+                return false;
+            }
             $univ = $eval->getUniversity();
             if ($univ && $univ->evaluation_scheme === 'mentor_only') {
                 return ($eval->nilai_pembimbing ?? 0) > 0;
             }
-            return ($eval->nilai_akademik > 0 || $eval->nilai_dosen > 0);
+
+            return $eval->nilai_akademik > 0 || $eval->nilai_dosen > 0;
         })->count();
         $totalPendingEval = max(0, $totalStudents - $totalEvaluated);
         $totalReportsApproved = $placements->filter(function ($p) {
@@ -126,9 +130,9 @@ class DashboardController extends Controller
         ])->where('application_id', $placementId)->firstOrFail();
 
         $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
-        $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
+        $isSuperAdmin = $lecturer->isSuperAdmin();
 
-        if (!$isAssignedAdvisor && !$isSuperAdmin) {
+        if (! $isAssignedAdvisor && ! $isSuperAdmin) {
             abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
         }
 

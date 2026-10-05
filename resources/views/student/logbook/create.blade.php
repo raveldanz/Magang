@@ -49,8 +49,8 @@
         handleAttachment(e) {
             const file = e.target.files[0];
             if (file) {
-                if (file.size > 3 * 1024 * 1024) {
-                    notify('Ukuran berkas lampiran maksimal 3MB.');
+                if (file.size > 2 * 1024 * 1024) {
+                    notify('Ukuran berkas lampiran maksimal 2MB.');
                     e.target.value = '';
                     if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
                     this.fileUrl = null;
@@ -79,7 +79,7 @@
 
     <!-- Baris Status & Aksi -->
     <div class="flex items-center justify-between pt-0.5 text-xs">
-        <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 3MB)</p>
+        <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
         
         <a x-show="fileUrl" 
            x-cloak 
@@ -127,8 +127,8 @@
 
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                if (file.size > 3 * 1024 * 1024) {
-                    notify('Ukuran berkas melebihi batas maksimal 3MB.');
+                if (file.size > 2 * 1024 * 1024) {
+                    notify('Ukuran berkas melebihi batas maksimal 2MB.');
                     input.value = '';
                     box.classList.add('hidden');
                     box.classList.remove('flex');

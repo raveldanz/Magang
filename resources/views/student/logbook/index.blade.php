@@ -141,7 +141,7 @@
                         <div class="text-xs text-blue-900 space-y-1">
                             <p class="font-bold">Informasi Akses Logbook:</p>
                             <p class="text-blue-800 leading-relaxed">
-                                Fitur pengisian <strong>Logbook Harian</strong> akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh instansi penempatan dan data DPL telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
+                                Fitur pengisian <strong>Logbook Harian</strong> akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh instansi penempatan dan masa magang dimulai. Anda dapat mengecek pembaruan status secara berkala di portal ini.
                             </p>
                         </div>
                     </div>
@@ -164,21 +164,20 @@
                     </div>
                 </div>
 
-            @elseif ($lifecycle === 'ACCEPTED' || ($lifecycle === 'ACTIVE' && $requiresDpl && (!$placement || empty($placement->academic_advisor_id))))
+            @elseif ($lifecycle === 'ACCEPTED')
                 <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-2xl shadow-xs">
                     <div class="flex items-start justify-between flex-wrap gap-4">
                         <div class="flex items-start gap-3">
                             <div>
                                 <h4 class="font-bold text-amber-900 text-sm sm:text-base">
-                                    {{ ($requiresDpl && (!$placement || empty($placement->academic_advisor_id))) ? 'Dosen Pembimbing Belum Dipilih' : 'Pengajuan Telah Disetujui (Menunggu Tanggal Mulai Magang)' }}
+                                    Pengajuan Telah Disetujui (Menunggu Tanggal Mulai Magang)
                                 </h4>
+                                <p class="text-xs text-amber-700 mt-0.5">
+                                    Pengajuan Anda sudah diterima. Logbook harian akan terbuka otomatis saat tanggal mulai magang pada tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong>.
+                                </p>
                                 @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
-                                    <p class="text-xs sm:text-sm text-amber-700 mt-1 leading-relaxed">
-                                        Silahkan memilih Dosen Pembimbing Lapangan terlebih dahulu agar dapat mengakses fitur pengisian Logbook harian.
-                                    </p>
-                                @else
-                                    <p class="text-xs text-amber-700 mt-0.5">
-                                        Pengajuan Anda sudah diterima. Logbook harian akan terbuka otomatis saat tanggal mulai magang pada tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong>.
+                                    <p class="text-xs text-amber-700 mt-1 leading-relaxed">
+                                        Dosen Pembimbing Lapangan (DPL) belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi dosen akan menyusul setelah DPL ditetapkan kampus.
                                     </p>
                                 @endif
                             </div>
@@ -203,7 +202,7 @@
                                 </p>
                             </div>
                         </div>
-                        @if ($placement)
+                        @if ($placement && $application->isCertificateEligible())
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('student.certificate.download', $placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,6 +239,29 @@
             {{-- ========================================================================= --}}
             @if ($application && in_array($lifecycle, ['ACTIVE', 'ACCEPTED', 'COMPLETED']))
 
+                {{-- Masa magang sudah berakhir tetapi syarat kelulusan belum lengkap --}}
+                @if ($application->isPastEndDate())
+                    <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-2xl shadow-xs text-xs text-rose-900">
+                        <p class="font-bold">Masa magang Anda telah berakhir {{ $application->daysPastEndDate() }} hari lalu.</p>
+                        <p class="mt-0.5">Segera lengkapi laporan akhir dan pastikan penilaian pembimbing sudah masuk agar status kelulusan &amp; sertifikat dapat diterbitkan.
+                            <a href="{{ route('student.final_report.index') }}" class="underline font-semibold">Buka Laporan Akhir</a></p>
+                    </div>
+                @endif
+
+                {{-- Info non-blocking: pembimbing menyusul (mentor/DPL belum ditugaskan) --}}
+                @if ($lifecycle === 'ACTIVE' && $placement && (!$placement->hasFieldMentor() || ($requiresDpl && !$placement->hasAcademicAdvisor())))
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-2xl shadow-xs text-xs text-amber-900 space-y-1">
+                        <p class="font-bold">Pembimbing Anda sedang dalam proses penugasan — logbook tetap dapat diisi.</p>
+                        @unless ($placement->hasFieldMentor())
+                            <p>&bull; Mentor Dinas belum ditunjuk: logbook Anda divalidasi sementara oleh <strong>Admin Dinas</strong> instansi penempatan.</p>
+                        @endunless
+                        @if ($requiresDpl && !$placement->hasAcademicAdvisor())
+                            <p>&bull; Dosen Pembimbing Lapangan (DPL) belum ditugaskan kampus: validasi dosen akan dilakukan setelah DPL ditetapkan.
+                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih DPL di Dashboard</a> bila sudah mengetahui dosen Anda.</p>
+                        @endif
+                    </div>
+                @endif
+
                 {{-- Card 1: Informasi Penempatan Magang --}}
                 <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
                     <div class="flex items-center justify-between mb-4 border-b border-blue-500 pb-3">
@@ -259,11 +281,11 @@
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
                             <p class="text-blue-200 uppercase tracking-wider mb-0.5">Mentor Lapangan Dinas</p>
-                            <p class="font-bold text-sm text-white">{{ $placement->mentor->name ?? $placement->pembimbing->name ?? 'Belum Ditentukan' }}</p>
+                            <p class="font-bold text-sm text-white">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan (divalidasi Admin Dinas)' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
                             <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing</p>
-                            <p class="font-bold text-sm text-white">{{ $placement->academicAdvisor->name ?? 'Belum Ditentukan' }}</p>
+                            <p class="font-bold text-sm text-white">{{ $placement?->academicAdvisor?->name ?? 'Belum Ditugaskan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
                             <p class="text-blue-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
@@ -307,7 +329,7 @@
 
                         {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
 @if ($lifecycle === 'ACTIVE')
-    @if (!$requiresDpl || ($placement && !empty($placement->academic_advisor_id)))
+    @if ($placement)
         {{-- Tombol Aktif / Bisa Dipencet --}}
         <a href="{{ route('student.logbook.create') }}" 
            class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
@@ -320,7 +342,7 @@
         {{-- Tombol Terkunci / Disable jika belum pilih DPL --}}
         <button type="button" 
                 disabled 
-                title="Pilih Dosen Pembimbing Lapangan di Dashboard terlebih dahulu untuk membuka akses pengisian logbook"
+                title="Data penempatan magang Anda belum tersedia. Hubungi Admin Dinas."
                 class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 text-slate-400 border border-slate-300 rounded-xl text-xs font-bold cursor-not-allowed select-none shadow-none">
             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -377,8 +399,8 @@
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" 
-                                                   @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                                <a href="{{ $log->attachment_url }}" 
+                                                   @click.prevent="$dispatch('open-lightbox', { url: '{{ $log->attachment_url }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
                                                    target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                                     <span>Buka Lampiran</span>
@@ -454,8 +476,8 @@
                                         </span>
                                     </div>
                                     @if ($log->attachment)
-                                        <a href="{{ asset('storage/' . $log->attachment) }}" 
-                                           @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                        <a href="{{ $log->attachment_url }}" 
+                                           @click.prevent="$dispatch('open-lightbox', { url: '{{ $log->attachment_url }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
                                            target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                             <span>Lampiran</span>

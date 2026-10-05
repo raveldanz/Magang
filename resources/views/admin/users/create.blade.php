@@ -92,15 +92,12 @@
                         <label class="block text-xs font-bold text-blue-900 uppercase tracking-wider">
                             Pilih Instansi Dinas Terkait
                         </label>
-                        <select name="agency_profile_id"
-                            class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="">-- Tanpa Instansi / Global Superadmin --</option>
-                            @foreach($agencies as $ag)
-                                <option value="{{ $ag->id }}" {{ old('agency_profile_id', request('agency_id')) == $ag->id ? 'selected' : '' }}>
-                                    {{ $ag->agency_name }} ({{ $ag->city }})
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-searchable-select
+                            name="agency_profile_id"
+                            placeholder="-- Tanpa Instansi / Global Superadmin --"
+                            :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
+                            :selected="old('agency_profile_id', request('agency_id'))"
+                        />
                     </div>
 
                     <!-- Input Universitas jika Role Universitas / Dosen / Mahasiswa -->
@@ -109,15 +106,12 @@
                         <label class="block text-xs font-bold text-sky-900 uppercase tracking-wider">
                             Pilih Perguruan Tinggi Terkait
                         </label>
-                        <select name="university_id"
-                            class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="">-- Pilih Universitas --</option>
-                            @foreach($universities as $un)
-                                <option value="{{ $un->id }}" {{ old('university_id') == $un->id ? 'selected' : '' }}>
-                                    {{ $un->name }} ({{ $un->code }})
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-searchable-select
+                            name="university_id"
+                            placeholder="-- Pilih Universitas --"
+                            :items="$universities->map(fn($un) => ['id' => $un->id, 'name' => $un->name, 'acronym' => $un->acronym ?? $un->code, 'meta' => $un->code])"
+                            :selected="old('university_id', request('university_id'))"
+                        />
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">

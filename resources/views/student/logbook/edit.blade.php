@@ -98,8 +98,8 @@
                             handleAttachment(e) {
                                 const file = e.target.files[0];
                                 if (file) {
-                                    if (file.size > 3 * 1024 * 1024) {
-                                        notify('Ukuran berkas lampiran maksimal 3MB.');
+                                    if (file.size > 2 * 1024 * 1024) {
+                                        notify('Ukuran berkas lampiran maksimal 2MB.');
                                         e.target.value = '';
                                         if (this.newFileUrl) URL.revokeObjectURL(this.newFileUrl);
                                         this.newFileUrl = null;
@@ -128,7 +128,7 @@
                                         <span class="text-[11px] text-slate-400">Pilih berkas baru di bawah jika ingin mengganti</span>
                                     </div>
                                 </div>
-                                <a href="{{ asset('storage/' . $logbook->attachment) }}" target="_blank" 
+                                <a href="{{ $logbook->attachment_url }}" target="_blank" 
                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-blue-600 hover:text-blue-800 border border-slate-200 rounded-xl text-xs font-bold transition shrink-0 shadow-2xs">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     <span>Buka File</span>
@@ -143,7 +143,7 @@
 
                         {{-- Baris Info & Tombol Lihat Berkas Baru --}}
                         <div class="flex items-center justify-between pt-0.5 text-xs">
-                            <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 3MB)</p>
+                            <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
                             
                             <a x-show="newFileUrl" 
                                x-cloak 

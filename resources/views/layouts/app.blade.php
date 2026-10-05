@@ -68,6 +68,23 @@
                 @include('layouts.navigation')
             </header>
 
+            {{-- Peringatan password bawaan: tidak memaksa, tapi tetap tampil di setiap halaman sampai password diganti --}}
+            @auth
+                @if (auth()->user()->must_change_password && !session()->has('impersonator_id'))
+                    <aside aria-label="Peringatan Keamanan Password" class="bg-amber-50 border-b border-amber-300 w-full">
+                        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <p class="text-xs sm:text-sm text-amber-900 flex items-start gap-2">
+                                <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <span><strong>Akun Anda masih memakai password bawaan.</strong> Siapa pun yang mengetahuinya bisa masuk ke akun ini. Segera ganti password Anda — peringatan ini akan terus tampil sampai password diganti.</span>
+                            </p>
+                            <a href="{{ route('profile.edit') }}#update-password" class="shrink-0 inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition">
+                                Ganti Password Sekarang
+                            </a>
+                        </div>
+                    </aside>
+                @endif
+            @endauth
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow-xs w-full overflow-hidden border-b border-slate-100">
@@ -175,6 +192,56 @@
         <!-- Global Triple-Confirmation Bulk Action Modal Component -->
         <x-bulk-action-modal />
 
+        @auth
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if ('serviceWorker' in navigator && 'PushManager' in window) {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                        
+                        Notification.requestPermission().then(function(permission) {
+                            if (permission === 'granted') {
+                                const vapidPublicKey = '{{ env("VAPID_PUBLIC_KEY") }}';
+                                if (vapidPublicKey) {
+                                    const applicationServerKey = urlB64ToUint8Array(vapidPublicKey);
+                                    registration.pushManager.subscribe({
+                                        userVisibleOnly: true,
+                                        applicationServerKey: applicationServerKey
+                                    }).then(function(subscription) {
+                                        fetch('/push-subscriptions', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                            },
+                                            body: JSON.stringify(subscription)
+                                        });
+                                    }).catch(function(err) {
+                                        console.log('Failed to subscribe the user: ', err);
+                                    });
+                                }
+                            }
+                        });
+                    }).catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
+                }
+                
+                function urlB64ToUint8Array(base64String) {
+                    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                    const base64 = (base64String + padding)
+                        .replace(/\-/g, '+')
+                        .replace(/_/g, '/');
+                    const rawData = window.atob(base64);
+                    const outputArray = new Uint8Array(rawData.length);
+                    for (let i = 0; i < rawData.length; ++i) {
+                        outputArray[i] = rawData.charCodeAt(i);
+                    }
+                    return outputArray;
+                }
+            });
+        </script>
+        @endauth
         @stack('scripts')
     </body>
 </html>
