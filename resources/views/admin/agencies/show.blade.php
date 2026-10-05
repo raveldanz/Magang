@@ -58,17 +58,7 @@
                     <!-- Sisi Kiri: Logo Resmi, Nama & Informasi Kontak -->
                     <div class="cc-hero-main flex items-start gap-4 sm:gap-6 flex-1 min-w-0">
                         @php
-                            $agencyLogoUrl = null;
-                            if (!empty($agency->logo)) {
-                                if (file_exists(public_path($agency->logo))) {
-                                    $agencyLogoUrl = asset($agency->logo);
-                                } elseif (file_exists(public_path('storage/' . $agency->logo)) || file_exists(storage_path('app/public/' . $agency->logo))) {
-                                    $agencyLogoUrl = asset('storage/' . $agency->logo);
-                                }
-                            }
-                            if (!$agencyLogoUrl) {
-                                $agencyLogoUrl = asset('images/default-agency.svg');
-                            }
+                            $agencyLogoUrl = $agency->logo_url;
                         @endphp
                         <div class="cc-logo border border-slate-200 rounded-xl p-2 bg-white shadow-2xs flex items-center justify-center shrink-0 overflow-hidden"
                              style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; max-width: 88px; max-height: 88px;">

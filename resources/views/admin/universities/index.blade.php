@@ -196,6 +196,20 @@
                 </div>
             @endif
 
+            <!-- Notifikasi Kampus Menunggu Verifikasi -->
+            @if(($pendingVerificationCount ?? 0) > 0)
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <p class="text-xs text-yellow-900">
+                        <strong>{{ $pendingVerificationCount }} perguruan tinggi</strong> didaftarkan mandiri oleh mahasiswa dan menunggu verifikasi.
+                    </p>
+                    @if(request('verification') === 'pending')
+                        <a href="{{ route('admin.universities.index') }}" class="px-4 py-2 bg-white border border-yellow-300 text-yellow-800 text-xs font-bold rounded-xl shrink-0">Tampilkan Semua</a>
+                    @else
+                        <a href="{{ route('admin.universities.index', ['verification' => 'pending']) }}" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold rounded-xl shrink-0">Tinjau Sekarang</a>
+                    @endif
+                </div>
+            @endif
+
             <!-- Search Bar -->
             <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs">
                 <form method="GET" action="{{ route('admin.universities.index') }}" class="flex items-center gap-3">
@@ -229,32 +243,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse($universities as $univ)
                     @php
-                        $univLogoUrl = null;
-                        if (!empty($univ->logo)) {
-                            if (file_exists(public_path($univ->logo))) {
-                                $univLogoUrl = asset($univ->logo);
-                            } elseif (file_exists(public_path('storage/' . $univ->logo)) || file_exists(storage_path('app/public/' . $univ->logo))) {
-                                $univLogoUrl = asset('storage/' . $univ->logo);
-                            }
-                        }
-                        if (!$univLogoUrl) {
-                            $uName = strtolower($univ->name ?? '');
-                            $uCode = strtolower($univ->code ?? '');
-                            if (str_contains($uName, 'unesa') || str_contains($uCode, 'unesa')) {
-                                $univLogoUrl = asset('images/logos/unesa.png');
-                            } elseif (str_contains($uName, 'its') || str_contains($uCode, 'its') || str_contains($uName, 'sepuluh nopember')) {
-                                $univLogoUrl = asset('images/logos/its.png');
-                            } elseif (str_contains($uName, 'unair') || str_contains($uCode, 'unair') || str_contains($uName, 'airlangga')) {
-                                $univLogoUrl = asset('images/logos/unair.png');
-                            } elseif (str_contains($uName, 'upn') || str_contains($uCode, 'upn') || str_contains($uName, 'veteran')) {
-                                $univLogoUrl = asset('images/logos/upnjatim.png');
-                            } elseif (str_contains($uName, 'unitomo') || str_contains($uCode, 'unitomo') || str_contains($uName, 'soetomo')) {
-                                $univLogoUrl = asset('images/logos/unitomo.png');
-                            }
-                        }
-                        if (!$univLogoUrl) {
-                            $univLogoUrl = asset('images/default-university.svg');
-                        }
+                        $univLogoUrl = $univ->logo_url;
                     @endphp
 
                     <div
@@ -272,7 +261,7 @@
                                 <div class="flex items-center gap-1.5 shrink-0">
                                     <span
                                         class="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200/80 rounded-lg text-[10px] font-bold">
-                                        {{ $univ->code }}
+                                        {{ $univ->code ?: 'BARU' }}
                                     </span>
 
                                     @if($univ->universityAdmin)
@@ -289,6 +278,22 @@
 
                             
                                 </div>
+                            </div>
+
+                            <!-- Status Verifikasi Kampus (kampus baru hasil input mandiri mahasiswa) -->
+                            <div class="mb-2">
+                                @if($univ->is_verified ?? true)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        {{ $univ->verification_label }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-50 text-yellow-800 border border-yellow-300"
+                                        title="Kampus ini didaftarkan mandiri oleh mahasiswa melalui opsi Perguruan Tinggi Lainnya">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        {{ $univ->verification_label }}
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Identitas Universitas -->
@@ -329,6 +334,59 @@
                         </div>
 
                         <!-- Action Footer Sejajar (Format Baku: Tombol Sekunder & Tombol Primer) -->
+                        @if($isSuperAdmin && !($univ->is_verified ?? true))
+                            <form method="POST" action="{{ route('admin.universities.verify', $univ->id) }}" class="m-0 mb-2">
+                                @csrf
+                                <button type="button"
+                                    @click="$dispatch('open-confirm-modal', {
+                                        form: $el.form,
+                                        title: 'Verifikasi Perguruan Tinggi',
+                                        message: 'Kampus ini didaftarkan mandiri oleh mahasiswa. Pastikan nama perguruan tinggi benar dan tidak duplikat dengan kampus yang sudah terdaftar.',
+                                        label: 'Perguruan tinggi:',
+                                        name: @js($univ->name),
+                                        desc: 'Setelah diverifikasi, kampus akan tampil di dropdown pendaftaran semua mahasiswa.',
+                                        confirmText: 'Ya, Verifikasi'
+                                    })"
+                                    class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs">
+                                    Verifikasi Kampus
+                                </button>
+                            </form>
+
+                            {{-- Gabungkan ke kampus terdaftar bila ternyata dobel (salah ketik / singkatan) --}}
+                            @php
+                                $suggestedIds = $mergeSuggestions[$univ->id] ?? [];
+                                $mergeOptions = ($verifiedOptions ?? collect())->sortBy(fn ($o) => in_array($o->id, $suggestedIds) ? array_search($o->id, $suggestedIds) : 999)->values();
+                            @endphp
+                            @if ($mergeOptions->isNotEmpty())
+                                <form method="POST" action="{{ route('admin.universities.merge', $univ->id) }}" class="m-0 mb-2 space-y-1.5">
+                                    @csrf
+                                    @if (!empty($suggestedIds))
+                                        <p class="text-[10px] font-bold text-blue-700">Kemungkinan dobel dengan kampus terdaftar (ditandai ★)</p>
+                                    @endif
+                                    <div class="flex items-center gap-1.5">
+                                        <select name="target_university_id" required class="flex-1 min-w-0 text-[11px] border-slate-200 rounded-xl py-2">
+                                            <option value="">Gabungkan ke…</option>
+                                            @foreach ($mergeOptions as $opt)
+                                                <option value="{{ $opt->id }}" @selected(($suggestedIds[0] ?? null) === $opt->id)>{{ in_array($opt->id, $suggestedIds) ? '★ ' : '' }}{{ $opt->name }}{{ ($opt->acronym ?? $opt->code) ? ' (' . ($opt->acronym ?? $opt->code) . ')' : '' }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button"
+                                            @click="$dispatch('open-confirm-modal', {
+                                                form: $el.form,
+                                                title: 'Gabungkan Kampus Dobel',
+                                                message: 'Semua mahasiswa, dosen, dan akun yang tercatat di kampus ini akan dipindahkan ke kampus tujuan, lalu entri ini dihapus.',
+                                                label: 'Kampus yang digabungkan:',
+                                                name: @js($univ->name),
+                                                desc: 'Tindakan ini tidak dapat dibatalkan.',
+                                                confirmText: 'Ya, Gabungkan'
+                                            })"
+                                            class="shrink-0 py-2 px-3 rounded-xl border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 font-bold text-[11px] transition cursor-pointer">
+                                            Gabungkan
+                                        </button>
+                                    </div>
+                                </form>
+                            @endif
+                        @endif
                         <div class="flex items-center gap-2 pt-2">
                             @if($isSuperAdmin && !$univ->universityAdmin)
                                 <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}"
