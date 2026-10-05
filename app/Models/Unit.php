@@ -14,6 +14,12 @@ class Unit extends Model
         return $this->belongsTo(AgencyProfile::class, 'agency_profile_id');
     }
 
+    // Relasi: Kepala / Koordinator Unit (akun mentor instansi, opsional)
+    public function head()
+    {
+        return $this->belongsTo(User::class, 'head_user_id');
+    }
+
     // Relasi: Satu Unit memiliki banyak pengajuan magang
     public function applications()
     {
@@ -24,7 +30,10 @@ class Unit extends Model
     // Memakai relasi yang sudah di-eager-load bila ada, agar halaman daftar divisi tidak N+1
     public function getOccupiedCountAttribute(): int
     {
-        if (!$this->relationLoaded('applications')) {
+        if (array_key_exists('occupied_count_db', $this->attributes)) {
+            return (int) $this->attributes['occupied_count_db'];
+        }
+        if (! $this->relationLoaded('applications')) {
             return $this->applications()->occupyingQuota()->count();
         }
 

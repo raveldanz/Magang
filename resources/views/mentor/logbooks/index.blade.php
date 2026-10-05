@@ -92,6 +92,9 @@
                                 <div>
                                     <div class="font-bold text-gray-900 text-sm">{{ $student->name ?? '-' }}</div>
                                     <div class="text-xs text-gray-500">{{ $unit->name ?? '-' }} &bull; Tanggal: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}</div>
+                                    @if ($log->placement && !$log->placement->hasFieldMentor())
+                                        <span class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">Validasi sementara sebagai Kepala Unit (mentor belum ditunjuk)</span>
+                                    @endif
                                 </div>
                             </div>
 
@@ -110,7 +113,7 @@
 
                         @if ($log->attachment)
                             <div class="pt-1">
-                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold bg-blue-50 px-3 py-1.5 rounded-lg">
+                                <a href="{{ $log->attachment_url }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold bg-blue-50 px-3 py-1.5 rounded-lg">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                     </svg>
