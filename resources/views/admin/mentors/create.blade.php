@@ -59,12 +59,13 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Instansi Dinas <span class="text-rose-500">*</span>
                             </label>
-                            <select name="agency_profile_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                <option value="">-- Pilih Dinas --</option>
-                                @foreach($agencies as $ag)
-                                    <option value="{{ $ag->id }}" {{ old('agency_profile_id') == $ag->id ? 'selected' : '' }}>{{ $ag->agency_name }}</option>
-                                @endforeach
-                            </select>
+                            <x-searchable-select
+                                name="agency_profile_id"
+                                placeholder="-- Pilih Dinas --"
+                                :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
+                                :selected="old('agency_profile_id')"
+                                :required="true"
+                            />
                         </div>
                     @endif
 

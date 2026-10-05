@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ApplicationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -51,6 +52,92 @@ class Placement extends Model
     public function application()
     {
         return $this->belongsTo(Application::class);
+    }
+
+    /**
+     * Apakah penempatan sudah memiliki mentor lapangan teknis (mentor_id / pembimbing_id legacy).
+     */
+    public function hasFieldMentor(): bool
+    {
+        return ! empty($this->mentor_id) || ! empty($this->pembimbing_id);
+    }
+
+    /**
+     * Apakah penempatan sudah memiliki Dosen Pembimbing Lapangan (DPL kampus).
+     */
+    public function hasAcademicAdvisor(): bool
+    {
+        return ! empty($this->academic_advisor_id);
+    }
+
+    /**
+     * ID instansi (agency_profile_id) tempat mahasiswa ditempatkan, via unit pada pengajuan.
+     */
+    public function agencyProfileId(): ?int
+    {
+        $agencyId = $this->application?->unit?->agency_profile_id;
+
+        return $agencyId !== null ? (int) $agencyId : null;
+    }
+
+    /**
+     * Fallback verifikator logbook: selama mahasiswa aktif belum memiliki mentor teknis
+     * (baru terikat di level unit/instansi), Admin Dinas instansi terkait — atau Super Admin —
+     * boleh sementara melihat & memvalidasi logbooknya. Setelah mentor ditetapkan, hak validasi
+     * kembali sepenuhnya ke mentor.
+     */
+    public function allowsAgencyAdminLogbookFallback(?User $user): bool
+    {
+        if (! $user || $this->hasFieldMentor()) {
+            return false;
+        }
+
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        return $user->role === 'admin'
+            && $user->agency_profile_id !== null
+            && (int) $user->agency_profile_id === $this->agencyProfileId();
+    }
+
+    /**
+     * Apakah user adalah mentor teknis yang ditugaskan pada penempatan ini.
+     */
+    public function isAssignedFieldMentor(?User $user): bool
+    {
+        return $user !== null
+            && ((int) $this->mentor_id === (int) $user->id || (int) $this->pembimbing_id === (int) $user->id)
+            && ! empty($user->id);
+    }
+
+    /**
+     * Apakah user adalah Kepala / Koordinator Unit tempat mahasiswa ditempatkan.
+     */
+    public function isUnitHead(?User $user): bool
+    {
+        $headId = $this->application?->unit?->head_user_id;
+
+        return $user !== null && $headId !== null && (int) $headId === (int) $user->id;
+    }
+
+    /**
+     * Siapa yang boleh meninjau & memvalidasi logbook dari sisi instansi (kolom status/feedback):
+     *  - mentor teknis yang ditugaskan; ATAU
+     *  - selama mentor belum ditunjuk (fallback): Admin Dinas instansi terkait, Super Admin,
+     *    atau Kepala Unit tempat mahasiswa ditempatkan.
+     */
+    public function canFieldReviewLogbook(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($this->hasFieldMentor()) {
+            return $this->isAssignedFieldMentor($user);
+        }
+
+        return $this->allowsAgencyAdminLogbookFallback($user) || $this->isUnitHead($user);
     }
 
     // Relasi ke User (Pembimbing Lapangan Dinas / Mentor)
@@ -130,7 +217,7 @@ class Placement extends Model
         $finalReport = $this->finalreport;
         $eval = $this->evaluation;
 
-        if (!$app || !$finalReport || strtolower($finalReport->status ?? '') !== 'approved') {
+        if (! $app || ! $finalReport || strtolower($finalReport->status ?? '') !== 'approved') {
             return false;
         }
 
@@ -140,15 +227,16 @@ class Placement extends Model
         }
 
         if ($eval && $eval->is_complete) {
-            $rawStatus = $app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : strtolower((string)$app->status);
-            if ($rawStatus !== 'completed' && !in_array($rawStatus, ['resigned', 'rejected'])) {
-                $app->update(['status' => \App\Enums\ApplicationStatus::COMPLETED]);
-                
-                \App\Models\AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [
+            $rawStatus = $app->status instanceof ApplicationStatus ? $app->status->value : strtolower((string) $app->status);
+            if ($rawStatus !== 'completed' && ! in_array($rawStatus, ['resigned', 'rejected'])) {
+                $app->update(['status' => ApplicationStatus::COMPLETED]);
+
+                AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [
                     'student_name' => $app->user?->name,
                     'reason' => 'Laporan akhir disetujui, nilai evaluasi lengkap, dan logbook terisi.',
                 ]);
             }
+
             return true;
         }
 

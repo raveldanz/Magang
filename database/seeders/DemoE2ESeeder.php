@@ -2,20 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\AgencyProfile;
+use App\Models\Application;
+use App\Models\AuditLog;
+use App\Models\Evaluation;
+use App\Models\FinalReport;
+use App\Models\Logbook;
+use App\Models\Placement;
+use App\Models\StudentProfile;
 use App\Models\Unit;
 use App\Models\University;
-use App\Models\StudentProfile;
-use App\Models\Application;
-use App\Models\Placement;
-use App\Models\Logbook;
-use App\Models\FinalReport;
-use App\Models\Evaluation;
-use App\Models\AuditLog;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class DemoE2ESeeder extends Seeder
 {
@@ -328,7 +328,7 @@ class DemoE2ESeeder extends Seeder
                 'mentor_id' => $mentorKominfo->id,
                 'pembimbing_id' => $mentorKominfo->id,
                 'academic_advisor_id' => $dplUnesa->id,
-                'status' => 'completed',
+                // placements.status sudah dihapus (migrasi 2026_09_24); status kelulusan ada di applications
                 'certificate_number' => 'SERT/001/PEMKOT-SBY/2026',
                 'certificate_hash' => '2nUkl4agLziObPEKxC3JqH9sn34KayDM',
             ]
@@ -449,7 +449,6 @@ class DemoE2ESeeder extends Seeder
                 'mentor_id' => $mentorKominfo->id,
                 'pembimbing_id' => $mentorKominfo->id,
                 'academic_advisor_id' => $dplUnesa->id,
-                'status' => 'active',
             ]
         );
 

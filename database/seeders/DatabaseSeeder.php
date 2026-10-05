@@ -2,19 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Unit;
 use App\Models\AgencyProfile;
-use App\Models\University;
-use App\Models\StudentProfile;
 use App\Models\Application;
-use App\Models\Placement;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Logbook;
+use App\Models\Placement;
+use App\Models\StudentProfile;
+use App\Models\Unit;
+use App\Models\University;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
         // Run dedicated Demo E2E Seeder & Admin Workflow Seeder
         $this->call(DemoE2ESeeder::class);
         $this->call(AdminWorkflowSeeder::class);
+        $this->call(SurabayaAndTopUniversitiesSeeder::class);
+        $this->call(SurabayaAgenciesSeeder::class);
 
         // =========================================================================
         // 0. SEED USER SUPERADMIN UTAMA (SELALU TERSEDIA)
@@ -1092,7 +1094,7 @@ class DatabaseSeeder extends Seeder
                     'date' => Carbon::now()->subDays(60 - ($i * 15))->format('Y-m-d'),
                 ],
                 [
-                    'activity' => "Pengembangan dan optimalisasi sistem informasi dinas tahap " . ($i + 1),
+                    'activity' => 'Pengembangan dan optimalisasi sistem informasi dinas tahap '.($i + 1),
                     'status' => 'approved',
                     'feedback' => 'Tugas diselesaikan dengan sangat baik dan memenuhi standar.',
                     'lecturer_status' => 'approved',
@@ -1181,7 +1183,7 @@ class DatabaseSeeder extends Seeder
                     'date' => Carbon::now()->subDays(60 - ($i * 15))->format('Y-m-d'),
                 ],
                 [
-                    'activity' => "Implementasi sistem perpustakaan dan repositori digital tahap " . ($i + 1),
+                    'activity' => 'Implementasi sistem perpustakaan dan repositori digital tahap '.($i + 1),
                     'status' => 'approved',
                     'feedback' => 'Hasil implementasi memuaskan dan tervalidasi.',
                     'lecturer_status' => 'approved',
@@ -1500,10 +1502,10 @@ class DatabaseSeeder extends Seeder
                     'major' => $data['jurusan'],
                     'semester' => $data['semester'],
                     'phone' => $data['phone'],
-                    'alamat' => 'Jl. Dharmawangsa No. ' . ($index + 10) . ', Surabaya',
-                    'address' => 'Jl. Dharmawangsa No. ' . ($index + 10) . ', Surabaya',
-                    'emergency_contact_name' => 'Wali Mahasiswa ' . $data['name'],
-                    'emergency_contact_phone' => '0812998877' . str_pad($index, 2, '0', STR_PAD_LEFT),
+                    'alamat' => 'Jl. Dharmawangsa No. '.($index + 10).', Surabaya',
+                    'address' => 'Jl. Dharmawangsa No. '.($index + 10).', Surabaya',
+                    'emergency_contact_name' => 'Wali Mahasiswa '.$data['name'],
+                    'emergency_contact_phone' => '0812998877'.str_pad($index, 2, '0', STR_PAD_LEFT),
                 ]
             );
 
@@ -1527,7 +1529,7 @@ class DatabaseSeeder extends Seeder
                     'transcript_path' => 'documents/applications/sample_transkrip.pdf',
                     'id_card_path' => 'documents/applications/sample_ktm.pdf',
                     'status' => 'accepted',
-                    'letter_number' => '500.12.2/' . str_pad($index + 10, 3, '0', STR_PAD_LEFT) . '/436.7.14/' . date('Y'),
+                    'letter_number' => '500.12.2/'.str_pad($index + 10, 3, '0', STR_PAD_LEFT).'/436.7.14/'.date('Y'),
                     'letter_date' => Carbon::now()->subMonths(3)->subDays(5)->format('Y-m-d'),
                 ]
             );

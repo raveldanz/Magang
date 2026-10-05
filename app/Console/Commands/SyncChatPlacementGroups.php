@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Placement;
+use App\Models\User;
 use App\Services\Chat\ChatGroupService;
 use Illuminate\Console\Command;
 
@@ -21,20 +22,35 @@ class SyncChatPlacementGroups extends Command
         $synced = 0;
         $failed = 0;
 
-        Placement::query()->orderBy('id')->chunkById(100, function ($placements) use ($groups, &$synced, &$failed) {
-            foreach ($placements as $placement) {
-                try {
-                    if ($groups->syncPlacementGroup($placement)) {
-                        $synced++;
-                    }
-                } catch (\Throwable $e) {
-                    $failed++;
-                    report($e);
-                }
-            }
-        });
+        $mentorIds = Placement::whereNotNull('mentor_id')->pluck('mentor_id')
+            ->merge(Placement::whereNotNull('pembimbing_id')->pluck('pembimbing_id'))
+            ->unique()->filter();
 
-        $this->info("Grup Bimbingan tersinkron: {$synced}" . ($failed ? " (gagal: {$failed}, lihat log)" : ''));
+        foreach (User::whereIn('id', $mentorIds)->get() as $mentor) {
+            try {
+                if ($groups->syncMentorGroup($mentor)) {
+                    $synced++;
+                }
+            } catch (\Throwable $e) {
+                $failed++;
+                report($e);
+            }
+        }
+
+        $dplIds = Placement::whereNotNull('academic_advisor_id')->pluck('academic_advisor_id')->unique()->filter();
+
+        foreach (User::whereIn('id', $dplIds)->get() as $dpl) {
+            try {
+                if ($groups->syncDplGroup($dpl)) {
+                    $synced++;
+                }
+            } catch (\Throwable $e) {
+                $failed++;
+                report($e);
+            }
+        }
+
+        $this->info("Grup Bimbingan tersinkron: {$synced}".($failed ? " (gagal: {$failed}, lihat log)" : ''));
 
         return $failed ? self::FAILURE : self::SUCCESS;
     }

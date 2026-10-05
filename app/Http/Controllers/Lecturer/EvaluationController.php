@@ -7,6 +7,8 @@ use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Placement;
+use App\Models\University;
+use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,9 +40,9 @@ class EvaluationController extends Controller
 
         // Otorisasi: DPL yang ditugaskan (academic_advisor_id) atau Super Admin
         $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
-        $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
+        $isSuperAdmin = $lecturer->isSuperAdmin();
 
-        if (!$isAssignedAdvisor && !$isSuperAdmin) {
+        if (! $isAssignedAdvisor && ! $isSuperAdmin) {
             abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
         }
 
@@ -62,15 +64,8 @@ class EvaluationController extends Controller
         $evaluation = $placement->evaluation;
 
         $univ = $evaluation?->getUniversity();
-        if (!$univ && $student) {
-            if ($student->university_id) {
-                $univ = \App\Models\University::find($student->university_id);
-            } else {
-                $name = $student->university ?? ($profile?->universitas ?? null);
-                if ($name) {
-                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                }
-            }
+        if (! $univ && $student) {
+            $univ = app(UniversityResolver::class)->forUser($student);
         }
 
         // Jika universitas memberlakukan 100% Mentor Dinas, arahkan langsung ke halaman detail mahasiswa
@@ -107,10 +102,10 @@ class EvaluationController extends Controller
 
         $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
         $univ = $evaluation->getUniversity();
-        if (!$univ && $placement->application?->user) {
+        if (! $univ && $placement->application?->user) {
             $u = $placement->application->user;
             if ($u->university_id) {
-                $univ = \App\Models\University::find($u->university_id);
+                $univ = University::find($u->university_id);
             }
         }
         $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
@@ -121,14 +116,14 @@ class EvaluationController extends Controller
         $evaluation->feedback_dosen = $feedback;
 
         $nilaiDosen = null;
-        if (!$isMentorOnly) {
+        if (! $isMentorOnly) {
             if ($request->filled('score_mastery') && $request->filled('score_report') && $request->filled('score_attitude')) {
-                $mastery = (float)$request->score_mastery;
-                $report = (float)$request->score_report;
-                $attitude = (float)$request->score_attitude;
+                $mastery = (float) $request->score_mastery;
+                $report = (float) $request->score_report;
+                $attitude = (float) $request->score_attitude;
                 $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
             } else {
-                $nilaiDosen = (float)($request->nilai_akademik ?? 85);
+                $nilaiDosen = (float) ($request->nilai_akademik ?? 85);
                 $mastery = $nilaiDosen;
                 $report = $nilaiDosen;
                 $attitude = $nilaiDosen;
@@ -137,7 +132,7 @@ class EvaluationController extends Controller
             $evaluation->nilai_disiplin = $evaluation->nilai_disiplin ?? 0;
             $evaluation->nilai_kinerja = $evaluation->nilai_kinerja ?? 0;
             $evaluation->nilai_laporan = $evaluation->nilai_laporan ?? 0;
-            $evaluation->nilai_akademik = (int)round($nilaiDosen);
+            $evaluation->nilai_akademik = (int) round($nilaiDosen);
             $evaluation->score_mastery = $mastery;
             $evaluation->score_report = $report;
             $evaluation->score_attitude = $attitude;
@@ -147,8 +142,8 @@ class EvaluationController extends Controller
         // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
         $nilaiDinas = $evaluation->nilai_pembimbing ?? 0;
         if ($nilaiDinas > 0) {
-            $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
-            $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+            $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
+            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
 
             if ($isMentorOnly) {
                 $final = $nilaiDinas;
@@ -157,12 +152,19 @@ class EvaluationController extends Controller
             }
             $evaluation->final_score = $final;
 
-            if ($final >= 85) $grade = 'A';
-            elseif ($final >= 75) $grade = 'AB';
-            elseif ($final >= 65) $grade = 'B';
-            elseif ($final >= 55) $grade = 'BC';
-            elseif ($final >= 40) $grade = 'C';
-            else $grade = 'E';
+            if ($final >= 85) {
+                $grade = 'A';
+            } elseif ($final >= 75) {
+                $grade = 'AB';
+            } elseif ($final >= 65) {
+                $grade = 'B';
+            } elseif ($final >= 55) {
+                $grade = 'BC';
+            } elseif ($final >= 40) {
+                $grade = 'C';
+            } else {
+                $grade = 'E';
+            }
 
             $evaluation->grade = $grade;
         }
@@ -181,8 +183,8 @@ class EvaluationController extends Controller
             'grade' => $evaluation->grade ?? null,
         ]);
 
-        $successMsg = $isMentorOnly 
-            ? 'Catatan bimbingan DPL berhasil disimpan!' 
+        $successMsg = $isMentorOnly
+            ? 'Catatan bimbingan DPL berhasil disimpan!'
             : 'Nilai bimbingan akademik DPL dan catatan berhasil disimpan!';
 
         return redirect()->route('lecturer.students.show', $placement->id)

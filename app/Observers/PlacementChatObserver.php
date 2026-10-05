@@ -23,4 +23,13 @@ class PlacementChatObserver implements ShouldHandleEventsAfterCommit
             report($e);
         }
     }
+
+    public function deleted(Placement $placement): void
+    {
+        try {
+            $this->groups->syncPlacementGroup($placement);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
 }

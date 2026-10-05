@@ -29,7 +29,7 @@ class DatabaseIndexTest extends TestCase
 
         foreach ($expected as $table => $indexes) {
             foreach ($indexes as $columns) {
-                $this->assertTrue(Schema::hasIndex($table, $columns), "Index {$table}(" . implode(',', $columns) . ') belum ada');
+                $this->assertTrue(Schema::hasIndex($table, $columns), "Index {$table}(".implode(',', $columns).') belum ada');
             }
         }
     }

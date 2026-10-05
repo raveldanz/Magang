@@ -74,7 +74,7 @@
                             <div class="w-32 h-32 rounded-2xl bg-white p-2 border border-gray-200 shadow-xs flex items-center justify-center overflow-hidden mb-3">
                                 @php
                                     $defaultUnivLogo = asset('images/default-university.svg');
-                                    $currentUnivLogo = ($university->logo && file_exists(public_path($university->logo))) ? asset($university->logo) : $defaultUnivLogo;
+                                    $currentUnivLogo = $university->logo_url;
                                 @endphp
                                 <img id="univLogoPreview" src="{{ $currentUnivLogo }}" alt="Logo {{ $university->name }}" class="max-h-full max-w-full object-contain transition-all duration-200">
                             </div>

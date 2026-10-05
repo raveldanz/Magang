@@ -10,18 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('applications', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->foreignId('unit_id')->constrained()->onDelete('cascade');
-        $table->date('start_date');
-        $table->date('end_date');
-        $table->enum('status', ['pending', 'verified', 'rejected', 'accepted'])->default('pending');
-        $table->text('rejection_note')->nullable();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('applications', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('unit_id')->constrained()->onDelete('cascade');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('status', ['pending', 'verified', 'rejected', 'accepted'])->default('pending');
+            $table->text('rejection_note')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

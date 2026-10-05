@@ -29,10 +29,15 @@ class SecurityAuthorizationTest extends TestCase
     use RefreshDatabase;
 
     private AgencyProfile $agencyA;
+
     private AgencyProfile $agencyB;
+
     private User $superAdmin;
+
     private User $adminA;
+
     private User $adminB;
+
     private User $mentorA;
 
     protected function setUp(): void
@@ -234,7 +239,7 @@ class SecurityAuthorizationTest extends TestCase
 
     private function makeApplication(User $student, AgencyProfile $agency, string $status = 'pending'): Application
     {
-        $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Unit ' . $agency->id, 'quota' => 5]);
+        $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Unit '.$agency->id, 'quota' => 5]);
 
         return Application::create([
             'user_id' => $student->id,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\University;
 
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
@@ -10,7 +11,6 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
@@ -23,8 +23,8 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // Cari master universitas terkait
-        $university = $user->university_id 
-            ? University::find($user->university_id) 
+        $university = $user->university_id
+            ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
         // 1. Query Mahasiswa yang Memiliki Penempatan (Placement)
@@ -36,7 +36,7 @@ class DashboardController extends Controller
             'academicAdvisor',
             'logbooks',
             'finalreport',
-            'evaluation'
+            'evaluation',
         ])->whereHas('application.user', function ($uq) use ($user, $university) {
             if ($user->university_id) {
                 $uq->where('university_id', $user->university_id);
@@ -51,7 +51,7 @@ class DashboardController extends Controller
             'unit.agencyProfile',
             'placement.mentor',
             'placement.academicAdvisor',
-            'placement.evaluation'
+            'placement.evaluation',
         ])->whereHas('user', function ($uq) use ($user, $university) {
             if ($user->university_id) {
                 $uq->where('university_id', $user->university_id);
@@ -65,10 +65,10 @@ class DashboardController extends Controller
             $search = strtolower($request->search);
             $applicationsQuery->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('studentProfile', function ($sp) use ($search) {
-                      $sp->where('nim', 'like', "%{$search}%")
-                         ->orWhere('jurusan', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('studentProfile', function ($sp) use ($search) {
+                        $sp->where('nim', 'like', "%{$search}%")
+                            ->orWhere('jurusan', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -111,11 +111,12 @@ class DashboardController extends Controller
             if ($b['count'] === $a['count']) {
                 return strcasecmp($a['name'], $b['name']);
             }
+
             return $b['count'] <=> $a['count'];
         });
 
         $totalAgenciesCount = count($agencyDistribution);
-        $activeAgenciesCount = count(array_filter($agencyDistribution, fn($d) => $d['count'] > 0));
+        $activeAgenciesCount = count(array_filter($agencyDistribution, fn ($d) => $d['count'] > 0));
 
         // Daftar Dosen Aktif Kampus untuk Plotting DPL (Hanya dosen dengan status aktif)
         $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
@@ -161,8 +162,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $universityId = $user->university_id;
-        $university = $universityId 
-            ? University::find($universityId) 
+        $university = $universityId
+            ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
         $request->validate([
@@ -176,22 +177,22 @@ class DashboardController extends Controller
 
         // Pastikan mahasiswa berasal dari universitas yang sama
         $isSameUniv = ($universityId && $student->university_id === $universityId);
-        if (!$isSameUniv && $university) {
+        if (! $isSameUniv && $university) {
             $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
         }
 
-        if (!$isSameUniv) {
+        if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk memplot dosen mahasiswa kampus lain.');
         }
 
         // Pastikan dosen yang dipilih berasal dari universitas yang sama
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
         $isAdvisorSameUniv = ($universityId && $advisor->university_id === $universityId);
-        if (!$isAdvisorSameUniv && $university) {
+        if (! $isAdvisorSameUniv && $university) {
             $isAdvisorSameUniv = ($advisor->university === $university->name);
         }
 
-        if (!$isAdvisorSameUniv) {
+        if (! $isAdvisorSameUniv) {
             return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
         }
 
@@ -214,8 +215,8 @@ class DashboardController extends Controller
     public function export(Request $request)
     {
         $user = Auth::user();
-        $university = $user->university_id 
-            ? University::find($user->university_id) 
+        $university = $user->university_id
+            ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
         $univName = $university?->name ?? $user->university ?? 'Universitas';
 
@@ -225,7 +226,7 @@ class DashboardController extends Controller
             'unit.agencyProfile',
             'placement.mentor',
             'placement.academicAdvisor',
-            'placement.evaluation'
+            'placement.evaluation',
         ])->whereHas('user', function ($uq) use ($user, $university) {
             if ($user->university_id) {
                 $uq->where('university_id', $user->university_id);
@@ -233,11 +234,11 @@ class DashboardController extends Controller
                 $uq->where('university', $university->name);
             }
         })
-        ->latest()
-        ->get();
+            ->latest()
+            ->get();
 
         $cleanUnivName = preg_replace('/[^A-Za-z0-9_]/', '_', $univName);
-        $filename = 'Rekap_Mahasiswa_Magang_' . $cleanUnivName . '_' . date('Ymd_His') . '.csv';
+        $filename = 'Rekap_Mahasiswa_Magang_'.$cleanUnivName.'_'.date('Ymd_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -281,7 +282,7 @@ class DashboardController extends Controller
 
                 $mentorScore = ($eval && $eval->nilai_pembimbing) ? number_format($eval->nilai_pembimbing, 2) : '-';
                 $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
-                
+
                 // Pakai accessor nilai_akhir: menghormati bobot & skema penilaian kampus
                 // (sebelumnya bobot 40/60 di-hardcode dan nilai setengah jadi ikut dianggap nilai akhir)
                 $finalScore = ($eval && (float) $eval->nilai_akhir > 0)
@@ -289,7 +290,7 @@ class DashboardController extends Controller
                     : '-';
 
                 $periode = ($app->start_date && $app->end_date)
-                    ? date('d/m/Y', strtotime($app->start_date)) . ' s.d. ' . date('d/m/Y', strtotime($app->end_date))
+                    ? date('d/m/Y', strtotime($app->start_date)).' s.d. '.date('d/m/Y', strtotime($app->end_date))
                     : '-';
 
                 fputcsv($handle, [
@@ -302,7 +303,7 @@ class DashboardController extends Controller
                     $dosen?->name ?? 'Belum Ditentukan',
                     $mentor?->name ?? 'Belum Diplot',
                     $periode,
-                    \App\Enums\ApplicationStatus::tryFrom($app->statusValue())?->label() ?? ucfirst($app->statusValue()),
+                    ApplicationStatus::tryFrom($app->statusValue())?->label() ?? ucfirst($app->statusValue()),
                     $mentorScore,
                     $dosenScore,
                     $finalScore,
@@ -319,13 +320,15 @@ class DashboardController extends Controller
     public function showStudent($id)
     {
         $user = Auth::user();
-        $university = $user->university_id 
-            ? University::find($user->university_id) 
+        $university = $user->university_id
+            ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
         $isMatchUniv = function ($student) use ($user, $university) {
-            if (!$student) return false;
-            if ($user->university_id && $student->university_id && (int)$user->university_id === (int)$student->university_id) {
+            if (! $student) {
+                return false;
+            }
+            if ($user->university_id && $student->university_id && (int) $user->university_id === (int) $student->university_id) {
                 return true;
             }
             if ($university) {
@@ -340,9 +343,10 @@ class DashboardController extends Controller
                     ($targetUnivName && (str_contains($studentUniv, $targetUnivName) || str_contains($targetUnivName, $studentUniv))) ||
                     ($targetUnivCode && (str_contains($studentUniv, $targetUnivCode) || str_contains($targetUnivCode, $studentUniv)))
                 ) {
-                    if (!$student->university_id && $university->id) {
+                    if (! $student->university_id && $university->id) {
                         $student->update(['university_id' => $university->id]);
                     }
+
                     return true;
                 }
             }
@@ -355,6 +359,7 @@ class DashboardController extends Controller
                     return true;
                 }
             }
+
             return false;
         };
 
@@ -369,7 +374,7 @@ class DashboardController extends Controller
                 $q->orderBy('date', 'desc');
             },
             'finalreport',
-            'evaluation'
+            'evaluation',
         ])->find($id);
 
         if ($placement && $isMatchUniv($placement->application?->user)) {
@@ -387,7 +392,7 @@ class DashboardController extends Controller
                     $q->orderBy('date', 'desc');
                 },
                 'placement.finalreport',
-                'placement.evaluation'
+                'placement.evaluation',
             ])->find($id);
 
             if ($appCandidate && $isMatchUniv($appCandidate->user)) {

@@ -66,6 +66,8 @@
                 $dosen = $logbook->placement->academicAdvisor ?? $logbook->placement->dosen;
                 $isMentor = in_array(Auth::user()?->role, ['mentor', 'pembimbing']);
                 $isLecturer = in_array(Auth::user()?->role, ['dosen', 'academic_advisor']);
+                // Fallback: mentor teknis belum ditunjuk → Admin Dinas instansi terkait boleh memvalidasi sementara
+                $isAdminFallback = !$isMentor && !$isLecturer && (bool) $logbook->placement?->allowsAgencyAdminLogbookFallback(Auth::user());
             @endphp
 
             <!-- 1. Card Informasi Mahasiswa & Penempatan -->
@@ -132,7 +134,7 @@
                                 </svg>
                                 <span>File Bukti Aktivitas Mahasiswa</span>
                             </div>
-                            <a href="{{ asset('storage/' . $logbook->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition">
+                            <a href="{{ $logbook->attachment_url }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
@@ -293,6 +295,34 @@
                             <a href="{{ $backUrl }}" class="w-full sm:w-auto text-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                                 Kembali ke Daftar Logbook
                             </a>
+                        </div>
+                    </form>
+                </div>
+            @elseif ($isAdminFallback)
+                <!-- FORM FALLBACK ADMIN DINAS (MENTOR BELUM DITUGASKAN) -->
+                <div class="bg-white rounded-2xl p-6 border-2 border-amber-300 shadow-sm space-y-4">
+                    <div class="border-b border-gray-100 pb-3">
+                        <h3 class="text-base font-bold text-gray-900">Validasi Sementara oleh Admin Dinas</h3>
+                        <p class="text-xs text-amber-700 mt-1">Mahasiswa ini belum memiliki Mentor Dinas. Anda dapat memvalidasi logbook hari-hari awal sampai mentor ditugaskan. Histori validasi tetap tersimpan setelah mentor ditetapkan.</p>
+                    </div>
+
+                    <form action="{{ route('admin.logbooks.review', $logbook->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        @method('PUT')
+                        <div>
+                            <label for="admin_feedback" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Catatan / Feedback Admin Dinas:</label>
+                            <textarea id="admin_feedback" name="feedback" rows="3" maxlength="1000"
+                                class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-amber-500 focus:border-amber-500 shadow-xs"
+                                placeholder="Tuliskan catatan untuk mahasiswa...">{{ old('feedback', $logbook->feedback) }}</textarea>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <button type="submit" name="status" value="approved" class="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">Setujui (Approve)</button>
+                                <button type="submit" name="status" value="rejected" class="flex-1 sm:flex-none px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">Tolak / Minta Revisi</button>
+                            </div>
+                            @if ($logbook->placement?->application_id)
+                                <a href="{{ route('admin.applications.show', $logbook->placement->application_id) }}#penugasan-pembimbing" class="w-full sm:w-auto text-center px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-xl transition">Tugaskan Mentor</a>
+                            @endif
                         </div>
                     </form>
                 </div>

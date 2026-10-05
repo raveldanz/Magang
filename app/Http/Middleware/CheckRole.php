@@ -16,7 +16,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             abort(403, 'Anda belum login.');
         }
 
@@ -60,7 +60,7 @@ class CheckRole
             };
 
             return redirect()->to($dest)
-                ->with('error', 'Halaman yang Anda tuju tidak tersedia untuk peran ' . strtoupper($userRole) . '. Anda tetap dapat kembali ke Super Admin melalui bilah merah di atas.');
+                ->with('error', 'Halaman yang Anda tuju tidak tersedia untuk peran '.strtoupper($userRole).'. Anda tetap dapat kembali ke Super Admin melalui bilah merah di atas.');
         }
 
         abort(403, 'Anda tidak memiliki hak akses ke halaman ini.');

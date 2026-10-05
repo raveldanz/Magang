@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -72,7 +74,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $currentUser = Auth::user();
-        $isSuperAdmin = ($currentUser->role === 'super_admin' || ($currentUser->role === 'admin' && is_null($currentUser->agency_profile_id)));
+        $isSuperAdmin = $currentUser->isSuperAdmin();
 
         $query = User::with(['agencyProfile', 'university', 'studentProfile']);
 
@@ -108,7 +110,7 @@ class UserController extends Controller
                 $q->where('university_id', $univId);
                 if ($univName) {
                     $q->orWhere('university', $like, "%{$univName}%")
-                      ->orWhereHas('studentProfile', fn($sp) => $sp->where('universitas', $like, "%{$univName}%"));
+                        ->orWhereHas('studentProfile', fn ($sp) => $sp->where('universitas', $like, "%{$univName}%"));
                 }
             });
         }
@@ -119,8 +121,8 @@ class UserController extends Controller
             $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhere('email', $like, "%{$search}%")
-                  ->orWhereHas('studentProfile', fn($sp) => $sp->where('nim', $like, "%{$search}%"));
+                    ->orWhere('email', $like, "%{$search}%")
+                    ->orWhereHas('studentProfile', fn ($sp) => $sp->where('nim', $like, "%{$search}%"));
             });
         }
 
@@ -159,18 +161,18 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'role' => 'required|in:' . ($this->currentUserIsSuperAdmin() ? 'admin,mentor,dosen,universitas,mahasiswa' : 'admin,mentor,mahasiswa'),
+            'role' => 'required|in:'.($this->currentUserIsSuperAdmin() ? 'admin,mentor,dosen,universitas,mahasiswa' : 'admin,mentor,mahasiswa'),
             'password' => 'nullable|string|min:6',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
-            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
             'return_to' => 'nullable|string',
         ]);
 
         // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
         // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
         $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
-        if (!$this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
             $agencyProfileId = Auth::user()->agency_profile_id;
         }
 
@@ -197,7 +199,7 @@ class UserController extends Controller
 
         // 1. Prioritas return_to dari halaman pemanggil
         $safeReturn = $this->safeReturnTo($request->return_to);
-        if ($safeReturn && !str_contains($safeReturn, 'users/create')) {
+        if ($safeReturn && ! str_contains($safeReturn, 'users/create')) {
             return redirect($safeReturn)->with('success', $successMsg);
         }
 
@@ -248,11 +250,11 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:' . ($isSuperAdmin ? 'admin,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'role' => 'required|in:'.($isSuperAdmin ? 'admin,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
-            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
             'password' => 'nullable|string|min:6',
             'return_to' => 'nullable|string',
         ]);
@@ -260,7 +262,7 @@ class UserController extends Controller
         // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
         // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
         $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
-        if (!$this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
             $agencyProfileId = Auth::user()->agency_profile_id;
         }
 
@@ -288,7 +290,7 @@ class UserController extends Controller
 
         // 1. Prioritas return_to dari halaman pemanggil
         $safeReturn = $this->safeReturnTo($request->return_to);
-        if ($safeReturn && !str_contains($safeReturn, 'users/' . $id . '/edit')) {
+        if ($safeReturn && ! str_contains($safeReturn, 'users/'.$id.'/edit')) {
             return redirect($safeReturn)->with('success', $successMsg);
         }
 
@@ -342,10 +344,10 @@ class UserController extends Controller
             ->where('id', '!=', $currentUser->id)
             ->where(function ($q) {
                 $q->where('role', '!=', 'super_admin')
-                  ->where(function ($sq) {
-                      $sq->where('role', '!=', 'admin')
-                         ->orWhereNotNull('agency_profile_id');
-                  });
+                    ->where(function ($sq) {
+                        $sq->where('role', '!=', 'admin')
+                            ->orWhereNotNull('agency_profile_id');
+                    });
             })
             ->get();
 
@@ -411,9 +413,9 @@ class UserController extends Controller
         $universityId = $user->university_id;
 
         AuditLog::record('USER_DELETE', 'User', $user->id, [
-            'name'  => $deletedName,
+            'name' => $deletedName,
             'email' => $deletedEmail,
-            'role'  => $deletedRole,
+            'role' => $deletedRole,
         ]);
 
         $user->delete();
@@ -446,10 +448,10 @@ class UserController extends Controller
             ->where('id', '!=', $currentUser->id)
             ->where(function ($q) {
                 $q->where('role', '!=', 'super_admin')
-                  ->where(function ($sq) {
-                      $sq->where('role', '!=', 'admin')
-                         ->orWhereNotNull('agency_profile_id');
-                  });
+                    ->where(function ($sq) {
+                        $sq->where('role', '!=', 'admin')
+                            ->orWhereNotNull('agency_profile_id');
+                    });
             })
             ->get();
 
@@ -470,6 +472,7 @@ class UserController extends Controller
             if ($user->hasInternshipHistory()) {
                 $skippedCount++;
                 $skippedNames[] = $user->name;
+
                 continue;
             }
 
@@ -488,7 +491,8 @@ class UserController extends Controller
 
         $message = "Berhasil menghapus {$deletedCount} akun pengguna.";
         if ($skippedCount > 0) {
-            $message .= " Namun {$skippedCount} akun dilewati karena memiliki relasi data magang/penempatan aktif (" . implode(', ', array_slice($skippedNames, 0, 3)) . ").";
+            $message .= " Namun {$skippedCount} akun dilewati karena memiliki relasi data magang/penempatan aktif (".implode(', ', array_slice($skippedNames, 0, 3)).').';
+
             return redirect()->back()->with('warning', $message);
         }
 

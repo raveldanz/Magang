@@ -34,16 +34,15 @@
                     <!-- Instansi Induk -->
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <div>
-                            <x-input-label for="agency_profile_id" value="Pilih Instansi Induk" />
-                            <select id="agency_profile_id" name="agency_profile_id"
-                                class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                required>
-                                @foreach ($agencies as $agency)
-                                    <option value="{{ $agency->id }}" {{ old('agency_profile_id', $defaultAgencyId) == $agency->id ? 'selected' : '' }}>
-                                        {{ $agency->agency_name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <x-searchable-select
+                                id="agency_profile_id"
+                                name="agency_profile_id"
+                                label="Pilih Instansi Induk"
+                                placeholder="-- Cari atau Pilih Instansi Induk --"
+                                :items="$agencies->map(fn($agency) => ['id' => $agency->id, 'name' => $agency->agency_name, 'acronym' => $agency->acronym, 'meta' => $agency->city])"
+                                :selected="old('agency_profile_id', $defaultAgencyId)"
+                                :required="true"
+                            />
                             @error('agency_profile_id')
                                 <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                             @enderror

@@ -74,6 +74,16 @@ export function chatApp(config) {
         lightbox: null,
         dragging: false,
 
+        // Utas komentar saluran (Telegram Channel comments)
+        commentsDrawer: {
+            open: false,
+            parentMessage: null,
+            comments: [],
+            loading: false,
+            sending: false,
+            draft: '',
+        },
+
         // Modal: contacts | editGroup | report | readers | confirm
         modal: null,
         contactMode: 'direct', // direct | group | add
@@ -145,11 +155,15 @@ export function chatApp(config) {
         get filteredConversations() {
             const q = this.search.trim().toLowerCase();
             const list = this.conversations.filter((c) => {
+                if (this.listFilter === 'channels') return c.type === 'channel';
+                // Saluran hanya tampil di menu Saluran Pengumuman agar tab Semua dan lainnya fokus ke chat personal dan grup
+                if (c.type === 'channel') return false;
+
                 if (this.listFilter === 'unread' && !c.unread) return false;
                 if (this.listFilter === 'groups' && c.type === 'direct') return false;
                 if (this.listFilter === 'priority' && !c.stage_badge?.is_urgent) return false;
                 if (this.listFilter === 'students') {
-                    const isStudent = c.stage_badge?.role_group === 'student' || c.type === 'placement' || c.contact?.role_group === 'student';
+                    const isStudent = c.stage_badge?.role_group === 'student' || c.type === 'placement' || c.scope_type === 'mentor_guidance' || c.scope_type === 'dpl_guidance' || c.contact?.role_group === 'student';
                     if (!isStudent) return false;
                 }
                 if (this.listFilter === 'staff') {
@@ -183,7 +197,11 @@ export function chatApp(config) {
         },
 
         get totalUnreadGroups() {
-            return this.conversations.filter((c) => c.unread > 0).length;
+            return this.conversations.filter((c) => c.type !== 'channel' && c.unread > 0).length;
+        },
+
+        get totalUnreadChannels() {
+            return this.conversations.filter((c) => c.type === 'channel' && c.unread > 0).length;
         },
 
         async loadConversations(throwErrors = false) {
@@ -201,7 +219,11 @@ export function chatApp(config) {
 
         // ================= Percakapan aktif =================
         get isGroupChat() {
-            return !!this.active && this.active.type !== 'direct';
+            return !!this.active && this.active.type !== 'direct' && this.active.type !== 'channel';
+        },
+
+        get isChannelChat() {
+            return !!this.active && this.active.type === 'channel';
         },
 
         get canSend() {
@@ -210,6 +232,10 @@ export function chatApp(config) {
 
         get headerSubtitle() {
             if (!this.active) return '';
+            if (this.isChannelChat) {
+                const count = this.active.member_count ? `${this.active.member_count} anggota` : 'Saluran Resmi';
+                return `${count} · Pengumuman Resmi`;
+            }
             const typing = this.state.typing || [];
             if (typing.length) {
                 if (typing.length > 1) return `${typing.length} orang sedang mengetik…`;
@@ -227,11 +253,11 @@ export function chatApp(config) {
         },
 
         get headerTyping() {
-            return (this.state.typing || []).length > 0;
+            return !this.isChannelChat && (this.state.typing || []).length > 0;
         },
 
         get headerOnline() {
-            return !this.isGroupChat && !!this.state.presence?.online;
+            return !this.isGroupChat && !this.isChannelChat && !!this.state.presence?.online;
         },
 
         async open(id, updateUrl = true) {
@@ -280,6 +306,7 @@ export function chatApp(config) {
 
         closeConversation() {
             this.stopRecording(false);
+            this.closeComments();
             this.activeId = null;
             this.active = null;
             this.messages = [];
@@ -371,6 +398,9 @@ export function chatApp(config) {
         bubbleClass(message) {
             if (message.deleted) return 'bg-white text-slate-400 border border-dashed border-slate-300';
             const failed = message.failed ? ' ring-2 ring-rose-400' : '';
+            if (this.isChannelChat) {
+                return 'bg-white text-slate-800 border border-slate-200/80 rounded-2xl shadow-sm' + failed;
+            }
             return (message.is_mine
                 ? 'bg-blue-600 text-white rounded-br-md'
                 : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-md') + failed;
@@ -476,6 +506,9 @@ export function chatApp(config) {
             try {
                 this._tick += 1;
                 if (this.activeId && !this.loadingMessages && !this.sending) await this.fetchNew();
+                if (this.commentsDrawer.open && this.commentsDrawer.parentMessage && !this.commentsDrawer.loading && !this.commentsDrawer.sending) {
+                    await this.fetchComments();
+                }
                 if (immediate || !this.activeId || this._tick % 3 === 0) await this.loadConversations(true);
                 this.connectionIssue = false;
             } catch (error) {
@@ -1159,6 +1192,93 @@ export function chatApp(config) {
             if (!this.lightbox || this.lightbox.items.length < 2) return;
             const count = this.lightbox.items.length;
             this.lightbox.index = (this.lightbox.index + delta + count) % count;
+        },
+
+        // ================= Utas Komentar Saluran (Channel Comments) =================
+        async openComments(message) {
+            if (!message || typeof message.id !== 'number') return;
+            this.commentsDrawer.parentMessage = message;
+            this.commentsDrawer.open = true;
+            this.commentsDrawer.loading = true;
+            this.commentsDrawer.comments = [];
+            this.commentsDrawer.draft = '';
+
+            try {
+                const res = await chatFetch(this.url('comments', message.id));
+                if (this.commentsDrawer.parentMessage?.id === message.id) {
+                    this.commentsDrawer.comments = res.comments || [];
+                    message.comments_count = this.commentsDrawer.comments.length;
+                }
+                this.$nextTick(() => {
+                    this.scrollCommentsToBottom();
+                    this.$refs.commentInput?.focus();
+                });
+            } catch (err) {
+                this.handleError(err);
+            } finally {
+                this.commentsDrawer.loading = false;
+            }
+        },
+
+        closeComments() {
+            this.commentsDrawer.open = false;
+            this.commentsDrawer.parentMessage = null;
+            this.commentsDrawer.comments = [];
+            this.commentsDrawer.draft = '';
+            this.commentsDrawer.loading = false;
+            this.commentsDrawer.sending = false;
+        },
+
+        scrollCommentsToBottom() {
+            const c = this.$refs.commentsContainer;
+            if (c) {
+                c.scrollTop = c.scrollHeight;
+            }
+        },
+
+        async submitComment() {
+            const text = this.commentsDrawer.draft.trim();
+            const parent = this.commentsDrawer.parentMessage;
+            if (!text || !parent || this.commentsDrawer.sending) return;
+
+            this.commentsDrawer.sending = true;
+            try {
+                const res = await sendJson(this.url('sendComment', parent.id), { body: text });
+                if (res.comment) {
+                    this.commentsDrawer.comments.push(res.comment);
+                    parent.comments_count = (parent.comments_count || 0) + 1;
+                    this.commentsDrawer.draft = '';
+                    this.$nextTick(() => {
+                        this.scrollCommentsToBottom();
+                    });
+                }
+            } catch (err) {
+                this.handleError(err);
+            } finally {
+                this.commentsDrawer.sending = false;
+            }
+        },
+
+        formatCommentTime(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        },
+
+        async fetchComments() {
+            const parent = this.commentsDrawer.parentMessage;
+            if (!parent || !this.commentsDrawer.open) return;
+            try {
+                const res = await chatFetch(this.url('comments', parent.id));
+                if (res.comments && this.commentsDrawer.parentMessage?.id === parent.id) {
+                    const previousCount = this.commentsDrawer.comments.length;
+                    this.commentsDrawer.comments = res.comments;
+                    parent.comments_count = res.comments.length;
+                    if (res.comments.length > previousCount) {
+                        this.$nextTick(() => this.scrollCommentsToBottom());
+                    }
+                }
+            } catch (_) {}
         },
     };
 }

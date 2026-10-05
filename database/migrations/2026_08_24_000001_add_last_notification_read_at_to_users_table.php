@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'last_notification_read_at')) {
+            if (! Schema::hasColumn('users', 'last_notification_read_at')) {
                 $table->timestamp('last_notification_read_at')->nullable()->after('status');
             }
         });

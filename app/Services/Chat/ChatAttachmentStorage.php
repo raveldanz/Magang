@@ -26,12 +26,12 @@ class ChatAttachmentStorage
         $extension = in_array($clientExtension, $allowed, true) ? $clientExtension : strtolower((string) $file->guessExtension());
         $mime = $file->getMimeType() ?: 'application/octet-stream';
 
-        $directory = 'chat/' . $conversationId . '/' . now()->format('Y-m');
-        $path = $file->storeAs($directory, Str::uuid() . '.' . $extension, self::DISK);
+        $directory = 'chat/'.$conversationId.'/'.now()->format('Y-m');
+        $path = $file->storeAs($directory, Str::uuid().'.'.$extension, self::DISK);
 
         return [
             'path' => $path,
-            'name' => $voiceNote ? 'Pesan suara.' . $extension : $this->cleanName($file->getClientOriginalName(), $extension),
+            'name' => $voiceNote ? 'Pesan suara.'.$extension : $this->cleanName($file->getClientOriginalName(), $extension),
             'mime' => $mime,
             'size' => (int) $file->getSize(),
             'kind' => self::kindFor($extension, $mime, $voiceNote),
@@ -52,7 +52,7 @@ class ChatAttachmentStorage
     public function deletePaths(iterable $paths): void
     {
         foreach ($paths as $path) {
-            if ($path && !str_contains($path, '..')) {
+            if ($path && ! str_contains($path, '..')) {
                 Storage::disk(self::DISK)->delete($path);
             }
         }
@@ -127,6 +127,6 @@ class ChatAttachmentStorage
         $base = pathinfo($original, PATHINFO_FILENAME);
         $base = trim(preg_replace('/[^\pL\pN\s._()-]+/u', '', $base)) ?: 'lampiran';
 
-        return Str::limit($base, 120, '') . '.' . $extension;
+        return Str::limit($base, 120, '').'.'.$extension;
     }
 }

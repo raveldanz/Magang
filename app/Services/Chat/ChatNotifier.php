@@ -45,7 +45,7 @@ class ChatNotifier
                 $title = $unread > 1 ? "{$unread} pesan baru dari {$sender->name}" : "Pesan baru dari {$sender->name}";
             } else {
                 $title = "Pesan baru di {$conversation->title}";
-                $preview = ChatPresenter::shortName($sender->name) . ': ' . $preview;
+                $preview = ChatPresenter::shortName($sender->name).': '.$preview;
             }
 
             $this->upsert($recipients->pluck('user_id')->map(fn ($id) => (int) $id), $url, $title, $preview);

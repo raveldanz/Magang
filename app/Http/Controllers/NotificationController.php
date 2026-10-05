@@ -26,7 +26,7 @@ class NotificationController extends Controller
             });
         } elseif ($category === 'urgent') {
             $notifications = array_filter($notifications, function ($item) {
-                return !empty($item['is_action_required']) || in_array($item['type'] ?? '', ['urgent', 'warning']);
+                return ! empty($item['is_action_required']) || in_array($item['type'] ?? '', ['urgent', 'warning']);
             });
         } else {
             $notifications = array_filter($notifications, function ($item) use ($category) {
