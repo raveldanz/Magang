@@ -52,7 +52,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
 | **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
 | **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
-| **LRN-043** | 2026-10-05 | Codebase Sanitization & Test Resilience | Eliminasi dead controllers/views Pembimbing, zero-dependency test suite (tanpa PHP GD), dan pengarsipan skrip scratch | RESOLVED |
+| **LRN-043** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
 
 ---
 
@@ -778,10 +778,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
 - **Pengecualian (2026-09-30)**: status keaktifan akun disederhanakan menjadi **Aktif / Nonaktif** (`active`/`inactive`) untuk semua role; label Bahasa Indonesia (bukan kode) karena status akun bukan alur kerja dan "ACTIVE" bertabrakan dengan status magang ACTIVE. Cuti pembimbing = Nonaktif, diaktifkan kembali oleh admin. Nilai `on_leave` dihapus (migrasi `2026_09_30_020000` memindahkannya ke `inactive`; validasi menolaknya). Mahasiswa yang mundur dari magang tetap memakai status pengajuan RESIGNED, bukan status akun.
-<<<<<<< HEAD
-=======
 - **Penguatan (2026-09-30)**: (1) `StatusViewGuardTest` memindai seluruh `resources/views` dan gagal bila ada nama status ditulis manual (isi elemen berupa kode/nama status, `strtoupper($x->status)`, atau peta nilai→label); pengecualian per baris dengan `{{-- status-guard:ignore --}}`. (2) Kolom status teks biasa tanpa CHECK constraint (`users.status`, `system_feedbacks.status`) dijaga listener `saving` di AppServiceProvider (`Enum::assertValid`); status logbook/laporan sudah dijaga CHECK constraint DB, status pengajuan oleh cast enum. Listener `saving` WAJIB tidak mengembalikan false (false = penyimpanan dibatalkan). (3) Migrasi `2026_09_30_030000` menambah index kolom foreign key (PostgreSQL tidak membuatnya otomatis). (4) Badge ringkas menampilkan keterangan di baris kedua pada layar sentuh (`[@media(hover:none)]`), karena tooltip tidak bisa dibuka.
->>>>>>> origin/main
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
 
 ---
@@ -906,24 +903,26 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-043] Codebase Sanitization, Dead Code Elimination & Zero-Dependency Test Resilience
+### [LRN-043] Penguncian Syarat Kelulusan Magang: Kewajiban Pengisian Logbook Aktivitas Harian
 - **Tanggal**: 2026-10-05
-- **Komponen**: `tests/Feature/Chat/ChatAttachmentTest.php`, `App\Http\Controllers\Pembimbing\`, `resources/views/pembimbing/`, `scripts/`
-- **Problem / Symptom**:
-  1. `php artisan test` menghasilkan 3 error di `ChatAttachmentTest` dengan exception: `"GD extension is not installed."` saat dijalankan pada sistem CLI yang tidak mengaktifkan modul GD di `php.ini`.
-  2. Adanya controller dan view mati `Pembimbing` (`app/Http/Controllers/Pembimbing` & `resources/views/pembimbing`) yang tidak pernah di-route dan memakai kolom usang `pembimbing_id`.
-  3. Menumpuknya 50 skrip debugging scratch di folder `scripts/` yang membingungkan alur kerja CI/CD dan pengembang.
+- **Komponen**: `app/Models/Application.php`, `app/Models/Placement.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Student/CertificateController.php`, `app/Http/Controllers/Student/LogbookController.php`, `app/Http/Controllers/Admin/UniversityController.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/student/final_report.blade.php`, `resources/views/dashboard.blade.php`
+- **Problem / Symptom**: Mahasiswa magang yang belum pernah mengisi logbook harian sama sekali masih dapat dinyatakan lulus magang (`COMPLETED`) oleh Admin atau tersinkronisasi otomatis oleh sistem jika laporan akhir disetujui dan nilai evaluasi telah diisi, serta tombol penerbitan E-Sertifikat terbuka prematur tanpa memverifikasi keaktifan pengisian logbook.
 - **Root Cause**:
-  1. Pemanggilan `UploadedFile::fake()->image()` memanggil fungsi C-library GD PHP (`imagecreatetruecolor`), menciptakan *hidden environment dependency* pada unit test.
-  2. Controller dan view `Pembimbing` adalah artefak transisi masa lalu sebelum dipisah menjadi `Mentor/` dan `Lecturer/`.
+  1. Method `getCanCompleteAttribute()` pada `Application.php` hanya mengecek `has_approved_report` dan `has_complete_evaluation`, tanpa mengecek keberadaan catatan logbook (`has_filled_logbook`).
+  2. Method `Placement::syncCompletionStatus()` otomatis memperbarui status aplikasi ke `completed` tanpa memeriksa relasi `$this->logbooks()->exists()`.
+  3. Form verifikasi Admin di `admin/applications/show.blade.php` dan `ApplicationController::updateStatus` tidak memvalidasi keberadaan logbook mahasiswa sebelum status diubah ke `completed`.
+  4. Checklist prasyarat E-Sertifikat di `student/final_report.blade.php` hanya memeriksa 3 aspek tanpa memasukkan logbook kegiatan harian.
 - **Fix Applied**:
-  1. Mengubah pemanggilan `UploadedFile::fake()->image()` menjadi `UploadedFile::fake()->create('...', ..., 'image/jpeg')` sehingga pengujian validasi MIME dan ekstensi berjalan tanpa membutuhkan ekstensi GD.
-  2. Menghapus folder `app/Http/Controllers/Pembimbing/` dan `resources/views/pembimbing/`.
-  3. Mengarsipkan seluruh skrip scratch/sekali pakai ke subdirektori `scripts/archive/`.
-  4. Menjalankan full regression test: **177/177 test PASSED (1.365 assertions, Strict Exit Code 0)**.
-- **Prevention Rule**:
-  - Untuk pengujian unggah berkas generik (MIME type, ekstensi, batas ukuran KB), gunakan `UploadedFile::fake()->create($filename, $kilobytes, $mimeType)`. Hindari `fake()->image()` kecuali jika kode yang diuji memang melakukan manipulasi piksel/resize menggunakan library grafis.
-  - Hapus artefak controller dan view yang sudah tidak memiliki rute aktif saat proses refactoring selesai agar tidak terjadi akumulasi utang teknis (*technical debt*).
+  1. Menambahkan accessor `has_filled_logbook` (`getHasFilledLogbookAttribute()`) pada model `Application` dan `Placement` yang mendeteksi keterisian logbook secara optimal (`logbooks_count`, loaded relation, atau query `exists()`).
+  2. Memperketat `Application::getCanCompleteAttribute()` sehingga mewajibkan ketiga syarat serentak: `has_approved_report && has_complete_evaluation && has_filled_logbook`.
+  3. Memperbarui `Placement::syncCompletionStatus()` untuk menolak status `completed` jika mahasiswa belum mengisi minimal 1 catatan logbook.
+  4. Menyelaraskan `Application::actionPrioritySql()` sehingga Tier 2 (*Siap Diluluskan*) wajib memenuhi syarat keterisian logbook (`$logbookFilled`).
+  5. Menambahkan validasi ketat backend di `Admin\ApplicationController::updateStatus()` dengan pesan spesifik: *"Gagal menyelesaikan magang: Logbook aktivitas magang belum pernah diisi."*
+  6. Menambahkan proteksi keamanan di `Student\CertificateController::getCertificateData()` yang menolak (HTTP 403) unduhan sertifikat jika logbook belum pernah diisi.
+  7. Menampilkan *Warning Banner* informatif di `admin/applications/show.blade.php`, indikator `Logbook belum diisi` di `admin/applications/index.blade.php`, checklist 4-item dinamis di `student/final_report.blade.php`, dan sinkronisasi `$isPassed` di `dashboard.blade.php`.
+  8. Menambahkan pemanggilan `$placement->syncCompletionStatus()` saat mahasiswa menyimpan logbook baru di `Student\LogbookController::store()`.
+  9. Menulis suite pengujian `LogbookCompletionRequirementTest.php` (6/6 lulus) dan menguji seluruh rangkaian test suite (183/183 PASS, Strict Exit Code 0).
+- **Prevention Rule**: Seluruh gerbang kelulusan akhir (*graduation gateway*) dan penerbitan sertifikat resmi negara wajib memverifikasi ketiga rukun pemenuhan magang (Logbook Aktivitas, Laporan Akhir Disetujui, dan Penilaian Lengkap) di level Model (`can_complete`), Controller (`updateStatus`), Service Sync (`syncCompletionStatus`), dan View UI. Jangan pernah mengizinkan transisi status terminal `COMPLETED` tanpa validasi riwayat aktivitas logbook.
 
 ---
 
