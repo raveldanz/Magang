@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 class ChatAttachment extends Model
 {
     public const KIND_IMAGE = 'image';
+
     public const KIND_VIDEO = 'video';
+
     public const KIND_AUDIO = 'audio';
+
     public const KIND_DOCUMENT = 'document';
 
     protected $fillable = [

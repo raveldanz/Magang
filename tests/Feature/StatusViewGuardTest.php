@@ -21,17 +21,17 @@ class StatusViewGuardTest extends TestCase
     private const CODES = 'PENDING|VERIFIED|ACCEPTED|ACTIVE|COMPLETED|REJECTED|RESIGNED|APPROVED|REVISION|IN PROGRESS|RESOLVED|CLOSED';
 
     private const LEGACY_NAMES = 'Aktif|Nonaktif|Non-Aktif|Cuti|Sedang Magang|Magang Aktif|Lulus|Lulus Magang|Diterima|Ditolak'
-        . '|Disetujui|Menunggu Review|Menunggu Verifikasi|Lolos Berkas|Terverifikasi|Selesai Magang|Mengundurkan Diri'
-        . '|Revisi|Pending|Approved|Rejected';
+        .'|Disetujui|Menunggu Review|Menunggu Verifikasi|Lolos Berkas|Terverifikasi|Selesai Magang|Mengundurkan Diri'
+        .'|Revisi|Pending|Approved|Rejected';
 
     private const STATUS_VALUES = 'pending|verified|accepted|active|completed|rejected|resigned|approved|revision|in_progress|resolved|closed|inactive';
 
     public function test_views_do_not_hardcode_status_names(): void
     {
         $rules = [
-            'nama status ditulis langsung sebagai isi elemen' => '/>\s*(?:' . self::CODES . '|' . self::LEGACY_NAMES . ')\s*</',
+            'nama status ditulis langsung sebagai isi elemen' => '/>\s*(?:'.self::CODES.'|'.self::LEGACY_NAMES.')\s*</',
             'status dijadikan huruf kapital sendiri' => '/strtoupper\(\s*\$[\w>-]*(?:status|lecturer_status)\b/',
-            'peta nilai status ke label buatan sendiri' => "/'(?:" . self::STATUS_VALUES . ")'\s*=>\s*'[A-Z][^']*'/",
+            'peta nilai status ke label buatan sendiri' => "/'(?:".self::STATUS_VALUES.")'\s*=>\s*'[A-Z][^']*'/",
         ];
 
         $violations = [];
@@ -50,7 +50,7 @@ class StatusViewGuardTest extends TestCase
             }
         }
 
-        $this->assertSame([], $violations, "Nama status harus dari enum lewat <x-status-badge> / Enum::label():\n" . implode("\n", $violations));
+        $this->assertSame([], $violations, "Nama status harus dari enum lewat <x-status-badge> / Enum::label():\n".implode("\n", $violations));
     }
 
     public function test_guard_catches_known_bad_patterns(): void
@@ -64,9 +64,9 @@ class StatusViewGuardTest extends TestCase
             '<option value="inactive">Non-Aktif</option>',
         ];
         $patterns = [
-            '/>\s*(?:' . self::CODES . '|' . self::LEGACY_NAMES . ')\s*</',
+            '/>\s*(?:'.self::CODES.'|'.self::LEGACY_NAMES.')\s*</',
             '/strtoupper\(\s*\$[\w>-]*(?:status|lecturer_status)\b/',
-            "/'(?:" . self::STATUS_VALUES . ")'\s*=>\s*'[A-Z][^']*'/",
+            "/'(?:".self::STATUS_VALUES.")'\s*=>\s*'[A-Z][^']*'/",
         ];
 
         foreach ($samples as $sample) {

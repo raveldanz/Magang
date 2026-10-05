@@ -45,7 +45,7 @@ class ChatApiController extends Controller
 
         $users = $this->contacts->contactsQuery($request->user())
             ->when($search !== '', function ($q) use ($search) {
-                $like = '%' . mb_strtolower($search) . '%';
+                $like = '%'.mb_strtolower($search).'%';
                 $q->where(fn ($w) => $w->whereRaw('LOWER(name) LIKE ?', [$like])->orWhereRaw('LOWER(email) LIKE ?', [$like]));
             })
             ->with(['agencyProfile', 'universityRelation'])
@@ -59,7 +59,7 @@ class ChatApiController extends Controller
     public function summary(Request $request)
     {
         $user = $request->user();
-        if (!$request->session()->has('impersonator_id')) {
+        if (! $request->session()->has('impersonator_id')) {
             $this->chat->touchPresence($user);
         }
 

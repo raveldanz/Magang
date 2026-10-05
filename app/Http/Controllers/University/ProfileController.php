@@ -16,12 +16,12 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        $university = $user->university_id 
-            ? University::find($user->university_id) 
+
+        $university = $user->university_id
+            ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
-        if (!$university) {
+        if (! $university) {
             $university = University::create([
                 'name' => $user->university ?? $user->name,
                 'code' => strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $user->name), 0, 8)),
@@ -39,11 +39,11 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        $university = $user->university_id 
-            ? University::find($user->university_id) 
+        $university = $user->university_id
+            ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
-        if (!$university) {
+        if (! $university) {
             $university = University::create([
                 'name' => $request->name,
                 'code' => $request->code,
@@ -81,7 +81,7 @@ class ProfileController extends Controller
             $weightLecturer = (int) $request->input('weight_lecturer', 60);
 
             if (($weightMentor + $weightLecturer) !== 100) {
-                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas (' . $weightMentor . '%) dan DPL Kampus (' . $weightLecturer . '%) harus berjumlah tepat 100%.');
+                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.');
             }
 
             $requireDpl = $request->boolean('require_dpl', true);
@@ -106,15 +106,15 @@ class ProfileController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
+            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
+
             $targetDir = public_path('images/logos');
-            if (!File::exists($targetDir)) {
+            if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
             }
 
             $file->move($targetDir, $filename);
-            $data['logo'] = 'images/logos/' . $filename;
+            $data['logo'] = 'images/logos/'.$filename;
         }
 
         $university->update($data);
