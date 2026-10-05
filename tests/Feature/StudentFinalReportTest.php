@@ -7,6 +7,7 @@ use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
 use App\Models\StudentProfile;
+use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,7 +53,7 @@ class StudentFinalReportTest extends TestCase
             'address' => 'Jl. Jimerto',
         ]);
 
-        $unit = \App\Models\Unit::create([
+        $unit = Unit::create([
             'agency_profile_id' => $agency->id,
             'name' => 'Bidang Aplikasi dan Tata Kelola Informatika',
         ]);

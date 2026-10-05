@@ -8,6 +8,7 @@ use App\Models\SystemFeedback;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Pagination\Paginator::useTailwind();
+        Paginator::useTailwind();
         // Login API: 5 percobaan/menit per (email + IP) agar brute force satu akun tertahan,
         // tapi ratusan mahasiswa di satu jaringan kampus (IP sama) tetap bisa login bersamaan.
         // Batas longgar per IP (300/menit) hanya untuk menahan serangan massal.
@@ -34,8 +35,8 @@ class AppServiceProvider extends ServiceProvider
             $email = strtolower((string) $request->input('email'));
 
             return [
-                Limit::perMinute(5)->by('email:' . $email . '|' . $request->ip()),
-                Limit::perMinute(300)->by('ip:' . $request->ip()),
+                Limit::perMinute(5)->by('email:'.$email.'|'.$request->ip()),
+                Limit::perMinute(300)->by('ip:'.$request->ip()),
             ];
         });
 

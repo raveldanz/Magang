@@ -25,9 +25,9 @@ class MonitoringController extends Controller
             $search = strtolower($request->search);
             $baseQuery->whereHas('application.user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('studentProfile', function ($sp) use ($search) {
-                      $sp->where('nim', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('studentProfile', function ($sp) use ($search) {
+                        $sp->where('nim', 'like', "%{$search}%");
+                    });
             });
         }
 
