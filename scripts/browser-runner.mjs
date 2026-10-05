@@ -20,7 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\TK ABA SBY 69 (3)\\.gemini\\antigravity-ide\\brain\\915a2d56-5924-4c37-aae7-696a537252dc';
+const artifactDir = process.env.ARTIFACT_DIR || path.resolve(projectRoot, 'public/test-artifacts');
 const publicTestArtifactsDir = path.resolve(projectRoot, 'public/test-artifacts');
 
 if (!fs.existsSync(publicTestArtifactsDir)) {
