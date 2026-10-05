@@ -22,14 +22,14 @@ class AgencyController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
 
         $query = AgencyProfile::with(['units', 'users', 'agencyAdmin'])
             ->withCount('units')
             ->withExists([
                 'users as has_admin_account' => function ($q) {
                     $q->where('role', 'admin');
-                }
+                },
             ])
             ->orderBy('has_admin_account', 'asc')
             ->orderBy('updated_at', 'desc');
@@ -49,6 +49,7 @@ class AgencyController extends Controller
             $ag->total_quota = $ag->units->sum('quota');
             $ag->total_mentors = $ag->users->whereIn('role', ['mentor', 'pembimbing'])->count();
             $ag->total_admins = $ag->users->where('role', 'admin')->count();
+
             return $ag;
         });
 
@@ -75,10 +76,10 @@ class AgencyController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
 
         // Multi-Tenant Check: Non-superadmin hanya boleh mengakses dinasnya sendiri
-        if (!$isSuperAdmin && (int) $user->agency_profile_id !== (int) $id) {
+        if (! $isSuperAdmin && (int) $user->agency_profile_id !== (int) $id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
         }
 
@@ -170,6 +171,7 @@ class AgencyController extends Controller
     public function create()
     {
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menambah instansi baru.');
+
         return view('admin.agencies.create');
     }
 
@@ -194,13 +196,13 @@ class AgencyController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
-            $filename = $cleanName . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = $cleanName.'_'.time().'.'.$file->getClientOriginalExtension();
             $targetDir = public_path('images/logos');
-            if (!File::exists($targetDir)) {
+            if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
             }
             $file->move($targetDir, $filename);
-            $logoPath = 'images/logos/' . $filename;
+            $logoPath = 'images/logos/'.$filename;
         }
 
         $agency = AgencyProfile::create([
@@ -230,6 +232,7 @@ class AgencyController extends Controller
     {
         abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
         $agency = AgencyProfile::with('units')->findOrFail($id);
+
         return view('admin.agencies.edit', compact('agency'));
     }
 
@@ -241,7 +244,7 @@ class AgencyController extends Controller
         $request->validate([
             'agency_name' => 'required|string|max:255',
             'government_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:agency_profiles,email,' . $agency->id,
+            'email' => 'required|email|max:255|unique:agency_profiles,email,'.$agency->id,
             'phone' => 'nullable|string|max:50',
             'address' => 'required|string',
             'signee_name' => 'nullable|string|max:255',
@@ -268,13 +271,13 @@ class AgencyController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
-            $filename = $cleanName . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = $cleanName.'_'.time().'.'.$file->getClientOriginalExtension();
             $targetDir = public_path('images/logos');
-            if (!File::exists($targetDir)) {
+            if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
             }
             $file->move($targetDir, $filename);
-            $data['logo'] = 'images/logos/' . $filename;
+            $data['logo'] = 'images/logos/'.$filename;
         }
 
         $agency->update($data);
@@ -294,16 +297,16 @@ class AgencyController extends Controller
 
         // 1. Proteksi Arsip: menghapus instansi ikut menghapus semua divisinya, dan applications.unit_id
         //    ON DELETE CASCADE menghapus seluruh pengajuan, logbook, nilai, serta sertifikat alumni.
-        $historyCount = \App\Models\Application::whereIn('unit_id', $agency->units->pluck('id'))->count();
+        $historyCount = Application::whereIn('unit_id', $agency->units->pluck('id'))->count();
 
         if ($historyCount > 0) {
             return redirect()->back()->with('error', "Gagal menghapus: Instansi '{$agency->agency_name}' menyimpan {$historyCount} riwayat pengajuan magang (termasuk arsip alumni & sertifikat) yang wajib dipertahankan.");
         }
 
         // 2. Proteksi Mentor dengan Bimbingan Aktif
-        $activeMentorsCount = \App\Models\Placement::whereIn('mentor_id', User::where('agency_profile_id', $agency->id)->whereIn('role', ['mentor', 'pembimbing'])->pluck('id'))
+        $activeMentorsCount = Placement::whereIn('mentor_id', User::where('agency_profile_id', $agency->id)->whereIn('role', ['mentor', 'pembimbing'])->pluck('id'))
             ->whereHas('application', function ($aq) {
-                $aq->whereIn('status', ['verified', ...\App\Models\Application::QUOTA_STATUSES]);
+                $aq->whereIn('status', ['verified', ...Application::QUOTA_STATUSES]);
             })->count();
 
         if ($activeMentorsCount > 0) {
@@ -353,19 +356,19 @@ class AgencyController extends Controller
         }
 
         $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $agency->agency_name ?: 'agency'));
-        $defaultEmail = $agency->email ?: ('admin.' . $cleanName . '@surabaya.go.id');
+        $defaultEmail = $agency->email ?: ('admin.'.$cleanName.'@surabaya.go.id');
 
         $email = $defaultEmail;
         $counter = 1;
         while (User::where('email', $email)->exists()) {
-            $email = 'admin.' . $cleanName . $counter . '@surabaya.go.id';
+            $email = 'admin.'.$cleanName.$counter.'@surabaya.go.id';
             $counter++;
         }
 
         $password = 'password';
 
         $user = User::create([
-            'name' => 'Admin ' . $agency->agency_name,
+            'name' => 'Admin '.$agency->agency_name,
             'email' => $email,
             'password' => Hash::make($password),
             'role' => 'admin',
