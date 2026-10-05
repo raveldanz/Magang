@@ -227,15 +227,26 @@ class FinalReportController extends Controller
         $realPath = null;
 
         $candidatePaths = [
-            Storage::disk('local')->path($filePath),
-            storage_path('app/public/'.$filePath),
-            public_path('storage/'.$filePath),
+            $filePath ? Storage::disk('local')->path($filePath) : null,
+            $filePath ? storage_path('app/public/'.$filePath) : null,
+            $filePath ? public_path('storage/'.$filePath) : null,
+            Storage::disk('local')->path('final_reports/default.pdf'),
             storage_path('app/public/final_reports/default.pdf'),
             public_path('storage/final_reports/default.pdf'),
         ];
 
+        // Jika file asli berformat DOC/DOCX dan bukan paksa unduh, prioritaskan berkas PDF pendamping agar dapat dibuka langsung di browser
+        if (! $request->boolean('download') && in_array(strtolower(pathinfo($filePath ?? '', PATHINFO_EXTENSION)), ['doc', 'docx'])) {
+            $pdfCandidate = preg_replace('/\.(docx|doc)$/i', '.pdf', $filePath);
+            array_unshift($candidatePaths,
+                Storage::disk('local')->path($pdfCandidate),
+                storage_path('app/public/'.$pdfCandidate),
+                public_path('storage/'.$pdfCandidate)
+            );
+        }
+
         foreach ($candidatePaths as $candidate) {
-            if ($candidate && file_exists($candidate) && is_file($candidate)) {
+            if ($candidate && file_exists($candidate) && is_file($candidate) && filesize($candidate) > 0) {
                 $realPath = $candidate;
                 break;
             }
@@ -254,12 +265,19 @@ class FinalReportController extends Controller
         $downloadFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}.{$ext}";
 
         $mimeType = mime_content_type($realPath) ?: 'application/octet-stream';
+        if (strtolower($ext) === 'pdf') {
+            $mimeType = 'application/pdf';
+        }
+
         $forceDownload = $request->boolean('download') || ! in_array(strtolower($ext), ['pdf', 'png', 'jpg', 'jpeg']);
         $disposition = $forceDownload ? 'attachment' : 'inline';
 
         return response()->file($realPath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => "{$disposition}; filename=\"{$downloadFilename}\"",
+            'Cache-Control' => 'no-cache, private, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
         ]);
     }
 }

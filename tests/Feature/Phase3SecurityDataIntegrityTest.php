@@ -286,6 +286,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
         $ready = $this->application('active', [], ['end_date' => now()->subDay()->toDateString()]);
         FinalReport::create(['placement_id' => $ready->placement->id, 'file_path' => 'x.pdf', 'status' => 'approved']);
         Evaluation::create(['placement_id' => $ready->placement->id, 'nilai_disiplin' => 90, 'nilai_kinerja' => 90, 'nilai_laporan' => 90, 'nilai_akademik' => 90]);
+        Logbook::create(['placement_id' => $ready->placement->id, 'date' => now()->subDays(3)->toDateString(), 'activity' => 'Menyusun dokumentasi sistem', 'status' => 'approved']);
 
         $other = User::factory()->create(['role' => 'mahasiswa']);
         $late = Application::create([

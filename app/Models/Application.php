@@ -153,7 +153,8 @@ class Application extends Model
      * Certificate Gate: daftar syarat penerbitan E-Sertifikat yang BELUM terpenuhi (kosong = boleh terbit).
      *  1. Evaluasi kinerja Mentor Lapangan lengkap (nilai disiplin, kinerja, laporan terisi).
      *  2. Laporan akhir mahasiswa disetujui (status approved).
-     *  3. Status magang sudah dinyatakan lulus (COMPLETED).
+     *  3. Mahasiswa telah mengisi logbook aktivitas magang.
+     *  4. Status magang sudah dinyatakan lulus (COMPLETED).
      *
      * @return array<int, string>
      */
@@ -176,6 +177,10 @@ class Application extends Model
             $blockers[] = 'Laporan akhir magang belum disetujui (ACC).';
         }
 
+        if (! $this->has_filled_logbook) {
+            $blockers[] = 'Logbook aktivitas magang belum pernah diisi.';
+        }
+
         if ($this->statusValue() !== ApplicationStatus::COMPLETED->value) {
             $blockers[] = 'Status magang belum dinyatakan lulus / selesai.';
         }
@@ -186,6 +191,24 @@ class Application extends Model
     public function isCertificateEligible(): bool
     {
         return $this->certificateBlockers() === [];
+    }
+
+    public function getHasFilledLogbookAttribute(): bool
+    {
+        $placement = $this->placement;
+        if (! $placement) {
+            return false;
+        }
+
+        if (isset($placement->attributes['logbooks_count'])) {
+            return (int) $placement->attributes['logbooks_count'] > 0;
+        }
+
+        if ($placement->relationLoaded('logbooks')) {
+            return $placement->logbooks->isNotEmpty();
+        }
+
+        return $placement->logbooks()->exists();
     }
 
     public function getCanCompleteAttribute(): bool
@@ -200,7 +223,7 @@ class Application extends Model
             return false;
         }
 
-        return $this->has_approved_report && $this->has_complete_evaluation;
+        return $this->has_approved_report && $this->has_complete_evaluation && $this->has_filled_logbook;
     }
 
     /** Status pengajuan yang menempati kuota divisi */
@@ -354,13 +377,15 @@ class Application extends Model
             ))";
         $reportApproved = "EXISTS (SELECT 1 FROM placements p JOIN final_reports fr ON fr.placement_id = p.id
             WHERE p.application_id = applications.id AND LOWER(fr.status) = 'approved')";
+        $logbookFilled = 'EXISTS (SELECT 1 FROM placements p JOIN logbooks lb ON lb.placement_id = p.id
+            WHERE p.application_id = applications.id)';
         $mentorMissing = 'NOT EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id
             AND (p.mentor_id IS NOT NULL OR p.pembimbing_id IS NOT NULL))';
         $dosenMissing = 'EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id AND p.academic_advisor_id IS NULL)';
 
         return "(CASE
             WHEN applications.status IN ('pending', 'verified') THEN 1
-            WHEN applications.status IN ('accepted', 'active') AND {$reportApproved} AND {$evaluationComplete} THEN 2
+            WHEN applications.status IN ('accepted', 'active') AND {$reportApproved} AND {$evaluationComplete} AND {$logbookFilled} THEN 2
             WHEN applications.status IN ('accepted', 'active') AND ({$mentorMissing} OR ({$dosenMissing} AND {$requireDpl})) THEN 3
             WHEN applications.status = 'active' THEN 4
             WHEN applications.status = 'accepted' THEN 5

@@ -258,6 +258,13 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
 
         Evaluation::where('placement_id', $placement->id)->update(['nilai_laporan' => 88, 'nilai_akademik' => 90]);
 
+        // Nilai & laporan lengkap, tetapi logbook belum pernah diisi: sertifikat tetap terkunci
+        $this->actingAs($this->student)->get(route('student.certificate.show', $appId))
+            ->assertForbidden()
+            ->assertSee('Logbook aktivitas magang belum pernah diisi');
+
+        Logbook::create(['placement_id' => $placement->id, 'date' => now()->subDays(3)->toDateString(), 'activity' => 'Menyusun dokumentasi sistem', 'status' => 'approved']);
+
         $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))->assertOk();
         $this->actingAs($this->adminA)->get(route('admin.certificates.generate', $placement->id))->assertOk();
         $this->actingAs($superAdmin)->get(route('admin.certificates.index'))->assertOk();
@@ -268,6 +275,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         $placement = $this->placement('active', ['mentor_id' => $this->assignedMentor->id]);
         FinalReport::create(['placement_id' => $placement->id, 'file_path' => 'x.pdf', 'status' => 'approved']);
         Evaluation::create(['placement_id' => $placement->id, 'nilai_disiplin' => 90, 'nilai_kinerja' => 85, 'nilai_laporan' => 88]);
+        Logbook::create(['placement_id' => $placement->id, 'date' => now()->subDays(3)->toDateString(), 'activity' => 'Menyusun dokumentasi sistem', 'status' => 'approved']);
 
         $application = Application::find($placement->application_id);
         $this->assertSame(['Status magang belum dinyatakan lulus / selesai.'], $application->certificateBlockers());

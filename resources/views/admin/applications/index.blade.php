@@ -257,6 +257,8 @@
                                             $actionHint = $app->actionHint();
                                             $waitingEvaluation = !$actionHint && in_array($app->statusValue(), ['accepted', 'active'], true)
                                                 && $app->has_approved_report && !$app->has_complete_evaluation;
+                                            $waitingLogbook = !$actionHint && in_array($app->statusValue(), ['accepted', 'active'], true)
+                                                && $app->has_approved_report && $app->has_complete_evaluation && !$app->has_filled_logbook;
                                         @endphp
                                         <x-status-badge :status="$app->status"
                                             :tooltip="$app->statusValue() === 'rejected' && $app->rejection_note ? 'Alasan: ' . $app->rejection_note : null" />
@@ -265,6 +267,8 @@
                                         @endif
                                         @if($actionHint)
                                             <div class="mt-1.5 text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
+                                        @elseif($waitingLogbook)
+                                            <div class="mt-1.5 text-xs font-semibold text-rose-600">Logbook belum diisi</div>
                                         @elseif($waitingEvaluation)
                                             <div class="mt-1.5 text-xs text-slate-500">Menunggu nilai evaluasi</div>
                                         @endif
@@ -296,6 +300,8 @@
                             $actionHint = $app->actionHint();
                             $waitingEvaluation = !$actionHint && in_array($rawStatus, ['accepted', 'active'], true)
                                 && $app->has_approved_report && !$app->has_complete_evaluation;
+                            $waitingLogbook = !$actionHint && in_array($rawStatus, ['accepted', 'active'], true)
+                                && $app->has_approved_report && $app->has_complete_evaluation && !$app->has_filled_logbook;
                         @endphp
                         <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 relative">
                             @if(in_array($rawStatus, ['pending', 'verified']))
@@ -318,6 +324,8 @@
 
                             @if($actionHint)
                                 <div class="text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
+                            @elseif($waitingLogbook)
+                                <div class="text-xs font-semibold text-rose-600">Logbook belum diisi</div>
                             @elseif($waitingEvaluation)
                                 <div class="text-xs text-slate-500">Menunggu nilai evaluasi</div>
                             @endif

@@ -34,11 +34,11 @@ class UniversityHubService
         $totalDosenActive = 0;
         $totalDosenCompleted = 0;
 
-        // Lulus = status completed, atau laporan disetujui + lembar nilai lengkap (accessor is_complete,
+        // Lulus = status completed, atau laporan disetujui + logbook terisi + lembar nilai lengkap (accessor is_complete,
         // bukan kolom lama nilai_akademik yang kosong bila DPL menilai lewat aspek score_*).
         $isPassed = function ($p, string $val) use ($university) {
             return $val === 'completed'
-                || (optional($p->finalreport)->status === 'approved' && (bool) $p->evaluation?->useUniversity($university)->is_complete);
+                || (optional($p->finalreport)->status === 'approved' && $p->has_filled_logbook && (bool) $p->evaluation?->useUniversity($university)->is_complete);
         };
 
         foreach ($dosens as $dosen) {

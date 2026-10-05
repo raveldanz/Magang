@@ -213,6 +213,18 @@
                         </div>
                     </div>
                 </div>
+            @elseif($application->placement && in_array($application->statusValue(), ['accepted', 'active'], true) && !$application->has_filled_logbook)
+                <div class="bg-rose-50/80 p-5 sm:p-6 rounded-2xl border border-rose-200/90 flex items-start gap-3.5">
+                    <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-rose-900">Mahasiswa Belum Mengisi Logbook Aktivitas</h4>
+                        <p class="text-xs text-rose-800/90 mt-1 leading-relaxed">
+                            Mahasiswa belum pernah mengisi catatan logbook kegiatan harian selama magang. Sesuai kebijakan program, <strong>mahasiswa yang tidak mengisi logbook tidak dapat dinyatakan lulus magang (COMPLETED)</strong>.
+                        </p>
+                    </div>
+                </div>
             @elseif($application->placement && in_array($application->statusValue(), ['accepted', 'active'], true) && $application->has_approved_report)
                 <div class="bg-amber-50/80 p-5 sm:p-6 rounded-2xl border border-amber-200/90 flex items-start gap-3.5">
                     <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -268,13 +280,7 @@
                     @method('PUT')
 
                     @php
-                        $canComplete = false;
-                        if ($application->placement) {
-                            $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
-                            $eval = $application->placement->evaluation;
-                            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
-                            $canComplete = $hasApprovedReport && $hasCompleteEval;
-                        }
+                        $canComplete = $application->can_complete;
                     @endphp
 
                     <!-- Form Status Pipeline (Synchronized with visual cards) -->
@@ -396,12 +402,19 @@
                                 if ($isAlreadyRejected) {
                                     $completedSubtitle = 'Pengajuan Ditolak';
                                 } elseif ($isCompleteDisabled) {
-                                    if (!$application->has_approved_report && !$application->has_complete_evaluation) {
-                                        $completedSubtitle = 'Laporan & Nilai Belum Lengkap';
-                                    } elseif (!$application->has_approved_report) {
-                                        $completedSubtitle = 'Laporan Belum Disetujui';
-                                    } elseif (!$application->has_complete_evaluation) {
-                                        $completedSubtitle = 'Nilai Belum Lengkap';
+                                    $missingItems = [];
+                                    if (!$application->has_filled_logbook) {
+                                        $missingItems[] = 'Logbook';
+                                    }
+                                    if (!$application->has_approved_report) {
+                                        $missingItems[] = 'Laporan';
+                                    }
+                                    if (!$application->has_complete_evaluation) {
+                                        $missingItems[] = 'Nilai';
+                                    }
+
+                                    if (!empty($missingItems)) {
+                                        $completedSubtitle = implode(' & ', $missingItems) . ' Belum Lengkap';
                                     } else {
                                         $completedSubtitle = 'Syarat Belum Terpenuhi';
                                     }

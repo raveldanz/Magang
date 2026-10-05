@@ -160,6 +160,9 @@ class LogbookController extends Controller
             'lecturer_verified_at' => $requiresDpl ? null : now(),
         ]);
 
+        // Evaluasi kelulusan otomatis jika naskah laporan & nilai sudah tuntas sebelumnya
+        $placement->syncCompletionStatus();
+
         return redirect()->route('student.logbook.index')->with('success', 'Logbook kegiatan berhasil disimpan!');
     }
 
