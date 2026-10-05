@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Mentor;
 
 use App\Http\Controllers\Controller;
 use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class DashboardController extends Controller
         // Base query penempatan yang diplot ke mentor ini
         $baseQuery = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
-              ->orWhere('pembimbing_id', $mentor->id);
+                ->orWhere('pembimbing_id', $mentor->id);
         });
 
         // Multi-Tenant Isolation: Scoping ke instansi jika mentor terikat ke agency tertentu
@@ -37,10 +38,10 @@ class DashboardController extends Controller
         $upcomingCount = (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count();
         $completedCount = (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count();
 
-        $pendingLogbooksCount = \App\Models\Logbook::whereHas('placement', function ($q) use ($mentor) {
+        $pendingLogbooksCount = Logbook::whereHas('placement', function ($q) use ($mentor) {
             $q->where(function ($sq) use ($mentor) {
                 $sq->where('mentor_id', $mentor->id)
-                   ->orWhere('pembimbing_id', $mentor->id);
+                    ->orWhere('pembimbing_id', $mentor->id);
             });
             if ($mentor->agency_profile_id !== null) {
                 $q->whereHas('application.unit', function ($sq) use ($mentor) {
@@ -71,7 +72,7 @@ class DashboardController extends Controller
             'logbooks',
             'evaluation',
             'finalreport',
-            'academicAdvisor'
+            'academicAdvisor',
         ]);
 
         $query = match ($tab) {
@@ -81,9 +82,21 @@ class DashboardController extends Controller
             default => $query->whereRelation('application', 'status', 'active'),
         };
 
+        // Pencarian cepat berdasarkan nama atau NIM mahasiswa
+        $search = trim((string) $request->get('q', ''));
+        if ($search !== '') {
+            $keyword = '%'.mb_strtolower($search).'%';
+            $query->whereHas('application.user', function ($q) use ($keyword) {
+                $q->whereRaw('LOWER(name) LIKE ?', [$keyword])
+                    ->orWhereHas('studentProfile', function ($sq) use ($keyword) {
+                        $sq->whereRaw('LOWER(nim) LIKE ?', [$keyword]);
+                    });
+            });
+        }
+
         $placements = $query->latest()->paginate(10)->withQueryString();
 
-        return view('mentor.dashboard', compact('placements', 'stats', 'tab'));
+        return view('mentor.dashboard', compact('placements', 'stats', 'tab', 'search'));
     }
 
     /**
@@ -101,10 +114,10 @@ class DashboardController extends Controller
             },
             'evaluation',
             'finalreport',
-            'academicAdvisor'
+            'academicAdvisor',
         ])->where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
-              ->orWhere('pembimbing_id', $mentor->id);
+                ->orWhere('pembimbing_id', $mentor->id);
         })->findOrFail($placementId);
 
         // Multi-Tenant Authorization Check
