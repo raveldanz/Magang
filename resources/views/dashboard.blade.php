@@ -598,8 +598,6 @@
                                     </div>
                                 </div>
 
-                                <x-chat-button :user="$academicAdvisor" label="Chat DPL" />
-
                                 <button type="button"
                                     onclick="document.getElementById('change-advisor-box').classList.toggle('hidden')"
                                     class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs transition cursor-pointer">
