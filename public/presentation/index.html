@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Presentasi: Pengujian Controller Dosen (DPL)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-hidden select-none">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between z-30 bg-slate-950/70 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-sm text-white shadow-lg shadow-blue-500/30">QA</span>
+            <div>
+                <h1 class="text-sm font-bold text-slate-200">Skenario & Hasil Pengujian Modul Dosen</h1>
+                <p class="text-[11px] text-slate-400">Sistem Informasi Manajemen Magang Mahasiswa</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="/Pengujian_Controller_Dosen_V2.pptx" download class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-md shadow-blue-600/20">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Unduh Slide PPTX (V2 Interactive)</span>
+            </a>
+            <button onclick="toggleFullscreen()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Toggle Fullscreen (F)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Slide Presentation Container -->
+    <main class="flex-1 relative flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+
+        <!-- SLIDE 1: COVER -->
+        <section class="slide active flex-col justify-center items-center text-center max-w-5xl mx-auto space-y-6 w-full py-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                Quality Assurance & Visual E2E Report
+            </div>
+            <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                Skenario Pengujian Komprehensif<br/>
+                <span class="bg-gradient-to-r from-blue-400 via-sky-300 to-emerald-400 bg-clip-text text-transparent">Controller Dosen Pembimbing (DPL)</span>
+            </h2>
+            <p class="text-slate-400 max-w-2xl text-sm sm:text-base leading-relaxed">
+                Pengujian fungsionalitas, validasi input boundary, integritas relasi multi-tenant, serta pembuktian visual nyata (*Before vs After*) pada sistem live.
+            </p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 w-full max-w-3xl">
+                <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-center">
+                    <p class="text-2xl font-black text-blue-400">4</p>
+                    <p class="text-xs text-slate-400 mt-1">Controller Utama</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-center">
+                    <p class="text-2xl font-black text-emerald-400">100%</p>
+                    <p class="text-xs text-slate-400 mt-1">Pass (Exit Code 0)</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-center">
+                    <p class="text-2xl font-black text-sky-400">10</p>
+                    <p class="text-xs text-slate-400 mt-1">Bukti Visual Nyata</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-center">
+                    <p class="text-2xl font-black text-rose-400">Anti-IDOR</p>
+                    <p class="text-xs text-slate-400 mt-1">Role Guard Teruji</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: ARSITEKTUR -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-6 w-full">
+            <div>
+                <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Arsitektur Perangkat Lunak</span>
+                <h2 class="text-2xl sm:text-3xl font-black text-white mt-1">Struktur Controller & Tanggung Jawab Modul Dosen</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-blue-400 text-base">DashboardController</h3>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-300">lecturer.dashboard</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Mengelola tampilan ringkasan bimbingan dosen aktif, metrik statistik (sudah dinilai, laporan ACC), filter pencarian dinamis, dan pengecualian mahasiswa berstatus resigned/rejected.
+                    </p>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-emerald-400 text-base">MonitoringController</h3>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300">lecturer.monitoring.index</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Segregasi alur pemantauan mahasiswa berdasarkan tahapan siklus hidup magang: tab Active (berlangsung & calon peserta), tab Upcoming, dan tab Completed (alumni magang).
+                    </p>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-sky-400 text-base">LogbookController</h3>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-300">lecturer.logbooks.*</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Mengagregasi paket logbook mingguan (weekly bundles 7 hari), verifikasi status individual dengan catatan feedback bimbingan, serta aksi massal (bulk approve).
+                    </p>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-amber-400 text-base">EvaluationController</h3>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300">lecturer.evaluations.*</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Menangani formulir penilaian 3 aspek kompetensi, adaptasi skema evaluasi kampus (mentor-only vs dual-evaluation), konversi grade, dan pemicu status kelulusan (auto-completion).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: SKENARIO 1 - DASHBOARD FILTER -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Skenario 1 • TC-DASH-01 s/d TC-DASH-06</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Isolasi Data Dashboard & Filter Pencarian Dinamis</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">PASSED</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-blue-400">Kondisi Awal (Before Filter)</span>
+                        <span class="text-[10px] text-slate-400">Seluruh Mahasiswa Bimbingan</span>
+                    </div>
+                    <img src="/test-artifacts/tc01_dashboard_before_filter.png" alt="Dashboard Before Filter" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Menampilkan kartu metrik statistik dan daftar bimbingan aktif dengan tombol aksi navigasi detail.</p>
+                </div>
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-emerald-400">Hasil Filter (After Search Filter)</span>
+                        <span class="text-[10px] text-slate-400">Pencarian Kata Kunci Nama</span>
+                    </div>
+                    <img src="/test-artifacts/tc02_dashboard_after_filter.png" alt="Dashboard After Filter" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Query PostgreSQL (ilike) memfilter mahasiswa secara instan tanpa merusak layout antarmuka tabel.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: SKENARIO 2 - MONITORING LIFECYCLE -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Skenario 2 • TC-MON-01 s/d TC-MON-05</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Monitoring Lifecycle: Mahasiswa Aktif vs Arsip Alumni</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">PASSED</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-blue-400">Tab 1: Mahasiswa Aktif (Active)</span>
+                        <span class="text-[10px] text-slate-400">Sedang Magang Berlangsung</span>
+                    </div>
+                    <img src="/test-artifacts/tc03_monitoring_tab_active.png" alt="Monitoring Active" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Memuat data peserta magang yang sedang aktif beserta jumlah logbook dan status verifikasi DPL.</p>
+                </div>
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-emerald-400">Tab 2: Arsip Alumni Selesai (Completed)</span>
+                        <span class="text-[10px] text-slate-400">Telah Lulus Magang</span>
+                    </div>
+                    <img src="/test-artifacts/tc09_monitoring_tab_completed.png" alt="Monitoring Completed" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Menyajikan riwayat kelulusan mahasiswa dengan indikator status COMPLETED biru dan nilai akhir resmi.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: SKENARIO 3 - VERIFIKASI LOGBOOK -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Skenario 3 • TC-LOG-01 s/d TC-LOG-06</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Verifikasi & Catatan Feedback Logbook Bimbingan</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">PASSED</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-amber-400">Before: Status Masih Pending</span>
+                        <span class="text-[10px] text-slate-400">Menunggu ACC Dosen</span>
+                    </div>
+                    <img src="/test-artifacts/tc05_logbook_before_verification.png" alt="Logbook Before Verification" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Badge DPL berstatus kuning PENDING dengan tombol interaktif 'Verifikasi DPL' aktif.</p>
+                </div>
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-emerald-400">After: Status Berubah Approved & Feedback</span>
+                        <span class="text-[10px] text-slate-400">ACC & Timestamp Tersimpan</span>
+                    </div>
+                    <img src="/test-artifacts/tc06_logbook_after_verification.png" alt="Logbook After Verification" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Badge berubah menjadi APPROVED hijau, box feedback biru muda muncul, dan timestamp tercatat resmi.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: SKENARIO 4 - EVALUASI PENILAIAN -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Skenario 4 • TC-EVAL-01 s/d TC-EVAL-06</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Penilaian Akademik 3 Aspek & Pembobotan Kampus</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">PASSED</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-blue-400">Formulir Penilaian DPL (Before)</span>
+                        <span class="text-[10px] text-slate-400">Input 3 Aspek Kompetensi</span>
+                    </div>
+                    <img src="/test-artifacts/tc07_evaluation_form_before.png" alt="Evaluation Form Before" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Input nilai penguasaan materi, laporan, dan sikap (0-100) dilengkapi kalkulasi live preview.</p>
+                </div>
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold text-emerald-400">Rekapitulasi Nilai Tersimpan (After)</span>
+                        <span class="text-[10px] text-slate-400">Bobot 40:60 & Grade Terbit</span>
+                    </div>
+                    <img src="/test-artifacts/tc08_evaluation_submitted_after.png" alt="Evaluation Submitted After" class="rounded-xl border border-slate-700 w-full object-cover max-h-80 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                    <p class="text-[11px] text-slate-300 px-1">Nilai gabungan otomatis terhitung, grade A disematkan, dan perubahan tercatat di AuditLog.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: SKENARIO 5 - LAPORAN AKHIR -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Skenario 5 • TC-EVAL-07 s/d TC-EVAL-09</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Verifikasi Laporan Akhir & Buka Naskah Tab Baru</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">PASSED</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div class="md:col-span-8 p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <img src="/test-artifacts/tc04_student_detail_report_acc.png" alt="Report ACC Detail" class="rounded-xl border border-slate-700 w-full object-cover max-h-96 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                </div>
+                <div class="md:col-span-4 space-y-3">
+                    <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block">Verifikasi Naskah Sukses</span>
+                        <h4 class="text-sm font-bold text-white">Status: APPROVED (ACC)</h4>
+                        <ul class="text-xs text-slate-300 space-y-1.5 pt-2">
+                            <li>• Tombol tab baru: <code class="text-sky-300">target="_blank"</code> aktif</li>
+                            <li>• Mengeliminasi iframe inline yang rentan crash</li>
+                            <li>• Memicu sinkronisasi status otomatis (syncCompletionStatus)</li>
+                            <li>• Akses dilindungi otorisasi multi-role</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: SKENARIO 6 - SECURITY ANTI-IDOR -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest">Skenario 6 • Keamanan & Otorisasi</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Pengujian Anti-IDOR: Akses Mahasiswa Dosen Lain Ditangkal</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 border border-rose-500/30 text-rose-400">BLOCKED (403)</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div class="md:col-span-7 p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                    <img src="/test-artifacts/tc10_security_idor_forbidden_403.png" alt="IDOR 403 Forbidden" class="rounded-xl border border-slate-700 w-full object-cover max-h-96 cursor-pointer hover:opacity-90 transition" onclick="openLightbox(this.src)">
+                </div>
+                <div class="md:col-span-5 space-y-3">
+                    <div class="p-5 rounded-2xl bg-rose-950/40 border border-rose-900/60 space-y-2">
+                        <span class="text-xs font-bold text-rose-400 uppercase tracking-wider block">IDOR Vulnerability Test</span>
+                        <h4 class="text-base font-bold text-white">HTTP 403: Akses Ditolak</h4>
+                        <p class="text-xs text-rose-200/80 leading-relaxed">
+                            Ketika Dosen UNAIR mencoba mengakses detail bimbingan mahasiswa milik Dosen UNITOMO melalui manipulasi route parameter <code class="text-white">/lecturer/students/{id}</code>, sistem secara tegas menghentikan request dengan HTTP 403.
+                        </p>
+                        <div class="pt-2 text-[11px] text-slate-300">
+                            <strong>Hasil Audit:</strong> Zero data leakage, hak akses strictly scoped ke <code class="text-sky-300">academic_advisor_id</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: REKAPITULASI QA -->
+        <section class="slide flex-col justify-center max-w-6xl mx-auto space-y-4 w-full">
+            <div>
+                <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest">Quality Assurance Summary</span>
+                <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">Matriks Rekapitulasi Hasil Pengujian Controller Dosen</h2>
+            </div>
+            <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-slate-950 text-slate-100 uppercase tracking-wider border-b border-slate-800 text-[11px]">
+                        <tr>
+                            <th class="py-3 px-4">Modul / Controller</th>
+                            <th class="py-3 px-4">Skenario Pengujian</th>
+                            <th class="py-3 px-4">Metode Verifikasi</th>
+                            <th class="py-3 px-4">Status Uji</th>
+                            <th class="py-3 px-4">Integritas Sistem</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 font-mono text-[11px]">
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="py-2.5 px-4 font-bold text-blue-400 font-sans">DashboardController</td>
+                            <td class="py-2.5 px-4 font-sans">Isolasi bimbingan DPL & filter pencarian</td>
+                            <td class="py-2.5 px-4">E2E Browser & Feature Test</td>
+                            <td class="py-2.5 px-4 font-bold text-emerald-400">100% PASS</td>
+                            <td class="py-2.5 px-4 font-sans text-slate-200">Strictly Scoped DPL</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="py-2.5 px-4 font-bold text-emerald-400 font-sans">MonitoringController</td>
+                            <td class="py-2.5 px-4 font-sans">Segregasi tab Active vs Completed</td>
+                            <td class="py-2.5 px-4">Live Browser Automation</td>
+                            <td class="py-2.5 px-4 font-bold text-emerald-400">100% PASS</td>
+                            <td class="py-2.5 px-4 font-sans text-slate-200">Presisi Filter Lifecycle</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="py-2.5 px-4 font-bold text-sky-400 font-sans">LogbookController</td>
+                            <td class="py-2.5 px-4 font-sans">Weekly bundles & verifikasi inline</td>
+                            <td class="py-2.5 px-4">E2E Flow & DB Timestamp</td>
+                            <td class="py-2.5 px-4 font-bold text-emerald-400">100% PASS</td>
+                            <td class="py-2.5 px-4 font-sans text-slate-200">Anti-Tamper & Timestamped</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="py-2.5 px-4 font-bold text-amber-400 font-sans">EvaluationController</td>
+                            <td class="py-2.5 px-4 font-sans">Nilai 3 aspek, pembobotan & ACC</td>
+                            <td class="py-2.5 px-4">Math Formula & AuditLog</td>
+                            <td class="py-2.5 px-4 font-bold text-emerald-400">100% PASS</td>
+                            <td class="py-2.5 px-4 font-sans text-slate-200">Audit Trail Tercatat</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="py-2.5 px-4 font-bold text-rose-400 font-sans">Security Anti-IDOR</td>
+                            <td class="py-2.5 px-4 font-sans">Akses cross-lecturer & role guard</td>
+                            <td class="py-2.5 px-4">Negative Security Attack</td>
+                            <td class="py-2.5 px-4 font-bold text-emerald-400">100% PASS (403)</td>
+                            <td class="py-2.5 px-4 font-sans text-slate-200">Zero Data Leakage</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: PENUTUP -->
+        <section class="slide flex-col justify-center items-center text-center max-w-4xl mx-auto space-y-6 w-full py-8">
+            <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                Verifikasi Selesai • Siap Produksi
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white">
+                Seluruh Modul Controller Dosen Teruji & Stabil
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
+                Pengujian menyeluruh pada level unit, integrasi, dan browser nyata membuktikan bahwa controller dosen memiliki ketahanan tinggi terhadap regresi fungsional, perhitungan nilai akurat, dan perlindungan keamanan ketat.
+            </p>
+            <div class="pt-4 flex flex-wrap gap-4 justify-center">
+                <a href="/Pengujian_Controller_Dosen.pptx" download class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Slide PPTX (PowerPoint)</span>
+                </a>
+                <button onclick="goToSlide(0)" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-bold transition">
+                    Ulangi dari Awal
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Controls & Thumbnails -->
+    <footer class="h-16 border-t border-slate-800/80 px-6 flex items-center justify-between z-30 bg-slate-950/70 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+            <button onclick="prevSlide()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Sebelumnya (Panah Kiri)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <span id="slideIndicator" class="text-xs font-mono text-slate-400 font-bold px-3 py-1 rounded bg-slate-900 border border-slate-800">
+                Slide 1 / 10
+            </span>
+            <button onclick="nextSlide()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Selanjutnya (Panah Kanan / Space)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+
+        <!-- Dot Indicators -->
+        <div id="dotContainer" class="hidden sm:flex items-center gap-1.5"></div>
+
+        <div class="text-[11px] text-slate-500 font-mono">
+            Gunakan tombol <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-sans">←</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-sans">→</kbd> untuk navigasi
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 cursor-zoom-out" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="Zoomed Screenshot" class="max-w-full max-h-[90vh] rounded-2xl shadow-2xl border border-slate-700 object-contain">
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+
+        const slideIndicator = document.getElementById('slideIndicator');
+        const dotContainer = document.getElementById('dotContainer');
+
+        // Create dots
+        slides.forEach((_, idx) => {
+            const dot = document.createElement('button');
+            dot.className = `w-2 h-2 rounded-full transition-all ${idx === 0 ? 'w-6 bg-blue-500' : 'bg-slate-700 hover:bg-slate-500'}`;
+            dot.onclick = () => goToSlide(idx);
+            dotContainer.appendChild(dot);
+        });
+
+        function updateSlideUI() {
+            slides.forEach((s, idx) => {
+                s.classList.toggle('active', idx === currentSlide);
+            });
+            slideIndicator.innerText = `Slide ${currentSlide + 1} / ${totalSlides}`;
+            
+            const dots = dotContainer.children;
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].className = `h-2 rounded-full transition-all ${i === currentSlide ? 'w-6 bg-blue-500' : 'w-2 bg-slate-700 hover:bg-slate-500'}`;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function goToSlide(idx) {
+            if (idx >= 0 && idx < totalSlides) {
+                currentSlide = idx;
+                updateSlideUI();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        function openLightbox(src) {
+            const lb = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImg');
+            img.src = src;
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('hidden');
+            lb.classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
