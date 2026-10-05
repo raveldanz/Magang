@@ -415,9 +415,11 @@
                             $hasDosenScore = $evaluation && (($evaluation->nilai_dosen_calculated ?? 0) > 0 || ($evaluation->nilai_dosen ?? 0) > 0 || ($evaluation->nilai_akademik ?? 0) > 0);
 
                             $isEvalComplete = $evaluation && $evaluation->is_complete;
+                            $hasFilledLogbook = (bool) ($application->has_filled_logbook ?? false);
+                            $canGraduate = $isEvalComplete && $hasFilledLogbook && ($finalReport && $finalReport->status === 'approved');
                         @endphp
 
-                        @if ($isEvalComplete)
+                        @if ($canGraduate)
                             <div class="space-y-4 pt-1">
                                 <div class="flex items-center justify-between border-b border-gray-100 pb-3 gap-2">
                                     <div>
@@ -488,23 +490,55 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </div>
                                 <div>
-                                    <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Lembar Penilaian & Verifikasi</span>
+                                    <span class="text-xs sm:text-sm font-bold text-amber-950 block">Menunggu Kelengkapan Syarat Kelulusan & Lembar Penilaian</span>
                                     <p class="text-xs text-amber-800 leading-relaxed">
-                                        E-Sertifikat resmi akan otomatis terbit begitu seluruh 3 indikator kelengkapan di bawah terpenuhi.
+                                        E-Sertifikat resmi akan otomatis terbit begitu seluruh 4 indikator kelayakan kelulusan di bawah terpenuhi.
                                     </p>
                                 </div>
                             </div>
 
-                            <!-- 3-Item Progress Checklist -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                            @if($isEvalComplete && !$hasFilledLogbook)
+                                <div class="p-3.5 rounded-xl bg-rose-100/80 border border-rose-200 text-xs text-rose-900 flex items-start justify-between gap-3">
+                                    <div class="flex items-start gap-2">
+                                        <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <div>
+                                            <strong class="font-bold">Perhatian: Logbook Belum Diisi</strong>
+                                            <p class="text-[11px] text-rose-800 mt-0.5">Penilaian dan laporan akhir Anda telah selesai, namun Anda belum pernah mengisi logbook kegiatan harian. Anda wajib mengisi logbook untuk dapat lulus magang.</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('student.logbook.index') }}" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shrink-0 transition shadow-2xs">
+                                        Isi Logbook &rarr;
+                                    </a>
+                                </div>
+                            @endif
+
+                            <!-- 4-Item Progress Checklist -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
+                                <!-- 1. Logbook Aktivitas -->
+                                <div class="p-3 rounded-xl border {{ $hasFilledLogbook ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900' }} space-y-1">
+                                    <div class="flex items-center gap-1.5 font-bold">
+                                        @if($hasFilledLogbook)
+                                            <span class="text-emerald-600 font-bold">✓</span>
+                                            <span>1. Logbook Harian</span>
+                                        @else
+                                            <span class="text-rose-500 font-bold">✗</span>
+                                            <span>1. Logbook Harian</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[11px] {{ $hasFilledLogbook ? 'text-emerald-700' : 'text-rose-700' }}">
+                                        {{ $hasFilledLogbook ? 'Logbook Terisi' : 'Belum Diisi (Wajib)' }}
+                                    </p>
+                                </div>
+
+                                <!-- 2. Pembimbing Lapangan -->
                                 <div class="p-3 rounded-xl border {{ $hasMentorScore ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
                                     <div class="flex items-center gap-1.5 font-bold">
                                         @if($hasMentorScore)
                                             <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>1. Pembimbing Lapangan</span>
+                                            <span>2. Pembimbing Lapangan</span>
                                         @else
                                             <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>1. Pembimbing Lapangan</span>
+                                            <span>2. Pembimbing Lapangan</span>
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ $hasMentorScore ? 'text-emerald-700' : 'text-slate-500' }}">
@@ -512,14 +546,15 @@
                                     </p>
                                 </div>
 
+                                <!-- 3. DPL Kampus -->
                                 <div class="p-3 rounded-xl border {{ ($hasDosenScore || $isMentorOnly) ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
                                     <div class="flex items-center gap-1.5 font-bold">
                                         @if($hasDosenScore || $isMentorOnly)
                                             <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>2. DPL Kampus</span>
+                                            <span>3. DPL Kampus</span>
                                         @else
                                             <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>2. DPL Kampus</span>
+                                            <span>3. DPL Kampus</span>
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
@@ -527,18 +562,19 @@
                                     </p>
                                 </div>
 
+                                <!-- 4. Naskah Laporan Akhir -->
                                 <div class="p-3 rounded-xl border {{ ($finalReport && $finalReport->status === 'approved') ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
                                     <div class="flex items-center gap-1.5 font-bold">
                                         @if($finalReport && $finalReport->status === 'approved')
                                             <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>3. Naskah Laporan Akhir</span>
+                                            <span>4. Laporan Akhir</span>
                                         @else
                                             <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>3. Naskah Laporan Akhir</span>
+                                            <span>4. Laporan Akhir</span>
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ ($finalReport && $finalReport->status === 'approved') ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui' : 'Menunggu Persetujuan Naskah' }}
+                                        {{ ($finalReport && $finalReport->status === 'approved') ? 'Disetujui (ACC)' : 'Menunggu Persetujuan Naskah' }}
                                     </p>
                                 </div>
                             </div>

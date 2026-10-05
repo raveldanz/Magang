@@ -144,10 +144,10 @@ class CertificateController extends Controller
             abort(403, 'Akses Ditolak: Anda tidak berhak melihat atau mengunduh sertifikat ini.');
         }
 
-        // Proteksi Ketat Kelulusan: E-Sertifikat hanya sah diakses jika mahasiswa telah berstatus COMPLETED
+        // Proteksi Ketat Kelulusan: E-Sertifikat hanya sah diakses jika mahasiswa telah berstatus COMPLETED dan terisi logbook
         $statusVal = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)$application->status;
-        if ($statusVal !== 'completed') {
-            abort(403, 'Akses Dibatasi: E-Sertifikat dan Transkrip Nilai resmi hanya dapat diterbitkan dan diunduh setelah mahasiswa dinyatakan lulus (status COMPLETED) dengan naskah laporan akhir yang telah disetujui (ACC) serta lembar evaluasi yang telah lengkap.');
+        if ($statusVal !== 'completed' || !$application->has_filled_logbook) {
+            abort(403, 'Akses Dibatasi: E-Sertifikat dan Transkrip Nilai resmi hanya dapat diterbitkan dan diunduh setelah mahasiswa dinyatakan lulus (status COMPLETED) dengan naskah laporan akhir yang telah disetujui (ACC), lembar evaluasi yang telah lengkap, serta telah mengisi logbook aktivitas magang.');
         }
 
         // Cek evaluasi kelulusan
