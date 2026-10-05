@@ -104,8 +104,25 @@ class Placement extends Model
     }
 
     /**
+     * Cek apakah mahasiswa telah mengisi minimal satu catatan logbook magang
+     */
+    public function getHasFilledLogbookAttribute(): bool
+    {
+        if (isset($this->attributes['logbooks_count'])) {
+            return (int) $this->attributes['logbooks_count'] > 0;
+        }
+
+        if ($this->relationLoaded('logbooks')) {
+            return $this->logbooks->isNotEmpty();
+        }
+
+        return $this->logbooks()->exists();
+    }
+
+    /**
      * Evaluasi dan perbarui status kelulusan magang (COMPLETED) secara otomatis.
-     * Syarat: Naskah laporan akhir disetujui (ACC) DAN lembar evaluasi lengkap sesuai skema kampus.
+     * Syarat: Naskah laporan akhir disetujui (ACC), lembar evaluasi lengkap sesuai skema kampus,
+     * DAN mahasiswa wajib telah mengisi logbook aktivitas magang.
      */
     public function syncCompletionStatus(): bool
     {
@@ -117,6 +134,11 @@ class Placement extends Model
             return false;
         }
 
+        // Mahasiswa yang tidak mengisi logbook tidak bisa lulus magang
+        if (!$this->has_filled_logbook) {
+            return false;
+        }
+
         if ($eval && $eval->is_complete) {
             $rawStatus = $app->status instanceof \App\Enums\ApplicationStatus ? $app->status->value : strtolower((string)$app->status);
             if ($rawStatus !== 'completed' && !in_array($rawStatus, ['resigned', 'rejected'])) {
@@ -124,7 +146,7 @@ class Placement extends Model
                 
                 \App\Models\AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [
                     'student_name' => $app->user?->name,
-                    'reason' => 'Laporan akhir disetujui dan nilai evaluasi lengkap.',
+                    'reason' => 'Laporan akhir disetujui, nilai evaluasi lengkap, dan logbook terisi.',
                 ]);
             }
             return true;
