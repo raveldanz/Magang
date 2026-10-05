@@ -63,6 +63,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-053** | 2026-10-05 | Saluran Pengumuman & Integrasi Logo Chat | Penamaan langsung nama lembaga (tanpa awalan panjang), resolusi dinamis logo resmi dari profil dinas & kampus, perbaikan avatar info panel | RESOLVED |
 | **LRN-055** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
 | **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
+| **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
+| **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
 
 ---
 
@@ -1249,6 +1251,62 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Memperbarui assertion pengujian di [Phase1OnboardingTest.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/tests/Feature/Phase1OnboardingTest.php) (`assertDontSee('Mahasiswa Belum Memiliki Mentor Dinas')`).
   4. Memvalidasi tampilan visual antarmuka via Playwright runner (`scripts/browser-runner.mjs`), memastikan tata letak kartu metrik eksekutif bersih, rapi, dan seluruh 237 pengujian PHPUnit lulus 100% (Strict Exit Code 0).
 - **Prevention Rule**: Pertahankan tujuan halaman Dashboard Admin sebagai pusat ringkasan metrik eksekutif dan analitik agregat. Aksi operasional penetapan perorangan (seperti plotting mentor/dosen) harus tetap terpusat di halaman detail entitas terkait (`admin.applications.show`) agar UI dashboard tidak over-cluttered dan bebas query database yang redundan.
+
+---
+
+### [LRN-057] Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi (Mentor Dinas & DPL)
+- **Tanggal**: 2026-10-05
+- **Komponen**: `App\Support\Grade`, `App\Services\LogbookWeeklyBundler`, `app/Http/Controllers/Mentor/LogbookController.php`, `app/Http/Controllers/Lecturer/LogbookController.php`, `app/Http/Controllers/Mentor/EvaluationController.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `resources/views/components/supervision/*`, Blade Views (`mentor/` & `lecturer/`).
+- **Problem / Symptom**:
+  1. Terdapat disparitas antarmuka dan alur operasional antara Mentor Dinas dan Dosen Pembimbing Lapangan (DPL): Mentor menilai logbook per hari sedangkan DPL menilai paket 7 hari lewat modal popup.
+  2. Halaman detail mahasiswa DPL memiliki form penilaian inline ganda yang tidak selaras dengan mentor.
+  3. Skala predikat nilai berbeda (Mentor memakai A/B/C dengan rentang lama, DPL memakai skala lain), dan form penilaian DPL secara default terisi nilai 85 serta me-redirect jika skema `mentor_only`.
+- **Root Cause**:
+  1. Implementasi awal mentor dan DPL dibangun terpisah dengan logic pengelompokan yang berbeda dan variasi komponen UI.
+  2. Ketiadaan helper terpusat untuk standardisasi konversi nilai angka ke huruf mutu (*letter grades*).
+  3. Form penilaian DPL menggunakan slider range dan default value daripada input angka besar yang ramah bagi pengguna lanjut usia (*elderly-friendly ergonomics*).
+- **Fix Applied**:
+  1. **Backend Separation & Helper Terpusat**:
+     - Mempertahankan pemisahan backend, controller, route, dan kolom DB.
+     - Membuat `App\Support\Grade` dengan standardisasi skala predikat: A (≥85), AB (≥75), B (≥65), BC (≥55), C (≥40), E (<40).
+     - Membuat `App\Services\LogbookWeeklyBundler` untuk pengelompokan 7-hari ISO week yang dapat dikonfigurasi kolom status & feedback-nya, dengan paginasi 10 paket per halaman.
+  2. **Shared Blade Components**:
+     - `<x-supervision.logbook-weekly>`: Paket mingguan dengan inline accordion Alpine.js (bukan modal), status harian dengan indikator review pihak lain, form catatan, serta tombol "Minta Revisi" dan "Setujui".
+     - `<x-supervision.score-form>`: Form input 3 aspek angka murni besar tanpa slider range, kotak kalkulasi real-time (Rata-rata, Predikat, Nilai Akhir berbobot), textarea catatan, dan tombol "Batal" + "Simpan Nilai".
+     - `<x-supervision.report-review>`: Review laporan akhir dengan tombol "Buka Naskah Laporan (Tab Baru ↗)" (`target="_blank"`), textarea catatan, dan tombol "Minta Revisi" serta "Setujui".
+  3. **Endpoints & Controller Hardening**:
+     - Menambahkan endpoint `POST /mentor/logbooks/bulk-review` yang memvalidasi otorisasi `canFieldReviewLogbook($user)` (termasuk fallback Kepala Unit) dan mencatat transaksi ke `AuditLog`.
+     - Mendukung alias `status` & `feedback` pada `lecturer.logbooks.bulk_approve`.
+     - Menghapus redirect `mentor_only` pada DPL EvaluationController (tetap menampilkan nilai mentor read-only + catatan DPL).
+  4. **Strict Exit Code 0 & Visual Parity**:
+     - Seluruh 244 automated tests (Unit & Feature) lulus 100% (Strict Exit Code 0).
+     - `vendor/bin/pint --test` lulus bersih tanpa pelanggaran PSR-12.
+     - Build Vite bersih dan verifikasi visual E2E dengan Google Chrome lokal mengonfirmasi 100% paritas visual di desktop dan mobile.
+- **Prevention Rule**: Seluruh antarmuka bimbingan (supervisi) lintas peran yang memiliki tugas paralel (seperti pembimbing lapangan dan dosen akademik) wajib menggunakan shared presentation components (`components/supervision/*`) untuk menjamin konsistensi tata letak tanpa menggabungkan layer bisnis/database. Selalu sertakan inline comment `{{-- status-guard:ignore --}}` pada label statis yang diperiksa oleh `StatusViewGuardTest`.
+
+---
+
+### [LRN-058] Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor
+- **Tanggal**: 2026-10-05
+- **Komponen**: `app/Http/Controllers/Mentor/DashboardController.php`, `resources/views/mentor/dashboard.blade.php`, `resources/views/lecturer/dashboard.blade.php`, `app/Support/Grade.php`
+- **Problem / Symptom**:
+  1. Tampilan Portal Mentor sebelumnya memakai layout tab lama (`tab=active`, `tab=upcoming`, dll.) yang berbeda dengan Portal Dosen yang sudah menggunakan 4 kartu metrik simpel, filter bar, dan tabel mahasiswa komprehensif.
+  2. Terjadi `QueryException` PostgreSQL (`column "nilai_pembimbing" does not exist`) saat mentor membuka dashboard, akibat pemanggilan accessor virtual pada query `whereHas('evaluation')`.
+  3. Label pada header Portal Dosen masih memuat singkatan dalam kurung (`Portal Dosen Pembimbing Lapangan (DPL Kampus)`).
+- **Root Cause**:
+  1. Tata letak mentor belum diselaraskan dengan standar terbaru Portal Dosen yang berbasis Clean Architecture dan ramah pengguna.
+  2. `nilai_pembimbing` adalah accessor virtual di `App\Models\Evaluation`, bukan kolom fisik database PostgreSQL (`evaluations` menyimpan `nilai_disiplin`, `nilai_kinerja`, `nilai_laporan`).
+- **Fix Applied**:
+  1. Mengubah `resources/views/mentor/dashboard.blade.php` agar persis identik dengan `resources/views/lecturer/dashboard.blade.php`:
+     - Header: "Portal Mentor Lapangan" dengan pill badge nama instansi dinas.
+     - 4 Kartu Metrik: "Total Bimbingan", "Sudah Dinilai", "Laporan Akhir", "Belum Dinilai".
+     - Filter Bar: Pencarian nama/NIM/jurusan, dropdown status laporan akhir, dan dropdown filter perguruan tinggi (`university_id`).
+     - Tabel Mahasiswa: Kolom Mahasiswa (+ status badge seperti `ACTIVE`/`COMPLETED` untuk kepatuhan `StatusLabelConsistencyTest`), Perguruan Tinggi & Unit, Dosen Pembimbing (+ Skor Dosen), Logbook (entri pill), Laporan Akhir (status badge), Nilai Mentor, dan tombol "Detail" simpel gaya admin.
+     - Mode responsif mobile card untuk layar HP (< 640px).
+  2. Memperbaiki query di `DashboardController::index()` untuk memeriksa kolom riil database: `nilai_disiplin > 0 or nilai_kinerja > 0 or nilai_laporan > 0`.
+  3. Menyederhanakan judul di `lecturer/dashboard.blade.php` menjadi "Portal Dosen Pembimbing" tanpa tanda kurung.
+  4. Menambahkan alias `Grade::fromScore()` pada helper `App\Support\Grade`.
+- **Prevention Rule**: Dilarang menggunakan Eloquent virtual accessor di dalam query database `where()` atau `whereHas()`. Selalu periksa skema tabel riil PostgreSQL sebelum menyusun query builder. Seluruh halaman supervisi bimbingan magang wajib mempertahankan paritas tata letak, warna, dan hirarki visual.
 
 ---
 

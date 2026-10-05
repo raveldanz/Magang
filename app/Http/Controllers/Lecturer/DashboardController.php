@@ -6,6 +6,7 @@ use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Placement;
+use App\Services\LogbookWeeklyBundler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,9 +28,9 @@ class DashboardController extends Controller
             'finalreport',
             'evaluation',
         ])->where('academic_advisor_id', $lecturer->id)
-          ->whereHas('application', function ($q) {
-              $q->whereNotIn('status', ['resigned', 'rejected']);
-          });
+            ->whereHas('application', function ($q) {
+                $q->whereNotIn('status', ['resigned', 'rejected']);
+            });
     }
 
     /**
@@ -109,7 +110,7 @@ class DashboardController extends Controller
     /**
      * Detail monitoring aktivitas, logbook, laporan akhir, dan form penilaian per mahasiswa bimbingan
      */
-    public function showStudent($placementId)
+    public function showStudent($placementId, LogbookWeeklyBundler $bundler)
     {
         $lecturer = Auth::user();
 
@@ -148,7 +149,19 @@ class DashboardController extends Controller
         $finalReport = $placement->finalreport;
         $evaluation = $placement->evaluation;
 
+        $weeklyBundles = $bundler->bundle(
+            logbooks: $logbooks,
+            statusColumn: 'lecturer_status',
+            feedbackColumn: 'lecturer_feedback',
+            otherStatusColumn: 'status',
+            otherFeedbackColumn: 'feedback',
+            perPage: null
+        );
+
+        $evaluationLockReason = $placement->evaluationLockReason();
+
         return view('lecturer.student-detail', compact(
+            'evaluationLockReason',
             'placement',
             'student',
             'profile',
@@ -156,6 +169,7 @@ class DashboardController extends Controller
             'agencyProfile',
             'mentor',
             'logbooks',
+            'weeklyBundles',
             'finalReport',
             'evaluation'
         ));
