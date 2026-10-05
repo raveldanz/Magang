@@ -36,7 +36,7 @@ class LogbookController extends Controller
             'placement.mentor',
             'placement.academicAdvisor',
         ])
-        ->whereIn('placement_id', $placementIds);
+            ->whereIn('placement_id', $placementIds);
 
         // Filter Mahasiswa
         if ($request->filled('placement_id')) {
@@ -58,12 +58,12 @@ class LogbookController extends Controller
             $search = strtolower(trim($request->search));
             $logbooksQuery->where(function ($q) use ($search) {
                 $q->where('activity', 'like', "%{$search}%")
-                  ->orWhereHas('placement.application.user', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%")
-                         ->orWhereHas('studentProfile', function ($sq) use ($search) {
-                             $sq->where('nim', 'like', "%{$search}%");
-                         });
-                  });
+                    ->orWhereHas('placement.application.user', function ($uq) use ($search) {
+                        $uq->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('studentProfile', function ($sq) use ($search) {
+                                $sq->where('nim', 'like', "%{$search}%");
+                            });
+                    });
             });
         }
 
@@ -75,7 +75,8 @@ class LogbookController extends Controller
 
         $weeklyBundles = $allSupervisedLogs->groupBy(function ($item) {
             $carbonDate = Carbon::parse($item->date);
-            return $item->placement_id . '_' . $carbonDate->year . '-W' . str_pad($carbonDate->isoWeek(), 2, '0', STR_PAD_LEFT);
+
+            return $item->placement_id.'_'.$carbonDate->year.'-W'.str_pad($carbonDate->isoWeek(), 2, '0', STR_PAD_LEFT);
         })->map(function ($group, $key) {
             $first = $group->first();
             $minDate = $group->min('date');
@@ -92,29 +93,30 @@ class LogbookController extends Controller
             }
 
             return [
-                'bundle_key'     => $key,
-                'placement'      => $first->placement,
-                'student'        => $first->placement->application->user ?? null,
-                'min_date'       => $minDate,
-                'max_date'       => $maxDate,
-                'entries_count'  => $group->count(),
-                'pending_count'  => $pendingCount,
+                'bundle_key' => $key,
+                'placement' => $first->placement,
+                'student' => $first->placement->application->user ?? null,
+                'min_date' => $minDate,
+                'max_date' => $maxDate,
+                'entries_count' => $group->count(),
+                'pending_count' => $pendingCount,
                 'approved_count' => $approvedCount,
                 'rejected_count' => $rejectedCount,
-                'status'         => $status,
-                'modal_data'     => [
+                'status' => $status,
+                'modal_data' => [
                     'student' => ['name' => $first->placement->application->user->name ?? 'Mahasiswa'],
                     'min_date' => $minDate,
                     'max_date' => $maxDate,
                     'entries_count' => $group->count(),
                     'logbook_ids' => $group->pluck('id')->toArray(),
                     'feedback' => $group->pluck('lecturer_feedback')->filter()->first() ?? null,
-                    'entries' => $group->sortBy('date')->map(function($entry) {
+                    'entries' => $group->sortBy('date')->map(function ($entry) {
                         return [
                             'id' => $entry->id,
                             'date' => $entry->date,
                             'activity' => $entry->activity,
                             'attachment' => $entry->attachment,
+                            'attachment_url' => $entry->attachment_url,
                             'status' => $entry->status,
                         ];
                     })->values()->toArray(),
@@ -162,14 +164,14 @@ class LogbookController extends Controller
         $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
         $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
 
-        if (!$isSameUniv && $user->university && $student) {
+        if (! $isSameUniv && $user->university && $student) {
             $isSameUniv = (
-                $student->university === $user->university || 
+                $student->university === $user->university ||
                 optional($student->studentProfile)->universitas === $user->university
             );
         }
 
-        if (!$isAssignedAdvisor && !$isSameUniv) {
+        if (! $isAssignedAdvisor && ! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk memonitor logbook mahasiswa ini.');
         }
 
@@ -196,14 +198,14 @@ class LogbookController extends Controller
         $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
         $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
 
-        if (!$isSameUniv && $user->university && $student) {
+        if (! $isSameUniv && $user->university && $student) {
             $isSameUniv = (
-                $student->university === $user->university || 
+                $student->university === $user->university ||
                 optional($student->studentProfile)->universitas === $user->university
             );
         }
 
-        if (!$isAssignedAdvisor && !$isSameUniv) {
+        if (! $isAssignedAdvisor && ! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
         }
 

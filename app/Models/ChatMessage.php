@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 class ChatMessage extends Model
 {
     public const TYPE_TEXT = 'text';
+
     // Pesan sistem: "Budi ditambahkan sebagai Mentor Lapangan", "Ani keluar dari grup", dst.
     public const TYPE_SYSTEM = 'system';
 
@@ -16,6 +17,8 @@ class ChatMessage extends Model
     protected $fillable = [
         'conversation_id',
         'sender_id',
+        'parent_id',
+        'comments_count',
         'type',
         'body',
         'reply_to_id',
@@ -27,6 +30,7 @@ class ChatMessage extends Model
     protected $casts = [
         'meta' => 'array',
         'deleted_at' => 'datetime',
+        'comments_count' => 'integer',
     ];
 
     public function conversation()
@@ -49,6 +53,26 @@ class ChatMessage extends Model
         return $this->belongsTo(self::class, 'reply_to_id');
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function isComment(): bool
+    {
+        return $this->parent_id !== null;
+    }
+
+    public function isBroadcast(): bool
+    {
+        return $this->parent_id === null;
+    }
+
     public function isDeleted(): bool
     {
         return $this->deleted_at !== null;
@@ -65,7 +89,7 @@ class ChatMessage extends Model
     public function preview(int $limit = 80): string
     {
         if ($this->isDeleted()) {
-            return '🚫 ' . self::DELETED_LABEL;
+            return '🚫 '.self::DELETED_LABEL;
         }
 
         $body = trim((string) $this->body);
@@ -75,7 +99,7 @@ class ChatMessage extends Model
 
         $attachments = $this->attachments;
         $first = $attachments->first();
-        if (!$first) {
+        if (! $first) {
             return '';
         }
 
@@ -83,9 +107,9 @@ class ChatMessage extends Model
             ChatAttachment::KIND_IMAGE => '📷 Foto',
             ChatAttachment::KIND_VIDEO => '🎬 Video',
             ChatAttachment::KIND_AUDIO => '🎤 Pesan suara',
-            default => '📎 ' . $first->name,
+            default => '📎 '.$first->name,
         };
 
-        return $attachments->count() > 1 ? $label . ' +' . ($attachments->count() - 1) . ' lampiran' : $label;
+        return $attachments->count() > 1 ? $label.' +'.($attachments->count() - 1).' lampiran' : $label;
     }
 }

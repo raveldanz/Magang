@@ -222,17 +222,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse($agencies as $agency)
                     @php
-                        $agencyLogoUrl = null;
-                        if (!empty($agency->logo)) {
-                            if (file_exists(public_path($agency->logo))) {
-                                $agencyLogoUrl = asset($agency->logo);
-                            } elseif (file_exists(public_path('storage/' . $agency->logo)) || file_exists(storage_path('app/public/' . $agency->logo))) {
-                                $agencyLogoUrl = asset('storage/' . $agency->logo);
-                            }
-                        }
-                        if (!$agencyLogoUrl) {
-                            $agencyLogoUrl = asset('images/default-agency.svg');
-                        }
+                        $agencyLogoUrl = $agency->logo_url;
                         $firstAdmin = $agency->users->firstWhere('role', 'admin');
                     @endphp
 

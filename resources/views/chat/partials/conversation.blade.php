@@ -22,18 +22,36 @@
                 </button>
                 <template x-if="active">
                     <button type="button" @click="toggleInfo()" class="flex items-center gap-3 min-w-0 flex-1 text-left rounded-xl py-1 hover:bg-slate-50 transition" aria-label="Lihat info percakapan">
-                        <span class="relative w-10 h-10 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0" :style="{ backgroundColor: active.avatar.color }">
-                            <template x-if="active.avatar.group">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </template>
-                            <template x-if="!active.avatar.group"><span x-text="active.avatar.initials"></span></template>
-                            <span x-show="headerOnline" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white"></span>
-                        </span>
+                        {{-- Avatar Saluran (Squircle dengan Logo Resmi) vs Avatar Akun Biasa (Lingkaran) --}}
+                        <template x-if="active.type === 'channel'">
+                            <span class="relative w-10 h-10 rounded-xl border border-slate-200/90 bg-white p-1 object-contain shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
+                                <template x-if="active.avatar && active.avatar.logo_url">
+                                    <img :src="active.avatar.logo_url" :alt="active.title" class="w-full h-full object-contain">
+                                </template>
+                                <template x-if="!active.avatar || !active.avatar.logo_url">
+                                    <span class="text-xs font-bold text-slate-700" x-text="active.avatar ? active.avatar.initials : '?'"></span>
+                                </template>
+                            </span>
+                        </template>
+                        <template x-if="active.type !== 'channel'">
+                            <span class="relative w-10 h-10 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0" :style="{ backgroundColor: active.avatar.color }">
+                                <template x-if="active.avatar.group">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </template>
+                                <template x-if="!active.avatar.group"><span x-text="active.avatar.initials"></span></template>
+                                <span x-show="headerOnline" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                            </span>
+                        </template>
                         <span class="min-w-0">
                             <span class="flex items-center gap-2">
                                 <span class="text-sm font-bold text-slate-900 truncate" x-text="active.title"></span>
-                                <span class="hidden sm:inline-flex"><span x-show="active.type === 'placement'" class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold whitespace-nowrap">Grup Bimbingan</span></span>
-                                <template x-if="active.stage_badge">
+                                <template x-if="active.type === 'channel' && active.scope_badge">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap"
+                                          :class="active.scope_badge === 'Pemkot' ? 'bg-amber-100 text-amber-800 border border-amber-200' : (active.scope_badge === 'Dinas' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200')"
+                                          x-text="`[${active.scope_badge}]`"></span>
+                                </template>
+                                <span class="hidden sm:inline-flex"><span x-show="active.scope_type === 'mentor_guidance' || active.scope_type === 'dpl_guidance' || active.type === 'placement'" class="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold whitespace-nowrap" x-text="active.scope_type === 'mentor_guidance' ? 'Bimbingan Mentor' : (active.scope_type === 'dpl_guidance' ? 'Bimbingan Dosen' : 'Grup Bimbingan')"></span></span>
+                                <template x-if="active.stage_badge && active.type !== 'channel'">
                                     <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap"
                                           :class="{
                                               'bg-amber-50 text-amber-700 border border-amber-200': active.stage_badge.theme === 'urgent',

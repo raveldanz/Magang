@@ -16,7 +16,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 composer setup                     # install, .env, key, migrate, npm build
-composer dev                       # serve + queue:listen + pail logs + vite (concurrently)
+composer dev                       # serve + queue:listen + schedule:work + pail logs + vite (concurrently)
+php artisan app:health             # scheduler & queue worker heartbeat check (see docs/DEPLOYMENT.md)
+vendor/bin/pint --test             # code style check (repo is fully Pint-formatted)
 php artisan migrate:fresh --seed   # DatabaseSeeder → DemoE2ESeeder: full 6-role demo data
 php artisan storage:link           # required for logos/uploads (see learnings LRN-001/LRN-013 for Windows junction issues)
 
@@ -30,7 +32,7 @@ php artisan optimize:clear && php artisan view:clear               # clear cache
 npm run test:hermes    # Puppeteer multi-role E2E scripts in scripts/hermes_*.mjs (needs running app at 127.0.0.1:8000)
 ```
 
-Demo accounts (all password `password`): `superadmin@surabaya.go.id`, `admin.kominfo@surabaya.go.id`, `mentor.kominfo@surabaya.go.id`, `admin@unesa.ac.id`, `dosen.unesa@unesa.ac.id`, `mahasiswa@unesa.ac.id`.
+Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `admin.kominfo@surabaya.go.id`, `mentor.kominfo@surabaya.go.id`, `admin@unesa.ac.id`, `dosen.unesa@unesa.ac.id`, `mahasiswa@unesa.ac.id`.
 
 ## Architecture
 
@@ -38,7 +40,7 @@ Demo accounts (all password `password`): `superadmin@surabaya.go.id`, `admin.kom
 - `users.role` is a plain string. Roles: `super_admin`, `admin` (Admin Dinas), `mentor` / `pembimbing` (field mentor, aliases), `dosen` / `academic_advisor` (university lecturer/DPL, aliases), `universitas` (university admin), `mahasiswa` (student).
 - `App\Http\Middleware\CheckRole` (alias `role`, registered in `bootstrap/app.php`) handles aliases and a **Super Admin bypass**: a user with role `super_admin`, *or* `admin` with `agency_profile_id = null`, passes any `role:admin` / `role:super_admin` gate. Agency admins are scoped by `agency_profile_id`; university users by `university_id`.
 - Impersonation (Quick Role Switcher, `Admin\ImpersonationController`) stores `impersonator_id` in session; `CheckRole` redirects impersonated users to their own dashboard instead of 403.
-- `routes/web.php` groups routes per role with URL/name prefixes: `student.*`, `admin.*`, `mentor.*`, `lecturer.*`, `university.*`. Controllers live in matching namespaces under `app/Http/Controllers/{Student,Admin,Mentor,Lecturer,University}` (plus a legacy `Pembimbing/` namespace). `routes/api.php` only exposes Sanctum login/me/logout.
+- `routes/web.php` groups routes per role with URL/name prefixes: `student.*`, `admin.*`, `mentor.*`, `lecturer.*`, `university.*`. Controllers live in matching namespaces under `app/Http/Controllers/{Student,Admin,Mentor,Lecturer,University}`. The `pembimbing.*` route names are aliases served by the Mentor controllers (the old `Pembimbing/` namespace and views were removed). `routes/api.php` only exposes Sanctum login/me/logout.
 
 ### Domain model & lifecycle
 - `Application` (student's submission to a `Unit`, which belongs to an `AgencyProfile`) → on acceptance gets one `Placement` linking mentor (`mentor`/`pembimbing` relations) and DPL (`academicAdvisor`/`dosen` relations). `Placement` has `logbooks`, `finalreport`, `evaluation`, and certificate fields (`certificate_hash`).
@@ -56,6 +58,12 @@ Demo accounts (all password `password`): `superadmin@surabaya.go.id`, `admin.kom
 - Migrations must run on both PostgreSQL and SQLite (tests). Postgres-only DDL (e.g. dropping `applications_status_check`) is wrapped in try/catch or a driver check — follow that pattern.
 - Avoid passing full Eloquent models into `@json`/`json_encode` in Blade — caused memory exhaustion (LRN-020); map to arrays first.
 - `scripts/*.php` are ad-hoc maintenance/debug scripts, not part of the app.
+- Timezone defaults to `Asia/Jakarta` and locale to `id` (`lang/id/*`); set `APP_TIMEZONE`/`APP_LOCALE` in `.env` accordingly.
+- Personal files (application documents, logbook attachments, student photos, feedback attachments) live on the private `local` disk and are served only via authorized routes (`documents.application*`, `logbooks.attachment`, `student.photo`, `feedbacks.attachment`). Never link them with `asset('storage/...')`. Legacy public files: `php artisan app:move-private-files`.
+- Resolve a user's university with `App\Services\UniversityResolver` (`university_id` → exact name/acronym/code), never `LIKE '%name%'`.
+- Production needs a cron for `php artisan schedule:run` (every minute) and a permanent `php artisan queue:work`; heartbeats are shown on the Super Admin dashboard (`App\Services\SystemHealth`). Never use external QR services — QR codes are generated locally (simple-qrcode).
+- Large Blade pages are split into `@include` partials (`student/dashboard/*`, `admin/universities/partials/*`); partials share the parent's variables, so a variable defined inside one partial is NOT visible to the next.
+- `users.must_change_password` is maintained automatically by `User::booted()` whenever the password changes (true when it equals `User::DEFAULT_PASSWORD`); the layout shows a persistent warning.
 
 ## Project conventions (from AGENTS.md / .antigravity/)
 

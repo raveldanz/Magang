@@ -8,11 +8,13 @@ use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Placement;
 use App\Models\University;
+use App\Services\UniversityResolver;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class CertificateController extends Controller
 {
@@ -21,7 +23,7 @@ class CertificateController extends Controller
      */
     public static function getCertificateData($id, $user = null)
     {
-        if (!$user) {
+        if (! $user) {
             $user = Auth::user();
         }
 
@@ -44,9 +46,9 @@ class CertificateController extends Controller
                     'evaluation',
                     'finalreport',
                 ])->where('id', (int) $id)
-                  ->whereHas('application', function ($aq) use ($user) {
-                      $aq->where('user_id', $user->id);
-                  })->first();
+                    ->whereHas('application', function ($aq) use ($user) {
+                        $aq->where('user_id', $user->id);
+                    })->first();
 
                 if ($placement) {
                     $application = $placement->application;
@@ -62,12 +64,12 @@ class CertificateController extends Controller
                         'placement.evaluation',
                         'placement.finalreport',
                     ])->where('user_id', $user->id)
-                      ->where(function ($q) use ($id) {
-                          $q->where('id', (int) $id)
-                            ->orWhereHas('placement', function ($pq) use ($id) {
-                                $pq->where('id', (int) $id);
-                            });
-                      })->first();
+                        ->where(function ($q) use ($id) {
+                            $q->where('id', (int) $id)
+                                ->orWhereHas('placement', function ($pq) use ($id) {
+                                    $pq->where('id', (int) $id);
+                                });
+                        })->first();
 
                     if ($application) {
                         $placement = $application->placement;
@@ -76,7 +78,7 @@ class CertificateController extends Controller
             }
 
             // Fallback: Ambil aplikasi terbaru milik mahasiswa ini jika ID tidak cocok atau bukan angka
-            if (!$application) {
+            if (! $application) {
                 $application = Application::with([
                     'user.studentProfile',
                     'unit.agencyProfile',
@@ -129,25 +131,33 @@ class CertificateController extends Controller
             }
         }
 
-        if (!$application) {
+        if (! $application) {
             abort(404, 'Data pengajuan magang / sertifikat tidak ditemukan.');
         }
 
         // Otorisasi: Mahasiswa pemilik, DPL, Mentor, Admin Dinas, Super Admin, atau Universitas
         $isOwner = ($user && $user->id === $application->user_id);
-        $isSuperAdmin = ($user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id))));
+        $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
         $isAgencyAdmin = ($user && $user->role === 'admin' && ($user->agency_profile_id === null || $user->agency_profile_id === $application->unit?->agency_profile_id));
         $isAdvisor = ($placement && ($placement->academic_advisor_id === $user?->id || $placement->mentor_id === $user?->id || $placement->pembimbing_id === $user?->id));
         $isUnivAdmin = ($user && $user->role === 'universitas' && ($user->university_id === $application->user?->university_id || $user->university_id === optional($application->user?->studentProfile)->university_id));
 
-        if (!$isOwner && !$isSuperAdmin && !$isAgencyAdmin && !$isAdvisor && !$isUnivAdmin) {
+        if (! $isOwner && ! $isSuperAdmin && ! $isAgencyAdmin && ! $isAdvisor && ! $isUnivAdmin) {
             abort(403, 'Akses Ditolak: Anda tidak berhak melihat atau mengunduh sertifikat ini.');
         }
 
-        // Proteksi Ketat Kelulusan: E-Sertifikat hanya sah diakses jika mahasiswa telah berstatus COMPLETED dan terisi logbook
-        $statusVal = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)$application->status;
-        if ($statusVal !== 'completed' || !$application->has_filled_logbook) {
-            abort(403, 'Akses Dibatasi: E-Sertifikat dan Transkrip Nilai resmi hanya dapat diterbitkan dan diunduh setelah mahasiswa dinyatakan lulus (status COMPLETED) dengan naskah laporan akhir yang telah disetujui (ACC), lembar evaluasi yang telah lengkap, serta telah mengisi logbook aktivitas magang.');
+        // Certificate Gate: E-Sertifikat hanya terbit bila evaluasi mentor lengkap, laporan akhir ACC,
+        // dan status magang COMPLETED. Bila belum, tampilkan halaman penjelasan (bukan sertifikat).
+        if ($placement) {
+            $application->setRelation('placement', $placement);
+        }
+        $blockers = $application->certificateBlockers();
+        if ($blockers !== []) {
+            throw new HttpResponseException(response()->view('certificates.locked', [
+                'application' => $application,
+                'blockers' => $blockers,
+                'viewer' => $user,
+            ], 403));
         }
 
         // Cek evaluasi kelulusan
@@ -155,7 +165,7 @@ class CertificateController extends Controller
         $finalReport = $placement?->finalreport;
 
         // Ambil profil instansi
-        $agencyProfile = $application->unit?->agencyProfile 
+        $agencyProfile = $application->unit?->agencyProfile
             ?? AgencyProfile::first();
 
         $student = $application->user;
@@ -168,17 +178,17 @@ class CertificateController extends Controller
         if ($profile?->university_id) {
             $university = University::find($profile->university_id);
         }
-        if (!$university && $student?->university_id) {
+        if (! $university && $student?->university_id) {
             $university = University::find($student->university_id);
         }
-        if (!$university && $profile?->universitas) {
-            $university = University::where('name', 'like', '%' . $profile->universitas . '%')->first();
+        if (! $university && $student) {
+            $university = app(UniversityResolver::class)->forUser($student);
         }
 
         // Nomor Registrasi Sertifikat & Hash Verifikasi Publik
         $year = Carbon::now()->format('Y');
         $paddedId = str_pad($placement ? $placement->id : $application->id, 3, '0', STR_PAD_LEFT);
-        
+
         if ($placement) {
             $dirty = false;
             if (empty($placement->certificate_hash)) {
@@ -201,17 +211,15 @@ class CertificateController extends Controller
 
         // QR dibuat lokal (SVG) — URL verifikasi tidak dikirim ke layanan pihak ketiga
         $qrSvg = null;
-        if ($verifyCertificateUrl && class_exists(\SimpleSoftwareIO\QrCode\Facades\QrCode::class)) {
+        if ($verifyCertificateUrl && class_exists(QrCode::class)) {
             try {
-                $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(64)->margin(0)->generate($verifyCertificateUrl);
+                $qrSvg = (string) QrCode::size(64)->margin(0)->generate($verifyCertificateUrl);
             } catch (\Throwable $e) {
                 $qrSvg = null;
             }
         }
-        // Cadangan jika library QR lokal tidak tersedia (URL gambar, bukan URL verifikasi)
-        $qrVerifyUrl = $verifyCertificateUrl
-            ? 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=' . urlencode($verifyCertificateUrl)
-            : null;
+        // Tanpa layanan QR eksternal: bila QR lokal gagal dibuat, halaman menampilkan tautan & kode verifikasi saja.
+        $qrVerifyUrl = null;
 
         return compact(
             'application',

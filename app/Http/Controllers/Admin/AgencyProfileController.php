@@ -30,10 +30,10 @@ class AgencyProfileController extends Controller
         } else {
             // Regular Agency Admin: restricted strictly to own agency
             $userAgencyId = $user->agency_profile_id;
-            
+
             // Check if user tries to access another agency ID via query parameter
             $requestedId = $request->query('agency_id', $request->query('id'));
-            if ($requestedId && (int)$requestedId !== (int)$userAgencyId) {
+            if ($requestedId && (int) $requestedId !== (int) $userAgencyId) {
                 abort(403, 'Anda tidak memiliki hak akses untuk mengubah instansi lain.');
             }
 
@@ -53,18 +53,18 @@ class AgencyProfileController extends Controller
         $isSuperAdmin = $this->isSuperAdmin($user);
 
         $request->validate([
-            'agency_id'       => 'nullable|exists:agency_profiles,id',
+            'agency_id' => 'nullable|exists:agency_profiles,id',
             'government_name' => 'required|string|max:255',
-            'agency_name'     => 'required|string|max:255',
-            'address'         => 'nullable|string',
-            'phone'           => 'nullable|string|max:50',
-            'email'           => 'nullable|email|max:100',
-            'website'         => 'nullable|string|max:150',
-            'logo'            => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-            'signee_name'     => 'required|string|max:255',
-            'signee_nip'      => 'nullable|string|max:100',
+            'agency_name' => 'required|string|max:255',
+            'address' => 'nullable|string',
+            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:100',
+            'website' => 'nullable|string|max:150',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'signee_name' => 'required|string|max:255',
+            'signee_nip' => 'nullable|string|max:100',
             'signee_position' => 'required|string|max:255',
-            'city'            => 'required|string|max:100',
+            'city' => 'required|string|max:100',
         ]);
 
         if ($isSuperAdmin) {
@@ -73,7 +73,7 @@ class AgencyProfileController extends Controller
         } else {
             $userAgencyId = $user->agency_profile_id;
             $submittedAgencyId = $request->input('agency_id');
-            if ($submittedAgencyId && (int)$submittedAgencyId !== (int)$userAgencyId) {
+            if ($submittedAgencyId && (int) $submittedAgencyId !== (int) $userAgencyId) {
                 abort(403, 'Anda tidak memiliki hak akses untuk mengubah instansi lain.');
             }
             $profile = $user->agencyProfile ?? AgencyProfile::findOrFail($userAgencyId);
@@ -94,7 +94,7 @@ class AgencyProfileController extends Controller
 
         if ($request->hasFile('logo')) {
             // Hapus logo lama jika ada pada disk publik
-            if (!empty($profile->logo) && Storage::disk('public')->exists($profile->logo)) {
+            if (! empty($profile->logo) && Storage::disk('public')->exists($profile->logo)) {
                 Storage::disk('public')->delete($profile->logo);
             }
 
@@ -108,4 +108,3 @@ class AgencyProfileController extends Controller
         return redirect()->back()->with('success', 'Profil Instansi & Pengaturan TTD Surat berhasil diperbarui!');
     }
 }
-

@@ -10,15 +10,15 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('units', function (Blueprint $table) {
-        $table->id();
-        $table->string('name'); // Contoh: Bidang Aptika, Sekretariat, dll.
-        $table->text('description')->nullable();
-        $table->integer('quota')->default(0);
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('units', function (Blueprint $table) {
+            $table->id();
+            $table->string('name'); // Contoh: Bidang Aptika, Sekretariat, dll.
+            $table->text('description')->nullable();
+            $table->integer('quota')->default(0);
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\University;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\University;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LetterController extends Controller
@@ -34,18 +33,18 @@ class LetterController extends Controller
         $mentor = $placement?->mentor ?? $placement?->pembimbing;
 
         // Cari profil universitas
-        $university = $user->university_id 
-            ? University::find($user->university_id) 
+        $university = $user->university_id
+            ? University::find($user->university_id)
             : ($student->university_id ? University::find($student->university_id) : University::where('name', $user->university)->orWhere('code', $user->university)->first());
 
         // Otorisasi: Pastikan mahasiswa berasal dari universitas yang sama
         $isSameUniv = false;
 
-        if ($user->university_id && $student->university_id && (int)$user->university_id === (int)$student->university_id) {
+        if ($user->university_id && $student->university_id && (int) $user->university_id === (int) $student->university_id) {
             $isSameUniv = true;
         }
 
-        if (!$isSameUniv && $university) {
+        if (! $isSameUniv && $university) {
             $studentUniv = strtolower(trim($student->university ?? ''));
             $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
             $targetUnivName = strtolower(trim($university->name ?? ''));
@@ -61,7 +60,7 @@ class LetterController extends Controller
             }
         }
 
-        if (!$isSameUniv && $user->university) {
+        if (! $isSameUniv && $user->university) {
             $userUniv = strtolower(trim($user->university));
             $studentUniv = strtolower(trim($student->university ?? ''));
             $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
@@ -71,7 +70,7 @@ class LetterController extends Controller
             }
         }
 
-        if (!$isSameUniv) {
+        if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk mencetak surat tugas mahasiswa kampus lain.');
         }
 

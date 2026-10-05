@@ -48,7 +48,7 @@ class ChatService
             return $existing;
         }
 
-        if (!$this->contacts->canContact($from, $to)) {
+        if (! $this->contacts->canContact($from, $to)) {
             throw new AuthorizationException('Anda tidak dapat memulai chat dengan pengguna ini.');
         }
 
@@ -71,7 +71,7 @@ class ChatService
     {
         $participant = ChatParticipant::where('conversation_id', $conversation->id)->where('user_id', $user->id)->first();
 
-        if (!$participant) {
+        if (! $participant) {
             throw new AuthorizationException('Anda bukan peserta percakapan ini.');
         }
 
@@ -90,6 +90,8 @@ class ChatService
             // Chat 1-on-1 baru muncul setelah ada pesan; grup langsung muncul
             ->where(fn ($q) => $q->whereNotNull('last_message_at')->orWhere('type', '!=', ChatConversation::TYPE_DIRECT))
             ->with([
+                'agencyProfile',
+                'university',
                 'lastMessage.sender',
                 'lastMessage.attachments',
                 'placement.application.user.universityRelation',
@@ -107,6 +109,7 @@ class ChatService
                 'user.applications' => fn ($q) => $q->latest('created_at')->with([
                     'placement.finalreport',
                     'placement.evaluation',
+                    'placement.logbooks',
                     'user.universityRelation',
                 ]),
             ])
@@ -133,6 +136,7 @@ class ChatService
                 'user.applications' => fn ($q) => $q->latest('created_at')->with([
                     'placement.finalreport',
                     'placement.evaluation',
+                    'placement.logbooks',
                     'user.universityRelation',
                 ]),
             ])
@@ -140,6 +144,8 @@ class ChatService
             ->get();
         $me = $participants->firstWhere('user_id', $viewer->id) ?? $this->participantOrFail($conversation, $viewer);
         $conversation->loadMissing([
+            'agencyProfile',
+            'university',
             'lastMessage.sender',
             'lastMessage.attachments',
             'placement.application.user.universityRelation',
@@ -182,7 +188,7 @@ class ChatService
      */
     public function messagesFor(ChatConversation $conversation, User $viewer, ?int $before = null, ?int $after = null, ?string $since = null): array
     {
-        $query = fn () => ChatMessage::where('conversation_id', $conversation->id)->with(self::MESSAGE_RELATIONS);
+        $query = fn () => ChatMessage::where('conversation_id', $conversation->id)->whereNull('parent_id')->with(self::MESSAGE_RELATIONS);
 
         if ($after !== null) {
             $items = $query()->where('id', '>', $after)->orderBy('id')->limit(100)->get();
@@ -207,6 +213,24 @@ class ChatService
             'has_more' => $hasMore,
             'changed' => $changed->map(fn (ChatMessage $m) => $this->presenter->message($m, $viewer))->values()->all(),
             'server_time' => now()->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Mengambil daftar komentar untuk sebuah pesan pengumuman (utas komentar).
+     *
+     * @return array{parent: array, comments: array}
+     */
+    public function commentsFor(ChatMessage $parent, User $viewer): array
+    {
+        $comments = ChatMessage::where('parent_id', $parent->id)
+            ->with(self::MESSAGE_RELATIONS)
+            ->orderBy('id')
+            ->get();
+
+        return [
+            'parent' => $this->presenter->message($parent, $viewer),
+            'comments' => $comments->map(fn (ChatMessage $c) => $this->presenter->message($c, $viewer))->values()->all(),
         ];
     }
 
@@ -276,7 +300,7 @@ class ChatService
 
     private function typingKey(ChatConversation $conversation): string
     {
-        return 'chat:typing:' . $conversation->id;
+        return 'chat:typing:'.$conversation->id;
     }
 
     // ---------------- Belum dibaca, badge & toast ----------------
@@ -341,7 +365,7 @@ class ChatService
                         'url' => route('chat.show', $m->conversation_id, false),
                         'title' => $isDirect ? ($m->sender?->name ?? 'Pesan baru') : (string) $m->conversation->title,
                         'sender' => $this->presenter->brief($m->sender),
-                        'preview' => ($isDirect ? '' : ChatPresenter::shortName($m->sender?->name) . ': ') . $m->preview(100),
+                        'preview' => ($isDirect ? '' : ChatPresenter::shortName($m->sender?->name).': ').$m->preview(100),
                     ];
                 })->all();
         }
@@ -382,7 +406,7 @@ class ChatService
 
     private function parseTime(?string $value): ?Carbon
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 

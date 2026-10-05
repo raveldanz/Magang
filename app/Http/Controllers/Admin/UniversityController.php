@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Placement;
+use App\Models\StudentProfile;
+use App\Models\SystemFeedback;
 use App\Models\University;
 use App\Models\User;
+use App\Services\UniversityHubService;
+use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UniversityController extends Controller
 {
@@ -26,10 +30,17 @@ class UniversityController extends Controller
             ->withExists([
                 'users as has_admin_account' => function ($q) {
                     $q->where('role', 'universitas');
-                }
+                },
             ])
+            ->orderBy('is_verified', 'asc') // kampus "Menunggu Verifikasi" tampil paling atas
             ->orderBy('has_admin_account', 'asc')
             ->orderBy('updated_at', 'desc');
+
+        if ($request->input('verification') === 'pending') {
+            $query->where('is_verified', false);
+        } elseif ($request->input('verification') === 'verified') {
+            $query->where('is_verified', true);
+        }
 
         if ($request->filled('search')) {
             $search = strtolower($request->search);
@@ -46,6 +57,22 @@ class UniversityController extends Controller
 
         // Count un-provisioned university accounts
         $unregisteredCount = University::doesntHave('universityAdmin')->count();
+
+        // Kampus baru hasil input mandiri mahasiswa yang belum divalidasi admin
+        $pendingVerificationCount = University::pendingVerification()->count();
+
+        // Saran "mungkin sama dengan" untuk kampus belum terverifikasi di halaman ini (bantu admin menggabungkan)
+        $resolver = app(UniversityResolver::class);
+        $mergeSuggestions = [];
+        $verifiedOptions = collect();
+        if ($universities->getCollection()->contains(fn ($u) => ! ($u->is_verified ?? true))) {
+            $verifiedOptions = University::verified()->orderBy('name')->get(['id', 'name', 'acronym', 'code']);
+            foreach ($universities as $u) {
+                if (! ($u->is_verified ?? true)) {
+                    $mergeSuggestions[$u->id] = $resolver->suggest($u->name, 3)->pluck('university.id')->all();
+                }
+            }
+        }
 
         // Executive Macro Stats
         $totalUniversities = University::count();
@@ -66,14 +93,84 @@ class UniversityController extends Controller
         ];
 
         $user = Auth::user();
-        $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
 
-        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'isSuperAdmin', 'macroStats'));
+        return view('admin.universities.index', compact('universities', 'unregisteredCount', 'pendingVerificationCount', 'isSuperAdmin', 'macroStats', 'mergeSuggestions', 'verifiedOptions'));
+    }
+
+    /**
+     * Gabungkan kampus dobel (biasanya input mandiri mahasiswa) ke kampus yang benar.
+     * Seluruh akun, profil mahasiswa, tiket, dan kanal chat dipindahkan ke kampus tujuan,
+     * lalu entri dobel dihapus.
+     */
+    public function merge(Request $request, $id)
+    {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menggabungkan data perguruan tinggi.');
+        $source = University::findOrFail($id);
+
+        $request->validate([
+            'target_university_id' => 'required|integer|exists:universities,id',
+        ], [
+            'target_university_id.required' => 'Pilih kampus tujuan penggabungan.',
+        ]);
+
+        $target = University::findOrFail((int) $request->target_university_id);
+        if ($target->id === $source->id) {
+            return redirect()->back()->with('error', 'Kampus tujuan tidak boleh sama dengan kampus yang digabungkan.');
+        }
+
+        $moved = \DB::transaction(function () use ($source, $target) {
+            $users = User::where('university_id', $source->id)
+                ->update(['university_id' => $target->id, 'university' => $target->name]);
+            $profiles = StudentProfile::where('university_id', $source->id)
+                ->update(['university_id' => $target->id, 'universitas' => $target->name]);
+            SystemFeedback::where('target_university_id', $source->id)
+                ->update(['target_university_id' => $target->id]);
+            if (\Schema::hasColumn('chat_conversations', 'university_id')) {
+                \DB::table('chat_conversations')->where('university_id', $source->id)->update(['university_id' => $target->id]);
+            }
+            $source->delete();
+
+            return ['users' => $users, 'profiles' => $profiles];
+        });
+
+        AuditLog::record('UNIVERSITY_MERGE', 'University', $target->id, [
+            'merged_from' => $source->name,
+            'merged_from_id' => $source->id,
+            'into' => $target->name,
+            'moved_users' => $moved['users'],
+            'moved_profiles' => $moved['profiles'],
+        ]);
+
+        return redirect()->route('admin.universities.index')
+            ->with('success', "Kampus '{$source->name}' berhasil digabungkan ke '{$target->name}' ({$moved['users']} akun dipindahkan).");
+    }
+
+    /**
+     * Validasi kampus yang didaftarkan mandiri oleh mahasiswa (is_verified = false → true).
+     */
+    public function verify(Request $request, $id)
+    {
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat memverifikasi data perguruan tinggi.');
+        $univ = University::findOrFail($id);
+
+        if ($univ->is_verified) {
+            return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' sudah terverifikasi.");
+        }
+
+        $univ->update(['is_verified' => true]);
+
+        AuditLog::record('UNIVERSITY_VERIFY', 'University', $univ->id, [
+            'name' => $univ->name,
+        ]);
+
+        return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' berhasil diverifikasi. Lengkapi kode kampus & profilnya melalui menu Edit bila diperlukan.");
     }
 
     public function create()
     {
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
+
         return view('admin.universities.create');
     }
 
@@ -96,13 +193,13 @@ class UniversityController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
             $targetDir = public_path('images/logos');
-            if (!File::exists($targetDir)) {
+            if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
             }
             $file->move($targetDir, $filename);
-            $logoPath = 'images/logos/' . $filename;
+            $logoPath = 'images/logos/'.$filename;
         }
 
         $univ = University::create([
@@ -130,6 +227,7 @@ class UniversityController extends Controller
     {
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan dosen pembimbing.');
         $university = University::findOrFail($id);
+
         return view('admin.universities.edit', compact('university'));
     }
 
@@ -140,7 +238,7 @@ class UniversityController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:universities,code,' . $univ->id,
+            'code' => 'required|string|max:50|unique:universities,code,'.$univ->id,
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string',
@@ -164,7 +262,7 @@ class UniversityController extends Controller
             $weightLecturer = (int) $request->input('weight_lecturer', $univ->weight_lecturer ?? 60);
 
             if (($weightMentor + $weightLecturer) !== 100) {
-                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas (' . $weightMentor . '%) dan DPL Kampus (' . $weightLecturer . '%) harus berjumlah tepat 100%.');
+                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.');
             }
 
             $requireDpl = $request->boolean('require_dpl', true);
@@ -188,13 +286,13 @@ class UniversityController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
             $targetDir = public_path('images/logos');
-            if (!File::exists($targetDir)) {
+            if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
             }
             $file->move($targetDir, $filename);
-            $data['logo'] = 'images/logos/' . $filename;
+            $data['logo'] = 'images/logos/'.$filename;
         }
 
         $univ->update($data);
@@ -225,21 +323,21 @@ class UniversityController extends Controller
         }
 
         $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $univ->code ?: 'univ'));
-        $defaultEmail = $univ->email ?: ($cleanCode . '@' . $cleanCode . '.ac.id');
+        $defaultEmail = $univ->email ?: ($cleanCode.'@'.$cleanCode.'.ac.id');
 
         $email = $defaultEmail;
         $counter = 1;
         while (User::where('email', $email)->exists()) {
-            $email = $cleanCode . $counter . '@magang.surabaya.go.id';
+            $email = $cleanCode.$counter.'@magang.surabaya.go.id';
             $counter++;
         }
 
         $password = 'password';
 
         $user = User::create([
-            'name' => 'Admin Portal ' . $univ->name,
+            'name' => 'Admin Portal '.$univ->name,
             'email' => $email,
-            'password' => \Illuminate\Support\Facades\Hash::make($password),
+            'password' => Hash::make($password),
             'role' => 'universitas',
             'university_id' => $univ->id,
             'university' => $univ->name,
@@ -315,136 +413,11 @@ class UniversityController extends Controller
     public function show(Request $request, $id)
     {
         $university = University::with(['universityAdmin'])->findOrFail($id);
+        $isSuperAdmin = $this->currentUserIsSuperAdmin();
 
-        $user = Auth::user();
-        $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
-
-        // 1. Query Seluruh Dosen Pembimbing Kampus Ini
-        $dosens = User::whereIn('role', ['dosen', 'academic_advisor'])
-            ->where(function ($q) use ($university) {
-                $q->where('university_id', $university->id)
-                    ->orWhere('university', $university->name)
-                    ->orWhere('university', $university->code);
-            })
-            ->with(['academicPlacements.application.user', 'academicPlacements.finalreport', 'academicPlacements.evaluation'])
-            ->orderBy('name', 'asc')
-            ->get();
-
-        $totalDosenActive = 0;
-        $totalDosenCompleted = 0;
-
-        // Lulus = status completed, atau laporan disetujui + logbook terisi + lembar nilai lengkap (accessor is_complete,
-        // bukan kolom lama nilai_akademik yang kosong bila DPL menilai lewat aspek score_*).
-        $isPassed = function ($p, string $val) use ($university) {
-            return $val === 'completed'
-                || (optional($p->finalreport)->status === 'approved' && $p->has_filled_logbook && (bool) $p->evaluation?->useUniversity($university)->is_complete);
-        };
-
-        foreach ($dosens as $dosen) {
-            $activeCount = $dosen->academicPlacements->filter(function ($p) use ($isPassed) {
-                $val = $p->application?->statusValue() ?? '';
-                return in_array($val, ['accepted', 'active']) && !$isPassed($p, $val);
-            })->count();
-
-            $completedCount = $dosen->academicPlacements->filter(function ($p) use ($isPassed) {
-                $val = $p->application?->statusValue() ?? '';
-                return $val === 'completed' || (in_array($val, ['accepted', 'active']) && $isPassed($p, $val));
-            })->count();
-
-            $dosen->active_students_count = $activeCount;
-            $dosen->completed_students_count = $completedCount;
-            $dosen->total_students_count = $activeCount + $completedCount;
-
-            $totalDosenActive += $activeCount;
-            $totalDosenCompleted += $completedCount;
-        }
-
-        // 2. Query Seluruh Mahasiswa Asal Kampus Ini
-        $studentsQuery = User::where('role', 'mahasiswa')
-            ->where(function ($q) use ($university) {
-                $q->where('university_id', $university->id)
-                    ->orWhere('university', $university->name)
-                    ->orWhereHas('studentProfile', function ($sp) use ($university) {
-                        $sp->where('university_id', $university->id)
-                            ->orWhere('universitas', 'like', "%{$university->name}%");
-                    });
-            })
-            ->with([
-                'studentProfile',
-                'applications' => function ($q) {
-                    $q->latest();
-                },
-                'applications.unit.agencyProfile',
-                'applications.placement.mentor',
-                'applications.placement.pembimbing',
-                'applications.placement.academicAdvisor',
-                'applications.placement.evaluation',
-                'applications.placement.finalreport',
-                'applications.placement.logbooks',
-            ]);
-
-        // Filter status: 'no_application' di query; 'action' & kode status disaring di bawah
-        // terhadap pengajuan terbaru — sama dengan badge yang tampil di tabel.
-        $statusFilter = (string) $request->input('student_status', '');
-        if ($statusFilter === 'no_application') {
-            $studentsQuery->doesntHave('applications');
-        }
-
-        // Search Mahasiswa
-        if ($request->filled('student_search')) {
-            $sSearch = strtolower($request->student_search);
-            $studentsQuery->where(function ($q) use ($sSearch) {
-                $q->where('name', 'like', "%{$sSearch}%")
-                    ->orWhere('email', 'like', "%{$sSearch}%")
-                    ->orWhereHas('studentProfile', fn($sp) => $sp->where('nim', 'like', "%{$sSearch}%")->orWhere('jurusan', 'like', "%{$sSearch}%"));
-            });
-        }
-
-        $students = $studentsQuery->get();
-
-        // Semua mahasiswa di daftar ini berasal dari kampus ini: tetapkan langsung agar accessor
-        // nilai (nilai_akhir, is_complete) memakai kebijakan kampus tanpa query berantai per baris.
-        foreach ($students as $s) {
-            $s->applications->each(fn ($a) => $a->placement?->evaluation?->useUniversity($university));
-        }
-
-        // Urutan standar prioritas tindakan (sama dengan halaman Pengajuan & pusat kendali dinas):
-        // tingkat 1–3 antrean terlama dulu, tingkat lain terbaru dulu. Mahasiswa tanpa pengajuan = tingkat 7.
-        $requireAdvisor = (bool) ($university->require_dpl ?? true);
-        $priorities = $students->mapWithKeys(fn ($s) => [
-            $s->id => $s->applications->first()?->actionPriority($requireAdvisor) ?? 7,
-        ]);
-        $sortKey = function ($s) use ($priorities) {
-            $app = $s->applications->first();
-
-            return Application::actionSortKey($priorities[$s->id], $app?->created_at ?? $s->created_at, $app?->id ?? 0);
-        };
-        $students = $students->sort(fn ($a, $b) => $sortKey($a) <=> $sortKey($b))->values();
-
-        if ($statusFilter === 'action') {
-            $students = $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->values();
-        } elseif (\App\Enums\ApplicationStatus::tryFrom($statusFilter)) {
-            $students = $students->filter(fn ($s) => $s->applications->first()?->statusValue() === $statusFilter)->values();
-        }
-
-        // 3. Hitung Metrik Statistik Kampus (status dibandingkan sebagai string, bukan enum vs string)
-        $latestStatus = fn ($s) => $s->applications->first()?->statusValue();
-
-        $scores = $students
-            ->map(fn ($s) => $s->applications->first()?->placement?->evaluation)
-            ->filter()
-            ->map(fn ($eval) => (float) $eval->nilai_akhir)
-            ->filter(fn ($score) => $score > 0);
-
-        $stats = [
-            'total_students' => $students->count(),
-            'total_dosens' => $dosens->count(),
-            'active_interns' => $students->filter(fn ($s) => $latestStatus($s) === 'active')->count(),
-            'completed_interns' => $students->filter(fn ($s) => $latestStatus($s) === 'completed')->count(),
-            'pending_applications' => $students->filter(fn ($s) => in_array($latestStatus($s), ['pending', 'verified'], true))->count(),
-            'needs_action' => $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->count(),
-            'average_score' => $scores->isNotEmpty() ? round($scores->avg(), 1) : null,
-        ];
+        // Data dosen, mahasiswa (urut prioritas tindakan) & statistik kampus disusun di service
+        [$dosens, $students, $stats, $requireAdvisor] = app(UniversityHubService::class)
+            ->build($university, (string) $request->input('student_status', ''), $request->input('student_search'));
 
         $activeTab = $request->query('tab', 'dosen');
 
@@ -479,8 +452,8 @@ class UniversityController extends Controller
         ]);
 
         $dosenName = trim($request->name);
-        if ($request->filled('nidn') && !str_contains($dosenName, 'NIDN')) {
-            $dosenName .= ' (NIDN: ' . trim($request->nidn) . ')';
+        if ($request->filled('nidn') && ! str_contains($dosenName, 'NIDN')) {
+            $dosenName .= ' (NIDN: '.trim($request->nidn).')';
         }
 
         $password = 'password';
@@ -621,17 +594,17 @@ class UniversityController extends Controller
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor',
-            'placement.evaluation'
+            'placement.evaluation',
         ])->whereHas('user', function ($uq) use ($university) {
             $uq->where('university_id', $university->id)
                 ->orWhere('university', $university->name)
-                ->orWhereHas('studentProfile', fn($sp) => $sp->where('university_id', $university->id)->orWhere('universitas', 'like', "%{$university->name}%"));
+                ->orWhereHas('studentProfile', fn ($sp) => $sp->where('university_id', $university->id)->orWhereRaw('LOWER(universitas) = ?', [mb_strtolower($university->name)]));
         })
             ->latest()
             ->get();
 
         $cleanUnivName = preg_replace('/[^A-Za-z0-9_]/', '_', $university->name);
-        $filename = 'Rekap_Mahasiswa_' . $cleanUnivName . '_' . date('Ymd_His') . '.csv';
+        $filename = 'Rekap_Mahasiswa_'.$cleanUnivName.'_'.date('Ymd_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -643,7 +616,7 @@ class UniversityController extends Controller
 
         return response()->stream(function () use ($applications, $university) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // UTF-8 BOM
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
 
             fputcsv($handle, [
                 'No',
@@ -676,7 +649,7 @@ class UniversityController extends Controller
                 $finalScore = ($eval && $eval->nilai_akhir > 0) ? number_format($eval->nilai_akhir, 2) : '-';
 
                 $periode = ($app->start_date && $app->end_date)
-                    ? date('d/m/Y', strtotime($app->start_date)) . ' s.d. ' . date('d/m/Y', strtotime($app->end_date))
+                    ? date('d/m/Y', strtotime($app->start_date)).' s.d. '.date('d/m/Y', strtotime($app->end_date))
                     : '-';
 
                 fputcsv($handle, [
@@ -689,7 +662,7 @@ class UniversityController extends Controller
                     $dosen?->name ?? 'Belum Ditentukan',
                     $mentor?->name ?? 'Belum Diplot',
                     $periode,
-                    \App\Enums\ApplicationStatus::tryFrom($app->statusValue())?->label() ?? ucfirst($app->statusValue()),
+                    ApplicationStatus::tryFrom($app->statusValue())?->label() ?? ucfirst($app->statusValue()),
                     $mentorScore,
                     $dosenScore,
                     $finalScore,

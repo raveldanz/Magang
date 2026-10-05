@@ -12,49 +12,49 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('student_profiles', function (Blueprint $table) {
-            if (!Schema::hasColumn('student_profiles', 'university_id')) {
+            if (! Schema::hasColumn('student_profiles', 'university_id')) {
                 $table->foreignId('university_id')->nullable()->after('universitas')->constrained('universities')->nullOnDelete();
             }
-            if (!Schema::hasColumn('student_profiles', 'faculty')) {
+            if (! Schema::hasColumn('student_profiles', 'faculty')) {
                 $table->string('faculty')->nullable()->after('university_id');
             }
-            if (!Schema::hasColumn('student_profiles', 'fakultas')) {
+            if (! Schema::hasColumn('student_profiles', 'fakultas')) {
                 $table->string('fakultas')->nullable()->after('faculty');
             }
-            if (!Schema::hasColumn('student_profiles', 'major')) {
+            if (! Schema::hasColumn('student_profiles', 'major')) {
                 $table->string('major')->nullable()->after('jurusan');
             }
-            if (!Schema::hasColumn('student_profiles', 'semester')) {
+            if (! Schema::hasColumn('student_profiles', 'semester')) {
                 $table->string('semester')->nullable()->after('major');
             }
-            if (!Schema::hasColumn('student_profiles', 'address')) {
+            if (! Schema::hasColumn('student_profiles', 'address')) {
                 $table->text('address')->nullable()->after('alamat');
             }
-            if (!Schema::hasColumn('student_profiles', 'emergency_contact_name')) {
+            if (! Schema::hasColumn('student_profiles', 'emergency_contact_name')) {
                 $table->string('emergency_contact_name')->nullable()->after('phone');
             }
-            if (!Schema::hasColumn('student_profiles', 'emergency_contact_phone')) {
+            if (! Schema::hasColumn('student_profiles', 'emergency_contact_phone')) {
                 $table->string('emergency_contact_phone')->nullable()->after('emergency_contact_name');
             }
         });
 
         Schema::table('applications', function (Blueprint $table) {
-            if (!Schema::hasColumn('applications', 'proposal_letter_path')) {
+            if (! Schema::hasColumn('applications', 'proposal_letter_path')) {
                 $table->string('proposal_letter_path')->nullable()->after('end_date');
             }
-            if (!Schema::hasColumn('applications', 'cv_path')) {
+            if (! Schema::hasColumn('applications', 'cv_path')) {
                 $table->string('cv_path')->nullable()->after('proposal_letter_path');
             }
-            if (!Schema::hasColumn('applications', 'transcript_path')) {
+            if (! Schema::hasColumn('applications', 'transcript_path')) {
                 $table->string('transcript_path')->nullable()->after('cv_path');
             }
-            if (!Schema::hasColumn('applications', 'id_card_path')) {
+            if (! Schema::hasColumn('applications', 'id_card_path')) {
                 $table->string('id_card_path')->nullable()->after('transcript_path');
             }
         });
 
         Schema::table('final_reports', function (Blueprint $table) {
-            if (!Schema::hasColumn('final_reports', 'final_report_path')) {
+            if (! Schema::hasColumn('final_reports', 'final_report_path')) {
                 $table->string('final_report_path')->nullable()->after('file_path');
             }
         });

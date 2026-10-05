@@ -78,17 +78,17 @@ class ProfileController extends Controller
             return back()->with('error', 'Akun ini menyimpan riwayat magang yang wajib diarsipkan sehingga tidak dapat dihapus.');
         }
 
-    $request->validateWithBag('userDeletion', [
-        'password' => ['required', 'current_password'],
-    ]);
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
 
-    Auth::logout();
+        Auth::logout();
 
-    $user->delete();
+        $user->delete();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-    return redirect('/')->with('success', 'Akun Anda berhasil dihapus.');
-}
+        return redirect('/')->with('success', 'Akun Anda berhasil dihapus.');
+    }
 }

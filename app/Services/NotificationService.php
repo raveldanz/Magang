@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
@@ -10,7 +12,7 @@ use App\Models\SystemFeedback;
 use App\Models\SystemNotification;
 use App\Models\University;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class NotificationService
 {
@@ -22,7 +24,7 @@ class NotificationService
         $role = $user->role;
         $agencyId = $user->agency_profile_id;
         $isSuperAdmin = ($role === 'super_admin' || ($role === 'admin' && is_null($agencyId)));
-        $isAdminDinas = ($role === 'admin' && !is_null($agencyId));
+        $isAdminDinas = ($role === 'admin' && ! is_null($agencyId));
 
         $actionable = [];
 
@@ -35,7 +37,7 @@ class NotificationService
 
             foreach ($pendingUnivs as $u) {
                 $actionable[] = [
-                    'id' => 'univ_' . $u->id,
+                    'id' => 'univ_'.$u->id,
                     'type' => 'urgent',
                     'category' => 'university',
                     'title' => "Perguruan Tinggi Baru: {$u->name}",
@@ -48,17 +50,17 @@ class NotificationService
             }
 
             // B. Instansi Dinas Baru Tanpa Akun Admin Dinas
-            $pendingAgencies = \App\Models\AgencyProfile::whereDoesntHave('users', function ($q) {
+            $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {
                 $q->where('role', 'admin');
             })->get();
 
             foreach ($pendingAgencies as $ag) {
                 $actionable[] = [
-                    'id' => 'agency_' . $ag->id,
+                    'id' => 'agency_'.$ag->id,
                     'type' => 'urgent',
                     'category' => 'agency',
                     'title' => "Instansi Dinas Baru: {$ag->agency_name}",
-                    'message' => "Instansi dinas baru terdaftar dan belum memiliki akun Admin Dinas.",
+                    'message' => 'Instansi dinas baru terdaftar dan belum memiliki akun Admin Dinas.',
                     'time' => $ag->created_at ? $ag->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.agencies.index'),
                     'action_label' => 'Buat Akun Admin Dinas',
@@ -74,7 +76,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'application',
                     'title' => "{$pendingAppsCount} Pengajuan Magang Menunggu Verifikasi",
-                    'message' => "Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.",
+                    'message' => 'Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.',
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Tinjau Pengajuan',
@@ -83,9 +85,9 @@ class NotificationService
             }
 
             // C. Tiket Feedback & Laporan Kendala Terbaru
-            $pendingFeedbacks = \App\Models\SystemFeedback::where('status', 'pending')->latest()->take(6)->get();
+            $pendingFeedbacks = SystemFeedback::where('status', 'pending')->latest()->take(6)->get();
             foreach ($pendingFeedbacks as $fb) {
-                $catLabel = match($fb->category) {
+                $catLabel = match ($fb->category) {
                     'error_bug' => 'Kendala / Bug',
                     'saran_fitur' => 'Saran Fitur',
                     'pertanyaan' => 'Pertanyaan',
@@ -94,12 +96,14 @@ class NotificationService
                     default => 'Masukan',
                 };
                 $actionable[] = [
-                    'id' => 'fb_' . $fb->id,
+                    'id' => 'fb_'.$fb->id,
                     'type' => $fb->priority === 'urgent' || in_array($fb->category, ['error_bug', 'laporan_chat'], true) ? 'urgent' : 'info',
                     'category' => 'feedback',
-                    'icon' => match ($fb->category) { 'error_bug' => '⚠️', 'laporan_chat' => '🚩', default => '💬' },
+                    'icon' => match ($fb->category) {
+                        'error_bug' => '⚠️', 'laporan_chat' => '🚩', default => '💬'
+                    },
                     'title' => "Feedback: [{$catLabel}] {$fb->subject}",
-                    'message' => "Dari {$fb->sender_name} (" . strtoupper($fb->sender_role) . "): " . \Illuminate\Support\Str::limit($fb->message, 80),
+                    'message' => "Dari {$fb->sender_name} (".strtoupper($fb->sender_role).'): '.Str::limit($fb->message, 80),
                     'time' => $fb->created_at->diffForHumans(),
                     'action_url' => route('admin.feedbacks.show', $fb->id),
                     'action_label' => '✉️ Buka Tiket',
@@ -108,14 +112,14 @@ class NotificationService
             }
 
             // D. Log Audit & Aktivitas Sistem Terbaru
-            $recentAudits = \App\Models\AuditLog::latest()->take(8)->get();
+            $recentAudits = AuditLog::latest()->take(8)->get();
             foreach ($recentAudits as $log) {
                 $actionable[] = [
-                    'id' => 'audit_' . $log->id,
+                    'id' => 'audit_'.$log->id,
                     'type' => 'info',
                     'category' => 'audit',
                     'title' => "Aktivitas: {$log->action}",
-                    'message' => "Oleh {$log->user_name} (" . strtoupper($log->user_role) . ") pada " . ($log->target_type ?? 'Sistem') . " #{$log->target_id}. " . \Illuminate\Support\Str::limit($log->details ?? '', 70),
+                    'message' => "Oleh {$log->user_name} (".strtoupper($log->user_role).') pada '.($log->target_type ?? 'Sistem')." #{$log->target_id}. ".Str::limit($log->details ?? '', 70),
                     'time' => $log->created_at ? $log->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.audit_logs.index'),
                     'action_label' => 'Buka Log Audit',
@@ -125,7 +129,7 @@ class NotificationService
 
             // D. Penetapan Pembimbing Belum Lengkap (Mahasiswa Diterima tapi Belum Ada DPL)
             $unassignedDpl = Placement::whereNull('academic_advisor_id')
-                ->whereHas('application', fn($q) => $q->whereIn('status', \App\Models\Application::QUOTA_STATUSES))
+                ->whereHas('application', fn ($q) => $q->whereIn('status', Application::QUOTA_STATUSES))
                 ->count();
             if ($unassignedDpl > 0) {
                 $actionable[] = [
@@ -133,7 +137,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'academic',
                     'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki DPL",
-                    'message' => "Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan belum ditentukan.",
+                    'message' => 'Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan belum ditentukan.',
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Lihat Penempatan',
@@ -145,7 +149,7 @@ class NotificationService
         // 2. ADMIN DINAS NOTIFICATIONS
         elseif ($isAdminDinas) {
             $agencyAppsCount = Application::where('status', 'pending')
-                ->whereHas('unit', fn($q) => $q->where('agency_profile_id', $agencyId))
+                ->whereHas('unit', fn ($q) => $q->where('agency_profile_id', $agencyId))
                 ->count();
             if ($agencyAppsCount > 0) {
                 $actionable[] = [
@@ -153,7 +157,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'application',
                     'title' => "{$agencyAppsCount} Berkas Pendaftar Menunggu Verifikasi",
-                    'message' => "Terdapat pendaftar magang baru di instansi dinas Anda yang menunggu proses verifikasi dan seleksi.",
+                    'message' => 'Terdapat pendaftar magang baru di instansi dinas Anda yang menunggu proses verifikasi dan seleksi.',
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
                     'is_action_required' => true,
@@ -161,7 +165,7 @@ class NotificationService
             }
 
             $pendingLogbooks = Logbook::where('status', 'pending')
-                ->whereHas('placement.application.unit', fn($q) => $q->where('agency_profile_id', $agencyId))
+                ->whereHas('placement.application.unit', fn ($q) => $q->where('agency_profile_id', $agencyId))
                 ->count();
             if ($pendingLogbooks > 0) {
                 $actionable[] = [
@@ -169,7 +173,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'logbook',
                     'title' => "{$pendingLogbooks} Logbook Mahasiswa Perlu Review",
-                    'message' => "Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.",
+                    'message' => 'Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.',
                     'time' => 'Monitoring dinas',
                     'action_url' => route('admin.logbooks.index'),
                     'action_label' => 'Cek Logbook',
@@ -198,7 +202,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'logbook',
                     'title' => "{$pendingLogbooksCount} Logbook Bimbingan Menunggu Evaluasi",
-                    'message' => "Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.",
+                    'message' => 'Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.',
                     'time' => 'Menunggu review',
                     'action_url' => route('lecturer.logbooks.index'),
                     'action_label' => 'Review Logbook',
@@ -217,7 +221,7 @@ class NotificationService
                     'type' => 'urgent',
                     'category' => 'evaluation',
                     'title' => "{$pendingReportsCount} Laporan Akhir Mahasiswa Siap Dinilai",
-                    'message' => "Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.",
+                    'message' => 'Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.',
                     'time' => 'Perlu penilaian',
                     'action_url' => route('lecturer.monitoring.index'),
                     'action_label' => 'Beri Nilai Akhir',
@@ -231,7 +235,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'academic',
                     'title' => "Total {$placements->count()} Mahasiswa dalam Bimbingan Anda",
-                    'message' => "Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.",
+                    'message' => 'Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.',
                     'time' => 'Portal DPL',
                     'action_url' => route('lecturer.monitoring.index'),
                     'is_action_required' => false,
@@ -244,7 +248,7 @@ class NotificationService
             $mentorPlacements = Placement::where('mentor_id', $user->id)
                 ->orWhere(function ($q) use ($user) {
                     if ($user->agency_profile_id) {
-                        $q->whereHas('application.unit', fn($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
+                        $q->whereHas('application.unit', fn ($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
                     }
                 })->get();
 
@@ -258,7 +262,7 @@ class NotificationService
                     'type' => 'warning',
                     'category' => 'logbook',
                     'title' => "{$pendingMentorLogbooks} Logbook Menunggu Validasi Mentor",
-                    'message' => "Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.",
+                    'message' => 'Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.',
                     'time' => 'Menunggu persetujuan',
                     'action_url' => route('mentor.logbooks.index'),
                     'action_label' => 'Validasi Logbook',
@@ -272,7 +276,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'mentor',
                     'title' => "Supervisi {$mentorPlacements->count()} Mahasiswa di Unit Kerja",
-                    'message' => "Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.",
+                    'message' => 'Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.',
                     'time' => 'Portal Mentor',
                     'action_url' => route('mentor.dashboard'),
                     'action_label' => 'Dashboard Mentor',
@@ -285,7 +289,7 @@ class NotificationService
         elseif ($role === 'mahasiswa') {
             $latestApp = Application::where('user_id', $user->id)->latest()->first();
             if ($latestApp) {
-                $status = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : strtolower((string)$latestApp->status);
+                $status = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : strtolower((string) $latestApp->status);
                 if (in_array($status, ['pending', 'verified'])) {
                     $actionable[] = [
                         'id' => 'student_app_pending',
@@ -300,7 +304,7 @@ class NotificationService
                     ];
                 } elseif (in_array($status, ['accepted', 'active'])) {
                     $placement = Placement::where('application_id', $latestApp->id)->first();
-                    if (!$placement || empty($placement->academic_advisor_id)) {
+                    if (! $placement || empty($placement->academic_advisor_id)) {
                         $actionable[] = [
                             'id' => 'student_need_dpl',
                             'type' => 'urgent',
@@ -318,7 +322,7 @@ class NotificationService
                             'type' => 'success',
                             'category' => 'academic',
                             'title' => 'Data Pembimbing Lengkap & Magang Siap Dilaksanakan',
-                            'message' => "Mentor Dinas & DPL telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.",
+                            'message' => 'Mentor Dinas & DPL telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.',
                             'time' => 'Aktif',
                             'action_url' => route('student.logbook.index'),
                             'action_label' => 'Buka Logbook',
@@ -331,7 +335,7 @@ class NotificationService
                         'type' => 'urgent',
                         'category' => 'application',
                         'title' => 'Pengajuan Magang Belum Diterima',
-                        'message' => 'Catatan: "' . ($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi') . '". Anda dapat mengajukan ulang.',
+                        'message' => 'Catatan: "'.($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi').'". Anda dapat mengajukan ulang.',
                         'time' => 'Pemberitahuan',
                         'action_url' => route('student.application.create'),
                         'action_label' => 'Ajukan Ulang',
@@ -361,11 +365,11 @@ class NotificationService
 
             foreach ($myAnsweredFeedbacks as $afb) {
                 $actionable[] = [
-                    'id' => 'my_fb_' . $afb->id,
+                    'id' => 'my_fb_'.$afb->id,
                     'type' => 'success',
                     'category' => 'feedback',
                     'title' => "Tanggapan atas Masukan: {$afb->subject}",
-                    'message' => "Admin telah membalas masukan Anda: \"" . \Illuminate\Support\Str::limit($afb->admin_response, 80) . "\"",
+                    'message' => 'Admin telah membalas masukan Anda: "'.Str::limit($afb->admin_response, 80).'"',
                     'time' => $afb->responded_at ? $afb->responded_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('feedbacks.show', $afb->id),
                     'action_label' => 'Lihat Tanggapan',
@@ -428,7 +432,7 @@ class NotificationService
         $dbNotifications = SystemNotification::forUser($user)->latest()->take(10)->get();
         foreach ($dbNotifications as $dn) {
             $actionable[] = [
-                'id' => 'db_' . $dn->id,
+                'id' => 'db_'.$dn->id,
                 'type' => $dn->type,
                 'category' => $dn->category,
                 'icon' => $dn->icon,
@@ -438,7 +442,7 @@ class NotificationService
                 'action_url' => $dn->action_url,
                 'action_label' => $dn->action_label ?? 'Buka Detail',
                 'is_action_required' => $dn->type === 'urgent' || $dn->type === 'warning',
-                'is_read' => !is_null($dn->read_at),
+                'is_read' => ! is_null($dn->read_at),
             ];
         }
 
@@ -453,10 +457,11 @@ class NotificationService
         $notifs = self::getNotificationsForUser($user);
         $count = 0;
         foreach ($notifs as $n) {
-            if (!empty($n['is_action_required']) || empty($n['is_read'])) {
+            if (! empty($n['is_action_required']) || empty($n['is_read'])) {
                 $count++;
             }
         }
+
         return $count;
     }
 
@@ -492,7 +497,7 @@ class NotificationService
         // Re-trigger red dot if there are unresolved urgent / action-required items
         $hasUrgentPending = false;
         foreach ($notifs as $n) {
-            if (!empty($n['is_action_required']) || in_array($n['type'] ?? '', ['urgent', 'warning'])) {
+            if (! empty($n['is_action_required']) || in_array($n['type'] ?? '', ['urgent', 'warning'])) {
                 $hasUrgentPending = true;
                 break;
             }

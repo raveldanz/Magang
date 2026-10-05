@@ -13,5 +13,6 @@
         @include('chat.partials.message-menu')
         @include('chat.partials.modals')
         @include('chat.partials.lightbox')
+        @include('chat.partials.comments-drawer')
     </div>
 </x-app-layout>

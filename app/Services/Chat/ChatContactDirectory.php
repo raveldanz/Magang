@@ -22,8 +22,11 @@ use Illuminate\Database\Eloquent\Builder;
 class ChatContactDirectory
 {
     public const AGENCY_STAFF_ROLES = ['admin', 'mentor', 'pembimbing'];
+
     public const MENTOR_ROLES = ['mentor', 'pembimbing'];
+
     public const LECTURER_ROLES = ['dosen', 'academic_advisor'];
+
     public const CAMPUS_STAFF_ROLES = ['universitas', 'dosen', 'academic_advisor'];
 
     /**
@@ -63,7 +66,7 @@ class ChatContactDirectory
     public function personalDetailsVisibleTo(User $viewer, array $userIds): array
     {
         $ids = array_values(array_unique(array_filter(array_map('intval', $userIds))));
-        if (!$ids) {
+        if (! $ids) {
             return [];
         }
         if ($viewer->isSuperAdmin()) {
@@ -127,7 +130,7 @@ class ChatContactDirectory
         if (in_array($role, self::LECTURER_ROLES, true)) {
             $this->orCampusStaff($q, $user->university_id);
             // Mode ketat: mahasiswa sekampus hanya yang menjadi bimbingan (lewat data penempatan di bawah)
-            if (!$strict) {
+            if (! $strict) {
                 $this->orCampusStudents($q, $user->university_id);
             }
             $advised = Placement::select('application_id')->where('academic_advisor_id', $user->id);
