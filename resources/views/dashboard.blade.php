@@ -11,13 +11,10 @@
 
             <!-- Flash Success Message -->
             @if (session('success'))
-                <div
-                    class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
                         <span>{{ session('success') }}</span>
                     </div>
@@ -25,6 +22,8 @@
             @endif
 
             @php
+                $rawSt = $application->status->value ?? 'none';
+                $rawAppSt = $rawSt;
                 $profile = Auth::user()->studentProfile;
                 $application = $application ?? ($profile ? App\Models\Application::where('user_id', Auth::id())->latest()->first() : null);
                 $placement = $application ? $application->placement : null;
@@ -34,7 +33,6 @@
                 $academicAdvisor = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
                 $logbooksCount = $placement ? ($placement->logbooks ? $placement->logbooks->count() : 0) : 0;
 
-                // Hitung target hari kerja secara dinamis berdasarkan periode magang diajukan
                 $targetDays = 30;
                 if ($application && $application->start_date && $application->end_date) {
                     try {
@@ -67,35 +65,30 @@
                     ? (\App\Enums\ApplicationStatus::resolve($rawSt)?->label() ?? strtoupper($rawSt))
                     : 'Registrasi Akun';
 
-                // Hitung persentase progress operasional
                 $stepCount = 0;
-                if (!empty($profile?->nim))
-                    $stepCount++;
-                if (!empty($application) && !in_array($rawSt, ['resigned', 'rejected']))
-                    $stepCount++;
-                if ($application && in_array($rawSt, ['accepted', 'active', 'completed']))
-                    $stepCount++;
-                if (!empty($academicAdvisor) && !in_array($rawSt, ['resigned', 'rejected']))
-                    $stepCount++;
-                if ($logbooksCount > 0)
-                    $stepCount++;
-                if ($finalReport && $rawFinalSt === 'approved')
-                    $stepCount++;
-                if ($isPassed)
-                    $stepCount++;
+                if (!empty($profile?->nim)) $stepCount++;
+                if (!empty($application) && !in_array($rawSt, ['resigned', 'rejected'])) $stepCount++;
+                if ($application && in_array($rawSt, ['accepted', 'active', 'completed'])) $stepCount++;
+                if (!empty($academicAdvisor) && !in_array($rawSt, ['resigned', 'rejected'])) $stepCount++;
+                if ($logbooksCount > 0) $stepCount++;
+                if ($finalReport && $rawFinalSt === 'approved') $stepCount++;
+                if ($isPassed) $stepCount++;
                 $progressPercent = round(($stepCount / 7) * 100);
             @endphp
 
-            <!-- 1. EXECUTIVE CIVIC BANNER (MATCHING PEMKOT SURABAYA ROYAL BLUE BRANDING) -->
+            <!-- 1. EXECUTIVE CIVIC BANNER -->
             <div x-data="{ showDetailModal: false }" class="space-y-6">
-                <div
-                    class="rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
+                <div class="rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
                     <div class="space-y-3 z-10 max-w-2xl">
                         <div class="space-y-1">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-blue-100 border border-white/15">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                Status: {{ $appStatusLabel }}
+                            </span>
                             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                                 Selamat Datang, {{ Auth::user()->name }}!
                             </h1>
-                            <p class="text-xs sm:text-sm leading-relaxed text-blue-100">
+                            <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90">
                                 Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Pemerintah Kota Surabaya
                             </p>
                         </div>
@@ -124,37 +117,36 @@
                         </div>
                     </div>
 
-                    <!-- Right Side: Sleek Progress Bar with "Lihat Detail" -->
-                    <div class="w-full lg:w-80 shrink-0 p-4 rounded-xl bg-white/10 border border-white/20 space-y-3">
+                    <!-- Sisi Kanan: Progress Bar Ramping -->
+                    <div class="w-full lg:w-72 shrink-0 p-4 rounded-xl bg-white/10 border border-white/20 space-y-2.5">
                         <div class="flex items-center justify-between text-xs text-white">
-                            <span class="text-blue-200">Institusi:</span>
-                            <span class="font-bold truncate max-w-[160px]">
+                            <span class="text-blue-200">Institusi</span>
+                            <span class="font-bold truncate max-w-[150px] text-right">
                                 {{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}
                             </span>
                         </div>
 
-                        <div class="space-y-1.5 pt-2 border-t border-white/15">
+                        <div class="space-y-1.5 pt-1.5 border-t border-white/15">
                             <div class="flex items-center justify-between text-xs font-bold text-white">
-                                <span>Kelengkapan Berkas Magang</span>
+                                <span>Kelengkapan Berkas</span>
                                 <span class="text-amber-300 font-mono">{{ $progressPercent }}%</span>
                             </div>
-                            <div class="w-full bg-black/20 rounded h-2 overflow-hidden">
-                                <div class="h-2 bg-emerald-400 rounded transition-all duration-500"
+                            <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+                                <div class="h-1.5 bg-emerald-400 rounded-full transition-all duration-500"
                                     style="width: {{ $progressPercent }}%;"></div>
                             </div>
-                            <div class="pt-1 flex items-center justify-between text-[11px]">
-                                <span class="text-blue-200">{{ $stepCount }} dari 7 Syarat Terpenuhi</span>
+                            <div class="pt-0.5 flex items-center justify-between text-[11px]">
+                                <span class="text-blue-200/90">{{ $stepCount }} dari 7 Syarat</span>
                                 <button type="button" @click="showDetailModal = true"
-                                    class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer flex items-center gap-1">
-                                    <span>Lihat Detail</span>
-                                    <span></span>
+                                    class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
+                                    Lihat Detail
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- MODAL: RINCIAN KELENGKAPAN & KEKURANGAN BERKAS MAGANG -->
+                <!-- MODAL: RINCIAN KELENGKAPAN BERKAS MAGANG -->
                 <div x-show="showDetailModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto"
                     aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     @php
@@ -162,15 +154,13 @@
                         $canProceed = $isAccepted && !empty($academicAdvisor);
                     @endphp
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <!-- Backdrop -->
                         <div x-show="showDetailModal" x-transition:enter="ease-out duration-200"
                             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                             x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100"
                             x-transition:leave-end="opacity-0" @click="showDetailModal = false"
                             class="fixed inset-0 bg-slate-900/60 transition-opacity"></div>
 
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                            aria-hidden="true">&#8203;</span>
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
                         <div x-show="showDetailModal" x-transition:enter="ease-out duration-200"
                             x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95"
@@ -181,33 +171,31 @@
                             class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-200">
 
                             <!-- Header Modal -->
-                            <div
-                                class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                                 <div>
-                                    <h3 class="text-sm font-bold text-slate-800" id="modal-title">Rincian Kelengkapan &
-                                        Kekurangan Berkas Magang</h3>
-                                    <p class="text-xs text-slate-500 mt-0.5">{{ $stepCount }} dari 7 syarat telah
-                                        terpenuhi ({{ $progressPercent }}%)</p>
+                                    <h3 class="text-sm font-bold text-slate-800" id="modal-title">
+                                        Rincian Kelengkapan & Kekurangan Berkas Magang
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        {{ $stepCount }} dari 7 syarat telah terpenuhi ({{ $progressPercent }}%)
+                                    </p>
                                 </div>
                                 <button type="button" @click="showDetailModal = false"
                                     class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg border border-slate-200 hover:bg-white transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
                             </div>
 
-                            <!-- List Status & Kekurangan dengan Navigasi Arahan -->
+                            <!-- List Status & Kekurangan -->
                             <div class="p-6 divide-y divide-slate-100 text-xs max-h-[70vh] overflow-y-auto space-y-1">
 
-                                <!-- Box Arahan Langkah Selanjutnya (Next Actionable Step) -->
+                                <!-- Box Arahan Langkah Selanjutnya -->
                                 <div class="pb-3">
-                                    <div
-                                        class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                         <div class="space-y-0.5">
-                                            <span
-                                                class="text-[11px] font-bold uppercase tracking-wider text-blue-800 block">
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-blue-800 block">
                                                 Arahan Tahapan Anda Saat Ini:
                                             </span>
                                             <p class="text-slate-700 leading-relaxed font-medium">
@@ -223,18 +211,13 @@
                                                 @elseif(!in_array($rawSt, ['accepted', 'active', 'completed'], true))
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
                                                 @elseif($isPassed)
-                                                    Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap
-                                                    diunduh.
+                                                    Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap diunduh.
                                                 @elseif(!$academicAdvisor)
                                                     Pengajuan diterima! Silakan <strong>pilih Dosen Pembimbing</strong> dari perguruan tinggi Anda.
                                                 @elseif($logbooksCount < 30)
-                                                    Terus catat aktivitas kerja harian Anda (sudah terisi
-                                                    <strong>{{ $logbooksCount }} hari</strong>, tersisa
-                                                    <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
+                                                    Terus catat aktivitas kerja harian Anda (sudah terisi <strong>{{ $logbooksCount }} hari</strong>, tersisa <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
                                                 @elseif(!$finalReport || $rawFinalSt !== 'approved')
-                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas
-                                                    harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta
-                                                    mengunggah/mencicil draf Laporan Akhir kapan saja.
+                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta mengunggah/mencicil draf Laporan Akhir kapan saja.
                                                 @else
                                                     Laporan akhir Anda sudah disetujui. E-Sertifikat akan terbit setelah syarat berikut terpenuhi:
                                                     {{ implode(' ', $certificateBlockers) }}
@@ -242,7 +225,6 @@
                                             </p>
                                         </div>
 
-                                        {{-- Tombol Tindakan Cepat Dinamis Sesuai Tahapan --}}
                                         <div class="shrink-0">
                                             @if(empty($profile?->nim))
                                                 <a href="{{ route('student.profile.edit') }}"
@@ -255,13 +237,11 @@
                                                     Daftar Magang
                                                 </a>
                                             @elseif(!in_array($rawSt, ['accepted', 'active', 'completed']))
-                                                <span
-                                                    class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
+                                                <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
                                                     Dalam Peninjauan
                                                 </span>
                                             @elseif($isPassed)
-                                                <a href="{{ route('student.certificate.show', $application->id) }}"
-                                                    target="_blank"
+                                                <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank"
                                                     class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition inline-block">
                                                     Unduh Sertifikat
                                                 </a>
@@ -289,6 +269,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- 1. Profil -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
@@ -382,7 +363,7 @@
                                                 Lihat Riwayat
                                             </a>
                                         @else
-                                          <button type="button" disabled
+                                            <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
                                                 title="Lengkapi verifikasi pengajuan dan pilih dosen pembimbing terlebih dahulu">
                                                 <span>+ Isi Logbook</span>
@@ -463,6 +444,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <!-- 2. BANNER KELULUSAN RESMI & UNDUH E-SERTIFIKAT (TEMA EMERALD-SURABAYA BLUE SOLID) -->
                 @if ($isPassed)
@@ -538,32 +520,121 @@
                             </div>
                         @endif
                     </div>
-                @endif
 
 
 
-                <!-- Modal Input Dosen Baru -->
-                <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
+            <!-- Modal Input Dosen Baru -->
+            <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
+                style="display: none;">
+
+                <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
+                    @click="openNewDosenModal = false"></div>
+
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 sm:p-7 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="text-lg font-bold text-slate-900 leading-6">
+                                Input Dosen Pembimbing Baru
+                            </h3>
+                            <button type="button" @click="openNewDosenModal = false"
+                                class="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">
+                                ✕
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Jika dosen pembimbing Anda belum terdaftar di sistem, silakan isi data di bawah ini. Akun portal dosen akan otomatis dibuatkan dan terhubung ke universitas Anda.
+                        </p>
+
+                        <form action="{{ route('student.create_advisor') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="university_id" value="{{ Auth::user()->university_id }}">
+
+                            <div>
+                                <label for="modal_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" id="modal_name" name="name" required
+                                    placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom"
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <label for="modal_email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Email Resmi / Kampus Dosen <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="email" id="modal_email" name="email" required
+                                    placeholder="Contoh: ahmad.sudrajat@kampus.ac.id"
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <label for="modal_nidn" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    NIDN / NIP Dosen (Opsional)
+                                </label>
+                                <input type="text" id="modal_nidn" name="nidn" placeholder="Contoh: 0012345678"
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Asal Perguruan Tinggi:
+                                </label>
+                                <input type="text"
+                                    value="{{ $univName ?? $profile->universitas ?? 'Universitas Mahasiswa' }}"
+                                    disabled
+                                    class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                                <button type="button" @click="openNewDosenModal = false"
+                                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                    Batal
+                                </button>
+                                <button type="submit"
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                                    Daftarkan & Pilih Sebagai DPL
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Popup Kredensial Akun Dosen Baru -->
+            @if (session('new_advisor_credential'))
+                @php
+                    $cred = session('new_advisor_credential');
+                    $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
+                @endphp
+                <div x-show="showCredentialModal" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
                     style="display: none;">
 
-                    <!-- Backdrop -->
                     <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
-                        @click="openNewDosenModal = false"></div>
+                        @click="showCredentialModal = false"></div>
 
                     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                        <div
-                            class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 sm:p-7 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+                        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5 my-auto max-h-[90vh] overflow-y-auto">
 
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-lg font-bold text-slate-900 leading-6">Input Dosen Pembimbing Baru
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="text-lg font-black text-slate-900 leading-snug">
+                                        Akun Dosen Pembimbing Berhasil Dibuat
                                     </h3>
+                                    <p class="text-xs text-emerald-600 font-semibold">
+                                        Tersambung ke {{ $cred['univ_name'] }}
+                                    </p>
                                 </div>
-                                <button type="button" @click="openNewDosenModal = false"
-                                    class="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">
+                                <button type="button" @click="showCredentialModal = false"
+                                    class="text-slate-400 hover:text-slate-600 text-lg p-1 cursor-pointer">
                                     ✕
                                 </button>
                             </div>
@@ -749,12 +820,20 @@
                     </div>
                 @endif
 
+                                        </div>
+                    </div>
+                @endif
+
                 <!-- ==================================================== -->
                 <!-- 4 & 5. DESKTOP VIEW: STATUS CARDS & DETAIL PENEMPATAN -->
                 <!-- ==================================================== -->
                 @php
                     $rawAppSt = $rawSt;
                 @endphp
+                                        </div>
+                    </div>
+                @endif
+
                 <!-- ==================================================== -->
                 <!-- 4 & 5. DESKTOP VIEW: STATUS CARDS & DETAIL PENEMPATAN -->
                 <!-- ==================================================== -->
@@ -1188,5 +1267,22 @@
                 </div>
 
             </div>
+
+            <!-- 5. CATATAN PENOLAKAN / PENGUNDURAN DIRI -->
+            @if ($application && in_array($rawAppSt, ['rejected', 'resigned']))
+                <div class="p-4 sm:p-5 {{ $rawAppSt === 'rejected' ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-slate-50 border-slate-200 text-slate-800' }} border rounded-2xl text-xs space-y-1.5 shadow-2xs">
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <svg class="w-4 h-4 {{ $rawAppSt === 'rejected' ? 'text-rose-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span>{{ $rawAppSt === 'rejected' ? 'Catatan Penolakan Berkas Magang' : 'Status Pengunduran Diri' }}</span>
+                    </div>
+                    <p class="leading-relaxed">
+                        {{ $application->rejection_reason ?? $application->rejection_note ?? ($rawAppSt === 'resigned' ? 'Anda telah mengundurkan diri dari pengajuan magang ini.' : 'Tidak ada catatan tambahan.') }}
+                    </p>
+                </div>
+            @endif
+
         </div>
+    </div>
 </x-app-layout>
