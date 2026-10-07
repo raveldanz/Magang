@@ -255,13 +255,12 @@
                             </div>
 
                             <!-- Identitas Instansi Dinas -->
-                            <h3 class="font-bold text-slate-900 text-[18px] leading-snug line-clamp-2 h-14 mb-1"
+                            <h3 class="font-bold text-slate-900 text-[15px] sm:text-base leading-snug line-clamp-3 h-[4.25rem] mb-1.5"
                                 title="{{ $agency->agency_name }}">
                                 {{ $agency->agency_name }}
                             </h3>
 
-
-                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-relaxed mb-2"
+                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-normal mb-2"
                                 title="{{ $agency->address }}">
                                 {{ $agency->address ?? 'Alamat kantor belum diatur' }}
                             </p>

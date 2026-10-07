@@ -10,9 +10,9 @@
                 <div class="lg:col-span-7 space-y-3">
                     @if($isSuperAdmin)
                         <span
-                            class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold tracking-wider"
                             style="background-color: rgba(251, 191, 36, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(251, 191, 36, 0.4) !important;">
-                            SUPER ADMIN GOVERNANCE HUB
+                            Administrator Utama
                         </span>
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight"
                             style="color: #ffffff !important;">
@@ -249,71 +249,79 @@
 
 
         {{-- 2. ENAM KARTU METRIK EKSEKUTIF (TERISOLASI OTOMATIS BERDASARKAN DINAS) --}}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-stretch">
             {{-- Pendaftar --}}
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition h-full flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pendaftar</span>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pendaftar</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_students'] ?? 0 }}</div>
                 </div>
-                <div class="text-2xl font-black text-slate-800">{{ $stats['total_students'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">{{ $isSuperAdmin ? 'Mahasiswa kota' : 'Pendaftar dinas' }}
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">
+                    {{ $isSuperAdmin ? 'Mahasiswa kota' : 'Pendaftar dinas' }}
                 </div>
             </div>
 
             {{-- Verifikasi --}}
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition h-full flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Verifikasi</span>
-
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Verifikasi</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
                 </div>
-                <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">PENDING dan VERIFIED</div>
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">PENDING dan VERIFIED</div>
             </div>
 
             {{-- Diterima --}}
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition h-full flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</span>
-
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_accepted'] ?? 0 }}</div>
                 </div>
-                <div class="text-2xl font-black text-slate-800">{{ $stats['total_accepted'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}</div>
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate" title="Diterima, Belum Mulai">Diterima, Belum Mulai</div>
             </div>
 
             {{-- Aktif --}}
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition h-full flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</span>
-
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_active'] ?? 0 }}</div>
                 </div>
-                <div class="text-2xl font-black text-slate-800">{{ $stats['total_active'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
             </div>
 
             {{-- Lulus --}}
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition h-full flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
-
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_completed'] ?? 0 }}</div>
                 </div>
-                <div class="text-2xl font-black text-slate-800">{{ $stats['total_completed'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</div>
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</div>
             </div>
 
             {{-- Sisa Kuota --}}
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition h-full flex flex-col justify-between"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sisa Kuota</span>
-
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sisa Kuota</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_quota_available'] ?? 0 }}</div>
                 </div>
-                <div class="text-2xl font-black text-slate-800">{{ $stats['total_quota_available'] ?? 0 }}</div>
-                <div class="text-[11px] text-slate-500 mt-1">
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">
                     {{ $isSuperAdmin ? 'Slot kuota kota' : 'Slot kuota dinas' }}
                 </div>
             </div>
