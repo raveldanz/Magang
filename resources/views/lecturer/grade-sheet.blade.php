@@ -308,48 +308,85 @@
             </div>
         </div>
 
-        <!-- 4. PENGESAHAN TANDA TANGAN (3 SISI) -->
-        <div class="mt-6 font-sans text-xs">
-            <p class="text-right text-slate-700 mb-2">
-                Ditetapkan di: <strong>Surabaya</strong> &bull; Pada tanggal: <strong>{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</strong>
-            </p>
-
-            <div class="grid grid-cols-3 gap-4 text-center mt-3">
-                <!-- Kolom 1: Pembimbing Lapangan Dinas -->
-                <div>
-                    <span class="text-slate-600 block">Mengetahui,</span>
-                    <span class="font-bold text-slate-900 block mt-0.5">Pembimbing Lapangan (Dinas)</span>
-                    <div class="h-20 flex items-center justify-center">
-                        <span class="text-[10px] text-slate-400 font-mono italic">[Telah Diverifikasi Sistem Dinas]</span>
+        <!-- 4. PENGESAHAN TANDA TANGAN (FORMAT 2 KOLOM STANDAR KAMPUS & INSTANSI) -->
+        @php
+            $verifyCertificateUrl = route('verify.certificate', $placement->ensureCertificateHash());
+            $qrSvg = null;
+            if (class_exists('SimpleSoftwareIO\QrCode\Facades\QrCode')) {
+                try {
+                    $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(72)->margin(0)->generate($verifyCertificateUrl);
+                } catch (\Throwable $e) {
+                    $qrSvg = null;
+                }
+            }
+        @endphp
+        <div class="mt-7 font-sans text-xs">
+            <div class="grid grid-cols-2 gap-8 text-center">
+                <!-- Kolom 1 (Kiri): Pembimbing Lapangan Dinas / Instansi -->
+                <div class="flex flex-col justify-between h-full">
+                    <div>
+                        <span class="text-slate-600 block">Mengetahui,</span>
+                        <span class="font-bold text-slate-900 block text-xs mt-0.5">Pembimbing Lapangan (Instansi)</span>
+                        <p class="text-[11px] text-slate-500 truncate">{{ $agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</p>
                     </div>
-                    <p class="font-bold text-slate-900 underline">{{ $mentor->name ?? '-' }}</p>
-                    <p class="text-[11px] text-slate-500">NIP. {{ $mentor->nip ?? '198503152010012001' }}</p>
+
+                    <div class="my-3 flex flex-col items-center justify-center min-h-[80px]">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-emerald-600/30 bg-emerald-50 text-emerald-900 text-[10.5px] font-semibold shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            Terverifikasi Sistem Lapangan
+                        </span>
+                        <span class="text-[9.5px] text-slate-400 mt-1">Dokumen Sah Evaluasi Kedinasan</span>
+                    </div>
+
+                    <div>
+                        <p class="font-bold text-slate-900 text-xs underline underline-offset-2">{{ $mentor->name ?? '-' }}</p>
+                        <p class="text-[11px] text-slate-600 mt-0.5">NIP. {{ $mentor->nip ?? '198503152010012001' }}</p>
+                    </div>
                 </div>
 
-                <!-- Kolom 2: Verifikasi QR Digital -->
-                <div class="flex flex-col items-center justify-center">
-                    <div class="p-1.5 bg-white border border-slate-300 rounded-lg shadow-2xs">
-                        <div class="w-16 h-16 bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 font-mono text-center leading-tight">
-                            QR VALIDASI<br/>RESMI DPL
+                <!-- Kolom 2 (Kanan): Dosen Pembimbing Lapangan (DPL) dengan TTE QR Code Resmi -->
+                <div class="flex flex-col justify-between h-full">
+                    <div>
+                        <p class="text-slate-600 text-xs">
+                            Surabaya, <strong>{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</strong>
+                        </p>
+                        <span class="font-bold text-slate-900 block text-xs mt-0.5">Dosen Pembimbing Lapangan (DPL)</span>
+                        <p class="text-[11px] text-slate-500 truncate">{{ $univ->name ?? ($profile->universitas ?? 'Perguruan Tinggi') }}</p>
+                    </div>
+
+                    <div class="my-2 flex flex-col items-center justify-center">
+                        <div class="p-1 bg-white border border-slate-300 rounded-lg shadow-2xs">
+                            @if (!empty($qrSvg))
+                                <div class="w-[72px] h-[72px] flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi TTE DPL">
+                                    {!! $qrSvg !!}
+                                </div>
+                            @else
+                                <div class="w-[72px] h-[72px] flex items-center justify-center text-[8px] text-slate-400 text-center leading-tight bg-slate-50 rounded">
+                                    QR TTE Resmi
+                                </div>
+                            @endif
                         </div>
-                    </div>
-                    <span class="text-[9px] text-slate-400 font-mono mt-1 text-center">
-                        ID: {{ $placement->ensureCertificateHash() ? substr($placement->certificate_hash, 0, 16) : 'VERIFIED-DOC' }}
-                    </span>
-                </div>
-
-                <!-- Kolom 3: Dosen Pembimbing Lapangan -->
-                <div>
-                    <span class="text-slate-600 block">Dosen Penilai,</span>
-                    <span class="font-bold text-slate-900 block mt-0.5">Dosen Pembimbing (DPL)</span>
-                    <div class="h-20 flex items-center justify-center">
-                        <span class="text-[10px] text-emerald-600 font-bold font-mono border border-emerald-200 bg-emerald-50 px-2 py-1 rounded">
-                            TERTANDATANGANI SECARA ELEKTRONIK
+                        <span class="text-[9px] font-mono text-slate-500 mt-1">
+                            ID: {{ substr($placement->ensureCertificateHash(), 0, 16) }}
+                        </span>
+                        <span class="text-[9.5px] text-blue-900 font-semibold flex items-center gap-1 mt-0.5">
+                            <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            Ditandatangani Secara Elektronik (TTE)
                         </span>
                     </div>
-                    <p class="font-bold text-slate-900 underline">{{ $dosen->name ?? '-' }}</p>
-                    <p class="text-[11px] text-slate-500">NIDN/NIP. {{ $dosen->nip ?? '0015088201' }}</p>
+
+                    <div>
+                        <p class="font-bold text-slate-900 text-xs underline underline-offset-2">{{ $dosen->name ?? '-' }}</p>
+                        <p class="text-[11px] text-slate-600 mt-0.5">NIDN/NIP. {{ $dosen->nip ?? '0015088201' }}</p>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Footer Legalitas Dokumen Elektronik -->
+            <div class="mt-6 pt-3 border-t border-slate-200 text-[10px] text-slate-400 text-center leading-relaxed">
+                <p>Dokumen Berita Acara Penilaian ini diterbitkan secara sah melalui Sistem Informasi Manajemen Magang dan telah diverifikasi secara elektronik berdasarkan UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.</p>
             </div>
         </div>
 
