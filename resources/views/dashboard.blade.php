@@ -11,13 +11,10 @@
 
             <!-- Flash Success Message -->
             @if (session('success'))
-                <div
-                    class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
                         <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
                         <span>{{ session('success') }}</span>
                     </div>
@@ -34,7 +31,6 @@
                 $academicAdvisor = $placement ? ($placement->academicAdvisor ?? $placement->dosen) : null;
                 $logbooksCount = $placement ? ($placement->logbooks ? $placement->logbooks->count() : 0) : 0;
 
-                // Hitung target hari kerja secara dinamis berdasarkan periode magang diajukan
                 $targetDays = 30;
                 if ($application && $application->start_date && $application->end_date) {
                     try {
@@ -67,100 +63,74 @@
                     ? (\App\Enums\ApplicationStatus::resolve($rawSt)?->label() ?? strtoupper($rawSt))
                     : 'Registrasi Akun';
 
-                // Hitung persentase progress operasional
                 $stepCount = 0;
-                if (!empty($profile?->nim))
-                    $stepCount++;
-                if (!empty($application) && !in_array($rawSt, ['resigned', 'rejected']))
-                    $stepCount++;
-                if ($application && in_array($rawSt, ['accepted', 'active', 'completed']))
-                    $stepCount++;
-                if (!empty($academicAdvisor) && !in_array($rawSt, ['resigned', 'rejected']))
-                    $stepCount++;
-                if ($logbooksCount > 0)
-                    $stepCount++;
-                if ($finalReport && $rawFinalSt === 'approved')
-                    $stepCount++;
-                if ($isPassed)
-                    $stepCount++;
+                if (!empty($profile?->nim)) $stepCount++;
+                if (!empty($application) && !in_array($rawSt, ['resigned', 'rejected'])) $stepCount++;
+                if ($application && in_array($rawSt, ['accepted', 'active', 'completed'])) $stepCount++;
+                if (!empty($academicAdvisor) && !in_array($rawSt, ['resigned', 'rejected'])) $stepCount++;
+                if ($logbooksCount > 0) $stepCount++;
+                if ($finalReport && $rawFinalSt === 'approved') $stepCount++;
+                if ($isPassed) $stepCount++;
                 $progressPercent = round(($stepCount / 7) * 100);
             @endphp
 
-            <!-- 1. EXECUTIVE CIVIC BANNER (MATCHING PEMKOT SURABAYA ROYAL BLUE BRANDING) -->
+            <!-- 1. EXECUTIVE CIVIC BANNER -->
             <div x-data="{ showDetailModal: false }" class="space-y-6">
-                <div
-                    class="rounded-2xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
+                <div class="rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
                     <div class="space-y-3 z-10 max-w-2xl">
                         <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span
-                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide bg-white/15 border border-white/20 text-white">
-                                    <span>Status: {{ $appStatusLabel }}</span>
-                                </span>
-                            </div>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-blue-100 border border-white/15">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                Status: {{ $appStatusLabel }}
+                            </span>
                             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                                 Selamat Datang, {{ Auth::user()->name }}!
                             </h1>
-                            <p class="text-xs sm:text-sm leading-relaxed text-blue-100">
+                            <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90">
                                 Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Pemerintah Kota Surabaya
                             </p>
                         </div>
 
-                        <!-- Executive Info Chips (Sharp Rectangular Badges, Zero Circles) -->
-                        <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                            <div
-                                class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                <span class="text-blue-200">NIM:</span>
-                                <strong class="font-mono text-white">{{ $profile->nim ?? 'Belum Diisi' }}</strong>
-                            </div>
-
-                            <div
-                                class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                <span class="text-blue-200">Logbook:</span>
-                                <strong class="text-amber-300">{{ $logbooksCount }} Entri Tercatat</strong>
-                            </div>
-
-                            @if($academicAdvisor)
-                                <div
-                                    class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                    <span class="text-blue-200">DPL:</span>
-                                    <strong class="text-white">{{ $academicAdvisor->name }}</strong>
-                                </div>
-                            @endif
+                        <!-- Baris Meta Informasi Bersih -->
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-xs text-blue-100/80 font-medium">
+                            <span>NIM: <strong class="text-white font-mono">{{ $profile->nim ?? 'Belum Diisi' }}</strong></span>
+                            <span>&bull;</span>
+                            <span>Aktivitas: <strong class="text-amber-300">{{ $logbooksCount }} Hari Terisi</strong></span>
+                            <span>&bull;</span>
+                            <span>Target: <strong class="text-white">{{ $targetDays }} Hari Kerja</strong></span>
                         </div>
                     </div>
 
-                    <!-- Right Side: Sleek Progress Bar with "Lihat Detail" -->
-                    <div class="w-full lg:w-80 shrink-0 p-4 rounded-xl bg-white/10 border border-white/20 space-y-3">
+                    <!-- Sisi Kanan: Progress Bar Ramping -->
+                    <div class="w-full lg:w-72 shrink-0 p-4 rounded-xl bg-white/10 border border-white/20 space-y-2.5">
                         <div class="flex items-center justify-between text-xs text-white">
-                            <span class="text-blue-200">Institusi:</span>
-                            <span class="font-bold truncate max-w-[160px]">
+                            <span class="text-blue-200">Institusi</span>
+                            <span class="font-bold truncate max-w-[150px] text-right">
                                 {{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}
                             </span>
                         </div>
 
-                        <div class="space-y-1.5 pt-2 border-t border-white/15">
+                        <div class="space-y-1.5 pt-1.5 border-t border-white/15">
                             <div class="flex items-center justify-between text-xs font-bold text-white">
-                                <span>Kelengkapan Berkas Magang</span>
+                                <span>Kelengkapan Berkas</span>
                                 <span class="text-amber-300 font-mono">{{ $progressPercent }}%</span>
                             </div>
-                            <div class="w-full bg-black/20 rounded h-2 overflow-hidden">
-                                <div class="h-2 bg-emerald-400 rounded transition-all duration-500"
+                            <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+                                <div class="h-1.5 bg-emerald-400 rounded-full transition-all duration-500"
                                     style="width: {{ $progressPercent }}%;"></div>
                             </div>
-                            <div class="pt-1 flex items-center justify-between text-[11px]">
-                                <span class="text-blue-200">{{ $stepCount }} dari 7 Syarat Terpenuhi</span>
+                            <div class="pt-0.5 flex items-center justify-between text-[11px]">
+                                <span class="text-blue-200/90">{{ $stepCount }} dari 7 Syarat</span>
                                 <button type="button" @click="showDetailModal = true"
-                                    class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer flex items-center gap-1">
-                                    <span>Lihat Detail</span>
-                                    <span></span>
+                                    class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
+                                    Lihat Detail
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- MODAL: RINCIAN KELENGKAPAN & KEKURANGAN BERKAS MAGANG -->
+                <!-- MODAL: RINCIAN KELENGKAPAN BERKAS MAGANG -->
                 <div x-show="showDetailModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto"
                     aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     @php
@@ -168,15 +138,13 @@
                         $canProceed = $isAccepted && !empty($academicAdvisor);
                     @endphp
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <!-- Backdrop -->
                         <div x-show="showDetailModal" x-transition:enter="ease-out duration-200"
                             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                             x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100"
                             x-transition:leave-end="opacity-0" @click="showDetailModal = false"
                             class="fixed inset-0 bg-slate-900/60 transition-opacity"></div>
 
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                            aria-hidden="true">&#8203;</span>
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
                         <div x-show="showDetailModal" x-transition:enter="ease-out duration-200"
                             x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95"
@@ -187,33 +155,31 @@
                             class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-200">
 
                             <!-- Header Modal -->
-                            <div
-                                class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                                 <div>
-                                    <h3 class="text-sm font-bold text-slate-800" id="modal-title">Rincian Kelengkapan &
-                                        Kekurangan Berkas Magang</h3>
-                                    <p class="text-xs text-slate-500 mt-0.5">{{ $stepCount }} dari 7 syarat telah
-                                        terpenuhi ({{ $progressPercent }}%)</p>
+                                    <h3 class="text-sm font-bold text-slate-800" id="modal-title">
+                                        Rincian Kelengkapan & Kekurangan Berkas Magang
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        {{ $stepCount }} dari 7 syarat telah terpenuhi ({{ $progressPercent }}%)
+                                    </p>
                                 </div>
                                 <button type="button" @click="showDetailModal = false"
                                     class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg border border-slate-200 hover:bg-white transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
                             </div>
 
-                            <!-- List Status & Kekurangan dengan Navigasi Arahan -->
+                            <!-- List Status & Kekurangan -->
                             <div class="p-6 divide-y divide-slate-100 text-xs max-h-[70vh] overflow-y-auto space-y-1">
 
-                                <!-- Box Arahan Langkah Selanjutnya (Next Actionable Step) -->
+                                <!-- Box Arahan Langkah Selanjutnya -->
                                 <div class="pb-3">
-                                    <div
-                                        class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                         <div class="space-y-0.5">
-                                            <span
-                                                class="text-[11px] font-bold uppercase tracking-wider text-blue-800 block">
+                                            <span class="text-[11px] font-bold uppercase tracking-wider text-blue-800 block">
                                                 Arahan Tahapan Anda Saat Ini:
                                             </span>
                                             <p class="text-slate-700 leading-relaxed font-medium">
@@ -229,18 +195,13 @@
                                                 @elseif(!in_array($rawSt, ['accepted', 'active', 'completed'], true))
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
                                                 @elseif($isPassed)
-                                                    Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap
-                                                    diunduh.
+                                                    Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap diunduh.
                                                 @elseif(!$academicAdvisor)
                                                     Pengajuan diterima! Silakan <strong>pilih Dosen Pembimbing Lapangan</strong> dari perguruan tinggi Anda.
                                                 @elseif($logbooksCount < 30)
-                                                    Terus catat aktivitas kerja harian Anda (sudah terisi
-                                                    <strong>{{ $logbooksCount }} hari</strong>, tersisa
-                                                    <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
+                                                    Terus catat aktivitas kerja harian Anda (sudah terisi <strong>{{ $logbooksCount }} hari</strong>, tersisa <strong>{{ max(0, 30 - $logbooksCount) }} hari kerja</strong>).
                                                 @elseif(!$finalReport || $rawFinalSt !== 'approved')
-                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas
-                                                    harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta
-                                                    mengunggah/mencicil draf Laporan Akhir kapan saja.
+                                                    Program magang Anda sedang berlangsung. Anda dapat mencatat aktivitas harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta mengunggah/mencicil draf Laporan Akhir kapan saja.
                                                 @else
                                                     Laporan akhir Anda sudah disetujui. E-Sertifikat akan terbit setelah syarat berikut terpenuhi:
                                                     {{ implode(' ', $certificateBlockers) }}
@@ -248,7 +209,6 @@
                                             </p>
                                         </div>
 
-                                        {{-- Tombol Tindakan Cepat Dinamis Sesuai Tahapan --}}
                                         <div class="shrink-0">
                                             @if(empty($profile?->nim))
                                                 <a href="{{ route('student.profile.edit') }}"
@@ -261,13 +221,11 @@
                                                     Daftar Magang
                                                 </a>
                                             @elseif(!in_array($rawSt, ['accepted', 'active', 'completed']))
-                                                <span
-                                                    class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
+                                                <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
                                                     Dalam Peninjauan
                                                 </span>
                                             @elseif($isPassed)
-                                                <a href="{{ route('student.certificate.show', $application->id) }}"
-                                                    target="_blank"
+                                                <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank"
                                                     class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition inline-block">
                                                     Unduh Sertifikat
                                                 </a>
@@ -295,19 +253,16 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- 1. Profil -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
                                         <div class="font-bold text-slate-800">1. Biodata & NIM Mahasiswa</div>
-
                                     </div>
                                     <div class="shrink-0">
                                         @if(!empty($profile?->nim))
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
-                                                Lengkap
-                                                ({{ $profile->user->name ?? auth()->user()->name ?? 'Nama Mahasiswa' }}
-                                                &bull; {{ $profile->nim }})
+                                            <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
+                                                Lengkap ({{ $profile->user->name ?? auth()->user()->name ?? 'Nama Mahasiswa' }} &bull; {{ $profile->nim }})
                                             </span>
                                         @else
                                             <a href="{{ route('student.profile.edit') }}"
@@ -317,47 +272,45 @@
                                         @endif
                                     </div>
                                 </div>
-<!-- 2. Unit Penempatan -->
-<div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-    <div>
-        <div class="font-bold text-slate-800">2. Penempatan Instansi & Unit Kerja</div>
-        <div class="text-slate-500 mt-0.5">Pemilihan instansi dinas dan divisi penempatan magang</div>
-    </div>
-    <div class="shrink-0">
-        @if($application && in_array($rawSt, ['accepted', 'active', 'completed'], true))
-            <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
-                Diterima ({{ $application->unit->name ?? 'Instansi Dinas' }})
-            </span>
-        @elseif($application && in_array($rawSt, ['resigned', 'rejected'], true))
-            <a href="{{ route('student.application.create') }}"
-                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                Buat Pengajuan Baru
-            </a>
-        @elseif($application)
-            <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
-                {{ $rawSt === 'verified' ? 'Menunggu Keputusan Dinas' : 'Menunggu Verifikasi Dinas' }}
-            </span>
-        @else
-            {{-- Karena NIM sudah ada, saat belum ada pengajuan tombol ini HARUS BISA DIKLIK --}}
-            <a href="{{ route('student.application.create') }}"
-                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
-                Pilih Unit
-            </a>
-        @endif
-    </div>
-</div>
+
+                                <!-- 2. Unit Penempatan -->
+                                <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div>
+                                        <div class="font-bold text-slate-800">2. Penempatan Instansi & Unit Kerja</div>
+                                        <div class="text-slate-500 mt-0.5">Pemilihan instansi dinas dan divisi penempatan magang</div>
+                                    </div>
+                                    <div class="shrink-0">
+                                        @if($application && in_array($rawSt, ['accepted', 'active', 'completed'], true))
+                                            <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
+                                                Diterima ({{ $application->unit->name ?? 'Instansi Dinas' }})
+                                            </span>
+                                        @elseif($application && in_array($rawSt, ['resigned', 'rejected'], true))
+                                            <a href="{{ route('student.application.create') }}"
+                                                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
+                                                Buat Pengajuan Baru
+                                            </a>
+                                        @elseif($application)
+                                            <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
+                                                {{ $rawSt === 'verified' ? 'Menunggu Keputusan Dinas' : 'Menunggu Verifikasi Dinas' }}
+                                            </span>
+                                        @else
+                                            <a href="{{ route('student.application.create') }}"
+                                                class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
+                                                Pilih Unit
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
 
                                 <!-- 3. DPL Kampus -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
                                         <div class="font-bold text-slate-800">3. Dosen Pembimbing Lapangan</div>
-                                        <div class="text-slate-500 mt-0.5">Dosen pembimbing akademik dari universitas
-                                            asal</div>
+                                        <div class="text-slate-500 mt-0.5">Dosen pembimbing akademik dari universitas asal</div>
                                     </div>
                                     <div class="shrink-0">
                                         @if($academicAdvisor)
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
+                                            <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                                                 Terdaftar ({{ $academicAdvisor->name }})
                                             </span>
                                         @elseif($isAccepted)
@@ -394,11 +347,10 @@
                                                 Lihat Riwayat
                                             </a>
                                         @else
-                                          <button type="button" disabled
+                                            <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
                                                 title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
                                                 <span>+ Isi Logbook</span>
-                                                
                                             </button>
                                             <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-block shadow-none"
@@ -413,8 +365,7 @@
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
                                         <div class="font-bold text-slate-800">5. Laporan Akhir Ilmiah Magang</div>
-                                        <div class="text-slate-500 mt-0.5">Dokumen pertanggungjawaban kegiatan magang
-                                            yang disahkan DPL & Mentor</div>
+                                        <div class="text-slate-500 mt-0.5">Dokumen pertanggungjawaban kegiatan magang yang disahkan DPL & Mentor</div>
                                     </div>
                                     <div class="shrink-0">
                                         @if (!$canProceed)
@@ -422,11 +373,9 @@
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
                                                 title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
                                                 <span>Unggah Laporan</span>
-                                                
                                             </button>
                                         @elseif ($finalReport && $rawFinalSt === 'approved')
-                                            <span
-                                                class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
+                                            <span class="px-2.5 py-1 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block">
                                                 Disetujui & Disahkan
                                             </span>
                                         @elseif ($finalReport)
@@ -446,141 +395,114 @@
                                 <!-- 6. Nilai & Sertifikat -->
                                 <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
-                                        <div class="font-bold text-slate-800">6. Nilai Kelulusan & E-Sertifikat Resmi
-                                        </div>
-
-                                        <div class="shrink-0">
-                                            @if($isPassed)
-                                                <a href="{{ route('student.certificate.show', $application->id) }}"
-                                                    target="_blank"
-                                                    class="px-3.5 py-1.5 rounded-md font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition inline-block">
-                                                    Unduh E-Sertifikat (PDF)
-                                                </a>
-                                            @else
-                                                <button type="button" disabled
+                                        <div class="font-bold text-slate-800">6. Nilai Kelulusan & E-Sertifikat Resmi</div>
+                                    </div>
+                                    <div class="shrink-0">
+                                        @if($isPassed)
+                                            <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank"
+                                                class="px-3.5 py-1.5 rounded-md font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition inline-block">
+                                                Unduh E-Sertifikat (PDF)
+                                            </a>
+                                        @else
+                                            <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
                                                 title="Sertifikat belum dapat diunduh: {{ implode(' ', $certificateBlockers) }}">
                                                 <span>Unduh E-Sertifikat</span>
-                                                
                                             </button>
-                                            @endif
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
 
-                                <!-- Footer Modal -->
-                                <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
-                                    <button type="button" @click="showDetailModal = false"
-                                        class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-100 transition cursor-pointer">
-                                        Tutup Rincian
-                                    </button>
-                                </div>
+                            </div>
+
+                            <!-- Footer Modal -->
+                            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+                                <button type="button" @click="showDetailModal = false"
+                                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                                    Tutup Rincian
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 2. BANNER KELULUSAN RESMI & UNDUH E-SERTIFIKAT (TEMA EMERALD-SURABAYA BLUE SOLID) -->
-                @if ($isPassed)
-                    <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6 relative overflow-hidden"
-                        style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #1e3a8a 100%) !important; color: #ffffff !important;">
-                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                            <div class="flex items-start space-x-4">
-                                <div class="space-y-1">
-                                    <h2 class="text-xl sm:text-2xl font-black" style="color: #ffffff !important;">
-                                        Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
-                                    </h2>
-                                    <p class="text-xs sm:text-sm max-w-2xl leading-relaxed"
-                                        style="color: #d1fae5 !important;">
-                                        Seluruh kewajiban logbook harian, laporan akhir ilmiah, dan evaluasi instansi dinas
-                                        serta bimbingan akademik DPL kampus telah lengkap. E-Sertifikat resmi kelulusan
-                                        telah
-                                        diterbitkan.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="shrink-0 w-full md:w-auto">
-                                <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank"
-                                    class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 cursor-pointer font-black text-xs sm:text-sm"
-                                    style="background-color: #ffffff !important; color: #065f46 !important; border: 2px solid #ffffff !important;">
-                                    <span>Cetak Sertifikat Resmi (PDF)</span>
-                                </a>
+            <!-- 2. BANNER KELULUSAN RESMI & UNDUH E-SERTIFIKAT -->
+            @if ($isPassed)
+                <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6 relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #1e3a8a 100%) !important; color: #ffffff !important;">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="space-y-1">
+                                <h2 class="text-xl sm:text-2xl font-black" style="color: #ffffff !important;">
+                                    Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
+                                </h2>
+                                <p class="text-xs sm:text-sm max-w-2xl leading-relaxed" style="color: #d1fae5 !important;">
+                                    Seluruh kewajiban logbook harian, laporan akhir ilmiah, dan evaluasi instansi dinas serta bimbingan akademik DPL kampus telah lengkap. E-Sertifikat resmi kelulusan telah diterbitkan.
+                                </p>
                             </div>
                         </div>
 
-                        <!-- Rekapitulasi Nilai Transparan -->
-                        @if($eval)
-                            @php
-                                $nilaiDinas = $eval->nilai_pembimbing ?? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1);
-                                $nilaiDpl = $eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0);
-                                $nilaiAkhir = $eval->nilai_akhir;
-                                $grade = $eval->grade_calculated ?? ($eval->grade ?? ($nilaiAkhir >= 85 ? 'A' : ($nilaiAkhir >= 70 ? 'B' : 'C')));
-                            @endphp
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t text-center"
-                                style="border-top-color: rgba(255, 255, 255, 0.2) !important;">
-                                <div class="p-3.5 rounded-2xl"
-                                    style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider block"
-                                        style="color: #a7f3d0 !important;">Nilai Dinas</span>
-                                    <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
-                                        {{ $nilaiDinas }}/100
-                                    </p>
-                                </div>
-                                <div class="p-3.5 rounded-2xl"
-                                    style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider block"
-                                        style="color: #a7f3d0 !important;">Nilai DPL</span>
-                                    <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
-                                        {{ $nilaiDpl }}/100
-                                    </p>
-                                </div>
-                                <div class="p-3.5 rounded-2xl"
-                                    style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider block"
-                                        style="color: #fde047 !important;">Nilai Akhir Total</span>
-                                    <p class="text-xl sm:text-2xl font-black mt-1" style="color: #fde047 !important;">
-                                        {{ $nilaiAkhir }}
-                                    </p>
-                                </div>
-                                <div class="p-3.5 rounded-2xl"
-                                    style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider block"
-                                        style="color: #fde047 !important;">Grade Kelulusan</span>
-                                    <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
-                                        {{ $grade }}
-                                    </p>
-                                </div>
-                            </div>
-                        @endif
+                        <div class="shrink-0 w-full md:w-auto">
+                            <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank"
+                                class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 cursor-pointer font-black text-xs sm:text-sm"
+                                style="background-color: #ffffff !important; color: #065f46 !important; border: 2px solid #ffffff !important;">
+                                <span>Cetak Sertifikat Resmi (PDF)</span>
+                            </a>
+                        </div>
                     </div>
-                @endif
 
-                <!-- 3. Form / Modal Pemilihan Dosen Pembimbing Kampus (Jika Diterima) -->
-                @if ($application && in_array($appStatusVal, ['accepted', 'active', 'completed']))
-                    <div
-                        class="bg-white rounded-3xl p-6 border-2 {{ $academicAdvisor ? 'border-emerald-200' : 'border-blue-300 bg-blue-50/20' }} shadow-sm space-y-4">
-                        <div
-                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-                                        Dosen Pembimbing Lapangan (DPL Kampus)
-                                        @if ($academicAdvisor)
-                                            <span
-                                                class="px-2.5 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
-                                                Terpilih
-                                            </span>
-                                        @else
-                                            <span
-                                                class="px-2.5 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded-full animate-pulse">
-                                                Perlu Ditentukan
-                                            </span>
-                                        @endif
-                                    </h3>
-                                </div>
+                    <!-- Rekapitulasi Nilai Transparan -->
+                    @if($eval)
+                        @php
+                            $nilaiDinas = $eval->nilai_pembimbing ?? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1);
+                            $nilaiDpl = $eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0);
+                            $nilaiAkhir = $eval->nilai_akhir;
+                            $grade = $eval->grade_calculated ?? ($eval->grade ?? ($nilaiAkhir >= 85 ? 'A' : ($nilaiAkhir >= 70 ? 'B' : 'C')));
+                        @endphp
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t text-center"
+                            style="border-top-color: rgba(255, 255, 255, 0.2) !important;">
+                            <div class="p-3.5 rounded-2xl"
+                                style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai Dinas</span>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
+                                    {{ $nilaiDinas }}/100
+                                </p>
+                            </div>
+                            <div class="p-3.5 rounded-2xl"
+                                style="background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important;">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #a7f3d0 !important;">Nilai DPL</span>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
+                                    {{ $nilaiDpl }}/100
+                                </p>
+                            </div>
+                            <div class="p-3.5 rounded-2xl"
+                                style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #fde047 !important;">Nilai Akhir Total</span>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #fde047 !important;">
+                                    {{ $nilaiAkhir }}
+                                </p>
+                            </div>
+                            <div class="p-3.5 rounded-2xl"
+                                style="background-color: rgba(255, 255, 255, 0.2) !important; border: 1px solid rgba(255, 255, 255, 0.35) !important;">
+                                <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: #fde047 !important;">Grade Kelulusan</span>
+                                <p class="text-xl sm:text-2xl font-black mt-1" style="color: #ffffff !important;">
+                                    {{ $grade }}
+                                </p>
                             </div>
                         </div>
+                    @endif
+                </div>
+            @endif
+
+            <!-- 3. Form Pemilihan Dosen Pembimbing Kampus (Polosan & Minimalis) -->
+            @if ($application && in_array($appStatusVal, ['accepted', 'active', 'completed']))
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border shadow-xs space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">
+                            Dosen Pembimbing Lapangan (DPL Kampus)
+                        </h3>
+                    </div>
 
                         @if ($academicAdvisor)
                             <!-- Tampilan Dosen yang Sudah Dipilih -->
@@ -598,438 +520,376 @@
                                     </div>
                                 </div>
 
-                                <button type="button"
-                                    onclick="document.getElementById('change-advisor-box').classList.toggle('hidden')"
-                                    class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs transition cursor-pointer">
-                                    Ganti Dosen Pembimbing
+                            <button type="button"
+                                onclick="document.getElementById('change-advisor-box').classList.toggle('hidden')"
+                                class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition shadow-2xs cursor-pointer">
+                                Ganti Dosen Pembimbing
+                            </button>
+                        </div>
+                    @else
+                        <div class="space-y-0.5">
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Silakan tentukan Dosen Pembimbing yang terdaftar di kampus Anda, atau gunakan tombol
+                                <strong class="text-slate-800">Input Dosen Baru</strong> jika belum ada di daftar.
+                            </p>
+                        </div>
+                    @endif
+
+                    <div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} pt-2 scroll-mt-6">
+                        <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label for="academic_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Pilih Dosen Terdaftar ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
+                                </label>
+                                <select id="academic_advisor_id" name="academic_advisor_id" required
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5 bg-white">
+                                    <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
+                                    @if(isset($availableDosens))
+                                        @foreach ($availableDosens as $dosen)
+                                            <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
+                                                {{ $dosen->name }} —
+                                                {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
+                                                ({{ $dosen->email }})
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div class="pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <button type="submit"
+                                        class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                                        Simpan Dosen Pembimbing
+                                    </button>
+
+                                    @if ($academicAdvisor)
+                                        <button type="button"
+                                            onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
+                                            class="px-3 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 transition rounded-xl hover:bg-slate-100 cursor-pointer">
+                                            Batal
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <button type="button" @click="openNewDosenModal = true"
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
+                                    Dosen tidak ditemukan? Input Dosen Baru
                                 </button>
                             </div>
-                        @else
-                            <!-- Alert Belum Memilih Dosen -->
-                            <div class="space-y-0.5">
-                                <p class="text-xs text-black-800 leading-relaxed">
-                                    Silakan pilih Dosen Pembimbing yang terdaftar di kampus Anda, atau klik tombol
-                                    <strong>Input Dosen Baru</strong>
-                                    jika nama dosen belum tertera pada daftar pilihan.
-                                </p>
-                            </div>
-                        @endif
-
-                        <!-- Form Pilihan Dosen -->
-                        <div id="change-advisor-box" class="{{ $academicAdvisor ? 'hidden' : '' }} pt-2 scroll-mt-6">
-                            <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-4">
-                                @csrf
-                                <div>
-                                    <div class="flex justify-between items-center mb-1.5">
-                                        <label for="academic_advisor_id"
-                                            class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            Pilih Dosen Terdaftar
-                                            ({{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}):
-                                        </label>
-                                    </div>
-                                    <select id="academic_advisor_id" name="academic_advisor_id" required
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
-                                        <option value="">-- Pilih Dosen Pembimbing Kampus --</option>
-                                        @if(isset($availableDosens))
-                                            @foreach ($availableDosens as $dosen)
-                                                <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                                    {{ $dosen->name }} —
-                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
-                                                    ({{ $dosen->email }})
-                                                </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-
-                                <!-- Baris Aksi Terpadu (Mobile: Turun ke Bawah, Desktop: Sebelahan Kiri & Kanan) -->
-                                <div class="pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                    <!-- Sisi Kiri: Simpan & Batal -->
-                                    <div class="flex items-center gap-2">
-                                        <button type="submit"
-                                            class="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                                            {{ __('Simpan Dosen Pembimbing') }}
-                                        </button>
-
-                                        @if ($academicAdvisor)
-                                            <button type="button"
-                                                onclick="document.getElementById('change-advisor-box').classList.add('hidden')"
-                                                class="px-3 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition rounded-xl hover:bg-slate-100 cursor-pointer">
-                                                Batal
-                                            </button>
-                                        @endif
-                                    </div>
-
-                                    <!-- Sisi Kanan: Input Dosen Baru -->
-                                    <button type="button" @click="openNewDosenModal = true"
-                                        class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-left sm:text-right">
-                                        Dosen tidak ditemukan? Input Dosen Baru
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        </form>
                     </div>
-                @endif
+                </div>
+            @endif
 
-                <!-- Modal Input Dosen Baru -->
-                <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
+            <!-- Modal Input Dosen Baru -->
+            <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
+                style="display: none;">
+
+                <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
+                    @click="openNewDosenModal = false"></div>
+
+                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 sm:p-7 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="text-lg font-bold text-slate-900 leading-6">
+                                Input Dosen Pembimbing Baru
+                            </h3>
+                            <button type="button" @click="openNewDosenModal = false"
+                                class="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">
+                                ✕
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Jika dosen pembimbing Anda belum terdaftar di sistem, silakan isi data di bawah ini. Akun portal dosen akan otomatis dibuatkan dan terhubung ke universitas Anda.
+                        </p>
+
+                        <form action="{{ route('student.create_advisor') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="university_id" value="{{ Auth::user()->university_id }}">
+
+                            <div>
+                                <label for="modal_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="text" id="modal_name" name="name" required
+                                    placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom"
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <label for="modal_email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Email Resmi / Kampus Dosen <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="email" id="modal_email" name="email" required
+                                    placeholder="Contoh: ahmad.sudrajat@kampus.ac.id"
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <label for="modal_nidn" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    NIDN / NIP Dosen (Opsional)
+                                </label>
+                                <input type="text" id="modal_nidn" name="nidn" placeholder="Contoh: 0012345678"
+                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    Asal Perguruan Tinggi:
+                                </label>
+                                <input type="text"
+                                    value="{{ $univName ?? $profile->universitas ?? 'Universitas Mahasiswa' }}"
+                                    disabled
+                                    class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                                <button type="button" @click="openNewDosenModal = false"
+                                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                    Batal
+                                </button>
+                                <button type="submit"
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                                    Daftarkan & Pilih Sebagai DPL
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Popup Kredensial Akun Dosen Baru -->
+            @if (session('new_advisor_credential'))
+                @php
+                    $cred = session('new_advisor_credential');
+                    $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
+                @endphp
+                <div x-show="showCredentialModal" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
                     style="display: none;">
 
-                    <!-- Backdrop -->
                     <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
-                        @click="openNewDosenModal = false"></div>
+                        @click="showCredentialModal = false"></div>
 
                     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                        <div
-                            class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 sm:p-7 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+                        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5 my-auto max-h-[90vh] overflow-y-auto">
 
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-lg font-bold text-slate-900 leading-6">Input Dosen Pembimbing Baru
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="text-lg font-black text-slate-900 leading-snug">
+                                        Akun Dosen Pembimbing Berhasil Dibuat
                                     </h3>
+                                    <p class="text-xs text-emerald-600 font-semibold">
+                                        Tersambung ke {{ $cred['univ_name'] }}
+                                    </p>
                                 </div>
-                                <button type="button" @click="openNewDosenModal = false"
-                                    class="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">
+                                <button type="button" @click="showCredentialModal = false"
+                                    class="text-slate-400 hover:text-slate-600 text-lg p-1 cursor-pointer">
                                     ✕
                                 </button>
                             </div>
 
-                            <p class="text-xs text-slate-500 leading-relaxed">
-                                Jika dosen pembimbing Anda belum terdaftar di sistem, silakan isi data di bawah ini.
-                                Akun
-                                portal dosen akan otomatis dibuatkan dan terhubung ke universitas Anda.
-                            </p>
-
-                            <form action="{{ route('student.create_advisor') }}" method="POST" class="space-y-4">
-                                @csrf
-                                <input type="hidden" name="university_id" value="{{ Auth::user()->university_id }}">
-
-                                <div>
-                                    <label for="modal_name"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span>
-                                    </label>
-                                    <input type="text" id="modal_name" name="name" required
-                                        placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom"
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                </div>
-
-                                <div>
-                                    <label for="modal_email"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Email Resmi / Kampus Dosen <span class="text-rose-500">*</span>
-                                    </label>
-                                    <input type="email" id="modal_email" name="email" required
-                                        placeholder="Contoh: ahmad.sudrajat@kampus.ac.id"
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                </div>
-
-                                <div>
-                                    <label for="modal_nidn"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        NIDN / NIP Dosen (Opsional)
-                                    </label>
-                                    <input type="text" id="modal_nidn" name="nidn" placeholder="Contoh: 0012345678"
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Asal Perguruan Tinggi:
-                                    </label>
-                                    <input type="text"
-                                        value="{{ $univName ?? $profile->universitas ?? 'Universitas Mahasiswa' }}"
-                                        disabled
-                                        class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
-                                </div>
-
-                                <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
-                                    <button type="button" @click="openNewDosenModal = false"
-                                        class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                        Batal
-                                    </button>
-                                    <button type="submit"
-                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
-                                        Daftarkan & Pilih Sebagai DPL
-                                    </button>
-                                </div>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal Popup Kredensial Akun Dosen Baru -->
-                @if (session('new_advisor_credential'))
-                    @php
-                        $cred = session('new_advisor_credential');
-                        $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
-                    @endphp
-                    <div x-show="showCredentialModal" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
-                        style="display: none;">
-
-                        <!-- Backdrop -->
-                        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
-                            @click="showCredentialModal = false"></div>
-
-                        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                            <div
-                                class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5 my-auto max-h-[90vh] overflow-y-auto">
-
-                                <!-- Header Modal -->
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="flex items-center gap-3">
-
-                                        <div>
-                                            <h3 class="text-lg font-black text-slate-900 leading-snug">Akun Dosen Pembimbing
-                                                Berhasil Dibuat</h3>
-                                            <p class="text-xs text-emerald-600 font-semibold">Tersambung ke
-                                                {{ $cred['univ_name'] }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="showCredentialModal = false"
-                                        class="text-slate-400 hover:text-slate-600 text-lg p-1 cursor-pointer">
-                                        ✕
-                                    </button>
-                                </div>
-
-                                <!-- Box Kredensial -->
-                                <div
-                                    class="rounded-2xl bg-slate-900 text-slate-100 p-5 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
-                                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                                        <span
-                                            class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">Kredensial
-                                            Akses Dosen</span>
-                                        <span
-                                            class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">{{ \App\Enums\AccountStatus::ACTIVE->label() }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Nama Dosen:</span>
-                                        <span class="col-span-2 font-bold text-white">{{ $cred['name'] }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Email Login:</span>
-                                        <span
-                                            class="col-span-2 font-bold text-amber-300 select-all">{{ $cred['email'] }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Password Default:</span>
-                                        <span
-                                            class="col-span-2 font-bold text-emerald-300 select-all">{{ $cred['password'] }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Portal Login:</span>
-                                        <span
-                                            class="col-span-2 font-bold text-sky-300 break-all select-all">{{ $cred['login_url'] }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Instruksi Mahasiswa -->
-                                <div
-                                    class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-xs text-amber-900 flex items-start gap-3 leading-relaxed">
-                                    <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div>
-                                        <strong class="font-bold">Instruksi Mahasiswa:</strong>
-                                        <p class="mt-1 text-amber-800">Harap simpan dan teruskan kredensial di atas kepada
-                                            <strong>Dosen Pembimbing Lapangan</strong> Anda agar beliau dapat login ke
-                                            Portal Dosen untuk memonitor logbook mingguan dan memberikan penilaian akhir
-                                            magang.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                                    <button type="button"
-                                        @click="navigator.clipboard.writeText(`{{ addslashes($waText) }}`); copied = true; setTimeout(() => copied = false, 3000)"
-                                        class="w-full inline-flex justify-center items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition transform active:scale-98 cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                        </svg>
-                                        <span
-                                            x-text="copied ? 'Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">Salin
-                                            Informasi Login</span>
-                                    </button>
-
-                                    <button type="button" @click="showCredentialModal = false"
-                                        class="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                        Tutup
-                                    </button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- 4. STATUS CARD GRID (3 KARTU INFORMASI UTAMA) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <!-- Card 1: Profil Mahasiswa -->
-                    <div
-                        class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 {{ $profile ? 'border-l-emerald-500' : 'border-l-amber-500' }} flex flex-col justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Profil</p>
-                            <p class="text-lg font-black mt-1 text-slate-800">
-                                {{ $profile ? 'Lengkap' : 'Belum Lengkap' }}
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-2">
-                            <a href="{{ route('student.profile.edit') }}"
-                                class="inline-block text-xs font-bold text-blue-600 hover:text-blue-800">
-                                {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }}
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Status Pengajuan & Lifecycle -->
-                    @php
-                        $rawAppSt = $rawSt;
-                    @endphp
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 
-                    {{ $rawAppSt === 'active' ? 'border-l-emerald-500' : '' }}
-                    {{ $rawAppSt === 'completed' ? 'border-l-blue-600' : '' }}
-                    {{ $rawAppSt === 'accepted' ? 'border-l-indigo-500' : '' }}
-                    {{ $rawAppSt === 'verified' ? 'border-l-sky-500' : '' }}
-                    {{ $rawAppSt === 'pending' ? 'border-l-amber-500' : '' }}
-                    {{ $rawAppSt === 'rejected' ? 'border-l-rose-500' : '' }}
-                    {{ $rawAppSt === 'resigned' ? 'border-l-slate-400' : '' }}
-                    {{ !$application ? 'border-l-slate-300' : '' }} flex flex-col justify-between">
-                        <div>
-                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Status Magang
-                            </div>
-                            <div class="mt-2">
-                                @if(!$application)
-                                    <span
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200">
-                                        Belum Mengajukan
+                            <div class="rounded-2xl bg-slate-900 text-slate-100 p-5 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                                    <span class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">
+                                        Kredensial Akses Dosen
                                     </span>
-                                @else
-                                    <x-status-badge :status="$application->status" stacked />
-                                @endif
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">
+                                        {{ \App\Enums\AccountStatus::ACTIVE->label() }}
+                                    </span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Nama Dosen:</span>
+                                    <span class="col-span-2 font-bold text-white">{{ $cred['name'] }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Email Login:</span>
+                                    <span class="col-span-2 font-bold text-amber-300 select-all">{{ $cred['email'] }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Password Default:</span>
+                                    <span class="col-span-2 font-bold text-emerald-300 select-all">{{ $cred['password'] }}</span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-1">
+                                    <span class="text-slate-400 font-sans">Portal Login:</span>
+                                    <span class="col-span-2 font-bold text-sky-300 break-all select-all">{{ $cred['login_url'] }}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt-4 pt-2">
-                            @if(!$application || in_array($rawAppSt, ['resigned', 'rejected']))
-                                <a href="{{ route('student.application.create') }}"
-                                    class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800">
-                                    <span>Buat Pengajuan Baru</span>
-                                </a>
-                            @else
-                                <div class="text-xs text-slate-500">Unit:
-                                    <strong>{{ $application->unit->name ?? '-' }}</strong>
+
+                            <div class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-xs text-amber-900 flex items-start gap-3 leading-relaxed">
+                                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <strong class="font-bold">Instruksi Mahasiswa:</strong>
+                                    <p class="mt-1 text-amber-800">
+                                        Harap simpan dan teruskan kredensial di atas kepada <strong>Dosen Pembimbing Lapangan</strong> Anda agar beliau dapat login ke Portal Dosen untuk memonitor logbook mingguan dan memberikan penilaian akhir magang.
+                                    </p>
                                 </div>
-                            @endif
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                                <button type="button"
+                                    @click="navigator.clipboard.writeText(`{{ addslashes($waText) }}`); copied = true; setTimeout(() => copied = false, 3000)"
+                                    class="w-full inline-flex justify-center items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition transform active:scale-98 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    <span x-text="copied ? 'Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">
+                                        Salin Informasi Login
+                                    </span>
+                                </button>
+
+                                <button type="button" @click="showCredentialModal = false"
+                                    class="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                    Tutup
+                                </button>
+                            </div>
+
                         </div>
                     </div>
+                </div>
+            @endif
 
-                    <!-- Card 3: Pembimbing Lapangan Dinas -->
-                    <div
-                        class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 border-l-4 border-l-blue-600 flex flex-col justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pembimbing Lapangan
-                                (Dinas)
-                            </p>
-                            <p class="text-base font-bold mt-1 text-slate-800">
-                                {{ $mentor ? $mentor->name : 'Belum Diplot Dinas' }}
-                            </p>
-                        </div>
-                        <div class="mt-4 pt-2 space-y-3">
-                            <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.
-                            </p>
-                            @if ($mentor || $academicAdvisor)
-                                <div class="flex flex-wrap gap-2">
-                                    @if ($mentor)
-                                        <x-chat-button :user="$mentor" label="Chat Mentor" />
-                                    @endif
-                                    <x-chat-group-button :placement="$placement" />
-                                </div>
-                            @endif
-                        </div>
+            <!-- 4. STATUS CARD GRID (3 KARTU POLOSAN & SERAGAM) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+
+                <!-- Card 1: Profil Mahasiswa -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xs border flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Status Profil</span>
+                        <p class="text-base sm:text-lg font-black mt-1 text-slate-800">
+                            {{ $profile ? 'Biodata Lengkap' : 'Belum Lengkap' }}
+                        </p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            {{ $profile ? 'Data akademik dan kontak aktif Anda telah sinkron dengan sistem.' : 'Lengkapi NIM, jurusan, dan kontak darurat Anda.' }}
+                        </p>
                     </div>
-
-                    <!-- Card 4: Penilaian Nilai Pembimbing -->
-                    @if($eval)
-                        @php
-                            $rataRata = round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 2);
-                        @endphp
-                        <div
-                            class="bg-white p-5 rounded-2xl shadow-[0_4px_12px_rgba(100,116,139,0.08)] border-l-4 border-purple-500 md:col-span-3">
-                            <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Penilaian Pembimbing
-                                Lapangan
-                            </p>
-                            <p class="text-2xl font-bold mt-1 text-slate-800">{{ $rataRata }}</p>
-                            <p class="text-xs text-slate-500 mt-1">Disiplin: {{ $eval->nilai_disiplin ?? '-' }} · Kinerja:
-                                {{ $eval->nilai_kinerja ?? '-' }} · Laporan: {{ $eval->nilai_laporan ?? '-' }}
-                            </p>
-                        </div>
-                    @endif
+                    <div class="pt-3 border-t border-slate-100">
+                        <a href="{{ route('student.profile.edit') }}" 
+                           class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <span>{{ $profile ? 'Kelola Data Profil' : 'Lengkapi Sekarang' }}</span>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- 5. DETAIL BANNER PENGAJUAN AKTIF -->
-                @if ($application)
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                            <h4 class="font-bold text-slate-800 text-base">Detail Penempatan Magang</h4>
-                            @if (in_array($appStatusVal, ['accepted', 'active', 'completed']))
-                                <a href="{{ route('student.application.letter', $application->id) }}" target="_blank"
-                                    class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                    <span>Unduh Surat Balasan Dinas</span>
-                                </a>
+                <!-- Card 2: Status Magang & Detail Penempatan -->
+                @php
+                    $rawAppSt =$rawSt;
+                @endphp
+                <div class="bg-white p-5 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xs border flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Magang</span>
+                            @if($application)
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full {{ in_array($rawAppSt, ['accepted', 'active', 'completed']) ? 'bg-emerald-500' : 'bg-amber-400' }}"></span>
+                                    <span class="text-xs font-bold tracking-wide uppercase {{ in_array($rawAppSt, ['accepted', 'active', 'completed']) ? 'text-emerald-700' : 'text-amber-700' }}">
+                                        {{ strtoupper($application->status instanceof \BackedEnum ? $application->status->value :$application->status) }}
+                                    </span>
+                                </div>
+                            @else
+                                <span class="text-xs font-semibold text-slate-400">Belum Ada</span>
                             @endif
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
-                            <p><span class="text-slate-500">Instansi Penempatan:</span>
-                                <strong>{{ $application->unit->agencyProfile->agency_name ?? '-' }}</strong>
-                            </p>
-                            <p><span class="text-slate-500">Unit Kerja:</span>
-                                <strong>{{ $application->unit->name ?? '-' }}</strong>
-                            </p>
-                            <p><span class="text-slate-500">Periode Magang:</span>
-                                <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d
-                                    {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</strong>
-                            </p>
-                            <p><span class="text-slate-500">Status Saat Ini:</span>
-                                <x-status-badge :status="$application->status" />
-                            </p>
-                            @if ($rawAppSt === 'rejected')
-                                <div
-                                    class="col-span-1 md:col-span-2 p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs">
-                                    <strong>Catatan Penolakan:</strong>
-                                    {{ $application->rejection_reason ?? $application->rejection_note }}
-                                </div>
-                            @elseif ($rawAppSt === 'resigned')
-                                <div
-                                    class="col-span-1 md:col-span-2 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                                    <div>
-                                        <strong>Status:</strong> Anda telah mengundurkan diri dari kegiatan magang ini.
+
+                        <div class="mt-2.5 space-y-1">
+                            @if($application)
+                                <p class="text-sm font-black text-slate-900 leading-snug">
+                                    {{ $application->unit->name ?? 'Bidang Penempatan' }}
+                                </p>
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    {{ $application->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}
+                                </p>
+                                
+                                @if($application->start_date &&$application->end_date)
+                                    <div class="pt-2 text-[11px] font-medium text-slate-600 flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</span>
                                     </div>
-                                    <a href="{{ route('student.application.create') }}"
-                                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition shadow-sm">
-                                        Buat Pengajuan Baru
-                                    </a>
-                                </div>
+                                @endif
+                            @else
+                                <p class="text-sm font-bold text-slate-700">Belum Mengajukan</p>
+                                <p class="text-xs text-slate-400">Silakan pilih instansi penempatan yang tersedia.</p>
                             @endif
                         </div>
                     </div>
-                @endif
+
+                    <!-- Tombol Aksi di Card Penempatan -->
+                    <div class="pt-3 border-t border-slate-100">
+                        @if (in_array($rawAppSt, ['accepted', 'active', 'completed']))
+                            <a href="{{ route('student.application.letter', $application->id) }}" target="_blank"
+                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition border border-blue-200 shadow-2xs">
+                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Unduh Surat Balasan Dinas (PDF)</span>
+                            </a>
+                        @elseif (!$application || in_array($rawAppSt, ['resigned', 'rejected']))
+                            <a href="{{ route('student.application.create') }}"
+                               class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs">
+                                <span>Buat Pengajuan Magang</span>
+                            </a>
+                        @else
+                            <span class="text-[11px] font-semibold text-slate-400 italic block text-center sm:text-left">
+                                Menunggu konfirmasi kedinasan
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Card 3: Pembimbing Lapangan Dinas -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl sm:rounded-3xl shadow-xs border flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Pembimbing Lapangan (Dinas)
+                        </span>
+                        <p class="text-base sm:text-lg font-black mt-1 text-slate-800">
+                            {{ $mentor ? $mentor->name : 'Belum Ditugaskan' }}
+                        </p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            {{ $mentor ? 'Mentor dinas yang bertugas mengevaluasi dan menandatangani logbook kegiatan.' : 'Mentor resmi akan diplot setelah Anda resmi masuk penempatan unit kerja.' }}
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                        <span>Pemerintah Kota Surabaya</span>
+                    </div>
+                </div>
 
             </div>
+
+            <!-- 5. CATATAN PENOLAKAN / PENGUNDURAN DIRI -->
+            @if ($application && in_array($rawAppSt, ['rejected', 'resigned']))
+                <div class="p-4 sm:p-5 {{ $rawAppSt === 'rejected' ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-slate-50 border-slate-200 text-slate-800' }} border rounded-2xl text-xs space-y-1.5 shadow-2xs">
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <svg class="w-4 h-4 {{ $rawAppSt === 'rejected' ? 'text-rose-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span>{{ $rawAppSt === 'rejected' ? 'Catatan Penolakan Berkas Magang' : 'Status Pengunduran Diri' }}</span>
+                    </div>
+                    <p class="leading-relaxed">
+                        {{ $application->rejection_reason ?? $application->rejection_note ?? ($rawAppSt === 'resigned' ? 'Anda telah mengundurkan diri dari pengajuan magang ini.' : 'Tidak ada catatan tambahan.') }}
+                    </p>
+                </div>
+            @endif
+
         </div>
+    </div>
 </x-app-layout>
