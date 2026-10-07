@@ -57,10 +57,10 @@
                 $finalReportStatusVal = $finalReport ? ($finalReport->status instanceof \BackedEnum ? $finalReport->status->value : $finalReport->status) : null;
                 $rawFinalSt = strtolower($finalReportStatusVal ?? '');
 
-                $isPassed = $application && (
-                    $rawSt === 'completed' ||
-                    (in_array($rawSt, ['accepted', 'active']) && $logbooksCount > 0 && $eval && ($eval->nilai_akhir > 0 || $eval->nilai_disiplin > 0) && $rawFinalSt === 'approved')
-                );
+                // Certificate Gate (Application::certificateBlockers): evaluasi mentor lengkap + laporan ACC
+                // + logbook terisi + status COMPLETED. Tombol unduh hanya aktif bila daftar blocker kosong.
+                $certificateBlockers = $application ? $application->certificateBlockers() : ['Belum ada pengajuan magang.'];
+                $isPassed = $application && $certificateBlockers === [];
 
                 // Nama status untuk banner: kode sistem standar (sama di semua role)
                 $appStatusLabel = $application
@@ -242,8 +242,8 @@
                                                     harian (terisi <strong>{{ $logbooksCount }} hari</strong>) serta
                                                     mengunggah/mencicil draf Laporan Akhir kapan saja.
                                                 @else
-                                                    Selamat! Seluruh kewajiban telah terpenuhi. E-Sertifikat resmi siap
-                                                    diunduh.
+                                                    Laporan akhir Anda sudah disetujui. E-Sertifikat akan terbit setelah syarat berikut terpenuhi:
+                                                    {{ implode(' ', $certificateBlockers) }}
                                                 @endif
                                             </p>
                                         </div>
@@ -287,11 +287,10 @@
                                                     Unggah Laporan
                                                 </a>
                                             @else
-                                                <a href="{{ route('student.certificate.show', $application->id) }}"
-                                                    target="_blank"
-                                                    class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition inline-block">
-                                                    Unduh Sertifikat
-                                                </a>
+                                                <span title="{{ implode(' ', $certificateBlockers) }}"
+                                                    class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block cursor-help">
+                                                    Menunggu Nilai &amp; Kelulusan
+                                                </span>
                                             @endif
                                         </div>
                                     </div>
@@ -460,7 +459,7 @@
                                             @else
                                                 <button type="button" disabled
                                                 class="px-3 py-1.5 rounded-md font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none inline-flex items-center gap-1 shadow-none"
-                                                title="Lengkapi verifikasi pengajuan dan pilih DPL terlebih dahulu">
+                                                title="Sertifikat belum dapat diunduh: {{ implode(' ', $certificateBlockers) }}">
                                                 <span>Unduh E-Sertifikat</span>
                                                 
                                             </button>
@@ -598,8 +597,6 @@
                                         <strong>{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</strong>
                                     </div>
                                 </div>
-
-                                <x-chat-button :user="$academicAdvisor" label="Chat DPL" />
 
                                 <button type="button"
                                     onclick="document.getElementById('change-advisor-box').classList.toggle('hidden')"

@@ -327,18 +327,26 @@
 
         // Logo Utama Instansi Dinamis Berbasis Base64 (Untuk Kompatibilitas Tinggi & DOMPDF)
         $logoPath = null;
-        if (!empty($agencyProfile?->logo) && file_exists(storage_path('app/public/' . $agencyProfile->logo))) {
-            $logoPath = storage_path('app/public/' . $agencyProfile->logo);
-        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path('storage/' . $agencyProfile->logo))) {
-            $logoPath = public_path('storage/' . $agencyProfile->logo);
-        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path($agencyProfile->logo))) {
-            $logoPath = public_path($agencyProfile->logo);
-        } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
-            $logoPath = public_path('images/logo-surabaya.png');
-        } elseif (file_exists(public_path('images/logo.png'))) {
-            $logoPath = public_path('images/logo.png');
+        $rawLogo = ltrim((string) ($agencyProfile?->logo ?? ''), '/');
+        if ($rawLogo !== '') {
+            if (file_exists(public_path($rawLogo))) {
+                $logoPath = public_path($rawLogo);
+            } elseif (file_exists(public_path('storage/' . $rawLogo))) {
+                $logoPath = public_path('storage/' . $rawLogo);
+            } elseif (file_exists(storage_path('app/public/' . $rawLogo))) {
+                $logoPath = storage_path('app/public/' . $rawLogo);
+            }
         }
 
+        if (!$logoPath) {
+            if (file_exists(public_path('images/logos/surabaya.png'))) {
+                $logoPath = public_path('images/logos/surabaya.png');
+            } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
+                $logoPath = public_path('images/logo-surabaya.png');
+            } elseif (file_exists(public_path('images/logo.png'))) {
+                $logoPath = public_path('images/logo.png');
+            }
+        }
 
         $logoData = $logoPath ? @file_get_contents($logoPath) : '';
         $mime = ($logoPath && function_exists('mime_content_type')) ? (@mime_content_type($logoPath) ?: 'image/png') : 'image/png';
@@ -384,7 +392,7 @@
                 $qrSvg = null;
             }
         }
-        $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
+        // Tidak memakai layanan QR eksternal: URL verifikasi tidak boleh dikirim ke pihak ketiga.
 
         // Logo BSrE Base64
         $bsreLogoPath = public_path('images/bsre-logo.png');
@@ -530,7 +538,8 @@
                                 {!! $qrSvg !!}
                             </div>
                         @else
-                            <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi TTE" class="tte-qr-img">
+                            {{-- QR lokal gagal dibuat: tampilkan alamat verifikasi sebagai teks --}}
+                            <div style="width: 65px; font-size: 6pt; word-break: break-all; color: #333;">Verifikasi: {{ $verifyUrl }}</div>
                         @endif
                     </td>
                     <td class="tte-text-cell">

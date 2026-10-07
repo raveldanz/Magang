@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuditLogController extends Controller
@@ -28,10 +27,10 @@ class AuditLogController extends Controller
             $search = strtolower($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('action', 'like', "%{$search}%")
-                  ->orWhere('user_name', 'like', "%{$search}%")
-                  ->orWhere('target_type', 'like', "%{$search}%")
-                  ->orWhere('details', 'like', "%{$search}%")
-                  ->orWhere('ip_address', 'like', "%{$search}%");
+                    ->orWhere('user_name', 'like', "%{$search}%")
+                    ->orWhere('target_type', 'like', "%{$search}%")
+                    ->orWhere('details', 'like', "%{$search}%")
+                    ->orWhere('ip_address', 'like', "%{$search}%");
             });
         }
 

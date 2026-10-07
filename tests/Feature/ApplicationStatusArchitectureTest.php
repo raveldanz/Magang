@@ -6,13 +6,12 @@ use App\Enums\ApplicationStatus;
 use App\Enums\ReviewStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
-use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
+use App\Models\StudentProfile;
 use App\Models\Unit;
-use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -228,7 +227,7 @@ class ApplicationStatusArchitectureTest extends TestCase
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Kominfo', 'quota' => 10]);
         $unit = Unit::create(['name' => 'Aplikasi', 'agency_profile_id' => $agency->id, 'quota' => 5]);
         $student = User::factory()->create(['role' => 'mahasiswa', 'email' => 'student.hist@test.com']);
-        \App\Models\StudentProfile::create([
+        StudentProfile::create([
             'user_id' => $student->id,
             'nim' => '1234567890',
             'universitas' => 'Universitas Negeri Surabaya',

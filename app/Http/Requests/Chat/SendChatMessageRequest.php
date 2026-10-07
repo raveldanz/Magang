@@ -4,6 +4,7 @@ namespace App\Http\Requests\Chat;
 
 use App\Services\Chat\ChatAttachmentStorage;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Validator;
 
 class SendChatMessageRequest extends FormRequest
@@ -18,12 +19,12 @@ class SendChatMessageRequest extends FormRequest
         $extensions = implode(',', ChatAttachmentStorage::allowedExtensions());
 
         return [
-            'body' => ['nullable', 'string', 'max:' . (int) config('chat.max_body_length', 5000)],
+            'body' => ['nullable', 'string', 'max:'.(int) config('chat.max_body_length', 5000)],
             'reply_to_id' => ['nullable', 'integer', 'min:1'],
             'voice' => ['nullable', 'boolean'],
-            'files' => ['nullable', 'array', 'max:' . (int) config('chat.max_files_per_message', 5)],
+            'files' => ['nullable', 'array', 'max:'.(int) config('chat.max_files_per_message', 5)],
             // `mimes` memeriksa jenis isi file (bukan sekadar nama), `extensions` memeriksa nama unggahan
-            'files.*' => ['file', 'max:' . ChatAttachmentStorage::maxUploadKb(), "mimes:$extensions", "extensions:$extensions"],
+            'files.*' => ['file', 'max:'.ChatAttachmentStorage::maxUploadKb(), "mimes:$extensions", "extensions:$extensions"],
         ];
     }
 
@@ -54,7 +55,7 @@ class SendChatMessageRequest extends FormRequest
     }
 
     /**
-     * @return \Illuminate\Http\UploadedFile[]
+     * @return UploadedFile[]
      */
     public function attachments(): array
     {

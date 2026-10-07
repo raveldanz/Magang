@@ -5,6 +5,8 @@ namespace Tests\Feature\Chat;
 use App\Enums\ApplicationStatus;
 use App\Models\Application;
 use App\Models\ChatConversation;
+use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
 use App\Services\Chat\ChatPresenter;
 
@@ -83,7 +85,7 @@ class ChatPriorityEngineTest extends ChatTestCase
     {
         $placement = Placement::firstOrFail();
         $placementGroup = ChatConversation::where('placement_id', $placement->id)->first();
-        if (!$placementGroup) {
+        if (! $placementGroup) {
             $placementGroup = ChatConversation::create([
                 'type' => ChatConversation::TYPE_PLACEMENT,
                 'placement_id' => $placement->id,
@@ -123,8 +125,79 @@ class ChatPriorityEngineTest extends ChatTestCase
         $target = collect($conversations)->firstWhere('id', $conversationId);
         $this->assertNotNull($target);
         $this->assertArrayHasKey('stage_badge', $target);
-        $this->assertSame('urgent', $target['stage_badge']['code']);
-        $this->assertSame('Seleksi Masuk', $target['stage_badge']['label']);
+        // Untuk Admin Dinas, mahasiswa BUKAN prioritas tindakan darurat
+        $this->assertFalse($target['stage_badge']['is_urgent']);
+        $this->assertSame('Mahasiswa', $target['stage_badge']['label']);
+    }
+
+    public function test_dosen_priority_for_report_review_and_missing_grades(): void
+    {
+        $placementA = Placement::where('academic_advisor_id', $this->dosenA->id)->firstOrFail();
+
+        FinalReport::create([
+            'placement_id' => $placementA->id,
+            'file_path' => 'final_reports/test.pdf',
+            'status' => 'pending',
+        ]);
+
+        $conversationId = $this->startConversation($this->dosenA, $this->studentA);
+        $this->sendMessage($this->studentA, $conversationId, ['body' => 'Bapak, laporan akhir sudah saya unggah.']);
+
+        $response = $this->actingAs($this->dosenA)
+            ->getJson(route('chat.api.conversations'))
+            ->assertOk();
+
+        $target = collect($response->json('conversations'))->firstWhere('id', $conversationId);
+        $this->assertNotNull($target);
         $this->assertTrue($target['stage_badge']['is_urgent']);
+        $this->assertSame('Perlu Review Laporan', $target['stage_badge']['label']);
+    }
+
+    public function test_admin_dinas_priority_for_city_instruction_and_university_affairs(): void
+    {
+        // Chat Admin Dinas dengan Super Admin (Instruksi Kota)
+        $cityConvId = $this->startConversation($this->adminX, $this->superAdmin);
+        $this->sendMessage($this->superAdmin, $cityConvId, ['body' => 'Mohon update kuota unit magang semester genap']);
+
+        // Chat Admin Dinas dengan Admin Kampus (Urusan Kampus)
+        $univConvId = $this->startConversation($this->adminX, $this->univAdminA);
+        $this->sendMessage($this->univAdminA, $univConvId, ['body' => 'Pengiriman berkas surat pengantar magang UNESA']);
+
+        $response = $this->actingAs($this->adminX)
+            ->getJson(route('chat.api.conversations'))
+            ->assertOk();
+
+        $cityTarget = collect($response->json('conversations'))->firstWhere('id', $cityConvId);
+        $this->assertNotNull($cityTarget);
+        $this->assertTrue($cityTarget['stage_badge']['is_urgent']);
+        $this->assertSame('Instruksi Kota', $cityTarget['stage_badge']['label']);
+
+        $univTarget = collect($response->json('conversations'))->firstWhere('id', $univConvId);
+        $this->assertNotNull($univTarget);
+        $this->assertTrue($univTarget['stage_badge']['is_urgent']);
+        $this->assertSame('Urusan Kampus', $univTarget['stage_badge']['label']);
+    }
+
+    public function test_mentor_priority_for_pending_logbook(): void
+    {
+        $placementA = Placement::where('mentor_id', $this->mentorX->id)->firstOrFail();
+        Logbook::create([
+            'placement_id' => $placementA->id,
+            'date' => now()->toDateString(),
+            'activity' => 'Melakukan pemeliharaan server database',
+            'status' => 'pending',
+        ]);
+
+        $conversationId = $this->startConversation($this->mentorX, $this->studentA);
+        $this->sendMessage($this->studentA, $conversationId, ['body' => 'Bu Mentor, logbook hari ini sudah diinput']);
+
+        $response = $this->actingAs($this->mentorX)
+            ->getJson(route('chat.api.conversations'))
+            ->assertOk();
+
+        $target = collect($response->json('conversations'))->firstWhere('id', $conversationId);
+        $this->assertNotNull($target);
+        $this->assertTrue($target['stage_badge']['is_urgent']);
+        $this->assertSame('Logbook Pending', $target['stage_badge']['label']);
     }
 }

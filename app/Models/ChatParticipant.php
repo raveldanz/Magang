@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ChatParticipant extends Model
 {
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_MEMBER = 'member';
 
     protected $fillable = [

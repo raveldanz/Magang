@@ -7,6 +7,7 @@ use App\Models\AgencyProfile;
 use App\Models\Placement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MonitoringController extends Controller
 {
@@ -26,12 +27,12 @@ class MonitoringController extends Controller
 
         if ($request->filled('search')) {
             $search = strtolower($request->search);
-            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $baseQuery->whereHas('application.user', function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
-                      $sp->where('nim', $like, "%{$search}%");
-                  });
+                    ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
+                        $sp->where('nim', $like, "%{$search}%");
+                    });
             });
         }
 
@@ -43,7 +44,7 @@ class MonitoringController extends Controller
 
         $stats = [
             'total' => (clone $baseQuery)->count(),
-            'active' => (clone $baseQuery)->whereRelation('application', fn($q) => $q->whereIn('status', ['active', 'accepted']))->count(),
+            'active' => (clone $baseQuery)->whereRelation('application', fn ($q) => $q->whereIn('status', ['active', 'accepted']))->count(),
             'completed' => (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count(),
             'upcoming' => (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count(),
         ];
@@ -64,7 +65,7 @@ class MonitoringController extends Controller
             'completed' => $query->whereRelation('application', 'status', 'completed'),
             'upcoming' => $query->whereRelation('application', 'status', 'accepted'),
             'all' => $query,
-            default => $query->whereRelation('application', fn($q) => $q->whereIn('status', ['active', 'accepted'])),
+            default => $query->whereRelation('application', fn ($q) => $q->whereIn('status', ['active', 'accepted'])),
         };
 
         $placements = $query->latest()->paginate(10)->withQueryString();

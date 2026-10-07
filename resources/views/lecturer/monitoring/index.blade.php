@@ -29,38 +29,37 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Filter & Search Bar -->
-            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                <form method="GET" action="{{ route('lecturer.monitoring.index') }}" class="w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+            <!-- Filter & Search Bar (satu baris: cari mahasiswa + pilih dinas + tombol) -->
+            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+                <form method="GET" action="{{ route('lecturer.monitoring.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <input type="hidden" name="tab" value="{{ $tab ?? 'active' }}">
 
-                    <div class="w-full sm:w-auto flex items-center gap-3">
-                        <select name="agency_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
-                            <option value="">-- Semua Dinas Penempatan --</option>
-                            @foreach ($agencies as $agency)
-                                <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>
-                                     {{ $agency->agency_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="w-full sm:w-72 flex items-center gap-2">
-                        <div class="relative w-full">
-                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 0.85rem !important;">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau NIM..." 
-                                   class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-                                   style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
+                    <div class="relative flex-1 min-w-0">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none" style="padding-left: 0.85rem;">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
-                        <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer">
-                            Cari
-                        </button>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau NIM..."
+                               class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500"
+                               style="padding-left: 2.5rem; padding-top: 0.6rem; padding-bottom: 0.6rem;">
                     </div>
 
+                    <select name="agency_id" onchange="this.form.submit()"
+                            class="text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500"
+                            style="padding-top: 0.6rem; padding-bottom: 0.6rem; min-width: 260px;">
+                        <option value="">Semua Dinas</option>
+                        @foreach ($agencies as $agency)
+                            <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>{{ $agency->agency_name }}</option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition shrink-0 cursor-pointer">
+                        Cari
+                    </button>
+                    @if (request()->filled('search') || request()->filled('agency_id'))
+                        <a href="{{ route('lecturer.monitoring.index', ['tab' => $tab ?? 'active']) }}" class="text-sm font-semibold text-slate-500 hover:text-slate-800 text-center shrink-0">Reset</a>
+                    @endif
                 </form>
             </div>
 
@@ -195,8 +194,8 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-right">
-                                        <div class="flex items-center justify-end gap-1.5">
+                                    <td class="py-4 px-4 text-right whitespace-nowrap">
+                                        <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
                                                class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shadow-xs border border-blue-200">
                                                 <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +217,7 @@
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
-                                                    <span>{{ $hasEval ? 'Edit' : 'Nilai' }}</span>
+                                                    <span>{{ $hasEval ? 'Ubah Nilai' : 'Input Nilai' }}</span>
                                                 </a>
                                             @endif
                                         </div>

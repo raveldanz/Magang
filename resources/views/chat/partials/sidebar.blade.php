@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
                 <h1 class="text-lg font-extrabold text-slate-900 leading-tight">Pesan</h1>
-                <p class="text-xs text-slate-500 truncate">Chat dengan mentor, DPL, dinas & kampus</p>
+                <p class="text-xs text-slate-500 truncate">Chat dengan mentor, dosen, dinas & kampus</p>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 {{-- Pengaturan notifikasi --}}
@@ -94,6 +94,15 @@
                       x-text="totalPriorityCount"></span>
             </button>
 
+            <button type="button" @click="listFilter = 'channels'" role="tab" :aria-selected="listFilter === 'channels'"
+                    class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition inline-flex items-center gap-1 shrink-0"
+                    :class="listFilter === 'channels' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                <span>Saluran Pengumuman</span>
+                <span x-show="totalUnreadChannels > 0" class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
+                      :class="listFilter === 'channels' ? 'bg-white/25 text-white' : 'bg-blue-100 text-blue-800'"
+                      x-text="totalUnreadChannels"></span>
+            </button>
+
             <button type="button" @click="listFilter = 'students'" role="tab" :aria-selected="listFilter === 'students'"
                     class="h-8 px-3 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0"
                     :class="listFilter === 'students' ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
@@ -139,7 +148,7 @@
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                 </div>
                 <p class="text-sm font-bold text-slate-800">Belum ada percakapan</p>
-                <p class="text-xs text-slate-500 mt-1">Mulai chat dengan mentor, DPL, admin dinas, atau admin kampus Anda.</p>
+                <p class="text-xs text-slate-500 mt-1">Mulai chat dengan mentor, dosen, admin dinas, atau admin kampus Anda.</p>
             </div>
         </template>
 
@@ -156,25 +165,43 @@
             <button type="button" @click="open(c.id)" :data-conv-id="c.id"
                     class="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-slate-100/80 transition min-h-[72px]"
                     :class="c.id === activeId ? 'bg-blue-50/80' : 'hover:bg-slate-50'">
-                <span class="relative w-11 h-11 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0"
-                      :style="{ backgroundColor: c.avatar.color }">
-                    <template x-if="c.avatar.group">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </template>
-                    <template x-if="!c.avatar.group"><span x-text="c.avatar.initials"></span></template>
-                    <span x-show="c.contact && c.contact.online" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white" title="Online"></span>
-                </span>
+                {{-- Avatar Saluran (Squircle dengan Logo Resmi) vs Avatar Akun Biasa (Lingkaran) --}}
+                <template x-if="c.type === 'channel'">
+                    <span class="relative w-11 h-11 rounded-xl border border-slate-200/90 bg-white p-1 object-contain shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
+                        <template x-if="c.avatar && c.avatar.logo_url">
+                            <img :src="c.avatar.logo_url" :alt="c.title" class="w-full h-full object-contain" loading="lazy">
+                        </template>
+                        <template x-if="!c.avatar || !c.avatar.logo_url">
+                            <span class="text-xs font-bold text-slate-700" x-text="c.avatar ? c.avatar.initials : '?'"></span>
+                        </template>
+                    </span>
+                </template>
+                <template x-if="c.type !== 'channel'">
+                    <span class="relative w-11 h-11 rounded-full text-white text-sm font-bold flex items-center justify-center shrink-0"
+                          :style="{ backgroundColor: c.avatar.color }">
+                        <template x-if="c.avatar.group">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </template>
+                        <template x-if="!c.avatar.group"><span x-text="c.avatar.initials"></span></template>
+                        <span x-show="c.contact && c.contact.online" class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white" title="Online"></span>
+                    </span>
+                </template>
                 <span class="flex-1 min-w-0">
                     <span class="flex items-center justify-between gap-2">
-                        <span class="flex items-center gap-1 min-w-0">
+                        <span class="flex items-center gap-1.5 min-w-0">
                             <span class="text-sm font-bold text-slate-900 truncate" x-text="c.title"></span>
+                            <template x-if="c.type === 'channel' && c.scope_badge">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-tight shrink-0"
+                                      :class="c.scope_badge === 'Pemkot' ? 'bg-amber-100 text-amber-800 border border-amber-200' : (c.scope_badge === 'Dinas' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200')"
+                                      x-text="`[${c.scope_badge}]`"></span>
+                            </template>
                             <svg x-show="c.pinned" class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-label="Disematkan"><path d="M16 3a1 1 0 01.707 1.707L15.414 6l2.586 2.586 1.293-1.293a1 1 0 111.414 1.414l-4 4-.707-.707-3 3V19a1 1 0 01-1.707.707l-3.5-3.5-3.586 3.586a1 1 0 01-1.414-1.414L6.586 14.8l-3.5-3.5A1 1 0 013.793 9.6H7.8l3-3-.707-.707 4-4A1 1 0 0116 3z"/></svg>
                         </span>
-                        <span class="text-xs shrink-0" :class="c.unread && !c.muted ? 'text-blue-600 font-bold' : 'text-slate-400'" x-text="listTime(c.last_message ? c.last_message.created_at : c.sort_at)"></span>
+                        <span class="text-xs shrink-0 text-slate-400 font-medium" x-text="listTime(c.last_message ? c.last_message.created_at : c.sort_at)"></span>
                     </span>
                     <span class="flex items-center justify-between gap-2 mt-0.5">
                         <span class="text-xs text-slate-400 truncate" x-text="c.subtitle"></span>
-                        <template x-if="c.stage_badge">
+                        <template x-if="c.stage_badge && c.type !== 'channel'">
                             <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 tracking-tight"
                                   :class="{
                                       'bg-amber-50 text-amber-700 border border-amber-200': c.stage_badge.theme === 'urgent',

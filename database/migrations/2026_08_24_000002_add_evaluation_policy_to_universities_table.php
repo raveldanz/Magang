@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('universities', function (Blueprint $table) {
-            if (!Schema::hasColumn('universities', 'evaluation_scheme')) {
+            if (! Schema::hasColumn('universities', 'evaluation_scheme')) {
                 $table->string('evaluation_scheme', 32)->default('dual_evaluation')->after('logo');
             }
-            if (!Schema::hasColumn('universities', 'weight_mentor')) {
+            if (! Schema::hasColumn('universities', 'weight_mentor')) {
                 $table->unsignedTinyInteger('weight_mentor')->default(40)->after('evaluation_scheme');
             }
-            if (!Schema::hasColumn('universities', 'weight_lecturer')) {
+            if (! Schema::hasColumn('universities', 'weight_lecturer')) {
                 $table->unsignedTinyInteger('weight_lecturer')->default(60)->after('weight_mentor');
             }
-            if (!Schema::hasColumn('universities', 'require_dpl')) {
+            if (! Schema::hasColumn('universities', 'require_dpl')) {
                 $table->boolean('require_dpl')->default(true)->after('weight_lecturer');
             }
         });

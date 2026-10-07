@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('placements', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('application_id')->constrained()->onDelete('cascade');
-        $table->foreignId('mentor_id')->nullable()->constrained('users')->onDelete('set null');
-        $table->foreignId('academic_advisor_id')->nullable()->constrained('users')->onDelete('set null');
-        $table->foreignId('pembimbing_id')->nullable()->constrained('users')->onDelete('set null');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('placements', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('application_id')->constrained()->onDelete('cascade');
+            $table->foreignId('mentor_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('academic_advisor_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('pembimbing_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

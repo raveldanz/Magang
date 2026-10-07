@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Mentor;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\Placement;
+use App\Services\StudentNotifier;
+use App\Support\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,7 +27,7 @@ class EvaluationController extends Controller
             'finalreport',
         ])->where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
-              ->orWhere('pembimbing_id', $mentor->id);
+                ->orWhere('pembimbing_id', $mentor->id);
         })->findOrFail($placementId);
 
         // Multi-Tenant Authorization Check
@@ -32,7 +35,10 @@ class EvaluationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
         }
 
-        return view('mentor.evaluation', compact('placement'));
+        // Form tetap bisa dibuka untuk melihat nilai, tetapi terkunci bila magang belum berjalan / sudah selesai.
+        $lockReason = $placement->evaluationLockReason();
+
+        return view('mentor.evaluation', compact('placement', 'lockReason'));
     }
 
     /**
@@ -45,7 +51,7 @@ class EvaluationController extends Controller
         $placement = Placement::with('application.unit')
             ->where(function ($q) use ($mentor) {
                 $q->where('mentor_id', $mentor->id)
-                  ->orWhere('pembimbing_id', $mentor->id);
+                    ->orWhere('pembimbing_id', $mentor->id);
             })->findOrFail($placementId);
 
         // Multi-Tenant Authorization Check
@@ -53,11 +59,15 @@ class EvaluationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk menilai mahasiswa instansi lain.');
         }
 
+        if ($lockReason = $placement->evaluationLockReason()) {
+            return redirect()->route('mentor.students.show', $placement->id)->with('error', $lockReason);
+        }
+
         $request->validate([
             'nilai_disiplin' => 'required|numeric|min:0|max:100',
-            'nilai_kinerja'  => 'required|numeric|min:0|max:100',
-            'nilai_laporan'  => 'required|numeric|min:0|max:100',
-            'catatan'        => 'nullable|string|max:1500',
+            'nilai_kinerja' => 'required|numeric|min:0|max:100',
+            'nilai_laporan' => 'required|numeric|min:0|max:100',
+            'catatan' => 'nullable|string|max:1500',
         ], [
             'nilai_disiplin.required' => 'Nilai disiplin wajib diisi.',
             'nilai_disiplin.min' => 'Nilai minimal adalah 0.',
@@ -74,9 +84,9 @@ class EvaluationController extends Controller
             ['placement_id' => $placement->id],
             [
                 'nilai_disiplin' => $request->nilai_disiplin,
-                'nilai_kinerja'  => $request->nilai_kinerja,
-                'nilai_laporan'  => $request->nilai_laporan,
-                'catatan'        => $request->catatan,
+                'nilai_kinerja' => $request->nilai_kinerja,
+                'nilai_laporan' => $request->nilai_laporan,
+                'catatan' => $request->catatan,
             ]
         );
 
@@ -86,12 +96,7 @@ class EvaluationController extends Controller
 
         if ($scheme === 'mentor_only') {
             $finalScore = $evaluation->nilai_pembimbing;
-            if ($finalScore >= 85) $grade = 'A';
-            elseif ($finalScore >= 75) $grade = 'AB';
-            elseif ($finalScore >= 65) $grade = 'B';
-            elseif ($finalScore >= 55) $grade = 'BC';
-            elseif ($finalScore >= 40) $grade = 'C';
-            else $grade = 'E';
+            $grade = Grade::letter($finalScore);
 
             $evaluation->update([
                 'final_score' => $finalScore,
@@ -104,16 +109,10 @@ class EvaluationController extends Controller
             // Skema Dual Evaluation: hitung ulang jika nilai dosen sudah ada
             $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
             if ($dosenScore > 0) {
-                $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
-                $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+                $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
+                $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
                 $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
-
-                if ($finalScore >= 85) $grade = 'A';
-                elseif ($finalScore >= 75) $grade = 'AB';
-                elseif ($finalScore >= 65) $grade = 'B';
-                elseif ($finalScore >= 55) $grade = 'BC';
-                elseif ($finalScore >= 40) $grade = 'C';
-                else $grade = 'E';
+                $grade = Grade::letter($finalScore);
 
                 $evaluation->update([
                     'final_score' => $finalScore,
@@ -124,7 +123,7 @@ class EvaluationController extends Controller
             }
         }
 
-        \App\Models\AuditLog::record('MENTOR_EVALUATION_SUBMIT', 'Placement', $placement->id, [
+        AuditLog::record('MENTOR_EVALUATION_SUBMIT', 'Placement', $placement->id, [
             'student_name' => $placement->application?->user?->name,
             'nilai_pembimbing' => $evaluation->nilai_pembimbing,
             'nilai_disiplin' => $request->nilai_disiplin,
@@ -132,7 +131,9 @@ class EvaluationController extends Controller
             'nilai_laporan' => $request->nilai_laporan,
         ]);
 
+        StudentNotifier::evaluationSubmitted($placement->application?->user, 'mentor');
+
         return redirect()->route('mentor.students.show', $placement->id)
-            ->with('success', 'Penilaian evaluasi akhir berhasil disimpan! Mahasiswa kini siap diterbitkan sertifikatnya.');
+            ->with('success', 'Nilai evaluasi mahasiswa berhasil disimpan.');
     }
 }

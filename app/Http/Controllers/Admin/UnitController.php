@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Unit;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UnitController extends Controller
 {
@@ -112,7 +114,7 @@ class UnitController extends Controller
         $successMsg = "Divisi '{$unit->name}' berhasil ditambahkan!";
 
         // 1. Prioritas return_to dari pemanggil
-        if ($request->filled('return_to') && !str_contains($request->return_to, 'units/create')) {
+        if ($request->filled('return_to') && ! str_contains($request->return_to, 'units/create')) {
             return redirect($request->return_to)->with('success', $successMsg);
         }
 
@@ -145,7 +147,13 @@ class UnitController extends Controller
         $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
         $returnTo = $request->query('return_to', url()->previous());
 
-        return view('admin.units.edit', compact('unit', 'agencies', 'returnTo'));
+        // Kandidat Kepala / Koordinator Unit: akun mentor resmi di instansi unit ini
+        $headCandidates = User::whereIn('role', ['mentor', 'pembimbing'])
+            ->where('agency_profile_id', $unit->agency_profile_id)
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+
+        return view('admin.units.edit', compact('unit', 'agencies', 'returnTo', 'headCandidates'));
     }
 
     /**
@@ -165,10 +173,17 @@ class UnitController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'quota' => 'required|integer|min:' . $occupied . '|max:500',
+            'quota' => 'required|integer|min:'.$occupied.'|max:500',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
+            'head_user_id' => [
+                'nullable',
+                Rule::exists('users', 'id')
+                    ->whereIn('role', ['mentor', 'pembimbing'])
+                    ->where('agency_profile_id', $unit->agency_profile_id),
+            ],
             'return_to' => 'nullable|string',
         ], [
+            'head_user_id.exists' => 'Kepala Unit harus akun mentor resmi dari instansi yang sama.',
             'quota.min' => "Kuota tidak boleh kurang dari jumlah mahasiswa yang sedang menempati divisi ini ({$occupied} orang).",
         ]);
 
@@ -178,7 +193,11 @@ class UnitController extends Controller
             'quota' => $request->quota,
         ];
 
-        if (!$agencyId && $request->filled('agency_profile_id')) {
+        if ($request->has('head_user_id')) {
+            $updateData['head_user_id'] = $request->filled('head_user_id') ? (int) $request->head_user_id : null;
+        }
+
+        if (! $agencyId && $request->filled('agency_profile_id')) {
             $updateData['agency_profile_id'] = $request->agency_profile_id;
         }
 
@@ -186,7 +205,7 @@ class UnitController extends Controller
         $successMsg = 'Data divisi / unit magang berhasil diperbarui!';
 
         // 1. Prioritas return_to dari pemanggil
-        if ($request->filled('return_to') && !str_contains($request->return_to, 'units/' . $id . '/edit')) {
+        if ($request->filled('return_to') && ! str_contains($request->return_to, 'units/'.$id.'/edit')) {
             return redirect($request->return_to)->with('success', $successMsg);
         }
 
@@ -222,6 +241,7 @@ class UnitController extends Controller
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => $belowOccupied], 422);
             }
+
             return redirect()->back()->with('error', $belowOccupied);
         }
 
@@ -236,6 +256,7 @@ class UnitController extends Controller
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => 'Kuota sudah 0, tidak dapat dikurangi lagi.'], 422);
                 }
+
                 return redirect()->back()->with('error', 'Kuota sudah 0, tidak dapat dikurangi lagi.');
             }
         } elseif ($request->filled('quota') || $request->filled('custom_quota')) {
@@ -244,12 +265,14 @@ class UnitController extends Controller
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => 'Jumlah kuota harus antara 0 dan 500.'], 422);
                 }
+
                 return redirect()->back()->with('error', 'Jumlah kuota harus antara 0 dan 500.');
             }
             if ($newQuota < $occupied) {
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => $belowOccupied], 422);
                 }
+
                 return redirect()->back()->with('error', $belowOccupied);
             }
             $unit->update(['quota' => $newQuota]);
@@ -258,6 +281,7 @@ class UnitController extends Controller
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Aksi penyesuaian kuota tidak valid.'], 422);
             }
+
             return redirect()->back()->with('error', 'Aksi penyesuaian kuota tidak valid.');
         }
 
