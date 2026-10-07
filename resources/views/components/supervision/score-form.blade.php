@@ -335,7 +335,7 @@
             </fieldset>
 
             <!-- 5. Tombol Aksi di Kanan Bawah: Batal + Simpan Nilai -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-slate-200">
                 <a href="{{ $cancelRoute }}" 
                    class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 hover:border-slate-300 shadow-2xs transition active:scale-95 cursor-pointer">
                     {{ $lockReason ? 'Kembali' : 'Batal' }}

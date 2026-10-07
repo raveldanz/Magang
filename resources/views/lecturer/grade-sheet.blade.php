@@ -51,6 +51,12 @@
             margin-top: 2px;
         }
 
+        @media screen and (max-width: 860px) {
+            .paper-container {
+                margin: 0 !important;
+            }
+        }
+
         @media print {
             body {
                 background: none !important;
@@ -72,11 +78,11 @@
 <body>
 
     <!-- TOPBAR AKSI (Hanya tampil di layar monitor / NO PRINT) -->
-    <div class="no-print bg-slate-900 text-white px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-md sticky top-0 z-50 font-sans">
+    <div class="no-print bg-slate-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between gap-3 shadow-md sticky top-0 z-50 font-sans">
         <div class="flex items-center gap-3">
-            <a href="{{ route('lecturer.students.show', $placement->id) }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition">
+            <a href="{{ route('lecturer.students.show', $placement->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Kembali ke Detail
+                <span>Kembali</span>
             </a>
             <div class="hidden sm:block border-l border-slate-700 pl-3">
                 <span class="text-xs text-slate-400 block">Dokumen Resmi Akademik</span>
@@ -84,17 +90,18 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2.5">
-            <span class="text-xs text-slate-300 hidden md:inline">Format Standar A4 Cetak Kampus</span>
-            <button onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-md shadow-blue-500/20 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Cetak / Simpan PDF (Ctrl+P)
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-300 hidden md:inline">Format Standar A4 Kampus</span>
+            <button onclick="window.print()" class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-xs cursor-pointer">
+                Cetak / Simpan PDF
             </button>
         </div>
     </div>
 
-    <!-- HALAMAN KERTAS A4 DOKUMEN RESMI -->
-    <div class="paper-container">
+    <!-- WRAPPER UNTUK MOBILE RESPONSIVENESS -->
+    <div class="w-full overflow-x-auto py-2 sm:py-6 px-1 sm:px-4 flex justify-center">
+        <!-- HALAMAN KERTAS A4 DOKUMEN RESMI -->
+        <div class="paper-container shrink-0">
 
         <!-- KOP SURAT UNIVERSITAS -->
         <div class="flex items-center gap-5">
@@ -346,6 +353,7 @@
             </div>
         </div>
 
+    </div>
     </div>
 
 </body>
