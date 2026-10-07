@@ -236,4 +236,55 @@ class EvaluationController extends Controller
 
         return redirect()->back()->with('success', "Status laporan akhir mahasiswa berhasil {$statusLabel}!");
     }
+
+    /**
+     * Cetak Berita Acara & Lembar Penilaian DPL Resmi (BAP Print-Ready)
+     */
+    public function printGradeSheet($placementId)
+    {
+        $placement = $this->getAuthorizedPlacement($placementId);
+
+        $student = $placement->application->user;
+        $profile = $student->studentProfile;
+        $unit = $placement->application->unit;
+        $agencyProfile = $unit?->agencyProfile ?? $placement->agencyProfile;
+        $mentor = $placement->mentor ?? $placement->pembimbing;
+        $dosen = $placement->academicAdvisor ?? Auth::user();
+        $evaluation = $placement->evaluation;
+        $finalReport = $placement->finalreport;
+        $consultations = $placement->academicConsultations;
+
+        $univ = $evaluation?->getUniversity();
+        if (!$univ && $student) {
+            if ($student->university_id) {
+                $univ = \App\Models\University::find($student->university_id);
+            } else {
+                $name = $student->university ?? ($profile?->universitas ?? null);
+                if ($name) {
+                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                }
+            }
+        }
+
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+
+        return view('lecturer.grade-sheet', compact(
+            'placement',
+            'student',
+            'profile',
+            'unit',
+            'agencyProfile',
+            'mentor',
+            'dosen',
+            'evaluation',
+            'finalReport',
+            'consultations',
+            'univ',
+            'scheme',
+            'weightMentor',
+            'weightLecturer'
+        ));
+    }
 }
