@@ -1334,6 +1334,21 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-060] Eliminasi Glitch Teks Tenggelam (Line-Clamp Overflow) pada Kartu Grid Instansi & Universitas
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/admin/agencies/index.blade.php`, `resources/views/admin/universities/index.blade.php`, `tests/Feature/AgencyCardTitleVisualTest.php`
+- **Problem / Symptom**: Pada halaman daftar instansi (`/admin/agencies`) dan universitas (`/admin/universities`), judul instansi dinas yang memiliki nama panjang (seperti *Badan Kepegawaian dan Pengembangan Sumber Daya Manusia* atau *Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan*) mengalami teks baris ketiga terpotong setengah (tenggelam / clipped text) di bagian bawah kotak judul.
+- **Root Cause**: Kombinasi kelas CSS `line-clamp-2` bersama `h-14` (56px) pada teks berukuran `text-[18px] leading-snug`. Di font 18px `leading-snug`, 2 baris teks menghabiskan ~49.5px, sehingga terdapat sisa ruang ~6.5px dalam container 56px. WebKit/Blink merender tanda ellipsis `...` di baris kedua, namun tetap merender potongan atas dari karakter baris ketiga pada sisa ruang 6.5px tersebut sehingga tampak "tenggelam". Selain itu, ukuran font 18px terlalu besar untuk nama dinas/perguruan tinggi yang rata-rata terdiri dari 6–10 kata.
+- **Fix Applied**: 
+  1. Menyesuaikan hierarki tipografi judul instansi dan kampus menjadi `text-[15px] sm:text-base font-bold text-slate-900 leading-snug`.
+  2. Meningkatkan kapasitas batas baris menjadi `line-clamp-3` dengan tinggi tetap `h-[4.25rem] mb-1.5` sehingga seluruh nama dinas (hingga 3 baris) dapat terbaca utuh tanpa terpotong sebagian.
+  3. Memperbaiki line-height pada deskripsi alamat menjadi `leading-normal h-8 text-[11px]` agar tidak memotong descender huruf bawah.
+  4. Menjalankan `npm run build` untuk meng-compile kelas utility Tailwind `line-clamp-3` dan `h-[4.25rem]` ke bundle CSS produksi (`public/build/assets/`).
+  5. Menambahkan unit/feature visual test `tests/Feature/AgencyCardTitleVisualTest.php` (PASS, Exit Code 0).
+- **Prevention Rule**: Jangan pernah memadukan `-webkit-line-clamp: N` dengan `height` container tetap yang lebih besar daripada `N * line-height`. Tinggi container judul kartu WAJIB pas secara matematis dengan kelipatan line-height batas baris untuk mencegah sisa celah pixel merender baris berikutnya secara cacat/tenggelam.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 
