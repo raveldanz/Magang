@@ -92,6 +92,11 @@ class Placement extends Model
         return $this->hasOne(Evaluation::class);
     }
 
+    public function academicConsultations()
+    {
+        return $this->hasMany(AcademicConsultation::class, 'placement_id')->orderBy('consultation_date', 'desc');
+    }
+
     public function unit()
     {
         return $this->hasOneThrough(Unit::class, Application::class, 'id', 'id', 'application_id', 'unit_id');

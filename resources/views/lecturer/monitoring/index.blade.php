@@ -5,14 +5,24 @@
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
                     {{ __('Monitoring Mahasiswa Bimbingan Kampus') }}
                 </h2>
+                <p class="text-xs text-gray-500 mt-1">Pantau perkembangan logbook harian, status laporan akhir, evaluasi nilai kumulatif, dan riwayat bimbingan.</p>
             </div>
 
-            <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span>Kembali ke Dashboard</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('lecturer.monitoring.export', request()->query()) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer" title="Download data rekapitulasi ke format CSV/Excel">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Ekspor Rekap CSV</span>
+                </a>
+
+                <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition shadow-xs border border-gray-200 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Kembali ke Dashboard</span>
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -186,22 +196,29 @@
                                     </td>
 
                                     <td class="py-4 px-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div class="flex items-center justify-end gap-1.5">
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shadow-xs border border-blue-200">
+                                               class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shadow-xs border border-blue-200">
                                                 <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                                 <span>Detail</span>
                                             </a>
+                                            <a href="{{ route('lecturer.evaluations.grade_sheet', $placement->id) }}" target="_blank"
+                                               class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-xl transition shadow-xs border border-purple-200" title="Cetak Berita Acara & Lembar Nilai Resmi (BAP)">
+                                                <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                </svg>
+                                                <span>BAP</span>
+                                            </a>
                                             @if (!$isMentorOnly)
                                                 <a href="{{ route('lecturer.evaluations.create', $placement->id) }}" 
-                                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
+                                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
-                                                    <span>{{ $hasEval ? 'Edit Nilai' : 'Input Nilai' }}</span>
+                                                    <span>{{ $hasEval ? 'Edit' : 'Nilai' }}</span>
                                                 </a>
                                             @endif
                                         </div>

@@ -30,6 +30,10 @@ class Evaluation extends Model
      */
     public function getNilaiDosenCalculatedAttribute()
     {
+        if (isset($this->attributes['dosen_evaluation_score']) && (float)$this->attributes['dosen_evaluation_score'] > 0) {
+            return (float)$this->attributes['dosen_evaluation_score'];
+        }
+
         if (isset($this->attributes['nilai_dosen']) && (float)$this->attributes['nilai_dosen'] > 0) {
             return (float)$this->attributes['nilai_dosen'];
         }
