@@ -21,16 +21,27 @@ abstract class ChatTestCase extends TestCase
     use RefreshDatabase;
 
     protected User $superAdmin;
+
     protected User $adminX;
+
     protected User $adminY;
+
     protected User $mentorX;
+
     protected User $mentorX2;
+
     protected User $dosenA;
+
     protected User $dosenB;
+
     protected User $univAdminA;
+
     protected User $univAdminB;
+
     protected User $studentA;
+
     protected User $studentB;
+
     protected User $inactiveStudent;
 
     protected function setUp(): void

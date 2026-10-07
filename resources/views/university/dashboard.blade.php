@@ -53,208 +53,73 @@
                 </div>
             </div>
 
-            <!-- Metrik Statistik Utama Kampus (Mobile: 2 Kolom, Desktop: 4 Kolom) -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-blue-600 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Pendaftar</span>
-                    <p class="text-xl sm:text-2xl font-black text-slate-800 mt-1">{{ $stats['total_students'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Mahasiswa terdaftar</span>
+            <!-- Metrik Statistik Utama Kampus (Putih Polos) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
+                     style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Total Pendaftar</span>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_students'] ?? 0 }}</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Mahasiswa terdaftar</div>
                 </div>
-
-                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-emerald-500 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Diterima</span>
-                    <p class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_accepted'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">ACCEPTED, ACTIVE, dan COMPLETED</span>
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
+                     style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Total Diterima</span>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_accepted'] ?? 0 }}</div>
+                    <div class="text-[11px] text-slate-500 mt-1">ACCEPTED, ACTIVE, dan COMPLETED</div>
                 </div>
-
-                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-teal-600 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
-                    <p class="text-xl sm:text-2xl font-black text-teal-700 mt-1">{{ $stats['total_completed'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</span>
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
+                     style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_completed'] ?? 0 }}</div>
+                    <div class="text-[11px] text-slate-500 mt-1">{{ \App\Enums\ApplicationStatus::COMPLETED->description() }}</div>
                 </div>
-
-                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-100 border-l-4 border-l-amber-500 flex flex-col justify-between">
-                    <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Menunggu Seleksi</span>
-                    <p class="text-xl sm:text-2xl font-black text-amber-600 mt-1">{{ $stats['total_pending'] ?? 0 }}</p>
-                    <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">PENDING dan VERIFIED</span>
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
+                     style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Menunggu Seleksi</span>
+                    <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
+                    <div class="text-[11px] text-slate-500 mt-1">PENDING dan VERIFIED</div>
                 </div>
             </div>
 
-            <!-- Card Sebaran Mahasiswa per Dinas Penempatan Pemkot Surabaya (Optimized, Mobile-Friendly & Compact) -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xs space-y-4"
-                 x-data="{
-                     viewMode: '{{ $activeAgenciesCount > 0 ? 'active' : 'all' }}',
-                     searchQuery: '',
-                     isExpanded: false,
-                     activeCount: {{ $activeAgenciesCount }},
-                     totalCount: {{ $totalAgenciesCount }},
-                     shouldShow(item) {
-                         // Search filter
-                         if (this.searchQuery.trim() !== '') {
-                             const q = this.searchQuery.toLowerCase();
-                             return item.name.toLowerCase().includes(q);
-                         }
-                         // Tab filter
-                         if (this.viewMode === 'active') {
-                             return item.count > 0;
-                         }
-                         return true;
-                     }
-                 }">
-                
-                <!-- Header: Judul, Ringkasan KPI & Segmented Control Switcher -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h4 class="font-bold text-slate-900 text-sm sm:text-base">
-                                Sebaran Penempatan Mahasiswa
-                            </h4>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                <span>Terisi:</span>
-                                <strong class="font-extrabold text-blue-900">{{ $activeAgenciesCount }}</strong>
-                                <span>/ {{ $totalAgenciesCount }} Dinas</span>
-                            </span>
-                        </div>
-                        <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-                            Distribusi mahasiswa magang asal kampus pada instansi dinas Pemkot Surabaya
-                        </p>
+            <!-- Card Sebaran Mahasiswa per Dinas (Simpel, seperti dashboard admin) -->
+            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
+                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
+                 x-data="{ showAll: {{ $activeAgenciesCount > 0 ? 'false' : 'true' }} }">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-sm font-bold text-slate-800 leading-snug">Sebaran Penempatan Mahasiswa</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
                     </div>
-
-                    <!-- Segmented Tab Controls (Hanya Terisi vs Semua Dinas) -->
-                    <div class="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-xl self-start sm:self-auto shrink-0 text-xs">
-                        <button type="button" 
-                                @click="viewMode = 'active'; isExpanded = false" 
-                                class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 cursor-pointer"
-                                :class="viewMode === 'active' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span>Hanya Terisi</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[10px]"
-                                  :class="viewMode === 'active' ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'">
-                                {{ $activeAgenciesCount }}
-                            </span>
+                    @if($totalAgenciesCount > $activeAgenciesCount)
+                        <button type="button" @click="showAll = !showAll"
+                                class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 cursor-pointer">
+                            <span x-text="showAll ? 'Hanya Dinas Terisi' : 'Semua Dinas'"></span>
                         </button>
-                        <button type="button" 
-                                @click="viewMode = 'all'; isExpanded = false" 
-                                class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 cursor-pointer"
-                                :class="viewMode === 'all' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'">
-                            <span>Semua Dinas</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[10px]"
-                                  :class="viewMode === 'all' ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'">
-                                {{ $totalAgenciesCount }}
-                            </span>
-                        </button>
-                    </div>
+                    @endif
                 </div>
 
-                <!-- Mini Quick Search Filter (Hanya tampil jika dinas banyak atau user beralih ke Semua Dinas) -->
-                <div x-show="viewMode === 'all' || totalCount > 6" 
-                     x-transition 
-                     class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                    <input type="text" 
-                           x-model="searchQuery" 
-                           placeholder="Cari nama instansi dinas..." 
-                           class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400">
-                </div>
-
-                <!-- Empty State jika Belum Ada Mahasiswa yang Terisi -->
-                @if($activeAgenciesCount === 0)
-                    <div x-show="viewMode === 'active'" class="p-6 text-center rounded-2xl bg-slate-50 border border-dashed border-slate-200 space-y-2">
-                        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </div>
-                        <p class="text-xs font-bold text-slate-700">Belum ada mahasiswa yang ditempatkan di dinas Pemkot</p>
-                        <p class="text-[11px] text-slate-400 max-w-sm mx-auto">Mahasiswa kampus Anda masih dalam tahap pendaftaran atau menunggu verifikasi.</p>
-                        <button type="button" @click="viewMode = 'all'" class="text-xs text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">
-                            Lihat Seluruh Daftar Dinas Mitra
-                        </button>
-                    </div>
-                @endif
-
-                <!-- Compact Grid / List Container (Mobile-First: 1 Kolom Ringkas, Tablet/Desktop: 2-3 Kolom) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
-                    @foreach ($agencyDistribution as $index => $dist)
-                        @php
-                            $hasStudents = ($dist['count'] > 0);
-                        @endphp
-                        <div x-show="shouldShow({ name: '{{ addslashes($dist['name']) }}', count: {{ $dist['count'] }} }) && (isExpanded || {{ $index }} < (viewMode === 'active' ? 6 : 6) || searchQuery.trim() !== '')"
-                             x-transition:enter="transition ease-out duration-150 transform"
-                             x-transition:enter-start="opacity-0 scale-98"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             class="group relative p-3 rounded-2xl border transition-all duration-150 flex flex-col justify-between {{ $hasStudents ? 'bg-gradient-to-br from-white to-blue-50/30 border-blue-100/90 shadow-2xs hover:shadow-xs hover:border-blue-300' : 'bg-slate-50/60 border-slate-100 hover:bg-white hover:border-slate-200' }}">
-                            
-                            <!-- Baris Atas: Icon + Nama + Badge Count -->
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="flex items-start gap-2.5 min-w-0 flex-1">
-                                    <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 {{ $hasStudents ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-200 text-slate-500' }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                        </svg>
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <h5 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 h-8 flex items-start group-hover:text-blue-700 transition" title="{{ $dist['name'] }}">
-                                            {{ $dist['name'] }}
-                                        </h5>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <span class="text-[10px] font-semibold text-slate-400">
-                                                Porsi: <strong class="{{ $hasStudents ? 'text-blue-700' : 'text-slate-500' }}">{{ $dist['percentage'] }}%</strong>
-                                            </span>
-                                            @if($hasStudents)
-                                                <span class="text-slate-300">&bull;</span>
-                                                <a href="{{ route('university.dashboard', ['agency_id' => $dist['id']]) }}" 
-                                                   class="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline">
-                                                    Filter Mahasiswa
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Badge Jumlah Mahasiswa -->
-                                <div class="shrink-0 text-right">
-                                    @if($hasStudents)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-black bg-blue-600 text-white shadow-2xs">
-                                            {{ $dist['count'] }} Mhs
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-slate-200/80 text-slate-500">
-                                            0 Mhs
-                                        </span>
-                                    @endif
-                                </div>
+                <div class="space-y-4 pt-1">
+                    @if($activeAgenciesCount === 0)
+                        <div x-show="!showAll" class="text-center py-6 text-xs text-slate-400">Belum ada mahasiswa yang ditempatkan di dinas.</div>
+                    @endif
+                    @foreach ($agencyDistribution as $dist)
+                        @php $hasStudents = $dist['count'] > 0; @endphp
+                        <div @if(!$hasStudents) x-show="showAll" x-cloak @endif>
+                            <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
+                                <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $dist['name'] }}</span>
+                                <span class="text-blue-700 font-bold shrink-0">
+                                    {{ $dist['count'] }} Mahasiswa
+                                    <span class="text-slate-400 font-normal">({{ $dist['percentage'] }}%)</span>
+                                </span>
                             </div>
-
-                            <!-- Progress Bar Persentase Penempatan: Selalu di Bagian Bawah -->
-                            <div class="mt-2.5 pt-1.5 border-t border-slate-100/60 mt-auto">
-                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                    <div class="h-1.5 rounded-full transition-all duration-300 {{ $hasStudents ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-300' }}" 
-                                         style="width: {{ max($dist['percentage'], $hasStudents ? 6 : 0) }}%"></div>
-                                </div>
+                            <div class="w-full rounded-full overflow-hidden mt-1.5"
+                                 style="background-color: #f1f5f9; height: 8px; border-radius: 9999px; overflow: hidden;">
+                                <div class="h-2 rounded-full transition-all duration-500"
+                                     style="background-color: #2563eb; height: 8px; border-radius: 9999px; width: {{ max((float) $dist['percentage'], 2) }}%"></div>
                             </div>
-
                         </div>
                     @endforeach
                 </div>
-
-                <!-- Tombol Expand / Collapse (Jika data yang sesuai filter melebihi batas default) -->
-                @if($totalAgenciesCount > 6)
-                    <div class="pt-2 text-center" 
-                         x-show="searchQuery.trim() === '' && ((viewMode === 'active' && activeCount > 6) || (viewMode === 'all' && totalCount > 6))">
-                        <button type="button" 
-                                @click="isExpanded = !isExpanded"
-                                class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                            <span x-text="isExpanded ? 'Tampilkan Lebih Sedikit' : 'Tampilkan Seluruh Instansi Lainnya (' + (viewMode === 'active' ? activeCount : totalCount) + ' Dinas)'"></span>
-                            <svg class="w-3.5 h-3.5 transition-transform duration-200" 
-                                 :class="isExpanded ? 'rotate-180' : ''" 
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </button>
-                    </div>
-                @endif
-
             </div>
 
             <!-- Filter & Search Panel -->
@@ -293,7 +158,7 @@
     <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
             <h4 class="font-bold text-slate-900 text-sm sm:text-base">
-                Daftar Mahasiswa Magang ({{ $allApplications->count() }})
+                Daftar Mahasiswa Magang
             </h4>
             <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
                 Seluruh mahasiswa terdaftar asal {{ $university->name ?? $user->name }}
@@ -330,8 +195,7 @@
                 <div class="shrink-0">
                     <a href="{{ route('university.students.show', $app->id) }}"
                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 text-xs font-semibold rounded-xl border border-blue-100 transition">
-                        <span>Detail</span>
-                        <span class="text-xs"></span>
+                        Detail
                     </a>
                 </div>
             </div>
@@ -347,13 +211,13 @@
         <table class="min-w-full divide-y divide-slate-100 text-left text-xs sm:text-sm">
             <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
                 <tr>
-                    <th class="px-5 py-3.5 whitespace-nowrap">Mahasiswa</th>
-                    <th class="px-5 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
-                    <th class="px-5 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
-                    <th class="px-5 py-3.5 whitespace-nowrap text-center">Status Magang</th>
-                    <th class="px-5 py-3.5 whitespace-nowrap">Dosen DPL</th>
-                    <th class="px-5 py-3.5 whitespace-nowrap">Mentor Dinas</th>
-                    <th class="px-5 py-3.5 whitespace-nowrap text-center min-w-[100px]">Aksi</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Mahasiswa</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap text-center">Status Magang</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Dosen DPL</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Mentor Dinas</th>
+                    <th class="py-3.5 whitespace-nowrap text-center" style="padding-left: 12px; padding-right: 32px;">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -368,22 +232,22 @@
                         $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
                     @endphp
                     <tr class="hover:bg-slate-50/80 transition">
-                        <td class="px-5 py-4">
+                        <td class="px-4 py-4">
                             <div class="font-bold text-slate-900">{{ $student->name }}</div>
                             <div class="text-xs text-slate-400 font-mono">{{ $student->email }}</div>
                         </td>
-                        <td class="px-5 py-4">
+                        <td class="px-4 py-4">
                             <div class="font-medium text-slate-800">{{ $student->studentProfile->jurusan ?? '-' }}</div>
                             <div class="text-xs text-slate-400 font-mono">NIM: {{ $student->studentProfile->nim ?? '-' }}</div>
                         </td>
-                        <td class="px-5 py-4">
+                        <td class="px-4 py-4">
                             <div class="font-bold text-blue-900">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
                             <div class="text-xs text-slate-500">{{ $app->unit->name ?? '-' }}</div>
                         </td>
-                        <td class="px-5 py-4 text-center">
+                        <td class="px-4 py-4 text-center">
                             <x-status-badge :status="$app->status" />
                         </td>
-                        <td class="px-5 py-4">
+                        <td class="px-4 py-4">
                             @if ($dosen)
                                 <div class="font-semibold text-slate-900 text-xs">{{ $dosen->name }}</div>
                                 <div class="text-[11px] text-slate-400 font-mono">{{ $dosen->email }}</div>
@@ -405,7 +269,7 @@
                                 </button>
                             @endif
                         </td>
-                        <td class="px-5 py-4">
+                        <td class="px-4 py-4">
                             @if ($mentor)
                                 <div class="font-semibold text-slate-900 text-xs">{{ $mentor->name }}</div>
                                 <div class="text-[11px] text-slate-400 font-mono">{{ $mentor->email }}</div>
@@ -413,11 +277,10 @@
                                 <span class="text-xs text-slate-400">Belum Diplot</span>
                             @endif
                         </td>
-                        <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <td class="py-4 whitespace-nowrap text-center" style="padding-left: 12px; padding-right: 32px;">
                             <a href="{{ route('university.students.show', $app->id) }}"
-                               class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold transition">
-                                <span>Detail</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                               class="inline-flex items-center justify-center px-4 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold transition">
+                                Detail
                             </a>
                         </td>
                     </tr>

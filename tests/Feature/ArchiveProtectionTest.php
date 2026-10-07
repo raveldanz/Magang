@@ -25,12 +25,19 @@ class ArchiveProtectionTest extends TestCase
     use RefreshDatabase;
 
     private University $univ;
+
     private AgencyProfile $agency;
+
     private Unit $unit;
+
     private User $superAdmin;
+
     private User $mentor;
+
     private User $dosen;
+
     private User $alumnus;
+
     private Application $alumniApplication;
 
     protected function setUp(): void

@@ -26,9 +26,13 @@ class ActionPriorityDisplayTest extends TestCase
     use RefreshDatabase;
 
     private University $univ;
+
     private Unit $unit;
+
     private User $superAdmin;
+
     private User $mentor;
+
     private User $dosen;
 
     protected function setUp(): void
@@ -132,7 +136,7 @@ class ActionPriorityDisplayTest extends TestCase
 
         $loaded = Application::with(['placement.finalreport', 'placement.evaluation', 'placement.logbooks', 'user.universityRelation'])->get();
         $phpTiers = $loaded->mapWithKeys(fn ($a) => [$a->id => $a->actionPriority()])->sortKeys()->all();
-        $sqlTiers = Application::query()->selectRaw('id, ' . Application::actionPrioritySql() . ' as tier')->get()
+        $sqlTiers = Application::query()->selectRaw('id, '.Application::actionPrioritySql().' as tier')->get()
             ->mapWithKeys(fn ($row) => [$row->id => (int) $row->tier])->sortKeys()->all();
 
         $this->assertSame($phpTiers, $sqlTiers, 'Tingkat prioritas SQL berbeda dengan PHP');

@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\Mentor;
 
+use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
+use App\Models\University;
+use App\Services\LogbookWeeklyBundler;
+use App\Services\StudentNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,7 +26,7 @@ class DashboardController extends Controller
         // Base query penempatan yang diplot ke mentor ini
         $baseQuery = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
-              ->orWhere('pembimbing_id', $mentor->id);
+                ->orWhere('pembimbing_id', $mentor->id);
         });
 
         // Multi-Tenant Isolation: Scoping ke instansi jika mentor terikat ke agency tertentu
@@ -31,65 +36,99 @@ class DashboardController extends Controller
             });
         }
 
-        // Hitung statistik langsung dari database
-        $totalStudents = (clone $baseQuery)->count();
-        $activeCount = (clone $baseQuery)->whereRelation('application', 'status', 'active')->count();
-        $upcomingCount = (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count();
-        $completedCount = (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count();
-
-        $pendingLogbooksCount = \App\Models\Logbook::whereHas('placement', function ($q) use ($mentor) {
-            $q->where(function ($sq) use ($mentor) {
-                $sq->where('mentor_id', $mentor->id)
-                   ->orWhere('pembimbing_id', $mentor->id);
+        // Jangan sertakan yang mengundurkan diri atau ditolak kecuali jika diminta khusus
+        $tab = $request->get('tab');
+        if ($tab && in_array($tab, ['upcoming', 'completed', 'active'])) {
+            $baseQuery->whereRelation('application', 'status', match ($tab) {
+                'upcoming' => 'accepted',
+                'completed' => 'completed',
+                default => 'active',
             });
-            if ($mentor->agency_profile_id !== null) {
-                $q->whereHas('application.unit', function ($sq) use ($mentor) {
-                    $sq->where('agency_profile_id', $mentor->agency_profile_id);
-                });
-            }
-        })->where('status', 'pending')->count();
+        } else {
+            $baseQuery->whereHas('application', function ($q) {
+                $q->whereNotIn('status', ['resigned', 'rejected']);
+            });
+        }
 
-        $evaluatedStudentsCount = (clone $baseQuery)->has('evaluation')->count();
-        $pendingEvaluationsCount = max(0, $totalStudents - $evaluatedStudentsCount);
+        // Hitung statistik bimbingan mentor
+        $totalStudents = (clone $baseQuery)->count();
+        $totalEvaluated = (clone $baseQuery)->whereHas('evaluation', function ($q) {
+            $q->where(function ($sq) {
+                $sq->where('nilai_disiplin', '>', 0)
+                    ->orWhere('nilai_kinerja', '>', 0)
+                    ->orWhere('nilai_laporan', '>', 0);
+            });
+        })->count();
+        $totalPendingEval = max(0, $totalStudents - $totalEvaluated);
+        $totalReportsApproved = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', 'approved'))->count();
+        $totalReportsPending = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', '!=', 'approved'))->count();
 
         $stats = [
             'total_students' => $totalStudents,
-            'active_students' => $activeCount,
-            'upcoming_students' => $upcomingCount,
-            'completed_students' => $completedCount,
-            'pending_logbooks' => $pendingLogbooksCount,
-            'evaluated_students' => $evaluatedStudentsCount,
-            'pending_evaluations' => $pendingEvaluationsCount,
+            'total_evaluated' => $totalEvaluated,
+            'total_pending_eval' => $totalPendingEval,
+            'total_reports_approved' => $totalReportsApproved,
+            'total_reports_pending' => $totalReportsPending,
+            'active_students' => $totalStudents,
+            'upcoming_students' => 0,
+            'completed_students' => 0,
+            'pending_logbooks' => 0,
         ];
-
-        $tab = $request->get('tab', 'active');
 
         // Query penempatan dengan relasi lengkap
         $query = (clone $baseQuery)->with([
             'application.user.studentProfile',
+            'application.user.universityRelation',
             'application.unit.agencyProfile',
             'logbooks',
             'evaluation',
             'finalreport',
-            'academicAdvisor'
+            'academicAdvisor',
         ]);
 
-        $query = match ($tab) {
-            'upcoming' => $query->whereRelation('application', 'status', 'accepted'),
-            'completed' => $query->whereRelation('application', 'status', 'completed'),
-            'all' => $query,
-            default => $query->whereRelation('application', 'status', 'active'),
-        };
+        // Filter pencarian nama / NIM / jurusan / kampus
+        $search = trim((string) ($request->get('search') ?? $request->get('q', '')));
+        if ($search !== '') {
+            $keyword = '%'.mb_strtolower($search).'%';
+            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->whereHas('application.user', function ($q) use ($search, $like) {
+                $q->where('name', $like, "%{$search}%")
+                    ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {
+                        $sq->where('nim', $like, "%{$search}%")
+                            ->orWhere('jurusan', $like, "%{$search}%")
+                            ->orWhere('universitas', $like, "%{$search}%");
+                    });
+            });
+        }
 
-        $placements = $query->latest()->paginate(10)->withQueryString();
+        // Filter status laporan akhir
+        if ($request->filled('report_status')) {
+            $repStatus = strtolower($request->report_status);
+            if (ReviewStatus::tryFrom($repStatus)) {
+                $query->whereHas('finalreport', fn ($q) => $q->where('status', $repStatus));
+            } elseif ($repStatus === 'none') {
+                $query->whereDoesntHave('finalreport');
+            }
+        }
 
-        return view('mentor.dashboard', compact('placements', 'stats', 'tab'));
+        // Filter perguruan tinggi
+        if ($request->filled('university_id')) {
+            $query->whereHas('application.user', function ($q) use ($request) {
+                $q->where('university_id', $request->university_id);
+            });
+        }
+
+        // 15 mahasiswa per halaman; filter & tab ikut terbawa saat pindah halaman
+        $placements = $query->latest()->paginate(15)->withQueryString();
+        $universities = University::orderBy('name')->get();
+
+        return view('mentor.dashboard', compact('placements', 'stats', 'universities', 'tab', 'search'));
     }
 
     /**
      * Detail Aktivitas & Logbook Mahasiswa Tertentu
      */
-    public function showStudent($placementId)
+    public function showStudent($placementId, LogbookWeeklyBundler $bundler)
     {
         $mentor = Auth::user();
 
@@ -97,22 +136,35 @@ class DashboardController extends Controller
             'application.user.studentProfile',
             'application.unit.agencyProfile',
             'logbooks' => function ($q) {
-                $q->orderBy('date', 'desc');
+                $q->orderBy('date', 'desc')->orderBy('id', 'desc');
             },
             'evaluation',
             'finalreport',
-            'academicAdvisor'
-        ])->where(function ($q) use ($mentor) {
-            $q->where('mentor_id', $mentor->id)
-              ->orWhere('pembimbing_id', $mentor->id);
-        })->findOrFail($placementId);
+            'academicAdvisor',
+        ])->findOrFail($placementId);
+
+        // Mentor yang ditugaskan, atau Kepala Unit selama mentor belum ditunjuk (validasi sementara).
+        abort_unless($placement->canFieldReviewLogbook($mentor), 403, 'Anda tidak memiliki hak akses ke data bimbingan mahasiswa ini.');
 
         // Multi-Tenant Authorization Check
         if ($mentor->agency_profile_id !== null && optional($placement->application?->unit)->agency_profile_id !== $mentor->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke data bimbingan instansi lain.');
         }
 
-        return view('mentor.student-detail', compact('placement'));
+        // Nilai & laporan akhir hanya boleh ditangani mentor yang ditugaskan (bukan Kepala Unit sementara).
+        $canEvaluate = $placement->isAssignedFieldMentor($mentor);
+        $evaluationLockReason = $placement->evaluationLockReason();
+
+        $weeklyBundles = $bundler->bundle(
+            logbooks: $placement->logbooks,
+            statusColumn: 'status',
+            feedbackColumn: 'feedback',
+            otherStatusColumn: 'lecturer_status',
+            otherFeedbackColumn: 'lecturer_feedback',
+            perPage: null
+        );
+
+        return view('mentor.student-detail', compact('placement', 'weeklyBundles', 'canEvaluate', 'evaluationLockReason'));
     }
 
     /**
@@ -148,6 +200,8 @@ class DashboardController extends Controller
         if ($request->status === 'approved') {
             $placement->syncCompletionStatus();
         }
+
+        StudentNotifier::finalReportReviewed($placement->application?->user, 'mentor', $request->status, $request->feedback);
 
         return redirect()->back()->with('success', 'Status laporan akhir mahasiswa berhasil diperbarui!');
     }

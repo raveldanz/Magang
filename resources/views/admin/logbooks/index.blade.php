@@ -207,6 +207,9 @@
                                 </h3>
                                 <p class="text-xs text-gray-600 mt-0.5">
                                     Unit: <strong>{{ $selUnit->name ?? '-' }}</strong> &bull; Pembimbing Lapangan: <strong>{{ $selMentor->name ?? 'Belum Ditentukan' }}</strong>
+                                    @unless ($selMentor)
+                                        &bull; <span class="text-amber-700 font-semibold">Logbook dapat divalidasi sementara oleh Admin Dinas (buka Detail)</span>
+                                    @endunless
                                 </p>
                             </div>
                         </div>
@@ -242,7 +245,7 @@
 
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if ($log->attachment)
-                                        <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
+                                        <a href="{{ $log->attachment_url }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
                                              Lampiran
                                         </a>
                                     @endif
@@ -310,6 +313,11 @@
                                         <div class="text-[11px] text-gray-500 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
+                                        @unless ($mentor)
+                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas">
+                                                Validasi sementara oleh Admin Dinas
+                                            </div>
+                                        @endunless
                                     </td>
 
                                     <td class="py-4 px-4 text-center" data-label="Rekap Logbook">

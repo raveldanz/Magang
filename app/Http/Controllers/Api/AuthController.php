@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\EnsureAccountIsActive;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -20,17 +20,17 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Kredensial email atau password salah.'
+                'message' => 'Kredensial email atau password salah.',
             ], 401);
         }
 
         if ($user->isInactive()) {
             return response()->json([
                 'status' => 'error',
-                'message' => \App\Http\Middleware\EnsureAccountIsActive::MESSAGE,
+                'message' => EnsureAccountIsActive::MESSAGE,
             ], 403);
         }
 
@@ -48,8 +48,8 @@ class AuthController extends Controller
                     'email' => $user->email,
                     'role' => $user->role, // Info Role dikirimkan di API
                 ],
-                'token' => $token
-            ]
+                'token' => $token,
+            ],
         ], 200);
     }
 
@@ -58,7 +58,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data' => $request->user()->load('studentProfile')
+            'data' => $request->user()->load('studentProfile'),
         ]);
     }
 
@@ -69,7 +69,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Logout berhasil'
+            'message' => 'Logout berhasil',
         ]);
     }
 }

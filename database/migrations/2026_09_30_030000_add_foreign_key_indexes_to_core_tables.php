@@ -26,7 +26,7 @@ return new class extends Migration
     {
         foreach (self::INDEXES as $table => $indexes) {
             foreach ($indexes as $columns) {
-                if (!Schema::hasTable($table) || !Schema::hasColumns($table, $columns) || Schema::hasIndex($table, $columns)) {
+                if (! Schema::hasTable($table) || ! Schema::hasColumns($table, $columns) || Schema::hasIndex($table, $columns)) {
                     continue;
                 }
                 Schema::table($table, fn (Blueprint $blueprint) => $blueprint->index($columns));

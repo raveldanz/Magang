@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\FinalReport;
+use App\Support\UploadRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,53 +19,53 @@ class FinalReportController extends Controller
      * Tampilkan Halaman Laporan Akhir Mahasiswa
      */
     public function index()
-{
-    // 1. Ambil pengajuan magang yang aktif / terbaru
-    $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
-        ->where('user_id', Auth::id())
-        ->whereNotIn('status', ['rejected', 'resigned'])
-        ->whereHas('placement')
-        ->latest()
-        ->first()
-        ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+    {
+        // 1. Ambil pengajuan magang yang aktif / terbaru
+        $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
             ->whereNotIn('status', ['rejected', 'resigned'])
+            ->whereHas('placement')
             ->latest()
-            ->first();
+            ->first()
+            ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+                ->where('user_id', Auth::id())
+                ->whereNotIn('status', ['rejected', 'resigned'])
+                ->latest()
+                ->first();
 
-    // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
-    if (!$application) {
-        return redirect()->route('dashboard')->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
-    }
-
-    $rawStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)($application->status ?? 'NONE');
-    $lifecycle = strtoupper($rawStatus);
-    $placement = $application->placement;
-    $finalReport = null;
-    $evaluation = null;
-
-    // 3. Jika sudah diterima dan memiliki placement, baru cek DPL & ambil data laporan
-    if ($placement) {
-        // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
-        if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
-            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+        // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
+        if (! $application) {
+            return redirect()->route('dashboard')->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
         }
 
-        $finalReport = $placement->finalreport;
-        $evaluation = $placement->evaluation;
+        $rawStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) ($application->status ?? 'NONE');
+        $lifecycle = strtoupper($rawStatus);
+        $placement = $application->placement;
+        $finalReport = null;
+        $evaluation = null;
+
+        // 3. Jika sudah diterima dan memiliki placement, baru cek DPL & ambil data laporan
+        if ($placement) {
+            // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
+            if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
+                return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+            }
+
+            $finalReport = $placement->finalreport;
+            $evaluation = $placement->evaluation;
+        }
+
+        // 4. Kirimkan $lifecycle ke view agar kartu alur/stepper muncul saat masih pending
+        return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation', 'lifecycle'));
     }
 
-    // 4. Kirimkan $lifecycle ke view agar kartu alur/stepper muncul saat masih pending
-    return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation', 'lifecycle'));
-}
-
     /**
-     * Upload / Unggah Dokumen Laporan Akhir Magang (PDF / DOCX) & Repositori Proyek
+     * Upload / Unggah Dokumen Laporan Akhir Magang (PDF, maks 5MB) & Repositori Proyek
      */
     public function store(Request $request)
     {
         $user = Auth::user();
-        
+
         // Prioritaskan pengajuan aktif yang belum resigned/rejected
         $application = Application::with('placement')
             ->where('user_id', $user->id)
@@ -76,8 +78,8 @@ class FinalReportController extends Controller
                 ->whereNotIn('status', ['rejected', 'resigned'])
                 ->latest()
                 ->first();
-        
-        if (!$application || !$application->placement) {
+
+        if (! $application || ! $application->placement) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak: Data penempatan tidak ditemukan.');
         }
 
@@ -90,7 +92,7 @@ class FinalReportController extends Controller
 
         $placementId = $application->placement->id;
         $finalReport = FinalReport::where('placement_id', $placementId)->first();
-        $hasExistingFile = $finalReport && !empty($finalReport->file_path);
+        $hasExistingFile = $finalReport && ! empty($finalReport->file_path);
 
         if ($finalReport && $finalReport->status === 'approved') {
             return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir yang sudah disetujui tidak dapat diubah atau diunggah ulang.');
@@ -99,11 +101,11 @@ class FinalReportController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'repository_url' => 'nullable|url|max:255',
-            'file_laporan' => ($hasExistingFile ? 'nullable' : 'required') . '|file|mimes:pdf,doc,docx|max:10240', // Maks 10MB
+            'file_laporan' => ($hasExistingFile ? 'nullable' : 'required').'|'.UploadRules::FINAL_REPORT, // PDF maks 5MB
         ], [
             'file_laporan.required' => 'File naskah laporan akhir wajib diunggah.',
-            'file_laporan.mimes' => 'Format file harus berupa PDF atau DOCX.',
-            'file_laporan.max' => 'Ukuran file maksimal adalah 10 MB.',
+            'file_laporan.mimes' => 'Format file naskah laporan akhir harus berupa PDF.',
+            'file_laporan.max' => 'Ukuran file naskah laporan akhir maksimal 5 MB (5120 KB).',
             'repository_url.url' => 'Format tautan repositori proyek harus berupa URL valid.',
         ]);
 
@@ -113,12 +115,12 @@ class FinalReportController extends Controller
             // Bersihkan file lama milik mahasiswa ini jika ada (kecuali file default/template bawaan)
             if ($finalReport && $finalReport->file_path) {
                 $baseOld = basename($finalReport->file_path);
-                if (!in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
+                if (! in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
                     if (Storage::disk('local')->exists($finalReport->file_path)) {
                         Storage::disk('local')->delete($finalReport->file_path);
                     } elseif (Storage::disk('public')->exists($finalReport->file_path)) {
                         Storage::disk('public')->delete($finalReport->file_path);
-                        @unlink(public_path('storage/' . $finalReport->file_path));
+                        @unlink(public_path('storage/'.$finalReport->file_path));
                     }
                 }
             }
@@ -181,7 +183,7 @@ class FinalReportController extends Controller
 
         // Validasi Otorisasi Hak Akses Multi-Role
         $isAuthorized = false;
-        $isSuperAdmin = ($currentUser->role === 'super_admin' || ($currentUser->role === 'admin' && is_null($currentUser->agency_profile_id)));
+        $isSuperAdmin = $currentUser->isSuperAdmin();
 
         if ($isSuperAdmin) {
             $isAuthorized = true;
@@ -216,7 +218,7 @@ class FinalReportController extends Controller
             }
         }
 
-        if (!$isAuthorized) {
+        if (! $isAuthorized) {
             abort(403, 'Anda tidak memiliki hak akses untuk membuka naskah laporan akhir ini.');
         }
 
@@ -226,20 +228,20 @@ class FinalReportController extends Controller
 
         $candidatePaths = [
             $filePath ? Storage::disk('local')->path($filePath) : null,
-            $filePath ? storage_path('app/public/' . $filePath) : null,
-            $filePath ? public_path('storage/' . $filePath) : null,
+            $filePath ? storage_path('app/public/'.$filePath) : null,
+            $filePath ? public_path('storage/'.$filePath) : null,
             Storage::disk('local')->path('final_reports/default.pdf'),
             storage_path('app/public/final_reports/default.pdf'),
             public_path('storage/final_reports/default.pdf'),
         ];
 
         // Jika file asli berformat DOC/DOCX dan bukan paksa unduh, prioritaskan berkas PDF pendamping agar dapat dibuka langsung di browser
-        if (!$request->boolean('download') && in_array(strtolower(pathinfo($filePath ?? '', PATHINFO_EXTENSION)), ['doc', 'docx'])) {
+        if (! $request->boolean('download') && in_array(strtolower(pathinfo($filePath ?? '', PATHINFO_EXTENSION)), ['doc', 'docx'])) {
             $pdfCandidate = preg_replace('/\.(docx|doc)$/i', '.pdf', $filePath);
             array_unshift($candidatePaths,
                 Storage::disk('local')->path($pdfCandidate),
-                storage_path('app/public/' . $pdfCandidate),
-                public_path('storage/' . $pdfCandidate)
+                storage_path('app/public/'.$pdfCandidate),
+                public_path('storage/'.$pdfCandidate)
             );
         }
 
@@ -250,7 +252,7 @@ class FinalReportController extends Controller
             }
         }
 
-        if (!$realPath || !file_exists($realPath)) {
+        if (! $realPath || ! file_exists($realPath)) {
             return redirect()->back()->with('error', 'Berkas naskah laporan akhir belum tersedia atau sedang disiapkan oleh mahasiswa.');
         }
 
@@ -267,7 +269,7 @@ class FinalReportController extends Controller
             $mimeType = 'application/pdf';
         }
 
-        $forceDownload = $request->boolean('download') || !in_array(strtolower($ext), ['pdf', 'png', 'jpg', 'jpeg']);
+        $forceDownload = $request->boolean('download') || ! in_array(strtolower($ext), ['pdf', 'png', 'jpg', 'jpeg']);
         $disposition = $forceDownload ? 'attachment' : 'inline';
 
         return response()->file($realPath, [
