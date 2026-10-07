@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>403 — Akses Ditolak | Portal Magang Pemkot Surabaya</title>
+    <!-- Favicon Resmi Pemerintah Kota Surabaya -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+    <link rel="apple-touch-icon" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800,900&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -15,9 +20,9 @@
         <aside aria-label="Impersonation Alert" class="bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 text-white shadow-md sticky top-0 z-[99999] border-b border-rose-700/60">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-3 min-h-[44px]">
                 <div class="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-white/95 tracking-normal">
-                    <span class="inline-flex relative flex h-2.5 w-2.5 shrink-0">
+                    <span class="relative flex h-3 w-3 shrink-0 items-center justify-center">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                     </span>
                     <span>
                         Mode Penyamaran: Anda sedang mengelola akun <strong class="font-bold text-white">{{ auth()->user()?->name ?? 'Pengguna' }}</strong> 

@@ -5,8 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Portal Magang Resmi - Pemerintah Kota Surabaya</title>
 
-        <!-- Favicon -->
-        <link rel="icon" type="image/png" href="{{ asset('images/logoPemkotSBY.png') }}">
+        <!-- Favicon Resmi Pemerintah Kota Surabaya -->
+        <link rel="icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+        <link rel="shortcut icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+        <link rel="apple-touch-icon" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
 
         <!-- Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

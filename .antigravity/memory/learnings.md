@@ -67,6 +67,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
 | **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
 | **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
+| **LRN-059** | 2026-10-07 | Dashboard Mahasiswa: Form Dosen Pembimbing, Status Harmonis & Standarisasi Istilah | Relokasi form pilih dosen tepat di bawah kartu info, eliminasi catatan penolakan panjang dari kartu dashboard demi keseragaman tinggi kartu, perbaikan status rejected, dan standardisasi penamaan Dosen Pembimbing / Mentor Lapangan tanpa kurung | RESOLVED |
 | **LRN-059** | 2026-10-07 | Seleksi Pengajuan Admin: Alpine Bulk Reactivity, Duplikasi ID & Mobile Overlap | Form bulk terima gagal validasi, count 2x lipat saat toggle-all, checkbox tertimpa badge status di HP & semantic pagination | RESOLVED |
 | **LRN-060** | 2026-10-07 | DPL BAP Print & Legalitas TTE | Kotak QR dummy teks, badge monospace TTE kaku & ketidaksinkronan posisi kolom pada Berita Acara Penilaian | RESOLVED |
 
@@ -1314,7 +1315,6 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-<<<<<<< HEAD
 ### [LRN-044] Inovasi Modul DPL: Berita Acara & Lembar Nilai A4, Smart Action Alerts, Dual-Status Badges, Supervision Log, dan Ekspor Rekapitulasi CSV
 - **Tanggal**: 2026-10-05
 - **Komponen**: `Lecturer\DashboardController`, `Lecturer\EvaluationController`, `Lecturer\MonitoringController`, `AcademicConsultation`, `Placement`, `Evaluation`, Blade Views (`lecturer/dashboard.blade.php`, `lecturer/student-detail.blade.php`, `lecturer/grade-sheet.blade.php`, `lecturer/monitoring/index.blade.php`), PPTX Script
