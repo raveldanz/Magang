@@ -52,6 +52,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
 | **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
 | **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
+| **LRN-043** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
+| **LRN-044** | 2026-10-05 | Inovasi Controller DPL: BAP A4, Action Center, Dual Badges, Log Bimbingan & Ekspor CSV | Ketiadaan instrumen formal DPL (BAP A4, riwayat bimbingan akademik, action alerts, dan ekspor CSV rekap bimbingan) & BackedEnum safety | RESOLVED |
 | **LRN-045** | 2026-10-03 | Saluran Pengumuman Resmi & Komentar | Saluran broadcast resmi instansi/kampus gaya Telegram Channel + Comment Thread & isolasi menu | RESOLVED |
 | **LRN-046** | 2026-10-04 | Restrukturisasi Grup Bimbingan Mentor & DPL | Eliminasi grup bimbingan 1-on-1-on-1 lama; 1 mentor banyak mahasiswa, 1 DPL banyak mahasiswa, mutasi & penanganan resign otomatis | RESOLVED |
 | **LRN-047** | 2026-10-04 | Nomenklatur Dosen & Penyeragaman Warna Waktu Chat | Penggantian akronim 'DPL' menjadi 'Dosen' pada grup, subtitle, badge & pesan sistem; penyeragaman warna timestamp (Rabu) | RESOLVED |
@@ -66,6 +68,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
 | **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
 | **LRN-059** | 2026-10-07 | Seleksi Pengajuan Admin: Alpine Bulk Reactivity, Duplikasi ID & Mobile Overlap | Form bulk terima gagal validasi, count 2x lipat saat toggle-all, checkbox tertimpa badge status di HP & semantic pagination | RESOLVED |
+| **LRN-060** | 2026-10-07 | DPL BAP Print & Legalitas TTE | Kotak QR dummy teks, badge monospace TTE kaku & ketidaksinkronan posisi kolom pada Berita Acara Penilaian | RESOLVED |
 
 ---
 
@@ -1311,6 +1314,31 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+<<<<<<< HEAD
+### [LRN-044] Inovasi Modul DPL: Berita Acara & Lembar Nilai A4, Smart Action Alerts, Dual-Status Badges, Supervision Log, dan Ekspor Rekapitulasi CSV
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Lecturer\DashboardController`, `Lecturer\EvaluationController`, `Lecturer\MonitoringController`, `AcademicConsultation`, `Placement`, `Evaluation`, Blade Views (`lecturer/dashboard.blade.php`, `lecturer/student-detail.blade.php`, `lecturer/grade-sheet.blade.php`, `lecturer/monitoring/index.blade.php`), PPTX Script
+- **Problem / Symptom**:
+  1. DPL tidak memiliki Berita Acara Penilaian (BAP-DPL) siap cetak format A4 berstandar universitas untuk pelaporan nilai magang ke program studi/fakultas.
+  2. DPL kesulitan mengetahui secara cepat mahasiswa mana yang membutuhkan perhatian (laporan belum dinilai, logbook pending) tanpa membuka satu per satu halaman.
+  3. Tabel pemantauan tidak menampilkan status ganda (Nilai Mentor vs Nilai DPL vs Nilai Akhir) secara komparatif.
+  4. Tidak ada instrumen pencatatan sesi konsultasi bimbingan akademik (Supervision Log) antara DPL dan mahasiswa bimbingan.
+  5. DPL tidak dapat mengekspor rekapitulasi nilai dan status mahasiswa bimbingan ke format CSV/Excel untuk BKD atau akreditasi.
+  6. Terjadi `TypeError` saat memformat `ApplicationStatus` enum di controller ekspor (`strtoupper($p->application->status)`).
+- **Root Cause**:
+  1. Ketiadaan rute dan view khusus cetak dokumen BAP A4 ber-Kop Universitas dan QR verifikasi DPL.
+  2. Ketiadaan tabel relasional untuk log bimbingan akademik (`academic_consultations`).
+  3. Status aplikasi menggunakan BackedEnum (`ApplicationStatus`), sehingga pemanggilan fungsi string native PHP langsung menimbulkan TypeError jika tidak mengekstrak `->value`.
+  4. Kolom tabel `evaluations` memiliki beberapa alias (`nilai_dosen`, `score_mastery`, `nilai_akademik`) yang perlu di-fallback secara aman pada accessor `nilai_dosen_calculated`.
+- **Fix Applied**:
+  1. Mengimplementasikan fitur Cetak Berita Acara & Lembar Nilai DPL format A4 siap cetak (`/lecturer/students/{placementId}/grade-sheet`) dengan perhitungan proporsi 40% DPL : 60% Mentor, Kop Universitas, dan QR digital.
+  2. Menambahkan Banner *Smart Action Alerts* di dasbor DPL yang otomatis mendeteksi laporan/logbook yang menunggu tindak lanjut dosen.
+  3. Memperbarui tabel mahasiswa dengan *Dual-Status Badges* yang membedakan nilai mentor kedinasan, nilai DPL, dan nilai akhir komparatif.
+  4. Membuat tabel migrasi dan model `AcademicConsultation` serta kartu timeline riwayat bimbingan akademik interaktif di halaman detail mahasiswa.
+  5. Menambahkan endpoint `lecturer.monitoring.export` yang mengalirkan file CSV ber-BOM UTF-8 siap buka di Excel dengan proteksi tipe data BackedEnum.
+  6. Menulis suite pengujian `LecturerInnovationsTest.php` (6/6 lulus) dan menguji seluruh test suite (189/189 PASS, 1.415 assertions, Exit Code 0).
+- **Prevention Rule**: Seluruh data yang bersumber dari Enum Backed wajib di-unwrap dengan `$val instanceof \BackedEnum ? $val->value : (string) $val` sebelum diproses fungsi string atau diekspor ke format CSV/Excel. Seluruh accessor nilai wajib menyediakan fallback bertingkat jika tabel database memiliki kolom alias untuk memastikan backward-compatibility.
+
 ### [LRN-059] Penanganan Asinkronus Alpine Bulk Action, Duplikasi ID Responsive Dual-View & Overlap Mobile UI
 - **Tanggal**: 2026-10-07
 - **Komponen**: `resources/views/admin/applications/index.blade.php`
@@ -1332,9 +1360,41 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Menutup `</form>` tepat sebelum blok paginasi.
 - **Prevention Rule**: Pada antarmuka responsif dual-rendering (desktop table + mobile cards), query selektor DOM untuk manipulasi data array WAJIB dideduplikasi dengan `Set`. Form submit sinkronus yang bergantung pada state reaktif Alpine WAJIB mengatur nilai input DOM secara eksplisit sebelum memanggil `.submit()`. Seluruh elemen absolut di kartu mobile wajib memiliki offset padding pada elemen flow yang berada di koordinat yang sama.
 
+### [LRN-060] Standarisasi Pengesahan TTE 2 Kolom & Integrasi QR SVG Resmi pada Berita Acara Penilaian DPL
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/lecturer/grade-sheet.blade.php`
+- **Problem / Symptom**: 
+  - Kotak QR verifikasi di tengah hanya berupa kotak abu-abu bertuliskan teks biasa `"QR VALIDASI RESMI DPL"`, bukan barcode QR Code SVG nyata yang bisa discan.
+  - Penamaan "QR VALIDASI RESMI DPL" berada di kolom tengah terpisah dari DPL yang berada di kolom kanan.
+  - Kolom TTE DPL menggunakan badge hijau neon font monospace bergaya tombol terminal (`[TERTANDATANGANI SECARA ELEKTRONIK]`).
+  - Kolom Pembimbing Lapangan hanya menampilkan teks miring abu-abu `[Telah Diverifikasi Sistem Dinas]`.
+- **Root Cause**: Desain awal Berita Acara Penilaian (BAP) menggunakan placeholder markup 3-kolom sementara tanpa menghubungkan helper `SimpleSoftwareIO\QrCode\Facades\QrCode` ke URL verifikasi sertifikat `/verify-certificate/{hash}`.
+- **Fix Applied**:
+  - Merefaktor tata letak pengesahan menjadi **Format 2 Kolom Standar Kampus & Instansi**:
+    * Kolom Kiri: Mengetahui Pembimbing Lapangan (Instansi) dengan badge resmi `Terverifikasi Sistem Lapangan` (ikon verifikasi perisai/centang) + nama & NIP.
+    * Kolom Kanan: Dosen Pembimbing Lapangan (DPL) lengkap dengan tempat & tanggal, render QR Code SVG asli (`route('verify.certificate', $placement->ensureCertificateHash())`), kode hash dokumen ID, badge `Ditandatangani Secara Elektronik (TTE)` + nama & NIDN/NIP DPL.
+  - Menambahkan catatan legalitas dokumen resmi di bagian bawah sesuai standar UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.
+- **Prevention Rule**: Dokumen cetak formal (BAP, Lembar Pengesahan, Sertifikat, Surat Balasan) dilarang menggunakan teks dummy di dalam kotak QR; selalu manfaatkan paket offline `SimpleSoftwareIO\QrCode\Facades\QrCode` untuk merender SVG matrix barcode yang valid ke endpoint verifikasi sistem.
+
+---
+
+### [LRN-060] Eliminasi Glitch Teks Tenggelam (Line-Clamp Overflow) pada Kartu Grid Instansi & Universitas
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/admin/agencies/index.blade.php`, `resources/views/admin/universities/index.blade.php`, `tests/Feature/AgencyCardTitleVisualTest.php`
+- **Problem / Symptom**: Pada halaman daftar instansi (`/admin/agencies`) dan universitas (`/admin/universities`), judul instansi dinas yang memiliki nama panjang (seperti *Badan Kepegawaian dan Pengembangan Sumber Daya Manusia* atau *Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan*) mengalami teks baris ketiga terpotong setengah (tenggelam / clipped text) di bagian bawah kotak judul.
+- **Root Cause**: Kombinasi kelas CSS `line-clamp-2` bersama `h-14` (56px) pada teks berukuran `text-[18px] leading-snug`. Di font 18px `leading-snug`, 2 baris teks menghabiskan ~49.5px, sehingga terdapat sisa ruang ~6.5px dalam container 56px. WebKit/Blink merender tanda ellipsis `...` di baris kedua, namun tetap merender potongan atas dari karakter baris ketiga pada sisa ruang 6.5px tersebut sehingga tampak "tenggelam". Selain itu, ukuran font 18px terlalu besar untuk nama dinas/perguruan tinggi yang rata-rata terdiri dari 6–10 kata.
+- **Fix Applied**: 
+  1. Menyesuaikan hierarki tipografi judul instansi dan kampus menjadi `text-[15px] sm:text-base font-bold text-slate-900 leading-snug`.
+  2. Meningkatkan kapasitas batas baris menjadi `line-clamp-3` dengan tinggi tetap `h-[4.25rem] mb-1.5` sehingga seluruh nama dinas (hingga 3 baris) dapat terbaca utuh tanpa terpotong sebagian.
+  3. Memperbaiki line-height pada deskripsi alamat menjadi `leading-normal h-8 text-[11px]` agar tidak memotong descender huruf bawah.
+  4. Menjalankan `npm run build` untuk meng-compile kelas utility Tailwind `line-clamp-3` dan `h-[4.25rem]` ke bundle CSS produksi (`public/build/assets/`).
+  5. Menambahkan unit/feature visual test `tests/Feature/AgencyCardTitleVisualTest.php` (PASS, Exit Code 0).
+- **Prevention Rule**: Jangan pernah memadukan `-webkit-line-clamp: N` dengan `height` container tetap yang lebih besar daripada `N * line-height`. Tinggi container judul kartu WAJIB pas secara matematis dengan kelipatan line-height batas baris untuk mencegah sisa celah pixel merender baris berikutnya secara cacat/tenggelam.
+
 ---
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
+
 
 
 ```markdown
