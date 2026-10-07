@@ -18,7 +18,7 @@
             <div class="flex items-center gap-4 lg:gap-8 shrink-0">
                 @php
                     $user = Auth::user();
-                    $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+                    $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
                     $isAdminDinas = $user && ($user->role === 'admin' && !is_null($user->agency_profile_id));
                     $isMahasiswa = $user && $user->role === 'mahasiswa';
                     $isDosen = $user && ($user->role === 'dosen' || $user->role === 'academic_advisor');
@@ -42,33 +42,18 @@
 
                     if ($user) {
                         if ($user->agency_profile_id && $user->agencyProfile) {
-                            $logoPath = $user->agencyProfile->logo ?? null;
-                            if ($logoPath && (file_exists(public_path('storage/' . $logoPath)) || file_exists(storage_path('app/public/' . $logoPath)))) {
-                                $navAvatarLogo = asset('storage/' . $logoPath);
-                            } elseif ($logoPath && file_exists(public_path($logoPath))) {
-                                $navAvatarLogo = asset($logoPath);
-                            } else {
-                                $navAvatarLogo = asset('images/default-agency.svg');
-                            }
+                            $navAvatarLogo = $user->agencyProfile->logo_url;
                         } elseif ($user->university_id || $isUniversitas || $isDosen || $isMahasiswa) {
                             $univObj = null;
                             if ($user->university_id) {
                                 $univObj = \App\Models\University::find($user->university_id);
                             }
-                            $uName = '';
                             if ($univObj) {
-                                if ($univObj->logo && (file_exists(public_path('storage/' . $univObj->logo)) || file_exists(storage_path('app/public/' . $univObj->logo)))) {
-                                    $navAvatarLogo = asset('storage/' . $univObj->logo);
-                                } elseif ($univObj->logo && file_exists(public_path($univObj->logo))) {
-                                    $navAvatarLogo = asset($univObj->logo);
-                                }
-                                $uName = strtolower($univObj->name ?? '');
+                                $navAvatarLogo = $univObj->logo_url;
                             }
                             if (!$navAvatarLogo) {
-                                if (empty($uName)) {
-                                    $rawUniv = $user->university ?? null;
-                                    $uName = strtolower(is_string($rawUniv) ? $rawUniv : ($user->studentProfile?->universitas ?? ''));
-                                }
+                                $rawUniv = $user->university ?? null;
+                                $uName = strtolower(is_string($rawUniv) ? $rawUniv : ($user->studentProfile?->universitas ?? ''));
                                 if (str_contains($uName, 'unesa') || str_contains($uName, 'negeri surabaya')) $navAvatarLogo = asset('images/logos/unesa.png');
                                 elseif (str_contains($uName, 'its') || str_contains($uName, 'sepuluh nopember')) $navAvatarLogo = asset('images/logos/its.png');
                                 elseif (str_contains($uName, 'unair') || str_contains($uName, 'airlangga')) $navAvatarLogo = asset('images/logos/unair.png');

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\FeedbackStatus;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
 use App\Models\SystemFeedback;
 use App\Models\SystemNotification;
 use App\Models\University;
 use App\Models\User;
+use App\Services\PrivateDocumentStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class FeedbackController extends Controller
 {
@@ -20,8 +23,8 @@ class FeedbackController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
-        $isAdminDinas = ($user->role === 'admin' && !is_null($user->agency_profile_id));
+        $isSuperAdmin = $user->isSuperAdmin();
+        $isAdminDinas = ($user->role === 'admin' && ! is_null($user->agency_profile_id));
         $isUniversitas = ($user->role === 'universitas');
 
         $query = SystemFeedback::with(['user', 'responder', 'targetAgency', 'targetUniversity'])->latest();
@@ -31,12 +34,12 @@ class FeedbackController extends Controller
         } elseif ($isAdminDinas) {
             $query->where(function ($q) use ($user) {
                 $q->where('target_agency_id', $user->agency_profile_id)
-                  ->orWhere('user_id', $user->id);
+                    ->orWhere('user_id', $user->id);
             });
         } elseif ($isUniversitas) {
             $query->where(function ($q) use ($user) {
                 $q->where('target_university_id', $user->university_id)
-                  ->orWhere('user_id', $user->id);
+                    ->orWhere('user_id', $user->id);
             });
         } else {
             // Regular user only sees their own
@@ -54,9 +57,9 @@ class FeedbackController extends Controller
             $search = strtolower($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('subject', 'like', "%{$search}%")
-                  ->orWhere('message', 'like', "%{$search}%")
-                  ->orWhere('sender_name', 'like', "%{$search}%")
-                  ->orWhere('sender_email', 'like', "%{$search}%");
+                    ->orWhere('message', 'like', "%{$search}%")
+                    ->orWhere('sender_name', 'like', "%{$search}%")
+                    ->orWhere('sender_email', 'like', "%{$search}%");
             });
         }
 
@@ -105,8 +108,9 @@ class FeedbackController extends Controller
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9\._-]/', '', $file->getClientOriginalName());
-            $attachmentPath = $file->storeAs('attachments/feedbacks', $fileName, 'public');
+            $fileName = time().'_'.preg_replace('/[^A-Za-z0-9\._-]/', '', $file->getClientOriginalName());
+            // Disk privat: lampiran (screenshot/dokumen) bisa berisi data pribadi
+            $attachmentPath = $file->storeAs(PrivateDocumentStorage::FEEDBACK_DIR, $fileName, PrivateDocumentStorage::DISK);
         }
 
         $feedback = SystemFeedback::create([
@@ -132,7 +136,7 @@ class FeedbackController extends Controller
         ]);
 
         // Send Notification to Super Admin
-        $catLabel = match($feedback->category) {
+        $catLabel = match ($feedback->category) {
             'error_bug' => 'Kendala / Bug Sistem',
             'saran_fitur' => 'Saran Fitur',
             'pertanyaan' => 'Pertanyaan MBKM',
@@ -141,7 +145,7 @@ class FeedbackController extends Controller
 
         SystemNotification::send(
             title: "Masukan Baru: [{$catLabel}] {$feedback->subject}",
-            message: "Dari {$feedback->sender_name} (" . strtoupper($feedback->sender_role) . "): " . \Illuminate\Support\Str::limit($feedback->message, 80),
+            message: "Dari {$feedback->sender_name} (".strtoupper($feedback->sender_role).'): '.Str::limit($feedback->message, 80),
             userId: null,
             targetRole: 'super_admin',
             actionUrl: route('admin.feedbacks.show', $feedback->id),
@@ -156,29 +160,41 @@ class FeedbackController extends Controller
     }
 
     /**
+     * Hak akses tiket (dipakai halaman detail & unduhan lampiran): Super Admin, pengirim,
+     * Admin Dinas tujuan, atau Admin Kampus tujuan.
+     */
+    public static function canAccess(?User $user, SystemFeedback $feedback): bool
+    {
+        if (! $user) {
+            return false;
+        }
+        if ($user->isSuperAdmin() || (int) $feedback->user_id === (int) $user->id) {
+            return true;
+        }
+        if ($user->role === 'admin' && $user->agency_profile_id !== null) {
+            return (int) $feedback->target_agency_id === (int) $user->agency_profile_id;
+        }
+        if ($user->role === 'universitas') {
+            return $user->university_id !== null && (int) $feedback->target_university_id === (int) $user->university_id;
+        }
+
+        return false;
+    }
+
+    /**
      * Show detail of a feedback item and allow admin response
      */
     public function show($id)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
-        $isAdminDinas = ($user->role === 'admin' && !is_null($user->agency_profile_id));
+        $isSuperAdmin = $user->isSuperAdmin();
+        $isAdminDinas = ($user->role === 'admin' && ! is_null($user->agency_profile_id));
         $isUniversitas = ($user->role === 'universitas');
 
         $feedback = SystemFeedback::with(['user', 'responder', 'targetAgency', 'targetUniversity'])->findOrFail($id);
 
         // Security check
-        if (!$isSuperAdmin) {
-            if ($isAdminDinas && $feedback->target_agency_id !== $user->agency_profile_id && $feedback->user_id !== $user->id) {
-                abort(403, 'Anda tidak memiliki akses ke tiket masukan ini.');
-            }
-            if ($isUniversitas && $feedback->target_university_id !== $user->university_id && $feedback->user_id !== $user->id) {
-                abort(403, 'Anda tidak memiliki akses ke tiket masukan ini.');
-            }
-            if (!$isAdminDinas && !$isUniversitas && $feedback->user_id !== $user->id) {
-                abort(403, 'Anda tidak memiliki akses ke tiket masukan ini.');
-            }
-        }
+        abort_unless(self::canAccess($user, $feedback), 403, 'Anda tidak memiliki akses ke tiket masukan ini.');
 
         return view('feedbacks.show', compact('feedback', 'isSuperAdmin', 'isAdminDinas', 'isUniversitas'));
     }
@@ -191,7 +207,7 @@ class FeedbackController extends Controller
         $feedback = SystemFeedback::findOrFail($id);
 
         $request->validate([
-            'status' => ['required', \Illuminate\Validation\Rule::in(\App\Enums\FeedbackStatus::values())],
+            'status' => ['required', Rule::in(FeedbackStatus::values())],
             'admin_response' => 'required|string|max:5000',
         ]);
 
@@ -213,7 +229,7 @@ class FeedbackController extends Controller
         if ($feedback->user_id) {
             SystemNotification::send(
                 title: "Tanggapan Masukan: {$feedback->subject}",
-                message: "Pengelola telah menanggapi masukan Anda (Status: " . strtoupper($feedback->status) . "): \"" . \Illuminate\Support\Str::limit($feedback->admin_response, 80) . "\"",
+                message: 'Pengelola telah menanggapi masukan Anda (Status: '.strtoupper($feedback->status).'): "'.Str::limit($feedback->admin_response, 80).'"',
                 userId: $feedback->user_id,
                 targetRole: null,
                 actionUrl: route('feedbacks.show', $feedback->id),

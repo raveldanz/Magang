@@ -4,7 +4,7 @@
     <template x-if="active">
         <div class="flex flex-col min-h-0 h-full">
             <div class="h-16 px-4 flex items-center justify-between gap-2 border-b border-slate-100 shrink-0">
-                <p class="text-sm font-extrabold text-slate-900" x-text="isGroupChat ? 'Info Grup' : 'Info Kontak'"></p>
+                <p class="text-sm font-extrabold text-slate-900" x-text="isChannelChat ? 'Info Saluran' : (isGroupChat ? 'Info Grup' : 'Info Kontak')"></p>
                 <button type="button" @click="infoOpen = false" class="w-9 h-9 rounded-xl text-slate-500 hover:bg-slate-100 flex items-center justify-center" aria-label="Tutup info">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -12,15 +12,32 @@
 
             <div x-ref="infoScroll" class="flex-1 overflow-y-auto min-h-0 p-4 space-y-5 scrollbar-thin">
                 <div class="text-center space-y-2">
-                    <span class="mx-auto w-20 h-20 rounded-full text-white text-2xl font-bold flex items-center justify-center" :style="{ backgroundColor: active.avatar.color }">
-                        <template x-if="active.avatar.group">
-                            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        </template>
-                        <template x-if="!active.avatar.group"><span x-text="active.avatar.initials"></span></template>
-                    </span>
-                    <p class="text-base font-extrabold text-slate-900 break-words" x-text="active.title"></p>
-                    <p class="text-xs text-slate-500" x-text="isGroupChat ? `${active.member_count} anggota` : active.subtitle"></p>
-                    <template x-if="active.stage_badge">
+                    <template x-if="isChannelChat">
+                        <div class="mx-auto w-20 h-20 rounded-2xl border border-slate-200/90 bg-white p-2 flex items-center justify-center shadow-xs">
+                            <template x-if="active.avatar && (active.avatar.logo_url || active.avatar.url)">
+                                <img :src="active.avatar.logo_url || active.avatar.url" :alt="active.title" class="w-full h-full object-contain">
+                            </template>
+                            <template x-if="!active.avatar || (!active.avatar.logo_url && !active.avatar.url)">
+                                <span class="text-2xl font-bold text-blue-700" x-text="active.avatar ? active.avatar.initials : 'P'"></span>
+                            </template>
+                        </div>
+                    </template>
+                    <template x-if="!isChannelChat">
+                        <span class="mx-auto w-20 h-20 rounded-full text-white text-2xl font-bold flex items-center justify-center" :style="{ backgroundColor: active.avatar.color }">
+                            <template x-if="active.avatar.group">
+                                <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </template>
+                            <template x-if="!active.avatar.group"><span x-text="active.avatar.initials"></span></template>
+                        </span>
+                    </template>
+                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                        <p class="text-base font-extrabold text-slate-900 break-words" x-text="active.title"></p>
+                        <span x-show="active.scope_badge" class="px-2 py-0.5 rounded text-[11px] font-bold"
+                              :class="active.scope_badge === 'Pemkot' ? 'bg-amber-50 text-amber-800 border border-amber-200' : (active.scope_badge === 'Dinas' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200')"
+                              x-text="`[${active.scope_badge}]`"></span>
+                    </div>
+                    <p class="text-xs text-slate-500" x-text="isChannelChat ? 'Saluran Pengumuman Resmi' : (isGroupChat ? `${active.member_count} anggota` : active.subtitle)"></p>
+                    <template x-if="active.stage_badge && !isChannelChat">
                         <div class="pt-1">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
                                   :class="{
@@ -44,9 +61,14 @@
                         </div>
                     </template>
                     <p x-show="active.description" class="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-xl p-2.5 text-left whitespace-pre-line" x-text="active.description"></p>
-                    <template x-if="active.type === 'placement'">
-                        <p class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-left">
-                            Grup Bimbingan dibuat otomatis untuk mahasiswa, mentor lapangan, dan DPL. Anggotanya mengikuti data penempatan.
+                    <template x-if="isChannelChat">
+                        <p class="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-xl p-2.5 text-left leading-relaxed">
+                            Saluran ini diperuntukkan untuk siaran pengumuman resmi. Semua anggota dapat mengajukan tanggapan melalui utas komentar.
+                        </p>
+                    </template>
+                    <template x-if="active.scope_type === 'mentor_guidance' || active.scope_type === 'dpl_guidance' || active.type === 'placement'">
+                        <p class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-left leading-relaxed">
+                            Grup bimbingan ini dibuat dan dikelola secara otomatis oleh sistem untuk mempermudah koordinasi mahasiswa bimbingan aktif dengan pembimbing.
                         </p>
                     </template>
                     <a x-show="active.placement_url" :href="active.placement_url" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800">

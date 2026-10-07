@@ -9,6 +9,14 @@ class AgencyProfile extends Model
     protected $guarded = ['id'];
 
     /**
+     * Alias atribut name ke agency_name agar seragam dengan antarmuka komponen.
+     */
+    public function getNameAttribute(): string
+    {
+        return (string) ($this->attributes['agency_name'] ?? '');
+    }
+
+    /**
      * URL logo instansi yang benar-benar ada.
      * Logo bisa tersimpan di public/ (mis. "images/logos/diskominfo.png") atau di disk public
      * (storage/app/public, diakses lewat /storage/...). Fallback ke logo default.
@@ -21,8 +29,8 @@ class AgencyProfile extends Model
             if (is_file(public_path($logo))) {
                 return asset($logo);
             }
-            if (is_file(public_path('storage/' . $logo)) || is_file(storage_path('app/public/' . $logo))) {
-                return asset('storage/' . $logo);
+            if (is_file(public_path('storage/'.$logo)) || is_file(storage_path('app/public/'.$logo))) {
+                return asset('storage/'.$logo);
             }
         }
 
@@ -49,23 +57,21 @@ class AgencyProfile extends Model
         return $this->hasMany(User::class, 'agency_profile_id')->where('role', 'admin');
     }
 
-public function getRemainingQuotaAttribute()
-{
-    // Hitung total kapasitas seluruh unit kerja
-    $totalQuota = $this->units->sum('quota');
+    public function getRemainingQuotaAttribute()
+    {
+        // Hitung total kapasitas seluruh unit kerja
+        $totalQuota = $this->units->sum('quota');
 
-    // Hitung total mahasiswa yang diterima/aktif di bawah dinas ini saat ini
-    $today = date('Y-m-d');
-    $filledQuota = \App\Models\Application::whereHas('unit', function ($query) {
-        $query->where('agency_profile_id', $this->id);
-    })->whereIn('status', ['accepted', 'active'])
-      ->where(function ($q) use ($today) {
-          $q->whereNull('end_date')
-            ->orWhere('end_date', '>=', $today);
-      })->count();
+        // Hitung total mahasiswa yang diterima/aktif di bawah dinas ini saat ini
+        $today = date('Y-m-d');
+        $filledQuota = Application::whereHas('unit', function ($query) {
+            $query->where('agency_profile_id', $this->id);
+        })->whereIn('status', ['accepted', 'active'])
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $today);
+            })->count();
 
-    return max(0, $totalQuota - $filledQuota);
+        return max(0, $totalQuota - $filledQuota);
+    }
 }
-
-}
-

@@ -46,7 +46,7 @@ class ChatMessageActionsTest extends ChatTestCase
         $this->assertNull(ChatMessage::findOrFail($messageId)->body);
 
         $this->actingAs($this->mentorX)
-            ->getJson(route('chat.api.messages.index', $id) . '?after=' . $messageId . '&since=' . urlencode($since))
+            ->getJson(route('chat.api.messages.index', $id).'?after='.$messageId.'&since='.urlencode($since))
             ->assertJsonPath('changed.0.id', $messageId)
             ->assertJsonPath('changed.0.deleted', true);
 

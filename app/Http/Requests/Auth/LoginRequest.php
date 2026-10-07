@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Http\Middleware\EnsureAccountIsActive;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -57,7 +58,7 @@ class LoginRequest extends FormRequest
             Auth::logout();
 
             throw ValidationException::withMessages([
-                'email' => \App\Http\Middleware\EnsureAccountIsActive::MESSAGE,
+                'email' => EnsureAccountIsActive::MESSAGE,
             ]);
         }
     }

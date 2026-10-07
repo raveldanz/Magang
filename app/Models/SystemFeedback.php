@@ -67,7 +67,7 @@ class SystemFeedback extends Model
     {
         return $query->where(function ($q) {
             $q->where('target_role', 'super_admin')
-              ->orWhereNull('target_role');
+                ->orWhereNull('target_role');
         });
     }
 
@@ -75,7 +75,7 @@ class SystemFeedback extends Model
     {
         return $query->where(function ($q) use ($agencyId) {
             $q->where('target_role', 'admin_dinas')
-              ->where('target_agency_id', $agencyId);
+                ->where('target_agency_id', $agencyId);
         });
     }
 
@@ -83,7 +83,7 @@ class SystemFeedback extends Model
     {
         return $query->where(function ($q) use ($universityId) {
             $q->where('target_role', 'universitas')
-              ->where('target_university_id', $universityId);
+                ->where('target_university_id', $universityId);
         });
     }
 }

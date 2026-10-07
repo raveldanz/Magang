@@ -13,6 +13,14 @@ class StudentProfile extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * URL foto profil lewat route terotorisasi (foto disimpan di disk privat).
+     */
+    public function getPhotoUrlAttribute(): ?string
+    {
+        return ! empty($this->attributes['photo'] ?? null) ? route('student.photo', $this->user_id) : null;
+    }
+
     public function university()
     {
         return $this->belongsTo(University::class);

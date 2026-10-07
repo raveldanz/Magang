@@ -196,7 +196,7 @@
                         <tbody class="divide-y divide-gray-100">
                             @forelse($users as $u)
                                 @php
-                                    $isSuperAdminUser = ($u->role === 'super_admin' || ($u->role === 'admin' && is_null($u->agency_profile_id)));
+                                    $isSuperAdminUser = $u->isSuperAdmin();
                                     $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition" :class="isSelected({{ $u->id }}) ? 'bg-blue-50/40' : ''">
@@ -367,7 +367,7 @@
                     <div class="divide-y divide-gray-100">
                         @forelse($users as $u)
                             @php
-                                $isSuperAdminUser = ($u->role === 'super_admin' || ($u->role === 'admin' && is_null($u->agency_profile_id)));
+                                $isSuperAdminUser = $u->isSuperAdmin();
                                 $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
                             @endphp
                             <div class="p-4 space-y-3 transition" :class="isSelected({{ $u->id }}) ? 'bg-blue-50/50' : 'hover:bg-slate-50/50'">
@@ -531,48 +531,44 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
              x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-             class="fixed bottom-4 sm:bottom-6 inset-x-0 z-40 max-w-2xl mx-auto px-3 sm:px-4 pointer-events-none"
-             x-cloak>
-            <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3.5 w-full">
-                
-                <!-- Info Terpilih -->
-                <div class="flex items-center justify-between w-full sm:w-auto gap-3">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0" x-text="selectedCount"></span>
-                        <div>
-                            <div class="text-xs font-black text-white tracking-wide">
-                                <span x-text="selectedCount"></span> Akun Dipilih
-                            </div>
-                            <button type="button" @click="clearSelection()" class="text-[11px] text-slate-400 hover:text-slate-200 underline transition cursor-pointer">
-                                Batalkan Pilihan
-                            </button>
-                        </div>
-                    </div>
+             class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] bg-slate-900/95 backdrop-blur-md text-white border border-slate-700/60 shadow-2xl rounded-2xl px-5 py-3 flex items-center justify-between w-max max-w-full gap-4 sm:gap-6"
+             x-cloak style="display: none;">
+            
+            <!-- Left: Info & Cancel -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center justify-center bg-blue-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full" x-text="selectedCount"></span>
+                    <span class="text-sm font-medium text-slate-200 hidden sm:inline">akun dipilih</span>
                 </div>
+                <button type="button" @click="clearSelection()" class="text-xs text-slate-400 hover:text-white underline transition">
+                    Batal
+                </button>
+            </div>
+            
+            <!-- Divider -->
+            <div class="h-6 w-px bg-slate-700 hidden sm:block"></div>
 
-                <!-- Tombol Aksi Massal -->
-                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <!-- Reset Massal Button -->
-                    <button type="button" 
-                            @click="openBulkResetModal()" 
-                            class="flex-1 sm:flex-none px-3 sm:px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                        </svg>
-                        <span>Reset Massal</span>
-                    </button>
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-2">
+                <!-- Reset Massal Button -->
+                <button type="button" 
+                        @click="openBulkResetModal()" 
+                        class="bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm inline-flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <span>Reset</span>
+                </button>
 
-                    <!-- Hapus Massal Button -->
-                    <button type="button" 
-                            @click="openBulkDeleteModal()" 
-                            class="flex-1 sm:flex-none px-3 sm:px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span>Hapus Massal</span>
-                    </button>
-                </div>
-
+                <!-- Hapus Massal Button -->
+                <button type="button" 
+                        @click="openBulkDeleteModal()" 
+                        class="bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm inline-flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>Hapus</span>
+                </button>
             </div>
         </div>
 
@@ -636,7 +632,7 @@
                 pageUsers: [
                     @foreach($users as $u)
                         @php
-                            $isSuperAdminUser = ($u->role === 'super_admin' || ($u->role === 'admin' && is_null($u->agency_profile_id)));
+                            $isSuperAdminUser = $u->isSuperAdmin();
                             $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
                         @endphp
                         {

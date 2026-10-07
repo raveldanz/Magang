@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class AdminWorkflowSeeder extends Seeder
 {
@@ -24,8 +23,9 @@ class AdminWorkflowSeeder extends Seeder
      */
     public function run(): void
     {
-        if (!app()->environment(['local', 'testing', 'development'])) {
+        if (! app()->environment(['local', 'testing', 'development'])) {
             $this->command?->warn('AdminWorkflowSeeder dilewati karena bukan environment local/testing/development.');
+
             return;
         }
 
@@ -33,9 +33,9 @@ class AdminWorkflowSeeder extends Seeder
             $defaultPassword = Hash::make('password');
 
             // 1. Pastikan Instansi Dinas QA / Target Tersedia
-            $agency = AgencyProfile::where('agency_name', 'like', '%Komunikasi%')->first() 
+            $agency = AgencyProfile::where('agency_name', 'like', '%Komunikasi%')->first()
                 ?? AgencyProfile::first();
-            if (!$agency) {
+            if (! $agency) {
                 $agency = AgencyProfile::create([
                     'government_name' => 'Pemerintah Kota Surabaya',
                     'agency_name' => 'Dinas Komunikasi dan Informatika',

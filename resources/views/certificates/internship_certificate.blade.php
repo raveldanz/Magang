@@ -140,28 +140,11 @@
     </p>
 
     @php
-        // 1. Logo Dinas Instansi Tempat Mahasiswa Magang
-        $agencyLogo = $agencyProfile->logo ?? null;
-        if (!$agencyLogo && $agencyProfile && $agencyProfile->agency_name) {
-            $aName = strtolower($agencyProfile->agency_name);
-            if (str_contains($aName, 'kominfo') || str_contains($aName, 'komunikasi')) $agencyLogo = 'images/logos/diskominfo.png';
-            elseif (str_contains($aName, 'penduduk') || str_contains($aName, 'dukcapil')) $agencyLogo = 'images/logos/dispendukcapil.png';
-            elseif (str_contains($aName, 'pustaka') || str_contains($aName, 'pusip')) $agencyLogo = 'images/logos/dispusip.png';
-        }
-        if (!$agencyLogo || !file_exists(public_path($agencyLogo))) {
-            $agencyLogo = 'images/logos/diskominfo.png';
-        }
+        // 1. Logo Dinas Instansi Tempat Mahasiswa Magang (Gunakan Accessor Terpusat)
+        $agencyLogoUrl = $agencyProfile?->logo_url ?? asset('images/logos/surabaya.png');
 
-        // 2. Logo Universitas Mahasiswa
-        $univLogo = $university->logo ?? null;
-        if (!$univLogo && $profile && $profile->universitas) {
-            $uName = strtolower($profile->universitas);
-            if (str_contains($uName, 'unesa')) $univLogo = 'images/logos/unesa.png';
-            elseif (str_contains($uName, 'its')) $univLogo = 'images/logos/its.png';
-            elseif (str_contains($uName, 'unair')) $univLogo = 'images/logos/unair.png';
-            elseif (str_contains($uName, 'upn')) $univLogo = 'images/logos/upnjatim.png';
-            elseif (str_contains($uName, 'unitomo') || str_contains($uName, 'soetomo')) $univLogo = 'images/logos/unitomo.png';
-        }
+        // 2. Logo Universitas Mahasiswa (Gunakan Accessor Terpusat)
+        $univLogoUrl = $university?->logo_url ?? ($profile?->user?->universityRelation?->logo_url ?? asset('images/default-university.svg'));
 
         // 3. Simple Grade (e.g. "A")
         $simpleGrade = $eval->grade_calculated ?? ($eval->grade ?? 'A');
@@ -179,7 +162,7 @@
 
         <!-- Watermark Lambang Dinas Samar di Tengah -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04]">
-            <img src="{{ asset($agencyLogo) }}" alt="Watermark" class="w-[360px] object-contain">
+            <img src="{{ $agencyLogoUrl }}" alt="Watermark" class="w-[360px] object-contain">
         </div>
 
         <!-- 1. KOP RESMI DINAS INSTANSI MAGANG & UNIVERSITAS (Bagian Atas) -->
@@ -188,7 +171,7 @@
                 
                 <!-- Logo Dinas Instansi Tempat Magang (Kiri) -->
                 <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                    <img src="{{ asset($agencyLogo) }}" 
+                    <img src="{{ $agencyLogoUrl }}" 
                          alt="{{ $agencyProfile->agency_name ?? 'Logo Dinas' }}" 
                          class="max-h-16 max-w-full object-contain"
                          style="height: 58px; width: auto;">
@@ -209,13 +192,7 @@
 
                 <!-- Logo Universitas Mitra (Kanan) -->
                 <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                    @if($univLogo && file_exists(public_path($univLogo)))
-                        <img src="{{ asset($univLogo) }}" alt="{{ $profile->universitas ?? 'Logo Kampus' }}" class="max-h-16 max-w-full object-contain" style="height: 56px; width: auto;">
-                    @else
-                        <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                        </div>
-                    @endif
+                    <img src="{{ $univLogoUrl }}" alt="{{ $profile->universitas ?? 'Logo Kampus' }}" class="max-h-16 max-w-full object-contain" style="height: 56px; width: auto;">
                 </div>
 
             </div>
@@ -304,9 +281,9 @@
                 <div class="p-1 bg-white border border-slate-300 rounded-md">
                     @if (!empty($qrSvg))
                         <div class="w-[68px] h-[68px] flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi Sertifikat">{!! $qrSvg !!}</div>
-                    @elseif (!empty($qrVerifyUrl))
-                        {{-- $qrVerifyUrl sudah berupa URL gambar QR yang berisi link verifikasi --}}
-                        <img src="{{ $qrVerifyUrl }}" alt="QR Verifikasi Sertifikat" class="w-[68px] h-[68px] object-contain">
+                    @else
+                        {{-- QR lokal tidak tersedia: verifikasi tetap bisa lewat tautan & kode di bawah --}}
+                        <div class="w-[68px] h-[68px] flex items-center justify-center text-[7px] text-slate-500 text-center leading-tight">QR tidak tersedia</div>
                     @endif
                 </div>
                 <p class="text-[8px] text-slate-500 mt-1 leading-snug">
@@ -357,7 +334,7 @@
             <!-- 1. HEADER TRANSKRIP NILAI DENGAN LOGO DINAS -->
             <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2.5">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset($agencyLogo) }}" 
+                    <img src="{{ $agencyLogoUrl }}" 
                          alt="{{ $agencyProfile->agency_name ?? 'Logo Dinas' }}" 
                          class="w-11 h-11 object-contain">
                     <div>

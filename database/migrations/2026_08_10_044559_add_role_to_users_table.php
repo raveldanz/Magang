@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->enum('role', ['mahasiswa', 'admin', 'unit', 'pembimbing', 'mentor', 'dosen', 'academic_advisor', 'universitas'])
-                  ->default('mahasiswa')
-                  ->after('email');
+                ->default('mahasiswa')
+                ->after('email');
             $table->string('university')->nullable()->after('agency_profile_id');
         });
     }

@@ -8,7 +8,7 @@
     <div class="py-5 sm:py-8 lg:py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6"
              x-data="{
-                photoPreview: '{{ ($profile?->photo ?? $user?->studentProfile?->photo ?? $user?->photo) ? asset('storage/' . ($profile?->photo ?? $user?->studentProfile?->photo ?? $user?->photo)) : '' }}',
+                photoPreview: '{{ ($profile?->photo ?? $user?->studentProfile?->photo) ? route('student.photo', $user->id) . '?v=' . substr(md5((string) ($profile?->photo ?? $user?->studentProfile?->photo)), 0, 8) : '' }}',
                 photoName: '',
                 showModal: false,
                 handlePhotoChange(e) {
@@ -182,38 +182,52 @@
                                     <span>Data Perguruan Tinggi & Akademik</span>
                                 </h4>
 
-                                <!-- Input Universitas Datalist -->
+                                <!-- Pilihan Universitas (Searchable Combobox + Opsi Kampus Belum Terdaftar) -->
+                                @php
+                                    $selectedUniversity = old('university_id', $currentUniversityId ?? '');
+                                    $currentUniv = $universities->firstWhere('id', (int) $selectedUniversity);
+                                @endphp
                                 <div>
-                                    <x-input-label for="universitas" value="Universitas / Perguruan Tinggi" class="text-xs font-bold uppercase tracking-wider" />
-                                    <div class="relative mt-1">
-                                        <x-text-input 
-                                            id="universitas" 
-                                            name="universitas" 
-                                            list="universities_list" 
-                                            type="text" 
-                                            class="block w-full text-xs sm:text-sm pr-10" 
-                                            :value="old('universitas', $profile?->universitas ?? Auth::user()?->university ?? $user?->university ?? '')" 
-                                            placeholder="Ketik atau pilih nama perguruan tinggi..." 
-                                            required 
-                                            autocomplete="off" />
-                                        
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                            </svg>
+                                    <x-searchable-select 
+                                        name="university_id" 
+                                        :items="$universities" 
+                                        :selected="$selectedUniversity" 
+                                        :allow-custom="true" 
+                                        custom-name="custom_university_name" 
+                                        label="Asal Perguruan Tinggi / Universitas" 
+                                        placeholder="-- Cari atau Pilih Asal Perguruan Tinggi --"
+                                        :required="true"
+                                    />
+                                    <x-input-error :messages="$errors->get('university_id')" class="mt-1" />
+                                    <x-input-error :messages="$errors->get('custom_university_name')" class="mt-1" />
+
+                                    {{-- Saran kampus serupa dari server (cegah kampus dobel) --}}
+                                    @if (session('university_suggestions'))
+                                        <div class="mt-2 p-3 rounded-xl bg-blue-50 border border-blue-200 space-y-2">
+                                            <p class="text-[11px] font-bold text-blue-900">Apakah maksud Anda salah satu kampus ini? Klik untuk memakai &amp; menyimpan:</p>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                @foreach (session('university_suggestions') as $suggestion)
+                                                    <button type="submit" name="university_id" value="{{ $suggestion['id'] }}"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-blue-200 text-[11px] font-semibold text-blue-800 hover:bg-blue-100 transition">
+                                                        {{ $suggestion['name'] }}@if (!empty($suggestion['acronym'])) <span class="text-blue-500">({{ $suggestion['acronym'] }})</span>@endif
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                            <label class="flex items-start gap-2 text-[11px] text-slate-700">
+                                                <input type="checkbox" name="confirm_new_university" value="1" class="mt-0.5 rounded border-slate-300 text-amber-600 focus:ring-amber-500">
+                                                <span>Bukan, kampus saya <strong>berbeda</strong> — tetap daftarkan "{{ old('custom_university_name') }}" sebagai kampus baru (akan diverifikasi Admin).</span>
+                                            </label>
                                         </div>
-                                    </div>
+                                    @endif
 
-                                    <datalist id="universities_list">
-                                        @foreach ($universities as $univ)
-                                            <option value="{{ $univ->name }}">{{ $univ->code ? '(' . $univ->code . ')' : '' }}</option>
-                                        @endforeach
-                                    </datalist>
-
-                                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
-                                        <span>Pilih universitas dari daftar yang tersedia, atau ketik nama universitas baru jika belum terdaftar.</span>
-                                    </p>
-                                    <x-input-error :messages="$errors->get('universitas')" class="mt-1" />
+                                    @if ($currentUniv && !$currentUniv->is_verified)
+                                        <p class="text-[11px] text-amber-700 mt-1.5 flex items-center gap-1 font-medium">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span>Perguruan tinggi Anda sedang dalam status <strong>{{ \App\Models\University::LABEL_PENDING_VERIFICATION }}</strong> oleh Admin. Anda tetap dapat melanjutkan pengajuan magang.</span>
+                                        </p>
+                                    @endif
                                 </div>
 
                                 <!-- Grid Fakultas, Jurusan, Semester -->

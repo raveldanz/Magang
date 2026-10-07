@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('system_feedbacks')) {
+        if (! Schema::hasTable('system_feedbacks')) {
             Schema::create('system_feedbacks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -34,7 +34,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('system_notifications')) {
+        if (! Schema::hasTable('system_notifications')) {
             Schema::create('system_notifications', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();

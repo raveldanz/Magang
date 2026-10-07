@@ -23,11 +23,11 @@ class EnsureAccountIsActive
         // Super Admin yang sedang "Login As" tetap boleh memeriksa akun nonaktif
         $isImpersonating = $request->hasSession() && $request->session()->has('impersonator_id');
 
-        if (!$user || !$user->isInactive() || $isImpersonating) {
+        if (! $user || ! $user->isInactive() || $isImpersonating) {
             return $next($request);
         }
 
-        if ($request->is('api/*') || !$request->hasSession()) {
+        if ($request->is('api/*') || ! $request->hasSession()) {
             $token = $user->currentAccessToken();
             if ($token && method_exists($token, 'delete')) {
                 $token->delete();

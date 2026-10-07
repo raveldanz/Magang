@@ -5,6 +5,7 @@ namespace Tests\Feature\Chat;
 use App\Models\ChatConversation;
 use App\Models\ChatParticipant;
 use App\Models\SystemNotification;
+use Illuminate\Support\Facades\Schema;
 
 class ChatMessagingTest extends ChatTestCase
 {
@@ -44,7 +45,7 @@ class ChatMessagingTest extends ChatTestCase
             ->assertJsonPath('unread_total', 1);
 
         $messages = $this->actingAs($this->mentorX)
-            ->getJson(route('chat.api.messages.index', $conversationId) . '?detail=1')
+            ->getJson(route('chat.api.messages.index', $conversationId).'?detail=1')
             ->assertOk()
             ->assertJsonPath('messages.0.is_mine', false)
             ->assertJsonPath('conversation.contact.name', $this->studentA->name)
@@ -59,7 +60,7 @@ class ChatMessagingTest extends ChatTestCase
         // Mahasiswa melihat pesannya sudah dibaca (✓✓)
         $this->actingAs($this->studentA)
             ->getJson(route('chat.api.messages.index', $conversationId))
-            ->assertJsonPath('state.read_state.' . $this->mentorX->id, $messages[0]['id']);
+            ->assertJsonPath('state.read_state.'.$this->mentorX->id, $messages[0]['id']);
 
         $this->assertTrue($this->conversationItem($this->studentA, $conversationId)['last_message']['is_mine']);
     }
@@ -71,12 +72,12 @@ class ChatMessagingTest extends ChatTestCase
         $this->sendMessage($this->dosenA, $conversationId, ['body' => 'Balasan dosen'])->assertCreated();
 
         $this->actingAs($this->studentA)
-            ->getJson(route('chat.api.messages.index', $conversationId) . '?after=' . $firstId)
+            ->getJson(route('chat.api.messages.index', $conversationId).'?after='.$firstId)
             ->assertJsonCount(1, 'messages')
             ->assertJsonPath('messages.0.body', 'Balasan dosen');
 
         $summary = $this->actingAs($this->studentA)
-            ->getJson(route('chat.api.summary') . '?after=' . $firstId)
+            ->getJson(route('chat.api.summary').'?after='.$firstId)
             ->assertJsonPath('unread_total', 1)
             ->json();
         $this->assertSame('Balasan dosen', $summary['messages'][0]['preview']);
@@ -139,7 +140,7 @@ class ChatMessagingTest extends ChatTestCase
         $notifications = SystemNotification::where('category', 'chat')->get();
         $this->assertCount(1, $notifications, 'Lonceng harus menggabungkan pesan per percakapan.');
         $this->assertSame($this->mentorX->id, $notifications[0]->user_id);
-        $this->assertSame('/chat/' . $conversationId, $notifications[0]->action_url);
+        $this->assertSame('/chat/'.$conversationId, $notifications[0]->action_url);
         $this->assertSame("2 pesan baru dari {$this->studentA->name}", $notifications[0]->title);
         $this->assertSame('Pesan dua', $notifications[0]->message);
         $this->assertNull($notifications[0]->read_at);
@@ -167,10 +168,10 @@ class ChatMessagingTest extends ChatTestCase
     public function test_pages_still_render_when_chat_migration_has_not_run(): void
     {
         // Simulasi: kode terbaru ditarik tapi `php artisan migrate` belum dijalankan
-        \Illuminate\Support\Facades\Schema::dropIfExists('chat_attachments');
-        \Illuminate\Support\Facades\Schema::dropIfExists('chat_messages');
-        \Illuminate\Support\Facades\Schema::dropIfExists('chat_participants');
-        \Illuminate\Support\Facades\Schema::dropIfExists('chat_conversations');
+        Schema::dropIfExists('chat_attachments');
+        Schema::dropIfExists('chat_messages');
+        Schema::dropIfExists('chat_participants');
+        Schema::dropIfExists('chat_conversations');
 
         $this->actingAs($this->mentorX)->get(route('profile.edit'))
             ->assertOk()

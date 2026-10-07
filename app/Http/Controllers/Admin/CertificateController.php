@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
-use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
 {
@@ -18,12 +14,14 @@ class CertificateController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Sinkronisasi otomatis mahasiswa yang sudah ACC laporan & tuntas evaluasi agar statusnya lulus (completed)
+        // 1. Sinkronisasi otomatis mahasiswa yang sudah ACC laporan, tuntas evaluasi, dan terisi logbook agar statusnya lulus (completed)
         $candidates = Placement::whereHas('application', function ($q) {
             $q->whereIn('status', ['accepted', 'active']);
         })->whereHas('finalreport', function ($subQuery) {
             $subQuery->where('status', 'approved');
-        })->whereHas('evaluation')->get();
+        })->whereHas('evaluation')
+            ->whereHas('logbooks')
+            ->get();
 
         foreach ($candidates as $cand) {
             $cand->syncCompletionStatus();
@@ -31,18 +29,19 @@ class CertificateController extends Controller
 
         // 2. Ambil aplikasi yang sudah berstatus completed dan siap cetak sertifikat
         $query = Application::with([
-            'user.studentProfile', 
-            'unit.agencyProfile', 
-            'placement.evaluation', 
-            'placement.finalreport', 
-            'placement.pembimbing'
+            'user.studentProfile',
+            'unit.agencyProfile',
+            'placement.evaluation',
+            'placement.finalreport',
+            'placement.pembimbing',
         ])
             ->where('status', 'completed')
             ->whereHas('placement', function ($query) {
                 $query->whereHas('evaluation')
-                      ->whereHas('finalreport', function ($subQuery) {
-                          $subQuery->where('status', 'approved');
-                      });
+                    ->whereHas('finalreport', function ($subQuery) {
+                        $subQuery->where('status', 'approved');
+                    })
+                    ->whereHas('logbooks');
             });
 
         // Multi-Tenant Isolation: Admin instansi hanya melihat sertifikat pada unit instansinya sendiri
@@ -52,7 +51,8 @@ class CertificateController extends Controller
             });
         }
 
-        $applications = $query->get();
+        // Certificate Gate: hanya tampilkan yang benar-benar memenuhi seluruh syarat penerbitan
+        $applications = $query->get()->filter(fn (Application $app) => $app->isCertificateEligible())->values();
 
         return view('admin.certificates.index', compact('applications'));
     }
@@ -61,6 +61,7 @@ class CertificateController extends Controller
     public function show($placementId)
     {
         $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+
         return view('certificates.internship_certificate', $data);
     }
 
@@ -68,7 +69,7 @@ class CertificateController extends Controller
     public function generate($placementId)
     {
         $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+
         return view('certificates.internship_certificate', $data);
     }
 }
-

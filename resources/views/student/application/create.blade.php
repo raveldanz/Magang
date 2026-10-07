@@ -105,37 +105,99 @@
                     <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        <!-- Bagian A: Pilihan Unit Kerja -->
-                        <div class="space-y-1.5">
-                            <x-input-label for="unit_id" value="Pilih Instansi & Unit Kerja / Divisi Magang *" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                            @php
-                                $totalAvailable = $units->filter(fn($unit) => $unit->remaining_quota > 0)->count();
-                            @endphp
+                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang -->
+                        @php
+                            $selectedUnitId = old('unit_id', '');
+                            $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
+                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? '');
 
-                            <select id="unit_id" name="unit_id"
-                                class="block w-full border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-400/40 rounded-xl shadow-xs text-xs sm:text-sm p-3 font-medium"
-                                {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
-                                
-                                @if ($totalAvailable === 0)
-                                    <option value="" disabled selected>-- Maaf, saat ini seluruh kuota divisi magang sudah penuh --</option>
-                                @else
-                                    <option value="">-- Pilih Instansi & Bidang/Divisi Magang --</option>
-                                    @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label="{{ strtoupper($agencyName) }}">
-                                            @foreach ($agencyUnits as $unit)
-                                                <option value="{{ $unit->id }}" 
-                                                    {{ old('unit_id') == $unit->id ? 'selected' : '' }}
-                                                    {{ $unit->remaining_quota <= 0 ? 'disabled class=text-slate-400' : '' }}>
-                                                    {{ $unit->name }} &bull; Sisa Kuota: {{ $unit->remaining_quota }} {{ $unit->remaining_quota <= 0 ? '(PENUH)' : 'orang' }}
-                                                </option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                @endif
-                            </select>
-                            @error('unit_id')
-                                <p class="text-xs text-red-600 font-semibold">{{ $message }}</p>
-                            @enderror
+                            $agencyItems = $agencies->map(function ($a) {
+                                return [
+                                    'id' => $a->id,
+                                    'name' => $a->agency_name,
+                                    'acronym' => $a->acronym,
+                                    'meta' => $a->address ?? 'Pemerintah Kota Surabaya',
+                                ];
+                            })->values()->all();
+
+                            $unitItems = $units->map(function ($u) {
+                                $agencyName = $u->agencyProfile->agency_name ?? 'Pemkot Surabaya';
+                                $rem = $u->remaining_quota;
+                                return [
+                                    'id' => $u->id,
+                                    'agency_profile_id' => $u->agency_profile_id,
+                                    'name' => $u->name,
+                                    'acronym' => $u->agencyProfile?->acronym,
+                                    'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " • {$agencyName}",
+                                    'remaining_quota' => $rem,
+                                    'disabled' => $rem <= 0,
+                                ];
+                            })->values()->all();
+                        @endphp
+
+                        <div x-data="{
+                            selectedAgencyId: '{{ $selectedAgencyId }}',
+                            selectedUnitId: '{{ $selectedUnitId }}',
+                            allUnits: {{ \Illuminate\Support\Js::from($unitItems) }},
+                            filteredUnits: [],
+
+                            init() {
+                                this.filterUnits();
+                                window.addEventListener('searchable-select-changed', (e) => {
+                                    if (e.detail.name === 'agency_profile_id') {
+                                        this.selectedAgencyId = e.detail.value;
+                                        this.filterUnits();
+                                        window.dispatchEvent(new CustomEvent('update-units-list', {
+                                            detail: { items: this.filteredUnits }
+                                        }));
+                                    }
+                                });
+                            },
+
+                            filterUnits() {
+                                if (!this.selectedAgencyId) {
+                                    this.filteredUnits = this.allUnits;
+                                } else {
+                                    this.filteredUnits = this.allUnits.filter(u => String(u.agency_profile_id) === String(this.selectedAgencyId));
+                                }
+                            }
+                        }" class="space-y-4">
+                            <!-- 1. Pemilihan Instansi Kedinasan (OPD Surabaya) -->
+                            <div>
+                                <x-searchable-select
+                                    name="agency_profile_id"
+                                    :items="$agencyItems"
+                                    :selected="$selectedAgencyId"
+                                    label="1. Pilih Instansi Dinas / Badan Daerah (OPD Pemkot Surabaya)"
+                                    placeholder="-- Cari Instansi (Ketik nama, misal: Diskominfo, Bapenda, Dinkes) --"
+                                    :required="true"
+                                />
+                                @error('agency_profile_id')
+                                    <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- 2. Pemilihan Divisi / Unit Kerja Magang -->
+                            <div>
+                                <x-searchable-select
+                                    name="unit_id"
+                                    :items="$unitItems"
+                                    :selected="$selectedUnitId"
+                                    parent-listener="update-units-list"
+                                    label="2. Pilih Bidang / Divisi Kerja Magang"
+                                    placeholder="-- Cari Divisi / Unit Kerja Magang --"
+                                    :required="true"
+                                />
+                                @error('unit_id')
+                                    <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                @enderror
+                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
+                                    <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Pilihan bidang kerja akan otomatis disaring sesuai instansi dinas yang Anda pilih di atas.</span>
+                                </p>
+                            </div>
                         </div>
 
                         <!-- Bagian B: Periode Magang -->
