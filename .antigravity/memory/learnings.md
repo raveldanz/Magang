@@ -65,6 +65,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
 | **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
 | **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
+| **LRN-059** | 2026-10-07 | Dashboard Mahasiswa: Form Dosen Pembimbing, Status Harmonis & Standarisasi Istilah | Relokasi form pilih dosen tepat di bawah kartu info, eliminasi catatan penolakan panjang dari kartu dashboard demi keseragaman tinggi kartu, perbaikan status rejected, dan standardisasi penamaan Dosen Pembimbing / Mentor Lapangan tanpa kurung | RESOLVED |
 
 ---
 
@@ -1307,6 +1308,156 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Menyederhanakan judul di `lecturer/dashboard.blade.php` menjadi "Portal Dosen Pembimbing" tanpa tanda kurung.
   4. Menambahkan alias `Grade::fromScore()` pada helper `App\Support\Grade`.
 - **Prevention Rule**: Dilarang menggunakan Eloquent virtual accessor di dalam query database `where()` atau `whereHas()`. Selalu periksa skema tabel riil PostgreSQL sebelum menyusun query builder. Seluruh halaman supervisi bimbingan magang wajib mempertahankan paritas tata letak, warna, dan hirarki visual.
+
+---
+
+### [LRN-053] Perbaikan Tabel Terpotong Desktop & Redesain Simpel Mobile Dashboard Mahasiswa
+- **Tanggal**: 2026-10-05
+- **Komponen**: `resources/views/student/application/create.blade.php`, `resources/views/dashboard.blade.php`, `resources/views/components/status-badge.blade.php`
+- **Problem / Symptom**:
+  1. Pada desktop `/student/application`, tabel "Riwayat Pengajuan Magang Anda" terpotong di tepi kanan/kiri dengan horizontal scrollbar yang tidak perlu (header "TANGGAL PENGAJUAN" terpotong jadi "AL PENGAJUAN", "SURAT PENERIMAAN" terpotong).
+  2. Pada mobile `/student/application`, badge status menampilkan teks ganda bertingkat (`• ACTIVE` dan keterangan `Aktif Magang` di bawahnya) dalam kotak tebal.
+  3. Pada mobile `/dashboard`, kartu mahasiswa ("STATUS PROFIL", "STATUS MAGANG", "PEMBIMBING LAPANGAN", "Detail Penempatan Magang") tampak terlalu menumpuk (*bulky*), redundan, dan memanjang ke bawah.
+- **Root Cause**:
+  1. Penggunaan kelas `min-w-max` pada tag `<table>` memaksa lebar tabel membentang melebihi lebar kontainer kartu (`max-w-7xl`), sehingga memicu horizontal scrollbar dan memotong kolom saat dibuka di viewport desktop standar.
+  2. Query Tailwind `@media(hover:none)` pada `status-badge.blade.php` sebelumnya memaksa render keterangan status (`description()`) di baris kedua pada seluruh perangkat sentuh/emulasi mobile.
+  3. Padding kartu dashboard yang kaku (`p-6 rounded-3xl`, `gap-6`) serta struktur informasi penempatan yang bertumpuk vertikal membuat tampilan mobile memanjang dan padat teks.
+- **Fix Applied**:
+  1. Menghapus kelas `min-w-max` dari `<table>` di `create.blade.php`, menstandarisasi padding sel `py-3.5 px-4`, serta merapikan perataan teks (Status rata tengah, Surat Penerimaan rata kanan).
+  2. Menghapus secondary text pada mobile view sehingga status di mobile tampil murni sebagai single-pill ringkas (`• ACTIVE`, `• PENDING`, dll.).
+  3. Merampingkan kartu dashboard mahasiswa versi mobile (`p-4 sm:p-6 rounded-2xl sm:rounded-3xl`, `gap-3.5 sm:gap-6`):
+     - Kartu Profil & Status Magang dibuat lebih simpel dengan tombol aksi dan status ringkas di sisi kanan.
+     - Menyembunyikan teks keterangan bantuan yang redundan pada kartu pembimbing lapangan untuk layar mobile.
+     - Mengubah "Detail Penempatan Magang" menjadi daftar pasangan kunci-nilai (*key-value*) elegan bergaris batas halus di mobile.
+- **Prevention Rule**: Hindari penggunaan `min-w-max` pada tabel data kecuali jumlah kolom benar-benar melebihi batas layar lebar (10+ kolom). Gunakan `w-full` dengan padding terukur agar tabel responsif alami di desktop. Pada antarmuka mobile, prioritaskan komponen single-line pill tanpa subtitle keterangan berulang.
+
+---
+
+### [LRN-054] Aturan Permanen: Pemisahan Eksplisit Blok UI Desktop vs Mobile pada Halaman Kompleks
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/dashboard.blade.php`, `resources/views/student/**/*.blade.php`, `.antigravity/memory/learnings.md`
+- **Problem / Symptom**:
+  1. Tampilan desktop dashboard mahasiswa (`/dashboard`) mengalami distorsi: nama unit kerja terpotong oleh kelas `truncate` menjadi `...`, dan grid Detail Penempatan Magang menjadi tidak sejajar karena properti layout mobile (`flex items-start justify-between`) mencemari tampilan desktop.
+  2. Penggabungan logika mobile-first ke dalam satu blok kontainer memicu kompromi yang merusak padding, radius, dan kelegaan tata letak desktop yang sudah rapi sebelumnya.
+- **Root Cause**: Mencoba mengakomodasi tampilan mobile ringkas dan tampilan desktop luas di dalam satu elemen/kontainer HTML yang sama dengan menimpa class dasar tanpa isolasi breakpoint yang bersih, sehingga layout desktop terdegradasi menjadi terasa sempit dan terpotong.
+- **Fix Applied**:
+  1. **Pemisahan Blok Total (Total Structural Separation)**:
+     - Blok Desktop diisolasi secara penuh menggunakan kontainer `hidden md:block` (atau `hidden md:grid`). Mengembalikan layout lebar dan lega semula (`p-6 gap-6 rounded-3xl`), grid 2 kolom proporsional pada Detail Penempatan Magang, dan memastikan teks unit memakai `break-words` sehingga tidak terpotong `...`.
+     - Blok Mobile diisolasi secara penuh menggunakan kontainer `block md:hidden`. Menggunakan format ringkas yang ramping, single-pill badge status (`• ACTIVE`), dan daftar vertikal bergaris batas halus.
+  2. Menghapus kelas `truncate` pada desktop agar nama unit *'Bidang Pengelolaan Informasi Administrasi Kependudukan (PIAK)'* tampil utuh.
+- **Prevention Rule (ATURAN WAJIB & PERMANEN KE DEPAN)**:
+  - **UI mobile dan desktop pada komponen/halaman kompleks HARUS dipisah secara eksplisit dan TIDAK BOLEH digabung atau dicampuradukkan.**
+  - Gunakan pemisah yang tegas: blok khusus desktop dibungkus `hidden md:block` (atau `hidden md:grid`), sedangkan blok ringkas mobile dibungkus `block md:hidden`.
+  - Dilarang keras mengubah atau menyederhanakan class dasar tanpa prefix responsif yang berakibat merusak struktur desktop yang sudah rapi sebelumnya.
+
+---
+
+### [LRN-055] Eliminasi Redundansi Elemen UI (Single Source of Truth pada Status, Nilai, & Penempatan)
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/dashboard.blade.php`, `.antigravity/memory/learnings.md`
+- **Problem / Symptom**:
+  1. Munculnya Card 4 "Penilaian Pembimbing Lapangan" (92 Disiplin: 93...) di bawah kartu profil yang memicu duplikasi data nilai, karena di atas sudah ada Banner Kelulusan yang menampilkan rekapitulasi nilai dinas (92), nilai DPL (97), nilai akhir (94.5), dan grade (A) secara lengkap.
+  2. Status magang diulang 3 kali di viewport yang sama: di hero banner biru (`Status: COMPLETED`), di kartu informasi tengah (`Status Magang: COMPLETED`), dan di kartu bawah (`Detail Penempatan Magang: Status Saat Ini: COMPLETED`).
+  3. Nama unit kerja diulang 2 kali (di kartu tengah dan di Detail Penempatan Magang).
+- **Root Cause**: Penumpukan komponen secara inkremental tanpa membersihkan representasi data lama yang sudah diakomodasi secara lebih utuh oleh komponen primer (`Banner Kelulusan` dan `Detail Penempatan Magang`).
+- **Fix Applied**:
+  1. Menghapus Card 4 (Penilaian Pembimbing Lapangan) pada tampilan Desktop dan Mobile.
+  2. Menghapus badge pill status pada hero banner biru atas, sehingga banner murni sebagai sambutan dan ringkasan berkas.
+  3. Menghapus Card 2 (Status Magang) yang redundan, dan menjadikan kontainer `Detail Penempatan Magang` sebagai satu-satunya *Single Source of Truth* untuk Instansi, Unit Kerja, Periode, dan Status Magang.
+  4. Merapikan baris kartu informasi menjadi grid 2-kolom proporsional: Card 1 (`Status Profil`) dan Card 2 (`Pembimbing Lapangan (Dinas)`).
+- **Prevention Rule**: **Zero-Redundancy Principle pada UI**: Setiap atribut domain penting (Status, Nilai, Divisi/Unit) hanya boleh memiliki SATU representasi visual primer pada satu viewport. Dilarang keras menampilkan kembali data yang sama pada card terpisah jika card lain yang berdampingan atau bertingkat sudah memuat data tersebut secara lengkap.
+
+---
+
+### [LRN-056] Modal Kelengkapan Berkas & Konsolidasi 3 Kartu Putih Modern Dashboard Mahasiswa
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/dashboard.blade.php`, `.antigravity/memory/learnings.md`
+- **Problem / Symptom**:
+  1. Modal "Rincian Kelengkapan & Kekurangan Berkas Magang" memiliki badge yang terlalu panjang dan redundan (misal: `Lengkap (Anisa Rahmawati • 22081010014)`, `Diterima (Bidang Infrastruktur...)`, `Terdaftar (Prof. Dr. Agus Widodo...)`, `Disetujui & Disahkan`).
+  2. Keterangan sub-judul di bawah item 2 dan 3 memenuhi modal sehingga terlihat padat.
+  3. Tombol unduh E-Sertifikat di item 6 berada di dalam div judul alih-alih flex sibling kanan, menyebabkan posisi tombol mepet dan tombol tutup di footer modal terdistorsi di dalam scroll container list.
+  4. Banner DPL kampus melayang secara terpisah di atas kartu informasi, sementara pengguna menginginkan tata letak 3 kartu sejajar yang bersih: `Status Magang`, `Dosen Pembimbing Lapangan (DPL Kampus)`, dan `Pembimbing Lapangan (Dinas)`.
+- **Root Cause**:
+  - Penempatan elemen modal footer di dalam container scrollable list `divide-y divide-slate-100 max-h-[70vh]`.
+  - Pembungkusan `<div class="shrink-0">` tombol unduh di dalam `<div>` judul item 6.
+  - Pemisahan section DPL ke dalam banner besar tersendiri di luar grid kartu utama.
+- **Fix Applied**:
+  1. Menyederhanakan badge status modal menjadi ringkas: `Lengkap`, `Diterima`, `Terdaftar`, `Disetujui`.
+  2. Menghapus sub-keterangan pada item 2 dan 3 di modal.
+  3. Menyejajarkan item 6 tombol unduh sebagai flex sibling di sisi kanan dan memindahkan tombol `Tutup` ke footer modal yang terisolasi dengan rapi (`border-t border-slate-200 bg-slate-50`).
+  4. Mengganti kartu profil menjadi `Status Magang`, menyatukan `Dosen Pembimbing (DPL Kampus)` sebagai kartu kedua di sebelahnya, dan `Pembimbing Lapangan (Dinas)` sebagai kartu ketiga.
+  5. Seluruh kartu didesain dengan tema putih bersih (`bg-white rounded-3xl border border-slate-100 shadow-sm p-6`) baik untuk versi desktop (`grid-cols-3`) maupun mobile (`space-y-3.5`).
+  6. Menyediakan form `#change-advisor-box` yang collapsible dan dapat dipanggil langsung dari tombol kartu.
+- **Prevention Rule**:
+  - Struktur modal bertingkat wajib memisahkan header, body scrollable (`max-h-[60vh] overflow-y-auto`), dan pinned footer modal (`border-t bg-slate-50`).
+  - Elemen kartu utama mahasiswa harus menjaga estetika putih minimalis modern dan tidak menumpuk informasi profil yang sudah jelas dari header akun.
+
+---
+
+### [LRN-057] Perbaikan Indikator Banner Penyamaran, Favicon Brand Pemkot, & Teks Instruksi Pengajuan
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/layouts/app.blade.php`, `resources/views/layouts/guest.blade.php`, `resources/views/errors/403.blade.php`, `resources/views/welcome.blade.php`, `public/favicon.ico`, `resources/views/student/application/create.blade.php`, `.antigravity/memory/learnings.md`
+- **Problem / Symptom**:
+  1. Lingkaran putih animasi pada banner Mode Penyamaran (`Mode Penyamaran: Ahmad Pending QA`) terpotong menjadi setengah lingkaran / lonjong di browser desktop.
+  2. Logo pada tab / judul browser (favicon) masih menggunakan logo default Laravel merah karena tidak adanya deklarasi `<link rel="icon">` di layout utama serta file `public/favicon.ico` berukuran 0 byte.
+  3. Kalimat panduan pada kotak penolakan pengajuan magang diawali dengan tanda asteris: `*Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.`
+- **Root Cause**:
+  - Class `truncate` dipasang pada container parent `div` flex yang membungkus bulatan animasi `h-2.5 w-2.5`, sehingga memicu `overflow: hidden` yang memotong bagian pinggir lingkaran saat dirender.
+  - Berkas layout (`layouts/app.blade.php` dan `layouts/guest.blade.php`) tidak mendefinisikan tautan rel favicon resmi dinas Surabaya (`asset('images/logos/surabaya.png')`).
+  - Tanda asteris `*` terformat secara manual di awal teks paragraf alert penolakan.
+- **Fix Applied**:
+  1. Menghapus class `truncate` dari container flex pembungkus bulatan penyamaran dan membatasi `truncate` hanya pada elemen teks nama pengguna. Indikator lingkaran dibungkus dalam container berdimensi presisi `h-3 w-3 shrink-0 items-center justify-center` dengan lingkaran penuh utuh.
+  2. Menambahkan deklarasi `<link rel="icon">`, `<link rel="shortcut icon">`, dan `<link rel="apple-touch-icon">` mengarah ke logo resmi Pemkot Surabaya (`images/logos/surabaya.png`) di seluruh layout (`app`, `guest`, `errors/403`, `welcome`).
+  3. Menyalin logo resmi Surabaya ke `public/favicon.ico` untuk menangani fallback direct request browser.
+  4. Menghapus tanda asteris `*` dari kalimat panduan penolakan di `resources/views/student/application/create.blade.php`.
+- **Prevention Rule**:
+  - Jangan pernah menaruh utility `truncate` pada container flex yang memuat ikon grafis atau indikator bulat, karena `overflow: hidden` akan memotong geometri non-teks. Letakkan `truncate` langsung pada elemen `<span>` teks yang bersangkutan.
+  - Seluruh layout HTML Blade wajib secara eksplisit mendefinisikan tautan favicon brand institusi resmi.
+
+---
+
+### [LRN-058] Pembersihan Simbol Asteris Formulir Pengajuan, Cache Buster Favicon & Eliminasi Duplikasi Status Magang
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/student/application/create.blade.php`, `resources/views/components/searchable-select.blade.php`, `resources/views/dashboard.blade.php`, `resources/views/layouts/app.blade.php`, `resources/views/layouts/guest.blade.php`, `resources/views/welcome.blade.php`, `resources/views/errors/403.blade.php`
+- **Problem / Symptom**:
+  1. Halaman formulir pengajuan magang mahasiswa (`/student/application`) masih menampilkan banyak tanda asteris merah `*` pada label pilihan OPD, bidang divisi, tanggal mulai/selesai, serta ke-4 dokumen persyaratan, yang mengacaukan kesederhanaan tampilan UI.
+  2. Tab browser klien kadang masih menampilkan logo lama Laravel akibat cache browser yang agresif terhadap favicon tanpa query parameter versioning.
+  3. Kartu `Detail Penempatan Magang` di desktop dan mobile masih menampilkan baris `Status Saat Ini: <badge>` yang mengulang data status magang yang sudah ada di Card 1 (`Status Magang`) di atasnya.
+- **Root Cause**:
+  - Komponen `<x-searchable-select>` secara default merender `<span class="text-rose-500">*</span>` jika `:required="true"`, dan label input tanggal serta dokumen persyaratan di-hardcode dengan `*`.
+  - Berkas layout memanggil favicon tanpa query parameter perusak cache (`?v=...`), sehingga browser mempertahankan aset lama dari disk cache.
+  - Kartu detail penempatan belum diselaraskan dengan tata letak 3 kartu putih baru yang telah menempatkan status magang sebagai metrik utama di Card 1.
+- **Fix Applied**:
+  1. Menambahkan props `:show-asterisk="false"` pada `<x-searchable-select>` dan menghapus seluruh simbol `*` pada label tanggal serta dokumen upload di `resources/views/student/application/create.blade.php`. Validasi form HTML `required` tetap aktif 100%.
+  2. Menambahkan query parameter cache-buster `?v=surabaya` pada seluruh deklarasi `<link rel="icon">`, `<link rel="shortcut icon">`, dan `<link rel="apple-touch-icon">` di layout `app`, `guest`, `welcome`, dan `errors/403`.
+  3. Menghapus baris status redundan di `Detail Penempatan Magang` pada desktop dan mobile, serta menata informasi penempatan ke dalam grid 3-kolom bersih: `Instansi Penempatan`, `Unit Kerja`, dan `Periode Magang`.
+- **Prevention Rule**:
+  - Untuk form yang mengutamakan desain bersih dan minimalis tanpa tanda asteris visual, pisahkan kontrol penanda visual (`showAsterisk`) dari atribut fungsional validasi HTML (`required`).
+  - Seluruh referensi favicon wajib dilengkapi query cache-busting agar pembaruan visual langsung berdampak pada browser klien tanpa harus melakukan hard reload manual.
+
+---
+
+### [LRN-059] Dashboard Mahasiswa: Harmonisasi Kartu Status, Form Dosen Pembimbing & Eliminasi Akronim / Tanda Kurung Redundan
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/dashboard.blade.php`, `resources/views/student/application/create.blade.php`, `app/Enums/ApplicationStatus.php`
+- **Problem / Symptom**:
+  1. Form pemilihan dosen pembimbing (`#change-advisor-box`) muncul di bawah kartu Detail Penempatan Magang, sehingga saat dibuka tata letak terasa terbalik dan tidak intuitif.
+  2. Kartu status magang pada status `REJECTED` menampilkan box alasan penolakan teks panjang di dalam kartu status, yang menyebabkan Card 1 memanjang ke bawah dan memaksa Card 2 (Dosen) serta Card 3 (Mentor) menjadi ikut melar dengan ruang kosong masif di tengahnya.
+  3. Status `REJECTED` keliru menampilkan footer "Dalam proses" akibat fallback `@else` yang tidak mengecek kondisi status secara eksplisit.
+  4. Penggunaan akronim `DPL`, `DPL Kampus`, `(Dinas)`, dan tanda kurung lainnya masih bertebaran di berbagai label tombol dan heading antarmuka.
+- **Root Cause**:
+  1. Elemen form berada di bawah container banner penempatan magang pada urutan DOM HTML.
+  2. CSS Grid `grid-cols-3` memiliki sifat meregangkan seluruh kartu di baris yang sama mengikuti elemen tertinggi (`flex-col justify-between`). Teks alasan penolakan panjang tidak proporsional ditaruh di kartu ringkasan status beranda (karena sudah lengkap ada di menu pengajuan `/student/application`).
+  3. Percabangan footer kartu status magang menggunakan `@else` tanpa mengecek `$rawAppSt === 'rejected'` atau `'resigned'`, sehingga status penolakan menampilkan teks "Dalam proses verifikasi".
+  4. Nomenklatur lawas belum dibersihkan dari akronim teknis dan tanda kurung ganda.
+- **Fix Applied**:
+  1. Memindahkan form `#change-advisor-box` (desktop) dan `#change-advisor-box-mobile` (mobile) tepat berada di bawah kartu informasi dosen/status, sehingga saat dibuka, kartu `Detail Penempatan Magang` terdorong secara alami ke bawah.
+  2. Menghapus kotak teks alasan penolakan dari Card 1 di desktop dan mobile. Kartu status kini bersih dan ringkas: hanya memuat badge status, nama divisi, dan tombol aksi langsung `Ajukan Magang Baru →` (rose-600). Ketiga kartu (Status, Dosen, Mentor) kini memiliki tinggi yang presisi, seragam, dan seimbang.
+  3. Mengisolasi percabangan status di footer kartu: status `rejected` menampilkan `Ajukan Magang Baru →`, `resigned` menampilkan `Daftar Magang Baru →`, dan "Dalam proses verifikasi" hanya muncul pada status `pending`/`verified`.
+  4. Standardisasi istilah antarmuka: mengganti "DPL" / "DPL Kampus" menjadi "Dosen Pembimbing", "Pembimbing Lapangan (Dinas)" menjadi "Mentor Lapangan", menghapus `(PDF)` pada tombol unduh, dan meminimalkan penggunaan tanda kurung `(...)` di seluruh copy UI.
+- **Prevention Rule**:
+  - Dilarang menempatkan konten penjelasan/catatan dinamis yang panjang di dalam kartu grid berjejer (*multi-column summary card*) karena akan merusak keseragaman ritme vertikal kartu di sampingnya.
+  - Untuk bimbingan mahasiswa, gunakan secara konsisten "Dosen Pembimbing" dan "Mentor Lapangan". Hindari akronim internal `DPL` dan kurangi penggunaan tanda kurung pada label antarmuka.
 
 ---
 

@@ -7,6 +7,11 @@
 
         <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang Surabaya') }}</title>
 
+        <!-- Favicon Resmi Pemerintah Kota Surabaya -->
+        <link rel="icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+        <link rel="shortcut icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+        <link rel="apple-touch-icon" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
