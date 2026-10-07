@@ -78,69 +78,66 @@
 
             <!-- 1. EXECUTIVE CIVIC BANNER -->
             <div x-data="{ showDetailModal: false }" class="space-y-6">
-                <div class="rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
-                    <div class="space-y-3 z-10 max-w-2xl">
-                        <div class="space-y-1">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-blue-100 border border-white/15">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                Status: {{ $appStatusLabel }}
-                            </span>
-                            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                                Selamat Datang, {{ Auth::user()->name }}!
-                            </h1>
-                            <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90">
-                                Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Pemerintah Kota Surabaya
-                            </p>
-                        </div>
-
-                        <!-- Executive Info Chips (Desktop Only: Sharp Rectangular Badges, Zero Circles) -->
-                        <div class="hidden md:flex flex-wrap items-center gap-2 pt-1 text-xs">
-                            <div
-                                class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                <span class="text-blue-200">NIM:</span>
-                                <strong class="font-mono text-white">{{ $profile->nim ?? 'Belum Diisi' }}</strong>
+                <div class="rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 border border-blue-900">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
+                        
+                        <!-- Sisi Kiri: Teks & Info -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <div class="space-y-1.5">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-white/10 text-blue-100 border border-white/15">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                    Status: {{ $appStatusLabel }}
+                                </span>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                                    Selamat Datang, {{ Auth::user()->name }}!
+                                </h1>
+                                <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90 max-w-xl">
+                                    Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Pemerintah Kota Surabaya
+                                </p>
                             </div>
 
-                            <div
-                                class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                <span class="text-blue-200">Logbook:</span>
-                                <strong class="text-amber-300">{{ $logbooksCount }} Entri Tercatat</strong>
-                            </div>
-
-                            @if($academicAdvisor)
-                                <div
-                                    class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
-                                    <span class="text-blue-200">Dosen Pembimbing:</span>
-                                    <strong class="text-white">{{ $academicAdvisor->name }}</strong>
+                            <!-- Executive Info Chips (Desktop Only: Sharp Rectangular Badges, Zero Circles) -->
+                            <div class="hidden md:flex flex-wrap items-center gap-2 text-xs">
+                                <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
+                                    <span class="text-blue-200">NIM:</span>
+                                    <strong class="font-mono text-white">{{ $profile->nim ?? 'Belum Diisi' }}</strong>
                                 </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Sisi Kanan: Progress Bar Ramping -->
-                    <div class="w-full lg:w-72 shrink-0 p-4 rounded-xl bg-white/10 border border-white/20 space-y-2.5">
-                        <div class="flex items-center justify-between text-xs text-white">
-                            <span class="text-blue-200">Institusi</span>
-                            <span class="font-bold truncate max-w-[150px] text-right">
-                                {{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}
-                            </span>
-                        </div>
-
-                        <div class="space-y-1.5 pt-1.5 border-t border-white/15">
-                            <div class="flex items-center justify-between text-xs font-bold text-white">
-                                <span>Kelengkapan Berkas</span>
-                                <span class="text-amber-300 font-mono">{{ $progressPercent }}%</span>
+                                <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
+                                    <span class="text-blue-200">Logbook:</span>
+                                    <strong class="text-amber-300">{{ $logbooksCount }} Entri Tercatat</strong>
+                                </div>
+                                @if($academicAdvisor)
+                                    <div class="px-3 py-1.5 rounded-md font-medium flex items-center gap-1.5 bg-white/10 border border-white/20 text-white">
+                                        <span class="text-blue-200">Dosen Pembimbing:</span>
+                                        <strong class="text-white truncate max-w-[200px]">{{ $academicAdvisor->name }}</strong>
+                                    </div>
+                                @endif
                             </div>
-                            <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-                                <div class="h-1.5 bg-emerald-400 rounded-full transition-all duration-500"
-                                    style="width: {{ $progressPercent }}%;"></div>
+                        </div>
+
+                        <!-- Sisi Kanan: Progress Bar Ramping -->
+                        <div class="lg:col-span-4 w-full p-4 rounded-xl bg-white/10 border border-white/20 space-y-3">
+                            <div class="flex items-center justify-between text-xs text-white">
+                                <span class="text-blue-200">Institusi</span>
+                                <span class="font-bold truncate max-w-[150px] text-right" title="{{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}">
+                                    {{ $univName ?? $profile->universitas ?? 'Perguruan Tinggi' }}
+                                </span>
                             </div>
-                            <div class="pt-0.5 flex items-center justify-between text-[11px]">
-                                <span class="text-blue-200/90">{{ $stepCount }} dari 7 Syarat</span>
-                                <button type="button" @click="showDetailModal = true"
-                                    class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
-                                    Lihat Detail
-                                </button>
+
+                            <div class="space-y-1.5 pt-2 border-t border-white/15">
+                                <div class="flex items-center justify-between text-xs font-bold text-white">
+                                    <span>Kelengkapan Berkas</span>
+                                    <span class="text-amber-300 font-mono">{{ $progressPercent }}%</span>
+                                </div>
+                                <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-1.5 bg-emerald-400 rounded-full transition-all duration-500" style="width: {{ $progressPercent }}%;"></div>
+                                </div>
+                                <div class="pt-1 flex items-center justify-between text-[11px]">
+                                    <span class="text-blue-200/90">{{ $stepCount }} dari 7 Syarat</span>
+                                    <button type="button" @click="showDetailModal = true" class="font-bold text-white hover:text-amber-300 underline transition cursor-pointer">
+                                        Lihat Detail
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -450,8 +447,8 @@
                 @if ($isPassed)
                     <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6 relative overflow-hidden"
                         style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #1e3a8a 100%) !important; color: #ffffff !important;">
-                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                            <div class="flex items-start space-x-4">
+                        <div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6">
+                            <div class="md:col-span-8 flex items-start space-x-4">
                                 <div class="space-y-1">
                                     <h2 class="text-xl sm:text-2xl font-black" style="color: #ffffff !important;">
                                         Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
@@ -466,7 +463,7 @@
                                 </div>
                             </div>
 
-                            <div class="shrink-0 w-full md:w-auto">
+                            <div class="md:col-span-4 flex justify-start md:justify-end">
                                 <a href="{{ route('student.certificate.show', $application->id) }}" target="_blank"
                                     class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 cursor-pointer font-black text-xs sm:text-sm"
                                     style="background-color: #ffffff !important; color: #065f46 !important; border: 2px solid #ffffff !important;">
