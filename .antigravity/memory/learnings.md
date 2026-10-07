@@ -67,6 +67,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
 | **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
 | **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
+| **LRN-059** | 2026-10-07 | DPL BAP Print & Legalitas TTE | Kotak QR dummy teks, badge monospace TTE kaku & ketidaksinkronan posisi kolom pada Berita Acara Penilaian | RESOLVED |
 
 ---
 
@@ -1335,6 +1336,22 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Menambahkan endpoint `lecturer.monitoring.export` yang mengalirkan file CSV ber-BOM UTF-8 siap buka di Excel dengan proteksi tipe data BackedEnum.
   6. Menulis suite pengujian `LecturerInnovationsTest.php` (6/6 lulus) dan menguji seluruh test suite (189/189 PASS, 1.415 assertions, Exit Code 0).
 - **Prevention Rule**: Seluruh data yang bersumber dari Enum Backed wajib di-unwrap dengan `$val instanceof \BackedEnum ? $val->value : (string) $val` sebelum diproses fungsi string atau diekspor ke format CSV/Excel. Seluruh accessor nilai wajib menyediakan fallback bertingkat jika tabel database memiliki kolom alias untuk memastikan backward-compatibility.
+
+### [LRN-059] Standarisasi Pengesahan TTE 2 Kolom & Integrasi QR SVG Resmi pada Berita Acara Penilaian DPL
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/lecturer/grade-sheet.blade.php`
+- **Problem / Symptom**: 
+  - Kotak QR verifikasi di tengah hanya berupa kotak abu-abu bertuliskan teks biasa `"QR VALIDASI RESMI DPL"`, bukan barcode QR Code SVG nyata yang bisa discan.
+  - Penamaan "QR VALIDASI RESMI DPL" berada di kolom tengah terpisah dari DPL yang berada di kolom kanan.
+  - Kolom TTE DPL menggunakan badge hijau neon font monospace bergaya tombol terminal (`[TERTANDATANGANI SECARA ELEKTRONIK]`).
+  - Kolom Pembimbing Lapangan hanya menampilkan teks miring abu-abu `[Telah Diverifikasi Sistem Dinas]`.
+- **Root Cause**: Desain awal Berita Acara Penilaian (BAP) menggunakan placeholder markup 3-kolom sementara tanpa menghubungkan helper `SimpleSoftwareIO\QrCode\Facades\QrCode` ke URL verifikasi sertifikat `/verify-certificate/{hash}`.
+- **Fix Applied**:
+  - Merefaktor tata letak pengesahan menjadi **Format 2 Kolom Standar Kampus & Instansi**:
+    * Kolom Kiri: Mengetahui Pembimbing Lapangan (Instansi) dengan badge resmi `Terverifikasi Sistem Lapangan` (ikon verifikasi perisai/centang) + nama & NIP.
+    * Kolom Kanan: Dosen Pembimbing Lapangan (DPL) lengkap dengan tempat & tanggal, render QR Code SVG asli (`route('verify.certificate', $placement->ensureCertificateHash())`), kode hash dokumen ID, badge `Ditandatangani Secara Elektronik (TTE)` + nama & NIDN/NIP DPL.
+  - Menambahkan catatan legalitas dokumen resmi di bagian bawah sesuai standar UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.
+- **Prevention Rule**: Dokumen cetak formal (BAP, Lembar Pengesahan, Sertifikat, Surat Balasan) dilarang menggunakan teks dummy di dalam kotak QR; selalu manfaatkan paket offline `SimpleSoftwareIO\QrCode\Facades\QrCode` untuk merender SVG matrix barcode yang valid ke endpoint verifikasi sistem.
 
 ---
 
