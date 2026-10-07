@@ -797,12 +797,7 @@
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Magang</span>
                             @if($application)
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full {{ in_array($rawAppSt, ['accepted', 'active', 'completed']) ? 'bg-emerald-500' : 'bg-amber-400' }}"></span>
-                                    <span class="text-xs font-bold tracking-wide uppercase {{ in_array($rawAppSt, ['accepted', 'active', 'completed']) ? 'text-emerald-700' : 'text-amber-700' }}">
-                                        {{ strtoupper($application->status instanceof \BackedEnum ? $application->status->value :$application->status) }}
-                                    </span>
-                                </div>
+                                <x-status-badge :status="$application->status" />
                             @else
                                 <span class="text-xs font-semibold text-slate-400">Belum Ada</span>
                             @endif
