@@ -297,11 +297,11 @@
                             </div>
 
                             <!-- Identitas Universitas -->
-                            <h3 class="font-bold text-slate-900 text-[18px] leading-snug line-clamp-2 h-14 mb-1"
+                            <h3 class="font-bold text-slate-900 text-[15px] sm:text-base leading-snug line-clamp-3 h-[4.25rem] mb-1.5"
                                 title="{{ $univ->name }}">
                                 {{ $univ->name }}
                             </h3>
-                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-relaxed mb-2"
+                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-normal mb-2"
                                 title="{{ $univ->address }}">
                                 {{ $univ->address ?? 'Alamat kampus belum diatur' }}
                             </p>
