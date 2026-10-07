@@ -750,9 +750,7 @@
             {{-- Bantuan & Masukan --}}
             <div class="pt-2 border-t border-slate-100 space-y-1">
                 <a href="{{ route('chat.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('chat.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('chat.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                    </div>
+                    
                     <span class="flex-1">Pesan</span>
                     <span x-show="$store.chat.unread > 0" x-text="$store.chat.label"
                           class="min-w-[20px] h-5 px-1.5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center"
