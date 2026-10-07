@@ -782,7 +782,6 @@
                     <div class="pt-3 border-t border-slate-100">
                         <a href="{{ route('student.profile.edit') }}" 
                            class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
-                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             <span>{{ $profile ? 'Kelola Data Profil' : 'Lengkapi Sekarang' }}</span>
                         </a>
                     </div>
@@ -832,9 +831,7 @@
                         @if (in_array($rawAppSt, ['accepted', 'active', 'completed']))
                             <a href="{{ route('student.application.letter', $application->id) }}" target="_blank"
                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition border border-blue-200 shadow-2xs">
-                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
+                                
                                 <span>Unduh Surat Balasan Dinas (PDF)</span>
                             </a>
                         @elseif (!$application || in_array($rawAppSt, ['resigned', 'rejected']))
