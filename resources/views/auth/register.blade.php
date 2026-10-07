@@ -2,11 +2,11 @@
     <div class="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
         <!-- Logo Pemkot Surabaya -->
         <div class="flex justify-center mb-4">
-            <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block">
+            <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Pemerintah Kota Surabaya">
                 <img src="{{ asset('images/logos/surabaya.png') }}" 
                      alt="Logo Pemkot Surabaya"
-                     class="h-20 w-auto object-contain drop-shadow-md"
-                     style="height: 72px; width: auto; max-height: 80px;">
+                     class="h-16 w-auto object-contain drop-shadow-sm transition-all"
+                     style="aspect-ratio: 960/1234; height: 64px; width: auto; max-height: 72px; object-fit: contain;">
             </a>
         </div>
 

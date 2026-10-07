@@ -41,8 +41,9 @@
                     $navAvatarInitials = strtoupper(substr($user->name ?? 'U', 0, 1));
 
                     if ($user) {
-                        if ($user->agency_profile_id && $user->agencyProfile) {
-                            $navAvatarLogo = $user->agencyProfile->logo_url;
+                        if ($user->agency_profile_id) {
+                            $navAvatarLogo = $user->agencyProfile?->logo_url 
+                                ?? \App\Models\AgencyProfile::find($user->agency_profile_id)?->logo_url;
                         } elseif ($user->university_id || $isUniversitas || $isDosen || $isMahasiswa) {
                             $univObj = null;
                             if ($user->university_id) {
@@ -64,13 +65,17 @@
                             $navAvatarLogo = asset('images/logos/surabaya.png');
                         }
                     }
+
+                    if (!$navAvatarLogo && isset($agencyProfile) && !empty($agencyProfile?->logo_url)) {
+                        $navAvatarLogo = $agencyProfile->logo_url;
+                    }
                 @endphp
 
-                <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
+                <a href="{{ $dashboardRoute }}" class="flex items-center gap-2.5 group py-2 shrink-0" title="Portal Magang Kota Surabaya">
                     <img src="{{ asset('images/logos/surabaya.png') }}" 
                          alt="Pemerintah Kota Surabaya" 
                          class="h-10 sm:h-11 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
-                         style="height: 42px; width: auto; max-height: 46px; object-fit: contain;">
+                         style="aspect-ratio: 960/1234; height: 42px; width: auto; max-height: 44px; object-fit: contain;">
                 </a>
 
                 {{-- 2. DESKTOP NAVIGATION BAR --}}
@@ -332,7 +337,7 @@
                         <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
                         @if($navAvatarLogo)
                             <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5">
+                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                             </div>
                         @else
                             <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -358,7 +363,7 @@
                             <div class="flex items-center gap-2.5 overflow-hidden">
                                 @if($navAvatarLogo)
                                     <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1">
+                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                                     </div>
                                 @else
                                     <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -556,7 +561,7 @@
                 <div class="flex items-center gap-2.5">
                     @if($navAvatarLogo)
                         <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1">
+                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                         </div>
                     @else
                         <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -663,27 +668,22 @@
 
                 @elseif ($isMahasiswa)
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    
                         <span>Dashboard Saya</span>
                     </a>
                     <a href="{{ route('student.profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
                         <span>Profil Saya</span>
                     </a>
-                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Pengaturan Akun
-                            </a>
                     <a href="{{ route('student.application.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.application.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
                         <span>Pengajuan Magang</span>
                     </a>
                     <a href="{{ route('student.logbook.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.logbook.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        
                         <span>Logbook Magang</span>
                     </a>
                     <a href="{{ route('student.final_report.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.final_report.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                       
                         <span>Laporan Akhir</span>
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <span>Pengaturan Akun</span>
                     </a>
 
                 @elseif ($isDosen)
@@ -738,7 +738,9 @@
             {{-- Bantuan & Masukan --}}
             <div class="pt-2 border-t border-slate-100 space-y-1">
                 <a href="{{ route('chat.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('chat.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('chat.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    </div>
                     <span class="flex-1">Pesan</span>
                     <span x-show="$store.chat.unread > 0" x-text="$store.chat.label"
                           class="min-w-[20px] h-5 px-1.5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center"

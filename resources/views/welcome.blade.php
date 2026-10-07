@@ -5,10 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Portal Magang Resmi - Pemerintah Kota Surabaya</title>
 
-        <!-- Favicon Resmi Pemerintah Kota Surabaya -->
-        <link rel="icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
-        <link rel="shortcut icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
-        <link rel="apple-touch-icon" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+        <!-- Favicon Resmi Pemerintah Kota Surabaya (Square Canvas Preserving Aspect Ratio) -->
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=2">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}?v=2">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=2">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-192.png') }}?v=2">
 
         <!-- Fonts: Plus Jakarta Sans -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +27,9 @@
                 
                 <!-- Logo & Brand -->
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('images/logoPemkotSBY.png') }}" alt="Logo Pemkot Surabaya" class="h-9 w-auto object-contain">
+                    <img src="{{ asset('images/logoPemkotSBY.png') }}" alt="Logo Pemkot Surabaya" 
+                         class="h-9 w-auto object-contain"
+                         style="aspect-ratio: 960/1234; height: 36px; width: auto; object-fit: contain;">
                     <div class="flex flex-col">
                         <span class="text-sm font-bold tracking-tight text-slate-900 leading-tight">Portal Magang</span>
                         <span class="text-[10px] font-semibold tracking-wider uppercase text-slate-400">Pemerintah Kota Surabaya</span>

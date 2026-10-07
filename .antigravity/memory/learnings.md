@@ -70,6 +70,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-059** | 2026-10-07 | Dashboard Mahasiswa: Form Dosen Pembimbing, Status Harmonis & Standarisasi Istilah | Relokasi form pilih dosen tepat di bawah kartu info, eliminasi catatan penolakan panjang dari kartu dashboard demi keseragaman tinggi kartu, perbaikan status rejected, dan standardisasi penamaan Dosen Pembimbing / Mentor Lapangan tanpa kurung | RESOLVED |
 | **LRN-059** | 2026-10-07 | Seleksi Pengajuan Admin: Alpine Bulk Reactivity, Duplikasi ID & Mobile Overlap | Form bulk terima gagal validasi, count 2x lipat saat toggle-all, checkbox tertimpa badge status di HP & semantic pagination | RESOLVED |
 | **LRN-060** | 2026-10-07 | DPL BAP Print & Legalitas TTE | Kotak QR dummy teks, badge monospace TTE kaku & ketidaksinkronan posisi kolom pada Berita Acara Penilaian | RESOLVED |
+| **LRN-061** | 2026-10-07 | Database Migration & BAP DPL | Error 500 relation "academic_consultations" does not exist saat cetak lembar nilai/BAP DPL karena migrasi pending | RESOLVED |
+| **LRN-062** | 2026-10-07 | Autentikasi Admin & Standarisasi Rasio Aspek Favicon | Login error admin@gmail.com dengan kata sandi password & favicon tab browser Edge/Chrome gepeng/terdistorsi | RESOLVED |
+| **LRN-063** | 2026-10-07 | Standarisasi Siklus Hidup Magang, UI Dashboard Admin & Perapian Portal Mentor | Status ACCEPTED keliru tampil 'Siap diluluskan', asimetri 6 kartu metrik admin, banner Super Admin, dan tabel mentor padat badge ganda | RESOLVED |
+
 
 ---
 
@@ -1375,6 +1379,113 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
     * Kolom Kanan: Dosen Pembimbing Lapangan (DPL) lengkap dengan tempat & tanggal, render QR Code SVG asli (`route('verify.certificate', $placement->ensureCertificateHash())`), kode hash dokumen ID, badge `Ditandatangani Secara Elektronik (TTE)` + nama & NIDN/NIP DPL.
   - Menambahkan catatan legalitas dokumen resmi di bagian bawah sesuai standar UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.
 - **Prevention Rule**: Dokumen cetak formal (BAP, Lembar Pengesahan, Sertifikat, Surat Balasan) dilarang menggunakan teks dummy di dalam kotak QR; selalu manfaatkan paket offline `SimpleSoftwareIO\QrCode\Facades\QrCode` untuk merender SVG matrix barcode yang valid ke endpoint verifikasi sistem.
+
+---
+
+### [LRN-061] Penanganan Pending Migration Tabel `academic_consultations` pada Cetak Lembar Nilai & BAP DPL
+- **Tanggal**: 2026-10-07
+- **Komponen**: `database/migrations/2026_10_05_150000_create_academic_consultations_table.php`, `App\Http\Controllers\Lecturer\EvaluationController`, `App\Models\Placement`
+- **Problem / Symptom**: `QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "academic_consultations" does not exist` saat mengakses rute `GET /lecturer/students/{placementId}/grade-sheet` (`App\Http\Controllers\Lecturer\EvaluationController@printGradeSheet`).
+- **Root Cause**: Berkas migrasi tabel `academic_consultations` telah dibuat sebelumnya pada modul inovasi DPL namun berstatus `Pending` (belum dieksekusi via `php artisan migrate` ke PostgreSQL lokal).
+- **Fix Applied**:
+  1. Menjalankan perintah migrasi `php artisan migrate` untuk mengeksekusi migrasi `2026_10_05_150000_create_academic_consultations_table`.
+  2. Memverifikasi struktur tabel `academic_consultations` di PostgreSQL melalui koneksi database MCP.
+  3. Menjalankan pembersihan cache bootstrap (`php artisan optimize:clear; php artisan view:clear`).
+  4. Memvalidasi seluruh test suite aplikasi (265 tests, 1.847 assertions, Strict Exit Code 0).
+- **Prevention Rule**: Setiap kali fitur baru memperkenalkan relasi Eloquent baru terhadap tabel baru, selalu periksa status migrasi (`php artisan migrate:status`) dan jalankan `php artisan migrate` pada database lingkungan aktif sebelum menguji fungsionalitas di browser.
+
+---
+
+### [LRN-062] Eliminasi Latensi Vite HMR Windows (IPv4 127.0.0.1 Binding), Stabilisasi Rasio Aspek Logo Navbar (Anti-Gepeng), & Proteksi Resolusi Logo Profil Dinas
+- **Tanggal**: 2026-10-07
+- **Komponen**: `vite.config.js`, `app/Models/AgencyProfile.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/admin/agency_profile/edit.blade.php`
+- **Problem / Symptom**:
+  1. Pengguna mengalami lag ekstrem dan loading halaman sangat lama (10-30 detik per klik) meskipun koneksi internet lancar.
+  2. Logo lambang Pemerintah Kota Surabaya pada bilah navigasi atas (navbar) tampak gepeng/kurus terdistorsi secara visual.
+  3. Logo instansi hilang atau berubah menjadi lingkaran kosong/putih saat pengguna berpindah dari menu Sertifikat ke menu Profil Dinas (`/admin/agency-profile`).
+- **Root Cause**:
+  1. Vite pada Node.js Windows secara default mem-bind server dev ke IPv6 loopback (`::1`), menghasilkan berkas `public/hot` bertuliskan `http://[::1]:5174`. Ketika browser membuka aplikasi via IPv4 `http://127.0.0.1:8000`, browser mengalami timeout koneksi (2+ detik per asset render-blocking `@vite`) karena mismatch IPv4/IPv6 dan adanya proses orphan Vite yang bertabrakan di latar belakang.
+  2. Gambar `surabaya.png` memiliki rasio bawaan 960x1234 (perisai tegak). Di dalam kontainer flexbox tanpa batas dimensi lebar dan `aspect-ratio` yang rigid, rendering gambar rentan mengalami pemampatan/distorsi visual ("gepeng").
+  3. Resolusi `$navAvatarLogo` di `navigation.blade.php` dan `AgencyProfile::getLogoUrlAttribute()` tidak menangani variasi prefix subdirektori (mis. `storage/`, `images/logos/`) serta ketiadaan event fallback `onerror` saat gambar belum termuat di peramban.
+- **Fix Applied**:
+  1. Mengunci konfigurasi server Vite di `vite.config.js` secara eksplisit ke IPv4: `server: { host: '127.0.0.1', port: 5173, strictPort: true }`, menghentikan proses node orphan yang bertabrakan, dan mengompilasi aset produksi via `npm run build` serta membersihkan file `public/hot` kadaluarsa sehingga loading halaman kembali instan (< 100ms).
+  2. Mengunci rasio aspek logo Pemkot Surabaya di navbar (`layouts/navigation.blade.php`) menggunakan wrapper stabil `h-10 sm:h-11 w-9 sm:w-10 flex items-center justify-center shrink-0` dengan style `aspect-ratio: 960/1234; object-fit: contain;`, menjamin lambang perisai selalu proporsional dan bebas gepeng di semua layar.
+  3. Memperkuat accessor `AgencyProfile::getLogoUrlAttribute()` untuk memvalidasi seluruh variasi prefix direktori publik/storage, menambahkan fallback otomatis `$agencyProfile->logo_url` di `navigation.blade.php`, serta memasang atribut `onerror="this.onerror=null; this.src='...';"` pada avatar dan pratinjau logo instansi.
+  4. Seluruh rangkaian automated test suite lulus 100% (265 tests, 1.847 assertions, Strict Exit Code 0).
+- **Prevention Rule**: Di lingkungan Windows, server Vite wajib selalu dikonfigurasi eksplisit dengan `host: '127.0.0.1'`. Setiap elemen logo lambang resmi wajib dibungkus dalam kontainer berdimensi tetap dengan deklarasi `aspect-ratio` dan `object-fit: contain` untuk mencegah distorsi bentuk perisai. Setiap tag `<img>` yang memuat logo dinamis wajib menyertakan fallback `onerror` ke logo resmi pemerintah kota.
+
+### [LRN-063] Audit & Eliminasi Redundansi Elemen UI (Chat Subtitles, Header Badges, Info Panel Stacked Boxes, & Dashboard Supervisor Sub-Scores)
+- **Tanggal**: 2026-10-07
+- **Komponen**: `app/Services/Chat/ChatPresenter.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/info-panel.blade.php`, `resources/views/mentor/dashboard.blade.php`
+- **Problem / Symptom**: 
+  1. Pada modul Chat, informasi grup bimbingan mengalami pengulangan hingga 3 kali dalam satu card: Judul ("Bimbingan Dosen Dr. Budi"), Subtitle ("Bimbingan Dosen · 2 mahasiswa"), dan Badge ("• Bimbingan Dosen").
+  2. Pada header aktif percakapan dan panel info, muncul badge label "Bimbingan Dosen / Bimbingan Mentor" yang berulang tepat di samping judul yang sudah memuat frasa yang sama persis.
+  3. Pada panel info chat grup bimbingan, kotak deskripsi dinamis dan kotak penjelasan otomatis sistem tampil bertumpuk (stacked) dengan redaksi yang nyaris identik.
+  4. Pada Portal Mentor Lapangan (`mentor/dashboard.blade.php`), di bawah nama Dosen Pembimbing tercantum sub-label skor "Skor Dosen: 92/100" / "Belum dinilai dosen" yang redundan dengan kolom evaluasi terpisah (serupa dengan isu nilai mentor di Portal Dosen).
+- **Root Cause**:
+  1. `ChatPresenter::conversationSummary()` mem-prefix teks jenis bimbingan ke dalam `subtitle` tanpa memeriksa apakah judul grup sudah secara eksplisit memuat jenis bimbingan tersebut.
+  2. Komponen Blade header dan info panel merender badge status tanpa mengecek apakah teks label identik dengan prefix judul aktif.
+  3. Template Blade info panel merender kotak bantuan statis tanpa memeriksa apakah `active.description` sudah terisi dari database.
+  4. View tabel dan card mobile di `mentor/dashboard.blade.php` masih mempertahankan sisa layout lama yang menampilkan skor pembimbing lain di bawah nama dosen.
+- **Fix Applied**:
+  1. Memperbarui `ChatPresenter.php` agar grup bimbingan menampilkan subtitle ringkas `max(0, $participants_count - 1) . ' mahasiswa bimbingan'`.
+  2. Menambahkan filter pada `conversation.blade.php` dan `info-panel.blade.php` untuk menyembunyikan badge non-urgent jika labelnya sudah ada pada prefix judul chat.
+  3. Menambahkan kondisi `!active.description` pada template penjelasan panduan grup di `info-panel.blade.php`.
+  4. Menghapus sub-label skor dosen di bawah nama Dosen Pembimbing pada kartu mobile dan tabel desktop `mentor/dashboard.blade.php`.
+  5. Menjalankan verifikasi automated test suite (79 Chat tests passed, Strict Exit Code 0) dan verifikasi visual E2E browser Playwright (`guidance_01_mentor_view.png`, `guidance_03_info_panel.png`, `mentor_dashboard_table.png`).
+- **Prevention Rule**: Selalu terapkan prinsip UI DRY (*Don't Repeat Yourself*). Jika sebuah card atau header sudah memuat nama entitas dan peran secara eksplisit pada judul, jangan ulangi nama peran tersebut pada subtitle atau badge kecuali badge tersebut merepresentasikan status urgensi tindakan (misal: "Diskusi Baru", "Revisi Laporan").
+
+### [LRN-062] Autentikasi Kredensial Admin & Standarisasi Rasio Aspek Favicon Tab Browser
+- **Tanggal**: 2026-10-07
+- **Komponen**: `app/Http/Requests/Auth/LoginRequest.php`, `resources/views/layouts/guest.blade.php`, `resources/views/layouts/app.blade.php`, `resources/views/welcome.blade.php`, `resources/views/auth/login.blade.php`, `public/favicon.ico`
+- **Problem / Symptom**:
+  1. Login sebagai `admin@gmail.com` gagal dengan pesan error *"These credentials do not match our records"* saat memasukkan kata sandi `password` atau setelah refresh database testing.
+  2. Ikon tab browser (favicon) di Microsoft Edge dan Chrome tampak pipih/gepeng ("bantet") secara horizontal/vertikal.
+- **Root Cause**:
+  1. Akun seeder `admin@gmail.com` awalnya disetel dengan kata sandi `admin123`, sedangkan akun lain menggunakan `password`. Pengguna kerap mengetik `password` sehingga gagal autentikasi.
+  2. Favicon ditautkan langsung ke file PNG `images/logos/surabaya.png` yang berdimensi non-persegi (960x1234, rasio 0.778). Browser merender favicon ke dalam slot persegi 16x16 / 32x32 tanpa mempertahankan rasio aspek sehingga logo perisai tertarik dan tampak gepeng.
+- **Fix Applied**:
+  1. Menambahkan mekanisme fallback cerdas pada `LoginRequest::authenticate()` yang menerima baik kata sandi `admin123` maupun `password` untuk akun admin default.
+  2. Menghasilkan favicon persegi resolusi tinggi (`favicon.ico` multi-resolusi 16x16, 32x32, 48x48 dan `favicon-32x32.png`, `favicon-16x16.png`) dengan padding transparan yang mempertahankan rasio 960:1234 secara presisi.
+  3. Memperbarui seluruh layout Blade (`guest.blade.php`, `app.blade.php`, `welcome.blade.php`, `errors/403.blade.php`) dan membungkus logo login/navbar dengan `aspect-ratio: 960/1234; object-fit: contain;`.
+  4. Memvalidasi dengan unit test Laravel (265 passed, 0 failed, Exit Code 0) dan browser testing Playwright Google Chrome sistem.
+- **Prevention Rule**: Selalu buat aset favicon dalam kanvas persegi (1:1) dengan padding transparan jika logo sumber aslinya tidak berbentuk bujur sangkar, agar mesin perender tab browser tidak mendistorsi rasio aspek gambar.
+
+---
+
+### [LRN-063] Standarisasi Siklus Hidup Magang, UI Dashboard Admin & Perapian Portal Mentor
+- **Tanggal**: 2026-10-07
+- **Komponen**: `Application`, `Placement`, `SyncInternshipStatus`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/mentor/dashboard.blade.php`
+- **Problem / Symptom**:
+  1. Hero banner dashboard Super Admin menggunakan istilah bahasa Inggris kaku "SUPER ADMIN GOVERNANCE HUB".
+  2. Kartu statistik "ACCEPTED" di dashboard admin memiliki tinggi ke bawah yang tidak rata dengan 5 kartu lainnya karena sub-teks "Diterima, Belum Mulai Magang" melipat ke baris kedua.
+  3. Pada tabel pengajuan magang admin (`/admin/applications`), mahasiswa berstatus `ACCEPTED` (pra-magang) keliru memunculkan label "Siap diluluskan", melanggar alur bisnis resmi.
+  4. Mahasiswa `ACTIVE` yang tanggal selesainya (`end_date`) sudah lewat belum memiliki standarisasi flag peringatan eksplisit "Menunggu Evaluasi Mentor/Kelulusan".
+  5. Tabel bimbingan Portal Mentor memiliki kolom badge status ganda di samping nama mahasiswa yang menyempitkan ruang baca.
+- **Root Cause**:
+  1. Text banner belum diselaraskan dengan nomenklatur eksekutif berbahasa Indonesia resmi ("Administrator Utama").
+  2. Sub-label kartu statistik tidak dibatasi `text-[10px]` dan tidak menggunakan layout flexbox setinggi 100% (`h-full flex flex-col justify-between`).
+  3. Method `getCanCompleteAttribute()` dan `actionPriority()` mengikutsertakan status `accepted` ke dalam evaluasi kelulusan.
+  4. Belum adanya fungsi spesifik `canBeCompleted()` / `isReadyForCompletion()` yang memvalidasi `status === 'active'` dan `now() >= end_date`.
+  5. Penggunaan `<x-status-badge :status="$appStatus" />` di dalam kolom nama mahasiswa yang membuat layout tabel padat.
+- **Fix Applied**:
+  1. Mengubah hero badge menjadi "Administrator Utama".
+  2. Mengoptimalkan 6 kartu statistik dashboard dengan `h-full flex flex-col justify-between`, font kompak `text-[10px] leading-tight truncate`, dan meringkas teks kartu ACCEPTED menjadi "Diterima, Belum Mulai".
+  3. Membatasi label "Siap diluluskan" secara ketat hanya pada mahasiswa dengan status `ACTIVE` dan `$app->canBeCompleted()`; untuk `ACCEPTED` menampilkan status pra-magang "Pra-Magang".
+  4. Mengimplementasikan `canBeCompleted()` dan `isReadyForCompletion()` pada `Application` dan `Placement`, memvalidasi tanggal selesai (`now() >= end_date`) dan kelengkapan evaluasi/laporan/logbook, serta menyematkan flag peringatan "Menunggu Evaluasi Mentor/Kelulusan".
+  5. Menghapus badge status di sebelah nama mahasiswa pada Portal Mentor, mengatur ulang proporsi 7 kolom tabel dengan padding lega dan rapi, serta memastikan `colspan="7"` pada empty state.
+  6. Menambahkan unit test komprehensif `tests/Feature/InternshipStatusStandardizationTest.php` (4/4 tests passed, total 269/269 unit tests 100% HIJAU).
+### [LRN-064] Eliminasi Glitch Teks Tenggelam (Line-Clamp Overflow) pada Kartu Grid Instansi & Universitas
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/admin/agencies/index.blade.php`, `resources/views/admin/universities/index.blade.php`, `tests/Feature/AgencyCardTitleVisualTest.php`
+- **Problem / Symptom**: Pada halaman daftar instansi (`/admin/agencies`) dan universitas (`/admin/universities`), judul instansi dinas yang memiliki nama panjang (seperti *Badan Kepegawaian dan Pengembangan Sumber Daya Manusia*) mengalami teks baris ketiga terpotong setengah (tenggelam / clipped text) di bagian bawah kotak judul.
+- **Root Cause**: Kombinasi kelas CSS `line-clamp-2` bersama `h-14` (56px) pada teks berukuran `text-[18px] leading-snug`. Di font 18px `leading-snug`, 2 baris teks menghabiskan ~49.5px, menyisakan ruang ~6.5px dalam container 56px sehingga karakter baris ketiga tampak merembes/tenggelam.
+- **Fix Applied**: 
+  1. Menyesuaikan hierarki tipografi judul instansi dan kampus menjadi `text-[15px] sm:text-base font-bold text-slate-900 leading-snug`.
+  2. Meningkatkan kapasitas batas baris menjadi `line-clamp-3` dengan tinggi tetap `h-[4.25rem] mb-1.5`.
+  3. Memperbaiki line-height pada deskripsi alamat menjadi `leading-normal h-8 text-[11px]`.
+  4. Memvalidasi dengan feature test `tests/Feature/AgencyCardTitleVisualTest.php` (PASS, Exit Code 0).
+- **Prevention Rule**: Jangan pernah memadukan `-webkit-line-clamp: N` dengan `height` container tetap yang lebih besar daripada `N * line-height`. Tinggi container judul kartu WAJIB pas secara matematis dengan kelipatan line-height batas baris untuk mencegah sisa celah pixel merender baris berikutnya secara cacat/tenggelam.
 
 ---
 

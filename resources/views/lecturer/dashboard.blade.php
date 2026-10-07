@@ -260,9 +260,6 @@
                                 <div class="text-slate-600">
                                     <span class="text-slate-500 font-medium">Mentor:</span> 
                                     <span class="font-semibold text-slate-800">{{ $mentor->name ?? 'Belum Ditugaskan' }}</span>
-                                    @if($nilaiDinas > 0)
-                                        <span class="text-emerald-700 font-semibold ml-1">&bull; Nilai Dinas: {{ number_format($nilaiDinas, 1) }}</span>
-                                    @endif
                                 </div>
                                 <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60 text-xs">
                                     <span class="text-slate-500">Laporan: 
@@ -274,9 +271,9 @@
                                     </span>
                                     <span>
                                         @if($hasEval)
-                                            <span class="text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">Nilai DPL: {{ number_format($eval->nilai_dosen_calculated, 1) }}</span>
+                                            <span class="text-slate-900 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Nilai DPL: {{ number_format($eval->nilai_dosen_calculated, 1) }}</span>
                                         @else
-                                            <span class="text-amber-700 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Belum Dinilai</span>
+                                            <span class="text-slate-600 font-medium bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Belum Dinilai</span>
                                         @endif
                                     </span>
                                 </div>
@@ -305,13 +302,14 @@
                     <table class="min-w-full divide-y divide-slate-100 text-left text-xs">
                         <thead class="bg-slate-50/75 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-4">Mahasiswa</th>
-                                <th class="py-3.5 px-4">Instansi & Unit Kerja</th>
-                                <th class="py-3.5 px-4">Pembimbing Dinas</th>
-                                <th class="py-3.5 px-4 text-center">Logbook</th>
-                                <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Evaluasi Nilai</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-3.5">Mahasiswa</th>
+                                <th class="py-3.5 px-3.5">Instansi & Unit Kerja</th>
+                                <th class="py-3.5 px-3.5">Pembimbing Dinas</th>
+                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Logbook</th>
+                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Laporan Akhir</th>
+                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Evaluasi Nilai</th>
+                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Nilai Akhir</th>
+                                <th class="py-3.5 px-3.5 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -344,39 +342,32 @@
                                 <tr class="hover:bg-slate-50/80 transition">
                                     
                                     <!-- Student Info -->
-                                    <td class="py-4 px-4">
+                                    <td class="py-4 px-3.5">
                                         <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-500 font-medium">NIM: {{ $profile?->nim ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-600">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <!-- Placement Location -->
-                                    <td class="py-4 px-4">
+                                    <td class="py-4 px-3.5">
                                         <div class="font-semibold text-slate-800 text-xs">{{ $agency->agency_name ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <!-- Mentor Info -->
-                                    <td class="py-4 px-4">
+                                    <td class="py-4 px-3.5">
                                         <div class="font-medium text-slate-800 text-xs">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5">
-                                            @if($nilaiDinas > 0)
-                                                <span class="text-emerald-700 font-semibold">Dinas: {{ number_format($nilaiDinas, 1) }}</span>
-                                            @else
-                                                <span class="text-slate-400">Belum dinilai</span>
-                                            @endif
-                                        </div>
                                     </td>
 
                                     <!-- Logbook Counter -->
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                                             {{ $logbooksCount }} Entri
                                         </span>
                                     </td>
 
                                     <!-- Final Report Status -->
-                                    <td class="py-4 px-4 text-center whitespace-nowrap">
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
                                         @if(!$finalReport)
                                             <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500">
                                                 Belum Unggah
@@ -386,58 +377,69 @@
                                         @endif
                                     </td>
 
-                                    <!-- Dual-Status Nilai (Dinas & DPL) & Kumulatif -->
-                                    <td class="py-3 px-4 text-center whitespace-nowrap">
-                                        <div class="flex flex-col items-center gap-1">
+                                    <!-- Evaluasi Nilai (2 Komponen: Dinas & DPL) -->
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
+                                        <div class="inline-flex items-center justify-center gap-1.5">
                                             @if($isMentorOnly)
                                                 @if($nilaiDinas > 0)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-900 border border-slate-200" title="Nilai Pembimbing Lapangan Dinas">
                                                         Dinas: {{ number_format($nilaiDinas, 1) }}
                                                     </span>
                                                 @else
-                                                    <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                                        Dinas: Menunggu
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200" title="Mentor Dinas belum menilai">
+                                                        Dinas: -
                                                     </span>
                                                 @endif
-                                                <span class="text-[10px] text-slate-400">100% Nilai Dinas</span>
                                             @else
-                                                <!-- Dual Indicator: Mentor + DPL -->
-                                                <div class="flex items-center gap-1.5">
-                                                    @if($nilaiDinas > 0)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200" title="Nilai Pembimbing Lapangan Dinas">
-                                                            Dinas: {{ number_format($nilaiDinas, 1) }}
-                                                        </span>
-                                                    @else
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400 border border-slate-200" title="Mentor Dinas belum menilai">
-                                                            Dinas: -
-                                                        </span>
-                                                    @endif
-
-                                                    @if($hasEval)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200" title="Nilai Akademik DPL Kampus">
-                                                            DPL: {{ number_format($eval->nilai_dosen_calculated, 1) }}
-                                                        </span>
-                                                    @else
-                                                        <a href="{{ route('lecturer.evaluations.create', $p->id) }}" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100" title="DPL belum mengisi nilai">
-                                                            Nilai
-                                                        </a>
-                                                    @endif
-                                                </div>
-
-                                                <!-- Kumulatif Final -->
-                                                @if($eval && $eval->nilai_akhir > 0)
-                                                    <span class="text-[11px] font-bold text-slate-900 mt-0.5 block">
-                                                        Akhir: <span class="text-blue-700">{{ number_format($eval->nilai_akhir, 1) }}</span> <span class="text-emerald-700 font-bold">({{ $eval->grade_calculated }})</span>
+                                                @if($nilaiDinas > 0)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-900 border border-slate-200" title="Nilai Pembimbing Lapangan Dinas">
+                                                        Dinas: {{ number_format($nilaiDinas, 1) }}
                                                     </span>
                                                 @else
-                                                    <span class="text-[10px] text-slate-400 italic">Belum Lengkap</span>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200" title="Mentor Dinas belum menilai">
+                                                        Dinas: -
+                                                    </span>
+                                                @endif
+
+                                                @if($hasEval)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-900 border border-slate-200" title="Nilai Akademik DPL Kampus">
+                                                        DPL: {{ number_format($eval->nilai_dosen_calculated, 1) }}
+                                                    </span>
+                                                @else
+                                                    <a href="{{ route('lecturer.evaluations.create', $p->id) }}" class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition" title="DPL belum mengisi nilai">
+                                                        Nilai
+                                                    </a>
                                                 @endif
                                             @endif
                                         </div>
                                     </td>
 
+                                    <!-- Nilai Akhir -->
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
+                                        @if($isMentorOnly)
+                                            @if($nilaiDinas > 0)
+                                                <span class="text-xs font-bold text-slate-900">
+                                                    {{ number_format($nilaiDinas, 1) }}
+                                                    @if($eval?->grade_calculated)
+                                                        ({{ $eval->grade_calculated }})
+                                                    @endif
+                                                </span>
+                                            @else
+                                                <span class="text-[11px] text-slate-400 italic">Belum Lengkap</span>
+                                            @endif
+                                        @else
+                                            @if($eval && $eval->nilai_akhir > 0)
+                                                <span class="text-xs font-bold text-slate-900">
+                                                    {{ number_format($eval->nilai_akhir, 1) }} ({{ $eval->grade_calculated }})
+                                                </span>
+                                            @else
+                                                <span class="text-[11px] text-slate-400 italic">Belum Lengkap</span>
+                                            @endif
+                                        @endif
+                                    </td>
+
                                     <!-- Action Buttons -->
-                                    <td class="py-4 px-4 text-right whitespace-nowrap">
+                                    <td class="py-4 px-3.5 text-right whitespace-nowrap">
                                         <div class="inline-flex items-center justify-end gap-1.5">
                                             <a href="{{ route('lecturer.students.show', $p->id) }}" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold transition">
                                                 Detail
@@ -451,7 +453,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-12 text-center text-slate-400">
+                                    <td colspan="8" class="py-12 text-center text-slate-400">
                                         Belum ada mahasiswa bimbingan magang yang ditugaskan kepada Anda.
                                     </td>
                                 </tr>
