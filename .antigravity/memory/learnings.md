@@ -65,6 +65,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
 | **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
 | **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
+| **LRN-059** | 2026-10-07 | Seleksi Pengajuan Admin: Alpine Bulk Reactivity, Duplikasi ID & Mobile Overlap | Form bulk terima gagal validasi, count 2x lipat saat toggle-all, checkbox tertimpa badge status di HP & semantic pagination | RESOLVED |
 
 ---
 
@@ -1307,6 +1308,29 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Menyederhanakan judul di `lecturer/dashboard.blade.php` menjadi "Portal Dosen Pembimbing" tanpa tanda kurung.
   4. Menambahkan alias `Grade::fromScore()` pada helper `App\Support\Grade`.
 - **Prevention Rule**: Dilarang menggunakan Eloquent virtual accessor di dalam query database `where()` atau `whereHas()`. Selalu periksa skema tabel riil PostgreSQL sebelum menyusun query builder. Seluruh halaman supervisi bimbingan magang wajib mempertahankan paritas tata letak, warna, dan hirarki visual.
+
+---
+
+### [LRN-059] Penanganan Asinkronus Alpine Bulk Action, Duplikasi ID Responsive Dual-View & Overlap Mobile UI
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/admin/applications/index.blade.php`
+- **Problem / Symptom**: 
+  1. Tombol "Terima" pada floating bar aksi massal pengajuan admin gagal memproses persetujuan pengajuan karena validasi error `bulk_action is required`.
+  2. Saat mencentang "Pilih Semua" (Select All), badge counter menampilkan jumlah pengajuan terpilih dua kali lipat (misal 6 padahal hanya 3), modal penolakan menyebutkan angka yang salah, dan pengguna tidak dapat membatalkan centang (uncheck) satu per satu.
+  3. Pada tampilan smartphone (< 768px), kotak checkbox absolut (`top-4 right-4`) bertabrakan visual dan menimpa langsung badge status pengajuan di pojok kanan atas kartu.
+  4. Komponen paginasi terkurung di dalam form POST aksi massal.
+- **Root Cause**: 
+  1. Reaktivitas Alpine `:value="action"` berjalan asinkronus (microtask), sedangkan `this.$el.submit()` dijalankan secara sinkronus seketika sehingga native form mengirimkan `bulk_action=""`.
+  2. Tampilan ganda (Tabel desktop dan Kartu mobile) berada di DOM bersamaan dengan kelas `.bulk-cb`. `toggleAll()` mengambil checkbox dari kedua tampilan sekaligus tanpa deduplikasi `Set`, memicu duplicate values pada array `selected` Alpine.
+  3. Baris header kartu mobile memiliki status badge di kolom kanan tanpa padding/margin offset terhadap checkbox absolut `right-4`.
+  4. Tag penutup `</form>` diletakkan setelah `{{ $applications->links() }}`.
+- **Fix Applied**: 
+  1. Mengisi langsung nilai input DOM `input[name='bulk_action'].value = type` sebelum memanggil submit, serta menambahkan konfirmasi dialog sebelum eksekusi massal.
+  2. Menggunakan `[...new Set(values)]` pada `toggleAll()` agar ID pengajuan selalu unik.
+  3. Memberikan kelas `pr-8` pada kontainer status badge di mobile kartu saat status `pending`/`verified` agar terpisah rapi dari checkbox.
+  4. Menambahkan nullsafe operator `$app->user?->name ?? 'Mahasiswa'` dan `$app->user?->studentProfile?->universitas`.
+  5. Menutup `</form>` tepat sebelum blok paginasi.
+- **Prevention Rule**: Pada antarmuka responsif dual-rendering (desktop table + mobile cards), query selektor DOM untuk manipulasi data array WAJIB dideduplikasi dengan `Set`. Form submit sinkronus yang bergantung pada state reaktif Alpine WAJIB mengatur nilai input DOM secara eksplisit sebelum memanggil `.submit()`. Seluruh elemen absolut di kartu mobile wajib memiliki offset padding pada elemen flow yang berada di koordinat yang sama.
 
 ---
 

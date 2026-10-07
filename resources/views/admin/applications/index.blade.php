@@ -16,7 +16,7 @@
                         </div>
                         <div>
                             <span class="font-medium text-indigo-700">Filter Aktif Perguruan Tinggi:</span>
-                            <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
+                            <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} {{ $selectedUniversity->code ? "({$selectedUniversity->code})" : '' }}</h4>
                         </div>
                     </div>
                     <div class="flex items-center flex-wrap gap-2 shrink-0">
@@ -134,17 +134,22 @@
                           rejectionNote: '',
                           toggleAll() {
                               if (this.selectAll) {
-                                  this.selected = Array.from(document.querySelectorAll('.bulk-cb')).map(cb => cb.value);
+                                  const values = Array.from(document.querySelectorAll('.bulk-cb')).map(cb => cb.value);
+                                  this.selected = [...new Set(values)];
                               } else {
                                   this.selected = [];
                               }
                           },
                           submitBulk(type) {
                               this.action = type;
+                              const input = this.$el.querySelector('input[name=\'bulk_action\']');
+                              if (input) input.value = type;
                               if (type === 'rejected') {
                                   this.showModal = true;
                               } else {
-                                  this.$el.submit();
+                                  if (confirm('Apakah Anda yakin ingin menerima ' + this.selected.length + ' pengajuan terpilih?')) {
+                                      this.$el.submit();
+                                  }
                               }
                           }
                       }">
@@ -159,7 +164,7 @@
                             <textarea name="bulk_rejection_note" x-model="rejectionNote" rows="3" class="w-full rounded-xl border-slate-300 text-sm focus:border-red-500 focus:ring-red-500" placeholder="Contoh: Kuota instansi penuh / Berkas tidak lengkap..."></textarea>
                             <div class="flex justify-end gap-2 pt-2">
                                 <button type="button" @click="showModal = false" class="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold">Batal</button>
-                                <button type="button" @click="$el.closest('form').submit()" class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-xl text-xs font-bold" :disabled="!rejectionNote">Tolak Pengajuan</button>
+                                <button type="button" @click="const input = $el.closest('form').querySelector('input[name=\'bulk_action\']'); if (input) input.value = 'rejected'; $el.closest('form').submit()" class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-xl text-xs font-bold" :disabled="!rejectionNote.trim()">Tolak Pengajuan</button>
                             </div>
                         </div>
                     </div>
@@ -230,9 +235,9 @@
                                         {{ $app->created_at->format('d M Y, H:i') }}
                                     </td>
                                     <td class="p-3 font-semibold text-gray-900">
-                                        <div class="leading-snug">{{ $app->user->name }}</div>
+                                        <div class="leading-snug">{{ $app->user?->name ?? 'Mahasiswa' }}</div>
                                     </td>
-                                    <td class="p-3 text-gray-600">{{ $app->user->studentProfile->universitas ?? '-' }} <br><span class="text-xs text-gray-400">({{ $app->user->studentProfile->jurusan ?? '-' }})</span></td>
+                                    <td class="p-3 text-gray-600">{{ $app->user?->studentProfile?->universitas ?? '-' }} <br><span class="text-xs text-gray-400">({{ $app->user?->studentProfile?->jurusan ?? '-' }})</span></td>
                                     <td class="p-3">
                                         <div class="space-y-1">
                                             <div class="font-bold text-gray-900 leading-snug">
@@ -305,16 +310,16 @@
                         @endphp
                         <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 relative">
                             @if(in_array($rawStatus, ['pending', 'verified']))
-                                <div class="absolute top-4 right-4">
+                                <div class="absolute top-4 right-4 z-10">
                                     <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                 </div>
                             @endif
                             <div class="flex items-start justify-between gap-2">
-                                <div class="min-w-0 pr-8">
-                                    <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user->name }}</h4>
-                                    <p class="text-xs text-slate-500 mt-0.5">{{ $app->user->studentProfile->universitas ?? '-' }} <span class="text-slate-400">({{ $app->user->studentProfile->jurusan ?? '-' }})</span></p>
+                                <div class="min-w-0 pr-2">
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">({{ $app->user?->studentProfile?->jurusan ?? '-' }})</span></p>
                                 </div>
-                                <div class="text-right shrink-0">
+                                <div class="text-right shrink-0 {{ in_array($rawStatus, ['pending', 'verified']) ? 'pr-8' : '' }}">
                                     <x-status-badge :status="$app->status" />
                                     @if($app->isPastEndDate())
                                         <div class="mt-1 text-[10px] font-bold text-rose-700">Lewat {{ $app->daysPastEndDate() }} hari</div>
@@ -365,11 +370,12 @@
                     @endforelse
                 </div>
 
+                </form>
+
                 <!-- Paginasi -->
                 <div class="mt-6">
                     {{ $applications->links() }}
                 </div>
-                </form>
 
             </div>
         </div>
