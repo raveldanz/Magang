@@ -16,6 +16,10 @@
                         <x-chat-button :user="$placement->mentor ?? $placement->pembimbing" label="Chat Mentor" />
                     @endif
                     <x-chat-group-button :placement="$placement" />
+                    <a href="{{ route('lecturer.students.grade_sheet', $placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs cursor-pointer" title="Buka Dokumen Resmi Berita Acara & Nilai A4">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        <span>Cetak Berita Acara (BAP)</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -526,6 +530,125 @@
                     @empty
                         <div class="py-8 text-center text-gray-400 text-xs">
                             Mahasiswa belum mengisi entri logbook magang.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- 5. LEMBAR RIWAYAT KONSULTASI BIMBINGAN DPL (SUPERVISION LOG) -->
+            <div id="supervision-log" class="bg-white rounded-3xl border border-gray-100 p-6 sm:p-7 shadow-xs space-y-6" x-data="{ openForm: {{ $consultations->isEmpty() ? 'true' : 'false' }} }">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-lg text-gray-900 tracking-tight">Riwayat Konsultasi & Bimbingan Akademik DPL</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Catat sesi konsultasi naskah laporan, telaah metodologi, dan arahan revisi bersama mahasiswa</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200">
+                            {{ $consultations->count() }} Sesi Bimbingan
+                        </span>
+                        <button type="button" @click="openForm = !openForm" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <span x-text="openForm ? 'Sembunyikan Form' : 'Tambah Sesi Bimbingan'">Tambah Sesi Bimbingan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Tambah Catatan Sesi Bimbingan -->
+                <div x-show="openForm" x-collapse x-cloak class="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                        Input Catatan Sesi Konsultasi DPL Baru
+                    </h4>
+                    <form method="POST" action="{{ route('lecturer.consultations.store', $placement->id) }}" class="space-y-4">
+                        @csrf
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Pertemuan / Konsultasi <span class="text-rose-500">*</span></label>
+                                <input type="date" name="consultation_date" value="{{ date('Y-m-d') }}" required
+                                       class="w-full text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Tahapan Bimbingan Laporan <span class="text-rose-500">*</span></label>
+                                <select name="stage" required class="w-full text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                    <option value="Bab 1-3 (Pendahuluan & Metodologi)">Bab 1-3 (Pendahuluan & Metodologi)</option>
+                                    <option value="Analisis Sistem & Pembahasan Masalah">Analisis Sistem & Pembahasan Masalah</option>
+                                    <option value="Penyusunan Draf Laporan Akhir">Penyusunan Draf Laporan Akhir</option>
+                                    <option value="Revisi & Penyempurnaan Bab Akhir">Revisi & Penyempurnaan Bab Akhir</option>
+                                    <option value="Persiapan Ujian / Pasca-Magang">Persiapan Ujian / Pasca-Magang</option>
+                                    <option value="Konsultasi Khusus & Evaluasi Kinerja">Konsultasi Khusus & Evaluasi Kinerja</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pokok Bahasan / Topik Konsultasi <span class="text-rose-500">*</span></label>
+                            <input type="text" name="topic" placeholder="Contoh: Review Bab 2 Landasan Teori dan Kerangka Kerja Scrum di Diskominfo" required
+                                   class="w-full text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Catatan, Masukan, & Arahan DPL <span class="text-rose-500">*</span></label>
+                            <textarea name="notes" rows="3" placeholder="Tuliskan arahan perbaikan, format referensi, atau instruksi langkah selanjutnya..." required
+                                      class="w-full text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"></textarea>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2 pt-2">
+                            <button type="button" @click="openForm = false" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition">
+                                Batal
+                            </button>
+                            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span>Simpan Catatan Bimbingan</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Timeline Daftar Riwayat Konsultasi -->
+                <div class="space-y-3">
+                    @forelse ($consultations as $session)
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2.5 hover:border-indigo-200 transition">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-lg text-xs font-bold">
+                                        Sesi #{{ $loop->iteration }}
+                                    </span>
+                                    <span class="text-xs font-bold text-slate-900">
+                                        {{ \Carbon\Carbon::parse($session->consultation_date)->translatedFormat('l, d F Y') }}
+                                    </span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                        {{ $session->stage }}
+                                    </span>
+                                </div>
+
+                                <form method="POST" action="{{ route('lecturer.consultations.destroy', $session->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus catatan sesi bimbingan ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus catatan sesi">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div>
+                                <h5 class="text-xs font-bold text-slate-900 leading-snug">
+                                    Topik: <span class="font-semibold text-slate-700">{{ $session->topic }}</span>
+                                </h5>
+                                <div class="mt-1.5 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed italic">
+                                    "{{ $session->notes }}"
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-slate-400 text-xs bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-6">
+                            <svg class="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                            <p class="font-medium text-slate-600">Belum Ada Sesi Bimbingan yang Dicatat</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Gunakan tombol "Tambah Sesi Bimbingan" di atas untuk mencatat setiap konsultasi laporan akademik.</p>
                         </div>
                     @endforelse
                 </div>

@@ -97,9 +97,37 @@ class DashboardController extends Controller
             'total_reports_pending' => $totalReportsPending,
         ];
 
+        // 1. SMART ACTION ALERTS (Peringatan Aksi Proaktif DPL)
+        $pendingReports = $placements->filter(function ($p) {
+            return $p->finalreport && $p->finalreport->status === 'pending';
+        });
+
+        $urgentEndingPlacements = $placements->filter(function ($p) {
+            $eval = $p->evaluation;
+            $hasScore = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->dosenAspectScore('score_mastery') ?? 0) > 0);
+            $app = $p->application;
+            if (!$app || $app->status === 'completed' || $app->status === 'rejected') return false;
+
+            $endDate = $app->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
+            $isNearEnd = $endDate && $endDate->diffInDays(\Carbon\Carbon::now(), false) >= -14;
+
+            return !$hasScore && ($isNearEnd || $app->status === 'active');
+        });
+
+        $supervisedPlacementIds = $placements->pluck('id')->toArray();
+        $pendingLogbooksCount = \App\Models\Logbook::whereIn('placement_id', $supervisedPlacementIds)
+            ->where('lecturer_status', 'pending')
+            ->count();
+
+        $actionAlerts = [
+            'pending_reports' => $pendingReports,
+            'urgent_ending' => $urgentEndingPlacements,
+            'pending_logbooks_count' => $pendingLogbooksCount,
+        ];
+
         $agencies = AgencyProfile::all();
 
-        return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies'));
+        return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies', 'actionAlerts'));
     }
 
     /**
@@ -118,6 +146,7 @@ class DashboardController extends Controller
             'logbooks',
             'finalreport',
             'evaluation',
+            'academicConsultations',
         ])->find($placementId) ?? Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
@@ -126,6 +155,7 @@ class DashboardController extends Controller
             'logbooks',
             'finalreport',
             'evaluation',
+            'academicConsultations',
         ])->where('application_id', $placementId)->firstOrFail();
 
         $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
@@ -143,6 +173,7 @@ class DashboardController extends Controller
         $logbooks = $placement->logbooks()->orderBy('date', 'desc')->get();
         $finalReport = $placement->finalreport;
         $evaluation = $placement->evaluation;
+        $consultations = $placement->academicConsultations;
 
         return view('lecturer.student-detail', compact(
             'placement',
@@ -153,7 +184,71 @@ class DashboardController extends Controller
             'mentor',
             'logbooks',
             'finalReport',
-            'evaluation'
+            'evaluation',
+            'consultations'
         ));
+    }
+
+    /**
+     * Simpan catatan sesi konsultasi bimbingan DPL
+     */
+    public function storeConsultation(Request $request, $placementId)
+    {
+        $lecturer = Auth::user();
+
+        $placement = Placement::with('application.user')->find($placementId)
+            ?? Placement::with('application.user')->where('application_id', $placementId)->firstOrFail();
+
+        $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
+        $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
+
+        if (!$isAssignedAdvisor && !$isSuperAdmin) {
+            abort(403, 'Akses Ditolak: Anda bukan DPL yang ditugaskan untuk mahasiswa ini.');
+        }
+
+        $request->validate([
+            'consultation_date' => 'required|date',
+            'stage' => 'required|string|max:100',
+            'topic' => 'required|string|max:255',
+            'notes' => 'required|string|max:2000',
+        ]);
+
+        $consultation = \App\Models\AcademicConsultation::create([
+            'placement_id' => $placement->id,
+            'academic_advisor_id' => $lecturer->id,
+            'consultation_date' => $request->consultation_date,
+            'stage' => $request->stage,
+            'topic' => $request->topic,
+            'notes' => $request->notes,
+            'status' => 'completed',
+        ]);
+
+        \App\Models\AuditLog::record('LECTURER_CONSULTATION_ADD', 'AcademicConsultation', $consultation->id, [
+            'student_name' => $placement->application?->user?->name ?? '-',
+            'topic' => $request->topic,
+            'consultation_date' => $request->consultation_date,
+        ]);
+
+        return redirect()->back()->with('success', 'Catatan sesi bimbingan DPL berhasil ditambahkan ke riwayat!');
+    }
+
+    /**
+     * Hapus catatan sesi bimbingan DPL
+     */
+    public function destroyConsultation($id)
+    {
+        $lecturer = Auth::user();
+        $consultation = \App\Models\AcademicConsultation::with('placement')->findOrFail($id);
+
+        $isAdvisor = ($consultation->academic_advisor_id === $lecturer->id || optional($consultation->placement)->academic_advisor_id === $lecturer->id);
+        $isSuperAdmin = ($lecturer->role === 'super_admin');
+
+        if (!$isAdvisor && !$isSuperAdmin) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki wewenang menghapus catatan ini.');
+        }
+
+        $consultation->delete();
+
+        return redirect()->back()->with('success', 'Catatan sesi bimbingan berhasil dihapus.');
     }
 }

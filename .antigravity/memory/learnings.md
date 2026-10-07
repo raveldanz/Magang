@@ -53,6 +53,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
 | **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
 | **LRN-043** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
+| **LRN-044** | 2026-10-05 | Inovasi Controller DPL: BAP A4, Action Center, Dual Badges, Log Bimbingan & Ekspor CSV | Ketiadaan instrumen formal DPL (BAP A4, riwayat bimbingan akademik, action alerts, dan ekspor CSV rekap bimbingan) & BackedEnum safety | RESOLVED |
+
 
 ---
 
@@ -926,7 +928,34 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-044] Inovasi Modul DPL: Berita Acara & Lembar Nilai A4, Smart Action Alerts, Dual-Status Badges, Supervision Log, dan Ekspor Rekapitulasi CSV
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Lecturer\DashboardController`, `Lecturer\EvaluationController`, `Lecturer\MonitoringController`, `AcademicConsultation`, `Placement`, `Evaluation`, Blade Views (`lecturer/dashboard.blade.php`, `lecturer/student-detail.blade.php`, `lecturer/grade-sheet.blade.php`, `lecturer/monitoring/index.blade.php`), PPTX Script
+- **Problem / Symptom**:
+  1. DPL tidak memiliki Berita Acara Penilaian (BAP-DPL) siap cetak format A4 berstandar universitas untuk pelaporan nilai magang ke program studi/fakultas.
+  2. DPL kesulitan mengetahui secara cepat mahasiswa mana yang membutuhkan perhatian (laporan belum dinilai, logbook pending) tanpa membuka satu per satu halaman.
+  3. Tabel pemantauan tidak menampilkan status ganda (Nilai Mentor vs Nilai DPL vs Nilai Akhir) secara komparatif.
+  4. Tidak ada instrumen pencatatan sesi konsultasi bimbingan akademik (Supervision Log) antara DPL dan mahasiswa bimbingan.
+  5. DPL tidak dapat mengekspor rekapitulasi nilai dan status mahasiswa bimbingan ke format CSV/Excel untuk BKD atau akreditasi.
+  6. Terjadi `TypeError` saat memformat `ApplicationStatus` enum di controller ekspor (`strtoupper($p->application->status)`).
+- **Root Cause**:
+  1. Ketiadaan rute dan view khusus cetak dokumen BAP A4 ber-Kop Universitas dan QR verifikasi DPL.
+  2. Ketiadaan tabel relasional untuk log bimbingan akademik (`academic_consultations`).
+  3. Status aplikasi menggunakan BackedEnum (`ApplicationStatus`), sehingga pemanggilan fungsi string native PHP langsung menimbulkan TypeError jika tidak mengekstrak `->value`.
+  4. Kolom tabel `evaluations` memiliki beberapa alias (`nilai_dosen`, `score_mastery`, `nilai_akademik`) yang perlu di-fallback secara aman pada accessor `nilai_dosen_calculated`.
+- **Fix Applied**:
+  1. Mengimplementasikan fitur Cetak Berita Acara & Lembar Nilai DPL format A4 siap cetak (`/lecturer/students/{placementId}/grade-sheet`) dengan perhitungan proporsi 40% DPL : 60% Mentor, Kop Universitas, dan QR digital.
+  2. Menambahkan Banner *Smart Action Alerts* di dasbor DPL yang otomatis mendeteksi laporan/logbook yang menunggu tindak lanjut dosen.
+  3. Memperbarui tabel mahasiswa dengan *Dual-Status Badges* yang membedakan nilai mentor kedinasan, nilai DPL, dan nilai akhir komparatif.
+  4. Membuat tabel migrasi dan model `AcademicConsultation` serta kartu timeline riwayat bimbingan akademik interaktif di halaman detail mahasiswa.
+  5. Menambahkan endpoint `lecturer.monitoring.export` yang mengalirkan file CSV ber-BOM UTF-8 siap buka di Excel dengan proteksi tipe data BackedEnum.
+  6. Menulis suite pengujian `LecturerInnovationsTest.php` (6/6 lulus) dan menguji seluruh test suite (189/189 PASS, 1.415 assertions, Exit Code 0).
+- **Prevention Rule**: Seluruh data yang bersumber dari Enum Backed wajib di-unwrap dengan `$val instanceof \BackedEnum ? $val->value : (string) $val` sebelum diproses fungsi string atau diekspor ke format CSV/Excel. Seluruh accessor nilai wajib menyediakan fallback bertingkat jika tabel database memiliki kolom alias untuk memastikan backward-compatibility.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
+
 
 
 ```markdown

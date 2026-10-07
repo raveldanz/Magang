@@ -26,6 +26,108 @@
                     </div>
                 </div>
             @endif
+
+            <!-- SMART ACTION ALERTS BANNER (Peringatan & Panduan Tindakan DPL) -->
+            @php
+                $hasUrgent = ($actionAlerts['pending_reports']->count() > 0) || 
+                             ($actionAlerts['urgent_ending']->count() > 0) || 
+                             ($actionAlerts['pending_logbooks_count'] > 0);
+            @endphp
+            @if ($hasUrgent)
+                <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-5 shadow-sm border border-blue-800/80 space-y-3">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-blue-800/60 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="p-2 bg-blue-500/20 text-cyan-400 rounded-xl border border-cyan-500/30">
+                                <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </span>
+                            <div>
+                                <h3 class="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                                    <span>Pusat Tindakan & Peringatan Bimbingan (Smart Action Center)</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/90 text-white uppercase tracking-wider">Perlu Tindakan</span>
+                                </h3>
+                                <p class="text-xs text-blue-200">Perhatikan mahasiswa bimbingan yang membutuhkan verifikasi atau penilaian segera</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                        <!-- Alert 1: Laporan Akhir Pending -->
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-xs font-semibold text-blue-200">
+                                    <span>Naskah Laporan Akhir</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['pending_reports']->count() > 0 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300' }}">
+                                        {{ $actionAlerts['pending_reports']->count() }} Menunggu
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-1.5 leading-snug">
+                                    @if ($actionAlerts['pending_reports']->count() > 0)
+                                        Mahasiswa telah mengunggah naskah laporan akhir yang menunggu persetujuan (ACC) dari Anda.
+                                    @else
+                                        Seluruh naskah laporan mahasiswa telah selesai diperiksa.
+                                    @endif
+                                </p>
+                            </div>
+                            @if ($actionAlerts['pending_reports']->count() > 0)
+                                <a href="{{ route('lecturer.students.show', $actionAlerts['pending_reports']->first()->id) }}" class="mt-3 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition shadow-xs">
+                                    <span>Review Laporan ({{ $actionAlerts['pending_reports']->first()->application->user->name ?? 'Mahasiswa' }})</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            @endif
+                        </div>
+
+                        <!-- Alert 2: Mahasiswa Mendekati Akhir Magang & Belum Dinilai -->
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-xs font-semibold text-blue-200">
+                                    <span>Masa Berakhir / Evaluasi</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['urgent_ending']->count() > 0 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300' }}">
+                                        {{ $actionAlerts['urgent_ending']->count() }} Belum Dinilai
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-1.5 leading-snug">
+                                    @if ($actionAlerts['urgent_ending']->count() > 0)
+                                        Mahasiswa aktif mendekati akhir periode magang. Nilai akademik DPL diperlukan untuk penerbitan sertifikat.
+                                    @else
+                                        Semua mahasiswa aktif yang mendekati akhir magang sudah dinilai.
+                                    @endif
+                                </p>
+                            </div>
+                            @if ($actionAlerts['urgent_ending']->count() > 0)
+                                <a href="{{ route('lecturer.evaluations.create', $actionAlerts['urgent_ending']->first()->id) }}" class="mt-3 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 bg-rose-500 hover:bg-rose-400 text-white text-xs font-bold rounded-lg transition shadow-xs">
+                                    <span>Input Nilai ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Mahasiswa' }})</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            @endif
+                        </div>
+
+                        <!-- Alert 3: Logbook Perlu Review DPL -->
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-xs font-semibold text-blue-200">
+                                    <span>Logbook Harian</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['pending_logbooks_count'] > 0 ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-300' }}">
+                                        {{ $actionAlerts['pending_logbooks_count'] }} Menunggu
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-1.5 leading-snug">
+                                    @if ($actionAlerts['pending_logbooks_count'] > 0)
+                                        Terdapat catatan aktivitas harian mahasiswa bimbingan yang menunggu validasi akademik Anda.
+                                    @else
+                                        Seluruh logbook mahasiswa telah selesai ditinjau.
+                                    @endif
+                                </p>
+                            </div>
+                            @if ($actionAlerts['pending_logbooks_count'] > 0)
+                                <a href="{{ route('lecturer.logbooks.index') }}" class="mt-3 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition shadow-xs">
+                                    <span>Tinjau Feed Logbook</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
                         
             <!-- 1. STATS WIDGETS -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -294,48 +396,65 @@
                                         @endif
                                     </td>
 
-                                    <!-- Nilai DPL Status -->
-                                    <td class="py-4 px-4 text-center whitespace-nowrap">
-                                        @if($isMentorOnly)
-                                            @if($nilaiDinas > 0)
-                                                <div class="inline-flex flex-col items-center">
-                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs" title="Aturan Kampus: 100% Pembimbing Dinas">
-                                                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        <span>Sudah Dinilai Dinas ({{ $nilaiDinas }})</span>
+                                    <!-- Dual-Status Nilai (Dinas & DPL) & Kumulatif -->
+                                    <td class="py-3 px-4 text-center whitespace-nowrap">
+                                        <div class="flex flex-col items-center gap-1">
+                                            @if($isMentorOnly)
+                                                @if($nilaiDinas > 0)
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                        <span>🏢 Dinas: {{ number_format($nilaiDinas, 1) }}</span>
                                                     </span>
-                                                    <span class="text-[9px] text-slate-400 font-medium mt-0.5">100% Nilai Dinas</span>
-                                                </div>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                        🏢 Dinas: Menunggu
+                                                    </span>
+                                                @endif
+                                                <span class="text-[9px] text-slate-400 font-medium">100% Nilai Dinas</span>
                                             @else
-                                                <div class="inline-flex flex-col items-center">
-                                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                                        Menunggu Nilai Dinas
-                                                    </span>
-                                                    <span class="text-[9px] text-slate-400 font-medium mt-0.5">100% Nilai Dinas</span>
-                                                </div>
-                                            @endif
-                                        @else
-                                            @if($hasEval)
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                                    {{ $eval->nilai_dosen_calculated }}/100
-                                                    @if($eval->grade_calculated !== '-')
-                                                        ({{ $eval->grade_calculated }})
+                                                <!-- Dual Indicator: Mentor + DPL -->
+                                                <div class="flex items-center gap-1.5">
+                                                    @if($nilaiDinas > 0)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" title="Nilai Pembimbing Lapangan Dinas">
+                                                            🏢 {{ number_format($nilaiDinas, 1) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200" title="Mentor Dinas belum menilai">
+                                                            🏢 -
+                                                        </span>
                                                     @endif
-                                                </span>
-                                            @else
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                                    Belum Dinilai
-                                                </span>
+
+                                                    @if($hasEval)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200" title="Nilai Akademik DPL Kampus">
+                                                            🎓 {{ number_format($eval->nilai_dosen_calculated, 1) }}
+                                                        </span>
+                                                    @else
+                                                        <a href="{{ route('lecturer.evaluations.create', $p->id) }}" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100" title="DPL belum mengisi nilai">
+                                                            🎓 Nilai
+                                                        </a>
+                                                    @endif
+                                                </div>
+
+                                                <!-- Kumulatif Final -->
+                                                @if($eval && $eval->nilai_akhir > 0)
+                                                    <span class="text-[11px] font-black text-slate-900 mt-0.5 block">
+                                                        Akhir: <strong class="text-blue-700">{{ number_format($eval->nilai_akhir, 1) }}</strong> <span class="text-[10px] text-emerald-700 font-bold">({{ $eval->grade_calculated }})</span>
+                                                    </span>
+                                                @else
+                                                    <span class="text-[9px] text-slate-400 italic">Nilai Belum Lengkap</span>
+                                                @endif
                                             @endif
-                                        @endif
+                                        </div>
                                     </td>
 
                                     <!-- Action Buttons -->
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <a href="{{ route('lecturer.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
                                                 <span>Detail</span>
+                                            </a>
+                                            <a href="{{ route('lecturer.students.grade_sheet', $p->id) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition cursor-pointer" title="Cetak Berita Acara & Nilai Resmi BAP">
+                                                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                                <span>BAP</span>
                                             </a>
                                         </div>
                                     </td>
