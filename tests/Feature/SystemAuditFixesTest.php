@@ -139,4 +139,3 @@ class SystemAuditFixesTest extends TestCase
         $response->assertSee('Pengajuan Magang Sedang Diverifikasi');
     }
 }
-

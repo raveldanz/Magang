@@ -52,9 +52,9 @@ class VerificationQrTest extends TestCase
     {
         $placement = $this->makePlacement();
 
-        $this->get('/verify-letter/' . $placement->application_id)->assertNotFound();
-        $this->get('/verify-certificate/' . $placement->id)->assertNotFound();
-        $this->get('/verify-certificate/' . $placement->application_id)->assertNotFound();
+        $this->get('/verify-letter/'.$placement->application_id)->assertNotFound();
+        $this->get('/verify-certificate/'.$placement->id)->assertNotFound();
+        $this->get('/verify-certificate/'.$placement->application_id)->assertNotFound();
     }
 
     public function test_numeric_id_can_be_enabled_for_legacy_documents(): void
@@ -62,8 +62,8 @@ class VerificationQrTest extends TestCase
         config(['app.verify_numeric_fallback' => true]);
         $placement = $this->makePlacement();
 
-        $this->get('/verify-letter/' . $placement->application_id)->assertOk();
-        $this->get('/verify-certificate/' . $placement->id)->assertOk();
+        $this->get('/verify-letter/'.$placement->application_id)->assertOk();
+        $this->get('/verify-certificate/'.$placement->id)->assertOk();
     }
 
     public function test_tokens_are_generated_when_missing(): void

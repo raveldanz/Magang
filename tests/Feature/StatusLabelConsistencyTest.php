@@ -11,10 +11,12 @@ use App\Models\Application;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
+use App\Models\SystemFeedback;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -31,7 +33,7 @@ class StatusLabelConsistencyTest extends TestCase
         foreach (ApplicationStatus::cases() as $case) {
             $this->assertSame(strtoupper($case->value), $case->label());
             $this->assertNotSame('', $case->description());
-            $this->assertSame($case, ApplicationStatus::resolve(' ' . strtoupper($case->value)));
+            $this->assertSame($case, ApplicationStatus::resolve(' '.strtoupper($case->value)));
         }
         $this->assertNull(ApplicationStatus::resolve('canceled'));
     }
@@ -135,7 +137,7 @@ class StatusLabelConsistencyTest extends TestCase
         $this->assertContains('Aktif', $this->badgeTexts($html, 'active'));
         $this->assertTrue($mentor->isInactive(), 'Nonaktif memblokir login');
 
-        $feedback = \App\Models\SystemFeedback::create([
+        $feedback = SystemFeedback::create([
             'user_id' => $mentor->id, 'sender_name' => $mentor->name, 'sender_email' => $mentor->email,
             'sender_role' => 'mentor', 'category' => 'pertanyaan', 'subject' => 'Tanya', 'message' => 'Isi', 'status' => 'in_progress',
         ]);
@@ -159,7 +161,7 @@ class StatusLabelConsistencyTest extends TestCase
 
         // Data lama "on_leave" dipindahkan menjadi inactive oleh migrasi
         $legacy = User::factory()->create(['role' => 'mentor']);
-        \Illuminate\Support\Facades\DB::table('users')->where('id', $legacy->id)->update(['status' => 'on_leave']);
+        DB::table('users')->where('id', $legacy->id)->update(['status' => 'on_leave']);
         (require database_path('migrations/2026_09_30_020000_merge_on_leave_into_inactive_account_status.php'))->up();
         $this->assertSame('inactive', $legacy->fresh()->status);
     }
@@ -218,13 +220,13 @@ class StatusLabelConsistencyTest extends TestCase
      */
     private function badgeTexts(string $html, string $code): array
     {
-        $dom = new \DOMDocument();
+        $dom = new \DOMDocument;
         libxml_use_internal_errors(true);
-        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+        $dom->loadHTML('<?xml encoding="utf-8" ?>'.$html);
         libxml_clear_errors();
 
         $texts = [];
-        foreach ((new \DOMXPath($dom))->query('//*[@data-status="' . $code . '"]') as $badge) {
+        foreach ((new \DOMXPath($dom))->query('//*[@data-status="'.$code.'"]') as $badge) {
             $pill = $badge->nodeName === 'div' ? $badge->getElementsByTagName('span')->item(0) : $badge;
             $own = '';
             foreach ($pill->childNodes as $child) {

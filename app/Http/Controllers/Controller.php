@@ -34,7 +34,7 @@ abstract class Controller
             return null;
         }
 
-        if (str_starts_with($returnTo, '/') && !str_starts_with($returnTo, '//')) {
+        if (str_starts_with($returnTo, '/') && ! str_starts_with($returnTo, '//')) {
             return $returnTo;
         }
 

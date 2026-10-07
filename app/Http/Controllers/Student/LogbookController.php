@@ -7,10 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Logbook;
 use App\Models\Placement;
-use App\Models\University;
+use App\Services\PrivateDocumentStorage;
+use App\Services\UniversityResolver;
+use App\Support\UploadRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class LogbookController extends Controller
 {
@@ -32,66 +33,66 @@ class LogbookController extends Controller
             ?? Application::where('user_id', $userId)->latest()->first();
     }
 
-public function index()
-{
-    $user = Auth::user();
-    $userId = $user->id;
+    public function index()
+    {
+        $user = Auth::user();
+        $userId = $user->id;
 
-    // 1. Ambil data pengajuan magang
-    $application = $this->getActiveInternship($userId);
+        // 1. Ambil data pengajuan magang
+        $application = $this->getActiveInternship($userId);
 
-    // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
-    if (!$application) {
-        return redirect()->route('dashboard')
-            ->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
-    }
-
-    // 3. Tentukan status lifecycle pengajuan
-    $lifecycle = $application->status instanceof ApplicationStatus ? strtoupper($application->status->value) : strtoupper((string)$application->status);
-
-    // 4. Inisialisasi variabel penempatan & logbook
-    $placement = null;
-    $logbooks = collect();
-    $requiresDpl = $this->isDplRequiredForStudent($user);
-
-    // 5. Jika pengajuan sudah memiliki placement (Diterima / Aktif)
-    if ($application->placement) {
-        $placement = Placement::where('application_id', $application->id)
-            ->with(['pembimbing', 'mentor', 'academicAdvisor'])
-            ->first();
-
-        if ($placement) {
-            $logbooks = Logbook::where('placement_id', $placement->id)
-                ->orderBy('date', 'desc')
-                ->get();
+        // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
+        if (! $application) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
         }
+
+        // 3. Tentukan status lifecycle pengajuan
+        $lifecycle = $application->status instanceof ApplicationStatus ? strtoupper($application->status->value) : strtoupper((string) $application->status);
+
+        // 4. Inisialisasi variabel penempatan & logbook
+        $placement = null;
+        $logbooks = collect();
+        $requiresDpl = $this->isDplRequiredForStudent($user);
+
+        // 5. Jika pengajuan sudah memiliki placement (Diterima / Aktif)
+        if ($application->placement) {
+            $placement = Placement::where('application_id', $application->id)
+                ->with(['pembimbing', 'mentor', 'academicAdvisor'])
+                ->first();
+
+            if ($placement) {
+                $logbooks = Logbook::where('placement_id', $placement->id)
+                    ->orderBy('date', 'desc')
+                    ->get();
+            }
+        }
+
+        // 6. Hitung statistik logbook
+        $stats = [
+            'total' => $logbooks->count(),
+            'approved' => $logbooks->where('status', 'approved')->count(),
+            'pending' => $logbooks->where('status', 'pending')->count(),
+            'rejected' => $logbooks->where('status', 'rejected')->count(),
+        ];
+
+        // Oper $lifecycle juga ke view
+        return view('student.logbook.index', compact(
+            'application',
+            'placement',
+            'logbooks',
+            'stats',
+            'requiresDpl',
+            'lifecycle'
+        ));
     }
-
-    // 6. Hitung statistik logbook
-    $stats = [
-        'total'    => $logbooks->count(),
-        'approved' => $logbooks->where('status', 'approved')->count(),
-        'pending'  => $logbooks->where('status', 'pending')->count(),
-        'rejected' => $logbooks->where('status', 'rejected')->count(),
-    ];
-
-    // Oper $lifecycle juga ke view
-    return view('student.logbook.index', compact(
-        'application', 
-        'placement', 
-        'logbooks', 
-        'stats', 
-        'requiresDpl',
-        'lifecycle'
-    ));
-}
 
     public function create()
     {
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
 
-        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
                 ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
@@ -99,9 +100,12 @@ public function index()
         $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
+        // DPL & mentor boleh menyusul: logbook tetap bisa diisi selama penempatan ACTIVE sudah ada.
+        // Validasi DPL tertunda (lecturer_status = pending) sampai DPL ditugaskan, dan selama mentor
+        // belum ditunjuk logbook divalidasi sementara oleh Admin Dinas (lihat Placement::allowsAgencyAdminLogbookFallback).
+        if (! $placement) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan setelah data penempatan magang Anda tersedia.');
         }
 
         return view('student.logbook.create', compact('application'));
@@ -112,7 +116,7 @@ public function index()
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
 
-        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
                 ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
@@ -120,38 +124,44 @@ public function index()
         $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        if (!$placement || ($requiresDpl && empty($placement->academic_advisor_id))) {
+        // DPL & mentor boleh menyusul: logbook tetap bisa diisi selama penempatan ACTIVE sudah ada.
+        // Validasi DPL tertunda (lecturer_status = pending) sampai DPL ditugaskan, dan selama mentor
+        // belum ditunjuk logbook divalidasi sementara oleh Admin Dinas (lihat Placement::allowsAgencyAdminLogbookFallback).
+        if (! $placement) {
             return redirect()->route('student.logbook.index')
-                ->with('warning', 'Pengisian logbook hanya dapat dilakukan saat masa magang aktif dan Dosen Pembimbing Lapangan telah terdaftar.');
+                ->with('warning', 'Pengisian logbook hanya dapat dilakukan setelah data penempatan magang Anda tersedia.');
         }
 
         $request->validate([
-            'date'       => 'required|date',
-            'activity'   => 'required|string|min:10',
-            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072',
+            'date' => 'required|date',
+            'activity' => 'required|string|min:10',
+            'attachment' => 'nullable|'.UploadRules::LOGBOOK_ATTACHMENT,
         ], [
-            'date.required'     => 'Tanggal kegiatan logbook wajib diisi.',
+            'date.required' => 'Tanggal kegiatan logbook wajib diisi.',
             'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
-            'activity.min'      => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
-            'attachment.mimes'  => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
-            'attachment.max'    => 'Ukuran file lampiran logbook maksimal 3MB (3072 KB).',
+            'activity.min' => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
+            'attachment.mimes' => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
+            'attachment.max' => 'Ukuran file lampiran logbook maksimal 2MB (2048 KB).',
         ]);
 
         $filePath = null;
         if ($request->hasFile('attachment')) {
-            $filePath = $request->file('attachment')->store('documents/logbooks', 'public');
+            $filePath = app(PrivateDocumentStorage::class)->store($request->file('attachment'), PrivateDocumentStorage::LOGBOOK_DIR);
         }
 
         Logbook::create([
             'placement_id' => $placement->id,
-            'date'         => $request->date,
-            'activity'     => $request->activity,
-            'attachment'   => $filePath,
-            'status'       => 'pending',
+            'date' => $request->date,
+            'activity' => $request->activity,
+            'attachment' => $filePath,
+            'status' => 'pending',
             'lecturer_status' => $requiresDpl ? 'pending' : 'approved',
             'lecturer_feedback' => $requiresDpl ? null : 'Dilewati (Kebijakan Penilaian 100% Instansi Dinas)',
             'lecturer_verified_at' => $requiresDpl ? null : now(),
         ]);
+
+        // Evaluasi kelulusan otomatis jika naskah laporan & nilai sudah tuntas sebelumnya
+        $placement->syncCompletionStatus();
 
         return redirect()->route('student.logbook.index')->with('success', 'Logbook kegiatan berhasil disimpan!');
     }
@@ -161,18 +171,13 @@ public function index()
      */
     protected function isDplRequiredForStudent($user): bool
     {
-        $univ = null;
-        if ($user->university_id) {
-            $univ = University::find($user->university_id);
-        } elseif ($user->university || $user->studentProfile?->universitas) {
-            $name = $user->university ?? $user->studentProfile?->universitas;
-            $univ = University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-        }
+        $univ = app(UniversityResolver::class)->forUser($user);
 
         if ($univ) {
             if ($univ->evaluation_scheme === 'mentor_only') {
                 return false;
             }
+
             return (bool) ($univ->require_dpl ?? true);
         }
 
@@ -183,7 +188,7 @@ public function index()
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
                 ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
@@ -208,21 +213,21 @@ public function index()
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (!$application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
             return redirect()->route('student.logbook.index')
                 ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
         }
 
         $request->validate([
-            'date'       => 'required|date',
-            'activity'   => 'required|string|min:10',
-            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072',
+            'date' => 'required|date',
+            'activity' => 'required|string|min:10',
+            'attachment' => 'nullable|'.UploadRules::LOGBOOK_ATTACHMENT,
         ], [
-            'date.required'     => 'Tanggal kegiatan logbook wajib diisi.',
+            'date.required' => 'Tanggal kegiatan logbook wajib diisi.',
             'activity.required' => 'Uraian aktivitas harian magang wajib diisi.',
-            'activity.min'      => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
-            'attachment.mimes'  => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
-            'attachment.max'    => 'Ukuran file lampiran logbook maksimal 3MB (3072 KB).',
+            'activity.min' => 'Uraian aktivitas harian minimal 10 karakter agar informatif.',
+            'attachment.mimes' => 'Lampiran logbook harus berformat PDF, JPG, JPEG, atau PNG.',
+            'attachment.max' => 'Ukuran file lampiran logbook maksimal 2MB (2048 KB).',
         ]);
 
         $logbook = Logbook::findOrFail($id);
@@ -237,15 +242,14 @@ public function index()
         }
 
         if ($request->hasFile('attachment')) {
-            if ($logbook->attachment && Storage::disk('public')->exists($logbook->attachment)) {
-                Storage::disk('public')->delete($logbook->attachment);
-            }
-            $logbook->attachment = $request->file('attachment')->store('documents/logbooks', 'public');
+            $storage = app(PrivateDocumentStorage::class);
+            $storage->delete($logbook->attachment);
+            $logbook->attachment = $storage->store($request->file('attachment'), PrivateDocumentStorage::LOGBOOK_DIR);
         }
 
         $logbook->date = $request->date;
         $logbook->activity = $request->activity;
-        
+
         if (strtolower($logbook->status) === 'rejected') {
             $logbook->status = 'pending';
         }
@@ -278,8 +282,8 @@ public function index()
         }
 
         // Hapus file lampiran jika ada
-        if ($logbook->attachment && Storage::disk('public')->exists($logbook->attachment)) {
-            Storage::disk('public')->delete($logbook->attachment);
+        if ($logbook->attachment) {
+            app(PrivateDocumentStorage::class)->delete($logbook->attachment);
         }
 
         $logbook->delete();
@@ -288,4 +292,3 @@ public function index()
             ->with('success', 'Entri logbook berhasil dihapus.');
     }
 }
-

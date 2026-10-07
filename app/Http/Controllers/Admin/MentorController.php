@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class MentorController extends Controller
 {
@@ -19,7 +21,7 @@ class MentorController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
 
         $query = User::whereIn('role', ['mentor', 'pembimbing'])->with('agencyProfile');
@@ -37,20 +39,19 @@ class MentorController extends Controller
             });
         }
 
-        $mentors = $query->orderBy('name')->get()->map(function ($m) {
-            $m->active_students_count = Placement::where(function ($q) use ($m) {
-                $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
-            })->whereHas('application', function ($aq) {
-                $aq->whereIn('status', ['accepted', 'active']);
-            })->count();
+        $mentors = $query->orderBy('name')->get();
 
-            $m->completed_students_count = Placement::where(function ($q) use ($m) {
-                $q->where('mentor_id', $m->id)->orWhere('pembimbing_id', $m->id);
-            })->whereHas('finalreport', function ($fq) {
-                $fq->where('status', 'approved');
-            })->count();
+        // Hitung jumlah bimbingan seluruh mentor dalam satu query (sebelumnya 2 query per mentor)
+        $mentorIds = $mentors->pluck('id');
+        $placements = Placement::query()
+            ->where(fn ($q) => $q->whereIn('mentor_id', $mentorIds)->orWhereIn('pembimbing_id', $mentorIds))
+            ->with(['application:id,status', 'finalreport:id,placement_id,status'])
+            ->get(['id', 'application_id', 'mentor_id', 'pembimbing_id']);
 
-            return $m;
+        $mentors->each(function ($m) use ($placements) {
+            $own = $placements->filter(fn ($p) => (int) $p->mentor_id === (int) $m->id || (int) $p->pembimbing_id === (int) $m->id);
+            $m->active_students_count = $own->filter(fn ($p) => in_array($p->application?->statusValue(), ['accepted', 'active'], true))->count();
+            $m->completed_students_count = $own->filter(fn ($p) => $p->finalreport?->status === 'approved')->count();
         });
 
         $agencies = AgencyProfile::all();
@@ -67,7 +68,7 @@ class MentorController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
         $agencies = AgencyProfile::all();
         $currentAgency = $user->agency_profile_id ? AgencyProfile::find($user->agency_profile_id) : null;
 
@@ -77,14 +78,14 @@ class MentorController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
         $agencyId = $isSuperAdmin ? $request->agency_profile_id : $user->agency_profile_id;
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'agency_profile_id' => $isSuperAdmin ? 'required|exists:agency_profiles,id' : 'nullable',
-            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ]);
 
         $mentor = User::create([
@@ -108,10 +109,10 @@ class MentorController extends Controller
     public function edit($id)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
         $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->findOrFail($id);
 
-        if (!$isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
+        if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses mengedit mentor dinas lain.');
         }
 
@@ -124,19 +125,19 @@ class MentorController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
 
         $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->findOrFail($id);
 
-        if (!$isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
+        if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses mengedit mentor dinas lain.');
         }
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $mentor->id,
+            'email' => 'required|email|max:255|unique:users,email,'.$mentor->id,
             'agency_profile_id' => $isSuperAdmin ? 'required|exists:agency_profiles,id' : 'nullable',
-            'status' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Enums\AccountStatus::values())],
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ]);
 
         $mentor->update([
@@ -156,11 +157,11 @@ class MentorController extends Controller
     public function resetPassword($id)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
 
         $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->findOrFail($id);
 
-        if (!$isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
+        if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses mereset password mentor dinas lain.');
         }
 
@@ -176,11 +177,11 @@ class MentorController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
 
         $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->findOrFail($id);
 
-        if (!$isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
+        if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses menghapus mentor dinas lain.');
         }
 

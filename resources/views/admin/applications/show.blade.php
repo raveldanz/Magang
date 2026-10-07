@@ -134,6 +134,11 @@
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 <span>Lihat PDF</span>
                             </a>
+                            <a href="{{ route('documents.application.download', $doc->id) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer"
+                               title="Unduh berkas">
+                                <span>Unduh</span>
+                            </a>
                         </div>
                     @empty
                         <div class="col-span-2 p-6 text-center text-xs text-slate-400">
@@ -208,6 +213,18 @@
                         </div>
                     </div>
                 </div>
+            @elseif($application->placement && in_array($application->statusValue(), ['accepted', 'active'], true) && !$application->has_filled_logbook)
+                <div class="bg-rose-50/80 p-5 sm:p-6 rounded-2xl border border-rose-200/90 flex items-start gap-3.5">
+                    <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-rose-900">Mahasiswa Belum Mengisi Logbook Aktivitas</h4>
+                        <p class="text-xs text-rose-800/90 mt-1 leading-relaxed">
+                            Mahasiswa belum pernah mengisi catatan logbook kegiatan harian selama magang. Sesuai kebijakan program, <strong>mahasiswa yang tidak mengisi logbook tidak dapat dinyatakan lulus magang (COMPLETED)</strong>.
+                        </p>
+                    </div>
+                </div>
             @elseif($application->placement && in_array($application->statusValue(), ['accepted', 'active'], true) && $application->has_approved_report)
                 <div class="bg-amber-50/80 p-5 sm:p-6 rounded-2xl border border-amber-200/90 flex items-start gap-3.5">
                     <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -263,13 +280,7 @@
                     @method('PUT')
 
                     @php
-                        $canComplete = false;
-                        if ($application->placement) {
-                            $hasApprovedReport = $application->placement->finalreport && in_array(strtolower($application->placement->finalreport->status instanceof \BackedEnum ? $application->placement->finalreport->status->value : ($application->placement->finalreport->status ?? '')), ['approved', 'disetujui']);
-                            $eval = $application->placement->evaluation;
-                            $hasCompleteEval = $eval && (($eval->nilai_pembimbing > 0 && $eval->nilai_dosen_calculated > 0) || $eval->nilai_akhir > 0);
-                            $canComplete = $hasApprovedReport && $hasCompleteEval;
-                        }
+                        $canComplete = $application->can_complete;
                     @endphp
 
                     <!-- Form Status Pipeline (Synchronized with visual cards) -->
@@ -391,12 +402,19 @@
                                 if ($isAlreadyRejected) {
                                     $completedSubtitle = 'Pengajuan Ditolak';
                                 } elseif ($isCompleteDisabled) {
-                                    if (!$application->has_approved_report && !$application->has_complete_evaluation) {
-                                        $completedSubtitle = 'Laporan & Nilai Belum Lengkap';
-                                    } elseif (!$application->has_approved_report) {
-                                        $completedSubtitle = 'Laporan Belum Disetujui';
-                                    } elseif (!$application->has_complete_evaluation) {
-                                        $completedSubtitle = 'Nilai Belum Lengkap';
+                                    $missingItems = [];
+                                    if (!$application->has_filled_logbook) {
+                                        $missingItems[] = 'Logbook';
+                                    }
+                                    if (!$application->has_approved_report) {
+                                        $missingItems[] = 'Laporan';
+                                    }
+                                    if (!$application->has_complete_evaluation) {
+                                        $missingItems[] = 'Nilai';
+                                    }
+
+                                    if (!empty($missingItems)) {
+                                        $completedSubtitle = implode(' & ', $missingItems) . ' Belum Lengkap';
                                     } else {
                                         $completedSubtitle = 'Syarat Belum Terpenuhi';
                                     }
@@ -509,38 +527,52 @@
                             </div>
                         @endif
 
-                        <!-- Dropdown Pembimbing Lapangan -->
+                        @php
+                            $selectedMentorId = old('mentor_id', optional($application->placement)->mentor_id ?? optional($application->placement)->pembimbing_id ?? '');
+                            $selectedDosenId = old('academic_advisor_id', optional($application->placement)->academic_advisor_id ?? '');
+
+                            $mentorItems = $pembimbings->map(function ($m) {
+                                return [
+                                    'id' => $m->id,
+                                    'name' => $m->name,
+                                    'acronym' => 'Mentor',
+                                    'meta' => $m->email . ($m->phone ? ' • ' . $m->phone : ''),
+                                ];
+                            })->values()->all();
+
+                            $dosenItems = $dosens->map(function ($d) {
+                                $univName = $d->universityRelation?->name ?? (is_string($d->university) ? $d->university : '');
+                                return [
+                                    'id' => $d->id,
+                                    'name' => $d->name,
+                                    'acronym' => 'Dosen',
+                                    'meta' => $d->email . ($univName ? ' • ' . $univName : ''),
+                                ];
+                            })->values()->all();
+                        @endphp
+
+                        <!-- Dropdown Pembimbing Lapangan (Searchable Combobox) -->
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                <span>Plotting Pembimbing Lapangan (Mentor Dinas Terkait)</span>
-                            </label>
-                            <select name="mentor_id" class="w-full text-xs font-medium border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
-                                <option value="">-- Pilih Pembimbing Lapangan ({{ $application->unit->agencyProfile->agency_name ?? 'Instansi' }}) --</option>
-                                @foreach ($pembimbings as $pembimbing)
-                                    <option value="{{ $pembimbing->id }}" {{ (optional($application->placement)->mentor_id == $pembimbing->id || optional($application->placement)->pembimbing_id == $pembimbing->id) ? 'selected' : '' }}>
-                                        {{ $pembimbing->name }} ({{ $pembimbing->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="text-[11px] text-slate-500 mt-1">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
+                            <x-searchable-select
+                                name="mentor_id"
+                                :items="$mentorItems"
+                                :selected="$selectedMentorId"
+                                label="Plotting Pembimbing Lapangan (Mentor Dinas Terkait)"
+                                placeholder="-- Cari atau Pilih Mentor Lapangan (Ketik nama / email) --"
+                            />
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
                         </div>
 
-                        <!-- Dropdown Dosen Pembimbing Lapangan (DPL Kampus) -->
+                        <!-- Dropdown Dosen Pembimbing Lapangan (Searchable Combobox) -->
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                                <span>Plotting Dosen Pembimbing Lapangan (DPL Kampus)</span>
-                            </label>
-                            <select name="academic_advisor_id" class="w-full text-xs font-medium border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
-                                <option value="">-- Pilih Dosen Pembimbing Lapangan (Opsional / Kampus Mitra) --</option>
-                                @foreach ($dosens as $dosen)
-                                    <option value="{{ $dosen->id }}" {{ optional($application->placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                        {{ $dosen->name }} ({{ $dosen->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="text-[11px] text-slate-500 mt-1">Dosen DPL resmi dari perguruan tinggi mahasiswa yang bersangkutan.</p>
+                            <x-searchable-select
+                                name="academic_advisor_id"
+                                :items="$dosenItems"
+                                :selected="$selectedDosenId"
+                                label="Plotting Dosen Pembimbing Lapangan (DPL Kampus)"
+                                placeholder="-- Cari atau Pilih Dosen Pembimbing (Ketik nama / email / kampus) --"
+                            />
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Dosen DPL resmi dari perguruan tinggi mahasiswa yang bersangkutan.</p>
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -618,6 +650,69 @@
                     </div>
                 </form>
             </div>
+
+            {{-- 6. Penugasan Pembimbing Susulan (penempatan sudah berjalan: ACCEPTED / ACTIVE) --}}
+            @if ($application->placement && in_array($currentStatus, \App\Services\PlacementAssignmentService::ASSIGNABLE_STATUSES, true))
+                @php
+                    $asgPlacement = $application->placement;
+                    $asgMentor = $asgPlacement->mentor ?? $asgPlacement->pembimbing;
+                    $asgAdvisor = $asgPlacement->academicAdvisor;
+                @endphp
+                <div id="penugasan-pembimbing" class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
+                    <div class="pb-4 border-b border-slate-100 mb-5">
+                        <h3 class="text-base font-bold text-slate-900">Penugasan Pembimbing (Susulan / Ganti)</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; DPL tanpa mengulang verifikasi. Histori logbook yang sudah divalidasi tetap tersimpan.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5 text-xs">
+                        <div class="p-3 rounded-xl border {{ $asgMentor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
+                            <div class="text-slate-500 font-semibold">Mentor Dinas saat ini</div>
+                            <div class="font-bold text-slate-900 mt-0.5">{{ $asgMentor?->name ?? 'Belum Ditugaskan' }}</div>
+                            @unless ($asgMentor)
+                                <div class="text-[11px] text-amber-700 mt-1">Sementara logbook divalidasi oleh Admin Dinas instansi.</div>
+                            @endunless
+                        </div>
+                        <div class="p-3 rounded-xl border {{ $asgAdvisor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
+                            <div class="text-slate-500 font-semibold">DPL Kampus saat ini</div>
+                            <div class="font-bold text-slate-900 mt-0.5">{{ $asgAdvisor?->name ?? 'Belum Ditugaskan' }}</div>
+                            @unless ($asgAdvisor)
+                                <div class="text-[11px] text-amber-700 mt-1">Menunggu SK / penugasan dari kampus.</div>
+                            @endunless
+                        </div>
+                    </div>
+
+                    <form action="{{ route('admin.applications.assignment', $application->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        @method('PATCH')
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="asg_mentor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mentor Dinas</label>
+                                <select id="asg_mentor_id" name="mentor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
+                                    <option value="">-- Tidak diubah --</option>
+                                    @foreach ($pembimbings as $pembimbing)
+                                        <option value="{{ $pembimbing->id }}" @selected((int) ($asgMentor?->id ?? 0) === (int) $pembimbing->id)>{{ $pembimbing->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('mentor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="asg_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Dosen Pembimbing Lapangan (DPL)</label>
+                                <select id="asg_advisor_id" name="academic_advisor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
+                                    <option value="">-- Tidak diubah --</option>
+                                    @foreach ($dosens as $dosen)
+                                        <option value="{{ $dosen->id }}" @selected((int) ($asgAdvisor?->id ?? 0) === (int) $dosen->id)>{{ $dosen->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('academic_advisor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                        @error('assignment') <p class="text-xs text-rose-600 font-semibold">{{ $message }}</p> @enderror
+                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                            Simpan Penugasan Pembimbing
+                        </button>
+                    </form>
+                </div>
+            @endif
 
         </div>
     </div>

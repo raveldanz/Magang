@@ -15,17 +15,17 @@ return new class extends Migration
     {
         // 1. Tambahkan kolom letter_token pada tabel applications
         Schema::table('applications', function (Blueprint $table) {
-            if (!Schema::hasColumn('applications', 'letter_token')) {
+            if (! Schema::hasColumn('applications', 'letter_token')) {
                 $table->string('letter_token', 64)->nullable()->unique()->after('letter_date');
             }
         });
 
         // 2. Tambahkan kolom certificate_number dan certificate_hash pada tabel placements
         Schema::table('placements', function (Blueprint $table) {
-            if (!Schema::hasColumn('placements', 'certificate_number')) {
+            if (! Schema::hasColumn('placements', 'certificate_number')) {
                 $table->string('certificate_number', 100)->nullable()->after('status');
             }
-            if (!Schema::hasColumn('placements', 'certificate_hash')) {
+            if (! Schema::hasColumn('placements', 'certificate_hash')) {
                 $table->string('certificate_hash', 64)->nullable()->unique()->after('certificate_number');
             }
         });

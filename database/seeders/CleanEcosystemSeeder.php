@@ -2,30 +2,30 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\AgencyProfile;
-use App\Models\Unit;
-use App\Models\University;
-use App\Models\StudentProfile;
 use App\Models\Application;
-use App\Models\Placement;
-use App\Models\Logbook;
-use App\Models\FinalReport;
-use App\Models\Evaluation;
 use App\Models\AuditLog;
+use App\Models\Evaluation;
+use App\Models\FinalReport;
+use App\Models\Logbook;
+use App\Models\Placement;
+use App\Models\StudentProfile;
 use App\Models\SystemFeedback;
 use App\Models\SystemNotification;
+use App\Models\Unit;
+use App\Models\University;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class CleanEcosystemSeeder extends Seeder
 {
     public function run(): void
     {
         DB::transaction(function () {
-            $this->command->info("Memulai pembersihan akun sampah & duplikat...");
+            $this->command->info('Memulai pembersihan akun sampah & duplikat...');
 
             // 1. DAFTAR EMAIL SAMPAH, JUNK, DAN DUPLIKAT
             $emailsToDelete = [
@@ -309,7 +309,7 @@ class CleanEcosystemSeeder extends Seeder
             // =========================================================================
             // 5. PENYEDIAAN DATA REALISTIS 7 TAHAP PROGRES MAHASISWA (LIFECYCLE MATRIX)
             // =========================================================================
-            $this->command->info("Menyusun 7 akun mahasiswa representasi siklus nyata...");
+            $this->command->info('Menyusun 7 akun mahasiswa representasi siklus nyata...');
 
             // TAHAP 1: BARU DAFTAR (PROFIL LENGKAP, BELUM MELAMAR)
             $mhsStage1 = User::updateOrCreate(
@@ -323,7 +323,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Teknik', 'fakultas' => 'Fakultas Teknik',
                     'jurusan' => 'Pendidikan Teknologi Informasi', 'major' => 'Pendidikan Teknologi Informasi',
                     'semester' => '6', 'phone' => '081234567111', 'alamat' => 'Jl. Ketintang Madya No. 45, Surabaya',
-                    'address' => 'Jl. Ketintang Madya No. 45, Surabaya', 'emergency_contact_name' => 'Kartika (Ibu)', 'emergency_contact_phone' => '081234567110'
+                    'address' => 'Jl. Ketintang Madya No. 45, Surabaya', 'emergency_contact_name' => 'Kartika (Ibu)', 'emergency_contact_phone' => '081234567110',
                 ]
             );
 
@@ -339,7 +339,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Ilmu Komputer', 'fakultas' => 'Fakultas Ilmu Komputer',
                     'jurusan' => 'Teknik Informatika', 'major' => 'Teknik Informatika',
                     'semester' => '6', 'phone' => '081234567222', 'alamat' => 'Jl. Nginden Semolo No. 88, Surabaya',
-                    'address' => 'Jl. Nginden Semolo No. 88, Surabaya', 'emergency_contact_name' => 'Pratama (Ayah)', 'emergency_contact_phone' => '081234567220'
+                    'address' => 'Jl. Nginden Semolo No. 88, Surabaya', 'emergency_contact_name' => 'Pratama (Ayah)', 'emergency_contact_phone' => '081234567220',
                 ]
             );
             Application::updateOrCreate(
@@ -368,7 +368,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Teknik', 'fakultas' => 'Fakultas Teknik',
                     'jurusan' => 'Sistem Informasi', 'major' => 'Sistem Informasi',
                     'semester' => '6', 'phone' => '081234567333', 'alamat' => 'Jl. Lidah Kulon No. 12, Surabaya',
-                    'address' => 'Jl. Lidah Kulon No. 12, Surabaya', 'emergency_contact_name' => 'Septiani (Ibu)', 'emergency_contact_phone' => '081234567330'
+                    'address' => 'Jl. Lidah Kulon No. 12, Surabaya', 'emergency_contact_name' => 'Septiani (Ibu)', 'emergency_contact_phone' => '081234567330',
                 ]
             );
             Application::updateOrCreate(
@@ -399,7 +399,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Ilmu Komputer', 'fakultas' => 'Fakultas Ilmu Komputer',
                     'jurusan' => 'Informatika', 'major' => 'Informatika',
                     'semester' => '6', 'phone' => '081234567444', 'alamat' => 'Jl. Rungkut Asri Timur No. 20, Surabaya',
-                    'address' => 'Jl. Rungkut Asri Timur No. 20, Surabaya', 'emergency_contact_name' => 'Kurniawan (Ayah)', 'emergency_contact_phone' => '081234567440'
+                    'address' => 'Jl. Rungkut Asri Timur No. 20, Surabaya', 'emergency_contact_name' => 'Kurniawan (Ayah)', 'emergency_contact_phone' => '081234567440',
                 ]
             );
             $appStage4 = Application::updateOrCreate(
@@ -438,7 +438,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Ilmu Komputer', 'fakultas' => 'Fakultas Ilmu Komputer',
                     'jurusan' => 'Teknik Informatika', 'major' => 'Teknik Informatika',
                     'semester' => '6', 'phone' => '081234567555', 'alamat' => 'Jl. Semolowaru Elok No. 15, Surabaya',
-                    'address' => 'Jl. Semolowaru Elok No. 15, Surabaya', 'emergency_contact_name' => 'Saputra (Ayah)', 'emergency_contact_phone' => '081234567550'
+                    'address' => 'Jl. Semolowaru Elok No. 15, Surabaya', 'emergency_contact_name' => 'Saputra (Ayah)', 'emergency_contact_phone' => '081234567550',
                 ]
             );
             $appStage5 = Application::updateOrCreate(
@@ -490,7 +490,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Teknik', 'fakultas' => 'Fakultas Teknik',
                     'jurusan' => 'Sistem Informasi', 'major' => 'Sistem Informasi',
                     'semester' => '6', 'phone' => '081234567666', 'alamat' => 'Jl. Mayjen Sungkono No. 50, Surabaya',
-                    'address' => 'Jl. Mayjen Sungkono No. 50, Surabaya', 'emergency_contact_name' => 'Zahirah (Ibu)', 'emergency_contact_phone' => '081234567660'
+                    'address' => 'Jl. Mayjen Sungkono No. 50, Surabaya', 'emergency_contact_name' => 'Zahirah (Ibu)', 'emergency_contact_phone' => '081234567660',
                 ]
             );
             $appStage6 = Application::updateOrCreate(
@@ -553,7 +553,7 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Sains dan Teknologi', 'fakultas' => 'Fakultas Sains dan Teknologi',
                     'jurusan' => 'Sistem Informasi', 'major' => 'Sistem Informasi',
                     'semester' => '6', 'phone' => '081234567777', 'alamat' => 'Jl. Dharmawangsa No. 29, Surabaya',
-                    'address' => 'Jl. Dharmawangsa No. 29, Surabaya', 'emergency_contact_name' => 'Rahman (Ayah)', 'emergency_contact_phone' => '081234567770'
+                    'address' => 'Jl. Dharmawangsa No. 29, Surabaya', 'emergency_contact_name' => 'Rahman (Ayah)', 'emergency_contact_phone' => '081234567770',
                 ]
             );
             $appStage7 = Application::updateOrCreate(
@@ -578,7 +578,7 @@ class CleanEcosystemSeeder extends Seeder
                     'pembimbing_id' => $mentorDukcapil->id,
                     'academic_advisor_id' => $dplUnair->id,
                     'certificate_number' => 'SERT/00045/PEMKOT-SBY/2026',
-                    'certificate_hash' => hash('sha256', 'SERT/00045/PEMKOT-SBY/2026' . $mhsStage7->id . 'Dukcapil'),
+                    'certificate_hash' => hash('sha256', 'SERT/00045/PEMKOT-SBY/2026'.$mhsStage7->id.'Dukcapil'),
                 ]
             );
             // Logbook lengkap
@@ -627,7 +627,7 @@ class CleanEcosystemSeeder extends Seeder
             // =========================================================================
             // 6. SUITE 1: 6 AKUN KHUSUS TESTING DESKTOP (BROWSER TOOL + HERMES)
             // =========================================================================
-            $this->command->info("Menyiapkan Suite 1: Akun Testing Desktop (Password: Password123!)...");
+            $this->command->info('Menyiapkan Suite 1: Akun Testing Desktop (Password: Password123!)...');
 
             $testPassword = Hash::make('Password123!');
 
@@ -673,14 +673,14 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Teknik', 'fakultas' => 'Fakultas Teknik',
                     'jurusan' => 'Teknik Informatika', 'major' => 'Teknik Informatika',
                     'semester' => '6', 'phone' => '081234567901', 'alamat' => 'Jl. Ketintang Madya No. 99, Gayungan, Surabaya',
-                    'address' => 'Jl. Ketintang Madya No. 99, Gayungan, Surabaya', 'emergency_contact_name' => 'Yudha (Ayah)', 'emergency_contact_phone' => '081234567900'
+                    'address' => 'Jl. Ketintang Madya No. 99, Gayungan, Surabaya', 'emergency_contact_name' => 'Yudha (Ayah)', 'emergency_contact_phone' => '081234567900',
                 ]
             );
 
             // =========================================================================
             // 7. SUITE 2: 6 AKUN KHUSUS TESTING MOBILE (BROWSER TOOL + HERMES)
             // =========================================================================
-            $this->command->info("Menyiapkan Suite 2: Akun Testing Mobile (Password: Password123!)...");
+            $this->command->info('Menyiapkan Suite 2: Akun Testing Mobile (Password: Password123!)...');
 
             // 1. Super Admin Mobile
             User::updateOrCreate(
@@ -724,11 +724,11 @@ class CleanEcosystemSeeder extends Seeder
                     'faculty' => 'Fakultas Ilmu Komputer', 'fakultas' => 'Fakultas Ilmu Komputer',
                     'jurusan' => 'Teknik Informatika', 'major' => 'Teknik Informatika',
                     'semester' => '6', 'phone' => '081234567902', 'alamat' => 'Jl. Semolowaru No. 99, Sukolilo, Surabaya',
-                    'address' => 'Jl. Semolowaru No. 99, Sukolilo, Surabaya', 'emergency_contact_name' => 'Ramadhan (Ayah)', 'emergency_contact_phone' => '081234567903'
+                    'address' => 'Jl. Semolowaru No. 99, Sukolilo, Surabaya', 'emergency_contact_name' => 'Ramadhan (Ayah)', 'emergency_contact_phone' => '081234567903',
                 ]
             );
 
-            $this->command->info("Ekosistem pengujian dan pengguna realistis berhasil disiapkan 100%!");
+            $this->command->info('Ekosistem pengujian dan pengguna realistis berhasil disiapkan 100%!');
         });
     }
 }
