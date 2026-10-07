@@ -68,7 +68,7 @@
                 </div>
             @endif
 
-            <!-- 1. FORM PENGAJUAN BARU -->
+            <!-- 1. FORM PENGAJUAN BARU / STATUS BANNER -->
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8 space-y-6">
 
                 @if ($activeApplication)
@@ -177,174 +177,173 @@
                         <hr class="border-slate-100">
 
                         <!-- Upload Dokumen Persyaratan Magang -->
-<div class="space-y-4">
-    <h3 class="text-sm font-bold text-slate-800">Upload Dokumen Persyaratan Magang</h3>
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-800">Upload Dokumen Persyaratan Magang</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- 1. Surat Pengantar / Proposal Kampus -->
-        <div x-data="{ 
-                fileName: '', 
-                fileUrl: null, 
-                handleFile(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        this.fileName = file.name;
-                        this.fileUrl = URL.createObjectURL(file);
-                    } else {
-                        this.fileName = '';
-                        this.fileUrl = null;
-                    }
-                } 
-             }" 
-             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-            <label class="block text-xs font-bold text-slate-700">
-                1. Surat Pengantar / Proposal Kampus <span class="text-red-500">*</span>
-            </label>
-            
-            <div class="flex items-center gap-2">
-                <input type="file" 
-                       id="surat_pengantar" 
-                       name="surat_pengantar" 
-                       accept=".pdf" 
-                       required 
-                       @change="handleFile($event)" 
-                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                
+                                <!-- 1. Surat Pengantar / Proposal Kampus -->
+                                <div x-data="{ 
+                                        fileName: '', 
+                                        fileUrl: null, 
+                                        handleFile(e) {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                this.fileName = file.name;
+                                                this.fileUrl = URL.createObjectURL(file);
+                                            } else {
+                                                this.fileName = '';
+                                                this.fileUrl = null;
+                                            }
+                                        } 
+                                     }" 
+                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+                                    <label class="block text-xs font-bold text-slate-700">
+                                        1. Surat Pengantar / Proposal Kampus <span class="text-red-500">*</span>
+                                    </label>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <input type="file" 
+                                               id="surat_pengantar" 
+                                               name="surat_pengantar" 
+                                               accept=".pdf" 
+                                               required 
+                                               @change="handleFile($event)" 
+                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+                                    </div>
 
-            <!-- Area Preview Feedback -->
-            <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-                <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    Lihat Berkas
-                </a>
-            </div>
-            <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
-            <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
-        </div>
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
+                                </div>
 
-        <!-- 2. Curriculum Vitae (CV) -->
-        <div x-data="{ 
-                fileName: '', 
-                fileUrl: null, 
-                handleFile(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        this.fileName = file.name;
-                        this.fileUrl = URL.createObjectURL(file);
-                    } else {
-                        this.fileName = '';
-                        this.fileUrl = null;
-                    }
-                } 
-             }" 
-             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-            <label class="block text-xs font-bold text-slate-700">
-                2. Curriculum Vitae (CV) <span class="text-red-500">*</span>
-            </label>
-            
-            <div class="flex items-center gap-2">
-                <input type="file" 
-                       id="cv" 
-                       name="cv" 
-                       accept=".pdf" 
-                       required 
-                       @change="handleFile($event)" 
-                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-            </div>
+                                <!-- 2. Curriculum Vitae (CV) -->
+                                <div x-data="{ 
+                                        fileName: '', 
+                                        fileUrl: null, 
+                                        handleFile(e) {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                this.fileName = file.name;
+                                                this.fileUrl = URL.createObjectURL(file);
+                                            } else {
+                                                this.fileName = '';
+                                                this.fileUrl = null;
+                                            }
+                                        } 
+                                     }" 
+                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+                                    <label class="block text-xs font-bold text-slate-700">
+                                        2. Curriculum Vitae (CV) <span class="text-red-500">*</span>
+                                    </label>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <input type="file" 
+                                               id="cv" 
+                                               name="cv" 
+                                               accept=".pdf" 
+                                               required 
+                                               @change="handleFile($event)" 
+                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+                                    </div>
 
-            <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-                <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    Lihat Berkas
-                </a>
-            </div>
-            <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
-            <x-input-error :messages="$errors->get('cv')" class="mt-1" />
-        </div>
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('cv')" class="mt-1" />
+                                </div>
 
-        <!-- 3. Transkrip Nilai Akademik Terakhir -->
-        <div x-data="{ 
-                fileName: '', 
-                fileUrl: null, 
-                handleFile(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        this.fileName = file.name;
-                        this.fileUrl = URL.createObjectURL(file);
-                    } else {
-                        this.fileName = '';
-                        this.fileUrl = null;
-                    }
-                } 
-             }" 
-             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-            <label class="block text-xs font-bold text-slate-700">
-                3. Transkrip Nilai Akademik Terakhir <span class="text-red-500">*</span>
-            </label>
-            
-            <div class="flex items-center gap-2">
-                <input type="file" 
-                       id="transkrip" 
-                       name="transkrip" 
-                       accept=".pdf" 
-                       required 
-                       @change="handleFile($event)" 
-                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-            </div>
+                                <!-- 3. Transkrip Nilai Akademik Terakhir -->
+                                <div x-data="{ 
+                                        fileName: '', 
+                                        fileUrl: null, 
+                                        handleFile(e) {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                this.fileName = file.name;
+                                                this.fileUrl = URL.createObjectURL(file);
+                                            } else {
+                                                this.fileName = '';
+                                                this.fileUrl = null;
+                                            }
+                                        } 
+                                     }" 
+                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+                                    <label class="block text-xs font-bold text-slate-700">
+                                        3. Transkrip Nilai Akademik Terakhir <span class="text-red-500">*</span>
+                                    </label>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <input type="file" 
+                                               id="transkrip" 
+                                               name="transkrip" 
+                                               accept=".pdf" 
+                                               required 
+                                               @change="handleFile($event)" 
+                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+                                    </div>
 
-            <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-                <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    Lihat Berkas
-                </a>
-            </div>
-            <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
-            <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
-        </div>
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
+                                </div>
 
-        <!-- 4. Kartu Tanda Mahasiswa (KTM / ID Card) -->
-        <div x-data="{ 
-                fileName: '', 
-                fileUrl: null, 
-                handleFile(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        this.fileName = file.name;
-                        this.fileUrl = URL.createObjectURL(file);
-                    } else {
-                        this.fileName = '';
-                        this.fileUrl = null;
-                    }
-                } 
-             }" 
-             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-            <label class="block text-xs font-bold text-slate-700">
-                4. Kartu Tanda Mahasiswa (KTM / ID Card) <span class="text-red-500">*</span>
-            </label>
-            
-            <div class="flex items-center gap-2">
-                <input type="file" 
-                       id="id_card" 
-                       name="id_card" 
-                       accept=".pdf,image/png,image/jpeg,image/jpg" 
-                       required 
-                       @change="handleFile($event)" 
-                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-            </div>
+                                <!-- 4. Kartu Tanda Mahasiswa (KTM / ID Card) -->
+                                <div x-data="{ 
+                                        fileName: '', 
+                                        fileUrl: null, 
+                                        handleFile(e) {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                this.fileName = file.name;
+                                                this.fileUrl = URL.createObjectURL(file);
+                                            } else {
+                                                this.fileName = '';
+                                                this.fileUrl = null;
+                                            }
+                                        } 
+                                     }" 
+                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+                                    <label class="block text-xs font-bold text-slate-700">
+                                        4. Kartu Tanda Mahasiswa (KTM / ID Card) <span class="text-red-500">*</span>
+                                    </label>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <input type="file" 
+                                               id="id_card" 
+                                               name="id_card" 
+                                               accept=".pdf,image/png,image/jpeg,image/jpg" 
+                                               required 
+                                               @change="handleFile($event)" 
+                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+                                    </div>
 
-            <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-                <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    Lihat Berkas
-                </a>
-            </div>
-            <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
-            <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
-        </div>
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
+                                </div>
 
-    </div>
-</div>
+                            </div>
+                        </div>
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-5 border-t border-slate-100">
@@ -365,53 +364,55 @@
                     <h3 class="text-base font-bold text-slate-900">Riwayat Pengajuan Magang Anda</h3>
                 </div>
 
-                <!-- Desktop View (Table) -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-max">
+                <!-- Desktop View (Tabel Pas Presisi Tanpa Scrollbar Horizontal) -->
+                <div class="hidden md:block w-full">
+                    <table class="w-full table-fixed text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50/60 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3.5 px-5 whitespace-nowrap">Tanggal Pengajuan</th>
-                                <th class="py-3.5 px-5 whitespace-nowrap">Unit Instansi</th>
-                                <th class="py-3.5 px-5 whitespace-nowrap">Periode Magang</th>
-                                <th class="py-3.5 px-5 whitespace-nowrap">Status</th>
-                                <th class="py-3.5 px-5 whitespace-nowrap">Catatan / Alasan Admin</th>
-                                <th class="py-3.5 px-5 whitespace-nowrap">Surat Penerimaan</th>
+                            <tr class="bg-slate-50/60 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="w-[16%] py-3.5 px-4">Tanggal Pengajuan</th>
+                                <th class="w-[28%] py-3.5 px-4">Unit Instansi</th>
+                                <th class="w-[22%] py-3.5 px-4">Periode Magang</th>
+                                <th class="w-[12%] py-3.5 px-4 text-center">Status</th>
+                                <th class="w-[10%] py-3.5 px-4 text-center">Catatan</th>
+                                <th class="w-[12%] py-3.5 px-4 text-right">Surat Penerimaan</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100">
                             @forelse ($applicationHistory as $app)
+                                @php $st = $app->statusValue(); @endphp
                                 <tr class="hover:bg-slate-50/70 transition-colors duration-150">
-                                    <td class="py-4 px-5 text-slate-500 font-mono text-xs whitespace-nowrap">
+                                    <td class="py-4 px-4 text-slate-500 font-mono text-xs">
                                         {{ $app->created_at->format('d M Y, H:i') }}
                                     </td>
-                                    <td class="py-4 px-5">
-                                        <div class="font-bold text-slate-900 leading-snug">{{ $app->unit->name ?? '-' }}</div>
-                                        <div class="text-xs text-slate-400 mt-0.5">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
+                                    <td class="py-4 px-4 pr-3">
+                                        <div class="font-bold text-slate-900 text-xs leading-snug break-words">
+                                            {{ $app->unit->name ?? '-' }}
+                                        </div>
+                                        <div class="text-[11px] text-slate-400 mt-0.5 break-words">
+                                            {{ $app->unit->agencyProfile->agency_name ?? '-' }}
+                                        </div>
                                     </td>
-                                    <td class="py-4 px-5 text-xs text-slate-700 whitespace-nowrap">
+                                    <td class="py-4 px-4 text-xs text-slate-700 leading-relaxed">
                                         {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
                                     </td>
-                                    <td class="py-4 px-5 whitespace-nowrap">
-                                        @php
-                                            $st = $app->statusValue();
-                                        @endphp
+                                    <td class="py-4 px-4 text-center">
                                         <x-status-badge :status="$app->status" />
                                     </td>
-                                    <td class="py-4 px-5 text-xs">
+                                    <td class="py-4 px-4 text-center text-xs">
                                         @if ($st === 'rejected')
-                                            <span class="text-red-700 font-medium bg-red-50 px-2.5 py-1 rounded-lg border border-red-200 inline-block">
-                                                {{ $app->rejection_note ?? 'Tidak ada catatan' }}
+                                            <span class="text-red-700 font-medium bg-red-50 px-2 py-0.5 rounded-md border border-red-200 inline-block text-[11px] truncate max-w-full" title="{{ $app->rejection_note }}">
+                                                {{ $app->rejection_note ?? 'Ditolak' }}
                                             </span>
                                         @else
                                             <span class="text-slate-400">-</span>
                                         @endif
                                     </td>
-                                    <td class="py-4 px-5 whitespace-nowrap">
+                                    <td class="py-4 px-4 text-right">
                                         @if (in_array($st, ['accepted', 'active', 'completed']))
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
-                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition shrink-0">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                                <span>Unduh Surat PDF</span>
+                                                <span>Unduh PDF</span>
                                             </a>
                                         @else
                                             <span class="text-slate-400 text-xs italic">Belum tersedia</span>
@@ -432,15 +433,13 @@
                 <!-- Mobile View (Cards) -->
                 <div class="block md:hidden border-t border-slate-100 divide-y divide-slate-100">
                     @forelse ($applicationHistory as $app)
+                        @php $st = $app->statusValue(); @endphp
                         <div class="p-5 space-y-3 hover:bg-slate-50/70 transition-colors duration-150">
                             <!-- Header: Tanggal & Status -->
                             <div class="flex justify-between items-start gap-2">
                                 <div class="text-xs text-slate-500 font-mono">
                                     {{ $app->created_at->format('d M Y, H:i') }}
                                 </div>
-                                @php
-                                    $st = $app->statusValue();
-                                @endphp
                                 <x-status-badge :status="$app->status" />
                             </div>
 
