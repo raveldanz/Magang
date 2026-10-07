@@ -46,7 +46,7 @@
                         </p>
                     </div>
                     <p class="text-[11px] text-red-600">
-                        *Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.
+                        Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.
                     </p>
                 </div>
             @endif
@@ -73,23 +73,27 @@
 
                 @if ($activeApplication)
                     @php $actSt = $activeApplication->statusValue(); @endphp
-                    <div class="p-5 rounded-2xl border {{ in_array($actSt, ['accepted', 'active'], true) ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($actSt === 'completed' ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-amber-50 border-amber-200 text-amber-950') }} shadow-xs space-y-2">
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-2 font-bold text-sm">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span>
-                                @if(in_array($actSt, ['pending', 'verified']))
-                                    Pengajuan Magang Sedang Diproses
-                                @elseif($actSt === 'accepted')
-                                    Pengajuan Magang Anda Telah Diterima
-                                @elseif($actSt === 'active')
-                                    Anda Sedang Menjalani Magang
-                                @elseif($actSt === 'completed')
-                                    Program Magang MBKM Telah Selesai
-                                @endif
-                            </span>
-                            <x-status-badge :status="$activeApplication->status" class="sm:ml-auto" />
+                    <div class="p-4 sm:p-5 rounded-2xl border {{ in_array($actSt, ['accepted', 'active'], true) ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($actSt === 'completed' ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-amber-50 border-amber-200 text-amber-950') }} shadow-xs space-y-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div class="flex items-center gap-2 font-bold text-sm">
+                                <svg class="w-5 h-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>
+                                    @if(in_array($actSt, ['pending', 'verified']))
+                                        Pengajuan Magang Sedang Diproses
+                                    @elseif($actSt === 'accepted')
+                                        Pengajuan Magang Anda Telah Diterima
+                                    @elseif($actSt === 'active')
+                                        Anda Sedang Menjalani Magang
+                                    @elseif($actSt === 'completed')
+                                        Program Magang MBKM Telah Selesai
+                                    @endif
+                                </span>
+                            </div>
+                            <div>
+                                <x-status-badge :status="$activeApplication->status" />
+                            </div>
                         </div>
                         <p class="text-xs leading-relaxed">
                             @if(in_array($actSt, ['pending', 'verified']))
@@ -171,6 +175,7 @@
                                     label="1. Pilih Instansi Dinas / Badan Daerah (OPD Pemkot Surabaya)"
                                     placeholder="-- Cari Instansi (Ketik nama, misal: Diskominfo, Bapenda, Dinkes) --"
                                     :required="true"
+                                    :show-asterisk="false"
                                 />
                                 @error('agency_profile_id')
                                     <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
@@ -187,6 +192,7 @@
                                     label="2. Pilih Bidang / Divisi Kerja Magang"
                                     placeholder="-- Cari Divisi / Unit Kerja Magang --"
                                     :required="true"
+                                    :show-asterisk="false"
                                 />
                                 @error('unit_id')
                                     <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
@@ -210,7 +216,7 @@
                             
                             <!-- Tanggal Mulai -->
                             <div class="space-y-1.5">
-                                <x-input-label for="start_date" value="Tanggal Mulai Magang *" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                 <x-text-input id="start_date" 
                                               name="start_date" 
                                               type="date" 
@@ -223,7 +229,7 @@
 
                             <!-- Tanggal Selesai -->
                             <div class="space-y-1.5">
-                                <x-input-label for="end_date" value="Tanggal Selesai Magang *" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
                                 <x-text-input id="end_date" 
                                               name="end_date" 
                                               type="date" 
@@ -242,37 +248,37 @@
                         <div class="space-y-4">
                             <h3 class="text-sm font-bold text-slate-800">Upload Dokumen Persyaratan Magang</h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                
-                                <!-- 1. Surat Pengantar / Proposal Kampus -->
-                                <div x-data="{ 
-                                        fileName: '', 
-                                        fileUrl: null, 
-                                        handleFile(e) {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                this.fileName = file.name;
-                                                this.fileUrl = URL.createObjectURL(file);
-                                            } else {
-                                                this.fileName = '';
-                                                this.fileUrl = null;
-                                            }
-                                        } 
-                                     }" 
-                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-                                    <label class="block text-xs font-bold text-slate-700">
-                                        1. Surat Pengantar / Proposal Kampus <span class="text-red-500">*</span>
-                                    </label>
-                                    
-                                    <div class="flex items-center gap-2">
-                                        <input type="file" 
-                                               id="surat_pengantar" 
-                                               name="surat_pengantar" 
-                                               accept=".pdf" 
-                                               required 
-                                               @change="handleFile($event)" 
-                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-                                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- 1. Surat Pengantar / Proposal Kampus -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                1. Surat Pengantar / Proposal Kampus
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="surat_pengantar" 
+                       name="surat_pengantar" 
+                       accept=".pdf" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
 
                                     <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
                                         <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
@@ -284,35 +290,35 @@
                                     <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
                                 </div>
 
-                                <!-- 2. Curriculum Vitae (CV) -->
-                                <div x-data="{ 
-                                        fileName: '', 
-                                        fileUrl: null, 
-                                        handleFile(e) {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                this.fileName = file.name;
-                                                this.fileUrl = URL.createObjectURL(file);
-                                            } else {
-                                                this.fileName = '';
-                                                this.fileUrl = null;
-                                            }
-                                        } 
-                                     }" 
-                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-                                    <label class="block text-xs font-bold text-slate-700">
-                                        2. Curriculum Vitae (CV) <span class="text-red-500">*</span>
-                                    </label>
-                                    
-                                    <div class="flex items-center gap-2">
-                                        <input type="file" 
-                                               id="cv" 
-                                               name="cv" 
-                                               accept=".pdf" 
-                                               required 
-                                               @change="handleFile($event)" 
-                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-                                    </div>
+        <!-- 2. Curriculum Vitae (CV) -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                2. Curriculum Vitae (CV)
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="cv" 
+                       name="cv" 
+                       accept=".pdf" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
 
                                     <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
                                         <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
@@ -324,35 +330,35 @@
                                     <x-input-error :messages="$errors->get('cv')" class="mt-1" />
                                 </div>
 
-                                <!-- 3. Transkrip Nilai Akademik Terakhir -->
-                                <div x-data="{ 
-                                        fileName: '', 
-                                        fileUrl: null, 
-                                        handleFile(e) {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                this.fileName = file.name;
-                                                this.fileUrl = URL.createObjectURL(file);
-                                            } else {
-                                                this.fileName = '';
-                                                this.fileUrl = null;
-                                            }
-                                        } 
-                                     }" 
-                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-                                    <label class="block text-xs font-bold text-slate-700">
-                                        3. Transkrip Nilai Akademik Terakhir <span class="text-red-500">*</span>
-                                    </label>
-                                    
-                                    <div class="flex items-center gap-2">
-                                        <input type="file" 
-                                               id="transkrip" 
-                                               name="transkrip" 
-                                               accept=".pdf" 
-                                               required 
-                                               @change="handleFile($event)" 
-                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-                                    </div>
+        <!-- 3. Transkrip Nilai Akademik Terakhir -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                3. Transkrip Nilai Akademik Terakhir
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="transkrip" 
+                       name="transkrip" 
+                       accept=".pdf" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
 
                                     <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
                                         <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
@@ -364,35 +370,35 @@
                                     <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
                                 </div>
 
-                                <!-- 4. Kartu Tanda Mahasiswa (KTM / ID Card) -->
-                                <div x-data="{ 
-                                        fileName: '', 
-                                        fileUrl: null, 
-                                        handleFile(e) {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                this.fileName = file.name;
-                                                this.fileUrl = URL.createObjectURL(file);
-                                            } else {
-                                                this.fileName = '';
-                                                this.fileUrl = null;
-                                            }
-                                        } 
-                                     }" 
-                                     class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
-                                    <label class="block text-xs font-bold text-slate-700">
-                                        4. Kartu Tanda Mahasiswa (KTM / ID Card) <span class="text-red-500">*</span>
-                                    </label>
-                                    
-                                    <div class="flex items-center gap-2">
-                                        <input type="file" 
-                                               id="id_card" 
-                                               name="id_card" 
-                                               accept=".pdf,image/png,image/jpeg,image/jpg" 
-                                               required 
-                                               @change="handleFile($event)" 
-                                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
-                                    </div>
+        <!-- 4. Kartu Tanda Mahasiswa (KTM / ID Card) -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                4. Kartu Tanda Mahasiswa (KTM / ID Card)
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="id_card" 
+                       name="id_card" 
+                       accept=".pdf,image/png,image/jpeg,image/jpg" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
 
                                     <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
                                         <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
@@ -422,7 +428,7 @@
 
             <!-- 2. TABEL RIWAYAT PENGAJUAN MAGANG -->
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
-                <div class="p-6 border-b border-slate-100">
+                <div class="p-5 sm:p-6 border-b border-slate-100">
                     <h3 class="text-base font-bold text-slate-900">Riwayat Pengajuan Magang Anda</h3>
                 </div>
 
@@ -498,8 +504,8 @@
                         @php $st = $app->statusValue(); @endphp
                         <div class="p-5 space-y-3 hover:bg-slate-50/70 transition-colors duration-150">
                             <!-- Header: Tanggal & Status -->
-                            <div class="flex justify-between items-start gap-2">
-                                <div class="text-xs text-slate-500 font-mono">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="text-xs text-slate-400 font-mono">
                                     {{ $app->created_at->format('d M Y, H:i') }}
                                 </div>
                                 <x-status-badge :status="$app->status" />
@@ -512,9 +518,9 @@
                             </div>
                             
                             <!-- Body: Periode Magang -->
-                            <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                <span class="font-semibold block mb-1">Periode Magang:</span>
-                                {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
+                            <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <span class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
+                                <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} – {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
                             </div>
 
                             <!-- Footer: Catatan & Surat -->
@@ -528,7 +534,7 @@
                             @endif
 
                             @if (in_array($st, ['accepted', 'active', 'completed']))
-                                <div class="pt-2">
+                                <div class="pt-1">
                                     <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
                                        class="inline-flex w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
