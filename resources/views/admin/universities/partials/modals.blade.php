@@ -13,7 +13,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-black text-base text-slate-900">Tambah Dosen DPL Baru</h3>
+                            <h3 class="font-black text-base text-slate-900">Tambah Dosen Pembimbing Baru</h3>
                             <p class="text-xs text-slate-500">{{ $university->name }}</p>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs">
-                            Simpan DPL
+                            Simpan Dosen
                         </button>
                     </div>
                 </form>
@@ -84,7 +84,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Dosen Pembimbing <span class="text-rose-500">*</span></label>
                         <select name="academic_advisor_id" required class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 py-2.5">
-                            <option value="">-- Pilih Dosen DPL dari {{ $university->name }} --</option>
+                            <option value="">-- Pilih Dosen Pembimbing dari {{ $university->name }} --</option>
                             @foreach($dosens as $dsn)
                                 <option value="{{ $dsn->id }}">{{ $dsn->name }} ({{ $dsn->email }})</option>
                             @endforeach
@@ -97,7 +97,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs">
-                            Tugaskan DPL
+                            Tugaskan Dosen
                         </button>
                     </div>
                 </form>
