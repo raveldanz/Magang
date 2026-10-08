@@ -20,7 +20,7 @@ async function run() {
         await page.click('button[type="submit"]');
         await page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
 
-        await page.goto('http://127.0.0.1:8000/lecturer/students/3', { waitUntil: 'networkidle' });
+        await page.goto('http://127.0.0.1:8000/lecturer/students/1', { waitUntil: 'networkidle' });
 
         // Tab Laporan Akhir
         await page.click('button:has-text("Laporan Akhir")');
@@ -31,7 +31,7 @@ async function run() {
         await page.click('button:has-text("Logbook")');
         await page.waitForTimeout(300);
         // Expand the first weekly bundle accordion
-        const toggleBtn = await page.$('button:has-text("Minggu")');
+        const toggleBtn = await page.$('button:has-text("Periksa Aktivitas")');
         if (toggleBtn) {
             await toggleBtn.click();
             await page.waitForTimeout(300);

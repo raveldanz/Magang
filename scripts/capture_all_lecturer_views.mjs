@@ -7,11 +7,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const brainDir = 'C:\\Users\\EVAN\\.gemini\\antigravity-ide\\brain\\860a2603-0d83-4450-8014-53b0e6df4d3a';
 const publicDir = path.resolve(projectRoot, 'public/test-artifacts');
+const brainDir = process.env.ARTIFACT_DIR || publicDir;
 
 if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-if (!fs.existsSync(brainDir)) fs.mkdirSync(brainDir, { recursive: true });
+try {
+    if (!fs.existsSync(brainDir)) fs.mkdirSync(brainDir, { recursive: true });
+} catch (_) {}
 
 async function run() {
     console.log('[*] Launching Chrome via Playwright (channel: chrome)...');
@@ -52,8 +54,8 @@ async function run() {
         console.log(`[+] Monitoring captured: ${monPath}`);
 
         // 3. Detail Mahasiswa Bimbingan
-        console.log('[*] Capturing /lecturer/students/3...');
-        await page.goto('http://127.0.0.1:8000/lecturer/students/3', { waitUntil: 'networkidle' });
+        console.log('[*] Capturing /lecturer/students/1...');
+        await page.goto('http://127.0.0.1:8000/lecturer/students/1', { waitUntil: 'networkidle' });
         await page.waitForTimeout(500);
         const detailPath = path.join(publicDir, 'lecturer_student_detail_clean.png');
         await page.screenshot({ path: detailPath, fullPage: true });
