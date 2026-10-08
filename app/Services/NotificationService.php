@@ -127,17 +127,23 @@ class NotificationService
                 ];
             }
 
-            // D. Penetapan Pembimbing Belum Lengkap (Mahasiswa Diterima tapi Belum Ada DPL)
+            // D. Penetapan Pembimbing Belum Lengkap (Mahasiswa Diterima tapi Belum Ada DPL pada kampus yang mewajibkan DPL)
             $unassignedDpl = Placement::whereNull('academic_advisor_id')
-                ->whereHas('application', fn ($q) => $q->whereIn('status', Application::QUOTA_STATUSES))
+                ->whereHas('application', function ($q) {
+                    $q->whereIn('status', Application::QUOTA_STATUSES)
+                        ->whereHas('user.universityRelation', function ($uq) {
+                            $uq->where('require_dpl', true)
+                                ->where('evaluation_scheme', '!=', 'mentor_only');
+                        });
+                })
                 ->count();
             if ($unassignedDpl > 0) {
                 $actionable[] = [
                     'id' => 'unassigned_dpl',
                     'type' => 'info',
                     'category' => 'academic',
-                    'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki DPL",
-                    'message' => 'Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan belum ditentukan.',
+                    'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki Dosen Pembimbing",
+                    'message' => 'Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing belum ditentukan.',
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Lihat Penempatan',
@@ -303,16 +309,17 @@ class NotificationService
                     ];
                 } elseif (in_array($status, ['accepted', 'active'])) {
                     $placement = Placement::where('application_id', $latestApp->id)->first();
-                    if (! $placement || empty($placement->academic_advisor_id)) {
+                    $requiresAdvisor = $latestApp->requiresAdvisor();
+                    if ($requiresAdvisor && (! $placement || empty($placement->academic_advisor_id))) {
                         $actionable[] = [
                             'id' => 'student_need_dpl',
                             'type' => 'urgent',
                             'category' => 'academic',
-                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih DPL',
-                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing Lapangan pada dashboard.',
+                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih Dosen Pembimbing',
+                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing pada dashboard.',
                             'time' => 'Tindakan diperlukan',
                             'action_url' => route('dashboard'),
-                            'action_label' => 'Pilih DPL',
+                            'action_label' => 'Pilih Dosen',
                             'is_action_required' => true,
                         ];
                     } else {
@@ -321,7 +328,9 @@ class NotificationService
                             'type' => 'success',
                             'category' => 'academic',
                             'title' => 'Data Pembimbing Lengkap & Magang Siap Dilaksanakan',
-                            'message' => 'Mentor Dinas & DPL telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.',
+                            'message' => $requiresAdvisor
+                                ? 'Mentor Dinas & Dosen Pembimbing telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.'
+                                : 'Mentor Dinas telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.',
                             'time' => 'Aktif',
                             'action_url' => route('student.logbook.index'),
                             'action_label' => 'Buka Logbook',

@@ -13,6 +13,7 @@ use App\Models\University;
 use App\Models\User;
 use App\Services\UniversityHubService;
 use App\Services\UniversityResolver;
+use App\Services\Admin\UniversityManagementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -103,7 +104,7 @@ class UniversityController extends Controller
      * Seluruh akun, profil mahasiswa, tiket, dan kanal chat dipindahkan ke kampus tujuan,
      * lalu entri dobel dihapus.
      */
-    public function merge(Request $request, $id)
+    public function merge(Request $request, $id, UniversityManagementService $service)
     {
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menggabungkan data perguruan tinggi.');
         $source = University::findOrFail($id);
@@ -115,54 +116,27 @@ class UniversityController extends Controller
         ]);
 
         $target = University::findOrFail((int) $request->target_university_id);
-        if ($target->id === $source->id) {
-            return redirect()->back()->with('error', 'Kampus tujuan tidak boleh sama dengan kampus yang digabungkan.');
+        
+        try {
+            $moved = $service->mergeUniversities($source, $target);
+            return redirect()->route('admin.universities.index')
+                ->with('success', "Kampus '{$source->name}' berhasil digabungkan ke '{$target->name}' ({$moved['users']} akun dipindahkan).");
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        $moved = \DB::transaction(function () use ($source, $target) {
-            $users = User::where('university_id', $source->id)
-                ->update(['university_id' => $target->id, 'university' => $target->name]);
-            $profiles = StudentProfile::where('university_id', $source->id)
-                ->update(['university_id' => $target->id, 'universitas' => $target->name]);
-            SystemFeedback::where('target_university_id', $source->id)
-                ->update(['target_university_id' => $target->id]);
-            if (\Schema::hasColumn('chat_conversations', 'university_id')) {
-                \DB::table('chat_conversations')->where('university_id', $source->id)->update(['university_id' => $target->id]);
-            }
-            $source->delete();
-
-            return ['users' => $users, 'profiles' => $profiles];
-        });
-
-        AuditLog::record('UNIVERSITY_MERGE', 'University', $target->id, [
-            'merged_from' => $source->name,
-            'merged_from_id' => $source->id,
-            'into' => $target->name,
-            'moved_users' => $moved['users'],
-            'moved_profiles' => $moved['profiles'],
-        ]);
-
-        return redirect()->route('admin.universities.index')
-            ->with('success', "Kampus '{$source->name}' berhasil digabungkan ke '{$target->name}' ({$moved['users']} akun dipindahkan).");
     }
 
     /**
      * Validasi kampus yang didaftarkan mandiri oleh mahasiswa (is_verified = false → true).
      */
-    public function verify(Request $request, $id)
+    public function verify(Request $request, $id, UniversityManagementService $service)
     {
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat memverifikasi data perguruan tinggi.');
         $univ = University::findOrFail($id);
 
-        if ($univ->is_verified) {
+        if (!$service->verifyUniversity($univ)) {
             return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' sudah terverifikasi.");
         }
-
-        $univ->update(['is_verified' => true]);
-
-        AuditLog::record('UNIVERSITY_VERIFY', 'University', $univ->id, [
-            'name' => $univ->name,
-        ]);
 
         return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' berhasil diverifikasi. Lengkapi kode kampus & profilnya melalui menu Edit bila diperlukan.");
     }
