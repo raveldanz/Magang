@@ -22,10 +22,10 @@
             @endif
 
             @php
-                $rawSt = $application->status->value ?? 'none';
-                $rawAppSt = $rawSt;
-                $profile = Auth::user()->studentProfile;
+                $profile = Auth::user()?->studentProfile;
                 $application = $application ?? ($profile ? App\Models\Application::where('user_id', Auth::id())->latest()->first() : null);
+                $rawSt = $application?->statusValue() ?? 'none';
+                $rawAppSt = $rawSt;
                 $placement = $application ? $application->placement : null;
                 $eval = optional($placement)->evaluation;
                 $finalReport = optional($placement)->finalreport ?? optional($placement)->finalReport;
@@ -519,204 +519,7 @@
                     </div>
                 @endif
 
-            <!-- Modal Input Dosen Baru -->
-            <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
-                style="display: none;">
-
-                <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
-                    @click="openNewDosenModal = false"></div>
-
-                <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                    <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100 p-6 sm:p-7 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
-
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <h3 class="text-lg font-bold text-slate-900 leading-6">
-                                Input Dosen Pembimbing Baru
-                            </h3>
-                            <button type="button" @click="openNewDosenModal = false"
-                                class="text-slate-400 hover:text-slate-600 text-sm cursor-pointer">
-                                ✕
-                            </button>
-                        </div>
-
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Jika dosen pembimbing Anda belum terdaftar di sistem, silakan isi data di bawah ini. Akun portal dosen akan otomatis dibuatkan dan terhubung ke universitas Anda.
-                        </p>
-
-                        <form action="{{ route('student.create_advisor') }}" method="POST" class="space-y-4">
-                            @csrf
-                            <input type="hidden" name="university_id" value="{{ Auth::user()->university_id }}">
-
-                            <div>
-                                <label for="modal_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                    Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span>
-                                </label>
-                                <input type="text" id="modal_name" name="name" required
-                                    placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom"
-                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            </div>
-
-                            <div>
-                                <label for="modal_email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                    Email Resmi / Kampus Dosen <span class="text-rose-500">*</span>
-                                </label>
-                                <input type="email" id="modal_email" name="email" required
-                                    placeholder="Contoh: ahmad.sudrajat@kampus.ac.id"
-                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            </div>
-
-                            <div>
-                                <label for="modal_nidn" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                    NIDN / NIP Dosen (Opsional)
-                                </label>
-                                <input type="text" id="modal_nidn" name="nidn" placeholder="Contoh: 0012345678"
-                                    class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                    Asal Perguruan Tinggi:
-                                </label>
-                                <input type="text"
-                                    value="{{ $univName ?? $profile->universitas ?? 'Universitas Mahasiswa' }}"
-                                    disabled
-                                    class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
-                            </div>
-
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
-                                <button type="button" @click="openNewDosenModal = false"
-                                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                    Batal
-                                </button>
-                                <button type="submit"
-                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
-                                    Daftarkan & Pilih Sebagai Dosen Pembimbing
-                                </button>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Popup Kredensial Akun Dosen Baru -->
-            @if (session('new_advisor_credential'))
-                    @php
-                        $cred = session('new_advisor_credential');
-                        $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
-                    @endphp
-                    <div x-show="showCredentialModal" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
-                        style="display: none;">
-
-                        <!-- Backdrop -->
-                        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
-                            @click="showCredentialModal = false"></div>
-
-                        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                            <div
-                                class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5 my-auto max-h-[90vh] overflow-y-auto">
-
-                                <!-- Header Modal -->
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="flex items-center gap-3">
-
-                                        <div>
-                                            <h3 class="text-lg font-black text-slate-900 leading-snug">Akun Dosen Pembimbing
-                                                Berhasil Dibuat</h3>
-                                            <p class="text-xs text-emerald-600 font-semibold">Tersambung ke
-                                                {{ $cred['univ_name'] }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button type="button" @click="showCredentialModal = false"
-                                        class="text-slate-400 hover:text-slate-600 text-lg p-1 cursor-pointer">
-                                        ✕
-                                    </button>
-                                </div>
-
-                                <!-- Box Kredensial -->
-                                <div
-                                    class="rounded-2xl bg-slate-900 text-slate-100 p-5 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
-                                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                                        <span
-                                            class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">Kredensial
-                                            Akses Dosen</span>
-                                        <span
-                                            class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">{{ \App\Enums\AccountStatus::ACTIVE->label() }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Nama Dosen:</span>
-                                        <span class="col-span-2 font-bold text-white">{{ $cred['name'] }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Email Login:</span>
-                                        <span
-                                            class="col-span-2 font-bold text-amber-300 select-all">{{ $cred['email'] }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Password Default:</span>
-                                        <span
-                                            class="col-span-2 font-bold text-emerald-300 select-all">{{ $cred['password'] }}</span>
-                                    </div>
-
-                                    <div class="grid grid-cols-3 gap-1">
-                                        <span class="text-slate-400 font-sans">Portal Login:</span>
-                                        <span
-                                            class="col-span-2 font-bold text-sky-300 break-all select-all">{{ $cred['login_url'] }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Instruksi Mahasiswa -->
-                                <div
-                                    class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-xs text-amber-900 flex items-start gap-3 leading-relaxed">
-                                    <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div>
-                                        <strong class="font-bold">Instruksi Mahasiswa:</strong>
-                                        <p class="mt-1 text-amber-800">Harap simpan dan teruskan kredensial di atas kepada
-                                            <strong>Dosen Pembimbing</strong> Anda agar beliau dapat login ke
-                                            Portal Dosen untuk memonitor logbook mingguan dan memberikan penilaian akhir
-                                            magang.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                                    <button type="button"
-                                        @click="navigator.clipboard.writeText(`{{ addslashes($waText) }}`); copied = true; setTimeout(() => copied = false, 3000)"
-                                        class="w-full inline-flex justify-center items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition transform active:scale-98 cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                        </svg>
-                                        <span
-                                            x-text="copied ? 'Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">Salin
-                                            Informasi Login</span>
-                                    </button>
-
-                                    <button type="button" @click="showCredentialModal = false"
-                                        class="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                        Tutup
-                                    </button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                @endif
+            @include('student.partials.new_dosen_modals')
 
                 <!-- ==================================================== -->
                 <!-- 4 & 5. DESKTOP VIEW: STATUS CARDS & DETAIL PENEMPATAN -->
@@ -756,15 +559,15 @@
                                     </a>
                                 @elseif (!$application)
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                        <span>Buat Pengajuan</span> 
+                                        <span>Buat Pengajuan</span> &rarr;
                                     </a>
                                 @elseif ($rawAppSt === 'rejected')
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-rose-600 hover:text-rose-800 inline-flex items-center gap-1">
-                                        <span>Ajukan Magang Baru</span> 
+                                        <span>Ajukan Magang Baru</span> &rarr;
                                     </a>
                                 @elseif ($rawAppSt === 'resigned')
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                        <span>Daftar Magang Baru</span> 
+                                        <span>Daftar Magang Baru</span> &rarr;
                                     </a>
                                 @else
                                     <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
@@ -810,7 +613,7 @@
                                     <button type="button"
                                         onclick="const el = document.getElementById('change-advisor-box'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                         class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                        {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} 
+                                        {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} &rarr;
                                     </button>
                                 @else
                                     <span class="text-[11px] text-slate-400">-</span>
@@ -948,210 +751,7 @@
 
                 </div>
 
-                <!-- ==================================================== -->
-                <!-- 4 & 5. MOBILE VIEW: STATUS CARDS & DETAIL PENEMPATAN  -->
-                <!-- ==================================================== -->
-                <div class="block md:hidden space-y-3.5">
-
-                    <!-- Card 1: Status Magang (Mobile) -->
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                        <div class="flex items-center justify-between">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Magang</p>
-                            @if ($application)
-                                <x-status-badge :status="$application->status" />
-                            @endif
-                        </div>
-                        <div class="mt-1">
-                            @if ($application)
-                                <p class="text-xs text-slate-600 font-medium">{{ $application->unit->name ?? $application->unit->agencyProfile->agency_name ?? 'Program Magang' }}</p>
-                            @else
-                                <p class="text-sm font-bold text-slate-800">Belum Mengajukan</p>
-                            @endif
-                        </div>
-                        <div class="mt-3 pt-2 border-t border-slate-50 flex items-center justify-between">
-                            @if ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                <a href="{{ route('student.application.letter', $application->id) }}" target="_blank"
-                                    class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                    <span>Surat Balasan</span>
-                                </a>
-                            @elseif (!$application)
-                                <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                    <span>Buat Pengajuan</span> 
-                                </a>
-                            @elseif ($rawAppSt === 'rejected')
-                                <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-rose-600 hover:text-rose-800 inline-flex items-center gap-1">
-                                    <span>Ajukan Magang Baru</span> 
-                                </a>
-                            @elseif ($rawAppSt === 'resigned')
-                                <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                    <span>Daftar Magang Baru</span> 
-                                </a>
-                            @else
-                                <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Dosen Pembimbing (Mobile) -->
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                        <div class="flex items-center justify-between">
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Dosen Pembimbing</p>
-                            @if ($academicAdvisor)
-                                <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
-                                    Terpilih
-                                </span>
-                            @elseif ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-md animate-pulse">
-                                    Perlu Ditentukan
-                                </span>
-                            @endif
-                        </div>
-                        <div class="mt-1">
-                            @if ($academicAdvisor)
-                                <p class="text-sm font-bold text-slate-800">{{ $academicAdvisor->name }}</p>
-                                <div class="text-xs text-slate-500 mt-0.5 space-y-0.5">
-                                    <p class="truncate font-mono">{{ $academicAdvisor->email }}</p>
-                                    <p class="truncate">{{ is_string($academicAdvisor->university) ? $academicAdvisor->university : ($academicAdvisor->universityRelation?->name ?? $academicAdvisor->university?->name ?? $univName ?? $profile->universitas) }}</p>
-                                </div>
-                            @elseif ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                <p class="text-xs text-slate-600">Belum memilih dosen pembimbing</p>
-                            @else
-                                <p class="text-xs text-slate-400">Belum Tersedia</p>
-                            @endif
-                        </div>
-                        @if ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                            <div class="mt-2.5 pt-2 border-t border-slate-50">
-                                <button type="button"
-                                    onclick="const el = document.getElementById('change-advisor-box-mobile'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
-                                    class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                    {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} 
-                                </button>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- FORM PILIH DOSEN PEMBIMBING (MOBILE - TEPAT DI BAWAH KARTU DOSEN PEMBIMBING) -->
-                    @if ($application && in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                        <div id="change-advisor-box-mobile" class="{{ $academicAdvisor ? 'hidden' : '' }} bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3 scroll-mt-6">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                                <h4 class="font-bold text-slate-800 text-sm">Pilih Dosen Pembimbing</h4>
-                                @if ($academicAdvisor)
-                                    <button type="button"
-                                        onclick="document.getElementById('change-advisor-box-mobile').classList.add('hidden')"
-                                        class="text-xs text-slate-400 hover:text-slate-600 font-bold transition cursor-pointer">
-                                        ✕ Tutup
-                                    </button>
-                                @endif
-                            </div>
-                            <form action="{{ route('student.select_advisor') }}" method="POST" class="space-y-3">
-                                @csrf
-                                <div>
-                                    <label for="academic_advisor_id_mobile"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Pilih Dosen Terdaftar: {{ $univName ?? $profile->universitas ?? 'Kampus Mahasiswa' }}
-                                    </label>
-                                    <select id="academic_advisor_id_mobile" name="academic_advisor_id" required
-                                        class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs p-2.5">
-                                        <option value="">-- Pilih Dosen Pembimbing --</option>
-                                        @if(isset($availableDosens))
-                                            @foreach ($availableDosens as $dosen)
-                                                <option value="{{ $dosen->id }}" {{ optional($placement)->academic_advisor_id == $dosen->id ? 'selected' : '' }}>
-                                                    {{ $dosen->name }} —
-                                                    {{ is_string($dosen->university) ? $dosen->university : ($dosen->universityRelation?->name ?? $dosen->university?->name ?? 'Dosen') }}
-                                                    ({{ $dosen->email }})
-                                                </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-
-                                <div class="pt-1 flex flex-col gap-2">
-                                    <button type="submit"
-                                        class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                                        {{ __('Simpan Dosen Pembimbing') }}
-                                    </button>
-                                    @if ($academicAdvisor)
-                                        <button type="button"
-                                            onclick="document.getElementById('change-advisor-box-mobile').classList.add('hidden')"
-                                            class="w-full py-1.5 text-xs font-bold text-slate-600 hover:text-slate-800 transition rounded-xl hover:bg-slate-100 cursor-pointer">
-                                            Batal
-                                        </button>
-                                    @endif
-                                    <button type="button" @click="openNewDosenModal = true"
-                                        class="text-xs text-blue-600 hover:text-blue-800 font-semibold underline cursor-pointer text-center pt-1">
-                                        Dosen tidak ditemukan? Input Dosen Baru
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    @endif
-
-                    <!-- Card 3: Mentor Lapangan (Mobile) -->
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                        <div>
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mentor Lapangan</p>
-                            <p class="text-sm font-bold mt-1 text-slate-800">
-                                {{ $mentor ? $mentor->name : 'Belum Diplot Dinas' }}
-                            </p>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Ditugaskan resmi oleh instansi penempatan magang Anda.</p>
-                        </div>
-                        @if ($mentor || $placement)
-                            <div class="mt-2.5 pt-2 border-t border-slate-50 flex flex-wrap gap-2">
-                                @if ($mentor)
-                                    <x-chat-button :user="$mentor" label="Chat Mentor" />
-                                @endif
-                                @if ($placement)
-                                    <x-chat-group-button :placement="$placement" />
-                                @endif
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- DETAIL BANNER PENGAJUAN AKTIF (Mobile) -->
-                    @if ($application)
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-                            <div class="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                                <h4 class="font-bold text-slate-800 text-sm">Detail Penempatan Magang</h4>
-                                @if (in_array($rawAppSt, ['accepted', 'active', 'completed'], true))
-                                    <a href="{{ route('student.application.letter', $application->id) }}" target="_blank"
-                                        class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                        <span>Unduh Surat</span>
-                                    </a>
-                                @endif
-                            </div>
-                            <div class="space-y-2 text-xs">
-                                <div class="flex items-start justify-between py-1 border-b border-slate-50">
-                                    <span class="text-slate-500">Instansi:</span>
-                                    <span class="font-bold text-slate-800 text-right ml-2">{{ $application->unit->agencyProfile->agency_name ?? '-' }}</span>
-                                </div>
-                                <div class="flex items-start justify-between py-1 border-b border-slate-50">
-                                    <span class="text-slate-500">Unit Kerja:</span>
-                                    <span class="font-bold text-slate-800 text-right ml-2">{{ $application->unit->name ?? '-' }}</span>
-                                </div>
-                                <div class="flex items-start justify-between py-1">
-                                    <span class="text-slate-500">Periode:</span>
-                                    <span class="font-bold text-slate-800 text-right ml-2">
-                                        {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between gap-3">
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-xs">Detail Penempatan Magang</h4>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Belum ada pengajuan aktif.</p>
-                            </div>
-                            <a href="{{ route('student.application.create') }}"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition shadow-sm shrink-0">
-                                <span>Daftar Magang</span>
-                            </a>
-                        </div>
-                    @endif
-
-                </div>
+                @include('student.partials.mobile_status_cards')
 
             </div>
 

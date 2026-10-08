@@ -49,6 +49,19 @@ class University extends Model
         return ($this->is_verified ?? true) ? self::LABEL_VERIFIED : self::LABEL_PENDING_VERIFICATION;
     }
 
+    /**
+     * Menentukan apakah perguruan tinggi mewajibkan penetapan Dosen Pembimbing (DPL).
+     * Jika skema evaluasi 'mentor_only', DPL tidak diperlukan.
+     */
+    public function requiresAdvisor(): bool
+    {
+        if ($this->evaluation_scheme === 'mentor_only') {
+            return false;
+        }
+
+        return (bool) ($this->require_dpl ?? true);
+    }
+
     protected static function booted(): void
     {
         // Slug otomatis dari nama kampus (dibuat ulang bila nama berubah)

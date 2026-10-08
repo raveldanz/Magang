@@ -33,11 +33,20 @@ class Unit extends Model
         if (array_key_exists('occupied_count_db', $this->attributes)) {
             return (int) $this->attributes['occupied_count_db'];
         }
+        if (array_key_exists('accepted_count', $this->attributes)) {
+            return (int) $this->attributes['accepted_count'];
+        }
         if (! $this->relationLoaded('applications')) {
             return $this->applications()->occupyingQuota()->count();
         }
 
         return $this->applications->filter(fn ($app) => $app->occupiesQuota())->count();
+    }
+
+    // Accessor alias untuk accepted_count agar seragam dengan occupied_count
+    public function getAcceptedCountAttribute(): int
+    {
+        return $this->occupied_count;
     }
 
     // Accessor untuk menghitung sisa kuota dinamis: $unit->remaining_quota
