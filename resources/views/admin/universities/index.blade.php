@@ -434,6 +434,12 @@
                 @endforelse
             </div>
 
+            @if(method_exists($universities, 'links'))
+                <div class="mt-6">
+                    {{ $universities->links() }}
+                </div>
+            @endif
+
         </div>
     </div>
 </x-app-layout>
