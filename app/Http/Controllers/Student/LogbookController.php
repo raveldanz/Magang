@@ -173,15 +173,7 @@ class LogbookController extends Controller
     {
         $univ = app(UniversityResolver::class)->forUser($user);
 
-        if ($univ) {
-            if ($univ->evaluation_scheme === 'mentor_only') {
-                return false;
-            }
-
-            return (bool) ($univ->require_dpl ?? true);
-        }
-
-        return true;
+        return $univ ? $univ->requiresAdvisor() : true;
     }
 
     public function edit($id)

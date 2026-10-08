@@ -124,13 +124,7 @@ class UniversityHubService
         };
         $students = $students->sort(fn ($a, $b) => $sortKey($a) <=> $sortKey($b))->values();
 
-        if ($statusFilter === 'action') {
-            $students = $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->values();
-        } elseif (ApplicationStatus::tryFrom($statusFilter)) {
-            $students = $students->filter(fn ($s) => $s->applications->first()?->statusValue() === $statusFilter)->values();
-        }
-
-        // 3. Hitung Metrik Statistik Kampus (status dibandingkan sebagai string, bukan enum vs string)
+        // 3. Hitung Metrik Statistik Kampus (berdasarkan seluruh mahasiswa kampus ini, sebelum filter tabel diterapkan)
         $latestStatus = fn ($s) => $s->applications->first()?->statusValue();
 
         $scores = $students
@@ -148,6 +142,13 @@ class UniversityHubService
             'needs_action' => $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->count(),
             'average_score' => $scores->isNotEmpty() ? round($scores->avg(), 1) : null,
         ];
+
+        // 4. Terapkan filter status untuk tabel daftar mahasiswa jika ada parameter filter
+        if ($statusFilter === 'action') {
+            $students = $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->values();
+        } elseif (ApplicationStatus::tryFrom($statusFilter)) {
+            $students = $students->filter(fn ($s) => $s->applications->first()?->statusValue() === $statusFilter)->values();
+        }
 
         return [$dosens, $students, $stats, $requireAdvisor];
     }

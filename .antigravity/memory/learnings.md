@@ -73,6 +73,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-061** | 2026-10-07 | Database Migration & BAP DPL | Error 500 relation "academic_consultations" does not exist saat cetak lembar nilai/BAP DPL karena migrasi pending | RESOLVED |
 | **LRN-062** | 2026-10-07 | Autentikasi Admin & Standarisasi Rasio Aspek Favicon | Login error admin@gmail.com dengan kata sandi password & favicon tab browser Edge/Chrome gepeng/terdistorsi | RESOLVED |
 | **LRN-063** | 2026-10-07 | Standarisasi Siklus Hidup Magang, UI Dashboard Admin & Perapian Portal Mentor | Status ACCEPTED keliru tampil 'Siap diluluskan', asimetri 6 kartu metrik admin, banner Super Admin, dan tabel mentor padat badge ganda | RESOLVED |
+| **LRN-064** | 2026-10-07 | UI Line-Clamp Grid & Tipografi | Teks judul instansi & universitas baris ketiga terpotong di halaman index | RESOLVED |
+| **LRN-065** | 2026-10-08 | Nomenklatur Akademik & Rekonsiliasi Merge | Standardisasi istilah Dosen Pembimbing lintas peran & pembersihan tag Blade | RESOLVED |
+| **LRN-066** | 2026-10-08 | Scheduler, Queue Heartbeat & Model Guarding | Validasi otomatis sinkronisasi status magang & monitoring kesehatan worker | RESOLVED |
+| **LRN-067** | 2026-10-08 | Audit Komprehensif Sistem, Metrik Kampus & Type-Safety | Distorsi metrik makro kampus saat filter tabel, nullsafe dashboard mahasiswa, filter notifikasi DPL per skema evaluasi kampus, & alias kuota unit | RESOLVED |
 
 
 ---
@@ -1506,6 +1510,30 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Memastikan perintah `php artisan app:health` melaporkan status normal secara akurat.
   4. Menjaga integritas mass-assignment model (`$guarded = ['id']`) agar atribut penunjang testing seperti `created_at` dan catatan evaluasi tidak terpotong.
 - **Prevention Rule**: Pertahankan `protected $guarded = ['id'];` pada model domain utama jika aplikasi mengandalkan pengujian berbasis seeding/factory dengan penyesuaian timestamps; pasang pengujian otomatis untuk setiap console command kritis.
+
+### [LRN-067] Audit Komprehensif Sistem: Integritas Metrik Makro, Nullsafety View Mahasiswa, Kebijakan Notifikasi DPL, & Type Safety Otorisasi Mentor
+- **Tanggal**: 2026-10-08
+- **Komponen**: `app/Services/UniversityHubService.php`, `resources/views/dashboard.blade.php`, `app/Models/University.php`, `app/Models/Application.php`, `app/Services/NotificationService.php`, `app/Models/Unit.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `tests/Feature/SystemAuditComprehensiveTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman detail universitas (`/admin/universities/{id}`), saat admin memfilter tabel daftar mahasiswa (misal: `?student_status=active` atau `completed`), kartu metrik statistik makro kampus (*Total Mahasiswa, Mahasiswa Aktif, Alumni Selesai, Perlu Tindakan*) ikut menciut ke subset filter dan kehilangan nilai total sebenarnya.
+  2. Pada `resources/views/dashboard.blade.php`, mahasiswa baru yang belum memiliki pengajuan magang memicu potensi PHP 8.2 notice/warning `Attempt to read property "status" on null` karena `$rawSt = $application->status->value` dievaluasi sebelum pengecekan/resolusi nullsafe.
+  3. Pada `NotificationService`, sistem memunculkan notifikasi darurat "Silakan Pilih Dosen Pembimbing / DPL" kepada mahasiswa yang diterima dan menghitung unassigned DPL di dashboard Super Admin, meskipun universitas mahasiswa tersebut menerapkan skema evaluasi `mentor_only` atau menonaktifkan kewajiban DPL (`require_dpl = false`).
+  4. Model `Unit` hanya memeriksa atribut `occupied_count_db` pada `getOccupiedCountAttribute()`, sehingga jika query menggunakan alias `accepted_count`, model memicu query fallback berulang.
+  5. Pada `Mentor\DashboardController::updateFinalReportStatus`, otorisasi mentor menggunakan komparasi identitas mentah non-int cast alih-alih method domain `Placement::isAssignedFieldMentor()`.
+- **Root Cause**:
+  1. `$students` collection di-filter oleh `$statusFilter` sebelum komputasi `$stats` dilakukan pada `UniversityHubService`.
+  2. Akses properti objek tanpa operator nullsafe (`?->`) dan penempatan urutan evaluasi variabel sebelum resolusi model pada Blade.
+  3. Logika verifikasi kebutuhan DPL tersebar dan belum tersentralisasi dalam method domain `University::requiresAdvisor()`.
+  4. Ketidakcocokan penamaan alias kolom kuota pada eager loading (`occupied_count_db` vs `accepted_count`).
+  5. Penggunaan operator `!==` langsung pada properti relasi `mentor_id` dan `pembimbing_id` tanpa memanfaatkan method model domain yang sudah teruji.
+- **Fix Applied**:
+  1. Menghitung array `$stats` pada koleksi lengkap `$students` sebelum filter `$statusFilter` diterapkan untuk tampilan tabel di `UniversityHubService`.
+  2. Memperbaiki urutan inisialisasi di `dashboard.blade.php` dengan nullsafe `$rawSt = $application?->statusValue() ?? 'none'`.
+  3. Menambahkan method domain `University::requiresAdvisor()` dan `Application::requiresAdvisor()`, serta memfilter notifikasi mahasiswa dan Super Admin pada `NotificationService` agar menghormati kebijakan evaluasi kampus.
+  4. Memperbarui `Unit::getOccupiedCountAttribute()` agar mendukung atribut alias `accepted_count` dan menambahkan accessor `getAcceptedCountAttribute()`.
+  5. Mengganti pengecekan manual di `Mentor\DashboardController` dengan `! $placement->isAssignedFieldMentor($mentor)`.
+  6. Menambahkan test suite komprehensif `tests/Feature/SystemAuditComprehensiveTest.php` (5/5 tests passed, total 280/280 tests 100% HIJAU, Strict Exit Code 0).
+- **Prevention Rule**: Selalu hitung statistik agregat tingkat entitas dari data dasar sebelum menerapkan filter presentasi; gunakan domain method pada Model untuk seluruh aturan bisnis lintas modul; selalu gunakan operator nullsafe `?->` pada view Blade saat mengakses model nullable.
 
 ---
 
