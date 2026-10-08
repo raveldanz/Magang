@@ -332,6 +332,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/lecturer/evaluations/{placementId}/grade-sheet', [LecturerEvaluationController::class, 'printGradeSheet'])->name('lecturer.evaluations.grade_sheet');
         Route::post('/lecturer/students/{placementId}/consultations', [LecturerDashboardController::class, 'storeConsultation'])->name('lecturer.consultations.store');
         Route::delete('/lecturer/consultations/{id}', [LecturerDashboardController::class, 'destroyConsultation'])->name('lecturer.consultations.destroy');
+        Route::patch('/lecturer/students/{placementId}/notes', [LecturerDashboardController::class, 'updateAdvisorNotes'])->name('lecturer.students.notes');
     });
 
     // ==========================================

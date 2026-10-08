@@ -243,6 +243,7 @@ class EvaluationController extends Controller
     public function printGradeSheet($placementId)
     {
         $placement = $this->getAuthorizedPlacement($placementId);
+        $placement->ensureCertificateHash();
 
         $student = $placement->application->user;
         $profile = $student->studentProfile;
