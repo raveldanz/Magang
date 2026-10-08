@@ -8,7 +8,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-sm font-black text-slate-900">Daftar Mahasiswa Asal {{ $university->name }}</h3>
-                            <p class="text-xs text-slate-500">Pantau status pendaftaran, instansi penempatan, DPL pembimbing, dan perkembangan nilai</p>
+                            <p class="text-xs text-slate-500">Pantau status pendaftaran, instansi penempatan, dosen pembimbing, dan perkembangan nilai</p>
                         </div>
 
                         <div class="cc-head-actions flex items-center gap-2">
@@ -132,7 +132,7 @@
                                         <td class="p-3.5">
                                             <div class="stt-people">
                                                 <div class="stt-person">
-                                                    <span class="stt-role">DPL</span>
+                                                    <span class="stt-role">Dosen</span>
                                                     @if($dosen)
                                                         <span class="stt-name text-indigo-700" title="{{ $dosen->name }}">{{ $dosen->name }}</span>
                                                         @if($isSuperAdmin && $latestApp)
@@ -145,7 +145,7 @@
                                                     @elseif($canAssignDpl)
                                                         <button type="button"
                                                                 @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
-                                                                class="stt-assign">+ Tugaskan DPL</button>
+                                                                class="stt-assign">+ Tugaskan Dosen</button>
                                                     @else
                                                         <span class="stt-empty">Belum ada</span>
                                                     @endif
@@ -248,12 +248,12 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <div class="mfield-label">Dosen DPL</div>
+                                    <div class="mfield-label">Dosen Pembimbing</div>
                                     <div class="mfield-value">{{ $dosen->name ?? '-' }}</div>
                                     @if($isSuperAdmin && $latestApp && ($dosen || in_array($mSt, ['accepted', 'active'], true)))
                                         <button type="button"
                                                 @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
-                                                class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti DPL' : '+ Tugaskan DPL' }}</button>
+                                                class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti Dosen' : '+ Tugaskan Dosen' }}</button>
                                     @endif
                                 </div>
                                 <div>

@@ -211,15 +211,41 @@ class Application extends Model
         return $placement->logbooks()->exists();
     }
 
+    /**
+     * Memvalidasi apakah pengajuan memenuhi syarat kelulusan:
+     * 1. Status wajib ACTIVE.
+     * 2. Tanggal sekarang sudah melewati atau sama dengan tanggal selesai magang (now() >= end_date).
+     * 3. Syarat administratif (Nilai Mentor Lapangan, Laporan Akhir ACC, & Logbook) terpenuhi.
+     */
+    public function canBeCompleted(): bool
+    {
+        $rawStatus = $this->statusValue();
+
+        if ($rawStatus !== ApplicationStatus::ACTIVE->value) {
+            return false;
+        }
+
+        if ($this->end_date && Carbon::parse($this->end_date)->startOfDay()->isFuture()) {
+            return false;
+        }
+
+        return $this->has_approved_report && $this->has_complete_evaluation && $this->has_filled_logbook;
+    }
+
+    public function isReadyForCompletion(): bool
+    {
+        return $this->canBeCompleted();
+    }
+
     public function getCanCompleteAttribute(): bool
     {
-        $rawStatus = $this->status instanceof ApplicationStatus ? $this->status->value : strtolower((string) $this->status);
+        $rawStatus = $this->statusValue();
 
-        if ($rawStatus === 'completed') {
+        if ($rawStatus === ApplicationStatus::COMPLETED->value) {
             return true;
         }
 
-        if (! in_array($rawStatus, ['accepted', 'active'])) {
+        if ($rawStatus !== ApplicationStatus::ACTIVE->value) {
             return false;
         }
 
@@ -286,7 +312,7 @@ class Application extends Model
 
         return match (true) {
             in_array($status, ['pending', 'verified'], true) => 1,
-            $ongoing && $this->can_complete => 2,
+            $status === 'active' && $this->can_complete => 2,
             $ongoing && $this->missingSupervisor($requireAdvisor ?? $this->requiresAdvisor()) !== null => 3,
             $status === 'active' => 4,
             $status === 'accepted' => 5,
@@ -385,7 +411,7 @@ class Application extends Model
 
         return "(CASE
             WHEN applications.status IN ('pending', 'verified') THEN 1
-            WHEN applications.status IN ('accepted', 'active') AND {$reportApproved} AND {$evaluationComplete} AND {$logbookFilled} THEN 2
+            WHEN applications.status = 'active' AND {$reportApproved} AND {$evaluationComplete} AND {$logbookFilled} THEN 2
             WHEN applications.status IN ('accepted', 'active') AND ({$mentorMissing} OR ({$dosenMissing} AND {$requireDpl})) THEN 3
             WHEN applications.status = 'active' THEN 4
             WHEN applications.status = 'accepted' THEN 5

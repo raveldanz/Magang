@@ -308,4 +308,20 @@ class Placement extends Model
 
         return false;
     }
+
+    /**
+     * Pengecekan kelulusan magang:
+     * 1. Status wajib ACTIVE.
+     * 2. Tanggal sekarang sudah melewati atau sama dengan tanggal selesai magang (now() >= end_date).
+     * 3. Syarat administratif (Nilai Mentor Lapangan, Laporan Akhir, Logbook) lengkap.
+     */
+    public function canBeCompleted(): bool
+    {
+        return $this->application ? $this->application->canBeCompleted() : false;
+    }
+
+    public function isReadyForCompletion(): bool
+    {
+        return $this->canBeCompleted();
+    }
 }

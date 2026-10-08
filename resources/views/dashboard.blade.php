@@ -517,8 +517,7 @@
                             </div>
                         @endif
                     </div>
-
-
+                @endif
 
             <!-- Modal Input Dosen Baru -->
             <div x-show="openNewDosenModal" x-transition:enter="transition ease-out duration-300"
@@ -594,7 +593,7 @@
                                 </button>
                                 <button type="submit"
                                     class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
-                                    Daftarkan & Pilih Sebagai DPL
+                                    Daftarkan & Pilih Sebagai Dosen Pembimbing
                                 </button>
                             </div>
                         </form>
@@ -605,104 +604,6 @@
 
             <!-- Modal Popup Kredensial Akun Dosen Baru -->
             @if (session('new_advisor_credential'))
-                @php
-                    $cred = session('new_advisor_credential');
-                    $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
-                @endphp
-                <div x-show="showCredentialModal" x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 z-[9999] overflow-y-auto"
-                    style="display: none;">
-
-                    <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity"
-                        @click="showCredentialModal = false"></div>
-
-                    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-emerald-100 p-6 sm:p-8 space-y-5 my-auto max-h-[90vh] overflow-y-auto">
-
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <h3 class="text-lg font-black text-slate-900 leading-snug">
-                                        Akun Dosen Pembimbing Berhasil Dibuat
-                                    </h3>
-                                    <p class="text-xs text-emerald-600 font-semibold">
-                                        Tersambung ke {{ $cred['univ_name'] }}
-                                    </p>
-                                </div>
-                                <button type="button" @click="showCredentialModal = false"
-                                    class="text-slate-400 hover:text-slate-600 text-lg p-1 cursor-pointer">
-                                    ✕
-                                </button>
-                            </div>
-
-                            <p class="text-xs text-slate-500 leading-relaxed">
-                                Jika dosen pembimbing Anda belum terdaftar di sistem, silakan isi data di bawah ini.
-                                Akun
-                                portal dosen akan otomatis dibuatkan dan terhubung ke universitas Anda.
-                            </p>
-
-                            <form action="{{ route('student.create_advisor') }}" method="POST" class="space-y-4">
-                                @csrf
-                                <input type="hidden" name="university_id" value="{{ Auth::user()->university_id }}">
-
-                                <div>
-                                    <label for="modal_name"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span>
-                                    </label>
-                                    <input type="text" id="modal_name" name="name" required
-                                        placeholder="Contoh: Dr. Ir. Ahmad Sudrajat, M.Kom"
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                </div>
-
-                                <div>
-                                    <label for="modal_email"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Email Resmi / Kampus Dosen <span class="text-rose-500">*</span>
-                                    </label>
-                                    <input type="email" id="modal_email" name="email" required
-                                        placeholder="Contoh: ahmad.sudrajat@kampus.ac.id"
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                </div>
-
-                                <div>
-                                    <label for="modal_nidn"
-                                        class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        NIDN / NIP Dosen (Opsional)
-                                    </label>
-                                    <input type="text" id="modal_nidn" name="nidn" placeholder="Contoh: 0012345678"
-                                        class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                        Asal Perguruan Tinggi:
-                                    </label>
-                                    <input type="text"
-                                        value="{{ $univName ?? $profile->universitas ?? 'Universitas Mahasiswa' }}"
-                                        disabled
-                                        class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
-                                </div>
-
-                                <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
-                                    <button type="button" @click="openNewDosenModal = false"
-                                        class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                        Batal
-                                    </button>
-                                    <button type="submit"
-                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
-                                        Daftarkan & Pilih Sebagai Dosen Pembimbing
-                                    </button>
-                                </div>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal Popup Kredensial Akun Dosen Baru -->
-                @if (session('new_advisor_credential'))
                     @php
                         $cred = session('new_advisor_credential');
                         $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
@@ -817,23 +718,12 @@
                     </div>
                 @endif
 
-                                        </div>
-                    </div>
-                @endif
-
                 <!-- ==================================================== -->
                 <!-- 4 & 5. DESKTOP VIEW: STATUS CARDS & DETAIL PENEMPATAN -->
                 <!-- ==================================================== -->
                 @php
                     $rawAppSt = $rawSt;
                 @endphp
-                                        </div>
-                    </div>
-                @endif
-
-                <!-- ==================================================== -->
-                <!-- 4 & 5. DESKTOP VIEW: STATUS CARDS & DETAIL PENEMPATAN -->
-                <!-- ==================================================== -->
                 <div class="hidden md:block space-y-6">
 
                     <!-- STATUS CARD GRID (3 KARTU INFORMASI UTAMA: STATUS, DOSEN, MENTOR - DESKTOP) -->
@@ -1264,21 +1154,6 @@
                 </div>
 
             </div>
-
-            <!-- 5. CATATAN PENOLAKAN / PENGUNDURAN DIRI -->
-            @if ($application && in_array($rawAppSt, ['rejected', 'resigned']))
-                <div class="p-4 sm:p-5 {{ $rawAppSt === 'rejected' ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-slate-50 border-slate-200 text-slate-800' }} border rounded-2xl text-xs space-y-1.5 shadow-2xs">
-                    <div class="flex items-center gap-2 font-bold text-sm">
-                        <svg class="w-4 h-4 {{ $rawAppSt === 'rejected' ? 'text-rose-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                        <span>{{ $rawAppSt === 'rejected' ? 'Catatan Penolakan Berkas Magang' : 'Status Pengunduran Diri' }}</span>
-                    </div>
-                    <p class="leading-relaxed">
-                        {{ $application->rejection_reason ?? $application->rejection_note ?? ($rawAppSt === 'resigned' ? 'Anda telah mengundurkan diri dari pengajuan magang ini.' : 'Tidak ada catatan tambahan.') }}
-                    </p>
-                </div>
-            @endif
 
         </div>
     </div>

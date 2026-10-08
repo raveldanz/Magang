@@ -180,9 +180,6 @@
                                 </div>
                                 <div class="text-[11px] text-slate-700 font-medium">
                                     <strong class="text-slate-900 font-bold">Dosen Pembimbing:</strong> {{ $dosen->name ?? 'Belum Ditugaskan' }}
-                                    @if($nilaiDosen > 0)
-                                        <span class="text-emerald-700 font-bold ml-1">&bull; Skor: {{ $nilaiDosen }}/100</span>
-                                    @endif
                                 </div>
                                 <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200/60">
                                     <span class="text-slate-500">Laporan Akhir:
@@ -224,13 +221,13 @@
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-4">Mahasiswa</th>
-                                <th class="py-3.5 px-4">Perguruan Tinggi & Unit</th>
-                                <th class="py-3.5 px-4">Dosen Pembimbing</th>
-                                <th class="py-3.5 px-4 text-center">Logbook</th>
-                                <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Nilai Mentor</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-5 w-3/12">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-3/12">Perguruan Tinggi & Unit</th>
+                                <th class="py-3.5 px-4 w-2/12">Dosen Pembimbing</th>
+                                <th class="py-3.5 px-3 text-center w-1/12 whitespace-nowrap">Logbook</th>
+                                <th class="py-3.5 px-3 text-center w-1/12 whitespace-nowrap">Laporan Akhir</th>
+                                <th class="py-3.5 px-4 text-center w-1/12 whitespace-nowrap">Nilai Mentor</th>
+                                <th class="py-3.5 px-5 text-right w-1/12 whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -253,42 +250,32 @@
                                 <tr class="hover:bg-slate-50/80 transition">
                                     
                                     <!-- Mahasiswa Info -->
-                                    <td class="py-4 px-4">
-                                        <div class="flex items-center gap-2">
-                                            <div class="font-bold text-gray-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
-                                            <x-status-badge :status="$appStatus" />
-                                        </div>
+                                    <td class="py-4 px-5">
+                                        <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug">{{ $student->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 font-mono mt-0.5">NIM: {{ $profile?->nim ?? '-' }}</div>
-                                        <div class="text-[10px] text-blue-600 font-semibold">{{ $profile?->jurusan ?? '-' }}</div>
+                                        <div class="text-[10px] text-blue-600 font-semibold mt-0.5">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <!-- Perguruan Tinggi & Unit -->
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-gray-800 text-xs">{{ $univName }}</div>
-                                        <div class="text-[11px] text-gray-500">{{ $unit->name ?? '-' }}</div>
+                                        <div class="text-[11px] text-gray-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <!-- Dosen Pembimbing Info -->
                                     <td class="py-4 px-4">
                                         <div class="font-semibold text-gray-800 text-xs">{{ $dosen->name ?? 'Belum Ditugaskan' }}</div>
-                                        <div class="text-[10px] text-emerald-600 font-semibold">
-                                            @if($nilaiDosen > 0)
-                                                Skor Dosen: {{ $nilaiDosen }}/100
-                                            @else
-                                                <span class="text-gray-400">Belum dinilai dosen</span>
-                                            @endif
-                                        </div>
                                     </td>
 
                                     <!-- Logbook Counter -->
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
                                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                             {{ $logbooksCount }} Entri
                                         </span>
                                     </td>
 
                                     <!-- Final Report Status -->
-                                    <td class="py-4 px-4 text-center whitespace-nowrap">
+                                    <td class="py-4 px-3 text-center whitespace-nowrap">
                                         @if(!$finalReport)
                                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500">
                                                 Belum Unggah
@@ -315,9 +302,9 @@
                                     </td>
 
                                     <!-- Action Buttons -->
-                                    <td class="py-4 px-4 text-right whitespace-nowrap">
+                                    <td class="py-4 px-5 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-2">
-                                            <a href="{{ route('mentor.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                            <a href="{{ route('mentor.students.show', $p->id) }}" class="inline-flex items-center gap-1 px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition cursor-pointer shadow-2xs">
                                                 <span>Detail</span>
                                             </a>
                                         </div>

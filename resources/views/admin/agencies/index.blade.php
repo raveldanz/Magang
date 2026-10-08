@@ -260,7 +260,6 @@
                                 {{ $agency->agency_name }}
                             </h3>
 
-
                             <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-normal mb-2"
                                 title="{{ $agency->address }}">
                                 {{ $agency->address ?? 'Alamat kantor belum diatur' }}

@@ -7,10 +7,11 @@
 
         <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang — Pemerintah Kota Surabaya') }}</title>
 
-        <!-- Favicon Resmi Pemerintah Kota Surabaya -->
-        <link rel="icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
-        <link rel="shortcut icon" type="image/png" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
-        <link rel="apple-touch-icon" href="{{ asset('images/logos/surabaya.png') }}?v=surabaya">
+        <!-- Favicon Resmi Pemerintah Kota Surabaya (Square Canvas Preserving Aspect Ratio) -->
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=2">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}?v=2">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=2">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-192.png') }}?v=2">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

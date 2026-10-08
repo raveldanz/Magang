@@ -150,7 +150,7 @@
                         <div class="text-xs text-blue-900 space-y-1">
                             <p class="font-bold">Informasi Akses Laporan Akhir:</p>
                             <p class="text-blue-800 leading-relaxed">
-                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data DPL telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
+                                Formulir pengunggahan naskah laporan ilmiah dan tautan luaran proyek magang akan otomatis aktif dan terbuka untuk diisi setelah pengajuan magang Anda <strong>diterima (disetujui)</strong> oleh pihak instansi kedinasan dan data Dosen Pembimbing telah dilengkapi. Anda dapat mengecek pembaruan status secara berkala di portal ini.
                             </p>
                         </div>
                     </div>
@@ -305,7 +305,7 @@
                                         <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider shrink-0">Format Baku</span>
                                     </div>
                                     <p class="text-slate-600 leading-relaxed text-[11px] sm:text-xs">
-                                        Agar memudahkan DPL dan Pembimbing Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
+                                        Agar memudahkan Dosen Pembimbing dan Mentor Dinas dalam memeriksa berkas Anda, pastikan nama file telah berformat standar:
                                     </p>
                                     <div class="p-2 sm:p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
                                         <div class="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-blue-700">
@@ -559,19 +559,19 @@
                                     </p>
                                 </div>
 
-                                <!-- 3. DPL Kampus -->
+                                <!-- 3. Dosen Pembimbing Kampus -->
                                 <div class="p-3 rounded-xl border {{ ($hasDosenScore || $isMentorOnly) ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-white border-amber-200 text-slate-700' }} space-y-1">
                                     <div class="flex items-center gap-1.5 font-bold">
                                         @if($hasDosenScore || $isMentorOnly)
                                             <span class="text-emerald-600 font-bold">✓</span>
-                                            <span>3. DPL Kampus</span>
+                                            <span>3. Dosen Pembimbing</span>
                                         @else
                                             <span class="text-amber-500 font-bold">⏳</span>
-                                            <span>3. DPL Kampus</span>
+                                            <span>3. Dosen Pembimbing</span>
                                         @endif
                                     </div>
                                     <p class="text-[11px] {{ ($hasDosenScore || $isMentorOnly) ? 'text-emerald-700' : 'text-slate-500' }}">
-                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Akademik DPL') }}
+                                        {{ $isMentorOnly ? 'Skema Kampus 100% Dinas' : ($hasDosenScore ? 'Selesai Menilai' : 'Menunggu Nilai Dosen Pembimbing') }}
                                     </p>
                                 </div>
 

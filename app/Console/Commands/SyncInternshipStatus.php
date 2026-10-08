@@ -41,7 +41,7 @@ class SyncInternshipStatus extends Command
     }
 
     /**
-     * ACCEPTED → ACTIVE saat tanggal mulai magang tiba.
+     * ACCEPTED → ACTIVE saat tanggal mulai magang tiba (dan belum lewat end_date).
      */
     private function activateStartedInternships(string $today): void
     {
@@ -49,6 +49,10 @@ class SyncInternshipStatus extends Command
             ->where('status', ApplicationStatus::ACCEPTED)
             ->whereNotNull('start_date')
             ->whereDate('start_date', '<=', $today)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                    ->orWhereDate('end_date', '>', $today);
+            })
             ->get();
 
         if ($applications->isEmpty()) {
@@ -86,30 +90,43 @@ class SyncInternshipStatus extends Command
 
     /**
      * Magang ACTIVE yang tanggal selesainya sudah lewat:
-     *  - bila laporan ACC & nilai lengkap → diluluskan otomatis (COMPLETED);
-     *  - bila belum → tetap ACTIVE (mahasiswa masih bisa melengkapi) dan dikirim pengingat ke
-     *    mahasiswa & mentor pada hari ke-1 setelah selesai lalu tiap 7 hari, agar tidak spam.
+     *  - bila syarat administratif (laporan ACC & nilai lengkap) SUDAH LENGKAP → transisi COMPLETED;
+     *  - bila belum → tetap ACTIVE, beri status/flag peringatan "Menunggu Evaluasi Mentor/Kelulusan".
      */
     private function handleEndedInternships(): void
     {
+        $today = Carbon::today()->toDateString();
         $applications = Application::with(['user', 'placement.finalreport', 'placement.evaluation', 'placement.mentor', 'placement.pembimbing'])
             ->where('status', ApplicationStatus::ACTIVE)
             ->whereNotNull('end_date')
-            ->whereDate('end_date', '<', Carbon::today()->toDateString())
+            ->whereDate('end_date', '<', $today)
             ->get();
 
         $completed = 0;
         $reminded = 0;
 
         foreach ($applications as $app) {
-            if ($app->placement && $app->placement->syncCompletionStatus() && $app->fresh()->statusValue() === ApplicationStatus::COMPLETED->value) {
+            $isComplete = $app->canBeCompleted()
+                || ($app->placement && $app->placement->syncCompletionStatus() && $app->fresh()->statusValue() === ApplicationStatus::COMPLETED->value);
+
+            if ($isComplete) {
+                if ($app->statusValue() !== ApplicationStatus::COMPLETED->value) {
+                    $app->update(['status' => ApplicationStatus::COMPLETED]);
+                    AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [
+                        'student_name' => $app->user?->name,
+                        'reason' => 'Masa magang berakhir dan syarat administratif lengkap (Auto-synced via scheduler)',
+                    ]);
+                }
                 $completed++;
                 $this->line(" - {$app->user?->name} (ID: {$app->id}) -> masa magang berakhir & syarat lengkap: COMPLETED.");
 
                 continue;
             }
 
+            // Jika syarat administratif belum lengkap: status tetap ACTIVE, beri flag peringatan "Menunggu Evaluasi Mentor/Kelulusan"
             $daysPast = $app->daysPastEndDate();
+            $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Lewat {$daysPast} hari [Menunggu Evaluasi Mentor/Kelulusan]. Status tetap ACTIVE.");
+
             if ($daysPast < 1 || ($daysPast - 1) % 7 !== 0) {
                 continue;
             }
@@ -119,13 +136,16 @@ class SyncInternshipStatus extends Command
                 $missing[] = 'laporan akhir belum disetujui';
             }
             if (! $app->has_complete_evaluation) {
-                $missing[] = 'nilai evaluasi belum lengkap';
+                $missing[] = 'nilai evaluasi mentor lapangan belum lengkap';
+            }
+            if (! $app->has_filled_logbook) {
+                $missing[] = 'logbook aktivitas belum diisi';
             }
             $missingText = $missing ? implode(' dan ', $missing) : 'kelengkapan kelulusan belum terpenuhi';
 
             SystemNotification::send(
                 'Masa Magang Telah Berakhir',
-                "Masa magang Anda berakhir {$daysPast} hari lalu, tetapi {$missingText}. Segera lengkapi agar status kelulusan & sertifikat dapat diterbitkan.",
+                "Masa magang Anda telah berakhir {$daysPast} hari lalu [Menunggu Evaluasi Mentor/Kelulusan], karena {$missingText}. Segera lengkapi agar status kelulusan & sertifikat dapat diterbitkan.",
                 $app->user_id,
                 null,
                 route('student.final_report.index', [], false),
@@ -139,7 +159,7 @@ class SyncInternshipStatus extends Command
             if ($mentor) {
                 SystemNotification::send(
                     'Mahasiswa Melewati Masa Magang',
-                    "Masa magang {$app->user?->name} berakhir {$daysPast} hari lalu, namun {$missingText}. Mohon tinjau laporan & lengkapi penilaian.",
+                    "Masa magang {$app->user?->name} berakhir {$daysPast} hari lalu [Menunggu Evaluasi Mentor/Kelulusan], namun {$missingText}. Mohon tinjau laporan akhir & lengkapi evaluasi mentor lapangan.",
                     $mentor->id,
                     null,
                     route('mentor.dashboard', [], false),

@@ -132,11 +132,9 @@ class ChatPresenter
             'title' => $contact ? $contact['name'] : ($c->title ?: 'Grup'),
             'subtitle' => $contact
                 ? implode(' · ', array_filter([$contact['role_label'], $contact['org']]))
-                : ($c->isMentorGuidance()
-                    ? 'Bimbingan Mentor · '.max(0, ((int) $c->participants_count) - 1).' mahasiswa'
-                    : ($c->isDplGuidance()
-                        ? 'Bimbingan Dosen · '.max(0, ((int) $c->participants_count) - 1).' mahasiswa'
-                        : ($c->type === ChatConversation::TYPE_PLACEMENT ? 'Grup Bimbingan' : ((int) $c->participants_count).' anggota'))),
+                : ($c->isMentorGuidance() || $c->isDplGuidance()
+                    ? max(0, ((int) $c->participants_count) - 1).' mahasiswa bimbingan'
+                    : ($c->type === ChatConversation::TYPE_PLACEMENT ? 'Grup Bimbingan' : ((int) $c->participants_count).' anggota')),
             'avatar' => $contact
                 ? ['initials' => $contact['initials'], 'color' => $contact['color'], 'group' => false, 'is_channel' => false, 'squircle' => false, 'logo_url' => null]
                 : ['initials' => $this->initials((string) $c->title), 'color' => ($c->isGuidanceGroup() || $c->type === ChatConversation::TYPE_PLACEMENT) ? self::PLACEMENT_COLOR : self::GROUP_COLOR, 'group' => true, 'is_channel' => false, 'squircle' => false, 'logo_url' => null],
