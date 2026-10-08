@@ -108,7 +108,7 @@ class LecturerInnovationsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('88.0');
         $response->assertSee('92.0');
-        $response->assertSee('BAP');
+        $response->assertSee('Detail');
     }
 
     public function test_dpl_can_view_official_grade_sheet_bap(): void
@@ -199,4 +199,21 @@ class LecturerInnovationsTest extends TestCase
         $this->assertStringContainsString('Ahmad Fajar', $content);
         $this->assertStringContainsString('22081010199', $content);
     }
+
+    public function test_dpl_can_save_internal_advisor_notes(): void
+    {
+        $response = $this->actingAs($this->dosen)->patch(
+            route('lecturer.students.notes', $this->placement->id),
+            [
+                'advisor_notes' => 'Catatan penting: Mahasiswa perlu bimbingan khusus pada analisis arsitektur.',
+            ]
+        );
+
+        $response->assertRedirect();
+        $this->assertEquals(
+            'Catatan penting: Mahasiswa perlu bimbingan khusus pada analisis arsitektur.',
+            $this->placement->fresh()->advisor_notes
+        );
+    }
 }
+
