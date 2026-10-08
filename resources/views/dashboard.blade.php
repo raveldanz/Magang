@@ -756,15 +756,15 @@
                                     </a>
                                 @elseif (!$application)
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                        <span>Buat Pengajuan</span> &rarr;
+                                        <span>Buat Pengajuan</span> 
                                     </a>
                                 @elseif ($rawAppSt === 'rejected')
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-rose-600 hover:text-rose-800 inline-flex items-center gap-1">
-                                        <span>Ajukan Magang Baru</span> &rarr;
+                                        <span>Ajukan Magang Baru</span> 
                                     </a>
                                 @elseif ($rawAppSt === 'resigned')
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                        <span>Daftar Magang Baru</span> &rarr;
+                                        <span>Daftar Magang Baru</span> 
                                     </a>
                                 @else
                                     <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
@@ -810,7 +810,7 @@
                                     <button type="button"
                                         onclick="const el = document.getElementById('change-advisor-box'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                         class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                        {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} &rarr;
+                                        {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} 
                                     </button>
                                 @else
                                     <span class="text-[11px] text-slate-400">-</span>
@@ -977,15 +977,15 @@
                                 </a>
                             @elseif (!$application)
                                 <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                    <span>Buat Pengajuan</span> &rarr;
+                                    <span>Buat Pengajuan</span> 
                                 </a>
                             @elseif ($rawAppSt === 'rejected')
                                 <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-rose-600 hover:text-rose-800 inline-flex items-center gap-1">
-                                    <span>Ajukan Magang Baru</span> &rarr;
+                                    <span>Ajukan Magang Baru</span> 
                                 </a>
                             @elseif ($rawAppSt === 'resigned')
                                 <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                                    <span>Daftar Magang Baru</span> &rarr;
+                                    <span>Daftar Magang Baru</span> 
                                 </a>
                             @else
                                 <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
@@ -1025,7 +1025,7 @@
                                 <button type="button"
                                     onclick="const el = document.getElementById('change-advisor-box-mobile'); el.classList.toggle('hidden'); if(!el.classList.contains('hidden')) el.scrollIntoView({behavior: 'smooth'});"
                                     class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-                                    {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} &rarr;
+                                    {{ $academicAdvisor ? 'Ganti Dosen Pembimbing' : 'Pilih Dosen Pembimbing' }} 
                                 </button>
                             </div>
                         @endif
