@@ -520,7 +520,7 @@
                                         </div>
                                     </div>
                                     <a href="{{ route('student.logbook.index') }}" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shrink-0 transition shadow-2xs">
-                                        Isi Logbook &rarr;
+                                        Isi Logbook 
                                     </a>
                                 </div>
                             @endif
