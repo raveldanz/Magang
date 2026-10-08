@@ -7,11 +7,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const brainDir = 'C:\\Users\\EVAN\\.gemini\\antigravity-ide\\brain\\860a2603-0d83-4450-8014-53b0e6df4d3a';
 const publicDir = path.resolve(projectRoot, 'public/test-artifacts');
+const brainDir = process.env.ARTIFACT_DIR || publicDir;
 
 if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-if (!fs.existsSync(brainDir)) fs.mkdirSync(brainDir, { recursive: true });
+try {
+    if (!fs.existsSync(brainDir)) fs.mkdirSync(brainDir, { recursive: true });
+} catch (_) {}
 
 async function run() {
     console.log('[*] Launching Chrome via Playwright (channel: chrome)...');
@@ -34,8 +36,8 @@ async function run() {
         await pageDesktop.click('button[type="submit"]');
         await pageDesktop.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
 
-        console.log('[*] Navigating to /lecturer/students/3...');
-        await pageDesktop.goto('http://127.0.0.1:8000/lecturer/students/3', { waitUntil: 'networkidle' });
+        console.log('[*] Navigating to /lecturer/students/1...');
+        await pageDesktop.goto('http://127.0.0.1:8000/lecturer/students/1', { waitUntil: 'networkidle' });
         await pageDesktop.waitForTimeout(500);
 
         const desktopPath = path.join(publicDir, 'student_detail_desktop.png');
@@ -59,7 +61,7 @@ async function run() {
         await pageMobile.click('button[type="submit"]');
         await pageMobile.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
 
-        await pageMobile.goto('http://127.0.0.1:8000/lecturer/students/3', { waitUntil: 'networkidle' });
+        await pageMobile.goto('http://127.0.0.1:8000/lecturer/students/1', { waitUntil: 'networkidle' });
         await pageMobile.waitForTimeout(500);
 
         const mobilePath = path.join(publicDir, 'student_detail_mobile.png');
