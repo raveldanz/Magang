@@ -259,28 +259,37 @@
                                     </td>
                                     <td class="p-3 whitespace-nowrap">
                                         @php
+                                            $rawStatus = $app->statusValue();
+                                            $isActive = $rawStatus === \App\Enums\ApplicationStatus::ACTIVE->value;
+                                            $isReadyToComplete = $app->canBeCompleted();
                                             $actionHint = $app->actionHint();
-                                            $waitingEvaluation = !$actionHint && in_array($app->statusValue(), ['accepted', 'active'], true)
+                                            $waitingEvaluation = !$actionHint && $isActive
                                                 && $app->has_approved_report && !$app->has_complete_evaluation;
-                                            $waitingLogbook = !$actionHint && in_array($app->statusValue(), ['accepted', 'active'], true)
+                                            $waitingLogbook = !$actionHint && $isActive
                                                 && $app->has_approved_report && $app->has_complete_evaluation && !$app->has_filled_logbook;
                                         @endphp
                                         <x-status-badge :status="$app->status"
-                                            :tooltip="$app->statusValue() === 'rejected' && $app->rejection_note ? 'Alasan: ' . $app->rejection_note : null" />
+                                            :tooltip="$rawStatus === 'rejected' && $app->rejection_note ? 'Alasan: ' . $app->rejection_note : null" />
                                         @if($app->isPastEndDate())
                                             <div class="mt-1.5 inline-flex px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold" title="Tanggal selesai {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}">Lewat masa magang {{ $app->daysPastEndDate() }} hari</div>
                                         @endif
-                                        @if($actionHint)
+                                        @if($isActive && $isReadyToComplete)
+                                            <div class="mt-1.5 text-xs text-emerald-600 font-medium">Siap diluluskan</div>
+                                        @elseif($isActive && $app->isPastEndDate() && !$isReadyToComplete)
+                                            <div class="mt-1.5 text-xs font-semibold text-rose-600">Menunggu Evaluasi Mentor/Kelulusan</div>
+                                        @elseif($actionHint && $actionHint !== 'Siap diluluskan')
                                             <div class="mt-1.5 text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
                                         @elseif($waitingLogbook)
                                             <div class="mt-1.5 text-xs font-semibold text-rose-600">Logbook belum diisi</div>
                                         @elseif($waitingEvaluation)
                                             <div class="mt-1.5 text-xs text-slate-500">Menunggu nilai evaluasi</div>
+                                        @elseif($rawStatus === \App\Enums\ApplicationStatus::ACCEPTED->value)
+                                            <div class="mt-1.5 text-xs text-indigo-600 font-medium">Pra-Magang</div>
                                         @endif
                                     </td>
                                     <td class="p-3 text-center whitespace-nowrap">
                                         <a href="{{ route('admin.applications.show', $app->id) }}" 
-                                           class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
+                                            class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
                                             <span>Detail</span>
                                             <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -302,10 +311,12 @@
                     @forelse ($applications as $app)
                         @php
                             $rawStatus = $app->statusValue();
+                            $isActive = $rawStatus === \App\Enums\ApplicationStatus::ACTIVE->value;
+                            $isReadyToComplete = $app->canBeCompleted();
                             $actionHint = $app->actionHint();
-                            $waitingEvaluation = !$actionHint && in_array($rawStatus, ['accepted', 'active'], true)
+                            $waitingEvaluation = !$actionHint && $isActive
                                 && $app->has_approved_report && !$app->has_complete_evaluation;
-                            $waitingLogbook = !$actionHint && in_array($rawStatus, ['accepted', 'active'], true)
+                            $waitingLogbook = !$actionHint && $isActive
                                 && $app->has_approved_report && $app->has_complete_evaluation && !$app->has_filled_logbook;
                         @endphp
                         <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 relative">
@@ -327,12 +338,18 @@
                                 </div>
                             </div>
 
-                            @if($actionHint)
+                            @if($isActive && $isReadyToComplete)
+                                <div class="text-xs text-emerald-600 font-medium">Siap diluluskan</div>
+                            @elseif($isActive && $app->isPastEndDate() && !$isReadyToComplete)
+                                <div class="text-xs font-semibold text-rose-600">Menunggu Evaluasi Mentor/Kelulusan</div>
+                            @elseif($actionHint && $actionHint !== 'Siap diluluskan')
                                 <div class="text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
                             @elseif($waitingLogbook)
                                 <div class="text-xs font-semibold text-rose-600">Logbook belum diisi</div>
                             @elseif($waitingEvaluation)
                                 <div class="text-xs text-slate-500">Menunggu nilai evaluasi</div>
+                            @elseif($rawStatus === \App\Enums\ApplicationStatus::ACCEPTED->value)
+                                <div class="text-xs text-indigo-600 font-medium">Pra-Magang</div>
                             @endif
 
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">

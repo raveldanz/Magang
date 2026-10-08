@@ -206,7 +206,7 @@
                                         Mahasiswa dibimbing & dinilai oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing</strong>. Logbook diverifikasi 2 arah.
                                     </p>
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
-                                        <span>✓ Wajib Pilih DPL</span>
+                                        <span>✓ Wajib Pilih Dosen Pembimbing</span>
                                         <span>✓ Verifikasi Logbook 2 Pihak</span>
                                     </div>
                                 </div>
@@ -226,7 +226,7 @@
                                         Kampus mempercayakan 100% penilaian dan pengawasan kepada <strong>Mentor Lapangan Dinas</strong>. Dosen tidak diwajibkan menilai.
                                     </p>
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
-                                        <span>✓ Tidak Wajib DPL</span>
+                                        <span>✓ Tidak Wajib Dosen Pembimbing</span>
                                         <span>✓ Cukup ACC Mentor Dinas</span>
                                     </div>
                                 </div>
@@ -282,7 +282,7 @@
                         <div class="pt-2 border-t border-slate-200 flex items-center gap-2">
                             <input type="checkbox" name="require_dpl" value="1" id="require_dpl" {{ old('require_dpl', $university->require_dpl ?? true) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <label for="require_dpl" class="text-xs text-gray-700 font-medium">
-                                <strong>Kunci Pengisian Logbook</strong> hingga mahasiswa memilih Dosen Pembimbing Lapangan.
+                                <strong>Kunci Pengisian Logbook</strong> hingga mahasiswa memilih Dosen Pembimbing.
                             </label>
                         </div>
                     </div>
@@ -291,7 +291,7 @@
                     <div x-show="scheme === 'mentor_only'" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
                         <p class="font-bold">Informasi Mode Penilaian Penuh Instansi:</p>
                         <p class="text-amber-800 leading-relaxed">
-                            Mahasiswa dari <strong>{{ $university->name }}</strong> dapat langsung mengisi logbook harian begitu diterima di dinas tanpa terhalang status DPL. Nilai akhir di sertifikat magang dihitung murni 100% dari Mentor Dinas.
+                            Mahasiswa dari <strong>{{ $university->name }}</strong> dapat langsung mengisi logbook harian begitu diterima di dinas tanpa terhalang status penugasan dosen pembimbing. Nilai akhir di sertifikat magang dihitung murni 100% dari Mentor Dinas.
                         </p>
                     </div>
 

@@ -215,7 +215,7 @@
                     <th class="px-4 py-3.5 whitespace-nowrap">Jurusan / NIM</th>
                     <th class="px-4 py-3.5 whitespace-nowrap">Instansi & Unit Kerja</th>
                     <th class="px-4 py-3.5 whitespace-nowrap text-center">Status Magang</th>
-                    <th class="px-4 py-3.5 whitespace-nowrap">Dosen DPL</th>
+                    <th class="px-4 py-3.5 whitespace-nowrap">Dosen Pembimbing</th>
                     <th class="px-4 py-3.5 whitespace-nowrap">Mentor Dinas</th>
                     <th class="py-3.5 whitespace-nowrap text-center" style="padding-left: 12px; padding-right: 32px;">Aksi</th>
                 </tr>
@@ -254,7 +254,7 @@
                                 <button type="button" 
                                         @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '{{ $dosen->id }}' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">
-                                    Ganti DPL
+                                    Ganti Dosen
                                 </button>
                             @else
                                 <div>
@@ -265,7 +265,7 @@
                                 <button type="button" 
                                         @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md inline-block cursor-pointer">
-                                    + Pilih DPL
+                                    + Pilih Dosen
                                 </button>
                             @endif
                         </td>
@@ -350,7 +350,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                            Simpan Penugasan DPL
+                            Simpan Penugasan Dosen
                         </button>
                     </div>
                 </form>

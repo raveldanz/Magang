@@ -23,18 +23,39 @@ class AgencyProfile extends Model
      */
     public function getLogoUrlAttribute(): string
     {
-        $logo = ltrim((string) ($this->attributes['logo'] ?? ''), '/');
+        $raw = (string) ($this->attributes['logo'] ?? '');
+        if (trim($raw) === '') {
+            return asset('images/logos/surabaya.png');
+        }
 
-        if ($logo !== '') {
-            if (is_file(public_path($logo))) {
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+            return $raw;
+        }
+
+        $logo = ltrim($raw, '/');
+
+        if (str_starts_with($logo, 'storage/')) {
+            $sub = substr($logo, 8);
+            if (is_file(public_path($logo)) || is_file(storage_path('app/public/'.$sub))) {
                 return asset($logo);
-            }
-            if (is_file(public_path('storage/'.$logo)) || is_file(storage_path('app/public/'.$logo))) {
-                return asset('storage/'.$logo);
             }
         }
 
-        return asset('images/default-agency.svg');
+        if (is_file(public_path($logo))) {
+            return asset($logo);
+        }
+
+        if (is_file(public_path('storage/'.$logo)) || is_file(storage_path('app/public/'.$logo))) {
+            return asset('storage/'.$logo);
+        }
+
+        if (is_file(public_path('images/logos/'.$logo))) {
+            return asset('images/logos/'.$logo);
+        }
+
+        return is_file(public_path('images/logos/surabaya.png'))
+            ? asset('images/logos/surabaya.png')
+            : asset('images/default-agency.svg');
     }
 
     public function units()

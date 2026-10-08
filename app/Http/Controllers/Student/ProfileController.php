@@ -22,16 +22,17 @@ class ProfileController extends Controller
         $currentUniversityId = $profile->university_id ?? $user->university_id;
 
         // Dropdown: kampus terverifikasi + kampus milik mahasiswa ini sendiri (meski masih menunggu verifikasi)
-        $universities = University::where(function ($query) use ($user) {
-        $query->where('is_verified', 1)
-              ->orWhere('id', $user->university_id);
-    })
-    ->where(function ($query) {
-        $query->whereNull('code')
-              ->orWhere('code', '!=', 'LAINNYA');
-    })
-    ->orderBy('name', 'asc')
-    ->get(['id', 'name', 'code', 'slug', 'is_verified']); // <-- Hapus 'acronym' dari array ini jika kolomnya belum ada di DB
+        $universities = University::query()
+            ->where(function ($q) use ($currentUniversityId) {
+                $q->where('is_verified', true);
+                if ($currentUniversityId) {
+                    $q->orWhere('id', $currentUniversityId);
+                }
+            })
+            ->where(fn ($q) => $q->whereNull('code')->orWhere('code', '!=', 'LAINNYA'))
+            ->orderBy('name', 'asc')
+            ->get(['id', 'name', 'code', 'acronym', 'slug', 'is_verified']);
+
         return view('student.profile.edit', compact('user', 'profile', 'universities', 'currentUniversityId'));
     }
 

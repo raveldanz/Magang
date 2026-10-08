@@ -101,22 +101,15 @@
                         <x-input-label for="logo" value="Logo Resmi Instansi" class="text-xs font-bold text-slate-700 uppercase" />
                         <div class="flex items-center space-x-4 mt-2">
                             @php
-                                $currentLogo = $agencyProfile->logo ?? $profile->logo ?? null;
-                                $displayLogo = null;
-                                if ($currentLogo && file_exists(public_path($currentLogo))) {
-                                    $displayLogo = asset($currentLogo);
-                                } elseif ($currentLogo && file_exists(storage_path('app/public/' . $currentLogo))) {
-                                    $displayLogo = asset('storage/' . $currentLogo);
-                                } else {
-                                    $displayLogo = asset('images/logos/surabaya.png');
-                                }
+                                $displayLogo = $agencyProfile->logo_url ?? asset('images/logos/surabaya.png');
                             @endphp
                             <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
                                 <div class="flex items-center gap-3 shrink-0">
                                     <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px;">
                                         <img id="agencyLogoPreview" src="{{ $displayLogo }}" 
-                                             alt="Logo {{ $agencyProfile->agency_name ?? $profile->agency_name }}" 
-                                             class="w-full h-full object-contain shrink-0 transition-all duration-200">
+                                             alt="Logo {{ $agencyProfile->agency_name ?? '' }}" 
+                                             class="w-full h-full object-contain shrink-0 transition-all duration-200"
+                                             onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                                     </div>
                                     <div class="sm:hidden text-xs">
                                         <span class="font-bold text-slate-800 block">Pratinjau Logo</span>
