@@ -1485,7 +1485,17 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Meningkatkan kapasitas batas baris menjadi `line-clamp-3` dengan tinggi tetap `h-[4.25rem] mb-1.5`.
   3. Memperbaiki line-height pada deskripsi alamat menjadi `leading-normal h-8 text-[11px]`.
   4. Memvalidasi dengan feature test `tests/Feature/AgencyCardTitleVisualTest.php` (PASS, Exit Code 0).
-- **Prevention Rule**: Jangan pernah memadukan `-webkit-line-clamp: N` dengan `height` container tetap yang lebih besar daripada `N * line-height`. Tinggi container judul kartu WAJIB pas secara matematis dengan kelipatan line-height batas baris untuk mencegah sisa celah pixel merender baris berikutnya secara cacat/tenggelam.
+### [LRN-065] Standardisasi Nomenklatur Akademik "Dosen Pembimbing" & Rekonsiliasi Merge Pasca-Update Main
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/admin/`, `resources/views/university/`, `resources/views/student/`, `resources/views/lecturer/`
+- **Problem / Symptom**: Inkonsistensi penyebutan pembimbing akademik kampus antara singkatan tidak baku "DPL" dan "Dosen Pembimbing" di berbagai view modul Mahasiswa, Admin Kampus, Dosen, dan Admin Utama setelah rekonsiliasi merge branch `main`. Selain itu, sempat ada penutupan tag bersarang yang hilang pada `resources/views/dashboard.blade.php`.
+- **Root Cause**: Fragmentasi penamaan pada view legacy sebelum standarisasi UI dinas Pemkot, serta adanya patch parsial saat resolve merge conflict.
+- **Fix Applied**:
+  1. Melakukan audit menyeluruh pada seluruh 118 berkas Blade template dan memvalidasi keutuhan tag directive (`php artisan view:cache` lolos 100%).
+  2. Menstandarisasikan seluruh label antarmuka pengguna dari "DPL / Dosen DPL" menjadi "Dosen Pembimbing" atau "Dosen" (di ruang ringkas).
+  3. Memperbaiki button aksi modal penugasan menjadi "Tugaskan Dosen", "Ganti Dosen", dan "Simpan Dosen".
+  4. Menjalankan test suite lengkap `php artisan test` (271/271 tests lolos, Exit Code 0).
+- **Prevention Rule**: Seluruh istilah resmi di antarmuka publik/internal wajib menggunakan "Dosen Pembimbing" (atau "Dosen" pada badge ringkas). Jangan gunakan akronim "DPL" di teks tombol, judul modal, maupun deskripsi alur demi menjaga citra formal kedinasan Pemkot Surabaya.
 
 ---
 
