@@ -116,7 +116,7 @@
                                 <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-0.5 text-blue-600">
                                 <div>
                                     <strong class="text-gray-900 block"> Kemitraan Dua Pihak (Standar)</strong>
-                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & DPL. Logbook diverifikasi 2 arah.</span>
+                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & Dosen Pembimbing. Logbook diverifikasi 2 arah.</span>
                                 </div>
                             </label>
 
@@ -144,7 +144,7 @@
 
                                 <div class="space-y-1">
                                     <div class="flex justify-between text-xs font-semibold text-gray-700">
-                                        <span>Bobot DPL Kampus:</span>
+                                        <span>Bobot Dosen Pembimbing Kampus:</span>
                                         <span class="font-mono text-purple-600 font-bold" x-text="weightLecturer + '%'"></span>
                                     </div>
                                     <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg accent-purple-600">
@@ -155,7 +155,7 @@
                             <div class="pt-1 flex items-center gap-2">
                                 <input type="checkbox" name="require_dpl" value="1" id="admin_require_dpl" {{ old('require_dpl', $university->require_dpl ?? true) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600">
                                 <label for="admin_require_dpl" class="text-xs text-gray-700 font-medium">
-                                    Kunci pengisian logbook mahasiswa hingga memilih DPL.
+                                    Kunci pengisian logbook mahasiswa hingga memilih Dosen Pembimbing.
                                 </label>
                             </div>
                         </div>

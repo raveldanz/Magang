@@ -563,16 +563,16 @@
                             <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
                         </div>
 
-                        <!-- Dropdown Dosen Pembimbing Lapangan (Searchable Combobox) -->
+                        <!-- Dropdown Dosen Pembimbing (Searchable Combobox) -->
                         <div>
                             <x-searchable-select
                                 name="academic_advisor_id"
                                 :items="$dosenItems"
                                 :selected="$selectedDosenId"
-                                label="Plotting Dosen Pembimbing Lapangan (DPL Kampus)"
+                                label="Plotting Dosen Pembimbing Kampus"
                                 placeholder="-- Cari atau Pilih Dosen Pembimbing (Ketik nama / email / kampus) --"
                             />
-                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Dosen DPL resmi dari perguruan tinggi mahasiswa yang bersangkutan.</p>
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Dosen Pembimbing resmi dari perguruan tinggi mahasiswa yang bersangkutan.</p>
                         </div>
 
                         <!-- Grid Nomor Surat & Tanggal Surat -->
@@ -661,7 +661,7 @@
                 <div id="penugasan-pembimbing" class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="pb-4 border-b border-slate-100 mb-5">
                         <h3 class="text-base font-bold text-slate-900">Penugasan Pembimbing (Susulan / Ganti)</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; DPL tanpa mengulang verifikasi. Histori logbook yang sudah divalidasi tetap tersimpan.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; Dosen Pembimbing tanpa mengulang verifikasi. Histori logbook yang sudah divalidasi tetap tersimpan.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5 text-xs">
@@ -673,7 +673,7 @@
                             @endunless
                         </div>
                         <div class="p-3 rounded-xl border {{ $asgAdvisor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
-                            <div class="text-slate-500 font-semibold">DPL Kampus saat ini</div>
+                            <div class="text-slate-500 font-semibold">Dosen Pembimbing Kampus saat ini</div>
                             <div class="font-bold text-slate-900 mt-0.5">{{ $asgAdvisor?->name ?? 'Belum Ditugaskan' }}</div>
                             @unless ($asgAdvisor)
                                 <div class="text-[11px] text-amber-700 mt-1">Menunggu SK / penugasan dari kampus.</div>
@@ -696,7 +696,7 @@
                                 @error('mentor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label for="asg_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Dosen Pembimbing Lapangan (DPL)</label>
+                                <label for="asg_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Dosen Pembimbing Kampus</label>
                                 <select id="asg_advisor_id" name="academic_advisor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
                                     <option value="">-- Tidak diubah --</option>
                                     @foreach ($dosens as $dosen)

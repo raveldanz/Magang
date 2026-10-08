@@ -218,7 +218,7 @@
                         </p>
                     </div>
                     <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full">
-                        Verifikasi DPL
+                        Verifikasi Dosen
                     </span>
                 </div>
 
@@ -234,7 +234,7 @@
             <div id="supervision-log" class="bg-white rounded-xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-6" x-data="{ openForm: {{ $consultations->isEmpty() ? 'true' : 'false' }} }">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
                     <div>
-                        <h3 class="font-bold text-base text-slate-900">Riwayat Konsultasi & Bimbingan DPL</h3>
+                        <h3 class="font-bold text-base text-slate-900">Riwayat Konsultasi & Bimbingan Dosen</h3>
                         <p class="text-xs text-slate-500 mt-0.5">Catat sesi konsultasi naskah laporan, telaah metodologi, dan arahan revisi bersama mahasiswa</p>
                     </div>
                     <div class="w-full sm:w-auto flex flex-wrap items-center justify-between sm:justify-end gap-2">
@@ -250,7 +250,7 @@
                 <!-- Form Tambah Catatan Sesi Bimbingan -->
                 <div x-show="openForm" x-collapse x-cloak class="p-5 bg-slate-50/80 rounded-xl border border-slate-200 space-y-4">
                     <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                        Input Catatan Sesi Konsultasi DPL
+                        Input Catatan Sesi Konsultasi Dosen
                     </h4>
                     <form method="POST" action="{{ route('lecturer.consultations.store', $placement->id) }}" class="space-y-4">
                         @csrf
@@ -280,7 +280,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan, Masukan, & Arahan DPL <span class="text-rose-500">*</span></label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan, Masukan, & Arahan Dosen <span class="text-rose-500">*</span></label>
                             <textarea name="notes" rows="3" placeholder="Tuliskan arahan perbaikan, format referensi, atau instruksi langkah selanjutnya..." required
                                       class="w-full text-xs border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>

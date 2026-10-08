@@ -61,7 +61,7 @@
                             @endif
 
                             <div class="text-xs text-slate-500 pt-1">
-                                Syarat Penugasan DPL: <strong class="text-slate-800">{{ $university->require_dpl ? 'Wajib Ditetapkan' : 'Opsional / Fleksibel' }}</strong>
+                                Syarat Penugasan Dosen Pembimbing: <strong class="text-slate-800">{{ $university->require_dpl ? 'Wajib Ditetapkan' : 'Opsional / Fleksibel' }}</strong>
                             </div>
                         </div>
                     </div>

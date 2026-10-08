@@ -153,7 +153,7 @@
                             <h4 class="font-bold text-amber-900 text-xs sm:text-sm">Terdapat {{ $unregisteredCount }}
                                 Perguruan Tinggi yang Belum Memiliki Akun Admin</h4>
                             <p class="text-[11px] text-amber-700 mt-0.5">Buatkan akun agar perwakilan kampus dapat login
-                                untuk monitoring mahasiswa dan penugasan DPL.</p>
+                                untuk monitoring mahasiswa dan penugasan dosen pembimbing.</p>
                         </div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                         <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
                             {{ $macroStats['total_dosens'] }}
                         </div>
-                        <div class="mt-1 text-xs text-slate-400">Dosen DPL aktif</div>
+                        <div class="mt-1 text-xs text-slate-400">Dosen pembimbing aktif</div>
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
@@ -324,7 +324,7 @@
                                 </div>
                                 <div class="border-x border-slate-200/60">
                                     <div class="text-sm font-black text-blue-600">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] font-medium text-blue-600/90 mt-0.5">Dosen DPL</div>
+                                    <div class="text-[10px] font-medium text-blue-600/90 mt-0.5">Dosen</div>
                                 </div>
                                 <div>
                                     <div class="text-sm font-black text-slate-900">{{ $univ->users_count }}</div>
