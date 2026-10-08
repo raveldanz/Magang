@@ -10,6 +10,7 @@
     'customValue' => '',
     'customLabel' => '[+] Tidak terdaftar? Masukkan manual',
     'required' => false,
+    'showAsterisk' => true,
     'disabled' => false,
     'class' => '',
     'eventName' => null,
@@ -270,7 +271,7 @@
     @if($label)
         <label for="{{ $elementId }}_btn" class="block font-bold text-xs uppercase tracking-wider text-slate-700 mb-1.5">
             {{ $label }}
-            @if($required) <span class="text-rose-500">*</span> @endif
+            @if($required && $showAsterisk) <span class="text-rose-500">*</span> @endif
         </label>
     @endif
 
