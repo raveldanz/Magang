@@ -269,4 +269,32 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'Catatan sesi bimbingan berhasil dihapus.');
     }
+
+    /**
+     * Simpan atau perbarui catatan internal pribadi DPL untuk mahasiswa bimbingan
+     */
+    public function updateAdvisorNotes(Request $request, $placementId)
+    {
+        $lecturer = Auth::user();
+        $placement = Placement::with('application.user')->find($placementId)
+            ?? Placement::with('application.user')->where('application_id', $placementId)->firstOrFail();
+
+        $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
+        $isSuperAdmin = $lecturer->isSuperAdmin();
+
+        if (! $isAssignedAdvisor && ! $isSuperAdmin) {
+            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+        }
+
+        $validated = $request->validate([
+            'advisor_notes' => 'nullable|string|max:3000',
+        ]);
+
+        $placement->update([
+            'advisor_notes' => $validated['advisor_notes'] ?? null,
+        ]);
+
+        return redirect()->back()->with('success', 'Catatan pribadi pembimbing berhasil disimpan.');
+    }
 }
+

@@ -19,6 +19,7 @@ class Placement extends Model
         'pembimbing_id',
         'certificate_number',
         'certificate_hash',
+        'advisor_notes',
     ];
 
     /**

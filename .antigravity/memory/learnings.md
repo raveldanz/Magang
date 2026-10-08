@@ -69,6 +69,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
 | **LRN-059** | 2026-10-07 | Seleksi Pengajuan Admin: Alpine Bulk Reactivity, Duplikasi ID & Mobile Overlap | Form bulk terima gagal validasi, count 2x lipat saat toggle-all, checkbox tertimpa badge status di HP & semantic pagination | RESOLVED |
 | **LRN-060** | 2026-10-07 | DPL BAP Print & Legalitas TTE | Kotak QR dummy teks, badge monospace TTE kaku & ketidaksinkronan posisi kolom pada Berita Acara Penilaian | RESOLVED |
+| **LRN-061** | 2026-10-08 | DPL Student Detail Redesign | Paritas Civic Hero Banner dengan portal mahasiswa, eliminasi BAP, grid 4 pilar konteks & KPI evaluasi | RESOLVED |
 
 ---
 
@@ -1360,21 +1361,83 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Menutup `</form>` tepat sebelum blok paginasi.
 - **Prevention Rule**: Pada antarmuka responsif dual-rendering (desktop table + mobile cards), query selektor DOM untuk manipulasi data array WAJIB dideduplikasi dengan `Set`. Form submit sinkronus yang bergantung pada state reaktif Alpine WAJIB mengatur nilai input DOM secara eksplisit sebelum memanggil `.submit()`. Seluruh elemen absolut di kartu mobile wajib memiliki offset padding pada elemen flow yang berada di koordinat yang sama.
 
-### [LRN-060] Standarisasi Pengesahan TTE 2 Kolom & Integrasi QR SVG Resmi pada Berita Acara Penilaian DPL
+### [LRN-060] Standardisasi Paritas Layout QR & Pengesahan TTE Berita Acara Penilaian (BAP) dengan Sertifikat Kelulusan
 - **Tanggal**: 2026-10-07
-- **Komponen**: `resources/views/lecturer/grade-sheet.blade.php`
+- **Komponen**: `resources/views/lecturer/grade-sheet.blade.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`
 - **Problem / Symptom**: 
-  - Kotak QR verifikasi di tengah hanya berupa kotak abu-abu bertuliskan teks biasa `"QR VALIDASI RESMI DPL"`, bukan barcode QR Code SVG nyata yang bisa discan.
-  - Penamaan "QR VALIDASI RESMI DPL" berada di kolom tengah terpisah dari DPL yang berada di kolom kanan.
-  - Kolom TTE DPL menggunakan badge hijau neon font monospace bergaya tombol terminal (`[TERTANDATANGANI SECARA ELEKTRONIK]`).
-  - Kolom Pembimbing Lapangan hanya menampilkan teks miring abu-abu `[Telah Diverifikasi Sistem Dinas]`.
-- **Root Cause**: Desain awal Berita Acara Penilaian (BAP) menggunakan placeholder markup 3-kolom sementara tanpa menghubungkan helper `SimpleSoftwareIO\QrCode\Facades\QrCode` ke URL verifikasi sertifikat `/verify-certificate/{hash}`.
+  - Layout QR pada Berita Acara Penilaian (BAP) sebelumnya tidak selaras dengan Sertifikat Kelulusan Magang (posisi QR terhimpit di dalam kolom DPL sebelah kanan).
+- **Root Cause**: Adanya variasi tata letak footer tanda tangan antara BAP A4 dan Sertifikat Kelulusan Resmi A4.
 - **Fix Applied**:
-  - Merefaktor tata letak pengesahan menjadi **Format 2 Kolom Standar Kampus & Instansi**:
-    * Kolom Kiri: Mengetahui Pembimbing Lapangan (Instansi) dengan badge resmi `Terverifikasi Sistem Lapangan` (ikon verifikasi perisai/centang) + nama & NIP.
-    * Kolom Kanan: Dosen Pembimbing Lapangan (DPL) lengkap dengan tempat & tanggal, render QR Code SVG asli (`route('verify.certificate', $placement->ensureCertificateHash())`), kode hash dokumen ID, badge `Ditandatangani Secara Elektronik (TTE)` + nama & NIDN/NIP DPL.
-  - Menambahkan catatan legalitas dokumen resmi di bagian bawah sesuai standar UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.
-- **Prevention Rule**: Dokumen cetak formal (BAP, Lembar Pengesahan, Sertifikat, Surat Balasan) dilarang menggunakan teks dummy di dalam kotak QR; selalu manfaatkan paket offline `SimpleSoftwareIO\QrCode\Facades\QrCode` untuk merender SVG matrix barcode yang valid ke endpoint verifikasi sistem.
+  - Merefaktor tata letak pengesahan BAP menjadi **Format 3 Kolom Identik Sertifikat Kelulusan Magang**:
+    * Kolom Kiri: Mengetahui, Pembimbing Lapangan (Instansi) dengan badge resmi emerald `Ditandatangani Secara Elektronik` + nama & NIP.
+    * Kolom Tengah: Verifikasi Keaslian Dokumen dengan QR Code SVG resmi ukuran 68px, tautan verifikasi `domain/verify-certificate/{hash}`, dan `Kode Verifikasi:` 8 kelompok karakter (2 baris).
+    * Kolom Kanan: Dosen Pembimbing Lapangan (DPL) lengkap dengan tempat & tanggal ("Surabaya, [Tanggal]"), badge resmi blue `Ditandatangani Secara Elektronik` + nama & NIDN/NIP DPL.
+  - Memastikan method `printGradeSheet` di `EvaluationController` mengeksekusi `$placement->ensureCertificateHash()` sebelum view dirender.
+  - Footer catatan legalitas dokumen resmi berdasarkan UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.
+### [LRN-061] Redesain Segar Halaman Detail Bimbingan DPL Paritas Portal Mahasiswa & Eliminasi Ketergantungan BAP
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/student-detail.blade.php`, `scripts/capture_student_detail_playwright.mjs`
+- **Problem / Symptom**:
+  1. Halaman detail bimbingan mahasiswa pada portal DPL (`lecturer.students.show`) sebelumnya memiliki tampilan kaku/datar ("Data Magang" kotak statis biasa) yang timpang dibandingkan dengan modernitas dashboard mahasiswa (Civic Hero Banner).
+  2. Tombol "Cetak Berita Acara (BAP)" tersemat kaku di header aksi meskipun tidak semua kampus mitra memiliki/menerapkan dokumen BAP formal dalam alur magang mereka, serta memicu pelanggaran `LecturerFeaturesUpdateTest::test_lecturer_can_view_student_detail_and_open_report_in_new_tab` (`assertDontSeeText('Cetak Lembar Nilai / Berita Acara')`).
+- **Root Cause**:
+  1. View detail dosen belum diselaraskan dengan arsitektur visual terbaru portal mahasiswa (Executive Civic Banner, progress bar supervisi glassmorphic, dan kartu pilar konteks).
+  2. Ketiadaan opsi fleksibilitas kampus tanpa BAP di antarmuka DPL.
+- **Fix Applied**:
+  1. Mengimplementasikan **Executive Civic Hero Profile Banner** bergradien identik (`from-blue-700 via-blue-800 to-indigo-900`), avatar squircle inisial nama mahasiswa, pill status aktif (`ApplicationStatus`), chip metadata (Instansi, Unit, Mentor, Periode), serta kartu glassmorphism ringkasan supervisi (progress logbook terhadap target hari kerja, status laporan akhir, dan status nilai dosen).
+  2. Mengeliminasi tombol BAP dari header aksi detail mahasiswa sesuai preferensi kampus pengguna ("tanpa BAP"), mempertahankan tombol komunikasi cepat (Chat Mahasiswa, Chat Mentor, Grup Bimbingan).
+  3. Mengubah 1 kartu datar lama menjadi **Grid 4 Pilar Konteks & Sinergi Bimbingan** berikon tematik: (1) Data Akademik Kampus, (2) Instansi Mitra OPD, (3) Mentor Lapangan Kedinasan, (4) Jadwal & Durasi Magang.
+  4. Memperbarui showcase komparasi nilai (Dosen vs Mentor) dengan kartu KPI terstruktur, status keterisian, rata-rata, predikat mutu, dan bobot evaluasi kampus.
+  5. Memvalidasi secara visual (E2E) via Playwright channel Google Chrome sistem (`student_detail_desktop.png` & `student_detail_mobile.png`), memastikan 100% responsif mobile tanpa horizontal overflow, serta seluruh 265 automated test suite lulus 100% (Strict Exit Code 0).
+
+### [LRN-062] Redesain Menyeluruh Seluruh Fitur Role Dosen: Eliminasi Border Berlebih, Pembersihan Subheadline & Panah Redundan, UX Logbook Terarah, dan Responsivitas Mobile Penuh
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/monitoring/index.blade.php`, `resources/views/lecturer/logbooks/index.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `resources/views/components/supervision/logbook-weekly.blade.php`
+- **Problem / Symptom**:
+  1. Seluruh antarmuka peran Dosen (Portal Dosen, Mahasiswa Bimbingan, Logbook, Detail Mahasiswa) memuat subheadline administratif panjang di bawah setiap judul yang membuat UI terasa kaku, birokratis, dan tidak natural.
+  2. Muncul tombol panah kembali (`<-`) yang janggal pada halaman utama seperti Logbook padahal navigasi utama telah tersedia di top navbar.
+  3. Tampilan terasa penuh border ("border-borderan") yang membuat layout sesak dan terkesan kaku.
+  4. Halaman review logbook terkesan "mainstream" dengan checkbox massal "Select All" yang kurang memberikan pengalaman verifikasi bermakna bagi dosen.
+  5. Pada layar smartphone (< 640px), tab bar dengan `overflow-x-auto` terpotong sebagian dan memaksa pengguna menggeser/scroll samping secara canggung, serta tombol aksi mengalami teks terlipat sempit.
+- **Root Cause**:
+  1. Template Blade lama masih membawa pola subjudul administratif dari cetak biru awal.
+  2. Tombol back button dipasang tanpa mempertimbangkan hierarki navigasi utama.
+  3. Desain sebelumnya terlalu banyak menerapkan utility `border border-slate-200` pada setiap kontainer, subkontainer, badge, dan tombol.
+  4. Tampilan tab mobile mengandalkan scrolling horizontal (`text-nowrap overflow-x-auto`) alih-alih adaptasi grid.
+- **Fix Applied**:
+  1. Menghapus 100% teks subheadline di seluruh halaman role dosen untuk menghasilkan visual modern yang bersih dan to-the-point.
+  2. Menghilangkan tombol panah kembali yang tidak diperlukan dari header halaman Logbook dan merapikan breadcrumb di Detail Mahasiswa.
+  3. Mengeliminasi konsep "Select All" massal yang generik pada review logbook, menggantikannya dengan **Status Filter Pills Cerdas** (Semua, Menunggu Review, Disetujui, Perlu Revisi) dan aksi mandiri per kartu mingguan ("Periksa Aktivitas", "Setujui Minggu Ini", "Minta Revisi").
+  4. Merefaktor seluruh kontainer menjadi permukaan borderless modern berbasis soft background contrast (`bg-slate-50`), elevasi bayangan halus (`shadow-xs`, `shadow-2xs`), dan badge tanpa outline.
+  5. Menjadikan tab switcher dan filter status pada layar mobile sebagai **Responsive 2x2 Grid (`grid grid-cols-2 sm:flex`)** sehingga 100% pas dalam batas layar ponsel tanpa horizontal scrolling atau teks terpotong.
+  6. Mengubah header aksi kartu nilai evaluasi menjadi `flex-col sm:flex-row` agar tombol "Ubah Nilai Evaluasi" tidak tertekan sempit pada resolusi HP sempit (390px).
+  7. Menjalankan verifikasi visual Playwright channel Chrome sistem untuk desktop (1440x900) dan mobile (390x844), serta memastikan seluruh 265 test suite berstatus 100% Passed (Exit Code 0).
+- **Prevention Rule**: Seluruh halaman kerja fungsional wajib menghindari subheadline bertele-tele, menolak duplikasi tombol navigasi kembali pada halaman tingkat atas, meniadakan horizontal scrollbar pada elemen kontrol mobile (utamakan responsif grid wrap), dan mengutamakan background surface depth daripada tumpukan stroke border.
+
+---
+
+### [LRN-063] Implementasi 6 Fitur Praktis Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/student-detail.blade.php`, `resources/views/components/supervision/report-review.blade.php`, `resources/views/components/supervision/logbook-weekly.blade.php`, `resources/views/lecturer/monitoring/index.blade.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `database/migrations/2026_10_08_150000_add_advisor_notes_to_placements_table.php`
+- **Problem / Symptom**:
+  1. Fitur ekspor CSV dinilai prematur dan belum dibutuhkan untuk sistem tahap awal.
+  2. Tampilan detail mahasiswa bimbingan terkesan "sangat AI" akibat banner hero dengan gradient gelap jenuh (`from-blue-700 via-blue-800 to-indigo-900`), widget glassmorphism translusen, checklist kaku bernomor (1. Logbook, 2. Laporan, 3. Nilai DPL, 4. Mentor), dan kartu nilai akhir hitam pekat (`bg-slate-900`).
+  3. Ketiadaan 6 alat bantu praktis untuk efisiensi pembimbingan dosen di lapangan: preset feedback cepat, direct WhatsApp link, indikator keaktifan pengisian logbook, countdown sisa hari magang, catatan internal pribadi DPL, dan label riwayat/timestamp naskah laporan.
+- **Root Cause**:
+  1. Template awal mengadopsi pola AI card generator dengan gradien gelap dan kontras jenuh yang tidak selaras dengan tema aplikasi modern.
+  2. Feedback textarea pada review logbook dan laporan akhir belum dilengkapi preset cepat sehingga dosen harus mengetik kalimat repetitif secara manual.
+- **Fix Applied**:
+  1. Menghapus tombol "Ekspor CSV" dari header monitoring mahasiswa.
+  2. Menghapus hero gradien gelap dan menggantinya dengan kartu profil putih bersih (`bg-white shadow-xs rounded-2xl`), inisial avatar modern (`bg-blue-50 text-blue-700`), serta metadata mahasiswa yang rapi.
+  3. Menambahkan **Tombol Kontak Cepat WhatsApp** dengan sanitasi nomor telepon otomatis (`628xxx`) dan pesan pra-isi.
+  4. Menambahkan **Indikator Keaktifan Pengisian Logbook** (mis. `Logbook: Hari ini`, `Logbook: 2 hari lalu`, atau `Perlu Diingatkan (X hari belum isi)`).
+  5. Menambahkan **Countdown Sisa Hari Magang** (mis. `Sisa X Hari` atau `Magang Selesai`).
+  6. Menyediakan **Quick Feedback Chips** pada review logbook dan laporan akhir untuk mengisi catatan revisi hanya dengan 1 kali klik.
+  7. Menambahkan **Catatan Pribadi Pembimbing (DPL)** tersimpan privat di kolom `placements.advisor_notes` via rute `lecturer.students.notes`.
+  8. Menampilkan **Label Timestamp & Riwayat Upload Laporan** lengkap (waktu unggah awal, pembaruan terakhir, dan status revisi/ACC).
+  9. Mengganti kartu nilai akhir hitam pekat menjadi kartu lembut bernuansa biru modern (`bg-blue-50/70 text-blue-950`).
+  10. Memvalidasi 100% tes otomatis lulus (266 tes, 0 error) dan bukti visual Playwright via channel Chrome.
+- **Prevention Rule**: Hindari estetika gradien jenuh dan banner hitam gelap pada desain kartu profil akademik; selalu utamakan permukaan putih bersih atau abu-abu lembut dengan tipografi berbobot tepat dan fungsi interaktif yang mempermudah kerja nyata pengguna.
 
 ---
 
