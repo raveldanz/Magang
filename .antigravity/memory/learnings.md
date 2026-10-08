@@ -1495,7 +1495,17 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Menstandarisasikan seluruh label antarmuka pengguna dari "DPL / Dosen DPL" menjadi "Dosen Pembimbing" atau "Dosen" (di ruang ringkas).
   3. Memperbaiki button aksi modal penugasan menjadi "Tugaskan Dosen", "Ganti Dosen", dan "Simpan Dosen".
   4. Menjalankan test suite lengkap `php artisan test` (271/271 tests lolos, Exit Code 0).
-- **Prevention Rule**: Seluruh istilah resmi di antarmuka publik/internal wajib menggunakan "Dosen Pembimbing" (atau "Dosen" pada badge ringkas). Jangan gunakan akronim "DPL" di teks tombol, judul modal, maupun deskripsi alur demi menjaga citra formal kedinasan Pemkot Surabaya.
+### [LRN-066] Validasi Layanan Latar Belakang (Scheduler & Queue Worker Heartbeat) & Integritas Mass Assignment Model
+- **Tanggal**: 2026-10-08
+- **Komponen**: `app/Console/Commands/SyncInternshipStatus.php`, `app/Jobs/QueueHeartbeat.php`, `app/Services/SystemHealth.php`, `routes/console.php`, `tests/Feature/SyncInternshipStatusTest.php`
+- **Problem / Symptom**: Layanan latar belakang (Scheduler dan Queue Worker) belum memiliki pengujian otomatis end-to-end yang menjamin fungsionalitas transisi status magang harian (`app:sync-internship-status`) dan pelaporan detak jantung (*heartbeat*) sistem di `php artisan app:health`.
+- **Root Cause**: Ketergantungan pada eksekusi manual server dan belum adanya test suite otomatis untuk memvalidasi transisi `ACCEPTED -> ACTIVE`, `ACTIVE -> COMPLETED`, serta pengiriman notifikasi pengingat evaluasi kelulusan.
+- **Fix Applied**:
+  1. Menambahkan feature test komprehensif `tests/Feature/SyncInternshipStatusTest.php` (4/4 passed) yang mencakup transisi waktu magang dan notifikasi pengingat.
+  2. Memverifikasi eksekusi `QueueHeartbeat` dan pembaruan `SystemHealth::recordSchedulerHeartbeat()`.
+  3. Memastikan perintah `php artisan app:health` melaporkan status normal secara akurat.
+  4. Menjaga integritas mass-assignment model (`$guarded = ['id']`) agar atribut penunjang testing seperti `created_at` dan catatan evaluasi tidak terpotong.
+- **Prevention Rule**: Pertahankan `protected $guarded = ['id'];` pada model domain utama jika aplikasi mengandalkan pengujian berbasis seeding/factory dengan penyesuaian timestamps; pasang pengujian otomatis untuk setiap console command kritis.
 
 ---
 
