@@ -35,7 +35,7 @@ class UniversityController extends Controller
             ])
             ->orderBy('is_verified', 'asc') // kampus "Menunggu Verifikasi" tampil paling atas
             ->orderBy('has_admin_account', 'asc')
-            ->orderBy('updated_at', 'desc');
+            ->orderBy('name', 'asc');
 
         if ($request->input('verification') === 'pending') {
             $query->where('is_verified', false);
@@ -48,13 +48,15 @@ class UniversityController extends Controller
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
+                    ->orWhere('acronym', $like, "%{$search}%")
                     ->orWhere('code', $like, "%{$search}%")
                     ->orWhere('email', $like, "%{$search}%")
                     ->orWhere('pic_name', $like, "%{$search}%");
             });
         }
 
-        $universities = $query->paginate(12)->withQueryString();
+        // Tampilkan semua card perguruan tinggi tanpa terpotong paginasi
+        $universities = $query->get();
 
         // Count un-provisioned university accounts
         $unregisteredCount = University::doesntHave('universityAdmin')->count();
@@ -66,9 +68,13 @@ class UniversityController extends Controller
         $resolver = app(UniversityResolver::class);
         $mergeSuggestions = [];
         $verifiedOptions = collect();
-        if ($universities->getCollection()->contains(fn ($u) => ! ($u->is_verified ?? true))) {
+        $univCollection = $universities instanceof \Illuminate\Pagination\AbstractPaginator
+            ? $universities->getCollection()
+            : $universities;
+
+        if ($univCollection->contains(fn ($u) => ! ($u->is_verified ?? true))) {
             $verifiedOptions = University::verified()->orderBy('name')->get(['id', 'name', 'acronym', 'code']);
-            foreach ($universities as $u) {
+            foreach ($univCollection as $u) {
                 if (! ($u->is_verified ?? true)) {
                     $mergeSuggestions[$u->id] = $resolver->suggest($u->name, 3)->pluck('university.id')->all();
                 }
