@@ -7,6 +7,12 @@
 
         <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang — Pemerintah Kota Surabaya') }}</title>
 
+        <!-- Favicon Resmi Pemerintah Kota Surabaya (Square Canvas Preserving Aspect Ratio) -->
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=2">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}?v=2">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=2">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-192.png') }}?v=2">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -40,10 +46,10 @@
                 @if(session()->has('impersonator_id'))
                     <aside aria-label="Impersonation Alert" class="bg-gradient-to-r from-amber-600 via-rose-600 to-red-600 text-white shadow-md border-b border-rose-700/60 w-full overflow-hidden">
                         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 min-h-[44px]">
-                            <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-white/95 tracking-normal truncate max-w-full">
-                                <span class="inline-flex relative flex h-2.5 w-2.5 shrink-0">
+                            <div class="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-white/95 tracking-normal min-w-0 max-w-full">
+                                <span class="relative flex h-3 w-3 shrink-0 items-center justify-center">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                                 </span>
                                 <span class="truncate">
                                     Mode Penyamaran: <strong class="font-bold text-white">{{ auth()->user()->name }}</strong> 

@@ -37,7 +37,7 @@
                               x-text="`[${active.scope_badge}]`"></span>
                     </div>
                     <p class="text-xs text-slate-500" x-text="isChannelChat ? 'Saluran Pengumuman Resmi' : (isGroupChat ? `${active.member_count} anggota` : active.subtitle)"></p>
-                    <template x-if="active.stage_badge && !isChannelChat">
+                    <template x-if="active.stage_badge && !isChannelChat && (!active.title.toLowerCase().startsWith(active.stage_badge.label.toLowerCase()) || active.stage_badge.is_urgent)">
                         <div class="pt-1">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
                                   :class="{
@@ -66,7 +66,7 @@
                             Saluran ini diperuntukkan untuk siaran pengumuman resmi. Semua anggota dapat mengajukan tanggapan melalui utas komentar.
                         </p>
                     </template>
-                    <template x-if="active.scope_type === 'mentor_guidance' || active.scope_type === 'dpl_guidance' || active.type === 'placement'">
+                    <template x-if="!active.description && (active.scope_type === 'mentor_guidance' || active.scope_type === 'dpl_guidance' || active.type === 'placement')">
                         <p class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-left leading-relaxed">
                             Grup bimbingan ini dibuat dan dikelola secara otomatis oleh sistem untuk mempermudah koordinasi mahasiswa bimbingan aktif dengan pembimbing.
                         </p>

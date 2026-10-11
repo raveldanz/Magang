@@ -177,7 +177,7 @@
                                 </p>
                                 @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                                     <p class="text-xs text-amber-700 mt-1 leading-relaxed">
-                                        Dosen Pembimbing Lapangan (DPL) belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi dosen akan menyusul setelah DPL ditetapkan kampus.
+                                        Dosen Pembimbing belum ditugaskan. Hal ini <strong>tidak menghambat</strong> pengisian logbook — validasi dosen akan menyusul setelah dosen pembimbing ditetapkan kampus.
                                     </p>
                                 @endif
                             </div>
@@ -185,7 +185,7 @@
                         
                         @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                             <a href="{{ route('dashboard') }}#change-advisor-box" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
-                                <span>Pilih DPL di Dashboard </span>
+                                <span>Pilih Dosen di Dashboard </span>
                             </a>
                         @endif
                     </div>
@@ -256,8 +256,8 @@
                             <p>&bull; Mentor Dinas belum ditunjuk: logbook Anda divalidasi sementara oleh <strong>Admin Dinas</strong> instansi penempatan.</p>
                         @endunless
                         @if ($requiresDpl && !$placement->hasAcademicAdvisor())
-                            <p>&bull; Dosen Pembimbing Lapangan (DPL) belum ditugaskan kampus: validasi dosen akan dilakukan setelah DPL ditetapkan.
-                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih DPL di Dashboard</a> bila sudah mengetahui dosen Anda.</p>
+                            <p>&bull; Dosen Pembimbing belum ditugaskan kampus: validasi dosen akan dilakukan setelah dosen pembimbing ditetapkan.
+                                <a href="{{ route('dashboard') }}#change-advisor-box" class="underline font-semibold">Pilih Dosen di Dashboard</a> bila sudah mengetahui dosen Anda.</p>
                         @endif
                     </div>
                 @endif
@@ -392,7 +392,7 @@
                                             @endif
                                             @if(!empty($log->lecturer_note))
                                                 <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
-                                                    <span class="font-bold shrink-0">Catatan DPL:</span>
+                                                    <span class="font-bold shrink-0">Catatan Dosen:</span>
                                                     <span>{{ $log->lecturer_note }}</span>
                                                 </div>
                                             @endif

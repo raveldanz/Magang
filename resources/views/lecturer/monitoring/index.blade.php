@@ -133,7 +133,7 @@
                                     </span>
                                 </div>
                                 <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                                    <span class="text-slate-400 font-medium">Nilai DPL:</span>
+                                    <span class="text-slate-400 font-medium">Nilai Dosen:</span>
                                     @if ($isMentorOnly)
                                         <span class="text-slate-500 text-[11px]">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
                                     @else
@@ -176,7 +176,7 @@
                                 <th class="py-3.5 px-4 text-center">Status</th>
                                 <th class="py-3.5 px-4 text-center">Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Nilai DPL</th>
+                                <th class="py-3.5 px-4 text-center">Nilai Dosen</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>

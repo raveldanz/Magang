@@ -88,7 +88,7 @@
                         <div class="pt-4 border-t border-slate-100 space-y-3 text-xs">
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400 font-medium">NIM</span>
-                                <strong class="text-slate-800 font-bold font-mono">{{ $profile?->nim ?: 'Belum Diisi' }}</strong>
+                                <strong class="text-slate-800 font-bold text-right truncate max-w-[170px]">{{ $profile?->nim ?: 'Belum Diisi' }}</strong>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-slate-400 font-medium">Universitas</span>
