@@ -5,7 +5,7 @@
                 Logbook: {{ $placement->application->user->name }}
             </h2>
             <a href="{{ route('pembimbing.dashboard') }}" class="px-4 py-2 bg-gray-200 text-gray-800 text-xs font-semibold rounded-md">
-                &larr; Kembali
+                 Kembali
             </a>
         </div>
     </x-slot>
@@ -45,7 +45,7 @@
                             <div class="text-sm mt-3">
                                 <p><strong>Status:</strong> <span class="uppercase font-bold text-blue-700">{{ $placement->finalreport->status }}</span></p>
                             </div>
-                            <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
+                            <a href="{{ route('final_reports.show', $placement->finalreport->id) }}" target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
                                 Unduh / Lihat Laporan
                             </a>
                         @else
@@ -79,12 +79,7 @@
                     <div class="border p-4 rounded-lg bg-gray-50 space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-gray-700">Tanggal: {{ $log->date }}</span>
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                {{ $log->status === 'approved' ? 'bg-green-100 text-green-800' : '' }}
-                                {{ $log->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                {{ $log->status === 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
-                                {{ strtoupper($log->status) }}
-                            </span>
+                            <x-status-badge type="review" :status="$log->status" />
                         </div>
 
                         <p class="text-sm text-gray-800">{{ $log->activity }}</p>

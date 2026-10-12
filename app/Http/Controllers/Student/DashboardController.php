@@ -52,8 +52,33 @@ class DashboardController extends Controller
             }
         }
 
-        // Ambil pengajuan magang terbaru mahasiswa
+        // Ambil pengajuan magang aktif mahasiswa (prioritaskan yang belum resigned/rejected)
         $application = Application::with([
+            'unit.agencyProfile', 
+            'placement.mentor', 
+            'placement.pembimbing',
+            'placement.academicAdvisor.university', 
+            'placement.evaluation', 
+            'placement.finalreport'
+        ])
+        ->where('user_id', $user->id)
+        ->whereNotIn('status', ['rejected', 'resigned'])
+        ->whereHas('placement')
+        ->latest()
+        ->first()
+        ?? Application::with([
+            'unit.agencyProfile', 
+            'placement.mentor', 
+            'placement.pembimbing',
+            'placement.academicAdvisor.university', 
+            'placement.evaluation', 
+            'placement.finalreport'
+        ])
+        ->where('user_id', $user->id)
+        ->whereNotIn('status', ['rejected', 'resigned'])
+        ->latest()
+        ->first()
+        ?? Application::with([
             'unit.agencyProfile', 
             'placement.mentor', 
             'placement.pembimbing',
@@ -109,7 +134,7 @@ class DashboardController extends Controller
         ]);
 
         $application = Application::where('user_id', $user->id)
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->latest()
             ->firstOrFail();
 
@@ -144,7 +169,7 @@ class DashboardController extends Controller
         ]);
 
         $application = Application::where('user_id', $user->id)
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->latest()
             ->firstOrFail();
 

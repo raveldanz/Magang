@@ -1,12 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Aktivitas & Logbook Magang') }}
-        </h2>
+        <div>
+            <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+                {{ __('Logbook & Aktivitas Magang') }}
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+                Catat dan pantau aktivitas harian pelaksanaan program magang MBKM Anda
+            </p>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-5 sm:py-8 lg:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             {{-- Flash Messages --}}
             @if (session('success'))
@@ -26,7 +31,8 @@
             @endif
 
             @php
-                $lifecycle = $application?->lifecycle_status ?? 'NONE';
+                $appStatus = $application?->status;
+                $lifecycle = $appStatus instanceof \App\Enums\ApplicationStatus ? strtoupper($appStatus->value) : strtoupper((string)($appStatus ?? 'NONE'));
             @endphp
 
             {{-- ========================================================================= --}}
@@ -43,7 +49,7 @@
                             </div>
                         </div>
                         <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
-                            Ajukan Magang Sekarang &rarr;
+                            Ajukan Magang Sekarang 
                         </a>
                     </div>
                 </div>
@@ -71,11 +77,10 @@
                         <div class="flex items-center gap-3">
                             <div>
                                 <h3 class="font-black text-base text-gray-900">Alur Proses & Informasi Pengajuan Magang</h3>
-                                <p class="text-xs text-gray-400">Pantau tahapan seleksi dan penempatan Anda</p>
-                            </div>
+                                </div>
                         </div>
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
-                            Buka Dashboard Utama &rarr;
+                            Buka Dashboard Utama 
                         </a>
                     </div>
 
@@ -100,7 +105,7 @@
                                 <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
                                 <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
                             </div>
-                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan (DPL).</p>
+                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan.</p>
                         </div>
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
                             <div class="flex items-center gap-2">
@@ -137,7 +142,7 @@
 
                     <!-- Notice Information Box -->
                     <div class="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex items-start gap-3">
-                        <span class="text-xl shrink-0">💡</span>
+                        <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                         <div class="text-xs text-blue-900 space-y-1">
                             <p class="font-bold">Informasi Akses Logbook:</p>
                             <p class="text-blue-800 leading-relaxed">
@@ -159,7 +164,7 @@
                             </div>
                         </div>
                         <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
-                            Ajukan Ulang Magang &rarr;
+                            Ajukan Ulang Magang 
                         </a>
                     </div>
                 </div>
@@ -170,25 +175,23 @@
                         <div class="flex items-start gap-3">
                             <div>
                                 <h4 class="font-bold text-amber-900 text-sm sm:text-base">
-                                    {{ ($requiresDpl && (!$placement || empty($placement->academic_advisor_id))) ? 'Dosen Pembimbing (DPL) Belum Dipilih' : 'Pengajuan Telah Disetujui (Menunggu Tanggal Mulai Magang)' }}
+                                    {{ ($requiresDpl && (!$placement || empty($placement->academic_advisor_id))) ? 'Dosen Pembimbing Belum Dipilih' : 'Pengajuan Telah Disetujui (Menunggu Tanggal Mulai Magang)' }}
                                 </h4>
                                 @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
                                     <p class="text-xs sm:text-sm text-amber-700 mt-1 leading-relaxed">
-                                        Pengajuan magang Anda telah <strong>DITERIMA</strong> oleh dinas dan mentor lapangan telah terdaftar. Namun, Anda <strong>belum menentukan Dosen Pembimbing Lapangan (DPL)</strong> dari perguruan tinggi Anda.
-                                    </p>
-                                    <p class="text-xs text-amber-800 font-semibold mt-1">
-                                        Fitur pengisian logbook harian baru akan terbuka setelah DPL terdaftar agar kegiatan magang dapat dipantau dan diverifikasi dua arah oleh kampus.
+                                        Silahkan memilih Dosen Pembimbing Lapangan terlebih dahulu agar dapat mengakses fitur pengisian Logbook harian.
                                     </p>
                                 @else
                                     <p class="text-xs text-amber-700 mt-0.5">
-                                        Pengajuan Anda telah <strong>DITERIMA</strong>. Logbook harian akan terbuka otomatis saat tanggal mulai magang pada tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong>.
+                                        Pengajuan Anda sudah diterima. Logbook harian akan terbuka otomatis saat tanggal mulai magang pada tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong>.
                                     </p>
                                 @endif
                             </div>
                         </div>
+                        
                         @if ($requiresDpl && (!$placement || empty($placement->academic_advisor_id)))
-                            <a href="{{ route('dashboard') }}" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
-                                <span>Pilih DPL di Dashboard &rarr;</span>
+                            <a href="{{ route('dashboard') }}#change-advisor-box" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 flex items-center gap-2 cursor-pointer">
+                                <span>Pilih DPL di Dashboard </span>
                             </a>
                         @endif
                     </div>
@@ -217,6 +220,24 @@
                         @endif
                     </div>
                 </div>
+
+            @elseif ($lifecycle === 'RESIGNED')
+                <div class="bg-slate-50 border-l-4 border-slate-500 p-6 rounded-2xl shadow-xs">
+                    <div class="flex items-start justify-between flex-wrap gap-4">
+                        <div class="flex items-start gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm sm:text-base">Status: Mengundurkan Diri</h4>
+                                <p class="text-xs sm:text-sm text-slate-700 mt-0.5">
+                                    Anda telah mengundurkan diri dari kegiatan magang ini. Akses pengisian logbook telah dinonaktifkan. Anda dapat membuat pengajuan baru jika ingin mendaftar kembali ke program magang.
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ route('student.application.create') }}" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0">
+                            Buat Pengajuan Baru 
+                        </a>
+                    </div>
+                </div>
+
             @endif
 
             {{-- ========================================================================= --}}
@@ -246,7 +267,7 @@
                             <p class="font-bold text-sm text-white">{{ $placement->mentor->name ?? $placement->pembimbing->name ?? 'Belum Ditentukan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing (DPL)</p>
+                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing</p>
                             <p class="font-bold text-sm text-white">{{ $placement->academicAdvisor->name ?? 'Belum Ditentukan' }}</p>
                         </div>
                         <div class="p-3 bg-white/10 rounded-xl">
@@ -263,16 +284,19 @@
                         <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total'] ?? 0 }}</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-emerald-500">
-                        <p class="text-xs text-gray-500 font-medium">Disetujui</p>
+                        <p class="text-xs text-gray-500 font-bold tracking-wide">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</p>
                         <p class="text-3xl font-bold text-emerald-600 mt-1">{{ $stats['approved'] ?? 0 }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ \App\Enums\ReviewStatus::APPROVED->description() }}</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-amber-500">
-                        <p class="text-xs text-gray-500 font-medium">Menunggu Review</p>
+                        <p class="text-xs text-gray-500 font-bold tracking-wide">{{ \App\Enums\ReviewStatus::PENDING->label() }}</p>
                         <p class="text-3xl font-bold text-amber-500 mt-1">{{ $stats['pending'] ?? 0 }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ \App\Enums\ReviewStatus::PENDING->description() }}</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-xs border-l-4 border-rose-500">
-                        <p class="text-xs text-gray-500 font-medium">Ditolak / Revisi</p>
+                        <p class="text-xs text-gray-500 font-bold tracking-wide">{{ \App\Enums\ReviewStatus::REJECTED->label() }}</p>
                         <p class="text-3xl font-bold text-rose-600 mt-1">{{ $stats['rejected'] ?? 0 }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ \App\Enums\ReviewStatus::REJECTED->description() }}</p>
                     </div>
                 </div>
 
@@ -286,20 +310,29 @@
                             <p class="text-xs text-gray-400 mt-0.5">Catatan aktivitas dan verifikasi dua arah (Mentor Dinas & Dosen Kampus)</p>
                         </div>
 
-                        {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE & Kebijakan DPL Terpenuhi) --}}
-                        @if ($lifecycle === 'ACTIVE')
-                            @if (!$requiresDpl || ($placement && !empty($placement->academic_advisor_id)))
-                                <a href="{{ route('student.logbook.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Tambah Aktivitas Logbook
-                                </a>
-                            @else
-                                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer" title="Pilih Dosen Pembimbing Lapangan di Dashboard">
-                                    <span>Pilih DPL di Dashboard Terlebih Dahulu</span>
-                                </a>
-                            @endif
+                        {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
+@if ($lifecycle === 'ACTIVE')
+    @if (!$requiresDpl || ($placement && !empty($placement->academic_advisor_id)))
+        {{-- Tombol Aktif / Bisa Dipencet --}}
+        <a href="{{ route('student.logbook.create') }}" 
+           class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Tambah Aktivitas Logbook</span>
+        </a>
+    @else
+        {{-- Tombol Terkunci / Disable jika belum pilih DPL --}}
+        <button type="button" 
+                disabled 
+                title="Pilih Dosen Pembimbing Lapangan di Dashboard terlebih dahulu untuk membuka akses pengisian logbook"
+                class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 text-slate-400 border border-slate-300 rounded-xl text-xs font-bold cursor-not-allowed select-none shadow-none">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Tambah Aktivitas Logbook</span>
+        </button>
+    @endif
                         @elseif ($lifecycle === 'COMPLETED')
                             <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200">
                                 Mode Arsip Magang Selesai
@@ -311,7 +344,8 @@
                         @endif
                     </div>
 
-                    <div class="overflow-x-auto">
+                    {{-- Desktop & Tablet Table Layout --}}
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 text-xs font-semibold text-gray-500 bg-gray-50/50">
@@ -332,24 +366,34 @@
                                             {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
                                         </td>
                                         <td class="p-4 text-gray-700 max-w-xs">
-                                            <p class="truncate" title="{{ $log->activity }}">{{ Str::limit($log->activity, 80) }}</p>
+                                            <p class="font-medium text-slate-800">{{ Str::limit($log->activity, 120) }}</p>
+                                            @if(!empty($log->mentor_note))
+                                                <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-1">
+                                                    <span class="font-bold shrink-0">Catatan Mentor:</span>
+                                                    <span>{{ $log->mentor_note }}</span>
+                                                </div>
+                                            @endif
+                                            @if(!empty($log->lecturer_note))
+                                                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800 flex items-start gap-1">
+                                                    <span class="font-bold shrink-0">Catatan DPL:</span>
+                                                    <span>{{ $log->lecturer_note }}</span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
-                                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-xs font-medium inline-flex items-center gap-1">
-                                                 Lihat File
+                                                <a href="{{ asset('storage/' . $log->attachment) }}" 
+                                                   @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                                   target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                                    <span>Buka Lampiran</span>
                                                 </a>
                                             @else
                                                 <span class="text-gray-400 text-xs">-</span>
                                             @endif
                                         </td>
                                         <td class="p-4 text-center">
-                                            <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
-                                                {{ strtolower($log->status) === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                                                {{ strtolower($log->status) === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
-                                                {{ strtolower($log->status) === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
-                                                {{ strtoupper($log->status) }}
-                                            </span>
+                                            <x-status-badge type="review" :status="$log->status" />
                                         </td>
                                         <td class="p-4 text-center">
                                             @if (!$requiresDpl)
@@ -357,19 +401,30 @@
                                                     — Dilewati
                                                 </span>
                                             @else
-                                                <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
-                                                    {{ strtolower($log->lecturer_status ?? 'pending') === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                                                    {{ strtolower($log->lecturer_status ?? 'pending') === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
-                                                    {{ strtolower($log->lecturer_status ?? 'pending') === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' : '' }}">
-                                                    {{ strtoupper($log->lecturer_status ?? 'PENDING') }}
-                                                </span>
+                                                <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" />
                                             @endif
                                         </td>
                                         <td class="p-4 text-center">
-                                            @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected'))
-                                                <a href="{{ route('student.logbook.edit', $log->id) }}" class="btn-action-edit">
-                                                    Edit
-                                                </a>
+                                            @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected' || strtolower($log->lecturer_status ?? '') === 'rejected'))
+                                                <div class="flex items-center justify-center gap-1.5">
+                                                    <a href="{{ route('student.logbook.edit', $log->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm cursor-pointer active:scale-95">
+                                                        Edit
+                                                    </a>
+                                                    <form action="{{ route('student.logbook.destroy', $log->id) }}" method="POST" class="inline-flex items-center m-0 p-0">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button"
+                                                                @click="$dispatch('open-delete-modal', {
+                                                                    action: '{{ route('student.logbook.destroy', $log->id) }}',
+                                                                    title: 'Hapus Catatan Logbook',
+                                                                    name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->format('d M Y')),
+                                                                    desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
+                                                                })"
+                                                                class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm cursor-pointer active:scale-95" title="Hapus Logbook">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             @else
                                                 <span class="text-gray-400 text-xs">—</span>
                                             @endif
@@ -389,10 +444,113 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Dedicated Mobile Cards (< 768px) --}}
+                    <div class="md:hidden divide-y divide-gray-100">
+                        @forelse ($logbooks as $index => $log)
+                            <div class="p-4 space-y-3 bg-white">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-blue-50 text-blue-700 text-xs font-bold flex items-center justify-center border border-blue-100 shrink-0">
+                                            {{ $index + 1 }}
+                                        </span>
+                                        <span class="font-bold text-xs text-slate-800">
+                                            {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}
+                                        </span>
+                                    </div>
+                                    @if ($log->attachment)
+                                        <a href="{{ asset('storage/' . $log->attachment) }}" 
+                                           @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                           target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                            <span>Lampiran</span>
+                                        </a>
+                                    @endif
+                                </div>
+
+                                <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                    {{ $log->activity }}
+                                </p>
+
+                                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                                        <span class="text-slate-400 block text-[10px] font-semibold uppercase">Mentor Dinas:</span>
+                                        <x-status-badge type="review" :status="$log->status" class="mt-1" />
+                                    </div>
+                                    <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                                        <span class="text-slate-400 block text-[10px] font-semibold uppercase">Dosen Pembimbing:</span>
+                                        @if (!$requiresDpl)
+                                            <span class="font-bold text-slate-500 mt-0.5 inline-block">Dilewati</span>
+                                        @else
+                                            <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" class="mt-1" />
+                                        @endif
+                                    </div>
+                                </div>
+
+                                @if ($lifecycle === 'ACTIVE' && (strtolower($log->status) === 'pending' || strtolower($log->status) === 'rejected' || strtolower($log->lecturer_status ?? '') === 'rejected'))
+                                    <div class="flex items-center gap-2 pt-1">
+                                        <a href="{{ route('student.logbook.edit', $log->id) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                                            <span>Edit Logbook</span>
+                                        </a>
+                                        <form action="{{ route('student.logbook.destroy', $log->id) }}" method="POST" class="shrink-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button"
+                                                    @click="$dispatch('open-delete-modal', {
+                                                        action: '{{ route('student.logbook.destroy', $log->id) }}',
+                                                        title: 'Hapus Catatan Logbook',
+                                                        name: @js('Logbook ' . \Carbon\Carbon::parse($log->date)->format('d M Y')),
+                                                        desc: @js(\Illuminate\Support\Str::limit(strip_tags($log->activity ?? ''), 90))
+                                                    })"
+                                                    class="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="p-6 text-center text-gray-400 text-xs">
+                                @if ($lifecycle === 'ACTIVE')
+                                    Belum ada catatan logbook. Klik tombol <strong class="text-gray-700">"+ Tambah Aktivitas Logbook"</strong> untuk mulai mencatat.
+                                @else
+                                    Belum ada catatan logbook yang tersimpan.
+                                @endif
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
 
             @endif
 
+        </div>
+    </div>
+
+    <!-- Lightbox Image Viewer Modal -->
+    <div x-data="{ openLightbox: false, lightboxUrl: '', lightboxTitle: '' }"
+         @open-lightbox.window="openLightbox = true; lightboxUrl = $event.detail.url; lightboxTitle = $event.detail.title || 'Lampiran Dokumen Logbook'">
+        <div x-show="openLightbox" x-cloak class="fixed inset-0 z-[9999] overflow-y-auto">
+            <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs transition-opacity" @click="openLightbox = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all max-w-3xl w-full p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 class="text-sm font-bold text-slate-800" x-text="lightboxTitle"></h3>
+                        <button type="button" @click="openLightbox = false" class="text-slate-400 hover:text-slate-600 text-base p-1 cursor-pointer">✕</button>
+                    </div>
+                    <div class="bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center p-2 min-h-[300px] max-h-[70vh]">
+                        <template x-if="lightboxUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i)">
+                            <img :src="lightboxUrl" alt="Preview Lampiran" class="max-h-[65vh] w-auto object-contain rounded-xl shadow-md">
+                        </template>
+                        <template x-if="!lightboxUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i)">
+                            <iframe :src="lightboxUrl" class="w-full h-[60vh] rounded-xl border-0"></iframe>
+                        </template>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <a :href="lightboxUrl" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">Buka Berkas Utama</a>
+                        <button type="button" @click="openLightbox = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">Tutup</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>

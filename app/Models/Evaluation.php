@@ -43,9 +43,60 @@ class Evaluation extends Model
     }
 
     /**
+     * Nilai per aspek DPL (score_mastery / score_report / score_attitude) untuk ditampilkan.
+     * Kolom aspek default-nya 0 (bukan null), jadi operator ?? tidak pernah jatuh ke fallback.
+     * Jika aspek belum diisi (mis. data lama/dummy hanya punya nilai_akademik), tampilkan nilai DPL rata-rata.
+     */
+    public function dosenAspectScore(string $field): ?float
+    {
+        $value = (float) ($this->attributes[$field] ?? 0);
+        if ($value > 0) {
+            return $value;
+        }
+
+        $fallback = (float) $this->nilai_dosen_calculated;
+
+        return $fallback > 0 ? $fallback : null;
+    }
+
+    /**
+     * Cache hasil getUniversity() per instance: accessor nilai_akhir, is_complete, dan
+     * grade_calculated masing-masing memanggilnya, sehingga tanpa cache satu baris tabel
+     * bisa memicu 3+ query yang sama. false = belum pernah di-resolve.
+     */
+    protected $resolvedUniversity = false;
+
+    /**
      * Dapatkan data Universitas asal Mahasiswa
      */
     public function getUniversity()
+    {
+        if ($this->resolvedUniversity !== false) {
+            return $this->resolvedUniversity;
+        }
+
+        return $this->resolvedUniversity = $this->findUniversity();
+    }
+
+    /**
+     * Tetapkan universitas yang sudah diketahui pemanggil (mis. halaman detail kampus),
+     * agar accessor nilai tidak perlu menelusuri placement → application → user lagi.
+     */
+    public function useUniversity(?University $university): static
+    {
+        $this->resolvedUniversity = $university;
+
+        return $this;
+    }
+
+    public function refresh()
+    {
+        $this->resolvedUniversity = false;
+
+        return parent::refresh();
+    }
+
+    private function findUniversity(): ?University
     {
         $student = $this->placement?->application?->user;
         if (!$student) return null;
@@ -63,6 +114,27 @@ class Evaluation extends Model
     }
 
     /**
+     * Cek apakah lembar evaluasi sudah lengkap sesuai skema kebijakan universitas
+     */
+    public function getIsCompleteAttribute(): bool
+    {
+        $univ = $this->getUniversity();
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $hasMentor = $this->nilai_pembimbing > 0;
+        $hasDosen = $this->nilai_dosen_calculated > 0 || ($this->nilai_dosen ?? 0) > 0 || ($this->nilai_akademik ?? 0) > 0;
+
+        if ((float)($this->attributes['final_score'] ?? 0) > 0) {
+            return true;
+        }
+
+        if ($scheme === 'mentor_only') {
+            return $hasMentor;
+        }
+
+        return $hasMentor && $hasDosen;
+    }
+
+    /**
      * Nilai Akhir Gabungan Adaptif Berdasarkan Kebijakan Kampus
      */
     public function getNilaiAkhirAttribute()
@@ -75,28 +147,23 @@ class Evaluation extends Model
         $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
         $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
 
-        if ($scheme === 'mentor_only') {
-            if ($nilaiDinas > 0) {
-                return (float)$nilaiDinas;
-            }
-            return (float)($this->attributes['final_score'] ?? 0);
-        }
-
-        if ($nilaiDinas > 0 && $nilaiDosen > 0) {
-            return (float)round(($nilaiDinas * ($weightMentor / 100)) + ($nilaiDosen * ($weightLecturer / 100)), 2);
-        }
-
+        // 1. Jika terdapat final_score resmi yang tersimpan di DB
         if (isset($this->attributes['final_score']) && (float)$this->attributes['final_score'] > 0) {
             return (float)$this->attributes['final_score'];
         }
 
-        if ($nilaiDinas > 0) {
+        // 2. Skema Penilaian Penuh Dinas (100% Mentor)
+        if ($scheme === 'mentor_only') {
             return (float)$nilaiDinas;
-        } elseif ($nilaiDosen > 0) {
-            return (float)$nilaiDosen;
         }
 
-        return 0;
+        // 3. Skema Penilaian Ganda (Dual Evaluation: Mentor + DPL)
+        // Wajib lengkap keduanya agar menghasilkan nilai akhir sah
+        if ($nilaiDinas > 0 && $nilaiDosen > 0) {
+            return (float)round(($nilaiDinas * ($weightMentor / 100)) + ($nilaiDosen * ($weightLecturer / 100)), 2);
+        }
+
+        return 0.0;
     }
 
     /**
@@ -106,6 +173,10 @@ class Evaluation extends Model
     {
         if (!empty($this->attributes['grade'])) {
             return $this->attributes['grade'];
+        }
+
+        if (!$this->is_complete) {
+            return '-';
         }
 
         $score = $this->nilai_akhir;

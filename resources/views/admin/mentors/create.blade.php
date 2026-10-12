@@ -1,8 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.mentors.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition">
-                
+            <a href="{{ route('admin.mentors.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
             </a>
             <div>
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
@@ -71,10 +73,11 @@
                             Status Keaktifan
                         </label>
                         <select name="status" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                            <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>🟢 Aktif (Tersedia Membimbing)</option>
-                            <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}>🟡 Cuti (Tidak Menerima Bimbingan)</option>
-                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>🔴 Non-Aktif</option>
+                            @foreach(\App\Enums\AccountStatus::cases() as $accountCase)
+                                <option value="{{ $accountCase->value }}" {{ old('status', 'active') === $accountCase->value ? 'selected' : '' }}>{{ $accountCase->label() }}</option>
+                            @endforeach
                         </select>
+                        <x-status-legend type="account" />
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">

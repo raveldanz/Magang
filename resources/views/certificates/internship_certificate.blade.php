@@ -70,6 +70,28 @@
             .page-break {
                 page-break-before: always;
             }
+            .sheet-scale-wrap {
+                height: auto !important;
+                width: auto !important;
+            }
+            .sheet-scale-wrap > .certificate-sheet {
+                transform: none !important;
+            }
+        }
+
+        @media screen {
+            .sheet-scale-wrap {
+                margin: 0 auto;
+                overflow: hidden;
+            }
+            .sheet-scale-wrap > .certificate-sheet {
+                transform-origin: top left;
+            }
+        }
+
+        .mobile-hint { display: none; }
+        @media screen and (max-width: 767px) {
+            .mobile-hint { display: block; }
         }
     </style>
 </head>
@@ -94,11 +116,11 @@
     @endphp
 
     {{-- Top Action Bar (Hidden on Print) --}}
-    <header class="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white px-6 py-3 flex items-center justify-between shadow-xl">
+    <header class="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white px-3 sm:px-6 py-3 flex items-center justify-between gap-2 shadow-xl">
         <div class="flex items-center gap-3">
             <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition border border-slate-700 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span>{{ $backLabel }}</span>
+                <span class="hidden sm:inline">{{ $backLabel }}</span><span class="sm:hidden">Kembali</span>
             </a>
             <div class="hidden sm:block text-xs text-slate-400 border-l border-slate-700 pl-3">
                 <span>Dokumen Resmi: </span>
@@ -109,10 +131,13 @@
         <div class="flex items-center gap-3">
             <button onclick="window.print()" class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-600/30 transition transform active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                <span>Cetak / Simpan PDF (A4 Landscape)</span>
+                <span class="hidden sm:inline">Cetak / Simpan PDF (A4 Landscape)</span><span class="sm:hidden">Cetak / PDF</span>
             </button>
         </div>
     </header>
+    <p class="no-print mobile-hint text-center text-[11px] text-slate-400 px-4 pt-3">
+        Pratinjau diperkecil agar muat di layar. Gunakan tombol <strong class="text-slate-200">Cetak / PDF</strong> untuk hasil ukuran A4 penuh.
+    </p>
 
     @php
         // 1. Logo Dinas Instansi Tempat Mahasiswa Magang
@@ -187,8 +212,8 @@
                     @if($univLogo && file_exists(public_path($univLogo)))
                         <img src="{{ asset($univLogo) }}" alt="{{ $profile->universitas ?? 'Logo Kampus' }}" class="max-h-16 max-w-full object-contain" style="height: 56px; width: auto;">
                     @else
-                        <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-xl font-bold text-blue-700">
-                            🎓
+                        <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
                     @endif
                 </div>
@@ -239,7 +264,7 @@
                     <div class="inline-flex items-center gap-3 px-8 py-2 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 border border-amber-300 rounded-xl shadow-2xs">
                         <span class="text-xs font-black text-amber-900 uppercase tracking-wider">PREDIKAT:</span>
                         <span class="text-base font-black text-amber-950 font-serif-title tracking-wide">
-                            GRADE {{ $simpleGrade }} (NILAI: {{ $eval->nilai_akhir ?? 90 }})
+                            GRADE {{ $simpleGrade }} (NILAI: {{ $eval->nilai_akhir ?? 0 }})
                         </span>
                     </div>
                 </div>
@@ -247,36 +272,68 @@
 
         </div>
 
-        <!-- 3. FOOTER TANDA TANGAN DUA PIHAK (Bagian Bawah) -->
-        <div class="relative z-10 grid grid-cols-2 gap-8 px-12 pb-4 text-center text-xs">
+        <!-- 3. FOOTER TANDA TANGAN DUA PIHAK & VERIFIKASI DIGITAL (Bagian Bawah) -->
+        <div class="relative z-10 grid grid-cols-3 gap-4 items-end px-8 pb-4 text-center text-xs">
             
-            <!-- TTD 1: Dosen Pembimbing Lapangan (DPL) / Kampus -->
+            <!-- TTD 1: Dosen Pembimbing Lapangan / Kampus -->
             <div>
                 <p class="text-slate-500 font-medium text-[10.5px]">Mengetahui & Menyetujui,</p>
-                <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing Lapangan (DPL)</p>
-                <p class="text-[10px] text-slate-500">{{ $profile->universitas ?? ($university->name ?? 'Universitas') }}</p>
+                <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing Lapangan</p>
+                <p class="text-[10px] text-slate-500 truncate">{{ $profile->universitas ?? ($university->name ?? 'Universitas') }}</p>
                 
-                <div class="h-14 flex items-center justify-center my-0.5">
-                    <span class="font-quote text-blue-900/35 text-lg italic font-bold">Verified Digital Signature</span>
+                <div class="h-12 flex items-center justify-center my-0.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-blue-800/25 bg-blue-50/60 text-blue-900/80 text-[8.5px] font-bold uppercase tracking-wider">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Ditandatangani Secara Elektronik
+                    </span>
                 </div>
 
-                <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
-                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom' }}</p>
+                <div class="border-t border-slate-400/60 pt-1 max-w-[200px] mx-auto">
+                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? ($univ->pic_name ?? 'Dosen Pembimbing Lapangan') }}</p>
                     <p class="text-[9.5px] text-slate-500">NIP/NIDN: {{ $dosen->nip ?? '-' }}</p>
                 </div>
             </div>
 
-            <!-- TTD 2: Kepala Dinas / Pembimbing Lapangan Instansi -->
+            <!-- TTD 2: QR Code Validasi Keaslian Sertifikat Digital -->
+            @php
+                $verifyHost = parse_url(url('/'), PHP_URL_HOST) . (parse_url(url('/'), PHP_URL_PORT) ? ':' . parse_url(url('/'), PHP_URL_PORT) : '');
+                $codeGroups = $placement?->certificate_hash ? str_split($placement->verification_code, 20) : [];
+            @endphp
+            <div class="flex flex-col items-center justify-end">
+                <p class="text-[8.5px] font-bold text-slate-800 uppercase tracking-wider mb-1">Verifikasi Keaslian Sertifikat</p>
+                <div class="p-1 bg-white border border-slate-300 rounded-md">
+                    @if (!empty($qrSvg))
+                        <div class="w-[68px] h-[68px] flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi Sertifikat">{!! $qrSvg !!}</div>
+                    @elseif (!empty($qrVerifyUrl))
+                        {{-- $qrVerifyUrl sudah berupa URL gambar QR yang berisi link verifikasi --}}
+                        <img src="{{ $qrVerifyUrl }}" alt="QR Verifikasi Sertifikat" class="w-[68px] h-[68px] object-contain">
+                    @endif
+                </div>
+                <p class="text-[8px] text-slate-500 mt-1 leading-snug">
+                    Pindai QR atau buka <span class="font-semibold text-slate-700">{{ $verifyHost }}/verify-certificate</span>
+                </p>
+                @if (!empty($codeGroups))
+                    <p class="text-[7.5px] text-slate-500 mt-0.5 leading-snug">Kode Verifikasi:</p>
+                    <p class="text-[8px] font-mono font-bold text-slate-800 tracking-wide leading-snug select-all">
+                        @foreach ($codeGroups as $line){{ trim($line, '-') }}@if (!$loop->last)<br>@endif @endforeach
+                    </p>
+                @endif
+            </div>
+
+            <!-- TTD 3: Kepala Dinas / Pembimbing Lapangan Instansi -->
             <div>
                 <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p class="font-bold text-slate-800 text-xs mt-0.5">{{ $agencyProfile->signee_position ?? 'Kepala Dinas' }}</p>
-                <p class="text-[10px] text-slate-500">{{ $agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</p>
+                <p class="text-[10px] text-slate-500 truncate">{{ $agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</p>
                 
-                <div class="h-14 flex items-center justify-center my-0.5">
-                    <span class="font-quote text-emerald-900/35 text-lg italic font-bold">Official Seal Verified</span>
+                <div class="h-12 flex items-center justify-center my-0.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-emerald-800/25 bg-emerald-50/60 text-emerald-900/80 text-[8.5px] font-bold uppercase tracking-wider">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Ditandatangani Secara Elektronik
+                    </span>
                 </div>
 
-                <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
+                <div class="border-t border-slate-400/60 pt-1 max-w-[200px] mx-auto">
                     <p class="font-bold text-slate-900 text-xs">{{ $agencyProfile->signee_name ?? 'Drs. H. M. NASER, M.Si' }}</p>
                     <p class="text-[9.5px] text-slate-500">NIP: {{ $agencyProfile->signee_nip ?? '19700101 199503 1 002' }}</p>
                 </div>
@@ -392,29 +449,29 @@
                             <td class="py-1.5 px-3 text-center text-slate-400">1</td>
                             <td class="py-1.5 px-3">Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->nilai_disiplin ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_disiplin ?? '-' }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
                             <td class="py-1.5 px-3 text-center text-slate-400">2</td>
                             <td class="py-1.5 px-3">Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->nilai_kinerja ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_kinerja ?? '-' }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr>
                             <td class="py-1.5 px-3 text-center text-slate-400">3</td>
                             <td class="py-1.5 px-3">Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval->nilai_laporan ?? 90 }}</td>
+                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_laporan ?? '-' }}</td>
                             <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                         </tr>
                         <tr class="bg-blue-50/70 font-bold">
                             <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
                             <td class="py-2 px-3 text-center text-blue-900">{{ $isMentorOnly ? '100%' : ($weightMentor . '%') }}</td>
-                            <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_pembimbing ?? 90 }}</td>
+                            <td class="py-2 px-3 text-center text-blue-900">{{ $eval?->nilai_pembimbing ?? 0 }}</td>
                             <td class="py-2 px-3 text-center text-blue-950 font-black">
-                                {{ $isMentorOnly ? ($eval->nilai_pembimbing ?? 90) : round(($weightMentor / 100) * ($eval->nilai_pembimbing ?? 90), 2) }}
+                                {{ $isMentorOnly ? ($eval?->nilai_pembimbing ?? 0) : round(($weightMentor / 100) * ($eval?->nilai_pembimbing ?? 0), 2) }}
                             </td>
                         </tr>
 
@@ -443,29 +500,29 @@
                                 <td class="py-1.5 px-3 text-center text-slate-400">1</td>
                                 <td class="py-1.5 px-3">Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang</td>
                                 <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_mastery ?? ($eval->nilai_akademik ?? 95) }}</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->dosenAspectScore('score_mastery') ?? '-' }}</td>
                                 <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                             </tr>
                             <tr>
                                 <td class="py-1.5 px-3 text-center text-slate-400">2</td>
                                 <td class="py-1.5 px-3">Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir</td>
                                 <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_report ?? ($eval->nilai_akademik ?? 90) }}</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->dosenAspectScore('score_report') ?? '-' }}</td>
                                 <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                             </tr>
                             <tr>
                                 <td class="py-1.5 px-3 text-center text-slate-400">3</td>
                                 <td class="py-1.5 px-3">Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan</td>
                                 <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval->score_attitude ?? ($eval->nilai_akademik ?? 85) }}</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->dosenAspectScore('score_attitude') ?? '-' }}</td>
                                 <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                             </tr>
                             <tr class="bg-blue-50/70 font-bold">
                                 <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL (Rata-rata):</td>
                                 <td class="py-2 px-3 text-center text-blue-900">{{ $weightLecturer }}%</td>
-                                <td class="py-2 px-3 text-center text-blue-900">{{ $eval->nilai_dosen_calculated ?? 90 }}</td>
+                                <td class="py-2 px-3 text-center text-blue-900">{{ $eval?->nilai_dosen_calculated ?? 0 }}</td>
                                 <td class="py-2 px-3 text-center text-blue-950 font-black">
-                                    {{ round(($weightLecturer / 100) * ($eval->nilai_dosen_calculated ?? 90), 2) }}
+                                    {{ round(($weightLecturer / 100) * ($eval?->nilai_dosen_calculated ?? 0), 2) }}
                                 </td>
                             </tr>
                         @endif
@@ -477,7 +534,7 @@
                             </td>
                             <td class="py-2.5 px-3 text-center">100%</td>
                             <td class="py-2.5 px-3 text-center text-emerald-400 text-sm">
-                                {{ $eval->nilai_akhir ?? 90 }}
+                                {{ $eval?->nilai_akhir ?? 0 }}
                             </td>
                             <td class="py-2.5 px-3 text-center text-amber-300 text-sm">
                                 GRADE {{ $simpleGrade }}
@@ -495,25 +552,66 @@
             <div>
                 <p class="font-bold text-slate-800 text-xs">{{ $isMentorOnly ? 'Pihak Perguruan Tinggi,' : 'Dosen Pembimbing Lapangan,' }}</p>
                 <div class="h-12 flex items-center justify-center my-1">
-                    <span class="font-quote text-blue-900/30 text-sm italic font-bold">Approved</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-blue-800/25 bg-blue-50/60 text-blue-900/80 text-[8.5px] font-bold uppercase tracking-wider">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Ditandatangani Secara Elektronik
+                    </span>
                 </div>
                 <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
-                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? ($univ->pic_name ?? 'Dr. Ir. Bambang Supriyadi, M.Kom') }}</p>
+                    <p class="font-bold text-slate-900 text-xs">{{ $dosen->name ?? ($univ->pic_name ?? 'Dosen Pembimbing Lapangan') }}</p>
                 </div>
             </div>
 
             <div>
                 <p class="font-bold text-slate-800 text-xs">Pembimbing Lapangan Dinas,</p>
                 <div class="h-12 flex items-center justify-center my-1">
-                    <span class="font-quote text-emerald-900/30 text-sm italic font-bold">Approved</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-emerald-800/25 bg-emerald-50/60 text-emerald-900/80 text-[8.5px] font-bold uppercase tracking-wider">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Ditandatangani Secara Elektronik
+                    </span>
                 </div>
                 <div class="border-t border-slate-400 pt-1 max-w-[200px] mx-auto">
-                    <p class="font-bold text-slate-900 text-xs">{{ $mentor->name ?? 'Retno Mumpuni, S.Kom., M.Sc' }}</p>
+                    <p class="font-bold text-slate-900 text-xs">{{ $mentor->name ?? 'Pembimbing Lapangan Dinas' }}</p>
                 </div>
             </div>
         </div>
 
     </section>
 
+    {{-- Skala otomatis agar lembar A4 landscape muat di layar HP/tablet (tampilan cetak tidak berubah) --}}
+    <script>
+        (function () {
+            var sheets = Array.prototype.slice.call(document.querySelectorAll('.certificate-sheet'));
+            sheets.forEach(function (sheet) {
+                var wrap = document.createElement('div');
+                wrap.className = 'sheet-scale-wrap';
+                sheet.parentNode.insertBefore(wrap, sheet);
+                wrap.appendChild(sheet);
+            });
+
+            function fit() {
+                var available = document.documentElement.clientWidth - 16;
+                sheets.forEach(function (sheet) {
+                    var wrap = sheet.parentNode;
+                    sheet.style.transform = 'none';
+                    var w = sheet.offsetWidth, h = sheet.offsetHeight;
+                    var styles = getComputedStyle(sheet);
+                    var mt = parseFloat(styles.marginTop) || 0, mb = parseFloat(styles.marginBottom) || 0;
+                    var scale = Math.min(1, available / w);
+                    sheet.style.transform = scale < 1 ? 'scale(' + scale + ')' : 'none';
+                    sheet.style.marginLeft = scale < 1 ? '0' : '';
+                    wrap.style.width = scale < 1 ? (w * scale) + 'px' : '';
+                    wrap.style.height = scale < 1 ? (h * scale + (mt + mb) * scale) + 'px' : '';
+                });
+            }
+
+            fit();
+            window.addEventListener('resize', fit);
+            window.addEventListener('beforeprint', function () {
+                sheets.forEach(function (s) { s.style.transform = 'none'; s.parentNode.style.height = ''; s.parentNode.style.width = ''; });
+            });
+            window.addEventListener('afterprint', fit);
+        })();
+    </script>
 </body>
 </html>

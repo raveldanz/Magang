@@ -160,8 +160,8 @@
                 @elseif (file_exists(public_path('images/logos/unitomo.png')))
                     <img src="{{ asset('images/logos/unitomo.png') }}" alt="Logo Kampus" class="max-h-24 max-w-24 object-contain">
                 @else
-                    <div class="w-20 h-20 border-2 border-black rounded-full flex items-center justify-center text-2xl font-bold font-sans">
-                        🏛️
+                    <div class="w-20 h-20 border-2 border-black rounded-full flex items-center justify-center text-xs font-bold font-sans">
+                        KAMPUS
                     </div>
                 @endif
             </div>
@@ -275,7 +275,7 @@
                     <td class="py-1">{{ $unit?->name ?? 'Bidang Terkait' }}</td>
                 </tr>
                 <tr class="py-1">
-                    <td class="py-1 font-semibold">Dosen Pembimbing (DPL)</td>
+                    <td class="py-1 font-semibold">Dosen Pembimbing</td>
                     <td class="py-1">:</td>
                     <td class="py-1 font-semibold">{{ $dosen?->name ?? 'Dosen Pembimbing Lapangan Terdaftar' }}</td>
                 </tr>

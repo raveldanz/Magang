@@ -55,12 +55,28 @@ class DashboardController extends Controller
             });
         }
 
+        if ($request->filled('report_status')) {
+            $status = strtolower($request->report_status);
+            // Filter per kode status laporan (sama dengan badge yang tampil)
+            if (\App\Enums\ReviewStatus::tryFrom($status)) {
+                $query->whereHas('finalreport', fn ($q) => $q->where('status', $status));
+            } elseif ($status === 'none') {
+                $query->whereDoesntHave('finalreport');
+            }
+        }
+
         $placements = $query->latest()->get();
 
         // Hitung metrik statistik bimbingan DPL
         $totalStudents = $placements->count();
         $totalEvaluated = $placements->filter(function ($p) {
-            return $p->evaluation && ($p->evaluation->nilai_akademik > 0 || $p->evaluation->nilai_dosen > 0);
+            $eval = $p->evaluation;
+            if (!$eval) return false;
+            $univ = $eval->getUniversity();
+            if ($univ && $univ->evaluation_scheme === 'mentor_only') {
+                return ($eval->nilai_pembimbing ?? 0) > 0;
+            }
+            return ($eval->nilai_akademik > 0 || $eval->nilai_dosen > 0);
         })->count();
         $totalPendingEval = max(0, $totalStudents - $totalEvaluated);
         $totalReportsApproved = $placements->filter(function ($p) {
@@ -113,7 +129,7 @@ class DashboardController extends Controller
         $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
 
         if (!$isAssignedAdvisor && !$isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan (DPL) yang ditugaskan untuk mahasiswa ini.');
+            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
         }
 
         $student = $placement->application->user;

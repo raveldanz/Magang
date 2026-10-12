@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.units.index') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
@@ -22,6 +22,8 @@
                 
                 <form action="{{ route('admin.units.update', $unit->id) }}" method="POST" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="return_to" value="{{ $returnTo ?? request('return_to') ?? old('return_to') }}">
+                   
                     @method('PUT')
 
                     <!-- Instansi Induk -->
@@ -31,7 +33,7 @@
                             <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                                 @foreach ($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_profile_id', $unit->agency_profile_id) == $agency->id ? 'selected' : '' }}>
-                                        🏛️ {{ $agency->agency_name }}
+                                         {{ $agency->agency_name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -42,7 +44,7 @@
                     @else
                         <div>
                             <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Instansi Induk</span>
-                            <p class="text-sm font-semibold text-gray-800 mt-1">🏛️ {{ $unit->agencyProfile->agency_name ?? '-' }}</p>
+                            <p class="text-sm font-semibold text-gray-800 mt-1"> {{ $unit->agencyProfile->agency_name ?? '-' }}</p>
                         </div>
                     @endif
 
@@ -75,7 +77,7 @@
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required
                         >
-                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->applications->where('status', 'accepted')->count() }}</strong> mahasiswa diterima.</p>
+                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->occupied_count }}</strong> mahasiswa diterima/aktif menempati kuota ini.</p>
                         @error('quota')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror

@@ -5,9 +5,7 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Riwayat Masukan & Laporan Kendala Saya</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Pantau status tiket masukan dan tanggapan resmi dari tim pengelola
-                </p>
+                
             </div>
 
             <a href="{{ route('feedbacks.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
@@ -40,12 +38,6 @@
                             default => 'Masukan',
                         };
 
-                        $statusBadge = match($fb->status) {
-                            'pending' => 'bg-amber-100 text-amber-900 border-amber-300',
-                            'in_progress' => 'bg-blue-100 text-blue-900 border-blue-300',
-                            'resolved' => 'bg-emerald-100 text-emerald-900 border-emerald-300',
-                            default => 'bg-slate-100 text-slate-700 border-slate-200',
-                        };
                     @endphp
 
                     <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs space-y-4">
@@ -54,9 +46,7 @@
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200">
                                     {{ $catLabel }}
                                 </span>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $statusBadge }}">
-                                    Status: {{ strtoupper($fb->status) }}
-                                </span>
+                                <x-status-badge type="feedback" :status="$fb->status" />
                             </div>
                             <span class="text-xs text-slate-400">
                                 {{ $fb->created_at->diffForHumans() }}
@@ -90,9 +80,7 @@
                     </div>
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mx-auto">
-                            💬
-                        </div>
+                        
                         <h4 class="font-bold text-base text-gray-800">Belum Ada Masukan yang Dikirimkan</h4>
                         <p class="text-xs text-gray-400">Jika Anda menemukan kendala atau memiliki saran, silakan klik tombol kirim masukan di atas.</p>
                     </div>

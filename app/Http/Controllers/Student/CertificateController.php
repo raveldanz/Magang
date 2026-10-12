@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CertificateController extends Controller
 {
@@ -133,6 +134,12 @@ class CertificateController extends Controller
             abort(403, 'Akses Ditolak: Anda tidak berhak melihat atau mengunduh sertifikat ini.');
         }
 
+        // Proteksi Ketat Kelulusan: E-Sertifikat hanya sah diakses jika mahasiswa telah berstatus COMPLETED
+        $statusVal = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)$application->status;
+        if ($statusVal !== 'completed') {
+            abort(403, 'Akses Dibatasi: E-Sertifikat dan Transkrip Nilai resmi hanya dapat diterbitkan dan diunduh setelah mahasiswa dinyatakan lulus (status COMPLETED) dengan naskah laporan akhir yang telah disetujui (ACC) serta lembar evaluasi yang telah lengkap.');
+        }
+
         // Cek evaluasi kelulusan
         $eval = $placement?->evaluation;
         $finalReport = $placement?->finalreport;
@@ -158,8 +165,43 @@ class CertificateController extends Controller
             $university = University::where('name', 'like', '%' . $profile->universitas . '%')->first();
         }
 
-        // Nomor Registrasi Sertifikat
-        $regNumber = "SERT/{$application->id}/PEMKOT-SBY/" . Carbon::now()->format('Y');
+        // Nomor Registrasi Sertifikat & Hash Verifikasi Publik
+        $year = Carbon::now()->format('Y');
+        $paddedId = str_pad($placement ? $placement->id : $application->id, 3, '0', STR_PAD_LEFT);
+        
+        if ($placement) {
+            $dirty = false;
+            if (empty($placement->certificate_hash)) {
+                $placement->certificate_hash = Str::random(32);
+                $dirty = true;
+            }
+            if (empty($placement->certificate_number)) {
+                $placement->certificate_number = "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+                $dirty = true;
+            }
+            if ($dirty) {
+                $placement->save();
+            }
+        }
+
+        $regNumber = $placement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+        $certificateHash = $placement?->certificate_hash;
+        // QR selalu memakai hash acak (bukan ID angka) agar sertifikat lain tidak bisa ditebak
+        $verifyCertificateUrl = $certificateHash ? route('verify.certificate', $certificateHash) : null;
+
+        // QR dibuat lokal (SVG) — URL verifikasi tidak dikirim ke layanan pihak ketiga
+        $qrSvg = null;
+        if ($verifyCertificateUrl && class_exists(\SimpleSoftwareIO\QrCode\Facades\QrCode::class)) {
+            try {
+                $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(64)->margin(0)->generate($verifyCertificateUrl);
+            } catch (\Throwable $e) {
+                $qrSvg = null;
+            }
+        }
+        // Cadangan jika library QR lokal tidak tersedia (URL gambar, bukan URL verifikasi)
+        $qrVerifyUrl = $verifyCertificateUrl
+            ? 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=0&data=' . urlencode($verifyCertificateUrl)
+            : null;
 
         return compact(
             'application',
@@ -172,7 +214,11 @@ class CertificateController extends Controller
             'university',
             'eval',
             'finalReport',
-            'regNumber'
+            'regNumber',
+            'certificateHash',
+            'verifyCertificateUrl',
+            'qrVerifyUrl',
+            'qrSvg'
         );
     }
 

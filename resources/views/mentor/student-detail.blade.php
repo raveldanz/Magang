@@ -129,12 +129,7 @@
                                 Laporan Akhir Magang
                             </h3>
                             @if ($placement->finalreport)
-                                <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                    {{ $placement->finalreport->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $placement->finalreport->status === 'revision' ? 'bg-rose-100 text-rose-800' : '' }}
-                                    {{ $placement->finalreport->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}">
-                                    {{ strtoupper($placement->finalreport->status) }}
-                                </span>
+                                <x-status-badge type="review" :status="$placement->finalreport->status" />
                             @else
                                 <span class="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
                                     Belum Diunggah
@@ -146,11 +141,11 @@
                             <div class="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-2 mb-4">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-gray-600 font-medium">Berkas Dokumen Laporan:</span>
-                                    <a href="{{ asset('storage/' . $placement->finalreport->file_path) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-bold">
+                                    <a href="{{ route('final_reports.show', $placement->finalreport->id) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-bold">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        Buka PDF Laporan
+                                        Buka Berkas Laporan
                                     </a>
                                 </div>
                                 @if ($placement->finalreport->feedback)
@@ -211,14 +206,9 @@
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="px-3 py-1 text-xs font-bold rounded-full 
-                                        {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                        {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                        {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                        {{ strtoupper($log->status) }}
-                                    </span>
+                                    <x-status-badge type="review" :status="$log->status" />
                                     <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
-                                        Detail &rarr;
+                                        Detail 
                                     </a>
                                 </div>
                             </div>

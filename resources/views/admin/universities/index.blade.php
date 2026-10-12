@@ -3,7 +3,6 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                   
                     <span>Master Perguruan Tinggi Mitra (Universitas)</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -11,30 +10,44 @@
                 </p>
             </div>
 
-            <a href="{{ route('admin.universities.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+            @if($isSuperAdmin)
+            <a href="{{ route('admin.universities.create') }}"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
                 <span>Tambah Universitas Baru</span>
             </a>
+            @endif
         </div>
     </x-slot>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Flash Alert -->
-            @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
+            <!-- Flash Alert Success -->
+            @if (session('success') && !session('new_university_credential'))
+                <div
+                    class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
+                <div
+                    class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>⚠️</span>
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <span>{{ session('error') }}</span>
                     </div>
                 </div>
@@ -43,184 +56,322 @@
             <!-- Credential Flash Alert -->
             @if (session('new_university_credential'))
                 @php $cred = session('new_university_credential'); @endphp
-                <div class="p-6 rounded-3xl shadow-2xl space-y-4 border" 
-                     style="background-color: #0f172a !important; color: #ffffff !important; border-color: #334155 !important;">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #1e293b !important;">
-                        <div class="flex items-center gap-3">
-                            <div>
-                                <h3 class="font-extrabold text-base sm:text-lg tracking-tight" style="color: #ffffff !important;">
-                                    Akun Admin Kampus Baru Berhasil Dibuat!
-                                </h3>
-                                <p class="text-xs mt-0.5" style="color: #94a3b8 !important;">
-                                    Kredensial resmi untuk <strong style="color: #38bdf8 !important;">{{ $cred['univ_name'] }}</strong> siap diteruskan ke pihak kemahasiswaan/rektorat.
-                                </p>
+                <div class="relative overflow-hidden rounded-3xl shadow-2xl border border-blue-400/30 p-6 sm:p-7 space-y-5"
+                    style="background: linear-gradient(135deg, #09172e 0%, #0d2857 45%, #07152c 100%) !important; color: #ffffff !important;">
+
+                    <div class="absolute -right-8 -bottom-10 pointer-events-none opacity-[0.06] text-white">
+                        <svg class="w-72 h-72" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.04-7 10.19-3.87-1.15-7-5.52-7-10.19V6.3l7-3.12z" />
+                        </svg>
+                    </div>
+
+                    <div
+                        class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-blue-400/20 pb-5">
+                        <div class="space-y-1">
+                            <h3 class="font-black text-lg sm:text-xl text-white tracking-tight flex items-center gap-2">
+                                <span>Akun Admin Kampus Baru Berhasil Dibuat!</span>
+                            </h3>
+                            <p class="text-xs text-blue-100/80 leading-relaxed">
+                                Kredensial login resmi untuk mitra <strong
+                                    class="text-amber-300 font-bold underline decoration-amber-400/40 underline-offset-2">{{ $cred['univ_name'] }}</strong>
+                                siap diteruskan ke pihak kemahasiswaan/rektorat.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2.5 shrink-0 pt-1 lg:pt-0">
+                            <button type="button"
+                                onclick="navigator.clipboard.writeText('Universitas: {{ addslashes($cred['univ_name']) }}\nPortal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<svg class=\'w-4 h-4 text-emerald-300\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'/></svg><span>Tersalin!</span>'; setTimeout(() => this.innerHTML = '<svg class=\'w-4 h-4 text-blue-200\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3\'/></svg><span>Salin Semua</span>', 2500);"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-950/70 hover:bg-blue-900/80 text-blue-100 border border-blue-400/30 rounded-xl text-xs font-bold transition shadow-sm hover:border-blue-300 cursor-pointer active:scale-95">
+                                <svg class="w-4 h-4 text-blue-200 shrink-0" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                </svg>
+                                <span>Salin Semua</span>
+                            </button>
+
+                            @if($isSuperAdmin && !empty($cred['user_id']))
+                                <form action="{{ route('admin.impersonate', $cred['user_id']) }}" method="POST"
+                                    class="inline-block m-0">
+                                    @csrf
+                                    <button type="submit"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-black transition-all shadow-lg border border-emerald-300/40 active:scale-95 cursor-pointer">
+                                        <svg class="w-4 h-4 text-emerald-100 shrink-0" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                        </svg>
+                                        <span>Login As Admin Kampus</span>
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                        <div
+                            class="p-3.5 rounded-2xl border border-blue-400/20 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-300">URL Portal
+                                Login</span>
+                            <div class="font-mono font-bold text-xs text-sky-300 select-all truncate mt-1">
+                                {{ $cred['login_url'] }}
                             </div>
                         </div>
-                        <button type="button" 
-                                onclick="navigator.clipboard.writeText('Portal: {{ $cred['login_url'] }}\nEmail: {{ $cred['email'] }}\nPassword: {{ $cred['password'] }}'); this.innerHTML = '<span>Tersalin ke Clipboard!</span> <span>✅</span>'; setTimeout(() => this.innerHTML = '<span>Salin Semua Kredensial</span> <span>📋</span>', 3000);"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer shrink-0">
-                            <span>Salin Semua Kredensial</span>
-                            <span>📋</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
-                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
-                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">URL Login Portal:</span>
-                            <span class="font-bold select-all break-all text-xs" style="color: #38bdf8 !important;">{{ $cred['login_url'] }}</span>
+                        <div
+                            class="p-3.5 rounded-2xl border border-blue-400/20 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Email Akun
+                                Kampus</span>
+                            <div class="font-mono font-bold text-xs text-emerald-300 select-all truncate mt-1">
+                                {{ $cred['email'] }}
+                            </div>
                         </div>
-                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
-                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Email / Username:</span>
-                            <span class="font-bold select-all break-all text-xs" style="color: #34d399 !important;">{{ $cred['email'] }}</span>
-                        </div>
-                        <div class="p-3.5 rounded-2xl border" style="background-color: #1e293b !important; border-color: #334155 !important;">
-                            <span class="font-sans block text-[11px] mb-1 font-semibold uppercase tracking-wider" style="color: #94a3b8 !important;">Password Default:</span>
-                            <span class="font-bold select-all text-xs" style="color: #fbbf24 !important;">{{ $cred['password'] }}</span>
+                        <div
+                            class="p-3.5 rounded-2xl border border-blue-400/20 bg-slate-900/60 backdrop-blur-md flex flex-col justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300">Password
+                                Default</span>
+                            <div class="font-mono font-bold text-xs text-amber-300 select-all truncate mt-1">
+                                {{ $cred['password'] }}
+                            </div>
                         </div>
                     </div>
                 </div>
             @endif
 
-            <!-- Warning Banner for Unregistered University Accounts -->
+            <!-- Warning Banner -->
             @if(($unregisteredCount ?? 0) > 0)
-                <div class="p-5 bg-amber-50 border-l-4 border-amber-500 rounded-2xl shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div
+                    class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-2xl shadow-xs flex items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <span class="text-2xl">🔔</span>
+                        <div class="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
                         <div>
-                            <h4 class="font-bold text-amber-900 text-sm">Terdapat {{ $unregisteredCount }} Perguruan Tinggi Baru yang Belum Memiliki Akun Admin Kampus</h4>
-                            <p class="text-xs text-amber-700 mt-0.5">Kampus terdaftar otomatis saat mahasiswa melakukan registrasi. Buatkan akun agar perwakilan kampus dapat login ke Portal Universitas.</p>
+                            <h4 class="font-bold text-amber-900 text-xs sm:text-sm">Terdapat {{ $unregisteredCount }}
+                                Perguruan Tinggi yang Belum Memiliki Akun Admin</h4>
+                            <p class="text-[11px] text-amber-700 mt-0.5">Buatkan akun agar perwakilan kampus dapat login
+                                untuk monitoring mahasiswa dan penugasan DPL.</p>
                         </div>
                     </div>
                 </div>
             @endif
 
-            <!-- Search Card -->
+            <!-- Executive Macro Stats Kemitraan Kampus -->
+            @if(isset($macroStats))
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Total Kampus Mitra</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
+                            {{ $macroStats['total_universities'] }}
+                        </div>
+                        <div class="mt-1 text-xs text-slate-400">Perguruan tinggi mitra</div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Total Mahasiswa</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
+                            {{ $macroStats['total_students'] }}
+                        </div>
+                        <div class="mt-1 text-xs text-slate-400">Mahasiswa terdaftar</div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Dosen Pembimbing</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
+                            {{ $macroStats['total_dosens'] }}
+                        </div>
+                        <div class="mt-1 text-xs text-slate-400">Dosen DPL aktif</div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-xs transition">
+                        <div class="text-xs font-semibold text-slate-500">Mahasiswa Magang</div>
+                        <div class="mt-2 text-3xl font-black text-slate-900 tracking-tight">
+                            {{ $macroStats['total_active_interns'] }}
+                        </div>
+                        <div class="mt-1 text-xs text-slate-400">Sedang magang di dinas</div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Search Bar -->
             <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs">
                 <form method="GET" action="{{ route('admin.universities.index') }}" class="flex items-center gap-3">
                     <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400"
+                            style="padding-left: 1rem !important;">
                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama perguruan tinggi, kode kampus (e.g. UNESA, ITS), email..." 
-                               class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-                               style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Cari nama perguruan tinggi, kode kampus (e.g. UNESA, ITS), email..."
+                            class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                            style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
                     </div>
-                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                    <button type="submit"
+                        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                         Cari
                     </button>
                     @if(request('search'))
-                        <a href="{{ route('admin.universities.index') }}" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">
+                        <a href="{{ route('admin.universities.index') }}"
+                            class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">
                             Reset
                         </a>
                     @endif
                 </form>
             </div>
 
-            <!-- Universities Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- List Universities Grid (Struktur Presisi & Konsisten Penuh dengan Agencies) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse($universities as $univ)
-                    <div class="bg-white rounded-3xl border border-gray-100 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
+                    @php
+                        $univLogoUrl = null;
+                        if (!empty($univ->logo)) {
+                            if (file_exists(public_path($univ->logo))) {
+                                $univLogoUrl = asset($univ->logo);
+                            } elseif (file_exists(public_path('storage/' . $univ->logo)) || file_exists(storage_path('app/public/' . $univ->logo))) {
+                                $univLogoUrl = asset('storage/' . $univ->logo);
+                            }
+                        }
+                        if (!$univLogoUrl) {
+                            $uName = strtolower($univ->name ?? '');
+                            $uCode = strtolower($univ->code ?? '');
+                            if (str_contains($uName, 'unesa') || str_contains($uCode, 'unesa')) {
+                                $univLogoUrl = asset('images/logos/unesa.png');
+                            } elseif (str_contains($uName, 'its') || str_contains($uCode, 'its') || str_contains($uName, 'sepuluh nopember')) {
+                                $univLogoUrl = asset('images/logos/its.png');
+                            } elseif (str_contains($uName, 'unair') || str_contains($uCode, 'unair') || str_contains($uName, 'airlangga')) {
+                                $univLogoUrl = asset('images/logos/unair.png');
+                            } elseif (str_contains($uName, 'upn') || str_contains($uCode, 'upn') || str_contains($uName, 'veteran')) {
+                                $univLogoUrl = asset('images/logos/upnjatim.png');
+                            } elseif (str_contains($uName, 'unitomo') || str_contains($uCode, 'unitomo') || str_contains($uName, 'soetomo')) {
+                                $univLogoUrl = asset('images/logos/unitomo.png');
+                            }
+                        }
+                        if (!$univLogoUrl) {
+                            $univLogoUrl = asset('images/default-university.svg');
+                        }
+                    @endphp
+
+                    <div
+                        class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition p-6 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-start justify-between gap-4">
-                                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; max-width: 56px; max-height: 56px;">
-                                    @if($univ->logo && file_exists(public_path($univ->logo)))
-                                        <img src="{{ asset($univ->logo) }}" alt="{{ $univ->name }}" class="w-10 h-10 object-contain shrink-0" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain;">
-                                    @else
-                                        <span class="text-2xl">🏛️</span>
-                                    @endif
-                                </div>
-                                <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                    <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-black">
+                            <!-- Header: Logo, Kode Kampus, Status Badge, & Menu Opsi Kanan Atas -->
+                            <div class="flex items-start justify-between gap-3 mb-4">
+                                <a href="{{ route('admin.universities.show', $univ->id) }}"
+                                    class="w-13 h-13 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2.5 shrink-0 overflow-hidden shadow-2xs"
+                                    style="width: 52px; height: 52px;">
+                                    <img src="{{ $univLogoUrl }}" alt="{{ $univ->name }}"
+                                        class="w-9 h-9 object-contain shrink-0">
+                                </a>
+
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <span
+                                        class="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200/80 rounded-lg text-[10px] font-bold">
                                         {{ $univ->code }}
                                     </span>
+
                                     @if($univ->universityAdmin)
-                                        <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
-                                            ● Akun Aktif
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            Akun Aktif
                                         </span>
                                     @else
-                                        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold animate-pulse">
-                                            ⏳ Belum Ada Akun
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                            Belum Ada Akun
                                         </span>
                                     @endif
+
+                            
                                 </div>
                             </div>
 
-                            <div class="mt-4">
-                                <h3 class="font-black text-base text-gray-900 leading-snug">{{ $univ->name }}</h3>
-                                <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ $univ->address ?? 'Alamat belum diatur' }}</p>
-                                
-                                <div class="mt-3 pt-3 border-t border-slate-50 space-y-1">
-                                    @if($univ->pic_name)
-                                        <div class="text-[11px] text-blue-700 font-semibold truncate">
-                                            👔 PIC: {{ $univ->pic_name }} ({{ $univ->pic_position ?? 'Pimpinan' }})
-                                        </div>
-                                    @else
-                                        <div class="text-[11px] text-slate-400 italic">
-                                            👔 PIC belum diisi
-                                        </div>
-                                    @endif
+                            <!-- Identitas Universitas -->
+                            <h3 class="font-bold text-slate-900 text-[18px] leading-snug line-clamp-2 h-14 mb-1"
+                                title="{{ $univ->name }}">
+                                {{ $univ->name }}
+                            </h3>
+                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-relaxed mb-2"
+                                title="{{ $univ->address }}">
+                                {{ $univ->address ?? 'Alamat kampus belum diatur' }}
+                            </p>
 
-                                    @if($univ->universityAdmin)
-                                        <div class="text-[11px] text-slate-600 truncate">
-                                            ✉️ <strong class="font-mono text-slate-700">{{ $univ->universityAdmin->email }}</strong>
-                                        </div>
-                                    @endif
-                                </div>
+                            <div class="text-[11px] font-mono text-slate-400 truncate mb-5">
+                                Admin:
+                                @if($univ->universityAdmin)
+                                    <span class="text-slate-700 font-medium">{{ $univ->universityAdmin->email }}</span>
+                                @else
+                                    <span class="text-slate-400 italic">Belum dibuatkan akun</span>
+                                @endif
                             </div>
 
-                            <!-- Stat Counts -->
-                            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-gray-100 text-center">
-                                <div class="p-2 rounded-xl bg-blue-50 border border-blue-100">
-                                    <div class="text-xs font-black text-blue-700">{{ $univ->students_count }}</div>
-                                    <div class="text-[10px] text-blue-600 font-semibold uppercase">Mahasiswa</div>
+                            <!-- Metrik Ringkas & Seragam (3 Kolom Berlatar Lembut) -->
+                            <div
+                                class="grid grid-cols-3 gap-2 p-3 bg-slate-50/80 rounded-2xl border border-slate-100 text-center mb-5 select-none">
+                                <div>
+                                    <div class="text-sm font-black text-slate-900">{{ $univ->students_count }}</div>
+                                    <div class="text-[10px] font-medium text-slate-500 mt-0.5">Mahasiswa</div>
                                 </div>
-                                <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                    <div class="text-xs font-black text-slate-700">{{ $univ->dosens_count }}</div>
-                                    <div class="text-[10px] text-slate-600 font-semibold uppercase">Dosen DPL</div>
+                                <div class="border-x border-slate-200/60">
+                                    <div class="text-sm font-black text-blue-600">{{ $univ->dosens_count }}</div>
+                                    <div class="text-[10px] font-medium text-blue-600/90 mt-0.5">Dosen DPL</div>
                                 </div>
-                                <div class="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                    <div class="text-xs font-black text-slate-700">{{ $univ->users_count }}</div>
-                                    <div class="text-[10px] text-slate-500 font-semibold uppercase">Akun</div>
+                                <div>
+                                    <div class="text-sm font-black text-slate-900">{{ $univ->users_count }}</div>
+                                    <div class="text-[10px] font-medium text-slate-500 mt-0.5">Total Akun</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Action Buttons in Footer -->
-                        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
-                            <a href="{{ route('admin.users.index', ['university_id' => $univ->id]) }}" class="text-xs text-blue-600 hover:text-blue-800 font-bold shrink-0">
-                                Lihat Akun &rarr;
-                            </a>
-
-                            <div class="btn-action-group">
-                                @if(!$univ->universityAdmin)
-                                    <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}" class="btn-action-form">
-                                        @csrf
-                                        <button type="submit" class="btn-action-create" title="Buatkan Akun Admin Kampus">
-                                            <span>⚡</span>
-                                            <span>Buat Akun</span>
-                                        </button>
-                                    </form>
-                                @endif
-
-                                <a href="{{ route('admin.universities.edit', $univ->id) }}" class="btn-action-edit">
-                                    Edit
-                                </a>
-
-                                <form action="{{ route('admin.universities.destroy', $univ->id) }}" method="POST" onsubmit="return confirm('Hapus universitas {{ $univ->name }}?');" class="btn-action-form">
+                        <!-- Action Footer Sejajar (Format Baku: Tombol Sekunder & Tombol Primer) -->
+                        <div class="flex items-center gap-2 pt-2">
+                            @if($isSuperAdmin && !$univ->universityAdmin)
+                                <form method="POST" action="{{ route('admin.universities.create_account', $univ->id) }}"
+                                    class="shrink-0 m-0">
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action-delete">
-                                        Hapus
+                                    <button type="button"
+                                        @click="$dispatch('open-confirm-modal', {
+                                            form: $el.form,
+                                            title: 'Buat Akun Admin Kampus',
+                                            message: 'Sistem akan membuat akun login portal untuk perwakilan kampus agar dapat mengelola dosen pembimbing secara mandiri.',
+                                            label: 'Perguruan tinggi:',
+                                            name: @js($univ->name),
+                                            desc: 'Password awal: password',
+                                            confirmText: 'Ya, Buat Akun'
+                                        })"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
+                                        title="Buatkan Akun Admin Kampus">
+                                        Buat Akun
                                     </button>
                                 </form>
-                            </div>
+                            @elseif($isSuperAdmin && $univ->universityAdmin)
+                                <form action="{{ route('admin.impersonate', $univ->universityAdmin->id) }}" method="POST"
+                                    class="shrink-0 m-0">
+                                    @csrf
+                                    <button type="submit"
+                                        class="whitespace-nowrap py-2.5 px-3 rounded-xl border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 hover:border-slate-400 font-bold text-xs transition cursor-pointer active:scale-95 shadow-xs"
+                                        title="Masuk Sebagai Admin Kampus">
+                                        Login As
+                                    </button>
+                                </form>
+                            @endif
+
+                            <a href="{{ route('admin.universities.show', $univ->id) }}"
+                                class="flex-1 min-w-0 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs text-center shadow-xs transition cursor-pointer whitespace-nowrap truncate">
+                                Kelola Kampus
+                            </a>
                         </div>
                     </div>
                 @empty
                     <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
                         <p class="font-bold text-gray-600">Belum ada universitas terdaftar</p>
+                        <p class="text-xs mt-1">Gunakan tombol "Tambah Universitas Baru" untuk mendaftarkan perguruan
+                            tinggi.</p>
                     </div>
                 @endforelse
             </div>

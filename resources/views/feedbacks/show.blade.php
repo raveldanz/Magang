@@ -6,7 +6,7 @@
             </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
-                    💬 Tiket Masukan #{{ $feedback->id }}
+                    Tiket Masukan #{{ $feedback->id }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
                     Detail laporan kendala, masukan pengguna, dan tanggapan resmi dari tim pengelola
@@ -22,7 +22,7 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -37,9 +37,7 @@
                             <span class="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200">
                                 {{ strtoupper($feedback->category) }}
                             </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-black {{ $feedback->status === 'resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                                STATUS: {{ strtoupper($feedback->status) }}
-                            </span>
+                            <x-status-badge type="feedback" :status="$feedback->status" />
                             <span class="text-xs text-slate-400">
                                 Dibuat {{ $feedback->created_at->translatedFormat('d F Y, H:i') }} ({{ $feedback->created_at->diffForHumans() }})
                             </span>
@@ -85,7 +83,7 @@
                 @if($feedback->attachment)
                     <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 flex items-center justify-between flex-wrap gap-3">
                         <div class="flex items-center gap-2 text-xs text-blue-900 font-semibold">
-                            <span class="text-lg">📎</span>
+                            <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                             <span>Lampiran Berkas / Bukti Screenshot</span>
                         </div>
                         <a href="{{ asset('storage/' . $feedback->attachment) }}" target="_blank" 
@@ -103,7 +101,7 @@
                 <div class="bg-emerald-50/80 rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-sm space-y-4">
                     <div class="flex items-center justify-between border-b border-emerald-200 pb-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">✅</span>
+                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <h4 class="font-extrabold text-sm text-emerald-950">Tanggapan Resmi Pengelola</h4>
                         </div>
                         <span class="text-xs text-emerald-700">
@@ -135,11 +133,11 @@
                             Perbarui Status Tiket <span class="text-rose-500">*</span>
                         </label>
                         <select name="status" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                            <option value="pending" {{ $feedback->status === 'pending' ? 'selected' : '' }}>⏳ Menunggu (Pending)</option>
-                            <option value="in_progress" {{ $feedback->status === 'in_progress' ? 'selected' : '' }}>⚙️ Sedang Diproses (In Progress)</option>
-                            <option value="resolved" {{ $feedback->status === 'resolved' ? 'selected' : '' }}>✅ Selesai & Terjawab (Resolved)</option>
-                            <option value="closed" {{ $feedback->status === 'closed' ? 'selected' : '' }}>🔒 Ditutup (Closed)</option>
+                            @foreach(\App\Enums\FeedbackStatus::cases() as $feedbackCase)
+                                <option value="{{ $feedbackCase->value }}" {{ $feedback->status == $feedbackCase->value ? 'selected' : '' }}>{{ $feedbackCase->label() }}</option>
+                            @endforeach
                         </select>
+                        <x-status-legend type="feedback" />
                     </div>
 
                     <div>

@@ -41,7 +41,7 @@ return new class extends Migration
                 $table->string('target_role')->nullable(); // null means all or specific user_id
                 $table->string('type')->default('info'); // info, warning, success, urgent, action_required
                 $table->string('category')->default('system'); // university, application, logbook, feedback, evaluation
-                $table->string('icon')->default('🔔');
+                $table->string('icon')->default('');
                 $table->string('title');
                 $table->text('message');
                 $table->string('action_url')->nullable();

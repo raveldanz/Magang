@@ -42,24 +42,14 @@ class DashboardController extends Controller
 
         $allApplications = $appQuery->latest()->get();
 
-        // Metrik Agregat Mahasiswa
-        $totalStudents = $allApplications->count();
-        $totalPending = $allApplications->whereIn('status', ['pending', 'submitted'])->count();
-        $totalAccepted = $allApplications->whereIn('status', ['accepted', 'verified'])->count();
-        $totalRejected = $allApplications->where('status', 'rejected')->count();
-
-        $today = now();
-        $totalActive = $allApplications->filter(function ($app) use ($today) {
-            $isAccepted = in_array(strtolower($app->status), ['accepted', 'verified']);
-            $isStarted = $app->start_date && $today->gte(\Carbon\Carbon::parse($app->start_date));
-            $isNotDone = !($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED' && optional($app->placement?->evaluation)->nilai_akademik > 0);
-            return $isAccepted && $isStarted && $isNotDone;
-        })->count();
-
-        $totalCompleted = $allApplications->filter(function ($app) {
-            return ($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED') ||
-                   ($app->placement && optional($app->placement->finalreport)->status === 'approved' && optional($app->placement->evaluation)->nilai_akademik > 0);
-        })->count();
+        // Metrik Agregat Mahasiswa (Direct Database Query Aggregation)
+        $totalStudents = (clone $appQuery)->count();
+        $totalPending = (clone $appQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalAccepted = (clone $appQuery)->where('status', 'accepted')->count();
+        $totalActive = (clone $appQuery)->where('status', 'active')->count();
+        $totalCompleted = (clone $appQuery)->where('status', 'completed')->count();
+        $totalRejected = (clone $appQuery)->where('status', 'rejected')->count();
+        $totalResigned = (clone $appQuery)->where('status', 'resigned')->count();
 
         // Kuota Unit Magang
         $unitsQuery = Unit::with('agencyProfile');
@@ -138,6 +128,11 @@ class DashboardController extends Controller
             $q->where('role', 'universitas');
         })->withCount('students')->get();
 
+        // Instansi dinas baru yang belum punya akun admin dinas
+        $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {
+            $q->where('role', 'admin');
+        })->withCount('units')->get();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_pending' => $totalPending,
@@ -145,6 +140,7 @@ class DashboardController extends Controller
             'total_active' => $totalActive,
             'total_completed' => $totalCompleted,
             'total_rejected' => $totalRejected,
+            'total_resigned' => $totalResigned,
             'total_quota_available' => $totalQuotaAvailable,
             'total_units' => $totalUnits,
             'total_agencies' => $totalAgencies,
@@ -153,6 +149,7 @@ class DashboardController extends Controller
             'total_mentors' => $totalMentors,
             'total_lecturers' => $totalLecturers,
             'pending_universities_count' => $pendingUniversities->count(),
+            'pending_agencies_count' => $pendingAgencies->count(),
         ];
 
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
@@ -170,7 +167,8 @@ class DashboardController extends Controller
             'recentAuditLogs',
             'currentAgency',
             'agencyId',
-            'pendingUniversities'
+            'pendingUniversities',
+            'pendingAgencies'
         ));
     }
 }

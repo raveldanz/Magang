@@ -1,9 +1,10 @@
-<x-app-layout>
+﻿<x-app-layout>
+    <x-responsive-table-style />
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>📜</span>
+                    <span></span>
                     <span>Audit Trail & Log Riwayat Aktivitas Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -56,7 +57,7 @@
             <!-- Logs Table -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
+                    <table class="rtable min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
                                 <th class="py-3.5 px-4">Waktu (WIB)</th>
@@ -72,13 +73,13 @@
                                 <tr class="hover:bg-slate-50/80 transition">
                                     
                                     <!-- Timestamp -->
-                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                    <td class="rt-title py-3.5 px-4 whitespace-nowrap" data-label="Waktu (WIB)">
                                         <div class="font-bold text-gray-900">{{ $log->created_at->format('d/m/Y H:i:s') }}</div>
                                         <div class="text-[10px] text-gray-400 font-mono">{{ $log->created_at->diffForHumans() }}</div>
                                     </td>
 
                                     <!-- User Actor -->
-                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                    <td class="py-3.5 px-4 whitespace-nowrap" data-label="Aktor / Pengguna">
                                         <div class="font-bold text-gray-900">{{ $log->user_name }}</div>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 uppercase">
                                             {{ $log->user_role }}
@@ -86,32 +87,32 @@
                                     </td>
 
                                     <!-- Action -->
-                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                    <td class="py-3.5 px-4 whitespace-nowrap" data-label="Jenis Aksi">
                                         @if(str_contains($log->action, 'IMPERSONATE'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-300">
-                                                ⚡ {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'DELETE'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                                🗑️ {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'CREATE'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                ➕ {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @elseif(str_contains($log->action, 'EVALUATION'))
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                📝 {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @else
                                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                🔄 {{ $log->action }}
+                                                 {{ $log->action }}
                                             </span>
                                         @endif
                                     </td>
 
                                     <!-- Target -->
-                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                    <td class="py-3.5 px-4 whitespace-nowrap" data-label="Target Entitas">
                                         @if($log->target_type)
                                             <div class="font-semibold text-gray-800">{{ $log->target_type }}</div>
                                             <div class="text-[10px] text-gray-400 font-mono">ID: #{{ $log->target_id ?? '-' }}</div>
@@ -121,14 +122,14 @@
                                     </td>
 
                                     <!-- Details -->
-                                    <td class="py-3.5 px-4">
+                                    <td class="py-3.5 px-4" data-label="Rincian / Metadata">
                                         <div class="text-[11px] text-gray-600 max-w-md font-mono bg-slate-50 p-2 rounded-lg border border-slate-100 break-words">
                                             {{ $log->details ?? 'Tidak ada data detail' }}
                                         </div>
                                     </td>
 
                                     <!-- IP -->
-                                    <td class="py-3.5 px-4 text-right whitespace-nowrap font-mono text-[11px] text-gray-500">
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap font-mono text-[11px] text-gray-500" data-label="IP Address">
                                         {{ $log->ip_address ?? '127.0.0.1' }}
                                     </td>
 

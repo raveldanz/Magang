@@ -1,21 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ url()->previous() }}" class="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 transition shadow-2xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            </a>
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
-                    💬 Kirim Laporan Kendala, Masukan, atau Pertanyaan
+                    Kirim Laporan Kendala, Masukan, atau Pertanyaan
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Laporkan kendala/bug sistem, ajukan saran perbaikan, atau sampaikan pertanyaan ke Super Admin / Instansi Dinas / Universitas
-                </p>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-2">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if ($errors->any())
@@ -143,9 +137,24 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                             Lampiran Bukti / Screenshot (Opsional)
                         </label>
-                        <input type="file" name="attachment" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" 
+                        <input type="file" name="attachment" id="feedbackAttachment" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" 
+                               onchange="handleFeedbackAttachmentPreview(this)"
                                class="w-full text-xs sm:text-sm border border-slate-200 rounded-xl file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 shadow-2xs cursor-pointer">
                         <p class="text-[11px] text-slate-400 mt-1">Format yang didukung: JPG, PNG, PDF, DOCX, ZIP (Maksimal 5MB)</p>
+
+                        <!-- Preview Container -->
+                        <div id="feedbackPreviewBox" class="hidden mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl items-center gap-3">
+                            <div id="fbPreviewImgWrapper" class="hidden w-16 h-16 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-white">
+                                <img id="fbPreviewImg" src="" alt="Pratinjau" class="w-full h-full object-cover">
+                            </div>
+                            <div id="fbPreviewDocWrapper" class="hidden w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p id="fbPreviewFileName" class="text-xs font-bold text-slate-800 truncate"></p>
+                                <p id="fbPreviewFileSize" class="text-[11px] text-slate-500"></p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Info Pengirim -->
@@ -163,16 +172,60 @@
                 <!-- Submit Button -->
                 <div class="flex items-center justify-between">
                     <a href="{{ route('feedbacks.my') }}" class="text-xs font-bold text-slate-500 hover:text-slate-800">
-                        &larr; Lihat Riwayat Laporan Saya
+                         Lihat Riwayat Laporan Saya
                     </a>
 
                     <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md transition cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                        <span>Kirim Laporan Sekarang</span>
+                         <span>Kirim Laporan Sekarang</span>
                     </button>
                 </div>
             </form>
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function handleFeedbackAttachmentPreview(input) {
+            const box = document.getElementById('feedbackPreviewBox');
+            const imgWrapper = document.getElementById('fbPreviewImgWrapper');
+            const img = document.getElementById('fbPreviewImg');
+            const docWrapper = document.getElementById('fbPreviewDocWrapper');
+            const nameEl = document.getElementById('fbPreviewFileName');
+            const sizeEl = document.getElementById('fbPreviewFileSize');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    notify('Ukuran berkas melebihi batas maksimal 5MB.');
+                    input.value = '';
+                    box.classList.add('hidden');
+                    box.classList.remove('flex');
+                    return;
+                }
+
+                nameEl.textContent = file.name;
+                sizeEl.textContent = (file.size / 1024).toFixed(1) + ' KB';
+                box.classList.remove('hidden');
+                box.classList.add('flex');
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        img.src = e.target.result;
+                        imgWrapper.classList.remove('hidden');
+                        docWrapper.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imgWrapper.classList.add('hidden');
+                    docWrapper.classList.remove('hidden');
+                }
+            } else {
+                box.classList.add('hidden');
+                box.classList.remove('flex');
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>
