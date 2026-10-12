@@ -68,7 +68,7 @@
                 </label>
             </div>
 
-            <!-- Action Button -->
+            <!-- Submit Button -->
             <div class="pt-2">
                 <button type="submit"
                     class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md shadow-blue-600/20 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out uppercase tracking-wider cursor-pointer">

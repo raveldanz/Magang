@@ -80,6 +80,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-068** | 2026-10-08 | DPL Student Detail Redesign | Paritas Civic Hero Banner dengan portal mahasiswa, eliminasi BAP, grid 4 pilar konteks & KPI evaluasi | RESOLVED |
 | **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Portal Dosen Pembimbing | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
 | **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
+| **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
 
 ---
 
@@ -1663,6 +1664,21 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**: Hindari estetika gradien jenuh dan banner hitam gelap pada desain kartu profil akademik; selalu utamakan permukaan putih bersih atau abu-abu lembut dengan tipografi berbobot tepat dan fungsi interaktif yang mempermudah kerja nyata pengguna.
 
 ---
+
+### [LRN-071] Penanganan Regresi Konflik Git Merge PR #92 & Pemulihan 22 Berkas Fitur Modern
+- **Tanggal**: 2026-10-12
+- **Komponen**: `routes/web.php`, `app/Http/Controllers/Admin/CertificateController.php`, Views (`dashboard.blade.php`, `admin/applications/`, `mentor/`, `lecturer/`, dll.)
+- **Problem / Symptom**:
+  1. Setelah melakukan pull dan merge dari GitHub, muncul error rute massal di 33 test (`Route [chat.start] not defined`, `Route [lecturer.students.grade_sheet] not defined`, `Route [admin.applications.assignment] not defined`, dll.).
+  2. Rute chat terhapus sehingga navbar dan layout crash, tampilan dashboard, halaman dosen, mentor, dan tabel admin kembali ke versi lama.
+- **Root Cause**:
+  Terjadi merge PR #92 ("backup-main-sebelum-override") di repositori GitHub yang memuat berkas cadangan lama. Saat menyelesaikan konflik merge secara lokal di commit `38bf275`, opsi "Accept Incoming Changes" dipilih, sehingga 22 berkas modern tertimpa kembali oleh versi cadangan lama.
+- **Fix Applied**:
+  1. Melakukan pemulihan (*checkout/restore*) terhadap 22 berkas yang terdegradasi dari commit stabil `b71315e`.
+  2. Mengembalikan struktur rute modular terpisah (`routes/student.php`, `routes/admin.php`, `routes/mentor.php`, dll.) serta suite rute Chat lengkap di `routes/web.php`.
+  3. Mengembalikan validasi gerbang kelulusan (*Certificate Gate* & logbook completion check) pada `CertificateController.php`.
+  4. Membersihkan cache aplikasi (`php artisan optimize:clear`) dan memvalidasi test suite hingga seluruh **281 Feature/Unit Tests (1.914 assertions) berstatus 100% PASS (Exit Code 0)**.
+- **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit stabil terakhir dan jalankan `php artisan test` segera setelah proses merge selesai untuk memastikan tidak ada fitur atau rute yang hilang.
 
 ---
 
