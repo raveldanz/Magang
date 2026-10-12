@@ -159,10 +159,8 @@
                              Simpan Perubahan Profil Instansi
                         </button>
                     </div>
-                </div>
-
-            </form>
-
+                </form>
+            </div>
 
 
         </div>
