@@ -81,6 +81,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Portal Dosen Pembimbing | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
 | **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
+| **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
 
 ---
 
@@ -1679,6 +1680,19 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Mengembalikan validasi gerbang kelulusan (*Certificate Gate* & logbook completion check) pada `CertificateController.php`.
   4. Membersihkan cache aplikasi (`php artisan optimize:clear`) dan memvalidasi test suite hingga seluruh **281 Feature/Unit Tests (1.914 assertions) berstatus 100% PASS (Exit Code 0)**.
 - **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit stabil terakhir dan jalankan `php artisan test` segera setelah proses merge selesai untuk memastikan tidak ada fitur atau rute yang hilang.
+
+---
+
+### [LRN-072] Resolusi Kanvas & Margin Transparan Logo Universitas Indonesia (UI)
+- **Tanggal**: 2026-10-12
+- **Komponen**: `public/images/logos/ui.png`, `storage/app/public/images/logos/ui.png`, `resources/views/admin/universities/index.blade.php`, `App\Models\University`
+- **Problem / Symptom**: Pada kartu perguruan tinggi Universitas Indonesia di halaman Manajemen Kampus Super Admin (`/admin/universities`), logo UI tidak tampak dan hanya terlihat titik/speck kuning mikroskopis di tengah kotak logo.
+- **Root Cause**: Berkas aset lama `ui.png` memiliki resolusi kanvas 512x512 piksel, namun lambang Makara di dalamnya hanya berukuran 36x39 piksel (hanya ~7% lebar kanvas dengan 93% padding transparan kosong). Ketika elemen dirender di dalam kontainer berukuran `w-9 h-9` (36x36 piksel) dengan utility `object-contain`, logo menyusut drastis menjadi hanya ~2.5 piksel, membuatnya tampak seolah tidak ada gambar.
+- **Fix Applied**: 
+  1. Mengganti aset `public/images/logos/ui.png` dan `storage/app/public/images/logos/ui.png` dengan gambar PNG Makara UI resmi beresolusi tinggi (427x468 piksel) dengan latar belakang transparan penuh tanpa padding kosong berlebih (*tight bounding box*).
+  2. Memverifikasi symlink dan keselarasan model `University::getLogoUrlAttribute()`.
+  3. Menjalankan `php artisan optimize:clear && php artisan view:clear` dan memastikan 261/261 unit & feature test suite tetap lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**: Seluruh aset gambar logo institusi (kampus dan dinas) wajib memiliki *tight bounding box* (proporsi gambar mengisi ruang kanvas tanpa margin transparan kosong berlebih). Hal ini untuk memastikan ketika logo dibatasi oleh dimensi styling Tailwind `w-9 h-9 object-contain` atau `h-12 w-auto`, lambang tetap tampil jelas, proporsional, dan tajam.
 
 ---
 
