@@ -32,17 +32,26 @@
     <div class="py-8" x-data="{}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Flash Messages -->
+            <!-- Flash Message -->
             @if (session('success'))
-                <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-semibold shadow-sm">
-                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    <span>{{ session('success') }}</span>
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm flex items-center justify-between text-emerald-900 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
                 </div>
             @endif
+
             @if (session('error'))
-                <div class="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-800 text-sm font-semibold shadow-sm">
-                    <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    <span>{{ session('error') }}</span>
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-lg shadow-sm flex items-center justify-between text-rose-900 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
                 </div>
             @endif
 
@@ -86,10 +95,10 @@
                     <p class="text-xs text-gray-500 mt-1">Kapasitas maksimal</p>
                 </div>
 
-                <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm shadow-slate-200/50 transition-all duration-200 hover:scale-[1.01]">
-                    <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Kuota Terisi</p>
-                    <h3 class="text-2xl font-extrabold text-emerald-600 mt-1.5">{{ $stats['total_filled'] }}</h3>
-                    <p class="text-[11px] text-slate-400 mt-1">Mahasiswa aktif magang</p>
+                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Kuota Terisi (Diterima)</p>
+                    <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_filled'] }}</h3>
+                    <p class="text-xs text-gray-500 mt-1">Mahasiswa aktif magang</p>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
@@ -100,7 +109,7 @@
             </div>
 
             <!-- Filter & Search Bar -->
-            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <form method="GET" action="{{ route('admin.units.index') }}" class="flex items-center gap-2">
@@ -116,7 +125,7 @@
                     @endif
                 </div>
 
-                <form method="GET" action="{{ route('admin.units.index') }}" class="w-full md:w-80 flex items-center gap-2">
+                <form method="GET" action="{{ route('admin.units.index') }}" class="w-full md:w-72 flex items-center gap-2">
                     @if (request('agency_id'))
                         <input type="hidden" name="agency_id" value="{{ request('agency_id') }}">
                     @endif
@@ -213,7 +222,7 @@
                 <div class="d-only overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50/60 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                 <th class="py-3.5 px-4">Nama Divisi / Bidang</th>
                                 <th class="py-3.5 px-4">Instansi Induk</th>
                                 <th class="py-3.5 px-4 text-center">Status Kuota</th>
@@ -222,7 +231,7 @@
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 text-sm">
+                        <tbody class="divide-y divide-gray-100 text-sm">
                             @forelse ($units as $unit)
                                 @php
                                     $acceptedCount = $unit->occupied_count;
@@ -233,8 +242,8 @@
                                     
                                     <!-- Nama Divisi & Deskripsi -->
                                     <td class="py-4 px-4 max-w-xs">
-                                        <div class="font-bold text-slate-900 leading-snug">{{ $unit->name }}</div>
-                                        <div class="text-xs text-slate-400 mt-0.5 line-clamp-2">{{ $unit->description ?? 'Tidak ada deskripsi' }}</div>
+                                        <div class="font-bold text-gray-900 leading-snug">{{ $unit->name }}</div>
+                                        <div class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ $unit->description ?? 'Tidak ada deskripsi' }}</div>
                                     </td>
 
                                     <!-- Instansi Induk -->
@@ -246,8 +255,8 @@
 
                                     <!-- Progress Kuota -->
                                     <td class="py-4 px-4 text-center min-w-[140px]">
-                                        <div class="space-y-1.5">
-                                            <div class="flex justify-between text-xs font-bold text-slate-700">
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between text-xs font-bold text-gray-700">
                                                 <span>{{ $acceptedCount }} Terisi</span>
                                                 <span id="unit-total-quota-{{ $unit->id }}" data-quota-total="{{ $unit->id }}">{{ $unit->quota }} Total</span>
                                             </div>
@@ -260,11 +269,11 @@
                                     <!-- Sisa Kuota & Status -->
                                     <td class="py-4 px-4 text-center" id="unit-remaining-badge-{{ $unit->id }}" data-quota-remaining="{{ $unit->id }}">
                                         @if ($remaining > 0)
-                                            <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full">
                                                 {{ $remaining }} Slot Tersedia
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-full border border-red-200">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-black rounded-full">
                                                 PENUH
                                             </span>
                                         @endif
@@ -338,9 +347,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-12 text-center text-slate-400">
-                                        <p class="font-medium text-slate-600">Belum Ada Divisi / Lowongan Magang</p>
-                                        <p class="text-xs text-slate-400 mt-1">Silakan klik tombol "Tambah Divisi Baru" untuk membuka lowongan.</p>
+                                    <td colspan="6" class="py-12 text-center text-gray-400">
+                                        <p class="font-medium text-gray-600">Belum Ada Divisi / Lowongan Magang</p>
+                                        <p class="text-xs text-gray-400 mt-1">Silakan klik tombol "Tambah Divisi Baru" untuk membuka lowongan.</p>
                                     </td>
                                 </tr>
                             @endforelse

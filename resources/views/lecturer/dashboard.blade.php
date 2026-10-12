@@ -431,6 +431,7 @@
                                             Detail
                                         </a>
                                     </td>
+
                                 </tr>
                             @empty
                                 <tr>
