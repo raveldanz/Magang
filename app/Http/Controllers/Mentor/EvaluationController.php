@@ -70,7 +70,7 @@ class EvaluationController extends Controller
             'nilai_laporan.max' => 'Nilai maksimal adalah 100.',
         ]);
 
-        Evaluation::updateOrCreate(
+        $evaluation = Evaluation::updateOrCreate(
             ['placement_id' => $placement->id],
             [
                 'nilai_disiplin' => $request->nilai_disiplin,
@@ -79,6 +79,58 @@ class EvaluationController extends Controller
                 'catatan'        => $request->catatan,
             ]
         );
+
+        // Cek skema kampus mahasiswa
+        $univ = $evaluation->getUniversity();
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+
+        if ($scheme === 'mentor_only') {
+            $finalScore = $evaluation->nilai_pembimbing;
+            if ($finalScore >= 85) $grade = 'A';
+            elseif ($finalScore >= 75) $grade = 'AB';
+            elseif ($finalScore >= 65) $grade = 'B';
+            elseif ($finalScore >= 55) $grade = 'BC';
+            elseif ($finalScore >= 40) $grade = 'C';
+            else $grade = 'E';
+
+            $evaluation->update([
+                'final_score' => $finalScore,
+                'grade' => $grade,
+            ]);
+
+            // Cek kelengkapan evaluasi dan sinkronkan status COMPLETED
+            $placement->syncCompletionStatus();
+        } else {
+            // Skema Dual Evaluation: hitung ulang jika nilai dosen sudah ada
+            $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
+            if ($dosenScore > 0) {
+                $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+                $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+                $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
+
+                if ($finalScore >= 85) $grade = 'A';
+                elseif ($finalScore >= 75) $grade = 'AB';
+                elseif ($finalScore >= 65) $grade = 'B';
+                elseif ($finalScore >= 55) $grade = 'BC';
+                elseif ($finalScore >= 40) $grade = 'C';
+                else $grade = 'E';
+
+                $evaluation->update([
+                    'final_score' => $finalScore,
+                    'grade' => $grade,
+                ]);
+
+                $placement->syncCompletionStatus();
+            }
+        }
+
+        \App\Models\AuditLog::record('MENTOR_EVALUATION_SUBMIT', 'Placement', $placement->id, [
+            'student_name' => $placement->application?->user?->name,
+            'nilai_pembimbing' => $evaluation->nilai_pembimbing,
+            'nilai_disiplin' => $request->nilai_disiplin,
+            'nilai_kinerja' => $request->nilai_kinerja,
+            'nilai_laporan' => $request->nilai_laporan,
+        ]);
 
         return redirect()->route('mentor.students.show', $placement->id)
             ->with('success', 'Penilaian evaluasi akhir berhasil disimpan! Mahasiswa kini siap diterbitkan sertifikatnya.');

@@ -1,0 +1,266 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.universities.index') }}" class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 transition flex items-center justify-center shadow-xs" title="Kembali">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+            <div>
+                <h2 class="font-black text-xl text-gray-900 tracking-tight">
+                    Edit Data Universitas: {{ $university->name }}
+                </h2>
+                <p class="text-xs text-gray-500">Perbarui identitas kampus, kode, dan pejabat penandatangan</p>
+            </div>
+        </div>
+    </x-slot>
+
+    <div class="py-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
+
+                <form method="POST" action="{{ route('admin.universities.update', $university->id) }}" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Nama Resmi Perguruan Tinggi <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="name" value="{{ old('name', $university->name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Kode / Singkatan <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="code" value="{{ old('code', $university->code) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono uppercase">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Email Resmi Kampus
+                            </label>
+                            <input type="email" name="email" value="{{ old('email', $university->email) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Nomor Telepon / Fax
+                            </label>
+                            <input type="text" name="phone" value="{{ old('phone', $university->phone) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Alamat Kampus Utama
+                        </label>
+                        <textarea name="address" rows="2" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('address', $university->address) }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Nama Rektor / Pimpinan (PIC)
+                            </label>
+                            <input type="text" name="pic_name" value="{{ old('pic_name', $university->pic_name) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                NIP / NIDN Rektor
+                            </label>
+                            <input type="text" name="pic_nip" value="{{ old('pic_nip', $university->pic_nip) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Jabatan Penandatangan
+                            </label>
+                            <input type="text" name="pic_position" value="{{ old('pic_position', $university->pic_position) }}" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                        </div>
+                    </div>
+
+                    <!-- Skema Kebijakan & Pembobotan Nilai Kampus Adaptif -->
+                    <div x-data="{ 
+                            scheme: '{{ old('evaluation_scheme', $university->evaluation_scheme ?? 'dual_evaluation') }}',
+                            weightMentor: {{ old('weight_mentor', $university->weight_mentor ?? 40) }},
+                            weightLecturer: {{ old('weight_lecturer', $university->weight_lecturer ?? 60) }},
+                            updateLecturer() {
+                                this.weightLecturer = Math.max(0, Math.min(100, 100 - this.weightMentor));
+                            },
+                            updateMentor() {
+                                this.weightMentor = Math.max(0, Math.min(100, 100 - this.weightLecturer));
+                            }
+                         }" 
+                         class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                        
+                        <div class="border-b border-slate-200 pb-2.5 flex items-center justify-between">
+                            <h4 class="font-bold text-xs sm:text-sm text-gray-900 flex items-center gap-1.5">
+                                <span></span>
+                                <span>Skema Kebijakan Evaluasi & Pembobotan Kampus</span>
+                            </h4>
+                            <span class="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">
+                                Fleksibel Multi-Kampus
+                            </span>
+                        </div>
+
+                        <!-- Skema Radio -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <label class="p-3 rounded-xl border cursor-pointer flex items-start gap-2.5 transition"
+                                   :class="scheme === 'dual_evaluation' ? 'border-blue-600 bg-white shadow-xs' : 'border-slate-200 hover:border-slate-300'">
+                                <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-0.5 text-blue-600">
+                                <div>
+                                    <strong class="text-gray-900 block"> Kemitraan Dua Pihak (Standar)</strong>
+                                    <span class="text-gray-500 text-[11px] block mt-0.5">Dinilai Mentor Dinas & DPL. Logbook diverifikasi 2 arah.</span>
+                                </div>
+                            </label>
+
+                            <label class="p-3 rounded-xl border cursor-pointer flex items-start gap-2.5 transition"
+                                   :class="scheme === 'mentor_only' ? 'border-blue-600 bg-white shadow-xs' : 'border-slate-200 hover:border-slate-300'">
+                                <input type="radio" name="evaluation_scheme" value="mentor_only" x-model="scheme" class="mt-0.5 text-blue-600">
+                                <div>
+                                    <strong class="text-gray-900 block"> Penilaian Penuh Dinas (100%)</strong>
+                                    <span class="text-gray-500 text-[11px] block mt-0.5">100% dinilai Dinas. Logbook cukup di-ACC Mentor.</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Range Slider jika Dual Evaluation -->
+                        <div x-show="scheme === 'dual_evaluation'" class="space-y-3 pt-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs font-semibold text-gray-700">
+                                        <span>Bobot Dinas:</span>
+                                        <span class="font-mono text-blue-600 font-bold" x-text="weightMentor + '%'"></span>
+                                    </div>
+                                    <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg accent-blue-600">
+                                    <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs font-semibold text-gray-700">
+                                        <span>Bobot DPL Kampus:</span>
+                                        <span class="font-mono text-purple-600 font-bold" x-text="weightLecturer + '%'"></span>
+                                    </div>
+                                    <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg accent-purple-600">
+                                    <input type="number" name="weight_lecturer" min="0" max="100" x-model="weightLecturer" @input="updateMentor()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
+                                </div>
+                            </div>
+
+                            <div class="pt-1 flex items-center gap-2">
+                                <input type="checkbox" name="require_dpl" value="1" id="admin_require_dpl" {{ old('require_dpl', $university->require_dpl ?? true) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600">
+                                <label for="admin_require_dpl" class="text-xs text-gray-700 font-medium">
+                                    Kunci pengisian logbook mahasiswa hingga memilih DPL.
+                                </label>
+                            </div>
+                        </div>
+
+                    <!-- Upload Logo Resmi Kampus -->
+                    <div class="pt-4 border-t border-gray-100">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                            Logo Resmi Perguruan Tinggi
+                        </label>
+                        <div class="flex items-center gap-4">
+                            @php
+                                $currentUnivLogo = null;
+                                if (!empty($university->logo)) {
+                                    if (file_exists(public_path($university->logo))) {
+                                        $currentUnivLogo = asset($university->logo);
+                                    } elseif (file_exists(public_path('storage/' . $university->logo))) {
+                                        $currentUnivLogo = asset('storage/' . $university->logo);
+                                    } elseif (file_exists(storage_path('app/public/' . $university->logo))) {
+                                        $currentUnivLogo = asset('storage/' . $university->logo);
+                                    }
+                                }
+                                if (!$currentUnivLogo) {
+                                    $uName = strtolower($university->name ?? '');
+                                    $uCode = strtolower($university->code ?? '');
+                                    if (str_contains($uName, 'unesa') || str_contains($uCode, 'unesa')) {
+                                        $currentUnivLogo = asset('images/logos/unesa.png');
+                                    } elseif (str_contains($uName, 'its') || str_contains($uCode, 'its')) {
+                                        $currentUnivLogo = asset('images/logos/its.png');
+                                    } elseif (str_contains($uName, 'unair') || str_contains($uCode, 'unair')) {
+                                        $currentUnivLogo = asset('images/logos/unair.png');
+                                    } elseif (str_contains($uName, 'upn') || str_contains($uCode, 'upn')) {
+                                        $currentUnivLogo = asset('images/logos/upnjatim.png');
+                                    } elseif (str_contains($uName, 'unitomo') || str_contains($uCode, 'unitomo')) {
+                                        $currentUnivLogo = asset('images/logos/unitomo.png');
+                                    } else {
+                                        $currentUnivLogo = asset('images/default-university.svg');
+                                    }
+                                }
+                            @endphp
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+                                        <img id="univLogoPreview" src="{{ $currentUnivLogo }}" alt="Logo {{ $university->name }}" class="w-full h-full object-contain shrink-0 transition-all duration-200">
+                                    </div>
+                                    <div class="sm:hidden text-xs">
+                                        <span class="font-bold text-slate-800 block">Pratinjau Logo</span>
+                                        <span class="text-[11px] text-slate-500">Maksimal ukuran 2MB</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <input type="file" id="univLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                           onchange="handleLogoPreview(this, 'univLogoPreview', '{{ $currentUnivLogo }}')"
+                                           class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs">
+                                    <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format: PNG, JPG, WEBP, SVG. Maks 2MB. Biarkan kosong jika tidak ingin mengubah logo.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-6 border-t border-gray-100">
+                        <a href="{{ route('admin.universities.index') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center justify-center flex items-center">
+                            Batal
+                        </a>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        function handleLogoPreview(input, previewId, defaultSrc) {
+            const preview = document.getElementById(previewId);
+            if (!preview) return;
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                if (!file.type.startsWith('image/')) {
+                    notify('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    notify('Ukuran berkas logo terlalu besar (maksimal 2MB).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = defaultSrc;
+            }
+        }
+    </script>
+    @endpush
+</x-app-layout>

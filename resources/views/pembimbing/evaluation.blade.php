@@ -5,7 +5,7 @@
                 Penilaian Magang: {{ $placement->application->user->name }}
             </h2>
             <a href="{{ route('pembimbing.student.detail', $placement->id) }}" class="px-4 py-2 bg-gray-200 text-gray-800 text-xs font-semibold rounded-md">
-                &larr; Kembali
+                 Kembali
             </a>
         </div>
     </x-slot>
@@ -22,34 +22,32 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700">Nilai Disiplin (0-100)</label>
-                            <input type="number" name="nilai_disiplin" min="0" max="100" value="{{ old('nilai_disiplin', $placement->evaluation->nilai_disiplin ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="number" name="nilai_disiplin" min="0" max="100" value="{{ old('nilai_disiplin', $placement->evaluation?->nilai_disiplin ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                             @error('nilai_disiplin') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700">Nilai Kinerja (0-100)</label>
-                            <input type="number" name="nilai_kinerja" min="0" max="100" value="{{ old('nilai_kinerja', $placement->evaluation->nilai_kinerja ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="number" name="nilai_kinerja" min="0" max="100" value="{{ old('nilai_kinerja', $placement->evaluation?->nilai_kinerja ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                             @error('nilai_kinerja') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700">Nilai Laporan (0-100)</label>
-                            <input type="number" name="nilai_laporan" min="0" max="100" value="{{ old('nilai_laporan', $placement->evaluation->nilai_laporan ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="number" name="nilai_laporan" min="0" max="100" value="{{ old('nilai_laporan', $placement->evaluation?->nilai_laporan ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                             @error('nilai_laporan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700">Catatan / Evaluasi Umum</label>
-                        <textarea name="catatan" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('catatan', $placement->evaluation->catatan ?? '') }}</textarea>
+                        <textarea name="catatan" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('catatan', $placement->evaluation?->catatan ?? '') }}</textarea>
                         @error('catatan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
-                    <div class="pt-4 flex justify-end border-t">
-                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700">
+                        <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition shadow-md cursor-pointer">
                             Simpan Penilaian
                         </button>
-                    </div>
                 </form>
             </div>
 

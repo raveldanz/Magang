@@ -1,5 +1,25 @@
 <x-app-layout>
-    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+    <x-slot name="header">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    {{ __('Portal Pembimbing Lapangan (Mentor)') }}
+                </h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">
+                    {{ Auth::user()->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }} &bull; Monitoring & Evaluasi Mahasiswa
+                </p>
+            </div>
+            <div class="flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Mentor: {{ Auth::user()->name }}</span>
+            </div>
+        </div>
+    </x-slot>
+
+    <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Welcome Header Card -->
@@ -42,10 +62,10 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Bimbingan Aktif</p>
-                            <h3 class="text-2xl font-black text-indigo-600 mt-1">{{ $stats['active_students'] }}</h3>
+                            <h3 class="text-2xl font-black text-blue-600 mt-1">{{ $stats['active_students'] }}</h3>
                             <p class="text-xs text-gray-500 mt-1">Sedang aktif magang</p>
                         </div>
-                        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
@@ -106,24 +126,24 @@
             <!-- Segregated Tab Navigation -->
             <div class="flex flex-wrap items-center gap-2 border-b border-gray-200 pb-2">
                 <a href="{{ route('mentor.dashboard', ['tab' => 'active']) }}" 
-                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? 'active') === 'active' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>⚡ Bimbingan Aktif</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? 'active') === 'active' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['active_students'] }}</span>
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? 'active') === 'active' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>Bimbingan Aktif</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? 'active') === 'active' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['active_students'] }}</span>
                 </a>
                 <a href="{{ route('mentor.dashboard', ['tab' => 'upcoming']) }}" 
-                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'upcoming' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>📅 Calon Peserta Magang</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'upcoming' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['upcoming_students'] }}</span>
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>Calon Peserta Magang</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['upcoming_students'] }}</span>
                 </a>
                 <a href="{{ route('mentor.dashboard', ['tab' => 'completed']) }}" 
-                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'completed' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>🎓 Alumni Selesai</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'completed' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['completed_students'] }}</span>
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'completed' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>Alumni Selesai</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'completed' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['completed_students'] }}</span>
                 </a>
                 <a href="{{ route('mentor.dashboard', ['tab' => 'all']) }}" 
-                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'all' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                    <span>📁 Semua Mahasiswa</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'all' ? 'bg-indigo-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['total_students'] }}</span>
+                    class="px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 {{ ($tab ?? '') === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
+                    <span>Semua Mahasiswa</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'all' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $stats['total_students'] }}</span>
                 </a>
             </div>
 
@@ -152,7 +172,79 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto">
+                <!-- 1. TAMPILAN KHUSUS MOBILE (< 640px) -->
+                <div class="block sm:hidden divide-y divide-slate-100">
+                    @forelse ($placements as $place)
+                        @php
+                            $student = $place->application?->user ?? null;
+                            $profile = $student?->studentProfile;
+                            $unit = $place->application?->unit;
+                            $eval = $place->evaluation;
+                            $report = $place->finalreport;
+                            $totalLog = $place->logbooks->count();
+                            $pendingLog = $place->logbooks->where('status', 'pending')->count();
+                            $appStatus = $place->application?->status;
+                            $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
+                            $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1) : null;
+                        @endphp
+                        <div class="p-4 space-y-3 hover:bg-slate-50/60 transition">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">
+                                        {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-xs sm:text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        <p class="text-[11px] text-slate-500 font-mono mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}</p>
+                                    </div>
+                                </div>
+                                <div class="shrink-0">
+                                    <x-status-badge :status="$appStatus" />
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <div class="text-[11px] text-slate-700 font-semibold truncate">
+                                    Unit: <span class="font-normal">{{ $unit->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200/60">
+                                    <span class="text-slate-500">Logbook: 
+                                        @if($pendingLog > 0)
+                                            <span class="text-amber-700 font-bold">{{ $pendingLog }} Pending</span>
+                                        @else
+                                            <span class="text-emerald-700 font-bold">{{ $totalLog }} Entri</span>
+                                        @endif
+                                    </span>
+                                    <span class="text-slate-500">Nilai: 
+                                        @if($eval)
+                                            <span class="text-blue-700 font-bold">{{ $rataRata }} ({{ $rataRata >= 85 ? 'A' : ($rataRata >= 70 ? 'B' : 'C') }})</span>
+                                        @else
+                                            <span class="text-slate-400 italic">Belum Ada</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-1">
+                                <a href="{{ route('mentor.students.show', $place->id) }}" 
+                                   class="flex-1 inline-flex items-center justify-center gap-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200">
+                                    <span>Detail</span>
+                                </a>
+                                <a href="{{ route('mentor.evaluations.create', $place->id) }}" 
+                                   class="flex-1 inline-flex items-center justify-center gap-1 py-2 px-3 {{ $eval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs">
+                                    <span>{{ $eval ? 'Edit Nilai' : 'Input Nilai' }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-6 text-center text-gray-400 text-xs">
+                            Tidak ada data mahasiswa bimbingan pada tab ini.
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- 2. TAMPILAN KHUSUS DESKTOP (Tabel Lengkap) -->
+                <div class="hidden sm:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
@@ -168,39 +260,45 @@
                         <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($placements as $place)
                                 @php
-                                    $student = $place->application->user ?? null;
+                                    $student = $place->application?->user ?? null;
                                     $profile = $student?->studentProfile;
-                                    $unit = $place->application->unit;
+                                    $unit = $place->application?->unit;
                                     $eval = $place->evaluation;
                                     $report = $place->finalreport;
                                     $totalLog = $place->logbooks->count();
                                     $pendingLog = $place->logbooks->where('status', 'pending')->count();
-                                    $lifecycle = $place->application?->lifecycle_status ?? 'ACCEPTED';
+                                    $appStatus = $place->application?->status;
+                                    $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
                                     
-                                    $rataRata = $eval ? round(($eval->nilai_disiplin + $eval->nilai_kinerja + $eval->nilai_laporan) / 3, 1) : null;
+                                    $rataRata = $eval ? round((($eval->nilai_disiplin ?? 0) + ($eval->nilai_kinerja ?? 0) + ($eval->nilai_laporan ?? 0)) / 3, 1) : null;
                                 @endphp
-                                <tr class="hover:bg-slate-50/70 transition-colors duration-150">
-                                    <td class="py-4 px-5">
-                                        <div class="font-bold text-slate-900 leading-snug">{{ $student->name ?? '-' }}</div>
-                                        <div class="text-xs text-slate-400 mt-0.5">
-                                            {{ $profile->nim ?? '-' }} &bull; {{ $profile->universitas ?? '-' }}
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-5 text-xs">
-                                        <div class="font-semibold text-slate-800">{{ $unit->name ?? '-' }}</div>
-                                        <div class="text-slate-400 mt-0.5">
-                                            {{ \Carbon\Carbon::parse($place->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($place->application->end_date)->translatedFormat('d M Y') }}
+                                <tr class="hover:bg-slate-50/75 transition-colors">
+                                    <!-- Mahasiswa -->
+                                    <td class="py-4 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">
+                                                {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-gray-900 leading-snug">{{ $student->name ?? '-' }}</div>
+                                                <div class="text-xs text-gray-500 mt-0.5">
+                                                    {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }}
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
 
-                                    <!-- Status Lifecycle -->
+                                    <!-- Unit Penempatan -->
+                                    <td class="py-4 px-4">
+                                        <div class="text-xs font-semibold text-gray-800 leading-tight">{{ $unit->name ?? '-' }}</div>
+                                        <div class="text-[11px] text-gray-400 mt-0.5">
+                                            {{ $place->application?->start_date ? \Carbon\Carbon::parse($place->application->start_date)->translatedFormat('d M Y') : '-' }} s/d {{ $place->application?->end_date ? \Carbon\Carbon::parse($place->application->end_date)->translatedFormat('d M Y') : '-' }}
+                                        </div>
+                                    </td>
+
+                                    <!-- Status Magang -->
                                     <td class="py-4 px-4 text-center">
-                                        <span class="px-2.5 py-1 text-[11px] font-bold rounded-full 
-                                            {{ $lifecycle === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : '' }}
-                                            {{ $lifecycle === 'ACCEPTED' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}
-                                            {{ $lifecycle === 'COMPLETED' ? 'bg-purple-100 text-purple-800 border border-purple-300' : '' }}">
-                                            {{ $lifecycle }}
-                                        </span>
+                                        <x-status-badge :status="$appStatus" />
                                     </td>
 
                                     <!-- Status Logbook -->
@@ -218,27 +316,26 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="py-4 px-5 text-center whitespace-nowrap">
-                                        @if ($report && strtolower($report->status) === 'approved')
-                                            <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
-                                                Disetujui
-                                            </span>
-                                        @elseif ($report && strtolower($report->status) === 'revision')
-                                            <span class="inline-flex items-center px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-full border border-red-200">
-                                                Revisi
-                                            </span>
-                                        @elseif ($report)
-                                            <span class="inline-flex items-center px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-200">
-                                                Terkirim
-                                            </span>
+
+                                    <!-- Laporan Akhir -->
+                                    <td class="py-4 px-4 text-center">
+                                        @if ($report)
+                                            <x-status-badge type="review" :status="$report->status" />
                                         @else
                                             <span class="text-xs text-slate-400 italic">Belum Ada</span>
                                         @endif
                                     </td>
                                     <td class="py-4 px-5 text-center whitespace-nowrap">
                                         @if ($eval)
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
-                                                {{ $rataRata }} ({{ $rataRata >= 85 ? 'A' : ($rataRata >= 70 ? 'B' : 'C') }})
+                                            <div class="inline-block">
+                                                <span class="text-base font-black text-blue-600">{{ $rataRata }}</span>
+                                                <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 ml-1">
+                                                    {{ $rataRata >= 85 ? 'A' : ($rataRata >= 70 ? 'B' : 'C') }}
+                                                </span>
+                                            </div>
+                                        @else
+                                            <span class="px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
+                                                Belum Dinilai
                                             </span>
                                         @else
                                             <span class="text-xs text-slate-400 italic">Belum Dinilai</span>
@@ -257,7 +354,7 @@
                                                 <span>Detail</span>
                                             </a>
                                             <a href="{{ route('mentor.evaluations.create', $place->id) }}" 
-                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $eval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs">
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $eval ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white' }} text-xs font-bold rounded-xl transition shadow-xs cursor-pointer">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
@@ -282,6 +379,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if(method_exists($placements, 'hasPages') && $placements->hasPages())
+                    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+                        {{ $placements->links() }}
+                    </div>
+                @endif
             </div>
 
         </div>

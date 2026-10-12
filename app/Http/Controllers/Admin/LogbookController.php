@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
+use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,13 +28,17 @@ class LogbookController extends Controller
                 $q->orderBy('date', 'desc');
             }
         ])->whereHas('application', function ($q) {
-            $q->where('status', 'accepted');
+            $q->whereIn('status', ['accepted', 'active', 'completed']);
         });
 
         // Multi-Tenant Isolation untuk Admin Dinas
         if ($user && $user->agency_profile_id !== null) {
             $query->whereHas('application.unit', function ($q) use ($user) {
                 $q->where('agency_profile_id', $user->agency_profile_id);
+            });
+        } elseif ($request->filled('agency_id')) {
+            $query->whereHas('application.unit', function ($q) use ($request) {
+                $q->where('agency_profile_id', $request->agency_id);
             });
         }
 
@@ -44,9 +49,26 @@ class LogbookController extends Controller
             });
         }
 
+        // Filter Berdasarkan Universitas
+        $selectedUniversity = null;
+        if ($request->filled('university_id')) {
+            $univId = $request->university_id;
+            $univ = University::find($univId);
+            $selectedUniversity = $univ;
+            $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+
+            $query->whereHas('application.user', function ($uq) use ($univId, $univ, $like) {
+                $uq->where('university_id', $univId);
+                if ($univ) {
+                    $uq->orWhere('university', $like, "%{$univ->name}%")
+                       ->orWhereHas('studentProfile', fn($sp) => $sp->where('university_id', $univId)->orWhere('universitas', $like, "%{$univ->name}%"));
+                }
+            });
+        }
+
         // Pencarian Mahasiswa (Nama / NIM)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->whereHas('application.user', function ($uq) use ($search) {
                 $uq->where('name', 'like', "%{$search}%")
                    ->orWhereHas('studentProfile', function ($sq) use ($search) {
@@ -79,6 +101,7 @@ class LogbookController extends Controller
             $unitsQuery->where('agency_profile_id', $user->agency_profile_id);
         }
         $units = $unitsQuery->orderBy('name')->get();
+        $universities = University::orderBy('name')->get();
 
         // Statistik Agregat Keseluruhan untuk Kartu Ringkasan
         $statsQuery = Logbook::query();
@@ -116,6 +139,8 @@ class LogbookController extends Controller
         return view('admin.logbooks.index', compact(
             'placements', 
             'units', 
+            'universities',
+            'selectedUniversity',
             'totalLogs', 
             'approvedLogs', 
             'pendingLogs', 

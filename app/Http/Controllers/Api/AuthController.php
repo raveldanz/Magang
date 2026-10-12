@@ -27,6 +27,13 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if ($user->isInactive()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => \App\Http\Middleware\EnsureAccountIsActive::MESSAGE,
+            ], 403);
+        }
+
         // Hapus token lama jika ada, lalu buat token baru
         $user->tokens()->delete();
         $token = $user->createToken('api_token')->plainTextToken;

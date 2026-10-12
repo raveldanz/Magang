@@ -27,22 +27,21 @@
                 
                 <div class="border-b border-gray-100 pb-4">
                     <h3 class="text-lg font-bold text-gray-900">Data Akademik, Pribadi & Kontak Darurat</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Lengkapi seluruh field profil di bawah ini secara akurat untuk verifikasi penempatan magang Pemkot Surabaya</p>
-                </div>
 
                 <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6">
                     @csrf
 
                     <!-- Section 1: Informasi Akun & NIM -->
                     <div class="space-y-4">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
-                            <span>👤 Identitas Akun & Mahasiswa</span>
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
+                            <span>Identitas Akun & Mahasiswa</span>
                         </h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="name" value="Nama Lengkap (Sesuai Akun)" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="name" type="text" class="mt-1 block w-full bg-gray-50 text-gray-500 cursor-not-allowed text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" disabled />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="Auth::user()?->name ?? $user?->name ?? ''" required />
+                                <x-input-error :messages="$errors->get('name')" class="mt-1" />
                             </div>
 
                             <div>
@@ -55,8 +54,8 @@
 
                     <!-- Section 2: Data Perguruan Tinggi & Akademik -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
-                            <span>🎓 Data Perguruan Tinggi & Akademik</span>
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
+                            <span>Data Perguruan Tinggi & Akademik</span>
                         </h4>
 
                         <!-- Input Universitas dengan Searchable Datalist -->
@@ -89,7 +88,6 @@
                             </datalist>
 
                             <p class="text-[11px] text-gray-500 mt-1.5 flex items-center gap-1">
-                                <span>💡</span>
                                 <span>Pilih universitas dari daftar yang tersedia, atau ketik nama universitas baru jika belum terdaftar.</span>
                             </p>
                             <x-input-error :messages="$errors->get('universitas')" class="mt-1" />
@@ -99,19 +97,19 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <x-input-label for="faculty" value="Fakultas" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile->faculty ?? $profile->fakultas ?? '')" placeholder="Contoh: Fakultas Ilmu Komputer" required />
+                                <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile?->faculty ?? $profile?->fakultas ?? '')" placeholder="Contoh: Fakultas Ilmu Komputer" required />
                                 <x-input-error :messages="$errors->get('faculty')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="jurusan" value="Program Studi / Jurusan" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile->jurusan ?? $profile->major ?? '')" placeholder="Contoh: Teknik Informatika" required />
+                                <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile?->jurusan ?? $profile?->major ?? '')" placeholder="Contoh: Teknik Informatika" required />
                                 <x-input-error :messages="$errors->get('jurusan')" class="mt-1" />
                             </div>
 
                             <div>
                                 <x-input-label for="semester" value="Semester Saat Ini" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="semester" name="semester" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile->semester ?? '5')" placeholder="Contoh: 5 / 6 / 7" required />
+                                <x-text-input id="semester" name="semester" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile?->semester ?? '5')" placeholder="Contoh: 5 / 6 / 7" required />
                                 <x-input-error :messages="$errors->get('semester')" class="mt-1" />
                             </div>
                         </div>
@@ -119,20 +117,20 @@
 
                     <!-- Section 3: Kontak Pribadi & Domisili -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
-                            <span>📞 Kontak Pribadi & Domisili</span>
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
+                            <span>Kontak Pribadi & Domisili</span>
                         </h4>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="phone" value="No. WhatsApp / HP Aktif" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('phone', $profile->phone ?? '')" placeholder="Contoh: 081234567890" required />
+                                <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('phone', $profile?->phone ?? '')" placeholder="Contoh: 081234567890" required />
                                 <x-input-error :messages="$errors->get('phone')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="alamat" value="Alamat Domisili / Tempat Tinggal" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('alamat', $profile->alamat ?? $profile->address ?? '')" placeholder="Contoh: Jl. Rungkut Asri Timur No. 12, Surabaya" />
+                                <x-input-label for="alamat" value="Alamat Domisili / Tempat Tinggal*" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('alamat', $profile?->alamat ?? $profile?->address ?? '')" placeholder="Contoh: Jl. Rungkut Asri Timur No. 12, Surabaya" />
                                 <x-input-error :messages="$errors->get('alamat')" class="mt-1" />
                             </div>
                         </div>
@@ -140,34 +138,36 @@
 
                     <!-- Section 4: Kontak Darurat (Emergency Contact) -->
                     <div class="space-y-4 pt-2 border-t border-gray-100">
-                        <h4 class="text-xs font-black uppercase text-indigo-700 tracking-wider flex items-center gap-2">
-                            <span>🚨 Kontak Darurat (Orang Tua / Wali)</span>
+                        <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
+                            <span>Kontak Darurat (Orang Tua / Wali)</span>
                         </h4>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat / Hubungan" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto (Ayah)" />
+                                <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat / Hubungan*" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile?->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto (Ayah)" />
                                 <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                             </div>
 
                             <div>
-                                <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
+                                <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat*" class="text-xs font-bold uppercase tracking-wider" />
+                                <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile?->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
                                 <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-1" />
+                                    
                             </div>
                         </div>
+                          <p class="text-xs text-gray-500 italic">*opsional</p>
                     </div>
 
                     <!-- Tombol Aksi -->
-                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                            &larr; Kembali ke Dashboard
+                    <div class="pt-5 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3">
+                        <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center flex items-center justify-center">
+                            {{ __('Kembali ke Dashboard') }}
                         </a>
 
-                        <x-primary-button class="text-xs px-5 py-2.5">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition cursor-pointer flex items-center justify-center">
                             {{ __('Simpan Perubahan Profil') }}
-                        </x-primary-button>
+                        </button>
                     </div>
                 </form>
 

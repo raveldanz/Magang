@@ -4,61 +4,260 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\FinalReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FinalReportController extends Controller
 {
-    // Tampilkan Halaman Laporan Akhir
+    /**
+     * Tampilkan Halaman Laporan Akhir Mahasiswa
+     */
     public function index()
-    {
-        $application = Application::with('placement.finalreport')->where('user_id', Auth::id())->latest()->first();
+{
+    // 1. Ambil pengajuan magang yang aktif / terbaru
+    $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+        ->where('user_id', Auth::id())
+        ->whereNotIn('status', ['rejected', 'resigned'])
+        ->whereHas('placement')
+        ->latest()
+        ->first()
+        ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+            ->where('user_id', Auth::id())
+            ->whereNotIn('status', ['rejected', 'resigned'])
+            ->latest()
+            ->first();
 
-        // Cek apakah mahasiswa sudah punya placement
+    // 2. Cegat HANYA jika mahasiswa benar-benar BELUM PERNAH daftar magang
+    if (!$application) {
+        return redirect()->route('dashboard')->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
+    }
+
+    $rawStatus = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status->value : (string)($application->status ?? 'NONE');
+    $lifecycle = strtoupper($rawStatus);
+    $placement = $application->placement;
+    $finalReport = null;
+    $evaluation = null;
+
+    // 3. Jika sudah diterima dan memiliki placement, baru cek DPL & ambil data laporan
+    if ($placement) {
+        // Syarat Wajib: DPL Harus Sudah Dipilih sebelum mengisi/mengakses Laporan Akhir
+        if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
+            return redirect()->route('dashboard')->with('error', 'Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu sebelum mengakses pengunggahan Laporan Akhir.');
+        }
+
+        $finalReport = $placement->finalreport;
+        $evaluation = $placement->evaluation;
+    }
+
+    // 4. Kirimkan $lifecycle ke view agar kartu alur/stepper muncul saat masih pending
+    return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation', 'lifecycle'));
+}
+
+    /**
+     * Upload / Unggah Dokumen Laporan Akhir Magang (PDF / DOCX) & Repositori Proyek
+     */
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Prioritaskan pengajuan aktif yang belum resigned/rejected
+        $application = Application::with('placement')
+            ->where('user_id', $user->id)
+            ->whereNotIn('status', ['rejected', 'resigned'])
+            ->whereHas('placement')
+            ->latest()
+            ->first()
+            ?? Application::with('placement')
+                ->where('user_id', $user->id)
+                ->whereNotIn('status', ['rejected', 'resigned'])
+                ->latest()
+                ->first();
+        
         if (!$application || !$application->placement) {
-            return redirect()->route('dashboard')->with('error', 'Anda belum diplot ke pembimbing atau belum memulai magang.');
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Data penempatan tidak ditemukan.');
         }
 
         $placement = $application->placement;
 
-        return view('student.final_report', compact('placement'));
-    }
-
-    // Upload Laporan
-    public function store(Request $request)
-    {
-        $request->validate([
-            'file_laporan' => 'required|mimes:pdf,doc,docx|max:5120', // Maks 5MB
-        ]);
-
-        $application = Application::with('placement')->where('user_id', Auth::id())->latest()->first();
-        
-        if (!$application || !$application->placement) {
-            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        // Syarat Wajib: DPL Harus Sudah Dipilih / Terdaftar
+        if (empty($placement->academic_advisor_id) && empty($placement->pembimbing_id)) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak: Silakan pilih Dosen Pembimbing Lapangan terlebih dahulu.');
         }
 
         $placementId = $application->placement->id;
-
-        // Cek jika laporan sudah ada, hapus file lama (opsional/bisa disesuaikan)
         $finalReport = FinalReport::where('placement_id', $placementId)->first();
-        
-        if ($finalReport && $finalReport->file_path && Storage::disk('public')->exists($finalReport->file_path)) {
-            Storage::disk('public')->delete($finalReport->file_path);
+        $hasExistingFile = $finalReport && !empty($finalReport->file_path);
+
+        if ($finalReport && $finalReport->status === 'approved') {
+            return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir yang sudah disetujui tidak dapat diubah atau diunggah ulang.');
         }
 
-        $filePath = $request->file('file_laporan')->store('final_reports', 'public');
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'repository_url' => 'nullable|url|max:255',
+            'file_laporan' => ($hasExistingFile ? 'nullable' : 'required') . '|file|mimes:pdf,doc,docx|max:10240', // Maks 10MB
+        ], [
+            'file_laporan.required' => 'File naskah laporan akhir wajib diunggah.',
+            'file_laporan.mimes' => 'Format file harus berupa PDF atau DOCX.',
+            'file_laporan.max' => 'Ukuran file maksimal adalah 10 MB.',
+            'repository_url.url' => 'Format tautan repositori proyek harus berupa URL valid.',
+        ]);
 
-        FinalReport::updateOrCreate(
+        $filePath = $finalReport?->file_path;
+
+        if ($request->hasFile('file_laporan')) {
+            // Bersihkan file lama milik mahasiswa ini jika ada (kecuali file default/template bawaan)
+            if ($finalReport && $finalReport->file_path) {
+                $baseOld = basename($finalReport->file_path);
+                if (!in_array($baseOld, ['default.pdf', 'sample_laporan_akhir.pdf', 'test_report.pdf'])) {
+                    if (Storage::disk('local')->exists($finalReport->file_path)) {
+                        Storage::disk('local')->delete($finalReport->file_path);
+                    } elseif (Storage::disk('public')->exists($finalReport->file_path)) {
+                        Storage::disk('public')->delete($finalReport->file_path);
+                        @unlink(public_path('storage/' . $finalReport->file_path));
+                    }
+                }
+            }
+
+            // Format nama file terstruktur: Laporan_Akhir_[NIM]_[Nama_Mahasiswa]_[Timestamp].[ext]
+            $file = $request->file('file_laporan');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $nim = $user->studentProfile?->nim ?? 'NIM';
+            $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
+            $cleanName = Str::slug($user->name, '_') ?: 'Mahasiswa';
+            $timestamp = time();
+            $customFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}_{$timestamp}.{$ext}";
+
+            // Simpan di disk 'local' (storage/app/private) agar TIDAK bisa diakses langsung lewat /storage/...
+            // Berkas hanya dapat dibuka melalui route final_reports.show (showFile) yang memeriksa hak akses.
+            $filePath = $file->storeAs('final_reports', $customFilename, 'local');
+        }
+
+        $newStatus = ($request->hasFile('file_laporan') || $finalReport?->status === 'revision') ? 'pending' : ($finalReport?->status ?? 'pending');
+
+        $report = FinalReport::updateOrCreate(
             ['placement_id' => $placementId],
             [
+                'title' => $request->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM',
+                'repository_url' => $request->repository_url,
                 'file_path' => $filePath,
-                'status' => 'pending', // kembali ke pending setelah upload ulang
-                'feedback' => null
+                'final_report_path' => $filePath,
+                'status' => $newStatus,
+                'feedback' => $newStatus === 'pending' ? null : ($finalReport?->feedback),
             ]
         );
 
-        return redirect()->route('student.final_report.index')->with('success', 'Laporan akhir berhasil diunggah dan menunggu verifikasi.');
+        $application->placement->syncCompletionStatus();
+
+        AuditLog::record('STUDENT_REPORT_SUBMIT', 'FinalReport', $report->id, [
+            'student_name' => $user->name,
+            'title' => $report->title,
+            'file_path' => $filePath,
+        ]);
+
+        return redirect()->route('student.final_report.index')->with('success', 'Laporan akhir magang berhasil diperbarui dan disimpan.');
+    }
+
+    /**
+     * Buka / Unduh Berkas Naskah Laporan Akhir dengan Nama Terformat & Otorisasi Ketat
+     */
+    public function showFile(Request $request, $id)
+    {
+        $report = FinalReport::with([
+            'placement.application.user.studentProfile',
+            'placement.application.unit.agencyProfile',
+            'placement.mentor',
+            'placement.academicAdvisor',
+        ])->findOrFail($id);
+
+        $currentUser = Auth::user();
+        $placement = $report->placement;
+        $application = $placement?->application;
+        $student = $application?->user;
+
+        // Validasi Otorisasi Hak Akses Multi-Role
+        $isAuthorized = false;
+        $isSuperAdmin = ($currentUser->role === 'super_admin' || ($currentUser->role === 'admin' && is_null($currentUser->agency_profile_id)));
+
+        if ($isSuperAdmin) {
+            $isAuthorized = true;
+        } elseif ($currentUser->role === 'admin') {
+            // Admin Dinas instansi yang sama
+            if ($currentUser->agency_profile_id && optional($application?->unit)->agency_profile_id === $currentUser->agency_profile_id) {
+                $isAuthorized = true;
+            }
+        } elseif (in_array($currentUser->role, ['mentor', 'pembimbing'])) {
+            // Pembimbing lapangan penempatan atau instansi terkait
+            if ($placement && ($placement->mentor_id === $currentUser->id || $placement->pembimbing_id === $currentUser->id)) {
+                $isAuthorized = true;
+            } elseif ($currentUser->agency_profile_id && optional($application?->unit)->agency_profile_id === $currentUser->agency_profile_id) {
+                $isAuthorized = true;
+            }
+        } elseif (in_array($currentUser->role, ['dosen', 'academic_advisor'])) {
+            // DPL penempatan atau satu perguruan tinggi
+            if ($placement && $placement->academic_advisor_id === $currentUser->id) {
+                $isAuthorized = true;
+            } elseif ($currentUser->university_id && $student?->university_id === $currentUser->university_id) {
+                $isAuthorized = true;
+            }
+        } elseif (in_array($currentUser->role, ['university', 'admin_univ', 'universitas'])) {
+            // Pengelola magang universitas
+            if ($currentUser->university_id && $student?->university_id === $currentUser->university_id) {
+                $isAuthorized = true;
+            }
+        } elseif ($currentUser->role === 'mahasiswa') {
+            // Mahasiswa pemilik berkas laporan
+            if ($application && $application->user_id === $currentUser->id) {
+                $isAuthorized = true;
+            }
+        }
+
+        if (!$isAuthorized) {
+            abort(403, 'Anda tidak memiliki hak akses untuk membuka naskah laporan akhir ini.');
+        }
+
+        // Resolusi Lokasi Berkas Fisik
+        $filePath = $report->file_path ?? $report->final_report_path;
+        $realPath = null;
+
+        $candidatePaths = [
+            Storage::disk('local')->path($filePath),
+            storage_path('app/public/' . $filePath),
+            public_path('storage/' . $filePath),
+            storage_path('app/public/final_reports/default.pdf'),
+            public_path('storage/final_reports/default.pdf'),
+        ];
+
+        foreach ($candidatePaths as $candidate) {
+            if ($candidate && file_exists($candidate) && is_file($candidate)) {
+                $realPath = $candidate;
+                break;
+            }
+        }
+
+        if (!$realPath || !file_exists($realPath)) {
+            return redirect()->back()->with('error', 'Berkas naskah laporan akhir belum tersedia atau sedang disiapkan oleh mahasiswa.');
+        }
+
+        // Susun Nama Berkas Bersih untuk Browser / Download: Laporan_Akhir_[NIM]_[Nama_Mahasiswa].[ext]
+        $studentName = $student?->name ?? 'Mahasiswa';
+        $nim = $student?->studentProfile?->nim ?? 'NIM';
+        $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
+        $cleanName = Str::slug($studentName, '_') ?: 'Mahasiswa';
+        $ext = pathinfo($realPath, PATHINFO_EXTENSION) ?: 'pdf';
+        $downloadFilename = "Laporan_Akhir_{$cleanNim}_{$cleanName}.{$ext}";
+
+        $mimeType = mime_content_type($realPath) ?: 'application/octet-stream';
+        $forceDownload = $request->boolean('download') || !in_array(strtolower($ext), ['pdf', 'png', 'jpg', 'jpeg']);
+        $disposition = $forceDownload ? 'attachment' : 'inline';
+
+        return response()->file($realPath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => "{$disposition}; filename=\"{$downloadFilename}\"",
+        ]);
     }
 }

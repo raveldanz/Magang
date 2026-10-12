@@ -39,7 +39,7 @@ class LogbookController extends Controller
 
         // Pencarian nama mahasiswa
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->whereHas('placement.application.user', function ($uq) use ($search) {
                 $uq->where('name', 'like', "%{$search}%");
             });
@@ -76,6 +76,12 @@ class LogbookController extends Controller
         $logbook->update([
             'status' => strtolower($request->status),
             'feedback' => $request->feedback,
+        ]);
+
+        \App\Models\AuditLog::record('MENTOR_LOGBOOK_REVIEW', 'Logbook', $logbook->id, [
+            'status' => $logbook->status,
+            'feedback' => $logbook->feedback,
+            'student_name' => optional($placement->application?->user)->name,
         ]);
 
         return redirect()->back()->with('success', 'Status logbook mahasiswa berhasil diperbarui!');

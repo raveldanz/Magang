@@ -32,7 +32,7 @@ class EvaluationController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        Evaluation::updateOrCreate(
+        $evaluation = Evaluation::updateOrCreate(
             ['placement_id' => $placement->id],
             [
                 'nilai_disiplin' => $request->nilai_disiplin,
@@ -41,6 +41,40 @@ class EvaluationController extends Controller
                 'catatan' => $request->catatan,
             ]
         );
+
+        // Hitung final_score sesuai skema kampus
+        $univ = $evaluation->getUniversity();
+        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+
+        if ($scheme === 'mentor_only') {
+            $finalScore = $evaluation->nilai_pembimbing;
+            if ($finalScore >= 85) $grade = 'A';
+            elseif ($finalScore >= 75) $grade = 'AB';
+            elseif ($finalScore >= 65) $grade = 'B';
+            elseif ($finalScore >= 55) $grade = 'BC';
+            elseif ($finalScore >= 40) $grade = 'C';
+            else $grade = 'E';
+
+            $evaluation->update(['final_score' => $finalScore, 'grade' => $grade]);
+            $placement->syncCompletionStatus();
+        } else {
+            $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
+            if ($dosenScore > 0) {
+                $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
+                $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+                $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
+
+                if ($finalScore >= 85) $grade = 'A';
+                elseif ($finalScore >= 75) $grade = 'AB';
+                elseif ($finalScore >= 65) $grade = 'B';
+                elseif ($finalScore >= 55) $grade = 'BC';
+                elseif ($finalScore >= 40) $grade = 'C';
+                else $grade = 'E';
+
+                $evaluation->update(['final_score' => $finalScore, 'grade' => $grade]);
+                $placement->syncCompletionStatus();
+            }
+        }
 
         return redirect()->route('pembimbing.student.detail', $placement->id)->with('success', 'Penilaian berhasil disimpan!');
     }

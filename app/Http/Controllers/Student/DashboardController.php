@@ -20,9 +20,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Redirect jika role bukan mahasiswa
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.applications.index');
+        if ($user->role === 'admin' || $user->role === 'super_admin') {
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user->role === 'mentor' || $user->role === 'pembimbing') {
@@ -53,8 +52,33 @@ class DashboardController extends Controller
             }
         }
 
-        // Ambil pengajuan magang terbaru mahasiswa
+        // Ambil pengajuan magang aktif mahasiswa (prioritaskan yang belum resigned/rejected)
         $application = Application::with([
+            'unit.agencyProfile', 
+            'placement.mentor', 
+            'placement.pembimbing',
+            'placement.academicAdvisor.university', 
+            'placement.evaluation', 
+            'placement.finalreport'
+        ])
+        ->where('user_id', $user->id)
+        ->whereNotIn('status', ['rejected', 'resigned'])
+        ->whereHas('placement')
+        ->latest()
+        ->first()
+        ?? Application::with([
+            'unit.agencyProfile', 
+            'placement.mentor', 
+            'placement.pembimbing',
+            'placement.academicAdvisor.university', 
+            'placement.evaluation', 
+            'placement.finalreport'
+        ])
+        ->where('user_id', $user->id)
+        ->whereNotIn('status', ['rejected', 'resigned'])
+        ->latest()
+        ->first()
+        ?? Application::with([
             'unit.agencyProfile', 
             'placement.mentor', 
             'placement.pembimbing',
@@ -110,25 +134,28 @@ class DashboardController extends Controller
         ]);
 
         $application = Application::where('user_id', $user->id)
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->latest()
             ->firstOrFail();
 
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
 
-        $placement = Placement::firstOrCreate(
-            ['application_id' => $application->id]
+        // Update row placement yang sudah ada (bukan membuat baris baru)
+        $placement = Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['academic_advisor_id' => $advisor->id]
         );
 
-        $placement->update([
-            'academic_advisor_id' => $advisor->id,
-        ]);
+        // Hapus placement duplikat jika ada
+        Placement::where('application_id', $application->id)
+            ->where('id', '!=', $placement->id)
+            ->delete();
 
         return redirect()->route('dashboard')->with('success', 'Dosen Pembimbing Kampus (' . $advisor->name . ') berhasil dipilih!');
     }
 
     /**
-     * Mahasiswa mendaftarkan Dosen Pembimbing Baru (Nama, Email, NIDN)
+     * Mahasiswa mendaftarkan Dosen Pembimbing Baru dengan Antisipasi Duplikasi & Flash Kredensial
      */
     public function storeNewAdvisor(Request $request)
     {
@@ -142,7 +169,7 @@ class DashboardController extends Controller
         ]);
 
         $application = Application::where('user_id', $user->id)
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'active', 'completed'])
             ->latest()
             ->firstOrFail();
 
@@ -150,42 +177,81 @@ class DashboardController extends Controller
         $targetUniv = $targetUnivId ? University::find($targetUnivId) : null;
         $univName = $targetUniv?->name ?? $user->university ?? 'Perguruan Tinggi';
 
-        // Format nama dengan NIDN jika diinputkan
-        $dosenName = $request->name;
-        if ($request->filled('nidn')) {
-            $dosenName .= ' (NIDN: ' . $request->nidn . ')';
+        $cleanEmail = strtolower(trim($request->email));
+        $cleanName = trim($request->name);
+
+        // 1. Cek duplikasi berdasarkan email (case-insensitive)
+        $existingLecturer = User::whereIn('role', ['dosen', 'academic_advisor'])
+            ->whereRaw('LOWER(email) = ?', [$cleanEmail])
+            ->first();
+
+        // 2. Jika tidak ditemukan lewat email, cek berdasarkan kesamaan nama pada universitas yang sama
+        if (!$existingLecturer && $targetUnivId) {
+            $existingLecturer = User::whereIn('role', ['dosen', 'academic_advisor'])
+                ->where('university_id', $targetUnivId)
+                ->where(function ($q) use ($cleanName) {
+                    $q->whereRaw('LOWER(TRIM(name)) = ?', [strtolower($cleanName)])
+                      ->orWhereRaw('LOWER(TRIM(name)) LIKE ?', [strtolower($cleanName) . '%']);
+                })
+                ->first();
         }
 
-        // Cari atau buat akun dosen baru
-        $dosen = User::where('email', strtolower($request->email))->first();
-
-        if (!$dosen) {
-            $dosen = User::create([
-                'name' => $dosenName,
-                'email' => strtolower($request->email),
-                'password' => Hash::make('password'),
-                'role' => 'dosen',
-                'university_id' => $targetUnivId,
-                'university' => $univName,
-            ]);
-        } else {
-            // Update univ jika sebelumnya belum terikat
-            if ($targetUnivId && !$dosen->university_id) {
-                $dosen->update([
+        // Kasus 1: Dosen sudah terdaftar di database
+        if ($existingLecturer) {
+            // Update relasi universitas jika sebelumnya belum terisi
+            if ($targetUnivId && !$existingLecturer->university_id) {
+                $existingLecturer->update([
                     'university_id' => $targetUnivId,
                     'university' => $univName,
                 ]);
             }
+
+            $placement = Placement::updateOrCreate(
+                ['application_id' => $application->id],
+                ['academic_advisor_id' => $existingLecturer->id]
+            );
+
+            Placement::where('application_id', $application->id)
+                ->where('id', '!=', $placement->id)
+                ->delete();
+
+            return redirect()->route('dashboard')->with('success', "Dosen Pembimbing {$existingLecturer->name} sudah terdaftar sebelumnya di sistem dan berhasil dipilih sebagai Dosen Pembimbing Anda.");
         }
 
-        $placement = Placement::firstOrCreate(
-            ['application_id' => $application->id]
-        );
+        // Kasus 2: Dosen Baru (Belum Terdaftar)
+        $dosenName = $cleanName;
+        if ($request->filled('nidn')) {
+            $dosenName .= ' (NIDN: ' . trim($request->nidn) . ')';
+        }
 
-        $placement->update([
-            'academic_advisor_id' => $dosen->id,
+        $newDosen = User::create([
+            'name' => $dosenName,
+            'email' => $cleanEmail,
+            'password' => Hash::make('password'),
+            'role' => 'dosen',
+            'university_id' => $targetUnivId,
+            'university' => $univName,
+            'email_verified_at' => now(),
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Dosen Pembimbing Baru (' . $dosen->name . ') berhasil didaftarkan dan dipilih sebagai DPL!');
+        $placement = Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['academic_advisor_id' => $newDosen->id]
+        );
+
+        Placement::where('application_id', $application->id)
+            ->where('id', '!=', $placement->id)
+            ->delete();
+
+        // Kirimkan session flash detail kredensial untuk ditampilkan di modal informasi mahasiswa
+        session()->flash('new_advisor_credential', [
+            'name' => $newDosen->name,
+            'email' => $newDosen->email,
+            'password' => 'password',
+            'login_url' => url('/login'),
+            'univ_name' => $univName,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', "Akun Dosen Pembimbing Baru ({$newDosen->name}) berhasil didaftarkan dan dipilih sebagai DPL!");
     }
 }

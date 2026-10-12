@@ -1,9 +1,22 @@
 <x-app-layout>
+    <x-responsive-table-style />
+    <style>
+        /* Filter logbook: di desktop 3 dropdown berjajar rapi dengan lebar tetap (teks panjang dipotong ...) */
+        @media (min-width: 768px) {
+            .lb-filter-selects { flex-wrap: nowrap; }
+            .lb-filter-selects select { width: 200px !important; max-width: 200px; text-overflow: ellipsis; }
+        }
+        @media (min-width: 768px) and (max-width: 1100px) {
+            .lb-filter { flex-direction: column; align-items: stretch; }
+            .lb-filter-selects select { width: 100% !important; max-width: none; flex: 1 1 0; min-width: 0; }
+            .lb-filter > div:last-child { width: 100%; }
+        }
+    </style>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                     {{ __('Rekapitulasi Logbook Mahasiswa Magang') }}
@@ -35,7 +48,7 @@
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-gray-500 uppercase">Mahasiswa Aktif</span>
-                        <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
@@ -60,7 +73,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">Disetujui (Approved)</span>
+                        <span class="text-xs font-bold text-emerald-600 uppercase">APPROVED</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -73,7 +86,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase">Menunggu Review</span>
+                        <span class="text-xs font-bold text-amber-600 uppercase">PENDING</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -85,42 +98,81 @@
                 </div>
             </div>
 
+            <!-- Active University Filter Indicator Banner -->
+            @if(isset($selectedUniversity) && $selectedUniversity)
+                <div class="p-4 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-indigo-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-indigo-700">Filter Aktif Logbook Kampus:</span>
+                            <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.universities.show', $selectedUniversity->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition">
+                            Pusat Kendali Kampus
+                        </a>
+                        <a href="{{ route('admin.logbooks.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Reset Filter
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <!-- Filter & Search Controls -->
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-                <form method="GET" action="{{ route('admin.logbooks.index') }}" class="flex flex-col md:flex-row items-center justify-between gap-3">
+                <form method="GET" action="{{ route('admin.logbooks.index') }}" class="lb-filter flex flex-col md:flex-row items-center justify-between gap-3">
                     
-                    <div class="w-full md:w-auto flex flex-wrap items-center gap-3">
+                    <div class="lb-filter-selects w-full md:w-auto flex flex-wrap items-center gap-3">
+                        <!-- Filter Universitas -->
+                        @if(isset($universities))
+                            <select name="university_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Semua Kampus --</option>
+                                @foreach ($universities as $unv)
+                                    <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
+                                        {{ $unv->name }} ({{ $unv->code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
+
                         <!-- Filter Unit -->
-                        <select name="unit_id" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Unit Penempatan --</option>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
-                                    🏢 {{ $unit->name }}
+                                     {{ $unit->name }}
                                 </option>
                             @endforeach
                         </select>
 
                         <!-- Filter Status Logbook -->
-                        <select name="status_filter" onchange="this.form.submit()" class="text-xs border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Status Logbook --</option>
-                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>⏳ Memiliki Logbook Pending</option>
-                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>✅ Memiliki Logbook Approved</option>
-                            <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}>⚠️ Belum Mengisi Logbook</option>
+                            <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Ada logbook PENDING</option>
+                            <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Ada logbook APPROVED</option>
+                            <option value="empty" {{ request('status_filter') === 'empty' ? 'selected' : '' }}> Belum Mengisi Logbook</option>
                         </select>
                     </div>
 
                     <!-- Search Input -->
                     <div class="w-full md:w-80 flex items-center gap-2">
                         <div class="relative w-full">
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa / NIM..." class="w-full text-xs border-gray-300 rounded-xl pl-9 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
-                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 0.85rem !important;">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa / NIM..." 
+                                   class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                                   style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                         </div>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                             Cari
                         </button>
-                        @if (request()->hasAny(['unit_id', 'status_filter', 'search', 'placement_id']))
+                        @if (request()->hasAny(['unit_id', 'university_id', 'status_filter', 'search', 'placement_id']))
                             <a href="{{ route('admin.logbooks.index') }}" class="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition" title="Reset Filter">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -140,16 +192,16 @@
                     $selUnit = $selectedPlacement->application->unit;
                     $selMentor = $selectedPlacement->mentor ?? $selectedPlacement->pembimbing;
                 @endphp
-                <div class="bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-6 shadow-sm space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-indigo-100 pb-4">
+                <div class="bg-blue-50/50 border-2 border-blue-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-blue-100 pb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-sm">
+                            <div class="w-10 h-10 bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center text-sm shadow-sm">
                                 {{ strtoupper(substr($selStudent->name, 0, 2)) }}
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
                                     Riwayat Logbook: {{ $selStudent->name }}
-                                    <span class="text-xs font-mono font-normal bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md">
+                                    <span class="text-xs font-mono font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">
                                         NIM: {{ $selProfile->nim ?? '-' }}
                                     </span>
                                 </h3>
@@ -170,25 +222,20 @@
                     <!-- List Logbook Entries Mahasiswa -->
                     <div class="space-y-3">
                         @forelse ($selectedPlacement->logbooks as $log)
-                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:border-indigo-300 transition">
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:border-blue-300 transition">
                                 <div class="space-y-1.5 flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold font-mono text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md">
-                                            📅 {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
+                                             {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}
                                         </span>
-                                        <span class="px-2.5 py-0.5 text-xs font-bold rounded-full
-                                            {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : '' }}
-                                            {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-200' : '' }}
-                                            {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-200' : '' }}">
-                                            {{ strtoupper($log->status) }}
-                                        </span>
+                                        <x-status-badge type="review" :status="$log->status" />
                                     </div>
                                     <p class="text-xs text-gray-700 leading-relaxed line-clamp-2">
                                         {{ $log->activity }}
                                     </p>
                                     @if ($log->feedback)
-                                        <p class="text-[11px] text-indigo-900 bg-indigo-50/75 px-2.5 py-1 rounded-md">
-                                            💬 <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
+                                        <p class="text-[11px] text-blue-900 bg-blue-50/75 px-2.5 py-1 rounded-md">
+                                            <strong>Feedback Mentor:</strong> "{{ $log->feedback }}"
                                         </p>
                                     @endif
                                 </div>
@@ -196,11 +243,11 @@
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if ($log->attachment)
                                         <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
-                                            📎 Lampiran
+                                             Lampiran
                                         </a>
                                     @endif
-                                    <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
-                                        Detail &rarr;
+                                    <a href="{{ route('admin.logbooks.show', $log->id) }}" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                                        Detail 
                                     </a>
                                 </div>
                             </div>
@@ -216,7 +263,7 @@
             <!-- Tabel Rekapitulasi Agregat per Mahasiswa -->
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="rtable w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
@@ -243,52 +290,52 @@
                                     $latestLog = $placement->logbooks->first();
                                     $isSelected = $selectedPlacement && $selectedPlacement->id === $placement->id;
                                 @endphp
-                                <tr class="hover:bg-slate-50/75 transition-colors {{ $isSelected ? 'bg-indigo-50/40 font-semibold' : '' }}">
-                                    <td class="py-4 px-4 text-center text-xs text-gray-500">
+                                <tr class="hover:bg-slate-50/75 transition-colors {{ $isSelected ? 'bg-blue-50/40 font-semibold' : '' }}">
+                                    <td class="rt-hide-mobile py-4 px-4 text-center text-xs text-gray-500" data-label="No">
                                         {{ $placements->firstItem() + $index }}
                                     </td>
 
-                                    <td class="py-4 px-4">
+                                    <td class="rt-title py-4 px-4" data-label="Mahasiswa">
                                         <div class="font-bold text-gray-900 leading-snug">{{ $student->name }}</div>
                                         <div class="text-xs text-gray-500 mt-0.5 font-mono">
                                             NIM: {{ $profile->nim ?? '-' }}
                                         </div>
-                                        <div class="text-[11px] text-indigo-600 mt-0.5">
+                                        <div class="text-[11px] text-blue-600 mt-0.5">
                                             {{ $profile->universitas ?? '-' }} ({{ $profile->jurusan ?? '-' }})
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4">
-                                        <div class="text-xs font-bold text-gray-800">🏢 {{ $unit->name ?? '-' }}</div>
+                                    <td class="py-4 px-4" data-label="Unit &amp; Pembimbing">
+                                        <div class="text-xs font-bold text-gray-800"> {{ $unit->name ?? '-' }}</div>
                                         <div class="text-[11px] text-gray-500 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-4 text-center" data-label="Rekap Logbook">
                                         <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
                                             <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md" title="Total Kegiatan">
-                                                📝 {{ $totalStudentLogs }} Total
+                                                 {{ $totalStudentLogs }} Total
                                             </span>
                                             @if ($approvedCount > 0)
                                                 <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-md" title="Approved">
-                                                    ✓ {{ $approvedCount }}
+                                                     {{ $approvedCount }}
                                                 </span>
                                             @endif
                                             @if ($pendingCount > 0)
                                                 <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-md" title="Pending">
-                                                    ⏳ {{ $pendingCount }}
+                                                     {{ $pendingCount }}
                                                 </span>
                                             @endif
                                             @if ($rejectedCount > 0)
                                                 <span class="px-2 py-0.5 bg-rose-50 text-rose-700 text-[11px] font-bold rounded-md" title="Rejected">
-                                                    ✗ {{ $rejectedCount }}
+                                                     {{ $rejectedCount }}
                                                 </span>
                                             @endif
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-4 text-center" data-label="Progres Disetujui">
                                         <div class="w-32 mx-auto">
                                             <div class="flex justify-between text-[10px] text-gray-500 font-bold mb-1">
                                                 <span>{{ $approvedCount }}/{{ $totalStudentLogs }}</span>
@@ -300,7 +347,7 @@
                                         </div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center whitespace-nowrap text-xs text-gray-600">
+                                    <td class="py-4 px-4 text-center whitespace-nowrap text-xs text-gray-600" data-label="Logbook Terakhir">
                                         @if ($latestLog)
                                             <span class="font-mono">{{ \Carbon\Carbon::parse($latestLog->date)->format('d M Y') }}</span>
                                         @else
@@ -308,8 +355,8 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $isSelected ? 'bg-indigo-700 text-white' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' }} text-xs font-bold rounded-xl transition shadow-xs">
+                                    <td class="rt-actions py-4 px-4 text-right whitespace-nowrap" data-label="Aksi">
+                                        <a href="{{ route('admin.logbooks.index', array_merge(request()->query(), ['placement_id' => $placement->id])) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $isSelected ? 'bg-blue-700 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }} text-xs font-bold rounded-xl transition shadow-xs">
                                             <span>Lihat Riwayat</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

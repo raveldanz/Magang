@@ -1,29 +1,27 @@
 <x-app-layout>
-    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <x-slot name="header">
+        <h2 class="font-bold text-xl text-slate-800 leading-tight">
+            {{ __('Pengaturan Profil Instansi & TTD Surat Balasan') }}
+        </h2>
+    </x-slot>
 
-            <!-- Page Header -->
-            <div>
-                <h2 class="text-xl font-bold tracking-tight text-slate-900">
-                    Pengaturan Profil Instansi
-                </h2>
-                <p class="text-xs text-slate-500 mt-0.5">
-                    Kelola identitas resmi instansi, logo, kontak, dan penandatangan sertifikat magang
-                </p>
-            </div>
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Flash Messages -->
             @if (session('success'))
-                <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-semibold shadow-sm">
-                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 rounded-xl shadow-xs text-sm font-bold flex items-center gap-2">
+                    <span></span>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="p-4 bg-red-50 border border-red-100 text-red-700 rounded-2xl text-xs space-y-1">
-                    <p class="font-bold">Terjadi kesalahan validasi:</p>
-                    <ul class="list-disc list-inside space-y-0.5">
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-800 rounded-xl shadow-xs text-sm">
+                    <p class="font-bold flex items-center gap-2">
+                        <span></span>
+                        <span>Gagal Menyimpan Perubahan:</span>
+                    </p>
+                    <ul class="mt-1 list-disc list-inside text-xs">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -31,146 +29,182 @@
                 </div>
             @endif
 
-            <!-- Main Form Card -->
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8">
-                <form action="{{ route('admin.agency_profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    @csrf
-                    @method('PUT')
+            @if(!empty($isSuperAdmin) && isset($allAgencies) && $allAgencies->count() > 1)
+                <!-- Agency Switcher Tabs (Khusus Superadmin) -->
+                <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+                    @foreach($allAgencies as $agency)
+                        <a href="{{ route('admin.agency_profile.edit', ['agency_id' => $agency->id]) }}"
+                           class="px-4 py-2 text-xs font-bold rounded-xl transition {{ ($agencyProfile->id ?? $profile->id) === $agency->id ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200' }}">
+                             {{ $agency->agency_name }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
 
-                    <!-- Section 1: Informasi Dasar Instansi -->
-                    <div>
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 pb-2 border-b border-slate-100 mb-4 flex items-center gap-2">
-                            <span>🏛️</span> Informasi Umum Instansi
-                        </h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Nama Instansi / Dinas -->
-                            <div class="md:col-span-2">
-                                <label for="agency_name" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Nama Instansi / Organisasi Perangkat Daerah
-                                </label>
-                                <input type="text" id="agency_name" name="agency_name" 
-                                       value="{{ old('agency_name', $agencyProfile->agency_name ?? '') }}" 
-                                       placeholder="Contoh: Dinas Komunikasi dan Informatika Kota Surabaya"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200" required>
-                            </div>
+            <form action="{{ route('admin.agency_profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="agency_id" value="{{ $agencyProfile->id ?? $profile->id }}">
 
-                            <!-- Alamat Kantor -->
-                            <div class="md:col-span-2">
-                                <label for="address" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Alamat Lengkap Kantor
-                                </label>
-                                <textarea id="address" name="address" rows="3" 
-                                          placeholder="Jl. Jimerto No. 25-27, Ketabang, Kec. Genteng, Surabaya..."
-                                          class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm p-3.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">{{ old('address', $agencyProfile->address ?? '') }}</textarea>
-                            </div>
+                <!-- 1. KARTU INFORMASI INSTANSI & KOP SURAT -->
+                <div class="bg-white shadow-sm rounded-3xl p-6 sm:p-8 border border-slate-100 space-y-4">
+                    <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center space-x-2">
+                        <span></span>
+                        <span>Identitas Pemerintah & Instansi Kerja</span>
+                    </h3>
 
-                            <!-- Email Resmi -->
-                            <div>
-                                <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Email Resmi Instansi
-                                </label>
-                                <input type="email" id="email" name="email" 
-                                       value="{{ old('email', $agencyProfile->email ?? '') }}" 
-                                       placeholder="diskominfo@surabaya.go.id"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label for="government_name" value="Nama Pemerintah / Kota / Provinsi" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="government_name" name="government_name" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('government_name', $agencyProfile->government_name ?? $profile->government_name) }}" required />
+                        </div>
 
-                            <!-- Nomor Telepon -->
-                            <div>
-                                <label for="phone" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Nomor Telepon / Hotline
-                                </label>
-                                <input type="text" id="phone" name="phone" 
-                                       value="{{ old('phone', $agencyProfile->phone ?? '') }}" 
-                                       placeholder="(031) 5312144"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
-                            </div>
+                        <div>
+                            <x-input-label for="agency_name" value="Nama Dinas / Instansi Kerja" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="agency_name" name="agency_name" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('agency_name', $agencyProfile->agency_name ?? $profile->agency_name) }}" required />
+                        </div>
+
+                        <div>
+                            <x-input-label for="city" value="Kota Tempat Penerbitan Surat" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="city" name="city" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('city', $agencyProfile->city ?? $profile->city ?? 'Surabaya') }}" required />
+                        </div>
+
+                        <div>
+                            <x-input-label for="phone" value="No. Telepon Instansi" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('phone', $agencyProfile->phone ?? $profile->phone) }}" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="email" value="Email Resmi Instansi" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('email', $agencyProfile->email ?? $profile->email) }}" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="website" value="Website Resmi" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="website" name="website" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('website', $agencyProfile->website ?? $profile->website) }}" />
                         </div>
                     </div>
 
-                    <!-- Section 2: Logo & Dokumen Branding -->
-                    <div class="pt-4 border-t border-slate-100">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 pb-2 border-b border-slate-100 mb-4 flex items-center gap-2">
-                            <span>🖼️</span> Logo Instansi & Kop Surat
-                        </h3>
+                    <div class="mt-4">
+                        <x-input-label for="address" value="Alamat Lengkap Kantor Instansi (Kop Surat)" class="text-xs font-bold text-slate-700 uppercase" />
+                        <textarea id="address" name="address" rows="2" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 shadow-2xs text-xs sm:text-sm">{{ old('address', $agencyProfile->address ?? $profile->address) }}</textarea>
+                    </div>
 
-                        <div class="flex flex-col sm:flex-row items-start gap-6">
-                            <!-- Preview Logo Saat Ini -->
-                            <div class="flex flex-col items-center gap-2 shrink-0">
-                                <span class="text-xs font-semibold text-slate-400">Logo Saat Ini:</span>
-                                <div class="w-24 h-24 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center p-2">
-                                    @if(isset($agencyProfile->logo) && $agencyProfile->logo)
-                                        <img src="{{ asset('storage/' . $agencyProfile->logo) }}" alt="Logo Instansi" class="max-h-full max-w-full object-contain">
-                                    @else
-                                        <img src="{{ asset('images/logoPemkotSBY.png') }}" alt="Logo Default" class="max-h-full max-w-full object-contain">
-                                    @endif
+                    <!-- Upload Logo -->
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <x-input-label for="logo" value="Logo Resmi Instansi" class="text-xs font-bold text-slate-700 uppercase" />
+                        <div class="flex items-center space-x-4 mt-2">
+                            @php
+                                $currentLogo = $agencyProfile->logo ?? $profile->logo ?? null;
+                                $displayLogo = null;
+                                if ($currentLogo && file_exists(public_path($currentLogo))) {
+                                    $displayLogo = asset($currentLogo);
+                                } elseif ($currentLogo && file_exists(storage_path('app/public/' . $currentLogo))) {
+                                    $displayLogo = asset('storage/' . $currentLogo);
+                                } else {
+                                    $displayLogo = asset('images/logos/surabaya.png');
+                                }
+                            @endphp
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0 overflow-hidden" style="width: 64px; height: 64px; min-width: 64px; min-height: 64px;">
+                                        <img id="agencyLogoPreview" src="{{ $displayLogo }}" 
+                                             alt="Logo {{ $agencyProfile->agency_name ?? $profile->agency_name }}" 
+                                             class="w-full h-full object-contain shrink-0 transition-all duration-200">
+                                    </div>
+                                    <div class="sm:hidden text-xs">
+                                        <span class="font-bold text-slate-800 block">Pratinjau Logo</span>
+                                        <span class="text-[11px] text-slate-500">Maksimal ukuran 2MB</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <input type="file" id="logo" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                           onchange="handleLogoPreview(this, 'agencyLogoPreview', '{{ $displayLogo }}')"
+                                           class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs" />
+                                    <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format: PNG, JPG, WEBP, SVG. Maks 2MB. Biarkan kosong jika tidak ingin mengubah logo.</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <!-- Input Upload File -->
-                            <div class="flex-1 w-full">
-                                <label for="logo" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Ganti Logo Instansi
-                                </label>
-                                <input type="file" id="logo" name="logo" accept=".png,.jpg,.jpeg"
-                                       class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-xl bg-slate-50">
-                                <p class="text-[11px] text-slate-400 mt-1.5">Rekomendasi format PNG transparan, ukuran maks. 2MB. Logo ini akan dicetak pada E-Sertifikat & laporan.</p>
-                            </div>
+                <!-- 2. KARTU PEJABAT PENANDATANGAN SURAT -->
+                <div class="bg-white shadow-sm rounded-3xl p-6 sm:p-8 border border-slate-100 space-y-4">
+                    <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center space-x-2">
+                        <span></span>
+                        <span>Pejabat Penandatangan Surat Balasan (TTD Official)</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <x-input-label for="signee_name" value="Nama Pejabat (Lengkap Gelar)" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="signee_name" name="signee_name" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('signee_name', $agencyProfile->signee_name ?? $profile->signee_name) }}" required />
+                        </div>
+
+                        <div>
+                            <x-input-label for="signee_nip" value="NIP Pejabat" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="signee_nip" name="signee_nip" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('signee_nip', $agencyProfile->signee_nip ?? $profile->signee_nip) }}" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="signee_position" value="Jabatan Resmi Pejabat" class="text-xs font-bold text-slate-700 uppercase" />
+                            <x-text-input id="signee_position" name="signee_position" type="text" class="mt-1 block w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm" 
+                                value="{{ old('signee_position', $agencyProfile->signee_position ?? $profile->signee_position) }}" required />
                         </div>
                     </div>
 
-                    <!-- Section 3: Pengesahan & Tanda Tangan Sertifikat -->
-                    <div class="pt-4 border-t border-slate-100">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 pb-2 border-b border-slate-100 mb-4 flex items-center gap-2">
-                            <span>✍️</span> Pejabat Penandatangan Sertifikat
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Nama Kepala Dinas / Pejabat -->
-                            <div>
-                                <label for="head_name" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Nama Lengkap Pejabat
-                                </label>
-                                <input type="text" id="head_name" name="head_name" 
-                                       value="{{ old('head_name', $agencyProfile->head_name ?? '') }}" 
-                                       placeholder="Nama beserta gelar akademik..."
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
-                            </div>
-
-                            <!-- NIP Pejabat -->
-                            <div>
-                                <label for="head_nip" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    NIP Pejabat
-                                </label>
-                                <input type="text" id="head_nip" name="head_nip" 
-                                       value="{{ old('head_nip', $agencyProfile->head_nip ?? '') }}" 
-                                       placeholder="19xxxxxxxxxxxxxx"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
-                            </div>
-
-                            <!-- Jabatan Resmi -->
-                            <div class="md:col-span-2">
-                                <label for="head_position" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Jabatan Resmi
-                                </label>
-                                <input type="text" id="head_position" name="head_position" 
-                                       value="{{ old('head_position', $agencyProfile->head_position ?? '') }}" 
-                                       placeholder="Contoh: Kepala Dinas Komunikasi dan Informatika Kota Surabaya"
-                                       class="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm px-3.5 py-2.5 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tombol Aksi Submit -->
-                    <div class="flex items-center gap-3 pt-6 border-t border-slate-100">
-                        <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-xs font-semibold uppercase tracking-wider shadow-sm shadow-blue-200 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer">
-                            Simpan Perubahan Profil
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
+                             Simpan Perubahan Profil Instansi
                         </button>
                     </div>
                 </form>
             </div>
 
+
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function handleLogoPreview(input, previewId, defaultSrc) {
+            const preview = document.getElementById(previewId);
+            if (!preview) return;
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                if (!file.type.startsWith('image/')) {
+                    notify('Berkas harus berupa gambar (PNG, JPG, WEBP, atau SVG).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    notify('Ukuran berkas logo terlalu besar (maksimal 2MB).');
+                    input.value = '';
+                    preview.src = defaultSrc;
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = defaultSrc;
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>

@@ -7,8 +7,10 @@ use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
 use App\Models\University;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
@@ -60,7 +62,7 @@ class DashboardController extends Controller
 
         // Filter Search & Agency
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $applicationsQuery->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhereHas('studentProfile', function ($sp) use ($search) {
@@ -79,16 +81,16 @@ class DashboardController extends Controller
         $allApplications = $applicationsQuery->latest()->get();
         $allPlacements = $placementsQuery->latest()->get();
 
-        // Metrik Statistik Kampus
-        $totalStudents = $allApplications->count();
-        $totalAccepted = $allApplications->where('status', 'accepted')->count();
-        $totalCompleted = $allPlacements->filter(function ($p) {
-            return optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-        })->count();
-        $totalPending = $allApplications->where('status', 'pending')->count();
+        // Metrik Statistik Kampus (Direct Database Query Aggregation)
+        $totalStudents = (clone $applicationsQuery)->count();
+        $totalActive = (clone $applicationsQuery)->where('status', 'active')->count();
+        $totalAccepted = (clone $applicationsQuery)->whereIn('status', ['accepted', 'active', 'completed'])->count();
+        $totalCompleted = (clone $applicationsQuery)->where('status', 'completed')->count();
+        $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalResigned = (clone $applicationsQuery)->where('status', 'resigned')->count();
 
         // Sebaran Dinas / Instansi Penempatan
-        $agencies = AgencyProfile::all();
+        $agencies = AgencyProfile::orderBy('agency_name')->get();
         $agencyDistribution = [];
 
         foreach ($agencies as $agency) {
@@ -104,11 +106,39 @@ class DashboardController extends Controller
             ];
         }
 
+        // Urutkan: instansi dengan mahasiswa terbanyak di urutan teratas, lalu abjad nama
+        usort($agencyDistribution, function ($a, $b) {
+            if ($b['count'] === $a['count']) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+            return $b['count'] <=> $a['count'];
+        });
+
+        $totalAgenciesCount = count($agencyDistribution);
+        $activeAgenciesCount = count(array_filter($agencyDistribution, fn($d) => $d['count'] > 0));
+
+        // Daftar Dosen Aktif Kampus untuk Plotting DPL (Hanya dosen dengan status aktif)
+        $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
+            ->where(function ($q) use ($user, $university) {
+                if ($user->university_id) {
+                    $q->where('university_id', $user->university_id);
+                } elseif ($university) {
+                    $q->where('university', $university->name);
+                }
+            })
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            })
+            ->orderBy('name')
+            ->get();
+
         $stats = [
             'total_students' => $totalStudents,
+            'total_active' => $totalActive,
             'total_accepted' => $totalAccepted,
             'total_completed' => $totalCompleted,
             'total_pending' => $totalPending,
+            'total_resigned' => $totalResigned,
         ];
 
         return view('university.dashboard', compact(
@@ -117,18 +147,218 @@ class DashboardController extends Controller
             'allApplications',
             'stats',
             'agencyDistribution',
-            'agencies'
+            'agencies',
+            'availableDosens',
+            'totalAgenciesCount',
+            'activeAgenciesCount'
         ));
     }
 
     /**
-     * Detail Mahasiswa Kampus untuk Pemantauan Universitas
+     * Plotting / Penugasan Dosen Pembimbing oleh Universitas
      */
-    public function showStudent($placementId)
+    public function assignAdvisor(Request $request, $applicationId)
     {
         $user = Auth::user();
-        $university = $user->university_id ? University::find($user->university_id) : null;
+        $universityId = $user->university_id;
+        $university = $universityId 
+            ? University::find($universityId) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
+        $request->validate([
+            'academic_advisor_id' => 'required|exists:users,id',
+        ], [
+            'academic_advisor_id.required' => 'Silakan pilih Dosen Pembimbing Lapangan.',
+        ]);
+
+        $application = Application::with('user.studentProfile')->findOrFail($applicationId);
+        $student = $application->user;
+
+        // Pastikan mahasiswa berasal dari universitas yang sama
+        $isSameUniv = ($universityId && $student->university_id === $universityId);
+        if (!$isSameUniv && $university) {
+            $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
+        }
+
+        if (!$isSameUniv) {
+            abort(403, 'Anda tidak memiliki hak akses untuk memplot dosen mahasiswa kampus lain.');
+        }
+
+        // Pastikan dosen yang dipilih berasal dari universitas yang sama
+        $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
+        $isAdvisorSameUniv = ($universityId && $advisor->university_id === $universityId);
+        if (!$isAdvisorSameUniv && $university) {
+            $isAdvisorSameUniv = ($advisor->university === $university->name);
+        }
+
+        if (!$isAdvisorSameUniv) {
+            return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
+        }
+
+        $placement = Placement::updateOrCreate(
+            ['application_id' => $application->id],
+            ['academic_advisor_id' => $advisor->id]
+        );
+
+        // Hapus penempatan duplikat jika ada
+        Placement::where('application_id', $application->id)
+            ->where('id', '!=', $placement->id)
+            ->delete();
+
+        return redirect()->back()->with('success', "Dosen Pembimbing Lapangan ({$advisor->name}) berhasil ditugaskan untuk mahasiswa {$student->name}!");
+    }
+
+    /**
+     * Export Rekapitulasi Data & Nilai Mahasiswa Magang ke CSV/Excel
+     */
+    public function export(Request $request)
+    {
+        $user = Auth::user();
+        $university = $user->university_id 
+            ? University::find($user->university_id) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+        $univName = $university?->name ?? $user->university ?? 'Universitas';
+
+        // Query Semua Pengajuan Mahasiswa Asal Kampus Ini
+        $applications = Application::with([
+            'user.studentProfile',
+            'unit.agencyProfile',
+            'placement.mentor',
+            'placement.academicAdvisor',
+            'placement.evaluation'
+        ])->whereHas('user', function ($uq) use ($user, $university) {
+            if ($user->university_id) {
+                $uq->where('university_id', $user->university_id);
+            } elseif ($university) {
+                $uq->where('university', $university->name);
+            }
+        })
+        ->latest()
+        ->get();
+
+        $cleanUnivName = preg_replace('/[^A-Za-z0-9_]/', '_', $univName);
+        $filename = 'Rekap_Mahasiswa_Magang_' . $cleanUnivName . '_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        return response()->stream(function () use ($applications) {
+            $handle = fopen('php://output', 'w');
+
+            // Add UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Header Kolom
+            fputcsv($handle, [
+                'No',
+                'NIM',
+                'Nama Mahasiswa',
+                'Program Studi',
+                'Instansi Magang',
+                'Unit / Bidang Kerja',
+                'Dosen Pembimbing',
+                'Mentor Dinas',
+                'Periode Magang',
+                'Status Magang',
+                'Nilai Mentor',
+                'Nilai Dosen',
+                'Nilai Akhir',
+            ]);
+
+            $no = 1;
+            foreach ($applications as $app) {
+                $student = $app->user;
+                $profile = $student?->studentProfile;
+                $placement = $app->placement;
+                $dosen = $placement?->academicAdvisor;
+                $mentor = $placement?->mentor ?? $placement?->pembimbing;
+                $eval = $placement?->evaluation;
+
+                $mentorScore = ($eval && $eval->nilai_pembimbing) ? number_format($eval->nilai_pembimbing, 2) : '-';
+                $dosenScore = ($eval && $eval->nilai_akademik) ? number_format($eval->nilai_akademik, 2) : '-';
+                
+                // Pakai accessor nilai_akhir: menghormati bobot & skema penilaian kampus
+                // (sebelumnya bobot 40/60 di-hardcode dan nilai setengah jadi ikut dianggap nilai akhir)
+                $finalScore = ($eval && (float) $eval->nilai_akhir > 0)
+                    ? number_format((float) $eval->nilai_akhir, 2)
+                    : '-';
+
+                $periode = ($app->start_date && $app->end_date)
+                    ? date('d/m/Y', strtotime($app->start_date)) . ' s.d. ' . date('d/m/Y', strtotime($app->end_date))
+                    : '-';
+
+                fputcsv($handle, [
+                    $no++,
+                    $profile?->nim ?? '-',
+                    $student?->name ?? '-',
+                    $profile?->jurusan ?? '-',
+                    $app->unit?->agencyProfile?->agency_name ?? '-',
+                    $app->unit?->name ?? '-',
+                    $dosen?->name ?? 'Belum Ditentukan',
+                    $mentor?->name ?? 'Belum Diplot',
+                    $periode,
+                    \App\Enums\ApplicationStatus::tryFrom($app->statusValue())?->label() ?? ucfirst($app->statusValue()),
+                    $mentorScore,
+                    $dosenScore,
+                    $finalScore,
+                ]);
+            }
+
+            fclose($handle);
+        }, 200, $headers);
+    }
+
+    /**
+     * Detail Mahasiswa Kampus untuk Pemantauan Universitas (View Khusus Universitas)
+     */
+    public function showStudent($id)
+    {
+        $user = Auth::user();
+        $university = $user->university_id 
+            ? University::find($user->university_id) 
+            : University::where('name', $user->university)->orWhere('code', $user->university)->first();
+
+        $isMatchUniv = function ($student) use ($user, $university) {
+            if (!$student) return false;
+            if ($user->university_id && $student->university_id && (int)$user->university_id === (int)$student->university_id) {
+                return true;
+            }
+            if ($university) {
+                $studentUniv = strtolower(trim($student->university ?? ''));
+                $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
+                $targetUnivName = strtolower(trim($university->name ?? ''));
+                $targetUnivCode = strtolower(trim($university->code ?? ''));
+
+                if (
+                    ($studentUniv && ($studentUniv === $targetUnivName || $studentUniv === $targetUnivCode)) ||
+                    ($studentProfileUniv && ($studentProfileUniv === $targetUnivName || $studentProfileUniv === $targetUnivCode)) ||
+                    ($targetUnivName && (str_contains($studentUniv, $targetUnivName) || str_contains($targetUnivName, $studentUniv))) ||
+                    ($targetUnivCode && (str_contains($studentUniv, $targetUnivCode) || str_contains($targetUnivCode, $studentUniv)))
+                ) {
+                    if (!$student->university_id && $university->id) {
+                        $student->update(['university_id' => $university->id]);
+                    }
+                    return true;
+                }
+            }
+            if ($user->university) {
+                $userUniv = strtolower(trim($user->university));
+                $studentUniv = strtolower(trim($student->university ?? ''));
+                $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
+
+                if ($studentUniv === $userUniv || $studentProfileUniv === $userUniv || str_contains($studentUniv, $userUniv) || str_contains($userUniv, $studentUniv)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        // 1. Coba cari Placement terlebih dahulu (karena route param adalah {placementId})
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
@@ -140,30 +370,79 @@ class DashboardController extends Controller
             },
             'finalreport',
             'evaluation'
-        ])->findOrFail($placementId);
+        ])->find($id);
 
-        $student = $placement->application->user;
+        if ($placement && $isMatchUniv($placement->application?->user)) {
+            $application = $placement->application;
+            $student = $application->user;
+        } else {
+            // 2. Jika tidak cocok/tidak ditemukan, coba cari Application dengan ID tersebut
+            $appCandidate = Application::with([
+                'user.studentProfile',
+                'unit.agencyProfile',
+                'placement.mentor',
+                'placement.pembimbing',
+                'placement.academicAdvisor',
+                'placement.logbooks' => function ($q) {
+                    $q->orderBy('date', 'desc');
+                },
+                'placement.finalreport',
+                'placement.evaluation'
+            ])->find($id);
 
-        // Otorisasi: Pastikan mahasiswa berasal dari universitas yang sama
-        $isSameUniv = ($user->university_id !== null && $student->university_id === $user->university_id);
-        if (!$isSameUniv && $university) {
-            $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
+            if ($appCandidate && $isMatchUniv($appCandidate->user)) {
+                $application = $appCandidate;
+                $student = $application->user;
+                $placement = $application->placement;
+            } elseif ($placement) {
+                // Ada placement tapi tidak sesuai kampus yang login
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
+            } elseif ($appCandidate) {
+                // Ada application tapi tidak sesuai kampus yang login
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
+            } else {
+                abort(404, 'Data mahasiswa magang tidak ditemukan.');
+            }
         }
 
-        if (!$isSameUniv) {
-            abort(403, 'Anda tidak memiliki hak akses untuk melihat data mahasiswa kampus lain.');
-        }
+        $profile = $student->studentProfile;
+        $unit = $application->unit;
+        $agencyProfile = $unit?->agencyProfile;
+        $mentor = $placement?->mentor ?? $placement?->pembimbing;
+        $dosen = $placement?->academicAdvisor;
+        $logbooks = $placement ? $placement->logbooks : collect();
+        $finalReport = $placement?->finalreport;
+        $evaluation = $placement?->evaluation;
 
-        return view('lecturer.student-detail', [
-            'placement' => $placement,
-            'student' => $student,
-            'profile' => $student->studentProfile,
-            'unit' => $placement->application->unit,
-            'agencyProfile' => $placement->application->unit?->agencyProfile,
-            'mentor' => $placement->mentor ?? $placement->pembimbing,
-            'logbooks' => $placement->logbooks,
-            'finalReport' => $placement->finalreport,
-            'evaluation' => $placement->evaluation,
-        ]);
+        // Daftar Dosen untuk modal Plotting (Hanya dosen aktif)
+        $availableDosens = User::whereIn('role', ['dosen', 'academic_advisor'])
+            ->where(function ($q) use ($user, $university) {
+                if ($user->university_id) {
+                    $q->where('university_id', $user->university_id);
+                } elseif ($university) {
+                    $q->where('university', $university->name);
+                }
+            })
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('university.students.show', compact(
+            'application',
+            'placement',
+            'student',
+            'profile',
+            'unit',
+            'agencyProfile',
+            'mentor',
+            'dosen',
+            'logbooks',
+            'finalReport',
+            'evaluation',
+            'availableDosens',
+            'university'
+        ));
     }
 }

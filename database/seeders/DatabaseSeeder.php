@@ -20,8 +20,26 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Run dedicated Demo E2E Seeder & Admin Workflow Seeder
+        $this->call(DemoE2ESeeder::class);
+        $this->call(AdminWorkflowSeeder::class);
+
         // =========================================================================
-        // 0. SEED MASTER DATA UNIVERSITAS DI SURABAYA
+        // 0. SEED USER SUPERADMIN UTAMA (SELALU TERSEDIA)
+        // =========================================================================
+        $adminUtama = User::firstOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Administrator Utama',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+                'agency_profile_id' => null,
+            ]
+        );
+
+        // =========================================================================
+        // 1. SEED MASTER DATA UNIVERSITAS DI SURABAYA
         // =========================================================================
         $universities = [
             'UNITOMO' => University::firstOrCreate(
@@ -104,18 +122,8 @@ class DatabaseSeeder extends Seeder
         ];
 
         // =========================================================================
-        // 2. SEED USER ADMIN (Utama & Masing-Masing Instansi Pemkot Surabaya)
+        // 2. SEED USER ADMIN MASING-MASING INSTANSI PEMKOT SURABAYA
         // =========================================================================
-        $adminUtama = User::firstOrCreate(
-            ['email' => 'admin@gmail.com'],
-            [
-                'name' => 'Administrator Utama',
-                'password' => Hash::make('admin123'),
-                'role' => 'admin',
-                'agency_profile_id' => null,
-            ]
-        );
-
         $adminDiskominfo = User::firstOrCreate(
             ['email' => 'admin.diskominfo@surabaya.go.id'],
             [

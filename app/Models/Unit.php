@@ -20,10 +20,20 @@ class Unit extends Model
         return $this->hasMany(Application::class);
     }
 
-    // Accessor untuk menghitung sisa kuota otomatis: $unit->remaining_quota
+    // Accessor jumlah kuota terisi: $unit->occupied_count (definisi: Application::scopeOccupyingQuota)
+    // Memakai relasi yang sudah di-eager-load bila ada, agar halaman daftar divisi tidak N+1
+    public function getOccupiedCountAttribute(): int
+    {
+        if (!$this->relationLoaded('applications')) {
+            return $this->applications()->occupyingQuota()->count();
+        }
+
+        return $this->applications->filter(fn ($app) => $app->occupiesQuota())->count();
+    }
+
+    // Accessor untuk menghitung sisa kuota dinamis: $unit->remaining_quota
     public function getRemainingQuotaAttribute()
     {
-        $acceptedCount = $this->applications()->where('status', 'accepted')->count();
-        return max(0, $this->quota - $acceptedCount);
+        return max(0, $this->quota - $this->occupied_count);
     }
 }

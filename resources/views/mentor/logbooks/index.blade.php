@@ -30,21 +30,17 @@
                 
                 <!-- Status Filter Pills -->
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <a href="{{ route('mentor.logbooks.index') }}" 
-                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ !request('status') ? 'bg-blue-600 text-white shadow-sm shadow-blue-200' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+                    <a href="{{ route('mentor.logbooks.index') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ !request('status') ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                         Semua Status
                     </a>
-                    <a href="{{ route('mentor.logbooks.index', ['status' => 'pending']) }}" 
-                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ request('status') === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100' }}">
-                        Pending Review
+                    <a href="{{ route('mentor.logbooks.index', ['status' => 'pending']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100' }}">
+                        PENDING
                     </a>
-                    <a href="{{ route('mentor.logbooks.index', ['status' => 'approved']) }}" 
-                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ request('status') === 'approved' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' }}">
-                        Approved
+                    <a href="{{ route('mentor.logbooks.index', ['status' => 'approved']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'approved' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100' }}">
+                        APPROVED
                     </a>
-                    <a href="{{ route('mentor.logbooks.index', ['status' => 'rejected']) }}" 
-                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 {{ request('status') === 'rejected' ? 'bg-red-600 text-white shadow-sm' : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' }}">
-                        Rejected
+                    <a href="{{ route('mentor.logbooks.index', ['status' => 'rejected']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('status') === 'rejected' ? 'bg-rose-600 text-white shadow-sm' : 'bg-rose-50 text-rose-800 hover:bg-rose-100' }}">
+                        REJECTED
                     </a>
                 </div>
 
@@ -54,10 +50,16 @@
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
                     <div class="relative w-full">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa..." class="w-full text-xs border border-slate-200 bg-slate-50 text-slate-900 rounded-xl pl-9 pr-3 py-2 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 0.85rem !important;">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa..." 
+                               class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                     </div>
-                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-sm shadow-blue-200 transition">
+                    <button type="submit" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
                         Cari
                     </button>
                 </form>
@@ -72,11 +74,11 @@
                         $unit = $log->placement->application->unit ?? null;
                         $st = strtolower($log->status ?? '');
                     @endphp
-                    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4 transition-all duration-200 hover:scale-[1.005]">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:border-blue-200 transition space-y-3">
                         
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center">
                                     {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
                                 </div>
                                 <div>
@@ -86,14 +88,9 @@
                             </div>
 
                             <div class="flex items-center gap-3">
-                                <span class="px-3 py-1 text-xs font-bold rounded-full 
-                                    {{ $log->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                                    {{ $log->status === 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                    {{ $log->status === 'rejected' ? 'bg-rose-100 text-rose-800' : '' }}">
-                                    {{ strtoupper($log->status) }}
-                                </span>
-                                <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
-                                    Detail & Review &rarr;
+                                <x-status-badge type="review" :status="$log->status" />
+                                <a href="{{ route('mentor.logbooks.show', $log->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
+                                    Detail & Review 
                                 </a>
                             </div>
                         </div>
@@ -104,10 +101,12 @@
                         </div>
 
                         @if ($log->attachment)
-                            <div>
-                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                                    Buka Lampiran Bukti
+                            <div class="pt-1">
+                                <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-bold bg-blue-50 px-3 py-1.5 rounded-lg">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    Buka Lampiran Dokumen Bukti
                                 </a>
                             </div>
                         @endif
@@ -118,7 +117,7 @@
                             @method('PUT')
                             
                             <div class="sm:col-span-3">
-                                <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback perbaikan mentor..." class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-900 px-3.5 py-2 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200">
+                                <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Catatan/feedback mentor..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
                             <div class="flex gap-2">
