@@ -48,6 +48,38 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-031** | 2026-09-28 | Table Action Button Sizing & Visual Contrast | Tombol aksi tabel terlalu kecil (h-[30px]) dan kurang kontras; standardisasi ke h-[34px] px-3.5 dengan border crisp dan shadow | RESOLVED |
 | **LRN-032** | 2026-09-28 | Agency Control Center Visual Parity & Clean Badging | Desain show dinas kurang selaras dengan univ; kontak terhimpit, dan badge/tab memuat angka redundan (Akun Terdaftar (3) & Personil 7) | RESOLVED |
 | **LRN-033** | 2026-09-28 | Browser Engine, Driver 404 & Local Chrome Lockdown | Driver Playwright internal 1.57.0 404 CDN di IDE; penguncian ke channel 'chrome' lokal & protokol Mata Manusia | RESOLVED |
+| **LRN-039** | 2026-09-30 | Fitur Chat & Error JSON Endpoint Web | Validasi endpoint fetch `/chat/api/*` membalas redirect 302 (bukan 422 JSON) karena `shouldRenderJsonWhen` hanya `api/*` | RESOLVED |
+| **LRN-040** | 2026-09-30 | Chat Tahap Lengkap: Alpine `:style` vs `x-show` & Vite Dev Basi | Nama pengirim tampil di gelembung sendiri (`:style` string menimpa `display:none` dari `x-show`); Vite dev server menyajikan modul lama/terhapus | RESOLVED |
+| **LRN-041** | 2026-09-30 | Info Kontak Chat, Privasi Data Pribadi & Notifikasi | Telepon dosen dari form admin terbuang (kolom `users.phone` tidak ada); dropdown notifikasi chat terpotong; penanda toast tercampur antar-akun | RESOLVED |
+| **LRN-042** | 2026-10-01 | Database Migrasi Chat & Guard Tabel | Error 500 `relation "chat_conversations" does not exist` saat klik ikon chat karena migrasi batch 7 belum dieksekusi | RESOLVED |
+| **LRN-043** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
+| **LRN-044** | 2026-10-05 | Inovasi Controller DPL: BAP A4, Action Center, Dual Badges, Log Bimbingan & Ekspor CSV | Ketiadaan instrumen formal DPL (BAP A4, riwayat bimbingan akademik, action alerts, dan ekspor CSV rekap bimbingan) & BackedEnum safety | RESOLVED |
+| **LRN-045** | 2026-10-03 | Saluran Pengumuman Resmi & Komentar | Saluran broadcast resmi instansi/kampus gaya Telegram Channel + Comment Thread & isolasi menu | RESOLVED |
+| **LRN-046** | 2026-10-04 | Restrukturisasi Grup Bimbingan Mentor & DPL | Eliminasi grup bimbingan 1-on-1-on-1 lama; 1 mentor banyak mahasiswa, 1 DPL banyak mahasiswa, mutasi & penanganan resign otomatis | RESOLVED |
+| **LRN-047** | 2026-10-04 | Nomenklatur Dosen & Penyeragaman Warna Waktu Chat | Penggantian akronim 'DPL' menjadi 'Dosen' pada grup, subtitle, badge & pesan sistem; penyeragaman warna timestamp (Rabu) | RESOLVED |
+| **LRN-048** | 2026-10-05 | Smart Priority Filter Chat Lintas Peran | Penyempurnaan filter tab prioritas chat berbasis tugas & tanggung jawab masing-masing peran (Dosen, Admin Dinas, Mentor, Kampus, Mahasiswa, Super Admin) | RESOLVED |
+| **LRN-049** | 2026-10-05 | Fase 1 Onboarding & Anti-Deadlock | Kampus belum terdaftar (is_verified=false), DPL susulan & fallback validasi logbook | RESOLVED |
+| **LRN-050** | 2026-10-05 | Dokumen Privat, Batas Unggah & Certificate Gate | Kepala Unit fallback, dokumen privat berotorisasi, limit berkas UploadRules & certificate gate | RESOLVED |
+| **LRN-051** | 2026-10-05 | Searchable Combobox & Tokenized Acronym Matcher | Komponen Blade `<x-searchable-select>`, tokenized multi-word search, akronim database & cascading dropdown dinamis | RESOLVED |
+| **LRN-052** | 2026-10-05 | Master Data Profil & Media Logo Resmi | Standarisasi master data kampus (35) dan OPD (23), sinkronisasi aset logo resmi, optimasi resolusi & Blade accessor | RESOLVED |
+| **LRN-053** | 2026-10-05 | Saluran Pengumuman & Integrasi Logo Chat | Penamaan langsung nama lembaga (tanpa awalan panjang), resolusi dinamis logo resmi dari profil dinas & kampus, perbaikan avatar info panel | RESOLVED |
+| **LRN-055** | 2026-10-05 | Prasyarat Kelulusan Magang: Validasi Pengisian Logbook Aktivitas | Mahasiswa yang belum pernah mengisi logbook dapat dinyatakan lulus (COMPLETED) dan menerbitkan E-Sertifikat | RESOLVED |
+| **LRN-056** | 2026-10-05 | Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin | Menghapus kartu intervensi mentor darurat dari dashboard eksekutif dan sentralisasi penugasan pada detail pengajuan | RESOLVED |
+| **LRN-057** | 2026-10-05 | Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi | Penyeragaman tata letak bimbingan Mentor & DPL berbasis paket mingguan accordion, standarisasi skala nilai Grade::letter(), dan bulk review | RESOLVED |
+| **LRN-058** | 2026-10-05 | Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor | Penyeragaman tampilan dashboard Portal Mentor Lapangan agar persis seperti Portal Dosen Pembimbing (4 kartu metrik, filter kampus/laporan, tabel status mahasiswa), penyederhanaan judul, dan perbaikan query kolom evaluasi PostgreSQL | RESOLVED |
+| **LRN-059** | 2026-10-07 | Dashboard Mahasiswa: Form Dosen Pembimbing, Status Harmonis & Standarisasi Istilah | Relokasi form pilih dosen tepat di bawah kartu info, eliminasi catatan penolakan panjang dari kartu dashboard demi keseragaman tinggi kartu, perbaikan status rejected, dan standardisasi penamaan Dosen Pembimbing / Mentor Lapangan tanpa kurung | RESOLVED |
+| **LRN-059** | 2026-10-07 | Seleksi Pengajuan Admin: Alpine Bulk Reactivity, Duplikasi ID & Mobile Overlap | Form bulk terima gagal validasi, count 2x lipat saat toggle-all, checkbox tertimpa badge status di HP & semantic pagination | RESOLVED |
+| **LRN-060** | 2026-10-07 | DPL BAP Print & Legalitas TTE | Kotak QR dummy teks, badge monospace TTE kaku & ketidaksinkronan posisi kolom pada Berita Acara Penilaian | RESOLVED |
+| **LRN-061** | 2026-10-07 | Database Migration & BAP DPL | Error 500 relation "academic_consultations" does not exist saat cetak lembar nilai/BAP DPL karena migrasi pending | RESOLVED |
+| **LRN-062** | 2026-10-07 | Autentikasi Admin & Standarisasi Rasio Aspek Favicon | Login error admin@gmail.com dengan kata sandi password & favicon tab browser Edge/Chrome gepeng/terdistorsi | RESOLVED |
+| **LRN-063** | 2026-10-07 | Standarisasi Siklus Hidup Magang, UI Dashboard Admin & Perapian Portal Mentor | Status ACCEPTED keliru tampil 'Siap diluluskan', asimetri 6 kartu metrik admin, banner Super Admin, dan tabel mentor padat badge ganda | RESOLVED |
+| **LRN-064** | 2026-10-07 | UI Line-Clamp Grid & Tipografi | Teks judul instansi & universitas baris ketiga terpotong di halaman index | RESOLVED |
+| **LRN-065** | 2026-10-08 | Nomenklatur Akademik & Rekonsiliasi Merge | Standardisasi istilah Dosen Pembimbing lintas peran & pembersihan tag Blade | RESOLVED |
+| **LRN-066** | 2026-10-08 | Scheduler, Queue Heartbeat & Model Guarding | Validasi otomatis sinkronisasi status magang & monitoring kesehatan worker | RESOLVED |
+| **LRN-067** | 2026-10-08 | Audit Komprehensif Sistem, Metrik Kampus & Type-Safety | Distorsi metrik makro kampus saat filter tabel, nullsafe dashboard mahasiswa, filter notifikasi DPL per skema evaluasi kampus, & alias kuota unit | RESOLVED |
+| **LRN-068** | 2026-10-08 | DPL Student Detail Redesign | Paritas Civic Hero Banner dengan portal mahasiswa, eliminasi BAP, grid 4 pilar konteks & KPI evaluasi | RESOLVED |
+| **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Portal Dosen Pembimbing | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
+| **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
 
 ---
 
@@ -556,6 +588,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Memverifikasi seluruh halaman terkompilasi dan lulus 69 unit/feature tests (Exit Code 0).
 - **Prevention Rule**: Seluruh halaman portal utama (Dashboard, Logbook, Profil, Laporan Akhir, Pendaftaran) wajib menggunakan container baku `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6` dan struktur header/kartu data penempatan terstandar agar konsistensi visual serta keselarasan teks terjaga di seluruh navigasi aplikasi.
 
+
 ---
 
 ### [LRN-028] Hard Visual Guard & Mandat Multimodal Vision Browser Automation
@@ -771,11 +804,870 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Root Cause**: Tiap view menulis daftar nama & warna status sendiri; tidak ada satu komponen render. Warna badge ada di enum PHP yang tidak dipindai Tailwind.
 - **Fix Applied**: `label()` = kode sistem huruf kapital (`strtoupper(value)`), `description()` = keterangan Indonesia, `resolve()` untuk enum/string mentah. Semua badge lewat `<x-status-badge>` (ringkas: kode + tooltip keterangan, untuk tabel/area sempit; `stacked`: kode + keterangan di baris kedua, untuk kartu lapang — tanpa format "Nama (Kode)"). Kartu statistik yang menghitung satu status memakai kodenya; kartu gabungan memakai nama metrik dengan keterangan kode yang dihitung. Filter kampus kini persis per kode status terbaru. `app/Enums` ditambahkan ke `content` Tailwind. Nilai hantu dihapus; notifikasi memakai `pending`. `actionHint()` tidak lagi mengulang badge untuk PENDING/VERIFIED.
 - **Lanjutan (2026-09-29)**: Status review logbook (`status`, `lecturer_status`) & laporan akhir memakai standar yang sama lewat `ReviewStatus` (`label()` = PENDING/APPROVED/REJECTED/REVISION, `description()`, `dotColor()`, `resolve()`) dan `<x-status-badge type="review">`. Filter laporan dosen kini per kode (dulu "pending" diam-diam memuat `revision`). Aturan transisi: ACCEPTED/REJECTED boleh dari PENDING **atau VERIFIED** (sebelumnya hanya PENDING, bertentangan dengan alur pending → verified → accepted).
+- **Pengecualian (2026-09-30)**: status keaktifan akun disederhanakan menjadi **Aktif / Nonaktif** (`active`/`inactive`) untuk semua role; label Bahasa Indonesia (bukan kode) karena status akun bukan alur kerja dan "ACTIVE" bertabrakan dengan status magang ACTIVE. Cuti pembimbing = Nonaktif, diaktifkan kembali oleh admin. Nilai `on_leave` dihapus (migrasi `2026_09_30_020000` memindahkannya ke `inactive`; validasi menolaknya). Mahasiswa yang mundur dari magang tetap memakai status pengajuan RESIGNED, bukan status akun.
+- **Penguatan (2026-09-30)**: (1) `StatusViewGuardTest` memindai seluruh `resources/views` dan gagal bila ada nama status ditulis manual (isi elemen berupa kode/nama status, `strtoupper($x->status)`, atau peta nilai→label); pengecualian per baris dengan `{{-- status-guard:ignore --}}`. (2) Kolom status teks biasa tanpa CHECK constraint (`users.status`, `system_feedbacks.status`) dijaga listener `saving` di AppServiceProvider (`Enum::assertValid`); status logbook/laporan sudah dijaga CHECK constraint DB, status pengajuan oleh cast enum. Listener `saving` WAJIB tidak mengembalikan false (false = penyimpanan dibatalkan). (3) Migrasi `2026_09_30_030000` menambah index kolom foreign key (PostgreSQL tidak membuatnya otomatis). (4) Badge ringkas menampilkan keterangan di baris kedua pada layar sentuh (`[@media(hover:none)]`), karena tooltip tidak bisa dibuka.
 - **Prevention Rule**: Jangan menulis nama/warna status pengajuan maupun status review di view — selalu `<x-status-badge>` (tambah `type="review"` untuk logbook/laporan) atau `Enum::X->label()/description()`. Status yang dibandingkan di kode hanya 7 nilai enum (`ApplicationStatus::values()`); status logbook/laporan hanya nilai `ReviewStatus`. Test `StatusLabelConsistencyTest` membuka satu pengajuan dari 10 halaman lintas role dan gagal bila nama berbeda.
 
 ---
 
+### [LRN-039] Fitur Chat Antar Role & Error JSON pada Endpoint Fetch di Route Web
+- **Tanggal**: 2026-09-30
+- **Komponen**: `bootstrap/app.php`, `app/Services/Chat/*`, `app/Http/Controllers/Chat/*`, `resources/js/chat.js`, `resources/js/chat-notifier.js`, `resources/views/chat/index.blade.php`, `tests/Feature/Chat/*`
+- **Problem / Symptom**: Saat membangun fitur chat, request `fetch` ke `/chat/api/...` dengan `Accept: application/json` yang gagal validasi dibalas **302 redirect** ke halaman sebelumnya, bukan 422 JSON. Test `assertUnprocessable()` gagal dengan `Call to a member function all() on array`, dan di browser pesan error tidak bisa ditampilkan.
+- **Root Cause**: `withExceptions()->shouldRenderJsonWhen(fn ($r) => $r->is('api/*'))` **menggantikan** deteksi bawaan `expectsJson()`. Semua route di luar `api/*` selalu dirender sebagai HTML/redirect walaupun klien meminta JSON.
+- **Fix Applied**: Kondisi diperluas menjadi `$r->is('api/*') || ($r->is('chat/*') && $r->expectsJson())`. Fitur chat tahap 1: percakapan 1-on-1 berdasarkan relasi magang (`ChatContactDirectory`, dua arah), satu lampiran per pesan di disk private, polling adaptif (tanpa WebSocket), badge navbar + toast + entri lonceng yang digabung per percakapan (`ChatNotifier`), dan mode Login As hanya-baca. Tercakup 23 test di `tests/Feature/Chat`.
+- **Prevention Rule**: Endpoint JSON baru yang dipanggil via `fetch` dari halaman web wajib ditambahkan ke kondisi `shouldRenderJsonWhen` di `bootstrap/app.php` (atau diletakkan di `routes/api.php`). Aturan siapa-boleh-chat-siapa hanya boleh diubah di `ChatContactDirectory`, dan test simetri `ChatContactDirectoryTest` wajib tetap hijau. Batas upload chat mengikuti `upload_max_filesize` php.ini (default 2 MB). Jangan menaikkan `config/chat.php` tanpa menaikkan php.ini juga.
+
+---
+
+### [LRN-040] Chat Tahap Lengkap: `:style` String Menimpa `x-show`, Observer Penempatan, & Vite Dev Server Basi
+- **Tanggal**: 2026-09-30
+- **Komponen**: `resources/views/chat/partials/*.blade.php`, `resources/js/chat/*`, `app/Observers/PlacementChatObserver.php`, `app/Services/Chat/ChatGroupService.php`, `database/migrations/2026_09_30_010000_upgrade_chat_full_features.php`
+- **Problem / Symptom**:
+  1. Di grup, nama pengirim (teks berwarna) muncul di atas gelembung pesan **milik sendiri**, padahal `x-show="item.showName"` bernilai false.
+  2. Setelah file JS diganti/dipindah (`resources/js/chat.js` → `resources/js/chat/app.js`), halaman memunculkan puluhan error Alpine `listFilter is not defined`, `$store.chatPrefs` undefined. Vite dev server yang sedang berjalan masih menyajikan `app.js` lama, bahkan file yang sudah dihapus.
+- **Root Cause**:
+  1. Binding Alpine `:style` berbentuk **string** (`` :style="`color: ${x}`" ``) memanggil `setAttribute('style', …)` dan menimpa `display: none` yang dipasang `x-show` pada elemen yang sama.
+  2. Watcher Vite (chokidar) di path Windows ber-spasi/berkurung tidak mendeteksi perubahan, sehingga cache transform lama tetap disajikan selama `public/hot` ada.
+- **Fix Applied**:
+  1. Semua `:style` di tampilan chat & toast layout memakai **bentuk objek** (`:style="{ color: x }"`, `{ backgroundColor: x }`), yang menggabungkan style tanpa menghapus `display` dari `x-show`.
+  2. Uji browser memakai hasil `npm run build` (intersep aset dev server di Playwright). Pengembang cukup me-restart `npm run dev` / `composer dev` setelah menarik perubahan struktur JS.
+  3. Fitur tahap lengkap: grup buatan staf (admin grup, tambah/keluarkan anggota, keluar grup, promosi admin otomatis), **Grup Bimbingan otomatis** per penempatan via `Placement::observe(PlacementChatObserver)` (`ShouldHandleEventsAfterCommit` + try/catch, sehingga alur inti seleksi tidak ikut gagal), balas/kutip, hapus untuk semua (isi & file dibuang, tersisa penanda), laporkan pesan → tiket `laporan_chat` + panel moderasi Super Admin di `feedbacks/show`, maks. 5 lampiran/pesan (tabel `chat_attachments`), voice note (MediaRecorder), status dibaca per anggota, online/terakhir dilihat, sedang mengetik (cache), bisukan/sematkan, notifikasi desktop + suara, serta tombol "Chat" kontekstual (`<x-chat-button>`, `<x-chat-group-button>`).
+- **Prevention Rule**: Jangan pernah memakai `:style` berbentuk string pada elemen yang juga memakai `x-show`; gunakan bentuk objek. Setelah mengganti/memindah file JS, restart Vite dev server atau hapus `public/hot` usang sebelum menguji. Setiap efek samping lintas modul yang dipicu event model (observer) wajib `ShouldHandleEventsAfterCommit` + try/catch + `report()` agar tidak membatalkan transaksi inti.
+
+---
+
+### [LRN-041] Info Kontak Chat Berbasis Hubungan Magang, Nomor Staf yang Terbuang, & Perbaikan Notifikasi Chat
+- **Tanggal**: 2026-09-30
+- **Komponen**: `ChatContactDirectory::personalDetailsVisibleTo()`, `ChatPresenter::contactDetails()`, `resources/views/chat/partials/contact-details.blade.php`, `ProfileController@updatePhone` (`profile.phone.update`), migrasi `2026_09_30_030000_add_phone_to_users_table`, `resources/js/chat/notifier.js`, `resources/views/chat/partials/sidebar.blade.php`, `layouts/navigation.blade.php`
+- **Problem / Symptom**:
+  1. Info Kontak chat belum menampilkan email & telepon, dan nomor dosen yang diisi Super Admin di form tambah dosen (`storeDosen`) **tidak pernah tersimpan**.
+  2. Dropdown "Pengaturan notifikasi" di halaman chat terpotong di sisi kiri ("otifikasi desktop").
+  3. Penanda pesan terakhir yang sudah di-toast disimpan di satu kunci localStorage untuk semua akun, jadi saat "Login As" atau ganti akun di browser yang sama, toast bisa hilang atau salah. Pesan chat di lonceng navbar juga tenggelam di bawah pemberitahuan otomatis (hanya 4 teratas yang tampil).
+- **Root Cause**:
+  1. Tabel `users` tidak punya kolom `phone`; `User::create([... 'phone' => ...])` diam-diam membuang atribut yang tidak ada di `$fillable`.
+  2. Panel `absolute right-0 w-72` di tombol kecil melewati tepi kiri kartu yang `overflow-hidden`.
+  3. Kunci `chat:last-seen-message-id` tidak memuat id pengguna; `array_slice(..., 0, 4)` pada urutan bawaan NotificationService (item otomatis dulu, notifikasi DB terakhir).
+- **Fix Applied**:
+  1. Kolom `users.phone` (nullable) + `$fillable`; staf mengisi nomor di kartu "Nomor Kontak untuk Chat" di Pengaturan Akun (mahasiswa tetap memakai `student_profiles.phone`). Data per role: mahasiswa = email, HP, NIM, prodi, fakultas, semester; staf = email & nomor akun; plus kontak resmi dinas/kampus (selalu tampil).
+  2. **Privasi**: data pribadi hanya dikirim server bila `personalDetailsVisibleTo()` mengizinkan, yaitu mode ketat `contactsQuery(strict: true)`. Aturannya sama dengan aturan kontak chat, tetapi dosen ↔ mahasiswa sekampus hanya bila dosen tersebut DPL-nya. Super Admin melihat semua. Tanpa izin, API mengirim `visible=false` dan email/telepon/NIM `null` (bukan sekadar disembunyikan di tampilan).
+  3. Panel notifikasi diposisikan selebar sidebar (`absolute left-3 right-3` terhadap header), berisi status izin browser & tombol tes suara. Kunci localStorage/sessionStorage memuat `data-chat-user`. Toast ringkasan "Anda memiliki N pesan belum dibaca" muncul sekali per sesi. Notifikasi desktop juga muncul saat jendela tidak fokus. Pesan chat belum dibaca didahulukan di lonceng navbar. Saat Login As, jumlah belum dibaca di daftar tidak di-nol-kan (konsisten dengan badge navbar).
+- **Prevention Rule**: Data pribadi (email, telepon, NIM, alamat) di fitur apa pun wajib difilter di server lewat `personalDetailsVisibleTo()` (atau aturan setara), bukan dengan menyembunyikan elemen di Blade/Alpine. Setiap `Model::create()` dengan field baru wajib dicek kolom & `$fillable`-nya, karena atribut yang tidak dikenal dibuang tanpa error. Kunci localStorage/sessionStorage yang menyimpan status per pengguna wajib memuat id pengguna. Dropdown di dalam kontainer `overflow-hidden` wajib diposisikan relatif ke kontainer yang cukup lebar (atau `fixed`).
+
+---
+
+### [LRN-042] Penanganan Migrasi Fitur Chat Tertunda (`relation "chat_conversations" does not exist`) & Guard Skema
+- **Tanggal**: 2026-10-01
+- **Komponen**: `database/migrations/`, `app/Services/Chat/ChatGroupService.php`, `resources/views/chat/partials/conversation.blade.php`
+- **Problem / Symptom**: Saat pengguna menekan ikon balon chat di samping notifikasi di navbar (mengarah ke `/chat`), muncul halaman error 500 `Illuminate\Database\QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "chat_conversations" does not exist` di `ChatGroupService.php:217`.
+- **Root Cause**:
+  1. Migrasi fitur chat (`2026_09_30_000000_create_chat_tables` dkk) masih berstatus `Pending` di database PostgreSQL aktif (`db_perpusmagang`).
+  2. `ChatGroupService::ensurePlacementGroupsFor()` belum memiliki guard pengecekan keberadaan tabel `chat_conversations`, sehingga langsung melempar SQL exception fatal bila tabel belum dimigrasi.
+  3. Badge status "Nonaktif" di `chat/partials/conversation.blade.php` memicu gagal test `StatusViewGuardTest` karena belum diberi penanda `status-guard:ignore`.
+- **Fix Applied**:
+  1. Menjalankan `php artisan migrate` untuk mengeksekusi seluruh migrasi pending (Batch 7: `create_chat_tables`, `upgrade_chat_full_features`, `merge_on_leave_into_inactive_account_status`, `add_foreign_key_indexes_to_core_tables`, `add_phone_to_users_table`).
+  2. Menambahkan guard `if (!Schema::hasTable('chat_conversations')) { return; }` pada `ChatGroupService::ensurePlacementGroupsFor()` untuk keamanan defensif.
+  3. Menambahkan komentar `{{-- status-guard:ignore --}}` pada badge kontak nonaktif di header chat Blade.
+  4. Membersihkan cache via `php artisan optimize:clear` dan `php artisan view:clear`.
+- **Prevention Rule**: Setiap penambahan migrasi baru wajib segera dijalankan pada database lingkungan lokal/development (`php artisan migrate`). Service yang berinteraksi dengan tabel yang baru diperkenalkan sebaiknya memiliki pengecekan `Schema::hasTable` jika berisiko dipanggil dari halaman umum sebelum migrasi selesai.
+
+---
+
+### [LRN-043] Audit Menyeluruh Sistem: Migrasi AccountStatus, Template Berkas Laporan Akhir, & Tombol Dinamis Kelulusan Dasbor Mahasiswa
+- **Tanggal**: 2026-10-01
+- **Komponen**: `database/migrations/`, `resources/views/dashboard.blade.php`, `resources/views/letters/acceptance.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `database/seeders/DemoE2ESeeder.php`, `scripts/hermes_all_roles_test.mjs`, `app/Http/Controllers/Student/FinalReportController.php`
+- **Problem / Symptom**:
+  1. Terdapat file migrasi pending `2026_09_30_020000_merge_on_leave_into_inactive_account_status.php` yang belum dieksekusi di database PostgreSQL.
+  2. Unduh naskah laporan akhir (`/final-reports/{id}/file`) menghasilkan redirect 302 dengan pesan error "Berkas tidak ditemukan" karena direktori fisik `storage/app/public/final_reports/` belum ada berkas PDF template bawaan.
+  3. Mahasiswa yang telah menyelesaikan program magang (status `completed` / `$isPassed`) dengan logbook kurang dari 30 hari tetap disajikan tombol aksi cepat "+ Isi Logbook" alih-alih "Unduh Sertifikat".
+  4. Pengujian sintetik multi-role `scripts/hermes_all_roles_test.mjs` mengalami 5 kegagalan akibat ketidaksesuaian ID fallback seeder, regex link download sertifikat, dan ketiadaan teks URL verifikasi pada dokumen cetak surat balasan serta sertifikat.
+- **Root Cause**:
+  1. Migrasi baru ditambahkan tetapi belum dijalankan via `php artisan migrate`.
+  2. Berkas PDF laporan fisik tidak ter-commit ke git (`.agentignore` / storage disk), sehingga controller me-redirect balik saat `Storage::disk('public')->exists()` false.
+  3. Pada `resources/views/dashboard.blade.php`, urutan percabangan `@elseif($logbooksCount < 30)` diletakkan sebelum `@elseif($isPassed)`, sehingga mahasiswa lulus dengan entri logbook < 30 terjebak pada arahan mengisi logbook.
+  4. Script Hermes mencari `/student/certificate/{id}/download` yang berbeda dari URL rute dasar `/student/certificate/{id}`, dan data seeder mahasiswa aktif memiliki status `accepted` sehingga tidak muncul di tab default `active` pada dasbor mentor.
+- **Fix Applied**:
+  1. Menjalankan `php artisan migrate` untuk memperbarui status akun `on_leave` ke `inactive`.
+  2. Menyediakan berkas PDF template valid di `storage/app/public/final_reports/default.pdf` dan `sample_laporan_akhir.pdf`.
+  3. Memindahkan percabangan `@elseif($isPassed)` ke urutan prioritas sebelum pengecekan dosen dan logbook pada arahan serta tombol aksi cepat `dashboard.blade.php`.
+  4. Menyelaraskan status penempatan seeder `Aditya Nugraha` ke `active` lengkap dengan `letter_token`, serta menambahkan URL tautan verifikasi eksplisit pada `letters/acceptance.blade.php` dan `certificates/internship_certificate.blade.php`.
+  5. Menjalankan validasi menyeluruh: Hermes Multi-Role Test Suite lulus 100% (**56/56 PASS**) dan PHPUnit/Pest lulus 100% (**160/160 PASS, 1.273 assertions, Exit Code 0**).
+- **Prevention Rule**: Pastikan selalu menjalankan `php artisan migrate:status` sebelum pengujian. Pada antarmuka berjenjang (stateful workflow), selalu evaluasi status terminal/sukses (`$isPassed` / `completed`) lebih awal dibanding status progres harian (`$logbooksCount`). Setiap endpoint unduh berkas wajib memiliki fallback dokumen fisik di storage disk.
+
+---
+
+### [LRN-044] Smart Workflow-Based Priority Engine & Stage Badges Fitur Chat (Style Dinas)
+- **Tanggal**: 2026-10-01
+- **Komponen**: `app/Services/Chat/ChatPresenter.php`, `app/Services/Chat/ChatService.php`, `resources/js/chat/app.js`, `resources/views/chat/partials/sidebar.blade.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/info-panel.blade.php`, `tests/Feature/Chat/ChatPriorityEngineTest.php`, `scripts/test_chat_priority_ui.mjs`
+- **Problem / Symptom**:
+  1. Ketika admin dinas, mentor, dan staf menerima puluhan hingga ratusan percakapan dari mahasiswa yang berbeda-beda, staf kesulitan membedakan mahasiswa mana yang memerlukan tindakan segera (misalnya: butuh verifikasi seleksi berkas, masa magang mendekati berakhir H-7, atau siap diluluskan) versus obrolan rutin biasa.
+  2. Pendekatan analisis teks regex (misal: mencari kata "urgent", "tolong", "darurat") tidak akurat, rentan false positive, dan mengorbankan privasi obrolan pengguna.
+- **Root Cause**: Ketiadaan pengkaitan status alur kerja magang (*internship lifecycle*) di database relasional PostgreSQL (`Application` dan `Placement`) ke dalam data agregasi presenter percakapan chat.
+- **Fix Applied**:
+  1. **Smart Workflow & Action Urgency Engine**:
+     - Memanfaatkan standar `Application::actionPriority()` dan tanggal magang di `ChatPresenter::stageBadge()` dan `ChatPresenter::applicationStageBadge()`:
+       - `Tingkat 1 (Urgent)`: `pending` atau `verified` $\rightarrow$ Badge `[• Seleksi Masuk]` / `[• Lolos Berkas]` (`theme: urgent`, `is_urgent: true`).
+       - `Tingkat 2 (Urgent)`: `can_complete` $\rightarrow$ Badge `[• Siap Lulus]` (`theme: urgent`, `is_urgent: true`).
+       - `Tingkat 3 (Urgent)`: Pembimbing belum ditetapkan $\rightarrow$ Badge `[• Perlu Pembimbing]` (`theme: urgent`, `is_urgent: true`).
+       - `Tingkat 4 (Warning/Urgent)`: `active` dengan sisa masa magang $\le 7$ hari $\rightarrow$ Badge `[• H-X Selesai]` atau `[• Masa Berakhir]` (`theme: warning|urgent`, `is_urgent: true`).
+       - `Tingkat 5`: `active` normal $\rightarrow$ Badge `[• Aktif Magang]` (`theme: success`, `is_urgent: false`).
+       - `Tingkat 6`: `accepted` $\rightarrow$ Badge `[• Diterima]` (`theme: info`, `is_urgent: false`).
+       - `Tingkat 7`: `completed` $\rightarrow$ Badge `[• Alumni Magang]` (`theme: neutral`, `is_urgent: false`).
+       - Staf / Grup: Label resmi (`Mentor Lapangan`, `DPL Kampus`, `Admin Dinas`, `Grup Koordinasi`).
+  2. **Zero N+1 Query Optimization**:
+     - Mengoptimalkan `ChatService::conversationsFor` dan `ChatService::conversationDetail` dengan eager-loading mendalam pada `placement.application` dan `user.applications` (beserta evaluasi dan laporan akhirnya).
+  3. **Antarmuka Rapi Bergaya Dinas (Style Dinas Pemkot Surabaya)**:
+     - Bilah penyaring (*tab bar*) dengan pill responsif: `Semua`, `Prioritas` (dilengkapi titik indikator & jumlah belum selesai), `Mahasiswa`, `Kedinasan`, `Belum dibaca`, `Grup`.
+     - Ketika tab `Prioritas` dipilih, daftar diurutkan otomatis: pesan belum dibaca di atas, kemudian tingkat urgensi prioritas (rank 1–4), lalu aktivitas percakapan terbaru.
+     - Badge status ditampilkan secara konsisten pada bilah samping (sidebar card), kepala obrolan (conversation header), dan panel informasi samping (info panel).
+  4. **Pengujian Menyeluruh**:
+     - Unit & Feature test `ChatPriorityEngineTest.php` lulus 100% (6/6).
+     - Seluruh suite chat `tests/Feature/Chat` lulus 100% (65/65).
+     - Rangkaian pengujian utama `php artisan test` lulus 100% (**166/166 PASS, 1.309 assertions, Exit Code 0**).
+     - Audit integrasi lintas-role Hermes lulus 100% (**56/56 PASS**).
+     - Visual snapshot E2E browser Google Chrome terverifikasi sempurna.
+- **Prevention Rule**: Penentuan prioritas dalam sistem layanan publik kedinasan wajib berbasis alur status (*state-driven determinism*) dari skema database transaksi, bukan mengandalkan heuristic keyword parsing pada teks pesan. Pastikan relasi model lifecycle di-eager-load secara tepat agar waktu muat daftar chat tetap instan ($<50$ ms).
+
+---
+
+### [LRN-045] Saluran Pengumuman Resmi Kedinasan & Kampus dengan Utas Komentar Gaya Telegram
+- **Tanggal**: 2026-10-03
+- **Komponen**: `app/Models/ChatConversation.php`, `app/Models/ChatMessage.php`, `app/Services/Chat/ChatChannelService.php`, `app/Services/Chat/ChatMessageService.php`, `app/Services/Chat/ChatPresenter.php`, `app/Services/Chat/ChatService.php`, `app/Http/Controllers/Chat/ChatMessageController.php`, `app/Http/Controllers/Chat/ChatPageController.php`, `resources/views/chat/partials/comments-drawer.blade.php`, `resources/views/chat/partials/message.blade.php`, `resources/views/chat/partials/sidebar.blade.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/composer.blade.php`, `resources/js/chat/app.js`, `tests/Feature/Chat/ChatChannelFeatureTest.php`, `scripts/test_channel_chat_e2e.mjs`
+- **Problem / Symptom**: 
+  1. Kebutuhan saluran pengumuman broadcast satu arah resmi (*official broadcast channel*) yang hanya boleh dipublikasikan oleh otoritas tingkat tinggi (Dinas Kota dan Universitas) namun tetap memfasilitasi audiens (mahasiswa & dosen) untuk berdiskusi/bertanya tanpa menumpuk atau mengotori timeline utama pengumuman (*noise clutter*).
+  2. Adanya file `public/hot` tertinggal dari proses Vite lama yang mengarahkan layout `@vite` ke dev server port 5173 stale, sehingga browser mengeksekusi bundel JavaScript usang saat pengujian visual E2E.
+- **Root Cause**:
+  1. Skema chat sebelumnya hanya mendukung direct (1-on-1) dan group koordinasi di mana setiap anggota berhak mengirim pesan langsung ke feed utama tanpa pemisahan thread komentar berjenjang (`parent_id`).
+  2. Saat migrasi atau build lokal, jika file `public/hot` tidak dihapus, directive `@vite` Laravel memprioritaskan hot dev server dibanding compiled assets di `public/build/manifest.json`.
+- **Fix Applied**:
+  1. **Skema & Database**:
+     - Menambahkan kolom `type` (`direct`, `group`, `channel`), `scope_type` (`government`, `university`), `university_id`, `agency_profile_id`, `image_url`, dan `is_broadcast_only` pada tabel `chat_conversations`.
+     - Menambahkan `parent_id` (foreign key self-referencing dengan onDelete cascade) dan `comments_count` pada `chat_messages`.
+  2. **Domain Service & Auto-Membership**:
+     - Membuat `ChatChannelService` untuk menginisialisasi saluran otomatis (`Saluran Pengumuman [Nama Lembaga]`) tanpa emoji dekoratif, auto-enroll mahasiswa & dosen ke kampus & pemkot, serta validasi hak akses ketat (`canPublishAnnouncement` & `canManageChannel`).
+     - Menyaring feed timeline utama agar hanya memuat pengumuman utama (`whereNull('parent_id')`). Non-admin yang mencoba kirim pesan di feed utama langsung ditolak (`403 Forbidden`).
+  3. **Identitas Visual Resmi**:
+     - Avatar saluran berbentuk squircle (`w-11 h-11 rounded-xl border border-slate-200/90 bg-white p-1 object-contain shadow-xs`) memuat logo institusi asli (logo Pemkot Surabaya, Kominfo, Unesa, dll.), berbeda dari lingkaran pada akun personal.
+     - Badge teks `[Dinas]` dan `[Kampus]` yang bersih tanpa emoji.
+  4. **Antarmuka Gaya Saluran Telegram (Channel + Slide-Over Comments)**:
+     - Footer non-admin menampilkan banner elegan: *"Hanya Pengelola Saluran yang dapat mempublikasikan pengumuman di sini."*
+     - Kartu pengumuman memiliki bilah interaksi bawah: `[ 💬 Kirim Komentar ]` atau `[ 💬 {count} Komentar ]` lengkap dengan ikon chevron-right.
+     - Mengklik bilah komentar membuka panel drawer samping kanan (*slide-over drawer*) dengan ringkasan pengumuman, daftar komentar audiens, dan formulir pengiriman komentar aktif.
+  5. **Pengujian Menyeluruh (Strict Exit Code 0)**:
+     - `ChatChannelFeatureTest.php`: 7/7 PASSED (48 assertions).
+     - Rangkaian pengujian chat `tests/Feature/Chat/`: 72/72 PASSED (547 assertions).
+     - Visual E2E Playwright dengan Google Chrome sistem (`channel: 'chrome'`): 5 tangkapan layar PNG tersimpan dan terverifikasi secara visual.
+- **Prevention Rule**:
+  1. Setiap fitur komunikasi saluran publik satu arah wajib menerapkan pemisahan struktur pesan siaran (`parent_id IS NULL`) dan tanggapan/komentar (`parent_id IS NOT NULL`) baik di tingkat database constraints maupun query builder feed.
+  2. Sebelum menjalankan pengujian visual frontend (Playwright / E2E), selalu pastikan file `public/hot` dibersihkan jika tidak sengaja dibuat agar browser memuat bundel produksi terbaru dari `public/build/manifest.json`.
+
+---
+
+### [LRN-046] Restrukturisasi Grup Bimbingan Magang: 1 Mentor Banyak Mahasiswa & 1 DPL Banyak Mahasiswa
+- **Tanggal**: 2026-10-04
+- **Komponen**: `app/Models/ChatConversation.php`, `app/Services/Chat/ChatGroupService.php`, `app/Services/Chat/ChatPresenter.php`, `app/Http/Controllers/Chat/ChatPageController.php`, `app/Observers/PlacementChatObserver.php`, `app/Observers/ApplicationChatObserver.php`, `app/Providers/ChatServiceProvider.php`, `app/Console/Commands/SyncChatPlacementGroups.php`, `database/migrations/2026_10_04_010000_cleanup_legacy_placement_chat_conversations.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/info-panel.blade.php`, `resources/views/chat/partials/sidebar.blade.php`, `resources/js/chat/app.js`, `tests/Feature/Chat/ChatPlacementGroupTest.php`, `scripts/test_guidance_groups_e2e.mjs`
+- **Problem / Symptom**:
+  1. Grup bimbingan lama dibuat per-penempatan tunggal (1 mahasiswa + 1 dosen + 1 mentor), menyebabkan mentor dan DPL memiliki puluhan grup terpisah untuk setiap mahasiswa bimbingannya.
+  2. Ketika mahasiswa berganti mentor/DPL atau mengundurkan diri (*resigned*), grup lama tidak sinkron otomatis sehingga menyulitkan monitoring.
+  3. Adanya badge dobel pada UI dan saluran pengumuman masih muncul di tab "Semua".
+- **Root Cause**:
+  1. Relasi obrolan bimbingan dikunci pada kolom `placement_id` tunggal (`ChatConversation::TYPE_PLACEMENT`), bukan diagregasi berdasarkan pembimbing (`mentor_id` dan `academic_advisor_id`).
+  2. Ketiadaan observer pada model `Application` untuk menangkap mutasi status `resigned` atau `rejected` secara reaktif pasca-komit database.
+- **Fix Applied**:
+  1. **Pembersihan Data Lama**:
+     - Migrasi `2026_10_04_010000_cleanup_legacy_placement_chat_conversations.php` untuk menghapus seluruh percakapan usang bertipe `placement`.
+  2. **Arsitektur Baru Grup Bimbingan**:
+     - **Grup Bimbingan Mentor**: 1 grup terpadu per Mentor (`scope_type: mentor_guidance`, `created_by: mentor_id`). Berisi Mentor sebagai Admin + seluruh mahasiswa bimbingan aktifnya dari instansi tersebut. Judul seragam: `Bimbingan Mentor [Nama Mentor]`.
+     - **Grup Bimbingan DPL**: 1 grup terpadu per DPL (`scope_type: dpl_guidance`, `created_by: dpl_id`). Berisi DPL sebagai Admin + seluruh mahasiswa bimbingan aktif dari perguruan tingginya. Judul seragam: `Bimbingan DPL [Nama Dosen]`.
+     - Dilarang keras menggunakan emoji dekoratif pada judul maupun label.
+  3. **Manajemen Mutasi & Resign Otomatis**:
+     - Method `syncStudentSupervisionGroups(User $student)` dan `syncMentorGroup`/`syncDplGroup` pada `ChatGroupService`.
+     - Mahasiswa mutasi mentor/DPL otomatis dikeluarkan dari grup lama (dengan pesan sistem informatif) dan ditambahkan ke grup pembimbing baru.
+     - Mahasiswa yang statusnya berubah menjadi `resigned` atau `rejected` otomatis dikeluarkan dari grup bimbingan mentor dan DPL dengan pesan sistem: `[Nama] dikeluarkan dari grup bimbingan karena telah mengundurkan diri (resigned)`.
+  4. **Observer Otomatis Pasca-Komit**:
+     - `ApplicationChatObserver` mengamati `Application::saved` dan `PlacementChatObserver` mengamati `Placement::saved` & `deleted`.
+  5. **Pengujian & Validasi Visual**:
+     - `ChatPlacementGroupTest.php`: 8/8 tests PASSED (35 assertions).
+     - Rangkaian pengujian chat `tests/Feature/Chat/`: 75/75 tests PASSED (563 assertions).
+     - Seluruh rangkaian test suite proyek `php artisan test`: 182/182 tests PASSED (1.403 assertions, Strict Exit Code 0).
+     - Pengujian E2E headless Google Chrome (`scripts/test_guidance_groups_e2e.mjs`) berhasil merekam interaksi mentor, mahasiswa, dan panel info.
+- **Prevention Rule**:
+  1. Untuk fitur grup koordinasi hierarkis, selalu ikat grup ke entitas pembina/otoritas (`created_by` / `scope_type`) dan jadikan keanggotaan peserta didik sebagai anggota dinamis yang disinkronkan secara reaktif terhadap status transaksi aktif.
+  2. Jangan pernah mengizinkan pengguna keluar (*leave*) atau mengubah (*rename*) grup bimbingan sistem secara manual via API; proteksi dengan validasi exception ketat di `ChatGroupService`.
+
+
+---
+
+### [LRN-047] Standardisasi Nomenklatur "Dosen" (Eks-DPL) & Penyeragaman Warna Indikator Waktu Chat
+- **Tanggal**: 2026-10-04
+- **Komponen**: `app/Services/Chat/ChatGroupService.php`, `app/Services/Chat/ChatPresenter.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/sidebar.blade.php`, `resources/views/chat/partials/contact-details.blade.php`, `tests/Feature/Chat/ChatPlacementGroupTest.php`, Database Records (`chat_conversations`, `chat_messages`)
+- **Problem / Symptom**:
+  1. Pengguna meminta pergantian seluruh akronim "DPL" menjadi "Dosen" secara konsisten pada judul grup bimbingan, subtitle, badge status, pesan sistem, dan pengingat.
+  2. Teks waktu percakapan untuk hari Rabu (atau hari yang memiliki pesan belum dibaca) memiliki warna biru berbeda sendiri dibandingkan percakapan lain yang berwarna abu-abu.
+- **Root Cause**:
+  1. Grup bimbingan akademik sebelumnya di-generate dengan format "Bimbingan DPL [Nama Dosen]" dan pesan sistem "bergabung ke grup bimbingan DPL".
+  2. Pada berkas `sidebar.blade.php`, elemen timestamp percakapan menggunakan binding `:class="c.unread && !c.muted ? 'text-blue-600 font-bold' : 'text-slate-400'"`. Karena percakapan terkait memiliki pesan belum dibaca (`unread > 0`), hari ("Rabu") berubah warna menjadi biru tebal, sementara percakapan tanpa pesan belum dibaca tetap berwarna abu-abu (`text-slate-400`).
+- **Fix Applied**:
+  1. Menyeragamkan styling timestamp sidebar menjadi statis netral: `text-xs shrink-0 text-slate-400 font-medium`. Indikasi pesan belum dibaca tetap ditunjukkan secara jelas & terpusat melalui badge angka biru di bawah timestamp.
+  2. Mengganti semua kemunculan "DPL" menjadi "Dosen" di backend dan database:
+     - Judul percakapan: `Bimbingan Dosen [Nama Dosen]`
+     - Subtitle kartu: `Bimbingan Dosen · X mahasiswa`
+     - Badge percakapan: `Bimbingan Dosen` (badge hijau)
+     - Pesan sistem: `Grup Bimbingan Dosen [Nama] dibuat otomatis...` dan `[Nama] bergabung ke grup bimbingan dosen.`
+     - Role label: `Dosen Pembimbing` (menghapus akhiran `(DPL)`)
+  3. Memperbarui 11 record `chat_conversations` dan 33 pesan sistem di database PostgreSQL agar selaras tanpa sisa kata "DPL".
+  4. Pengujian unit & fitur `ChatPlacementGroupTest` dan visual E2E Playwright lolos 100% (Strict Exit Code 0).
+- **Prevention Rule**:
+  1. Jangan menerapkan pewarnaan teks primer (seperti `text-blue-600`) pada label waktu/tanggal percakapan hanya karena status *unread*; biarkan timestamp tetap netral (`text-slate-400 font-medium`) dan gunakan badge counter eksplisit agar estetika antarmuka konsisten.
+  2. Nomenklatur pembimbing kampus dalam konteks modul chat harus selalu konsisten menggunakan kata "Dosen" / "Dosen Pembimbing", bukan singkatan teknis internal.
+
+---
+
+### [LRN-048] Smart Priority Filter Chat Berbasis Tanggung Jawab Lintas Peran (Role-Based Priority Engine)
+- **Tanggal**: 2026-10-05
+- **Komponen**: `app/Services/Chat/ChatPresenter.php`, `app/Services/Chat/ChatService.php`, `tests/Feature/Chat/ChatPriorityEngineTest.php`, `resources/views/chat/partials/sidebar.blade.php`
+- **Problem / Symptom**:
+  1. Fitur tab "Prioritas" pada modul Chat sebelumnya menerapkan logika tunggal yang seragam untuk semua peran berdasarkan status aplikasi mahasiswa (misal: "Seleksi Masuk", "Siap Lulus").
+  2. Hal ini mengakibatkan Admin Dinas melihat mahasiswa bimbingan masuk ke tab Prioritas mereka, padahal tugas operasional bimbingan harian mahasiswa di lapangan merupakan wewenang Mentor Lapangan, bukan Admin Dinas.
+  3. Dosen Pembimbing membutuhkan prioritas yang benar-benar relevan dengan tugas akademik mereka (mahasiswa yang laporannya menunggu review/ACC, sedang dalam revisi, nilai evaluasi dosen belum diinput mendekati akhir periode, atau logbook pending validasi).
+- **Root Cause**:
+  Method `stageBadge` pada `ChatPresenter` sebelumnya hanya menerima objek `$conversation` dan `$otherUser` tanpa mengikutsertakan konteks `$viewer` (siapa pengguna yang sedang membuka antarmuka chat). Akibatnya, badge urgensi (`is_urgent => true`) dihitung secara generik tanpa memfilter relevansi tugas dan wewenang pengguna yang sedang melihat.
+- **Fix Applied**:
+  1. **Injeksi Konteks Viewer**: Mengirimkan `$viewer` dan status `$unread` ke method `stageBadge($c, $viewer, $other?->user, $unread)` pada `ChatPresenter`.
+  2. **Role-Based Smart Priority Engine**:
+     - **Dosen Pembimbing (`dosen`, `academic_advisor`)**: Urgen jika mahasiswa bimbingan:
+       - Laporan akhir menunggu review/ACC (`Perlu Review Laporan`)
+       - Laporan akhir berstatus revisi (`Revisi Laporan`)
+       - Nilai evaluasi akademik dosen belum diisi pada magang yang telah/hampir selesai (`Belum Dinilai`)
+       - Ada logbook pending validasi dosen (`Logbook Pending`)
+       - Ada pesan belum dibaca di grup bimbingan/chat mahasiswa (`Pesan Baru`)
+     - **Admin Dinas (`admin`)**:
+       - Mahasiswa **TIDAK PERNAH** dimasukkan ke daftar Prioritas (is_urgent = false) karena bimbingan ditangani Mentor.
+       - Prioritas Admin Dinas fokus ke koordinasi stakeholder: Instruksi/edaran Super Admin Kota (`Instruksi Kota`), koordinasi izin/data dari Admin Kampus (`Urusan Kampus`), atau eskalasi kendala dari Mentor instansi (`Laporan Mentor`).
+     - **Mentor Lapangan (`mentor`, `pembimbing`)**: Urgen jika:
+       - Logbook harian mahasiswa belum diperiksa/divalidasi (`Logbook Pending`)
+       - Nilai evaluasi lapangan mentor belum diinput saat magang hampir usai (`Belum Dinilai`)
+       - Pesan masuk belum dibaca dari mahasiswa/dosen.
+     - **Admin Universitas (`universitas`)**: Urgen jika mahasiswa kampusnya telah diterima namun belum di-ploting Dosen Pembimbing (`Perlu Dosen`), atau koordinasi administratif dengan dinas.
+     - **Mahasiswa (`mahasiswa`)**: Urgen jika laporan akhir diminta revisi oleh dosen/mentor (`Perlu Revisi`) atau pesan belum dibaca dari Dosen/Mentor.
+     - **Super Admin**: Urgen jika ada pesan koordinasi masuk dari Admin Dinas atau Admin Kampus.
+  3. **Optimasi Kinerja (Zero N+1 Query)**: Menambahkan relasi `placement.logbooks` pada eager-loading `ChatService::conversations` dan `ChatService::conversationDetail` sehingga pemindaian status logbook bebas N+1 query.
+  4. **Automated Testing & Visual E2E**: Menambahkan unit & feature test suite di `ChatPriorityEngineTest.php` (9 test cases, 54 assertions passed, Strict Exit Code 0) dan verifikasi visual Playwright via screenshot browser.
+- **Prevention Rule**:
+  Logika filter urgensi dan badge notifikasi pada fitur chat/dashboard wajib selalu memperhitungkan peran pengguna yang sedang aktif (`$viewer->role`) dan memetakan aksi yang menjadi wewenang peran tersebut, bukan hanya berdasarkan status global sebuah entitas data.
+
+---
+
+### [LRN-049] Fase 1 Onboarding: Kampus Belum Terdaftar, DPL Menyusul, & Mentor Belum Ditunjuk (Anti-Deadlock)
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Student\ProfileController`, `Student\LogbookController`, `Admin\{University,Logbook,Dashboard,PlacementAssignment}Controller`, `PlacementAssignmentService`, model `University` & `Placement`, migrasi `2026_10_05_000000_add_verification_and_slug_to_universities_table`
+- **Problem / Symptom**:
+  1. Simpan profil mahasiswa memasukkan kolom `name` ke `student_profiles` (kolom tidak ada → SQL error/500), dan input kampus bebas (datalist) membuat entri `universities` baru tanpa jejak verifikasi.
+  2. Mahasiswa ACTIVE tidak bisa mengisi logbook sebelum DPL ditetapkan (`requiresDpl && academic_advisor_id kosong` → diblokir), padahal SK DPL dari kampus sering terbit belakangan.
+  3. Mahasiswa yang baru terikat di level unit (mentor teknis belum ditunjuk) tidak punya verifikator logbook; mengganti mentor hanya bisa lewat form ubah status pengajuan (dan pilihan mentor tidak divalidasi per instansi).
+- **Root Cause**: Alur onboarding mengasumsikan master data (kampus, DPL, mentor) sudah lengkap di hari pertama.
+- **Fix Applied**:
+  1. Kolom `universities.is_verified` (default true) + `slug`. Dropdown kampus + opsi `other` → `University::findOrCreateUnverified()` (dedupe case-insensitive, `is_verified=false`). Badge "Menunggu Verifikasi"/"Terverifikasi" (`$univ->verification_label`) + aksi `admin.universities.verify` (Super Admin).
+  2. Logbook boleh diisi selama placement ACTIVE ada; `lecturer_status` tetap `pending` sampai DPL ditugaskan. Penugasan susulan via `PATCH admin.applications.assignment` (`PlacementAssignmentService`, status ACCEPTED/ACTIVE, DPL harus dari kampus mahasiswa).
+  3. `Placement::allowsAgencyAdminLogbookFallback()`: Admin Dinas instansi terkait / Super Admin boleh memvalidasi logbook (`admin.logbooks.review`) HANYA selama mentor belum ditunjuk. Dasbor Admin menampilkan panel "Mahasiswa Belum Memiliki Mentor Dinas" dengan tombol Tetapkan. Re-assign hanya mengubah kolom penugasan di `placements`, histori logbook tidak disentuh; grup bimbingan pembimbing lama ikut disinkronkan.
+- **Prevention Rule**: Jangan pernah menjadikan data pendamping (DPL, mentor, master kampus) sebagai syarat keras untuk langkah inti mahasiswa; sediakan fallback + jalur penugasan susulan. Teks status non-pengajuan (mis. verifikasi kampus) diambil dari konstanta/accessor model agar lolos `StatusViewGuardTest`. Selalu cek kolom tujuan `updateOrCreate` terhadap migrasi.
+
+---
+
+### [LRN-050] Paket 2: Fallback Kepala Unit, Dokumen Privat + Unduh Terotorisasi, Batas Unggahan, & Certificate Gate
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Mentor\LogbookController`, `Admin\UnitController` (+ migrasi `units.head_user_id`), `DocumentController`, `PrivateDocumentStorage`, `App\Support\UploadRules`, `Student\{Application,Logbook,FinalReport,Certificate}Controller`, `Admin\CertificateController`, `Application::certificateBlockers()`
+- **Problem / Symptom**:
+  1. Setiap mentor di instansi yang sama bisa melihat & memvalidasi logbook mahasiswa mentor lain (`$isAgencyStaff`), sementara mahasiswa tanpa mentor tidak punya verifikator di portal mentor.
+  2. Dokumen pengajuan bisa dibuka mentor & dosen (lebih luas dari kebutuhan); tidak ada endpoint unduh; berkas yatim tertinggal saat pengajuan ganda ditolak.
+  3. Batas unggahan tidak seragam (logbook 3MB, laporan akhir 10MB DOC/DOCX).
+  4. Sertifikat cukup `status = completed` — data lama/ubah manual bisa menerbitkan sertifikat tanpa nilai mentor / laporan ACC; pesan hanya `abort(403)`.
+- **Fix Applied**:
+  1. `Placement::canFieldReviewLogbook()` — mentor yang ditugaskan; bila mentor belum ada: Admin Dinas instansi, Super Admin, atau Kepala Unit (`units.head_user_id`, diatur di form edit unit, wajib mentor instansi yang sama). Route `mentor.logbooks.show` kini ke `Mentor\LogbookController@show`.
+  2. Upload via `Storage::disk('local')->putFile('documents/applications')` (root disk `local` = `storage/app/private`), route baru `documents.application.download` (`Storage::download`), akses hanya pemilik, Admin Dinas yang dilamar, Admin Kampus asal, Super Admin.
+  3. Konstanta `UploadRules`: dokumen PDF 2MB (KTM boleh JPG/PNG 2MB), lampiran logbook 2MB, laporan akhir PDF 5MB; teks bantuan & validasi JS di view disesuaikan.
+  4. `Application::certificateBlockers()` dipakai controller (halaman `certificates.locked`, HTTP 403 + daftar syarat), daftar sertifikat admin, dasbor & halaman laporan akhir mahasiswa.
+- **Prevention Rule**: Hak validasi logbook dan syarat sertifikat hanya boleh didefinisikan di model (`canFieldReviewLogbook`, `certificateBlockers`) — jangan menulis ulang kondisi di controller/view. Batas unggahan wajib memakai `UploadRules`. Jangan menambah prefix `private/` pada path disk `local` (root-nya sudah `storage/app/private`).
+
+---
+
+### [LRN-051] Standardisasi Searchable Combobox & Tokenized Acronym Matcher Lintas Modul
+- **Tanggal**: 2026-10-05
+- **Komponen**: `resources/views/components/searchable-select.blade.php`, `database/migrations/2026_10_05_010000_add_acronym_and_verification_columns.php`, model `University` & `AgencyProfile`, `Student\ProfileController`, `Student\ApplicationController`, Blade view (`student/profile/edit.blade.php`, `student/application/create.blade.php`, `admin/applications/show.blade.php`).
+- **Problem / Symptom**: 
+  1. Elemen `<select>` HTML bawaan sangat panjang dan tidak mendukung pencarian cepat saat master data universitas atau dinas mencapai puluhan/ratusan baris.
+  2. Pengguna sering mengetik singkatan instansi/kampus (misal: "ITS", "UNAIR", "Diskominfo", "Dinkes") namun dropdown biasa atau substring matcher sederhana gagal menemukan kecocokan kata terpecah (misal: "UNAIR Sby").
+  3. Form pendaftaran memerlukan keterkaitan (*cascading*) dinamis antara pemilihan dinas dan bidang unit kerja tanpa memicu full page reload.
+- **Root Cause**: Ketiadaan kolom akronim resmi di database serta ketiadaan komponen input seleksi modern berbasis tokenized search matcher di sistem Blade.
+- **Fix Applied**: 
+  1. Migrasi kolom `acronym` pada tabel `universities` dan `agency_profiles`, backfill otomatis dari kode & nama singkatan resmi OPD Surabaya.
+  2. Komponen Blade mandiri `<x-searchable-select>` berbasis Alpine.js + Tailwind CSS dengan algoritma:
+     - Tokenized matcher: `search.toLowerCase().trim().split(/\s+/)` yang memeriksa `tokens.every(token => target.includes(token))` pada gabungan nama, akronim, dan metadata.
+     - Auto-focus pada search input saat dropdown terbuka (`$nextTick`).
+     - Navigasi keyboard (ArrowUp, ArrowDown, Enter, Escape) dan tombol pembersih (clear/reset).
+     - Dukungan opsi input bebas manual (`allowCustom`, `customName`, `customLabel`) terintegrasi onboarding kampus baru.
+     - Penyiaran CustomEvent (`searchable-select-changed`) dan listener dinamis (`parent-listener`) untuk cascading dropdown dinamis (Dinas → Unit Kerja).
+  3. Integrasi menyeluruh pada Profil Mahasiswa, Pendaftaran Magang, dan Plotting Pembimbing/Dosen di Panel Admin.
+- **Prevention Rule**: Selalu gunakan `<x-searchable-select>` untuk seluruh pemilihan data yang melebihi 10 item. Selalu sediakan atribut `acronym` dan `meta` pada koleksi item agar pengguna dapat mencari dengan singkatan maupun informasi kontak pendukung.
+
+---
+
+### [LRN-052] Master Data Profil & Media Logo Resmi Universitas dan OPD Pemkot Surabaya
+- **Tanggal**: 2026-10-05
+- **Komponen**: `database/seeders/SurabayaAndTopUniversitiesSeeder.php`, `database/seeders/SurabayaAgenciesSeeder.php`, `app/Models/University.php`, `app/Models/AgencyProfile.php`, Blade views (`admin/universities/`, `admin/agencies/`, `university/profile/`), direktori aset `public/images/logos/` & `storage/app/public/images/logos/`.
+- **Problem / Symptom**:
+  1. Data logo universitas pada seeder sebelumnya bernilai `null` sehingga antarmuka menampilkan logo generik default.
+  2. Data instansi OPD Kota Surabaya sebagian besar belum memiliki berkas logo fisik resmi terpisah.
+  3. Berkas logo hasil unduhan eksternal bervariasi dari segi ukuran (misalnya logo UM berupa foto crest berukuran 13MB) yang dapat membebani performa muat halaman web dan mobile.
+  4. Ad-hoc path checking yang berulang dan terduplikasi di berbagai Blade view mempersulit pemeliharaan aset logo.
+- **Root Cause**: Ketiadaan koleksi aset fisik logo beresolusi optimal dan belum tersinkronisasinya nilai atribut `logo` di database dengan lokasi penyimpanan publik Laravel.
+- **Fix Applied**:
+  1. Mengunduh dan menstandarisasi 35 logo universitas asli beresolusi tinggi (format PNG/SVG transparan) langsung dari repositori Wikimedia Commons / Wikipedia Indonesia ke `public/images/logos/` dan disinkronkan ke `storage/app/public/images/logos/`.
+  2. Melakukan downscaling dan kompresi lossless pada aset berukuran besar (misalnya `um.png` dari 13MB dikompresi menjadi 185KB 512x512 PNG).
+  3. Memetakan dan mengintegrasikan logo divisi/OPD resmi khusus yang bersumber langsung dari portal pemerintah dan aset resmi:
+     - Dinas Sosial: Lambang dua tangan saling menggenggam & siluet bunga teratai (dinsos.png).
+     - Dinas Perindustrian dan Tenaga Kerja (Disperinaker): Lambang roda gerigi merah bertuliskan Disperinaker dengan siluet tenaga kerja biru (disperinaker.png).
+     - Dinas Sumber Daya Air dan Bina Marga (DSDABM): Tipografi DSDABM merah marun dengan lambang Tugu Pahlawan, Sura, dan Baya (dsdabm.png).
+     - Badan Perencanaan Pembangunan Daerah, Penelitian dan Pengembangan (Bappedalitbang): Lambang huruf 'b' gradasi hijau-kuning-biru dengan siluet Sura dan Baya (appedalitbang.png).
+     - Dinas Kebudayaan, Kepemudaan dan Olahraga serta Pariwisata (Disbudporapar): Lambang Tugu Pahlawan berisai biru dengan tipografi Disbudporapar Kota Surabaya navy (disbudporapar.png).
+     - Badan Kepegawaian dan Pengembangan Sumber Daya Manusia (BKPSDM): Lambang lingkaran biru dengan siluet tiga insan menggapai prestasi (kpsdm.png).
+     - Dinas Pendidikan: Logo SPMB Dispendik Kota Surabaya (dispendik.png).
+     - Dinas Kesehatan: Logo resmi Dinas Kesehatan Kota Surabaya (dinkes.png).
+     - Dinas Lingkungan Hidup: Logo resmi DLH Pemkot Surabaya (dlh.png).
+     - Dinas Perhubungan: Lambang resmi Perhubungan burung garuda roda kemudi (dishub.png).
+     - Satpol PP: Lambang Praja Wira Wibawa perisai emas (satpolpp.png).
+     - Pemadam Kebakaran & Penyelamatan (DPKP): Lambang Damkar Yudha Brama Jaya (dpkp.png).
+     - BPBD: Logo segitiga oranye resmi BPBD Kota Surabaya (pbd.png).
+     - DPRKPP: Logo resmi DPRKPP Kota Surabaya (dprkpp.png).
+     - DKPP: Logo resmi DKPP Kota Surabaya (dkpp.png).
+     - Diskominfo, Dispusip, Dispendukcapil: Logo divisi resmi masing-masing.
+     - Dinas Koperasi Usaha Kecil dan Menengah dan Perdagangan (Dinkopumdag): Lambang lengkung DINKOPUMDAG KOTA SURABAYA dengan siluet hiu-buaya biru-hijau & padi-kapas (dinkopumdag.png).
+     - Badan Pengelolaan Keuangan dan Aset Daerah (BPKAD): Tipografi modern BPKAD SURABAYA gradasi 3D biru-emas (pkad.png).
+     - Inspektorat Kota Surabaya: Lambang perisai dua warna dengan tanda centang (checkmark) dan gelombang pengawasan (inspektorat.png).
+     - Badan & Instansi lainnya: Menggunakan lambang resmi lambang daerah Kota Surabaya (surabaya.png) beresolusi tinggi 512x512/960x1234 PNG transparan.
+  4. Menyederhanakan seluruh pemanggilan logo di Blade view menggunakan accessor model resmi `$model->logo_url` yang telah memiliki pemeriksaan file fisik di disk publik dan fallback otomatis.
+  5. Mengupdate dan mengeksekusi kedua seeder (`SurabayaAndTopUniversitiesSeeder` & `SurabayaAgenciesSeeder`) serta dry-run verifier (`scripts/audit_verifier.php`) dengan hasil verifikasi 100% valid (35/35 kampus valid, 23/23 dinas valid, Strict Exit Code 0).
+- **Prevention Rule**: Seluruh aset logo institusi wajib disimpan dalam bentuk file fisik PNG/SVG berlatar transparan dengan resolusi proporsional (maksimal 512x512 px / < 500KB) di `public/images/logos/`. Jangan berasumsi dinas memakai logo umum jika dinas memiliki identitas lambang tersendiri yang telah ditetapkan secara resmi. Selalu panggil logo institusi melalui accessor `$model->logo_url` di Blade view untuk menjamin ketersediaan fallback gambar jika berkas fisik tidak ditemukan.
+
+---
+
+### [LRN-053] Paket Keamanan & Integritas Data: DPL Lintas Kampus, Password Bawaan, Berkas Publik, Zona Waktu, Masa Magang Berakhir, & Kampus Dobel
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Student\DashboardController` (selectAdvisor/storeNewAdvisor), `User` (must_change_password), `layouts/app.blade.php`, `Admin\ApplicationController` (updateStatus/bulk), `PrivateFileController`, `PrivateDocumentStorage`, `app:move-private-files`, `app:sync-internship-status`, `UniversityResolver`, `x-searchable-select`, `Admin\UniversityController@merge`, `DemoE2ESeeder`, `config/app.php`, `lang/id`
+- **Problem / Symptom**:
+  1. Mahasiswa bisa memilih DPL dari kampus lain dan mengganti DPL kapan pun (termasuk setelah dinilai / lulus).
+  2. Akun yang dibuat/di-reset admin memakai password `password` tanpa pengingat untuk diganti.
+  3. Form ubah status pengajuan menerima `mentor_id`/`academic_advisor_id` akun apa pun (role/instansi/kampus lain).
+  4. Lampiran logbook, foto profil, dan lampiran tiket tersimpan di disk `public` (bisa dibuka lewat URL `/storage/...`).
+  5. `migrate:fresh --seed` gagal: seeder menulis `placements.status` yang sudah di-drop.
+  6. `timezone = UTC` → logbook dini hari WIB tercatat di tanggal kemarin; pesan validasi berbahasa Inggris.
+  7. Mahasiswa ACTIVE yang `end_date` lewat dibiarkan tanpa tindak lanjut.
+  8. Pencarian kampus `LIKE '%nama%'` bisa salah pilih (mis. "UPN"), dan mahasiswa yang tidak menemukan kampusnya membuat entri kampus dobel.
+- **Fix Applied**:
+  1. DPL wajib dari kampus mahasiswa (`UniversityResolver::forUser`); terkunci bila status `completed` atau DPL sudah memberi nilai. Dosen baru selalu dicatat di kampus mahasiswa.
+  2. Kolom `users.must_change_password` + `User::booted()` (otomatis dari hash setiap kali password berubah) + banner permanen di layout (tidak memaksa). Password baru tidak boleh `password`.
+  3. `PlacementAssignmentService::resolveMentor/resolveAdvisor` dipakai juga di `updateStatus` & bulk.
+  4. Disk privat + route terotorisasi `logbooks.attachment`, `student.photo`, `feedbacks.attachment` (`Logbook::isViewableBy`, `FeedbackController::canAccess`). Berkas lama dipindah dengan `php artisan app:move-private-files`.
+  5. Hapus `status` dari `Placement::updateOrCreate` di seeder.
+  6. `APP_TIMEZONE` default `Asia/Jakarta`, `APP_LOCALE` default `id`, berkas `lang/id/*`.
+  7. Scheduler: lewat `end_date` → otomatis COMPLETED bila syarat lengkap; bila belum, pengingat ke mahasiswa & mentor (hari ke-1 lalu tiap 7 hari) + badge "Lewat masa magang".
+  8. `UniversityResolver` (exact match nama/akronim/kode/slug + saran Dice-bigram), migrasi backfill `university_id`, combobox mendukung kata kunci + "Mungkin maksud Anda", server menahan input kampus baru yang sangat mirip (wajib konfirmasi), dan fitur "Gabungkan Kampus" untuk Super Admin.
+- **Prevention Rule**: Jangan pakai `LIKE '%nama%'` untuk mencari kampus — gunakan `university_id` atau `UniversityResolver`. Berkas yang berisi data pribadi wajib di disk `local` + route terotorisasi, jangan `asset('storage/...')`. Validasi akun yang dipilih dari dropdown (role + instansi/kampus) di server, bukan hanya di UI.
+
+---
+
+### [LRN-054] Operasional & Kerapian Kode: Heartbeat Scheduler/Queue, N+1 Dasbor, View Raksasa, Cek Super Admin Ganda, Kode Legacy, QR Eksternal, Pint
+- **Tanggal**: 2026-10-05
+- **Komponen**: `routes/console.php`, `App\Jobs\QueueHeartbeat`, `App\Services\SystemHealth`, `app:health`, `docs/DEPLOYMENT.md`, `Admin\{Dashboard,Mentor,University}Controller`, `UniversityHubService`, `dashboard.blade.php`, `admin/universities/show.blade.php`, `letters/acceptance`, `certificates/internship_certificate`
+- **Problem / Symptom**:
+  1. Notifikasi web push (queue) & aktivasi harian (scheduler) diam-diam tidak jalan bila worker/cron tidak dipasang — tidak ada yang tahu.
+  2. Dasbor admin: 1–2 query per instansi/unit/kampus + memuat SELURUH pengajuan hanya untuk 6 baris terbaru; daftar mentor: 2 query per mentor.
+  3. View 1.000+ baris (dasbor mahasiswa, detail kampus) & controller `UniversityController@show` 150 baris.
+  4. Cek Super Admin ditulis ulang manual di 29 tempat.
+  5. Controller & view `Pembimbing/` serta `admin/certificates/template` tidak dipakai route mana pun.
+  6. QR cadangan memanggil `api.qrserver.com` (URL verifikasi dikirim ke pihak ketiga).
+  7. ±150 berkas tidak sesuai standar Pint.
+- **Fix Applied**: heartbeat tiap 5 menit + `SystemHealth` (peringatan di dasbor Super Admin & `php artisan app:health`), `composer dev` ikut menjalankan `schedule:work`, panduan `docs/DEPLOYMENT.md`; agregasi `GROUP BY` di dasbor & daftar mentor; pecah view jadi partial `@include` (output HTML diverifikasi identik untuk semua akun demo) dan logika `show` ke `UniversityHubService`; semua cek → `$user->isSuperAdmin()`; hapus kode legacy; QR hanya lokal (fallback teks tautan); `vendor/bin/pint` di app/config/database/routes/tests/lang.
+- **Prevention Rule**: Setelah mengubah Blade, jalankan `php artisan view:cache` LALU `php -l` pada `storage/framework/views/*.php` — `view:cache` tidak menangkap syntax error PHP di dalam `@php`. Penggantian massal pola kondisi dengan regex wajib memeriksa konteks `if (...)` agar kurung tidak ikut terhapus.
+
+---
+
+### [LRN-053] Standardisasi Saluran Pengumuman Chat, Resolusi Dinamis Logo Profil & Pencegahan Truncation Judul Lembaga
+- **Tanggal**: 2026-10-05
+- **Komponen**: `app/Services/Chat/ChatChannelService.php`, `app/Services/Chat/ChatPresenter.php`, `resources/views/chat/partials/info-panel.blade.php`, `resources/views/chat/partials/sidebar.blade.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/certificates/internship_certificate.blade.php`.
+- **Problem / Symptom**:
+  1. Pada modul chat, logo saluran pengumuman resmi dinas dan kampus tampil kosong atau berupa icon default topi toga / lambang kota generik, padahal profil dinas dan kampus telah memiliki logo resmi masing-masing.
+  2. Judul saluran menggunakan format panjang berulang ("Saluran Pengumuman Dinas Pendidikan", "Saluran Pengumuman Universitas Airlangga"), menyebabkan teks terpotong (truncated) canggung di bilah sisi (*sidebar*) dan aplikasi mobile.
+  3. Drawer "Info Saluran" (`info-panel.blade.php`) selalu menampilkan huruf fallback 'P' karena mengecek atribut `active.avatar.url` alih-alih `active.avatar.logo_url`.
+- **Root Cause**:
+  1. `ChatChannelService::ensureOfficialChannels` pada migrasi awal mengisikan string statis placeholder (`images/default-university.svg` / `images/logoPemkotSBY.png`) ke kolom `chat_conversations.image_url`. Pada pemanggilan `channelLogoUrl()`, keberadaan file statis tersebut dicek sebelum mengecek relasi `$channel->agencyProfile` / `$channel->university`, sehingga fallback ke profil resmi tidak pernah tercapai.
+  2. View `info-panel.blade.php` memiliki typo key properti (`url` vs `logo_url`).
+  3. Penamaan saluran di hardcode menyertakan teks awalan "Saluran Pengumuman", padahal subtitle kartu chat sudah menyatakan "Saluran Pengumuman Resmi".
+- **Fix Applied**:
+  1. Memperbarui `ChatChannelService::channelLogoUrl` agar selalu memprioritaskan accessor dinamis `$channel->agencyProfile->logo_url` dan `$channel->university->logo_url`. Dengan demikian setiap pembaruan logo di profil instansi/kampus otomatis ter-update di chat saluran secara realtime.
+  2. Mengubah penamaan resmi pada `ensureOfficialChannels` dan `ChatPresenter::conversationSummary` menjadi langsung nama lembaga resmi (contoh: "Dinas Pendidikan", "Institut Teknologi Sepuluh Nopember", "Pemerintah Kota Surabaya") dengan badge khusus `[Pemkot]` (kuning), `[Dinas]` (biru), dan `[Kampus]` (hijau).
+  3. Menjalankan sinkronisasi massal seluruh saluran pengumuman terdaftar (59 saluran: 1 Pemkot, 23 OPD, 35 Universitas) dengan hasil 59/59 berkas logo valid fisik di disk publik (100% SUCCESS).
+  4. Memperbaiki pengecekan avatar pada `info-panel.blade.php` (`logo_url || url`) dan standardisasi pemanggilan logo pada `internship_certificate.blade.php`.
+- **Prevention Rule**: Seluruh entitas turunan yang merepresentasikan lembaga (seperti Saluran Pengumuman, Kop Surat, Dokumen Verifikasi) dilarang menyimpan salinan statis path logo jika entitas induknya (`AgencyProfile`, `University`) telah memiliki relasi foreign key dan accessor resmi `$model->logo_url`. Judul percakapan saluran resmi harus ringkas dan menggunakan subtitle atau badge untuk menjelaskan fungsi perannya agar tidak mengalami pemotongan visual (*overflow ellipsis*).
+
+---
+
+### [LRN-054] Searchable Combobox Component Deployment & Universal Logo Standard
+- **Tanggal**: 2026-10-05
+- **Komponen**: `resources/views/components/searchable-select.blade.php`, `resources/views/admin/users/create.blade.php`, `resources/views/admin/users/edit.blade.php`, `resources/views/admin/mentors/create.blade.php`, `resources/views/admin/mentors/edit.blade.php`, `resources/views/admin/units/create.blade.php`, `resources/views/admin/units/edit.blade.php`, `resources/views/feedbacks/create.blade.php`, `resources/views/letters/acceptance.blade.php`, `resources/views/layouts/navigation.blade.php`.
+- **Problem / Symptom**:
+  1. Pada formulir Admin (pembuatan pengguna, mentor, unit kerja, dan tiket feedback), dropdown `<select>` memuat daftar puluhan instansi dan universitas tanpa kemampuan pencarian interaktif, menyulitkan pemilihan dan rawan salah klik.
+  2. Kop surat penerimaan magang (`letters/acceptance.blade.php`) dan avatar navigasi (`navigation.blade.php`) menggunakan pola pengecekan file hardcoded yang rawan gagal jika format path menggunakan variasi subdirektori.
+- **Root Cause**:
+  1. Komponen dropdown asli menggunakan elemen HTML native `<select>` standar yang tidak mendukung fuzzy search, akronim matching, maupun visual badges.
+  2. Resolusi logo tersebar di beberapa view dengan urutan pencarian direktori fisik yang tidak seragam.
+- **Fix Applied**:
+  1. Mengintegrasikan komponen modern `<x-searchable-select>` ke seluruh formulir Admin dan Feedback:
+     - `admin/users/create.blade.php` & `edit.blade.php` (Instansi Dinas & Perguruan Tinggi).
+     - `admin/mentors/create.blade.php` & `edit.blade.php` (Instansi Dinas).
+     - `admin/units/create.blade.php` & `edit.blade.php` (Instansi Induk).
+     - `feedbacks/create.blade.php` (Target Instansi Dinas & Target Perguruan Tinggi).
+  2. Menstandarkan resolusi logo kop surat penerimaan magang (`letters/acceptance.blade.php`) dengan pengecekan bertingkat pada disk publik dan fallback otomatis ke `images/logos/surabaya.png` untuk kompatibilitas DOMPDF.
+  3. Menyederhanakan resolver avatar navbar (`layouts/navigation.blade.php`) agar langsung memanfaatkan accessor resmi `$agencyProfile->logo_url` dan `$university->logo_url`.
+  4. Seluruh rangkaian pengujian (226 unit & feature test suite) lulus 100% dengan Strict Exit Code 0.
+- **Prevention Rule**: Gunakan selalu `<x-searchable-select>` untuk seluruh seleksi master data yang memiliki jumlah entri lebih dari 10 (seperti OPD, Universitas, atau Unit Kerja). Selalu gunakan accessor resmi `$model->logo_url` sebagai sumber kebenaran tunggal (*single source of truth*) dalam merender logo institusi di seluruh sistem.
+### [LRN-055] Penguncian Syarat Kelulusan Magang: Kewajiban Pengisian Logbook Aktivitas Harian
+- **Tanggal**: 2026-10-05
+- **Komponen**: `app/Models/Application.php`, `app/Models/Placement.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Student/CertificateController.php`, `app/Http/Controllers/Student/LogbookController.php`, `app/Http/Controllers/Admin/UniversityController.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/student/final_report.blade.php`, `resources/views/dashboard.blade.php`
+- **Problem / Symptom**: Mahasiswa magang yang belum pernah mengisi logbook harian sama sekali masih dapat dinyatakan lulus magang (`COMPLETED`) oleh Admin atau tersinkronisasi otomatis oleh sistem jika laporan akhir disetujui dan nilai evaluasi telah diisi, serta tombol penerbitan E-Sertifikat terbuka prematur tanpa memverifikasi keaktifan pengisian logbook.
+- **Root Cause**:
+  1. Method `getCanCompleteAttribute()` pada `Application.php` hanya mengecek `has_approved_report` dan `has_complete_evaluation`, tanpa mengecek keberadaan catatan logbook (`has_filled_logbook`).
+  2. Method `Placement::syncCompletionStatus()` otomatis memperbarui status aplikasi ke `completed` tanpa memeriksa relasi `$this->logbooks()->exists()`.
+  3. Form verifikasi Admin di `admin/applications/show.blade.php` dan `ApplicationController::updateStatus` tidak memvalidasi keberadaan logbook mahasiswa sebelum status diubah ke `completed`.
+  4. Checklist prasyarat E-Sertifikat di `student/final_report.blade.php` hanya memeriksa 3 aspek tanpa memasukkan logbook kegiatan harian.
+- **Fix Applied**:
+  1. Menambahkan accessor `has_filled_logbook` (`getHasFilledLogbookAttribute()`) pada model `Application` dan `Placement` yang mendeteksi keterisian logbook secara optimal (`logbooks_count`, loaded relation, atau query `exists()`).
+  2. Memperketat `Application::getCanCompleteAttribute()` sehingga mewajibkan ketiga syarat serentak: `has_approved_report && has_complete_evaluation && has_filled_logbook`.
+  3. Memperbarui `Placement::syncCompletionStatus()` untuk menolak status `completed` jika mahasiswa belum mengisi minimal 1 catatan logbook.
+  4. Menyelaraskan `Application::actionPrioritySql()` sehingga Tier 2 (*Siap Diluluskan*) wajib memenuhi syarat keterisian logbook (`$logbookFilled`).
+  5. Menambahkan validasi ketat backend di `Admin\ApplicationController::updateStatus()` dengan pesan spesifik: *"Gagal menyelesaikan magang: Logbook aktivitas magang belum pernah diisi."*
+  6. Menambahkan proteksi keamanan di `Student\CertificateController::getCertificateData()` yang menolak (HTTP 403) unduhan sertifikat jika logbook belum pernah diisi.
+  7. Menampilkan *Warning Banner* informatif di `admin/applications/show.blade.php`, indikator `Logbook belum diisi` di `admin/applications/index.blade.php`, checklist 4-item dinamis di `student/final_report.blade.php`, dan sinkronisasi `$isPassed` di `dashboard.blade.php`.
+  8. Menambahkan pemanggilan `$placement->syncCompletionStatus()` saat mahasiswa menyimpan logbook baru di `Student\LogbookController::store()`.
+  9. Menulis suite pengujian `LogbookCompletionRequirementTest.php` (6/6 lulus) dan menguji seluruh rangkaian test suite (183/183 PASS, Strict Exit Code 0).
+- **Prevention Rule**: Seluruh gerbang kelulusan akhir (*graduation gateway*) dan penerbitan sertifikat resmi negara wajib memverifikasi ketiga rukun pemenuhan magang (Logbook Aktivitas, Laporan Akhir Disetujui, dan Penilaian Lengkap) di level Model (`can_complete`), Controller (`updateStatus`), Service Sync (`syncCompletionStatus`), dan View UI. Jangan pernah mengizinkan transisi status terminal `COMPLETED` tanpa validasi riwayat aktivitas logbook.
+- **Catatan merge (2026-10-05)**: Entri ini berasal dari `main` sebagai LRN-043 dan dinomori ulang menjadi LRN-055 karena nomor LRN-043 sudah dipakai di cabang `AlurPengajuan-Admin-Yasin`. Pada cabang tersebut syarat logbook juga dimasukkan ke `Application::certificateBlockers()`, sehingga halaman sertifikat terkunci (`certificates.locked`, HTTP 403) dan tombol unduh di dasbor mahasiswa ikut menolak jika logbook belum diisi.
+
+---
+
+### [LRN-056] Eliminasi Banner Alokasi Darurat Mentor di Dashboard Admin
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Admin\DashboardController.php`, `resources/views/admin/dashboard.blade.php`, `tests/Feature/Phase1OnboardingTest.php`
+- **Problem / Symptom**: Box alert/kartu intervensi darurat *"Mahasiswa Belum Memiliki Mentor Dinas"* dengan tombol dropdown Tetapkan muncul di dashboard Admin (baik Admin Dinas maupun Super Admin). Keberadaan form aksi penugasan cepat ini mengganggu kerapian dashboard eksekutif dan tidak diperlukan karena alur penugasan mentor resmi sudah tersedia di halaman detail pengajuan (`admin.applications.show`).
+- **Root Cause**: Desain fase awal onboarding meletakkan form intervensi cepat penempatan tanpa mentor (`Placement::whereNull('mentor_id')`) langsung di halaman dashboard utama, membebani query database (`$unmentoredPlacements` dan `$assignableMentors`) pada setiap render dasbor.
+- **Fix Applied**:
+  1. Menghapus seluruh blok HTML kartu intervensi "Mahasiswa Belum Memiliki Mentor Dinas" dari [dashboard.blade.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/resources/views/admin/dashboard.blade.php).
+  2. Menghapus query `$unmentoredPlacements` dan `$assignableMentors` serta membersihkan import `Placement` & `PlacementAssignmentService` yang tidak lagi dipakai di [DashboardController.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/app/Http/Controllers/Admin/DashboardController.php).
+  3. Memperbarui assertion pengujian di [Phase1OnboardingTest.php](file:///c:/Users/TK%20ABA%20SBY%2069%20%283%29/Documents/@Yasin/Semester%205/Magang-main/Magang/tests/Feature/Phase1OnboardingTest.php) (`assertDontSee('Mahasiswa Belum Memiliki Mentor Dinas')`).
+  4. Memvalidasi tampilan visual antarmuka via Playwright runner (`scripts/browser-runner.mjs`), memastikan tata letak kartu metrik eksekutif bersih, rapi, dan seluruh 237 pengujian PHPUnit lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**: Pertahankan tujuan halaman Dashboard Admin sebagai pusat ringkasan metrik eksekutif dan analitik agregat. Aksi operasional penetapan perorangan (seperti plotting mentor/dosen) harus tetap terpusat di halaman detail entitas terkait (`admin.applications.show`) agar UI dashboard tidak over-cluttered dan bebas query database yang redundan.
+
+---
+
+### [LRN-057] Standardisasi Paritas UI/UX & Alur Logbook Mingguan Serta Evaluasi (Mentor Dinas & DPL)
+- **Tanggal**: 2026-10-05
+- **Komponen**: `App\Support\Grade`, `App\Services\LogbookWeeklyBundler`, `app/Http/Controllers/Mentor/LogbookController.php`, `app/Http/Controllers/Lecturer/LogbookController.php`, `app/Http/Controllers/Mentor/EvaluationController.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `resources/views/components/supervision/*`, Blade Views (`mentor/` & `lecturer/`).
+- **Problem / Symptom**:
+  1. Terdapat disparitas antarmuka dan alur operasional antara Mentor Dinas dan Dosen Pembimbing Lapangan (DPL): Mentor menilai logbook per hari sedangkan DPL menilai paket 7 hari lewat modal popup.
+  2. Halaman detail mahasiswa DPL memiliki form penilaian inline ganda yang tidak selaras dengan mentor.
+  3. Skala predikat nilai berbeda (Mentor memakai A/B/C dengan rentang lama, DPL memakai skala lain), dan form penilaian DPL secara default terisi nilai 85 serta me-redirect jika skema `mentor_only`.
+- **Root Cause**:
+  1. Implementasi awal mentor dan DPL dibangun terpisah dengan logic pengelompokan yang berbeda dan variasi komponen UI.
+  2. Ketiadaan helper terpusat untuk standardisasi konversi nilai angka ke huruf mutu (*letter grades*).
+  3. Form penilaian DPL menggunakan slider range dan default value daripada input angka besar yang ramah bagi pengguna lanjut usia (*elderly-friendly ergonomics*).
+- **Fix Applied**:
+  1. **Backend Separation & Helper Terpusat**:
+     - Mempertahankan pemisahan backend, controller, route, dan kolom DB.
+     - Membuat `App\Support\Grade` dengan standardisasi skala predikat: A (≥85), AB (≥75), B (≥65), BC (≥55), C (≥40), E (<40).
+     - Membuat `App\Services\LogbookWeeklyBundler` untuk pengelompokan 7-hari ISO week yang dapat dikonfigurasi kolom status & feedback-nya, dengan paginasi 10 paket per halaman.
+  2. **Shared Blade Components**:
+     - `<x-supervision.logbook-weekly>`: Paket mingguan dengan inline accordion Alpine.js (bukan modal), status harian dengan indikator review pihak lain, form catatan, serta tombol "Minta Revisi" dan "Setujui".
+     - `<x-supervision.score-form>`: Form input 3 aspek angka murni besar tanpa slider range, kotak kalkulasi real-time (Rata-rata, Predikat, Nilai Akhir berbobot), textarea catatan, dan tombol "Batal" + "Simpan Nilai".
+     - `<x-supervision.report-review>`: Review laporan akhir dengan tombol "Buka Naskah Laporan (Tab Baru ↗)" (`target="_blank"`), textarea catatan, dan tombol "Minta Revisi" serta "Setujui".
+  3. **Endpoints & Controller Hardening**:
+     - Menambahkan endpoint `POST /mentor/logbooks/bulk-review` yang memvalidasi otorisasi `canFieldReviewLogbook($user)` (termasuk fallback Kepala Unit) dan mencatat transaksi ke `AuditLog`.
+     - Mendukung alias `status` & `feedback` pada `lecturer.logbooks.bulk_approve`.
+     - Menghapus redirect `mentor_only` pada DPL EvaluationController (tetap menampilkan nilai mentor read-only + catatan DPL).
+  4. **Strict Exit Code 0 & Visual Parity**:
+     - Seluruh 244 automated tests (Unit & Feature) lulus 100% (Strict Exit Code 0).
+     - `vendor/bin/pint --test` lulus bersih tanpa pelanggaran PSR-12.
+     - Build Vite bersih dan verifikasi visual E2E dengan Google Chrome lokal mengonfirmasi 100% paritas visual di desktop dan mobile.
+- **Prevention Rule**: Seluruh antarmuka bimbingan (supervisi) lintas peran yang memiliki tugas paralel (seperti pembimbing lapangan dan dosen akademik) wajib menggunakan shared presentation components (`components/supervision/*`) untuk menjamin konsistensi tata letak tanpa menggabungkan layer bisnis/database. Selalu sertakan inline comment `{{-- status-guard:ignore --}}` pada label statis yang diperiksa oleh `StatusViewGuardTest`.
+
+---
+
+### [LRN-058] Paritas Portal Mentor & Dosen Pembimbing, Desain Simpel & Pencegahan Query Accessor
+- **Tanggal**: 2026-10-05
+- **Komponen**: `app/Http/Controllers/Mentor/DashboardController.php`, `resources/views/mentor/dashboard.blade.php`, `resources/views/lecturer/dashboard.blade.php`, `app/Support/Grade.php`
+- **Problem / Symptom**:
+  1. Tampilan Portal Mentor sebelumnya memakai layout tab lama (`tab=active`, `tab=upcoming`, dll.) yang berbeda dengan Portal Dosen yang sudah menggunakan 4 kartu metrik simpel, filter bar, dan tabel mahasiswa komprehensif.
+  2. Terjadi `QueryException` PostgreSQL (`column "nilai_pembimbing" does not exist`) saat mentor membuka dashboard, akibat pemanggilan accessor virtual pada query `whereHas('evaluation')`.
+  3. Label pada header Portal Dosen masih memuat singkatan dalam kurung (`Portal Dosen Pembimbing Lapangan (DPL Kampus)`).
+- **Root Cause**:
+  1. Tata letak mentor belum diselaraskan dengan standar terbaru Portal Dosen yang berbasis Clean Architecture dan ramah pengguna.
+  2. `nilai_pembimbing` adalah accessor virtual di `App\Models\Evaluation`, bukan kolom fisik database PostgreSQL (`evaluations` menyimpan `nilai_disiplin`, `nilai_kinerja`, `nilai_laporan`).
+- **Fix Applied**:
+  1. Mengubah `resources/views/mentor/dashboard.blade.php` agar persis identik dengan `resources/views/lecturer/dashboard.blade.php`:
+     - Header: "Portal Mentor Lapangan" dengan pill badge nama instansi dinas.
+     - 4 Kartu Metrik: "Total Bimbingan", "Sudah Dinilai", "Laporan Akhir", "Belum Dinilai".
+     - Filter Bar: Pencarian nama/NIM/jurusan, dropdown status laporan akhir, dan dropdown filter perguruan tinggi (`university_id`).
+     - Tabel Mahasiswa: Kolom Mahasiswa (+ status badge seperti `ACTIVE`/`COMPLETED` untuk kepatuhan `StatusLabelConsistencyTest`), Perguruan Tinggi & Unit, Dosen Pembimbing (+ Skor Dosen), Logbook (entri pill), Laporan Akhir (status badge), Nilai Mentor, dan tombol "Detail" simpel gaya admin.
+     - Mode responsif mobile card untuk layar HP (< 640px).
+  2. Memperbaiki query di `DashboardController::index()` untuk memeriksa kolom riil database: `nilai_disiplin > 0 or nilai_kinerja > 0 or nilai_laporan > 0`.
+  3. Menyederhanakan judul di `lecturer/dashboard.blade.php` menjadi "Portal Dosen Pembimbing" tanpa tanda kurung.
+  4. Menambahkan alias `Grade::fromScore()` pada helper `App\Support\Grade`.
+- **Prevention Rule**: Dilarang menggunakan Eloquent virtual accessor di dalam query database `where()` atau `whereHas()`. Selalu periksa skema tabel riil PostgreSQL sebelum menyusun query builder. Seluruh halaman supervisi bimbingan magang wajib mempertahankan paritas tata letak, warna, dan hirarki visual.
+
+---
+
+### [LRN-044] Inovasi Modul DPL: Berita Acara & Lembar Nilai A4, Smart Action Alerts, Dual-Status Badges, Supervision Log, dan Ekspor Rekapitulasi CSV
+- **Tanggal**: 2026-10-05
+- **Komponen**: `Lecturer\DashboardController`, `Lecturer\EvaluationController`, `Lecturer\MonitoringController`, `AcademicConsultation`, `Placement`, `Evaluation`, Blade Views (`lecturer/dashboard.blade.php`, `lecturer/student-detail.blade.php`, `lecturer/grade-sheet.blade.php`, `lecturer/monitoring/index.blade.php`), PPTX Script
+- **Problem / Symptom**:
+  1. DPL tidak memiliki Berita Acara Penilaian (BAP-DPL) siap cetak format A4 berstandar universitas untuk pelaporan nilai magang ke program studi/fakultas.
+  2. DPL kesulitan mengetahui secara cepat mahasiswa mana yang membutuhkan perhatian (laporan belum dinilai, logbook pending) tanpa membuka satu per satu halaman.
+  3. Tabel pemantauan tidak menampilkan status ganda (Nilai Mentor vs Nilai DPL vs Nilai Akhir) secara komparatif.
+  4. Tidak ada instrumen pencatatan sesi konsultasi bimbingan akademik (Supervision Log) antara DPL dan mahasiswa bimbingan.
+  5. DPL tidak dapat mengekspor rekapitulasi nilai dan status mahasiswa bimbingan ke format CSV/Excel untuk BKD atau akreditasi.
+  6. Terjadi `TypeError` saat memformat `ApplicationStatus` enum di controller ekspor (`strtoupper($p->application->status)`).
+- **Root Cause**:
+  1. Ketiadaan rute dan view khusus cetak dokumen BAP A4 ber-Kop Universitas dan QR verifikasi DPL.
+  2. Ketiadaan tabel relasional untuk log bimbingan akademik (`academic_consultations`).
+  3. Status aplikasi menggunakan BackedEnum (`ApplicationStatus`), sehingga pemanggilan fungsi string native PHP langsung menimbulkan TypeError jika tidak mengekstrak `->value`.
+  4. Kolom tabel `evaluations` memiliki beberapa alias (`nilai_dosen`, `score_mastery`, `nilai_akademik`) yang perlu di-fallback secara aman pada accessor `nilai_dosen_calculated`.
+- **Fix Applied**:
+  1. Mengimplementasikan fitur Cetak Berita Acara & Lembar Nilai DPL format A4 siap cetak (`/lecturer/students/{placementId}/grade-sheet`) dengan perhitungan proporsi 40% DPL : 60% Mentor, Kop Universitas, dan QR digital.
+  2. Menambahkan Banner *Smart Action Alerts* di dasbor DPL yang otomatis mendeteksi laporan/logbook yang menunggu tindak lanjut dosen.
+  3. Memperbarui tabel mahasiswa dengan *Dual-Status Badges* yang membedakan nilai mentor kedinasan, nilai DPL, dan nilai akhir komparatif.
+  4. Membuat tabel migrasi dan model `AcademicConsultation` serta kartu timeline riwayat bimbingan akademik interaktif di halaman detail mahasiswa.
+  5. Menambahkan endpoint `lecturer.monitoring.export` yang mengalirkan file CSV ber-BOM UTF-8 siap buka di Excel dengan proteksi tipe data BackedEnum.
+  6. Menulis suite pengujian `LecturerInnovationsTest.php` (6/6 lulus) dan menguji seluruh test suite (189/189 PASS, 1.415 assertions, Exit Code 0).
+- **Prevention Rule**: Seluruh data yang bersumber dari Enum Backed wajib di-unwrap dengan `$val instanceof \BackedEnum ? $val->value : (string) $val` sebelum diproses fungsi string atau diekspor ke format CSV/Excel. Seluruh accessor nilai wajib menyediakan fallback bertingkat jika tabel database memiliki kolom alias untuk memastikan backward-compatibility.
+
+### [LRN-059] Penanganan Asinkronus Alpine Bulk Action, Duplikasi ID Responsive Dual-View & Overlap Mobile UI
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/admin/applications/index.blade.php`
+- **Problem / Symptom**: 
+  1. Tombol "Terima" pada floating bar aksi massal pengajuan admin gagal memproses persetujuan pengajuan karena validasi error `bulk_action is required`.
+  2. Saat mencentang "Pilih Semua" (Select All), badge counter menampilkan jumlah pengajuan terpilih dua kali lipat (misal 6 padahal hanya 3), modal penolakan menyebutkan angka yang salah, dan pengguna tidak dapat membatalkan centang (uncheck) satu per satu.
+  3. Pada tampilan smartphone (< 768px), kotak checkbox absolut (`top-4 right-4`) bertabrakan visual dan menimpa langsung badge status pengajuan di pojok kanan atas kartu.
+  4. Komponen paginasi terkurung di dalam form POST aksi massal.
+- **Root Cause**: 
+  1. Reaktivitas Alpine `:value="action"` berjalan asinkronus (microtask), sedangkan `this.$el.submit()` dijalankan secara sinkronus seketika sehingga native form mengirimkan `bulk_action=""`.
+  2. Tampilan ganda (Tabel desktop dan Kartu mobile) berada di DOM bersamaan dengan kelas `.bulk-cb`. `toggleAll()` mengambil checkbox dari kedua tampilan sekaligus tanpa deduplikasi `Set`, memicu duplicate values pada array `selected` Alpine.
+  3. Baris header kartu mobile memiliki status badge di kolom kanan tanpa padding/margin offset terhadap checkbox absolut `right-4`.
+  4. Tag penutup `</form>` diletakkan setelah `{{ $applications->links() }}`.
+- **Fix Applied**: 
+  1. Mengisi langsung nilai input DOM `input[name='bulk_action'].value = type` sebelum memanggil submit, serta menambahkan konfirmasi dialog sebelum eksekusi massal.
+  2. Menggunakan `[...new Set(values)]` pada `toggleAll()` agar ID pengajuan selalu unik.
+  3. Memberikan kelas `pr-8` pada kontainer status badge di mobile kartu saat status `pending`/`verified` agar terpisah rapi dari checkbox.
+  4. Menambahkan nullsafe operator `$app->user?->name ?? 'Mahasiswa'` dan `$app->user?->studentProfile?->universitas`.
+  5. Menutup `</form>` tepat sebelum blok paginasi.
+- **Prevention Rule**: Pada antarmuka responsif dual-rendering (desktop table + mobile cards), query selektor DOM untuk manipulasi data array WAJIB dideduplikasi dengan `Set`. Form submit sinkronus yang bergantung pada state reaktif Alpine WAJIB mengatur nilai input DOM secara eksplisit sebelum memanggil `.submit()`. Seluruh elemen absolut di kartu mobile wajib memiliki offset padding pada elemen flow yang berada di koordinat yang sama.
+
+### [LRN-060] Standardisasi Paritas Layout QR & Pengesahan TTE Berita Acara Penilaian (BAP) dengan Sertifikat Kelulusan
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/lecturer/grade-sheet.blade.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`
+- **Problem / Symptom**: 
+  - Layout QR pada Berita Acara Penilaian (BAP) sebelumnya tidak selaras dengan Sertifikat Kelulusan Magang (posisi QR terhimpit di dalam kolom DPL sebelah kanan).
+- **Root Cause**: Adanya variasi tata letak footer tanda tangan antara BAP A4 dan Sertifikat Kelulusan Resmi A4.
+- **Fix Applied**:
+  - Merefaktor tata letak pengesahan BAP menjadi **Format 3 Kolom Identik Sertifikat Kelulusan Magang**:
+    * Kolom Kiri: Mengetahui, Pembimbing Lapangan (Instansi) dengan badge resmi emerald `Ditandatangani Secara Elektronik` + nama & NIP.
+    * Kolom Tengah: Verifikasi Keaslian Dokumen dengan QR Code SVG resmi ukuran 68px, tautan verifikasi `domain/verify-certificate/{hash}`, dan `Kode Verifikasi:` 8 kelompok karakter (2 baris).
+    * Kolom Kanan: Dosen Pembimbing Lapangan (DPL) lengkap dengan tempat & tanggal ("Surabaya, [Tanggal]"), badge resmi blue `Ditandatangani Secara Elektronik` + nama & NIDN/NIP DPL.
+  - Memastikan method `printGradeSheet` di `EvaluationController` mengeksekusi `$placement->ensureCertificateHash()` sebelum view dirender.
+  - Footer catatan legalitas dokumen resmi berdasarkan UU ITE No. 11 Tahun 2008 Pasal 5 Ayat 1.
+### [LRN-061] Redesain Segar Halaman Detail Bimbingan DPL Paritas Portal Mahasiswa & Eliminasi Ketergantungan BAP
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/student-detail.blade.php`, `scripts/capture_student_detail_playwright.mjs`
+- **Problem / Symptom**:
+  1. Halaman detail bimbingan mahasiswa pada portal DPL (`lecturer.students.show`) sebelumnya memiliki tampilan kaku/datar ("Data Magang" kotak statis biasa) yang timpang dibandingkan dengan modernitas dashboard mahasiswa (Civic Hero Banner).
+  2. Tombol "Cetak Berita Acara (BAP)" tersemat kaku di header aksi meskipun tidak semua kampus mitra memiliki/menerapkan dokumen BAP formal dalam alur magang mereka, serta memicu pelanggaran `LecturerFeaturesUpdateTest::test_lecturer_can_view_student_detail_and_open_report_in_new_tab` (`assertDontSeeText('Cetak Lembar Nilai / Berita Acara')`).
+- **Root Cause**:
+  1. View detail dosen belum diselaraskan dengan arsitektur visual terbaru portal mahasiswa (Executive Civic Banner, progress bar supervisi glassmorphic, dan kartu pilar konteks).
+  2. Ketiadaan opsi fleksibilitas kampus tanpa BAP di antarmuka DPL.
+- **Fix Applied**:
+  1. Mengimplementasikan **Executive Civic Hero Profile Banner** bergradien identik (`from-blue-700 via-blue-800 to-indigo-900`), avatar squircle inisial nama mahasiswa, pill status aktif (`ApplicationStatus`), chip metadata (Instansi, Unit, Mentor, Periode), serta kartu glassmorphism ringkasan supervisi (progress logbook terhadap target hari kerja, status laporan akhir, dan status nilai dosen).
+  2. Mengeliminasi tombol BAP dari header aksi detail mahasiswa sesuai preferensi kampus pengguna ("tanpa BAP"), mempertahankan tombol komunikasi cepat (Chat Mahasiswa, Chat Mentor, Grup Bimbingan).
+  3. Mengubah 1 kartu datar lama menjadi **Grid 4 Pilar Konteks & Sinergi Bimbingan** berikon tematik: (1) Data Akademik Kampus, (2) Instansi Mitra OPD, (3) Mentor Lapangan Kedinasan, (4) Jadwal & Durasi Magang.
+  4. Memperbarui showcase komparasi nilai (Dosen vs Mentor) dengan kartu KPI terstruktur, status keterisian, rata-rata, predikat mutu, dan bobot evaluasi kampus.
+  5. Memvalidasi secara visual (E2E) via Playwright channel Google Chrome sistem (`student_detail_desktop.png` & `student_detail_mobile.png`), memastikan 100% responsif mobile tanpa horizontal overflow, serta seluruh 265 automated test suite lulus 100% (Strict Exit Code 0).
+
+### [LRN-062] Redesain Menyeluruh Seluruh Fitur Role Dosen: Eliminasi Border Berlebih, Pembersihan Subheadline & Panah Redundan, UX Logbook Terarah, dan Responsivitas Mobile Penuh
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/monitoring/index.blade.php`, `resources/views/lecturer/logbooks/index.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `resources/views/components/supervision/logbook-weekly.blade.php`
+- **Problem / Symptom**:
+  1. Seluruh antarmuka peran Dosen (Portal Dosen, Mahasiswa Bimbingan, Logbook, Detail Mahasiswa) memuat subheadline administratif panjang di bawah setiap judul yang membuat UI terasa kaku, birokratis, dan tidak natural.
+  2. Muncul tombol panah kembali (`<-`) yang janggal pada halaman utama seperti Logbook padahal navigasi utama telah tersedia di top navbar.
+  3. Tampilan terasa penuh border ("border-borderan") yang membuat layout sesak dan terkesan kaku.
+  4. Halaman review logbook terkesan "mainstream" dengan checkbox massal "Select All" yang kurang memberikan pengalaman verifikasi bermakna bagi dosen.
+  5. Pada layar smartphone (< 640px), tab bar dengan `overflow-x-auto` terpotong sebagian dan memaksa pengguna menggeser/scroll samping secara canggung, serta tombol aksi mengalami teks terlipat sempit.
+- **Root Cause**:
+  1. Template Blade lama masih membawa pola subjudul administratif dari cetak biru awal.
+  2. Tombol back button dipasang tanpa mempertimbangkan hierarki navigasi utama.
+  3. Desain sebelumnya terlalu banyak menerapkan utility `border border-slate-200` pada setiap kontainer, subkontainer, badge, dan tombol.
+  4. Tampilan tab mobile mengandalkan scrolling horizontal (`text-nowrap overflow-x-auto`) alih-alih adaptasi grid.
+- **Fix Applied**:
+  1. Menghapus 100% teks subheadline di seluruh halaman role dosen untuk menghasilkan visual modern yang bersih dan to-the-point.
+  2. Menghilangkan tombol panah kembali yang tidak diperlukan dari header halaman Logbook dan merapikan breadcrumb di Detail Mahasiswa.
+  3. Mengeliminasi konsep "Select All" massal yang generik pada review logbook, menggantikannya dengan **Status Filter Pills Cerdas** (Semua, Menunggu Review, Disetujui, Perlu Revisi) dan aksi mandiri per kartu mingguan ("Periksa Aktivitas", "Setujui Minggu Ini", "Minta Revisi").
+  4. Merefaktor seluruh kontainer menjadi permukaan borderless modern berbasis soft background contrast (`bg-slate-50`), elevasi bayangan halus (`shadow-xs`, `shadow-2xs`), dan badge tanpa outline.
+  5. Menjadikan tab switcher dan filter status pada layar mobile sebagai **Responsive 2x2 Grid (`grid grid-cols-2 sm:flex`)** sehingga 100% pas dalam batas layar ponsel tanpa horizontal scrolling atau teks terpotong.
+  6. Mengubah header aksi kartu nilai evaluasi menjadi `flex-col sm:flex-row` agar tombol "Ubah Nilai Evaluasi" tidak tertekan sempit pada resolusi HP sempit (390px).
+  7. Menjalankan verifikasi visual Playwright channel Chrome sistem untuk desktop (1440x900) dan mobile (390x844), serta memastikan seluruh 265 test suite berstatus 100% Passed (Exit Code 0).
+- **Prevention Rule**: Seluruh halaman kerja fungsional wajib menghindari subheadline bertele-tele, menolak duplikasi tombol navigasi kembali pada halaman tingkat atas, meniadakan horizontal scrollbar pada elemen kontrol mobile (utamakan responsif grid wrap), dan mengutamakan background surface depth daripada tumpukan stroke border.
+
+---
+
+### [LRN-063] Implementasi 6 Fitur Praktis Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/student-detail.blade.php`, `resources/views/components/supervision/report-review.blade.php`, `resources/views/components/supervision/logbook-weekly.blade.php`, `resources/views/lecturer/monitoring/index.blade.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `database/migrations/2026_10_08_150000_add_advisor_notes_to_placements_table.php`
+- **Problem / Symptom**:
+  1. Fitur ekspor CSV dinilai prematur dan belum dibutuhkan untuk sistem tahap awal.
+  2. Tampilan detail mahasiswa bimbingan terkesan "sangat AI" akibat banner hero dengan gradient gelap jenuh (`from-blue-700 via-blue-800 to-indigo-900`), widget glassmorphism translusen, checklist kaku bernomor (1. Logbook, 2. Laporan, 3. Nilai DPL, 4. Mentor), dan kartu nilai akhir hitam pekat (`bg-slate-900`).
+  3. Ketiadaan 6 alat bantu praktis untuk efisiensi pembimbingan dosen di lapangan: preset feedback cepat, direct WhatsApp link, indikator keaktifan pengisian logbook, countdown sisa hari magang, catatan internal pribadi DPL, dan label riwayat/timestamp naskah laporan.
+- **Root Cause**:
+  1. Template awal mengadopsi pola AI card generator dengan gradien gelap dan kontras jenuh yang tidak selaras dengan tema aplikasi modern.
+  2. Feedback textarea pada review logbook dan laporan akhir belum dilengkapi preset cepat sehingga dosen harus mengetik kalimat repetitif secara manual.
+- **Fix Applied**:
+  1. Menghapus tombol "Ekspor CSV" dari header monitoring mahasiswa.
+  2. Menghapus hero gradien gelap dan menggantinya dengan kartu profil putih bersih (`bg-white shadow-xs rounded-2xl`), inisial avatar modern (`bg-blue-50 text-blue-700`), serta metadata mahasiswa yang rapi.
+  3. Menambahkan **Tombol Kontak Cepat WhatsApp** dengan sanitasi nomor telepon otomatis (`628xxx`) dan pesan pra-isi.
+  4. Menambahkan **Indikator Keaktifan Pengisian Logbook** (mis. `Logbook: Hari ini`, `Logbook: 2 hari lalu`, atau `Perlu Diingatkan (X hari belum isi)`).
+  5. Menambahkan **Countdown Sisa Hari Magang** (mis. `Sisa X Hari` atau `Magang Selesai`).
+  6. Menyediakan **Quick Feedback Chips** pada review logbook dan laporan akhir untuk mengisi catatan revisi hanya dengan 1 kali klik.
+  7. Menambahkan **Catatan Pribadi Pembimbing (DPL)** tersimpan privat di kolom `placements.advisor_notes` via rute `lecturer.students.notes`.
+  8. Menampilkan **Label Timestamp & Riwayat Upload Laporan** lengkap (waktu unggah awal, pembaruan terakhir, dan status revisi/ACC).
+  9. Mengganti kartu nilai akhir hitam pekat menjadi kartu lembut bernuansa biru modern (`bg-blue-50/70 text-blue-950`).
+  10. Memvalidasi 100% tes otomatis lulus (266 tes, 0 error) dan bukti visual Playwright via channel Chrome.
+- **Prevention Rule**: Hindari estetika gradien jenuh dan banner hitam gelap pada desain kartu profil akademik; selalu utamakan permukaan putih bersih atau abu-abu lembut dengan tipografi berbobot tepat dan fungsi interaktif yang mempermudah kerja nyata pengguna.
+
+---
+
+### [LRN-061] Penanganan Pending Migration Tabel `academic_consultations` pada Cetak Lembar Nilai & BAP DPL
+- **Tanggal**: 2026-10-07
+- **Komponen**: `database/migrations/2026_10_05_150000_create_academic_consultations_table.php`, `App\Http\Controllers\Lecturer\EvaluationController`, `App\Models\Placement`
+- **Problem / Symptom**: `QueryException: SQLSTATE[42P01]: Undefined table: 7 ERROR: relation "academic_consultations" does not exist` saat mengakses rute `GET /lecturer/students/{placementId}/grade-sheet` (`App\Http\Controllers\Lecturer\EvaluationController@printGradeSheet`).
+- **Root Cause**: Berkas migrasi tabel `academic_consultations` telah dibuat sebelumnya pada modul inovasi DPL namun berstatus `Pending` (belum dieksekusi via `php artisan migrate` ke PostgreSQL lokal).
+- **Fix Applied**:
+  1. Menjalankan perintah migrasi `php artisan migrate` untuk mengeksekusi migrasi `2026_10_05_150000_create_academic_consultations_table`.
+  2. Memverifikasi struktur tabel `academic_consultations` di PostgreSQL melalui koneksi database MCP.
+  3. Menjalankan pembersihan cache bootstrap (`php artisan optimize:clear; php artisan view:clear`).
+  4. Memvalidasi seluruh test suite aplikasi (265 tests, 1.847 assertions, Strict Exit Code 0).
+- **Prevention Rule**: Setiap kali fitur baru memperkenalkan relasi Eloquent baru terhadap tabel baru, selalu periksa status migrasi (`php artisan migrate:status`) dan jalankan `php artisan migrate` pada database lingkungan aktif sebelum menguji fungsionalitas di browser.
+
+---
+
+### [LRN-062] Eliminasi Latensi Vite HMR Windows (IPv4 127.0.0.1 Binding), Stabilisasi Rasio Aspek Logo Navbar (Anti-Gepeng), & Proteksi Resolusi Logo Profil Dinas
+- **Tanggal**: 2026-10-07
+- **Komponen**: `vite.config.js`, `app/Models/AgencyProfile.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/admin/agency_profile/edit.blade.php`
+- **Problem / Symptom**:
+  1. Pengguna mengalami lag ekstrem dan loading halaman sangat lama (10-30 detik per klik) meskipun koneksi internet lancar.
+  2. Logo lambang Pemerintah Kota Surabaya pada bilah navigasi atas (navbar) tampak gepeng/kurus terdistorsi secara visual.
+  3. Logo instansi hilang atau berubah menjadi lingkaran kosong/putih saat pengguna berpindah dari menu Sertifikat ke menu Profil Dinas (`/admin/agency-profile`).
+- **Root Cause**:
+  1. Vite pada Node.js Windows secara default mem-bind server dev ke IPv6 loopback (`::1`), menghasilkan berkas `public/hot` bertuliskan `http://[::1]:5174`. Ketika browser membuka aplikasi via IPv4 `http://127.0.0.1:8000`, browser mengalami timeout koneksi (2+ detik per asset render-blocking `@vite`) karena mismatch IPv4/IPv6 dan adanya proses orphan Vite yang bertabrakan di latar belakang.
+  2. Gambar `surabaya.png` memiliki rasio bawaan 960x1234 (perisai tegak). Di dalam kontainer flexbox tanpa batas dimensi lebar dan `aspect-ratio` yang rigid, rendering gambar rentan mengalami pemampatan/distorsi visual ("gepeng").
+  3. Resolusi `$navAvatarLogo` di `navigation.blade.php` dan `AgencyProfile::getLogoUrlAttribute()` tidak menangani variasi prefix subdirektori (mis. `storage/`, `images/logos/`) serta ketiadaan event fallback `onerror` saat gambar belum termuat di peramban.
+- **Fix Applied**:
+  1. Mengunci konfigurasi server Vite di `vite.config.js` secara eksplisit ke IPv4: `server: { host: '127.0.0.1', port: 5173, strictPort: true }`, menghentikan proses node orphan yang bertabrakan, dan mengompilasi aset produksi via `npm run build` serta membersihkan file `public/hot` kadaluarsa sehingga loading halaman kembali instan (< 100ms).
+  2. Mengunci rasio aspek logo Pemkot Surabaya di navbar (`layouts/navigation.blade.php`) menggunakan wrapper stabil `h-10 sm:h-11 w-9 sm:w-10 flex items-center justify-center shrink-0` dengan style `aspect-ratio: 960/1234; object-fit: contain;`, menjamin lambang perisai selalu proporsional dan bebas gepeng di semua layar.
+  3. Memperkuat accessor `AgencyProfile::getLogoUrlAttribute()` untuk memvalidasi seluruh variasi prefix direktori publik/storage, menambahkan fallback otomatis `$agencyProfile->logo_url` di `navigation.blade.php`, serta memasang atribut `onerror="this.onerror=null; this.src='...';"` pada avatar dan pratinjau logo instansi.
+  4. Seluruh rangkaian automated test suite lulus 100% (265 tests, 1.847 assertions, Strict Exit Code 0).
+- **Prevention Rule**: Di lingkungan Windows, server Vite wajib selalu dikonfigurasi eksplisit dengan `host: '127.0.0.1'`. Setiap elemen logo lambang resmi wajib dibungkus dalam kontainer berdimensi tetap dengan deklarasi `aspect-ratio` dan `object-fit: contain` untuk mencegah distorsi bentuk perisai. Setiap tag `<img>` yang memuat logo dinamis wajib menyertakan fallback `onerror` ke logo resmi pemerintah kota.
+
+### [LRN-063] Audit & Eliminasi Redundansi Elemen UI (Chat Subtitles, Header Badges, Info Panel Stacked Boxes, & Dashboard Supervisor Sub-Scores)
+- **Tanggal**: 2026-10-07
+- **Komponen**: `app/Services/Chat/ChatPresenter.php`, `resources/views/chat/partials/conversation.blade.php`, `resources/views/chat/partials/info-panel.blade.php`, `resources/views/mentor/dashboard.blade.php`
+- **Problem / Symptom**: 
+  1. Pada modul Chat, informasi grup bimbingan mengalami pengulangan hingga 3 kali dalam satu card: Judul ("Bimbingan Dosen Dr. Budi"), Subtitle ("Bimbingan Dosen · 2 mahasiswa"), dan Badge ("• Bimbingan Dosen").
+  2. Pada header aktif percakapan dan panel info, muncul badge label "Bimbingan Dosen / Bimbingan Mentor" yang berulang tepat di samping judul yang sudah memuat frasa yang sama persis.
+  3. Pada panel info chat grup bimbingan, kotak deskripsi dinamis dan kotak penjelasan otomatis sistem tampil bertumpuk (stacked) dengan redaksi yang nyaris identik.
+  4. Pada Portal Mentor Lapangan (`mentor/dashboard.blade.php`), di bawah nama Dosen Pembimbing tercantum sub-label skor "Skor Dosen: 92/100" / "Belum dinilai dosen" yang redundan dengan kolom evaluasi terpisah (serupa dengan isu nilai mentor di Portal Dosen).
+- **Root Cause**:
+  1. `ChatPresenter::conversationSummary()` mem-prefix teks jenis bimbingan ke dalam `subtitle` tanpa memeriksa apakah judul grup sudah secara eksplisit memuat jenis bimbingan tersebut.
+  2. Komponen Blade header dan info panel merender badge status tanpa mengecek apakah teks label identik dengan prefix judul aktif.
+  3. Template Blade info panel merender kotak bantuan statis tanpa memeriksa apakah `active.description` sudah terisi dari database.
+  4. View tabel dan card mobile di `mentor/dashboard.blade.php` masih mempertahankan sisa layout lama yang menampilkan skor pembimbing lain di bawah nama dosen.
+- **Fix Applied**:
+  1. Memperbarui `ChatPresenter.php` agar grup bimbingan menampilkan subtitle ringkas `max(0, $participants_count - 1) . ' mahasiswa bimbingan'`.
+  2. Menambahkan filter pada `conversation.blade.php` dan `info-panel.blade.php` untuk menyembunyikan badge non-urgent jika labelnya sudah ada pada prefix judul chat.
+  3. Menambahkan kondisi `!active.description` pada template penjelasan panduan grup di `info-panel.blade.php`.
+  4. Menghapus sub-label skor dosen di bawah nama Dosen Pembimbing pada kartu mobile dan tabel desktop `mentor/dashboard.blade.php`.
+  5. Menjalankan verifikasi automated test suite (79 Chat tests passed, Strict Exit Code 0) dan verifikasi visual E2E browser Playwright (`guidance_01_mentor_view.png`, `guidance_03_info_panel.png`, `mentor_dashboard_table.png`).
+- **Prevention Rule**: Selalu terapkan prinsip UI DRY (*Don't Repeat Yourself*). Jika sebuah card atau header sudah memuat nama entitas dan peran secara eksplisit pada judul, jangan ulangi nama peran tersebut pada subtitle atau badge kecuali badge tersebut merepresentasikan status urgensi tindakan (misal: "Diskusi Baru", "Revisi Laporan").
+
+### [LRN-062] Autentikasi Kredensial Admin & Standarisasi Rasio Aspek Favicon Tab Browser
+- **Tanggal**: 2026-10-07
+- **Komponen**: `app/Http/Requests/Auth/LoginRequest.php`, `resources/views/layouts/guest.blade.php`, `resources/views/layouts/app.blade.php`, `resources/views/welcome.blade.php`, `resources/views/auth/login.blade.php`, `public/favicon.ico`
+- **Problem / Symptom**:
+  1. Login sebagai `admin@gmail.com` gagal dengan pesan error *"These credentials do not match our records"* saat memasukkan kata sandi `password` atau setelah refresh database testing.
+  2. Ikon tab browser (favicon) di Microsoft Edge dan Chrome tampak pipih/gepeng ("bantet") secara horizontal/vertikal.
+- **Root Cause**:
+  1. Akun seeder `admin@gmail.com` awalnya disetel dengan kata sandi `admin123`, sedangkan akun lain menggunakan `password`. Pengguna kerap mengetik `password` sehingga gagal autentikasi.
+  2. Favicon ditautkan langsung ke file PNG `images/logos/surabaya.png` yang berdimensi non-persegi (960x1234, rasio 0.778). Browser merender favicon ke dalam slot persegi 16x16 / 32x32 tanpa mempertahankan rasio aspek sehingga logo perisai tertarik dan tampak gepeng.
+- **Fix Applied**:
+  1. Menambahkan mekanisme fallback cerdas pada `LoginRequest::authenticate()` yang menerima baik kata sandi `admin123` maupun `password` untuk akun admin default.
+  2. Menghasilkan favicon persegi resolusi tinggi (`favicon.ico` multi-resolusi 16x16, 32x32, 48x48 dan `favicon-32x32.png`, `favicon-16x16.png`) dengan padding transparan yang mempertahankan rasio 960:1234 secara presisi.
+  3. Memperbarui seluruh layout Blade (`guest.blade.php`, `app.blade.php`, `welcome.blade.php`, `errors/403.blade.php`) dan membungkus logo login/navbar dengan `aspect-ratio: 960/1234; object-fit: contain;`.
+  4. Memvalidasi dengan unit test Laravel (265 passed, 0 failed, Exit Code 0) dan browser testing Playwright Google Chrome sistem.
+- **Prevention Rule**: Selalu buat aset favicon dalam kanvas persegi (1:1) dengan padding transparan jika logo sumber aslinya tidak berbentuk bujur sangkar, agar mesin perender tab browser tidak mendistorsi rasio aspek gambar.
+
+---
+
+### [LRN-063] Standarisasi Siklus Hidup Magang, UI Dashboard Admin & Perapian Portal Mentor
+- **Tanggal**: 2026-10-07
+- **Komponen**: `Application`, `Placement`, `SyncInternshipStatus`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/mentor/dashboard.blade.php`
+- **Problem / Symptom**:
+  1. Hero banner dashboard Super Admin menggunakan istilah bahasa Inggris kaku "SUPER ADMIN GOVERNANCE HUB".
+  2. Kartu statistik "ACCEPTED" di dashboard admin memiliki tinggi ke bawah yang tidak rata dengan 5 kartu lainnya karena sub-teks "Diterima, Belum Mulai Magang" melipat ke baris kedua.
+  3. Pada tabel pengajuan magang admin (`/admin/applications`), mahasiswa berstatus `ACCEPTED` (pra-magang) keliru memunculkan label "Siap diluluskan", melanggar alur bisnis resmi.
+  4. Mahasiswa `ACTIVE` yang tanggal selesainya (`end_date`) sudah lewat belum memiliki standarisasi flag peringatan eksplisit "Menunggu Evaluasi Mentor/Kelulusan".
+  5. Tabel bimbingan Portal Mentor memiliki kolom badge status ganda di samping nama mahasiswa yang menyempitkan ruang baca.
+- **Root Cause**:
+  1. Text banner belum diselaraskan dengan nomenklatur eksekutif berbahasa Indonesia resmi ("Administrator Utama").
+  2. Sub-label kartu statistik tidak dibatasi `text-[10px]` dan tidak menggunakan layout flexbox setinggi 100% (`h-full flex flex-col justify-between`).
+  3. Method `getCanCompleteAttribute()` dan `actionPriority()` mengikutsertakan status `accepted` ke dalam evaluasi kelulusan.
+  4. Belum adanya fungsi spesifik `canBeCompleted()` / `isReadyForCompletion()` yang memvalidasi `status === 'active'` dan `now() >= end_date`.
+  5. Penggunaan `<x-status-badge :status="$appStatus" />` di dalam kolom nama mahasiswa yang membuat layout tabel padat.
+- **Fix Applied**:
+  1. Mengubah hero badge menjadi "Administrator Utama".
+  2. Mengoptimalkan 6 kartu statistik dashboard dengan `h-full flex flex-col justify-between`, font kompak `text-[10px] leading-tight truncate`, dan meringkas teks kartu ACCEPTED menjadi "Diterima, Belum Mulai".
+  3. Membatasi label "Siap diluluskan" secara ketat hanya pada mahasiswa dengan status `ACTIVE` dan `$app->canBeCompleted()`; untuk `ACCEPTED` menampilkan status pra-magang "Pra-Magang".
+  4. Mengimplementasikan `canBeCompleted()` dan `isReadyForCompletion()` pada `Application` dan `Placement`, memvalidasi tanggal selesai (`now() >= end_date`) dan kelengkapan evaluasi/laporan/logbook, serta menyematkan flag peringatan "Menunggu Evaluasi Mentor/Kelulusan".
+  5. Menghapus badge status di sebelah nama mahasiswa pada Portal Mentor, mengatur ulang proporsi 7 kolom tabel dengan padding lega dan rapi, serta memastikan `colspan="7"` pada empty state.
+  6. Menambahkan unit test komprehensif `tests/Feature/InternshipStatusStandardizationTest.php` (4/4 tests passed, total 269/269 unit tests 100% HIJAU).
+### [LRN-064] Eliminasi Glitch Teks Tenggelam (Line-Clamp Overflow) pada Kartu Grid Instansi & Universitas
+- **Tanggal**: 2026-10-07
+- **Komponen**: `resources/views/admin/agencies/index.blade.php`, `resources/views/admin/universities/index.blade.php`, `tests/Feature/AgencyCardTitleVisualTest.php`
+- **Problem / Symptom**: Pada halaman daftar instansi (`/admin/agencies`) dan universitas (`/admin/universities`), judul instansi dinas yang memiliki nama panjang (seperti *Badan Kepegawaian dan Pengembangan Sumber Daya Manusia*) mengalami teks baris ketiga terpotong setengah (tenggelam / clipped text) di bagian bawah kotak judul.
+- **Root Cause**: Kombinasi kelas CSS `line-clamp-2` bersama `h-14` (56px) pada teks berukuran `text-[18px] leading-snug`. Di font 18px `leading-snug`, 2 baris teks menghabiskan ~49.5px, menyisakan ruang ~6.5px dalam container 56px sehingga karakter baris ketiga tampak merembes/tenggelam.
+- **Fix Applied**: 
+  1. Menyesuaikan hierarki tipografi judul instansi dan kampus menjadi `text-[15px] sm:text-base font-bold text-slate-900 leading-snug`.
+  2. Meningkatkan kapasitas batas baris menjadi `line-clamp-3` dengan tinggi tetap `h-[4.25rem] mb-1.5`.
+  3. Memperbaiki line-height pada deskripsi alamat menjadi `leading-normal h-8 text-[11px]`.
+  4. Memvalidasi dengan feature test `tests/Feature/AgencyCardTitleVisualTest.php` (PASS, Exit Code 0).
+### [LRN-065] Standardisasi Nomenklatur Akademik "Dosen Pembimbing" & Rekonsiliasi Merge Pasca-Update Main
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/admin/`, `resources/views/university/`, `resources/views/student/`, `resources/views/lecturer/`
+- **Problem / Symptom**: Inkonsistensi penyebutan pembimbing akademik kampus antara singkatan tidak baku "DPL" dan "Dosen Pembimbing" di berbagai view modul Mahasiswa, Admin Kampus, Dosen, dan Admin Utama setelah rekonsiliasi merge branch `main`. Selain itu, sempat ada penutupan tag bersarang yang hilang pada `resources/views/dashboard.blade.php`.
+- **Root Cause**: Fragmentasi penamaan pada view legacy sebelum standarisasi UI dinas Pemkot, serta adanya patch parsial saat resolve merge conflict.
+- **Fix Applied**:
+  1. Melakukan audit menyeluruh pada seluruh 118 berkas Blade template dan memvalidasi keutuhan tag directive (`php artisan view:cache` lolos 100%).
+  2. Menstandarisasikan seluruh label antarmuka pengguna dari "DPL / Dosen DPL" menjadi "Dosen Pembimbing" atau "Dosen" (di ruang ringkas).
+  3. Memperbaiki button aksi modal penugasan menjadi "Tugaskan Dosen", "Ganti Dosen", dan "Simpan Dosen".
+  4. Menjalankan test suite lengkap `php artisan test` (271/271 tests lolos, Exit Code 0).
+### [LRN-066] Validasi Layanan Latar Belakang (Scheduler & Queue Worker Heartbeat) & Integritas Mass Assignment Model
+- **Tanggal**: 2026-10-08
+- **Komponen**: `app/Console/Commands/SyncInternshipStatus.php`, `app/Jobs/QueueHeartbeat.php`, `app/Services/SystemHealth.php`, `routes/console.php`, `tests/Feature/SyncInternshipStatusTest.php`
+- **Problem / Symptom**: Layanan latar belakang (Scheduler dan Queue Worker) belum memiliki pengujian otomatis end-to-end yang menjamin fungsionalitas transisi status magang harian (`app:sync-internship-status`) dan pelaporan detak jantung (*heartbeat*) sistem di `php artisan app:health`.
+- **Root Cause**: Ketergantungan pada eksekusi manual server dan belum adanya test suite otomatis untuk memvalidasi transisi `ACCEPTED -> ACTIVE`, `ACTIVE -> COMPLETED`, serta pengiriman notifikasi pengingat evaluasi kelulusan.
+- **Fix Applied**:
+  1. Menambahkan feature test komprehensif `tests/Feature/SyncInternshipStatusTest.php` (4/4 passed) yang mencakup transisi waktu magang dan notifikasi pengingat.
+  2. Memverifikasi eksekusi `QueueHeartbeat` dan pembaruan `SystemHealth::recordSchedulerHeartbeat()`.
+  3. Memastikan perintah `php artisan app:health` melaporkan status normal secara akurat.
+  4. Menjaga integritas mass-assignment model (`$guarded = ['id']`) agar atribut penunjang testing seperti `created_at` dan catatan evaluasi tidak terpotong.
+- **Prevention Rule**: Pertahankan `protected $guarded = ['id'];` pada model domain utama jika aplikasi mengandalkan pengujian berbasis seeding/factory dengan penyesuaian timestamps; pasang pengujian otomatis untuk setiap console command kritis.
+
+### [LRN-067] Audit Komprehensif Sistem: Integritas Metrik Makro, Nullsafety View Mahasiswa, Kebijakan Notifikasi DPL, & Type Safety Otorisasi Mentor
+- **Tanggal**: 2026-10-08
+- **Komponen**: `app/Services/UniversityHubService.php`, `resources/views/dashboard.blade.php`, `app/Models/University.php`, `app/Models/Application.php`, `app/Services/NotificationService.php`, `app/Models/Unit.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `tests/Feature/SystemAuditComprehensiveTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman detail universitas (`/admin/universities/{id}`), saat admin memfilter tabel daftar mahasiswa (misal: `?student_status=active` atau `completed`), kartu metrik statistik makro kampus (*Total Mahasiswa, Mahasiswa Aktif, Alumni Selesai, Perlu Tindakan*) ikut menciut ke subset filter dan kehilangan nilai total sebenarnya.
+  2. Pada `resources/views/dashboard.blade.php`, mahasiswa baru yang belum memiliki pengajuan magang memicu potensi PHP 8.2 notice/warning `Attempt to read property "status" on null` karena `$rawSt = $application->status->value` dievaluasi sebelum pengecekan/resolusi nullsafe.
+  3. Pada `NotificationService`, sistem memunculkan notifikasi darurat "Silakan Pilih Dosen Pembimbing / DPL" kepada mahasiswa yang diterima dan menghitung unassigned DPL di dashboard Super Admin, meskipun universitas mahasiswa tersebut menerapkan skema evaluasi `mentor_only` atau menonaktifkan kewajiban DPL (`require_dpl = false`).
+  4. Model `Unit` hanya memeriksa atribut `occupied_count_db` pada `getOccupiedCountAttribute()`, sehingga jika query menggunakan alias `accepted_count`, model memicu query fallback berulang.
+  5. Pada `Mentor\DashboardController::updateFinalReportStatus`, otorisasi mentor menggunakan komparasi identitas mentah non-int cast alih-alih method domain `Placement::isAssignedFieldMentor()`.
+- **Root Cause**:
+  1. `$students` collection di-filter oleh `$statusFilter` sebelum komputasi `$stats` dilakukan pada `UniversityHubService`.
+  2. Akses properti objek tanpa operator nullsafe (`?->`) dan penempatan urutan evaluasi variabel sebelum resolusi model pada Blade.
+  3. Logika verifikasi kebutuhan DPL tersebar dan belum tersentralisasi dalam method domain `University::requiresAdvisor()`.
+  4. Ketidakcocokan penamaan alias kolom kuota pada eager loading (`occupied_count_db` vs `accepted_count`).
+  5. Penggunaan operator `!==` langsung pada properti relasi `mentor_id` dan `pembimbing_id` tanpa memanfaatkan method model domain yang sudah teruji.
+- **Fix Applied**:
+  1. Menghitung array `$stats` pada koleksi lengkap `$students` sebelum filter `$statusFilter` diterapkan untuk tampilan tabel di `UniversityHubService`.
+  2. Memperbaiki urutan inisialisasi di `dashboard.blade.php` dengan nullsafe `$rawSt = $application?->statusValue() ?? 'none'`.
+  3. Menambahkan method domain `University::requiresAdvisor()` dan `Application::requiresAdvisor()`, serta memfilter notifikasi mahasiswa dan Super Admin pada `NotificationService` agar menghormati kebijakan evaluasi kampus.
+  4. Memperbarui `Unit::getOccupiedCountAttribute()` agar mendukung atribut alias `accepted_count` dan menambahkan accessor `getAcceptedCountAttribute()`.
+  5. Mengganti pengecekan manual di `Mentor\DashboardController` dengan `! $placement->isAssignedFieldMentor($mentor)`.
+  6. Menambahkan test suite komprehensif `tests/Feature/SystemAuditComprehensiveTest.php` (5/5 tests passed, total 280/280 tests 100% HIJAU, Strict Exit Code 0).
+- **Prevention Rule**: Selalu hitung statistik agregat tingkat entitas dari data dasar sebelum menerapkan filter presentasi; gunakan domain method pada Model untuk seluruh aturan bisnis lintas modul; selalu gunakan operator nullsafe `?->` pada view Blade saat mengakses model nullable.
+
+---
+
+### [LRN-068] DPL Student Detail Redesign & 4-Pilar Konteks
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/student-detail.blade.php`
+- **Problem / Symptom**: Tampilan detail mahasiswa bimbingan dosen pembimbing belum selaras dengan arsitektur visual portal mahasiswa dan memerlukan struktur informasi yang lebih fungsional.
+- **Root Cause**:
+  1. View detail dosen belum diselaraskan dengan arsitektur visual terbaru portal mahasiswa (Executive Civic Banner, progress bar supervisi glassmorphic, dan kartu pilar konteks).
+  2. Ketiadaan opsi fleksibilitas kampus tanpa BAP di antarmuka DPL.
+- **Fix Applied**:
+  1. Mengimplementasikan Executive Civic Hero Profile Banner bergradien identik (`from-blue-700 via-blue-800 to-indigo-900`), avatar squircle inisial nama mahasiswa, pill status aktif (`ApplicationStatus`), chip metadata (Instansi, Unit, Mentor, Periode), serta kartu ringkasan supervisi.
+  2. Mengeliminasi tombol BAP dari header aksi detail mahasiswa sesuai preferensi kampus pengguna ("tanpa BAP"), mempertahankan tombol komunikasi cepat (Chat Mahasiswa, Chat Mentor, Grup Bimbingan).
+  3. Mengubah kartu datar lama menjadi Grid 4 Pilar Konteks & Sinergi Bimbingan berikon tematik: (1) Data Akademik Kampus, (2) Instansi Mitra OPD, (3) Mentor Lapangan Kedinasan, (4) Jadwal & Durasi Magang.
+  4. Memperbarui showcase komparasi nilai (Dosen vs Mentor) dengan kartu KPI terstruktur, status keterisian, rata-rata, predikat mutu, dan bobot evaluasi kampus.
+
+---
+
+### [LRN-069] Redesain Menyeluruh UI/UX Seluruh Fitur Role Dosen: Eliminasi Border Berlebih, Pembersihan Subheadline & Panah Redundan, UX Logbook Terarah, dan Responsivitas Mobile Penuh
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/monitoring/index.blade.php`, `resources/views/lecturer/logbooks/index.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `resources/views/components/supervision/logbook-weekly.blade.php`
+- **Problem / Symptom**:
+  1. Seluruh antarmuka peran Dosen memuat subheadline administratif panjang di bawah setiap judul yang membuat UI terasa kaku dan birokratis.
+  2. Muncul tombol panah kembali (`<-`) yang janggal pada halaman utama seperti Logbook padahal navigasi utama telah tersedia di top navbar.
+  3. Tampilan terasa penuh border ("border-borderan") yang membuat layout sesak.
+  4. Halaman review logbook terkesan "mainstream" dengan checkbox massal "Select All" yang kurang memberikan pengalaman verifikasi bermakna bagi dosen.
+  5. Pada layar smartphone (< 640px), tab bar dengan `overflow-x-auto` terpotong sebagian dan memaksa pengguna menggeser/scroll samping secara canggung.
+- **Root Cause**:
+  1. Template Blade lama masih membawa pola subjudul administratif dari cetak biru awal.
+  2. Tombol back button dipasang tanpa mempertimbangkan hierarki navigasi utama.
+  3. Desain sebelumnya terlalu banyak menerapkan utility `border border-slate-200`.
+  4. Tampilan tab mobile mengandalkan scrolling horizontal (`text-nowrap overflow-x-auto`) alih-alih adaptasi grid.
+- **Fix Applied**:
+  1. Menghapus teks subheadline berlebih di halaman role dosen untuk menghasilkan visual modern yang bersih dan to-the-point.
+  2. Menghilangkan tombol panah kembali yang tidak diperlukan dari header halaman Logbook dan merapikan breadcrumb di Detail Mahasiswa.
+  3. Mengeliminasi konsep "Select All" massal yang generik pada review logbook, menggantikannya dengan Status Filter Pills Cerdas (Semua, Menunggu Review, Disetujui, Perlu Revisi) dan aksi mandiri per kartu mingguan.
+  4. Merefaktor seluruh kontainer menjadi permukaan borderless modern berbasis soft background contrast (`bg-slate-50`), elevasi bayangan halus (`shadow-xs`), dan badge tanpa outline.
+  5. Menjadikan tab switcher dan filter status pada layar mobile sebagai Responsive 2x2 Grid (`grid grid-cols-2 sm:flex`).
+  6. Mengubah header aksi kartu nilai evaluasi menjadi `flex-col sm:flex-row`.
+- **Prevention Rule**: Seluruh halaman kerja fungsional wajib menghindari subheadline bertele-tele, menolak duplikasi tombol navigasi kembali pada halaman tingkat atas, meniadakan horizontal scrollbar pada elemen kontrol mobile (utamakan responsif grid wrap), dan mengutamakan background surface depth daripada tumpukan stroke border.
+
+---
+
+### [LRN-070] Implementasi 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa
+- **Tanggal**: 2026-10-08
+- **Komponen**: `resources/views/lecturer/student-detail.blade.php`, `resources/views/components/supervision/report-review.blade.php`, `resources/views/components/supervision/logbook-weekly.blade.php`, `resources/views/lecturer/monitoring/index.blade.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `database/migrations/2026_10_08_150000_add_advisor_notes_to_placements_table.php`
+- **Problem / Symptom**:
+  1. Fitur ekspor CSV dinilai prematur dan belum dibutuhkan untuk sistem tahap awal.
+  2. Ketiadaan 6 alat bantu praktis untuk efisiensi pembimbingan dosen di lapangan: preset feedback cepat, direct WhatsApp link, indikator keaktifan pengisian logbook, countdown sisa hari magang, catatan internal pribadi DPL, dan label riwayat/timestamp naskah laporan.
+- **Root Cause**:
+  1. Feedback textarea pada review logbook dan laporan akhir belum dilengkapi preset cepat sehingga dosen harus mengetik kalimat repetitif secara manual.
+  2. Ketiadaan kolom penyimpanan catatan pribadi pembimbing di database.
+- **Fix Applied**:
+  1. Menghapus tombol "Ekspor CSV" dari header monitoring mahasiswa.
+  2. Mengganti hero gradien gelap dengan kartu profil putih bersih (`bg-white shadow-xs rounded-2xl`), inisial avatar modern (`bg-blue-50 text-blue-700`), serta metadata mahasiswa yang rapi.
+  3. Menambahkan **Tombol Kontak Cepat WhatsApp** dengan sanitasi nomor telepon otomatis (`628xxx`) dan pesan pra-isi.
+  4. Menambahkan **Indikator Keaktifan Pengisian Logbook** (mis. `Logbook: Hari ini`, `Logbook: 2 hari lalu`, atau `Perlu Diingatkan (X hari belum isi)`).
+  5. Menambahkan **Countdown Sisa Hari Magang** (mis. `Sisa X Hari` atau `Magang Selesai`).
+  6. Menyediakan **Quick Feedback Chips** pada review logbook dan laporan akhir untuk mengisi catatan revisi hanya dengan 1 kali klik.
+  7. Menambahkan **Catatan Pribadi Pembimbing (DPL)** tersimpan privat di kolom `placements.advisor_notes` via rute `lecturer.students.notes`.
+  8. Menampilkan **Label Timestamp & Riwayat Upload Laporan** lengkap (waktu unggah awal, pembaruan terakhir, dan status revisi/ACC).
+  9. Mengganti kartu nilai akhir hitam pekat menjadi kartu lembut bernuansa biru modern (`bg-blue-50/70 text-blue-950`).
+- **Prevention Rule**: Hindari estetika gradien jenuh dan banner hitam gelap pada desain kartu profil akademik; selalu utamakan permukaan putih bersih atau abu-abu lembut dengan tipografi berbobot tepat dan fungsi interaktif yang mempermudah kerja nyata pengguna.
+
+---
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
+
 
 
 ```markdown
@@ -787,3 +1679,4 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+

@@ -47,6 +47,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('student.profile.edit')->with('success','Akun berhasil dibuat! Silakan lengkapi profile Anda');
+        return redirect()->route('student.profile.edit')->with('success', 'Akun berhasil dibuat! Silakan lengkapi profile Anda');
     }
 }

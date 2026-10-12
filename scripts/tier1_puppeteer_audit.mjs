@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\TK ABA SBY 69 (3)\\.gemini\\antigravity-ide\\brain\\ed9247fc-cc69-4353-a531-61712e0581f1';
+const artifactDir = process.env.ARTIFACT_DIR || path.resolve(projectRoot, 'public/test-artifacts');
 
 if (!fs.existsSync(artifactDir)) {
     fs.mkdirSync(artifactDir, { recursive: true });

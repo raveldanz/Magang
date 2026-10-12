@@ -222,17 +222,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse($agencies as $agency)
                     @php
-                        $agencyLogoUrl = null;
-                        if (!empty($agency->logo)) {
-                            if (file_exists(public_path($agency->logo))) {
-                                $agencyLogoUrl = asset($agency->logo);
-                            } elseif (file_exists(public_path('storage/' . $agency->logo)) || file_exists(storage_path('app/public/' . $agency->logo))) {
-                                $agencyLogoUrl = asset('storage/' . $agency->logo);
-                            }
-                        }
-                        if (!$agencyLogoUrl) {
-                            $agencyLogoUrl = asset('images/default-agency.svg');
-                        }
+                        $agencyLogoUrl = $agency->logo_url;
                         $firstAdmin = $agency->users->firstWhere('role', 'admin');
                     @endphp
 
@@ -265,13 +255,12 @@
                             </div>
 
                             <!-- Identitas Instansi Dinas -->
-                            <h3 class="font-bold text-slate-900 text-[18px] leading-snug line-clamp-2 h-14 mb-1"
+                            <h3 class="font-bold text-slate-900 text-[15px] sm:text-base leading-snug line-clamp-3 h-[4.25rem] mb-1.5"
                                 title="{{ $agency->agency_name }}">
                                 {{ $agency->agency_name }}
                             </h3>
 
-
-                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-relaxed mb-2"
+                            <p class="text-[11px] text-slate-500 line-clamp-2 h-8 leading-normal mb-2"
                                 title="{{ $agency->address }}">
                                 {{ $agency->address ?? 'Alamat kantor belum diatur' }}
                             </p>

@@ -73,7 +73,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">APPROVED</span>
+                        <span class="text-xs font-bold text-emerald-600 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -86,7 +86,7 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase">PENDING</span>
+                        <span class="text-xs font-bold text-amber-600 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -207,6 +207,9 @@
                                 </h3>
                                 <p class="text-xs text-gray-600 mt-0.5">
                                     Unit: <strong>{{ $selUnit->name ?? '-' }}</strong> &bull; Pembimbing Lapangan: <strong>{{ $selMentor->name ?? 'Belum Ditentukan' }}</strong>
+                                    @unless ($selMentor)
+                                        &bull; <span class="text-amber-700 font-semibold">Logbook dapat divalidasi sementara oleh Admin Dinas (buka Detail)</span>
+                                    @endunless
                                 </p>
                             </div>
                         </div>
@@ -242,7 +245,7 @@
 
                                 <div class="flex items-center gap-2 shrink-0">
                                     @if ($log->attachment)
-                                        <a href="{{ asset('storage/' . $log->attachment) }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
+                                        <a href="{{ $log->attachment_url }}" target="_blank" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition" title="Unduh Lampiran">
                                              Lampiran
                                         </a>
                                     @endif
@@ -310,6 +313,11 @@
                                         <div class="text-[11px] text-gray-500 mt-0.5">
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
+                                        @unless ($mentor)
+                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas">
+                                                Validasi sementara oleh Admin Dinas
+                                            </div>
+                                        @endunless
                                     </td>
 
                                     <td class="py-4 px-4 text-center" data-label="Rekap Logbook">

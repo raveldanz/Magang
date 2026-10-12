@@ -27,7 +27,9 @@
                     </a>
                 @endif
 
-                <a href="{{ route('university.dashboard') }}" 
+                <x-chat-button :user="$student" label="Chat Mahasiswa" />
+
+                <a href="{{ route('university.dashboard') }}"
                    class="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center">
                      Kembali ke Dashboard
                 </a>
@@ -109,12 +111,12 @@
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div>
                             <h3 class="font-bold text-sm text-slate-900 leading-tight">Pembimbing</h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">DPL Kampus & Mentor Dinas</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Dosen Pembimbing & Mentor Dinas</p>
                         </div>
                         <button type="button" 
                                 @click="showAssignModal = true" 
                                 class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
-                            {{ $dosen ? 'Ganti' : '+ DPL' }}
+                            {{ $dosen ? 'Ganti' : '+ Dosen' }}
                         </button>
                     </div>
 
@@ -257,7 +259,7 @@
                                 </div>
 
                                 <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-center">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Dosen DPL</span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Dosen Pembimbing</span>
                                     <x-status-badge type="review" :status="$log->lecturer_status ?? 'pending'" class="mt-1" />
                                 </div>
                             </div>
@@ -370,7 +372,7 @@
                             Batal
                         </button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                            Simpan Penugasan DPL
+                            Simpan Penugasan Dosen
                         </button>
                     </div>
                 </form>

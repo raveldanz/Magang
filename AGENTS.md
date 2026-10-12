@@ -38,7 +38,6 @@ Seluruh agen wajib memanfaatkan alat bantu yang terhubung secara sistematis:
   2. Buka gambar via multimodal vision (`view_file`).
   3. Render gambar inline di chat obrolan (`![Deskripsi](path/gambar.png)`) sebagai bukti fisik nyata kepada pengguna.
 
-
 ### D. Sub-Agents Delegation via Native MCP Tools (`subagents`)
 - Gunakan native MCP tools sub-agen secara proaktif & refleks sebelum memvalidasi kode akhir:
   1. `delegate_to_claude(prompt)`: Panggil untuk deep reasoning, tinjauan arsitektur repositori multi-file, root cause analysis bug kompleks, dan perancangan domain layer.

@@ -18,7 +18,7 @@
             <div class="flex items-center gap-4 lg:gap-8 shrink-0">
                 @php
                     $user = Auth::user();
-                    $isSuperAdmin = $user && ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+                    $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
                     $isAdminDinas = $user && ($user->role === 'admin' && !is_null($user->agency_profile_id));
                     $isMahasiswa = $user && $user->role === 'mahasiswa';
                     $isDosen = $user && ($user->role === 'dosen' || $user->role === 'academic_advisor');
@@ -41,34 +41,20 @@
                     $navAvatarInitials = strtoupper(substr($user->name ?? 'U', 0, 1));
 
                     if ($user) {
-                        if ($user->agency_profile_id && $user->agencyProfile) {
-                            $logoPath = $user->agencyProfile->logo ?? null;
-                            if ($logoPath && (file_exists(public_path('storage/' . $logoPath)) || file_exists(storage_path('app/public/' . $logoPath)))) {
-                                $navAvatarLogo = asset('storage/' . $logoPath);
-                            } elseif ($logoPath && file_exists(public_path($logoPath))) {
-                                $navAvatarLogo = asset($logoPath);
-                            } else {
-                                $navAvatarLogo = asset('images/default-agency.svg');
-                            }
+                        if ($user->agency_profile_id) {
+                            $navAvatarLogo = $user->agencyProfile?->logo_url 
+                                ?? \App\Models\AgencyProfile::find($user->agency_profile_id)?->logo_url;
                         } elseif ($user->university_id || $isUniversitas || $isDosen || $isMahasiswa) {
                             $univObj = null;
                             if ($user->university_id) {
                                 $univObj = \App\Models\University::find($user->university_id);
                             }
-                            $uName = '';
                             if ($univObj) {
-                                if ($univObj->logo && (file_exists(public_path('storage/' . $univObj->logo)) || file_exists(storage_path('app/public/' . $univObj->logo)))) {
-                                    $navAvatarLogo = asset('storage/' . $univObj->logo);
-                                } elseif ($univObj->logo && file_exists(public_path($univObj->logo))) {
-                                    $navAvatarLogo = asset($univObj->logo);
-                                }
-                                $uName = strtolower($univObj->name ?? '');
+                                $navAvatarLogo = $univObj->logo_url;
                             }
                             if (!$navAvatarLogo) {
-                                if (empty($uName)) {
-                                    $rawUniv = $user->university ?? null;
-                                    $uName = strtolower(is_string($rawUniv) ? $rawUniv : ($user->studentProfile?->universitas ?? ''));
-                                }
+                                $rawUniv = $user->university ?? null;
+                                $uName = strtolower(is_string($rawUniv) ? $rawUniv : ($user->studentProfile?->universitas ?? ''));
                                 if (str_contains($uName, 'unesa') || str_contains($uName, 'negeri surabaya')) $navAvatarLogo = asset('images/logos/unesa.png');
                                 elseif (str_contains($uName, 'its') || str_contains($uName, 'sepuluh nopember')) $navAvatarLogo = asset('images/logos/its.png');
                                 elseif (str_contains($uName, 'unair') || str_contains($uName, 'airlangga')) $navAvatarLogo = asset('images/logos/unair.png');
@@ -79,13 +65,17 @@
                             $navAvatarLogo = asset('images/logos/surabaya.png');
                         }
                     }
+
+                    if (!$navAvatarLogo && isset($agencyProfile) && !empty($agencyProfile?->logo_url)) {
+                        $navAvatarLogo = $agencyProfile->logo_url;
+                    }
                 @endphp
 
-                <a href="{{ $dashboardRoute }}" class="flex items-center group py-2">
+                <a href="{{ $dashboardRoute }}" class="flex items-center gap-2.5 group py-2 shrink-0" title="Portal Magang Kota Surabaya">
                     <img src="{{ asset('images/logos/surabaya.png') }}" 
                          alt="Pemerintah Kota Surabaya" 
                          class="h-10 sm:h-11 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
-                         style="height: 42px; width: auto; max-height: 46px; object-fit: contain;">
+                         style="aspect-ratio: 960/1234; height: 42px; width: auto; max-height: 44px; object-fit: contain;">
                 </a>
 
                 {{-- 2. DESKTOP NAVIGATION BAR --}}
@@ -251,8 +241,27 @@
 
                 @php
                     $navHasUnreadDot = Auth::user() ? \App\Services\NotificationService::hasUnreadDot(Auth::user()) : false;
-                    $navQuickNotifs = Auth::user() ? array_slice(\App\Services\NotificationService::getNotificationsForUser(Auth::user()), 0, 4) : [];
+                    $navAllNotifs = Auth::user() ? \App\Services\NotificationService::getNotificationsForUser(Auth::user()) : [];
+                    // Pesan chat belum dibaca didahulukan agar tidak tenggelam di bawah pemberitahuan otomatis lain
+                    $navIsUnreadChat = fn ($n) => ($n['category'] ?? '') === 'chat' && empty($n['is_read']);
+                    $navQuickNotifs = array_slice(array_merge(
+                        array_values(array_filter($navAllNotifs, $navIsUnreadChat)),
+                        array_values(array_filter($navAllNotifs, fn ($n) => !$navIsUnreadChat($n)))
+                    ), 0, 4);
+                    $navChatUnread = (int) ($chatUnread ?? 0);
+                    $navChatLabel = $navChatUnread > 99 ? '99+' : (string) $navChatUnread;
                 @endphp
+                {{-- Pesan / Chat (badge diperbarui live via Alpine.store('chat')) --}}
+                <a href="{{ route('chat.index') }}" title="Pesan" aria-label="Pesan"
+                   class="relative p-2.5 rounded-full border transition shadow-2xs {{ request()->routeIs('chat.*') ? 'border-blue-200 bg-blue-50 text-blue-600' : 'border-slate-200 hover:border-slate-300 bg-white text-slate-600 hover:text-blue-600' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <span x-show="$store.chat.unread > 0" x-text="$store.chat.label" data-chat-badge
+                          class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-white"
+                          @if($navChatUnread < 1) style="display: none;" @endif>{{ $navChatLabel }}</span>
+                </a>
+
                 <div x-data="{ notifOpen: false }" class="relative" @click.outside="notifOpen = false">
                     <button @click="notifOpen = !notifOpen" 
                             type="button"
@@ -328,7 +337,7 @@
                         <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
                         @if($navAvatarLogo)
                             <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5">
+                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                             </div>
                         @else
                             <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -354,7 +363,7 @@
                             <div class="flex items-center gap-2.5 overflow-hidden">
                                 @if($navAvatarLogo)
                                     <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1">
+                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                                     </div>
                                 @else
                                     <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -455,6 +464,9 @@
                         @endif
 
                         <div class="pt-1.5 border-t border-slate-100 mt-1.5 space-y-0.5">
+                            <a href="{{ route('chat.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Pesan
+                            </a>
                             <a href="{{ route('notifications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pemberitahuan Sistem
                             </a>
@@ -486,8 +498,14 @@
             </div>
 
             {{-- 4. MOBILE MENU TOGGLE BUTTON --}}
-            <div class="flex items-center md:hidden">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" 
+            <div class="flex items-center gap-1 md:hidden">
+                <a href="{{ route('chat.index') }}" class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition" aria-label="Pesan">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    <span x-show="$store.chat.unread > 0" x-text="$store.chat.label" data-chat-badge
+                          class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-white"
+                          @if(($chatUnread ?? 0) < 1) style="display: none;" @endif>{{ ($chatUnread ?? 0) > 99 ? '99+' : ($chatUnread ?? 0) }}</span>
+                </a>
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
                         type="button" 
                         class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none transition cursor-pointer"
                         aria-label="Buka Menu">
@@ -543,7 +561,7 @@
                 <div class="flex items-center gap-2.5">
                     @if($navAvatarLogo)
                         <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1">
+                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                         </div>
                     @else
                         <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -632,7 +650,7 @@
                         </div>
                         <span>Monitoring Logbook</span>
                     </a>
-                    <a href="{{ route('admin.certificates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.certificates.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <a href="{{ route('admin.certificates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                         </div>
@@ -650,53 +668,35 @@
 
                 @elseif ($isMahasiswa)
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        </div>
                         <span>Dashboard Saya</span>
                     </a>
                     <a href="{{ route('student.profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('student.profile.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </div>
                         <span>Profil Saya</span>
                     </a>
                     <a href="{{ route('student.application.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.application.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('student.application.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
                         <span>Pengajuan Magang</span>
                     </a>
                     <a href="{{ route('student.logbook.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.logbook.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('student.logbook.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        </div>
                         <span>Logbook Magang</span>
                     </a>
                     <a href="{{ route('student.final_report.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('student.final_report.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('student.final_report.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </div>
                         <span>Laporan Akhir</span>
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <span>Pengaturan Akun</span>
                     </a>
 
                 @elseif ($isDosen)
                     <a href="{{ route('lecturer.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('lecturer.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        </div>
+                        
                         <span>Portal Dosen</span>
                     </a>
                     <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.monitoring.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('lecturer.monitoring.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        </div>
+                        
                         <span>Mahasiswa Bimbingan</span>
                     </a>
                     <a href="{{ route('lecturer.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('lecturer.logbooks.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        </div>
+                        
                         <span>Logbook Bimbingan</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
@@ -705,15 +705,11 @@
 
                 @elseif ($isMentor)
                     <a href="{{ route('mentor.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('mentor.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('mentor.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        </div>
+                        
                         <span>Portal Mentor</span>
                     </a>
                     <a href="{{ route('mentor.logbooks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('mentor.logbooks.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        </div>
+                        
                         <span>Review Logbook</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
@@ -722,21 +718,15 @@
 
                 @elseif ($isUniversitas)
                     <a href="{{ route('university.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('university.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        </div>
+                        
                         <span>Portal Universitas</span>
                     </a>
                     <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.lecturers.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('university.lecturers.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        </div>
+                        
                         <span>Dosen Pembimbing</span>
                     </a>
                     <a href="{{ route('university.profile.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('university.profile.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </div>
+                        
                         <span>Profil Kampus</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
@@ -747,30 +737,31 @@
 
             {{-- Bantuan & Masukan --}}
             <div class="pt-2 border-t border-slate-100 space-y-1">
-                <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('notifications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('notifications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <a href="{{ route('chat.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('chat.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('chat.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                     </div>
+                    <span class="flex-1">Pesan</span>
+                    <span x-show="$store.chat.unread > 0" x-text="$store.chat.label"
+                          class="min-w-[20px] h-5 px-1.5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center"
+                          @if(($chatUnread ?? 0) < 1) style="display: none;" @endif>{{ ($chatUnread ?? 0) > 99 ? '99+' : ($chatUnread ?? 0) }}</span>
+                </a>
+                <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('notifications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    
                     <span>Pemberitahuan Sistem</span>
                 </a>
                 @if($isSuperAdmin || $isAdminDinas)
                     <a href="{{ route('admin.feedbacks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.feedbacks.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.feedbacks.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                        </div>
+                       
                         <span>Feedback & Masukan</span>
                     </a>
                 @else
                     <a href="{{ route('feedbacks.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('feedbacks.create') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('feedbacks.create') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                        </div>
+                       
                         <span>Kirim Laporan Kendala</span>
                     </a>
                     <a href="{{ route('feedbacks.my') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('feedbacks.my') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('feedbacks.my') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
+                        
                         <span>Riwayat Masukan Saya</span>
                     </a>
                 @endif
@@ -781,8 +772,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition cursor-pointer active:scale-[0.99] min-h-[40px]">
-                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        <span>Keluar Sistem</span>
+                         <span>Keluar Sistem</span>
                     </button>
                 </form>
             </div>

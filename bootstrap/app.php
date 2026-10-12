@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\EnsureAccountIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,18 +15,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias([
-        'role' => \App\Http\Middleware\CheckRole::class,
-        'active' => \App\Http\Middleware\EnsureAccountIsActive::class,
+        $middleware->alias([
+            'role' => CheckRole::class,
+            'active' => EnsureAccountIsActive::class,
         ]);
 
-    // Akun berstatus Nonaktif diputus sesinya di seluruh halaman web (termasuk sesi "Ingat saya")
-    $middleware->web(append: [
-        \App\Http\Middleware\EnsureAccountIsActive::class,
-    ]);
+        // Akun berstatus Nonaktif diputus sesinya di seluruh halaman web (termasuk sesi "Ingat saya")
+        $middleware->web(append: [
+            EnsureAccountIsActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Endpoint chat dipanggil via fetch dari halaman web; error validasi/otorisasi harus berupa JSON
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*'),
+            fn (Request $request) => $request->is('api/*') || ($request->is('chat/*') && $request->expectsJson()),
         );
     })->create();

@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ApplicationStatus;
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Application extends Model
@@ -84,7 +84,8 @@ class Application extends Model
         if ($this->status instanceof ApplicationStatus) {
             return strtoupper($this->status->value);
         }
-        return strtoupper((string)($this->status ?? 'PENDING'));
+
+        return strtoupper((string) ($this->status ?? 'PENDING'));
     }
 
     public function getIsActiveInternshipAttribute(): bool
@@ -100,17 +101,18 @@ class Application extends Model
     public function getHasApprovedReportAttribute(): bool
     {
         $placement = $this->placement;
-        return (bool)($placement && $placement->finalreport && strtolower($placement->finalreport->status ?? '') === 'approved');
+
+        return (bool) ($placement && $placement->finalreport && strtolower($placement->finalreport->status ?? '') === 'approved');
     }
 
     public function getHasCompleteEvaluationAttribute(): bool
     {
         $eval = $this->placement?->evaluation;
-        if (!$eval) {
+        if (! $eval) {
             return false;
         }
 
-        if ((float)($eval->final_score ?? 0) > 0) {
+        if ((float) ($eval->final_score ?? 0) > 0) {
             return true;
         }
 
@@ -126,19 +128,128 @@ class Application extends Model
         return ($hasMentor && $hasDosen) || $eval->is_complete;
     }
 
-    public function getCanCompleteAttribute(): bool
+    /**
+     * Magang berstatus ACTIVE yang tanggal selesainya sudah lewat namun belum dinyatakan lulus
+     * (laporan akhir / nilai belum lengkap). Status tetap ACTIVE agar mahasiswa masih bisa melengkapi.
+     */
+    public function isPastEndDate(): bool
     {
-        $rawStatus = $this->status instanceof ApplicationStatus ? $this->status->value : strtolower((string)$this->status);
+        return $this->statusValue() === ApplicationStatus::ACTIVE->value
+            && $this->end_date
+            && \Illuminate\Support\Carbon::parse($this->end_date)->endOfDay()->isPast();
+    }
 
-        if ($rawStatus === 'completed') {
-            return true;
+    /** Jumlah hari sejak tanggal selesai magang (0 bila belum lewat). */
+    public function daysPastEndDate(): int
+    {
+        if (! $this->isPastEndDate()) {
+            return 0;
         }
 
-        if (!in_array($rawStatus, ['accepted', 'active'])) {
+        return (int) \Illuminate\Support\Carbon::parse($this->end_date)->startOfDay()->diffInDays(\Illuminate\Support\Carbon::today());
+    }
+
+    /**
+     * Certificate Gate: daftar syarat penerbitan E-Sertifikat yang BELUM terpenuhi (kosong = boleh terbit).
+     *  1. Evaluasi kinerja Mentor Lapangan lengkap (nilai disiplin, kinerja, laporan terisi).
+     *  2. Laporan akhir mahasiswa disetujui (status approved).
+     *  3. Mahasiswa telah mengisi logbook aktivitas magang.
+     *  4. Status magang sudah dinyatakan lulus (COMPLETED).
+     *
+     * @return array<int, string>
+     */
+    public function certificateBlockers(): array
+    {
+        $placement = $this->placement;
+        $eval = $placement?->evaluation;
+        $blockers = [];
+
+        $mentorEvalComplete = $eval
+            && (float) ($eval->nilai_disiplin ?? 0) > 0
+            && (float) ($eval->nilai_kinerja ?? 0) > 0
+            && (float) ($eval->nilai_laporan ?? 0) > 0;
+
+        if (! $mentorEvalComplete) {
+            $blockers[] = 'Nilai evaluasi kinerja dari Mentor Lapangan (dinas) belum lengkap.';
+        }
+
+        if (! $this->has_approved_report) {
+            $blockers[] = 'Laporan akhir magang belum disetujui (ACC).';
+        }
+
+        if (! $this->has_filled_logbook) {
+            $blockers[] = 'Logbook aktivitas magang belum pernah diisi.';
+        }
+
+        if ($this->statusValue() !== ApplicationStatus::COMPLETED->value) {
+            $blockers[] = 'Status magang belum dinyatakan lulus / selesai.';
+        }
+
+        return $blockers;
+    }
+
+    public function isCertificateEligible(): bool
+    {
+        return $this->certificateBlockers() === [];
+    }
+
+    public function getHasFilledLogbookAttribute(): bool
+    {
+        $placement = $this->placement;
+        if (! $placement) {
             return false;
         }
 
-        return $this->has_approved_report && $this->has_complete_evaluation;
+        if (isset($placement->attributes['logbooks_count'])) {
+            return (int) $placement->attributes['logbooks_count'] > 0;
+        }
+
+        if ($placement->relationLoaded('logbooks')) {
+            return $placement->logbooks->isNotEmpty();
+        }
+
+        return $placement->logbooks()->exists();
+    }
+
+    /**
+     * Memvalidasi apakah pengajuan memenuhi syarat kelulusan:
+     * 1. Status wajib ACTIVE.
+     * 2. Tanggal sekarang sudah melewati atau sama dengan tanggal selesai magang (now() >= end_date).
+     * 3. Syarat administratif (Nilai Mentor Lapangan, Laporan Akhir ACC, & Logbook) terpenuhi.
+     */
+    public function canBeCompleted(): bool
+    {
+        $rawStatus = $this->statusValue();
+
+        if ($rawStatus !== ApplicationStatus::ACTIVE->value) {
+            return false;
+        }
+
+        if ($this->end_date && Carbon::parse($this->end_date)->startOfDay()->isFuture()) {
+            return false;
+        }
+
+        return $this->has_approved_report && $this->has_complete_evaluation && $this->has_filled_logbook;
+    }
+
+    public function isReadyForCompletion(): bool
+    {
+        return $this->canBeCompleted();
+    }
+
+    public function getCanCompleteAttribute(): bool
+    {
+        $rawStatus = $this->statusValue();
+
+        if ($rawStatus === ApplicationStatus::COMPLETED->value) {
+            return true;
+        }
+
+        if ($rawStatus !== ApplicationStatus::ACTIVE->value) {
+            return false;
+        }
+
+        return $this->has_approved_report && $this->has_complete_evaluation && $this->has_filled_logbook;
     }
 
     /** Status pengajuan yang menempati kuota divisi */
@@ -192,7 +303,7 @@ class Application extends Model
     /**
      * Prioritas tindakan admin (angka kecil = lebih mendesak).
      *
-     * @param bool|null $requireAdvisor DPL wajib? null = ikuti kebijakan kampus mahasiswa (universities.require_dpl).
+     * @param  bool|null  $requireAdvisor  DPL wajib? null = ikuti kebijakan kampus mahasiswa (universities.require_dpl).
      */
     public function actionPriority(?bool $requireAdvisor = null): int
     {
@@ -201,7 +312,7 @@ class Application extends Model
 
         return match (true) {
             in_array($status, ['pending', 'verified'], true) => 1,
-            $ongoing && $this->can_complete => 2,
+            $status === 'active' && $this->can_complete => 2,
             $ongoing && $this->missingSupervisor($requireAdvisor ?? $this->requiresAdvisor()) !== null => 3,
             $status === 'active' => 4,
             $status === 'accepted' => 5,
@@ -248,7 +359,9 @@ class Application extends Model
      */
     public function requiresAdvisor(): bool
     {
-        return (bool) ($this->user?->universityRelation?->require_dpl ?? true);
+        $univ = $this->user?->universityRelation;
+
+        return $univ ? $univ->requiresAdvisor() : true;
     }
 
     /**
@@ -258,11 +371,11 @@ class Application extends Model
     {
         $placement = $this->placement;
 
-        if (!$placement || (!$placement->mentor_id && !$placement->pembimbing_id)) {
+        if (! $placement || (! $placement->mentor_id && ! $placement->pembimbing_id)) {
             return 'mentor';
         }
 
-        if ($requireAdvisor && !$placement->academic_advisor_id) {
+        if ($requireAdvisor && ! $placement->academic_advisor_id) {
             return 'dosen';
         }
 
@@ -282,7 +395,7 @@ class Application extends Model
         $mentorSum = 'COALESCE(ev.nilai_disiplin, 0) + COALESCE(ev.nilai_kinerja, 0) + COALESCE(ev.nilai_laporan, 0)';
         $mentorAll = 'COALESCE(ev.nilai_disiplin, 0) > 0 AND COALESCE(ev.nilai_kinerja, 0) > 0 AND COALESCE(ev.nilai_laporan, 0) > 0';
         $dosenAny = '(COALESCE(ev.nilai_dosen, 0) > 0 OR COALESCE(ev.nilai_akademik, 0) > 0'
-            . ' OR COALESCE(ev.score_mastery, 0) + COALESCE(ev.score_report, 0) + COALESCE(ev.score_attitude, 0) > 0)';
+            .' OR COALESCE(ev.score_mastery, 0) + COALESCE(ev.score_report, 0) + COALESCE(ev.score_attitude, 0) > 0)';
 
         $evaluationComplete = "EXISTS (SELECT 1 FROM placements p JOIN evaluations ev ON ev.placement_id = p.id
             WHERE p.application_id = applications.id AND (
@@ -292,13 +405,15 @@ class Application extends Model
             ))";
         $reportApproved = "EXISTS (SELECT 1 FROM placements p JOIN final_reports fr ON fr.placement_id = p.id
             WHERE p.application_id = applications.id AND LOWER(fr.status) = 'approved')";
-        $mentorMissing = "NOT EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id
-            AND (p.mentor_id IS NOT NULL OR p.pembimbing_id IS NOT NULL))";
-        $dosenMissing = "EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id AND p.academic_advisor_id IS NULL)";
+        $logbookFilled = 'EXISTS (SELECT 1 FROM placements p JOIN logbooks lb ON lb.placement_id = p.id
+            WHERE p.application_id = applications.id)';
+        $mentorMissing = 'NOT EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id
+            AND (p.mentor_id IS NOT NULL OR p.pembimbing_id IS NOT NULL))';
+        $dosenMissing = 'EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id AND p.academic_advisor_id IS NULL)';
 
         return "(CASE
             WHEN applications.status IN ('pending', 'verified') THEN 1
-            WHEN applications.status IN ('accepted', 'active') AND {$reportApproved} AND {$evaluationComplete} THEN 2
+            WHEN applications.status = 'active' AND {$reportApproved} AND {$evaluationComplete} AND {$logbookFilled} THEN 2
             WHEN applications.status IN ('accepted', 'active') AND ({$mentorMissing} OR ({$dosenMissing} AND {$requireDpl})) THEN 3
             WHEN applications.status = 'active' THEN 4
             WHEN applications.status = 'accepted' THEN 5
@@ -317,7 +432,7 @@ class Application extends Model
         $tier = self::actionPrioritySql();
 
         return $query->orderByRaw("{$tier} ASC")
-            ->orderByRaw("CASE WHEN {$tier} <= " . self::ACTION_THRESHOLD . ' THEN applications.created_at END ASC')
+            ->orderByRaw("CASE WHEN {$tier} <= ".self::ACTION_THRESHOLD.' THEN applications.created_at END ASC')
             ->orderBy('applications.created_at', 'desc')
             ->orderBy('applications.id', 'desc');
     }
@@ -327,6 +442,6 @@ class Application extends Model
      */
     public function scopeRequiringAction($query)
     {
-        return $query->whereRaw(self::actionPrioritySql() . ' <= ' . self::ACTION_THRESHOLD);
+        return $query->whereRaw(self::actionPrioritySql().' <= '.self::ACTION_THRESHOLD);
     }
 }
