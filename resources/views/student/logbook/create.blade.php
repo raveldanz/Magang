@@ -1,9 +1,9 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Logbook Harian') }}
-        </h2>
-    </x-slot>
+    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Card Form Surface -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8">
 
     <div class="py-5 sm:py-8 lg:py-10">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,7 +16,7 @@
 
                 {{-- Alert Error jika Validasi Gagal --}}
                 @if ($errors->any())
-                    <div class="p-4 mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">
+                    <div class="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs">
                         <p class="font-bold mb-1">Gagal Menyimpan Logbook:</p>
                         <ul class="list-disc list-inside space-y-1">
                             @foreach ($errors->all() as $error)
@@ -26,11 +26,11 @@
                     </div>
                 @endif
 
-                {{-- FORM CREATE (Mengirim POST ke route store) --}}
-                <form action="{{ route('student.logbook.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                {{-- FORM CREATE --}}
+                <form action="{{ route('student.logbook.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
 
-                    {{-- Tanggal --}}
+                    {{-- Tanggal Kegiatan --}}
                     <div>
                         <label for="date" class="block font-semibold text-sm text-gray-700 mb-1">Tanggal Kegiatan</label>
                         <input type="date" id="date" name="date" value="{{ date('Y-m-d') }}" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm text-sm" required>

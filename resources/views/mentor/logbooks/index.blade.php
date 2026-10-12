@@ -1,43 +1,34 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+            <!-- Page Header -->
             <div class="flex items-center gap-3">
-                <a href="{{ route('mentor.dashboard') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
+                <a href="{{ route('mentor.dashboard') }}" class="p-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 </a>
                 <div>
-                    <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    <h2 class="text-xl font-bold tracking-tight text-slate-900">
                         Semua Logbook Mahasiswa Bimbingan
                     </h2>
-                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">
+                    <p class="text-xs text-slate-500 mt-0.5">
                         Tinjau seluruh aktivitas harian mahasiswa di unit kerja Anda
                     </p>
                 </div>
             </div>
-        </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-
-            <!-- Flash Success Message -->
+            <!-- Flash Alert -->
             @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm flex items-center justify-between text-emerald-900 text-sm font-medium">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>{{ session('success') }}</span>
-                    </div>
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-semibold shadow-sm">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
 
             <!-- Filter & Search Bar -->
-            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-4">
                 
-                <!-- Status Filter Tabs -->
+                <!-- Status Filter Pills -->
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
                     <a href="{{ route('mentor.logbooks.index') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ !request('status') ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                         Semua Status
@@ -75,23 +66,24 @@
 
             </div>
 
-            <!-- List Logbook Entries -->
+            <!-- List Logbook Cards -->
             <div class="space-y-4">
                 @forelse ($logbooks as $log)
                     @php
                         $student = $log->placement->application->user ?? null;
                         $unit = $log->placement->application->unit ?? null;
+                        $st = strtolower($log->status ?? '');
                     @endphp
                     <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:border-blue-200 transition space-y-3">
                         
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center">
                                     {{ strtoupper(substr($student->name ?? 'M', 0, 2)) }}
                                 </div>
                                 <div>
-                                    <div class="font-bold text-gray-900 text-sm">{{ $student->name ?? '-' }}</div>
-                                    <div class="text-xs text-gray-500">{{ $unit->name ?? '-' }} &bull; Tanggal: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}</div>
+                                    <div class="font-bold text-slate-900 text-sm leading-snug">{{ $student->name ?? '-' }}</div>
+                                    <div class="text-xs text-slate-400 mt-0.5">{{ $unit->name ?? '-' }} &bull; Tanggal: {{ \Carbon\Carbon::parse($log->date)->translatedFormat('l, d F Y') }}</div>
                                 </div>
                             </div>
 
@@ -104,7 +96,7 @@
                         </div>
 
                         <!-- Activity Text -->
-                        <div class="text-sm text-gray-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-gray-100">
+                        <div class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50/70 p-4 rounded-xl border border-slate-100">
                             {{ $log->activity }}
                         </div>
 
@@ -119,8 +111,8 @@
                             </div>
                         @endif
 
-                        <!-- Form Approve / Reject -->
-                        <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                        <!-- Form Approve / Reject Inline -->
+                        <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-4 gap-2.5 items-center">
                             @csrf
                             @method('PUT')
                             
@@ -129,10 +121,10 @@
                             </div>
 
                             <div class="flex gap-2">
-                                <button type="submit" name="status" value="approved" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                <button type="submit" name="status" value="approved" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition shadow-sm">
                                     Approve
                                 </button>
-                                <button type="submit" name="status" value="rejected" class="w-full px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                <button type="submit" name="status" value="rejected" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition shadow-sm">
                                     Reject
                                 </button>
                             </div>
@@ -140,15 +132,14 @@
 
                     </div>
                 @empty
-                    <div class="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-200">
-                        <p class="font-medium text-gray-600">Tidak Ada Logbook Ditemukan</p>
-                        <p class="text-xs text-gray-400 mt-1">Belum ada aktivitas mahasiswa sesuai filter pencarian yang dipilih.</p>
+                    <div class="bg-white rounded-2xl p-12 text-center text-slate-400 border border-slate-100">
+                        <p class="font-medium text-slate-600">Tidak Ada Logbook Ditemukan</p>
+                        <p class="text-xs text-slate-400 mt-1">Belum ada aktivitas mahasiswa sesuai filter pencarian yang dipilih.</p>
                     </div>
                 @endforelse
 
-                <!-- Pagination -->
                 @if ($logbooks->hasPages())
-                    <div class="p-4 bg-white rounded-2xl border border-gray-200">
+                    <div class="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
                         {{ $logbooks->links() }}
                     </div>
                 @endif

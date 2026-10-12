@@ -82,7 +82,7 @@
             </div>
 
             <!-- Tabel Monitoring -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -96,7 +96,7 @@
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
+                        <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($placements as $placement)
                                 @php
                                     $student = $placement->application?->user;
@@ -151,7 +151,7 @@
                                         @if ($finalReport)
                                             <x-status-badge type="review" :status="$finalReport->status" />
                                         @else
-                                            <span class="text-xs text-gray-400 italic">Belum Ada</span>
+                                            <span class="text-xs text-slate-400 italic">Belum Ada</span>
                                         @endif
                                     </td>
 

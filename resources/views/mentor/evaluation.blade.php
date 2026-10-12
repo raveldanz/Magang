@@ -43,8 +43,31 @@
     }">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
+            <!-- Page Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('mentor.students.show', $placement->id) }}" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl transition shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </a>
+                    <div>
+                        <h2 class="text-xl font-bold tracking-tight text-slate-900">
+                            Formulir Penilaian Evaluasi Akhir
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Mahasiswa: <strong class="text-slate-800">{{ $placement->application->user->name ?? '-' }}</strong> ({{ $placement->application->user->studentProfile->nim ?? '-' }})
+                        </p>
+                    </div>
+                </div>
+
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100">
+                    🏛️ {{ $placement->application->unit->name ?? '-' }}
+                </span>
+            </div>
+
             <!-- Card Informasi Mahasiswa -->
-            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-md">
                         {{ strtoupper(substr($placement->application?->user?->name ?? 'M', 0, 2)) }}
@@ -65,24 +88,24 @@
             </div>
 
             <!-- Form Penilaian -->
-            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-6">
                 
                 <form action="{{ route('mentor.evaluations.store', $placement->id) }}" method="POST" class="space-y-6">
                     @csrf
 
                     <div>
-                        <h4 class="text-base font-bold text-gray-900 pb-2 border-b">Komponen Penilaian Numerik (Skala 0 - 100)</h4>
-                        <p class="text-xs text-gray-500 mt-1">Masukkan nilai angka murni. Nilai rata-rata dan predikat kelulusan akan dihitung secara otomatis untuk transkrip E-Sertifikat.</p>
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-slate-800 pb-2 border-b border-slate-100">Komponen Penilaian Numerik (Skala 0 - 100)</h4>
+                        <p class="text-xs text-slate-500 mt-1">Masukkan nilai angka murni. Nilai rata-rata dan predikat kelulusan akan dihitung secara otomatis untuk transkrip E-Sertifikat.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         
                         <!-- 1. Nilai Disiplin -->
                         <div class="bg-slate-50/75 p-4 rounded-2xl border border-gray-200 focus-within:border-blue-500 transition">
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 1. Nilai Disiplin
                             </label>
-                            <p class="text-[11px] text-gray-500 mb-2">Ketepatan kehadiran & kepatuhan aturan</p>
+                            <p class="text-[11px] text-slate-400 mb-2">Ketepatan kehadiran & kepatuhan aturan</p>
                             <input 
                                 type="number" 
                                 name="nilai_disiplin" 
@@ -94,7 +117,7 @@
                                 required
                             >
                             @error('nilai_disiplin')
-                                <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
+                                <span class="text-red-600 text-xs block mt-1">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -103,7 +126,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 2. Nilai Kinerja
                             </label>
-                            <p class="text-[11px] text-gray-500 mb-2">Kualitas hasil tugas & keaktifan tim</p>
+                            <p class="text-[11px] text-slate-400 mb-2">Kualitas hasil tugas & keaktifan tim</p>
                             <input 
                                 type="number" 
                                 name="nilai_kinerja" 
@@ -115,7 +138,7 @@
                                 required
                             >
                             @error('nilai_kinerja')
-                                <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
+                                <span class="text-red-600 text-xs block mt-1">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -124,7 +147,7 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 3. Nilai Laporan
                             </label>
-                            <p class="text-[11px] text-gray-500 mb-2">Kelengkapan & sistematika laporan</p>
+                            <p class="text-[11px] text-slate-400 mb-2">Kelengkapan & sistematika laporan</p>
                             <input 
                                 type="number" 
                                 name="nilai_laporan" 
@@ -136,7 +159,7 @@
                                 required
                             >
                             @error('nilai_laporan')
-                                <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
+                                <span class="text-red-600 text-xs block mt-1">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -170,7 +193,7 @@
 
                     <!-- Catatan Evaluasi -->
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
                             Catatan / Rekomendasi Mentor
                         </label>
                         <textarea 
@@ -180,13 +203,13 @@
                             class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                         >{{ old('catatan', $placement->evaluation?->catatan ?? '') }}</textarea>
                         @error('catatan')
-                            <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
+                            <span class="text-red-600 text-xs block mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <!-- Submit Actions -->
-                    <div class="pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end items-center gap-3">
-                        <a href="{{ route('mentor.students.show', $placement->id) }}" class="w-full sm:w-auto px-5 py-2.5 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                    <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-end items-center gap-3">
+                        <a href="{{ route('mentor.students.show', $placement->id) }}" class="w-full sm:w-auto px-4 py-2.5 text-center bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-medium rounded-xl transition">
                             Batal
                         </a>
                         <button type="submit" class="w-full sm:w-auto px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">

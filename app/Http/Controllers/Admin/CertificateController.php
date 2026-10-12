@@ -9,11 +9,12 @@ use App\Models\Placement;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class CertificateController extends Controller
 {
-    // Menampilkan daftar mahasiswa yang siap cetak sertifikat (Multi-Tenant Scoped)
+    /**
+     * Menampilkan daftar mahasiswa yang siap cetak sertifikat (Multi-Tenant Scoped)
+     */
     public function index()
     {
         $user = Auth::user();
@@ -52,7 +53,7 @@ class CertificateController extends Controller
             });
         }
 
-        $applications = $query->get();
+        $applications = $query->latest()->get();
 
         return view('admin.certificates.index', compact('applications'));
     }
@@ -71,4 +72,3 @@ class CertificateController extends Controller
         return view('certificates.internship_certificate', $data);
     }
 }
-

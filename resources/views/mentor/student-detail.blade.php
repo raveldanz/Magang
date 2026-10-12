@@ -15,7 +15,6 @@
                         {{ $placement->application?->user?->studentProfile?->nim ?? '-' }} &bull; {{ $placement->application?->user?->studentProfile?->universitas ?? '-' }} ({{ $placement->application?->user?->studentProfile?->jurusan ?? '-' }})
                     </p>
                 </div>
-            </div>
 
             <div class="flex items-center gap-2">
                 <a href="{{ route('mentor.evaluations.create', $placement->id) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
@@ -25,26 +24,33 @@
                     {{ $placement->evaluation ? 'Edit Penilaian Akhir' : 'Input Penilaian Akhir' }}
                 </a>
             </div>
-        </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-
-            <!-- Flash Success Message -->
+            <!-- Flash Alert -->
             @if (session('success'))
-                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm flex items-center justify-between text-emerald-900 text-sm font-medium">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>{{ session('success') }}</span>
-                    </div>
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-semibold shadow-sm">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
 
-            <!-- Grid Kartu Status: Penilaian & Laporan Akhir -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Info Cards Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <!-- Biodata Card -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm shadow-slate-200/50 space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 font-bold text-base flex items-center justify-center shrink-0">
+                            {{ strtoupper(substr($placement->application->user->name ?? 'M', 0, 2)) }}
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">{{ $placement->application->user->name ?? '-' }}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                {{ $placement->application->user->studentProfile->universitas ?? '-' }} &bull; Jurusan {{ $placement->application->user->studentProfile->jurusan ?? '-' }}
+                            </p>
+                            <span class="inline-block mt-1 px-2.5 py-0.5 bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-semibold rounded-full">
+                                NIM: {{ $placement->application->user->studentProfile->nim ?? '-' }}
+                            </span>
+                        </div>
+                    </div>
 
                 <!-- 1. Kartu Status Evaluasi Nilai -->
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col justify-between">
@@ -66,7 +72,19 @@
                                 </span>
                             @endif
                         </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 block text-[11px]">Periode Magang:</span>
+                            <span class="font-bold text-slate-800">
+                                {{ \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Status Evaluasi & Laporan -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-2">Status Nilai Akhir</span>
                         @if ($placement->evaluation)
                             @php
                                 $eval = $placement->evaluation;
@@ -106,9 +124,8 @@
                                 @endif
                             </div>
                         @else
-                            <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-500 text-sm mb-4">
-                                <p>Mahasiswa belum memiliki evaluasi nilai dari Pembimbing Lapangan.</p>
-                                <p class="text-xs text-gray-400 mt-1">Silakan klik tombol di bawah untuk memasukkan nilai evaluasi akhir.</p>
+                            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                                <span class="text-xs text-slate-400 italic">Belum dinilai oleh mentor</span>
                             </div>
                         @endif
                     </div>
@@ -147,11 +164,6 @@
                                         </svg>
                                         Buka Berkas Laporan
                                     </a>
-                                </div>
-                                @if ($placement->finalreport->feedback)
-                                    <p class="text-xs text-gray-500 border-t pt-2 mt-2">
-                                        <strong>Feedback Pembimbing:</strong> "{{ $placement->finalreport->feedback }}"
-                                    </p>
                                 @endif
                             </div>
 
@@ -170,21 +182,18 @@
                                 </div>
                             </form>
                         @else
-                            <div class="p-6 bg-gray-50 rounded-xl text-center text-gray-500 text-sm">
-                                <p>Mahasiswa belum mengunggah berkas laporan akhir magang.</p>
-                            </div>
+                            <span class="text-xs text-slate-400 italic">Belum ada unggahan laporan</span>
                         @endif
                     </div>
                 </div>
-
             </div>
 
-            <!-- Daftar Aktivitas Logbook Harian -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200 p-6 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2">
+            <!-- List Logbook Mahasiswa Tersebut -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900">Riwayat & Verifikasi Logbook Harian</h3>
-                        <p class="text-xs text-gray-500">Tinjau deskripsi aktivitas, lampiran bukti, dan berikan status verifikasi beserta feedback</p>
+                        <h3 class="text-base font-bold text-slate-900">Riwayat Logbook Harian</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Daftar seluruh aktivitas harian yang dikerjakan mahasiswa</p>
                     </div>
                     <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full">
                         Total: {{ $placement->logbooks->count() }} Kegiatan
@@ -213,9 +222,9 @@
                                 </div>
                             </div>
 
-                            <div class="text-sm text-gray-700 leading-relaxed bg-white p-3.5 rounded-xl border border-gray-100">
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-white p-3.5 rounded-xl border border-slate-100">
                                 {{ $log->activity }}
-                            </div>
+                            </p>
 
                             @if ($log->attachment)
                                 <div class="pt-1">
@@ -228,28 +237,26 @@
                                 </div>
                             @endif
 
-                            <!-- Form Action Verifikasi (Approve / Reject) -->
-                            <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                            <!-- Quick Form Approve / Reject Inline -->
+                            <form action="{{ route('mentor.logbooks.updateStatus', $log->id) }}" method="POST" class="pt-3 border-t border-slate-200/70 grid grid-cols-1 sm:grid-cols-4 gap-2 items-center">
                                 @csrf
                                 @method('PUT')
-                                
                                 <div class="sm:col-span-3">
                                     <input type="text" name="feedback" value="{{ $log->feedback }}" placeholder="Tambahkan catatan/feedback pembimbing..." class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
                                 </div>
-
                                 <div class="flex gap-2">
-                                    <button type="submit" name="status" value="approved" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                    <button type="submit" name="status" value="approved" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold uppercase rounded-xl transition shadow-sm">
                                         Approve
                                     </button>
-                                    <button type="submit" name="status" value="rejected" class="w-full px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                    <button type="submit" name="status" value="rejected" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold uppercase rounded-xl transition shadow-sm">
                                         Reject
                                     </button>
                                 </div>
                             </form>
                         </div>
                     @empty
-                        <div class="py-8 text-center text-gray-400">
-                            <p class="text-sm">Mahasiswa belum menginputkan logbook kegiatan.</p>
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            Belum ada logbook kegiatan yang diunggah oleh mahasiswa ini.
                         </div>
                     @endforelse
                 </div>

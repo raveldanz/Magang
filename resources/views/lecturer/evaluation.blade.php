@@ -114,16 +114,16 @@
                     <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block"> Nilai Evaluasi Pembimbing Dinas</span>
                     <div class="grid grid-cols-3 gap-3 mt-3">
                         <div class="bg-white p-3 rounded-xl border border-emerald-100 text-center">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">Nilai Disiplin</span>
-                            <p class="text-xl font-black text-emerald-700 mt-0.5">{{ $evaluation->nilai_disiplin }}</p>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Nilai Disiplin</span>
+                            <p class="text-xl font-extrabold text-emerald-700 mt-0.5">{{ $evaluation->nilai_disiplin }}</p>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-emerald-100 text-center">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">Nilai Kinerja</span>
-                            <p class="text-xl font-black text-emerald-700 mt-0.5">{{ $evaluation->nilai_kinerja }}</p>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Nilai Kinerja</span>
+                            <p class="text-xl font-extrabold text-emerald-700 mt-0.5">{{ $evaluation->nilai_kinerja }}</p>
                         </div>
                         <div class="bg-white p-3 rounded-xl border border-emerald-100 text-center">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">Nilai Laporan Dinas</span>
-                            <p class="text-xl font-black text-emerald-700 mt-0.5">{{ $evaluation->nilai_laporan }}</p>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Nilai Laporan Dinas</span>
+                            <p class="text-xl font-extrabold text-emerald-700 mt-0.5">{{ $evaluation->nilai_laporan }}</p>
                         </div>
                     </div>
                     @if ($evaluation->catatan)

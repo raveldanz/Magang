@@ -893,6 +893,9 @@
                                 {{ $profile ? 'Edit Data Profil ' : 'Lengkapi Profil Sekarang ' }}
                             </a>
                         </div>
+                        <h3 class="text-lg font-bold tracking-tight text-slate-900 mt-3">
+                            {{ $profile ? 'Lengkap' : 'Belum Lengkap' }}
+                        </h3>
                     </div>
 
                     <!-- Card 2: Status Pengajuan & Lifecycle -->
@@ -951,6 +954,9 @@
                             <p class="text-[11px] text-slate-400">Ditugaskan resmi oleh instansi penempatan magang Anda.
                             </p>
                         </div>
+                        <h3 class="text-base font-bold text-slate-900 mt-3 truncate">
+                            {{ $application && $application->placement && $application->placement->pembimbing ? $application->placement->pembimbing->name : 'Belum Diplot' }}
+                        </h3>
                     </div>
 
                     <!-- Card 4: Penilaian Nilai Pembimbing -->

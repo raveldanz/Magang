@@ -344,7 +344,6 @@
                                             </a>
                                         </div>
                                     </td>
-
                                 </tr>
                             @empty
                                 <tr>

@@ -358,7 +358,7 @@
                                     <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-sm divide-y divide-gray-50">
+                            <tbody class="text-sm divide-y divide-slate-100">
                                 @forelse ($logbooks as $index => $log)
                                     <tr class="hover:bg-gray-50/50 transition">
                                         <td class="p-4 text-gray-500">{{ $index + 1 }}</td>
@@ -380,7 +380,7 @@
                                                 </div>
                                             @endif
                                         </td>
-                                        <td class="p-4">
+                                        <td class="py-4 px-5 whitespace-nowrap">
                                             @if ($log->attachment)
                                                 <a href="{{ asset('storage/' . $log->attachment) }}" 
                                                    @click.prevent="$dispatch('open-lightbox', { url: '{{ asset('storage/' . $log->attachment) }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
@@ -389,7 +389,7 @@
                                                     <span>Buka Lampiran</span>
                                                 </a>
                                             @else
-                                                <span class="text-gray-400 text-xs">-</span>
+                                                <span class="text-slate-400 text-xs">-</span>
                                             @endif
                                         </td>
                                         <td class="p-4 text-center">
@@ -426,7 +426,7 @@
                                                     </form>
                                                 </div>
                                             @else
-                                                <span class="text-gray-400 text-xs">—</span>
+                                                <span class="text-slate-400 text-xs">—</span>
                                             @endif
                                         </td>
                                     </tr>

@@ -35,10 +35,17 @@
                 <!-- Form Filter & Search (Responsive Single-Row Flex Layout) -->
                 <form method="GET" action="{{ route('admin.applications.index') }}" class="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
                     <div class="flex flex-col lg:flex-row items-center gap-3">
-                        <!-- Input Search (flex-1) -->
-                        <div class="flex-1 w-full">
-                            <x-text-input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-sm h-10" />
+                        
+                        <!-- Input Search -->
+                        <div class="flex-1 w-full relative">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ request('search') }}" 
+                                   placeholder="Cari nama mahasiswa, NIM, atau universitas..." 
+                                   class="w-full h-10 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-900 px-3.5 pl-9 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all duration-200" />
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
 
                         <!-- Filter Universitas (w-52) -->
@@ -93,7 +100,7 @@
                             </select>
                         </div>
 
-                        <!-- Filter Status (w-44) -->
+                        <!-- Filter Status -->
                         <div class="w-full lg:w-44">
                             <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
                                 <option value="">-- Semua Status --</option>
@@ -106,7 +113,7 @@
                             </select>
                         </div>
 
-                        <!-- Action Buttons (Height 10 uniform) -->
+                        <!-- Action Buttons -->
                         <div class="flex items-center gap-2 w-full lg:w-auto shrink-0">
                             <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-4 h-10 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition w-full lg:w-auto cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,6 +130,7 @@
                         </div>
                     </div>
                 </form>
+            </div>
 
                 <!-- Tabel Data Pengajuan (Desktop & Tablet) -->
                 <div class="hidden md:block overflow-x-auto">
@@ -137,10 +145,10 @@
                                 <th class="p-3 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm divide-y">
+                        <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse ($applications as $app)
-                                <tr class="border-b hover:bg-gray-50/50">
-                                    <td class="p-3 text-xs text-gray-500 font-mono">
+                                <tr class="hover:bg-slate-50/70 transition-colors duration-150">
+                                    <td class="py-4 px-5 text-xs text-slate-400 font-mono whitespace-nowrap">
                                         {{ $app->created_at->format('d M Y, H:i') }}
                                     </td>
                                     <td class="p-3 font-semibold text-gray-900">
@@ -192,7 +200,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="p-6 text-center text-gray-500">Tidak ada pengajuan magang yang sesuai kriteria pencarian.</td>
+                                    <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+                                        Tidak ada pengajuan magang yang sesuai kriteria pencarian.
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -261,11 +271,13 @@
                 </div>
 
                 <!-- Paginasi -->
-                <div class="mt-6">
-                    {{ $applications->links() }}
-                </div>
-
+                @if($applications->hasPages())
+                    <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                        {{ $applications->links() }}
+                    </div>
+                @endif
             </div>
+
         </div>
     </div>
 </x-app-layout>
