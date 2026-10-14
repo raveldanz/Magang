@@ -7,8 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-const brainDir = 'C:\\Users\\EVAN\\.gemini\\antigravity-ide\\brain\\860a2603-0d83-4450-8014-53b0e6df4d3a';
 const publicDir = path.resolve(projectRoot, 'public/test-artifacts');
+const brainDir = process.env.ARTIFACT_DIR || publicDir;
 
 async function run() {
     const browser = await chromium.launch({ headless: true, channel: 'chrome' });

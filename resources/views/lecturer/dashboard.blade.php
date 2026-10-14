@@ -294,14 +294,13 @@
                     <table class="min-w-full divide-y divide-slate-100 text-left text-xs">
                         <thead class="bg-slate-50/75 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-3.5">Mahasiswa</th>
-                                <th class="py-3.5 px-3.5">Instansi & Unit Kerja</th>
-                                <th class="py-3.5 px-3.5">Pembimbing Dinas</th>
-                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Logbook</th>
-                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Laporan Akhir</th>
-                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Evaluasi Nilai</th>
-                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Nilai Akhir</th>
-                                <th class="py-3.5 px-3.5 text-right whitespace-nowrap">Aksi</th>
+                                <th class="py-3.5 px-4">Mahasiswa</th>
+                                <th class="py-3.5 px-4">Instansi & Unit Kerja</th>
+                                <th class="py-3.5 px-4">Pembimbing Dinas</th>
+                                <th class="py-3.5 px-4 text-center">Logbook</th>
+                                <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
+                                <th class="py-3.5 px-4 text-center">Evaluasi Nilai</th>
+                                <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -334,21 +333,28 @@
                                 <tr class="hover:bg-slate-50/80 transition">
                                     
                                     <!-- Student Info -->
-                                    <td class="py-4 px-3.5">
+                                    <td class="py-4 px-4">
                                         <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-500 font-medium">NIM: {{ $profile?->nim ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-600">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <!-- Placement Location -->
-                                    <td class="py-4 px-3.5">
+                                    <td class="py-4 px-4">
                                         <div class="font-semibold text-slate-800 text-xs">{{ $agency->agency_name ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <!-- Mentor Info -->
-                                    <td class="py-4 px-3.5">
+                                    <td class="py-4 px-4">
                                         <div class="font-medium text-slate-800 text-xs">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5">
+                                            @if($nilaiDinas > 0)
+                                                <span class="text-emerald-700 font-semibold">Dinas: {{ number_format($nilaiDinas, 1) }}</span>
+                                            @else
+                                                <span class="text-slate-400">Belum dinilai</span>
+                                            @endif
+                                        </div>
                                     </td>
 
                                     <!-- Logbook Counter -->
@@ -359,7 +365,7 @@
                                     </td>
 
                                     <!-- Final Report Status -->
-                                    <td class="py-4 px-3 text-center whitespace-nowrap">
+                                    <td class="py-4 px-4 text-center whitespace-nowrap">
                                         @if(!$finalReport)
                                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500">
                                                 Belum Unggah
@@ -369,9 +375,9 @@
                                         @endif
                                     </td>
 
-                                    <!-- Evaluasi Nilai (2 Komponen: Dinas & DPL) -->
-                                    <td class="py-4 px-3 text-center whitespace-nowrap">
-                                        <div class="inline-flex items-center justify-center gap-1.5">
+                                    <!-- Dual-Status Nilai (Dinas & DPL) & Kumulatif -->
+                                    <td class="py-3 px-4 text-center whitespace-nowrap">
+                                        <div class="flex flex-col items-center gap-1">
                                             @if($isMentorOnly)
                                                 @if($nilaiDinas > 0)
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800">
@@ -382,6 +388,7 @@
                                                         Dinas: Menunggu
                                                     </span>
                                                 @endif
+                                                <span class="text-[10px] text-slate-400">100% Nilai Dinas</span>
                                             @else
                                                 <!-- Dual Indicator: Mentor + DPL -->
                                                 <div class="flex items-center gap-1.5">
@@ -405,32 +412,17 @@
                                                         </a>
                                                     @endif
                                                 </div>
+
+                                                <!-- Kumulatif Final -->
+                                                @if($eval && $eval->nilai_akhir > 0)
+                                                    <span class="text-[11px] font-bold text-slate-900 mt-0.5 block">
+                                                        Akhir: <span class="text-blue-700">{{ number_format($eval->nilai_akhir, 1) }}</span> <span class="text-emerald-700 font-bold">({{ $eval->grade_calculated }})</span>
+                                                    </span>
+                                                @else
+                                                    <span class="text-[10px] text-slate-400 italic">Belum Lengkap</span>
+                                                @endif
                                             @endif
                                         </div>
-                                    </td>
-
-                                    <!-- Nilai Akhir -->
-                                    <td class="py-4 px-3 text-center whitespace-nowrap">
-                                        @if($isMentorOnly)
-                                            @if($nilaiDinas > 0)
-                                                <span class="text-xs font-bold text-slate-900">
-                                                    {{ number_format($nilaiDinas, 1) }}
-                                                    @if($eval?->grade_calculated)
-                                                        ({{ $eval->grade_calculated }})
-                                                    @endif
-                                                </span>
-                                            @else
-                                                <span class="text-[11px] text-slate-400 italic">Belum Lengkap</span>
-                                            @endif
-                                        @else
-                                            @if($eval && $eval->nilai_akhir > 0)
-                                                <span class="text-xs font-bold text-slate-900">
-                                                    {{ number_format($eval->nilai_akhir, 1) }} ({{ $eval->grade_calculated }})
-                                                </span>
-                                            @else
-                                                <span class="text-[11px] text-slate-400 italic">Belum Lengkap</span>
-                                            @endif
-                                        @endif
                                     </td>
 
                                     <!-- Action Button (Detail only, zero BAP) -->
@@ -443,7 +435,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="py-12 text-center text-slate-400">
+                                    <td colspan="7" class="py-12 text-center text-slate-400">
                                         Belum ada mahasiswa bimbingan magang yang ditugaskan kepada Anda.
                                     </td>
                                 </tr>

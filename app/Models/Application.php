@@ -359,7 +359,9 @@ class Application extends Model
      */
     public function requiresAdvisor(): bool
     {
-        return (bool) ($this->user?->universityRelation?->require_dpl ?? true);
+        $univ = $this->user?->universityRelation;
+
+        return $univ ? $univ->requiresAdvisor() : true;
     }
 
     /**

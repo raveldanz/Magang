@@ -131,9 +131,8 @@
                                             <span class="text-slate-400 italic">Belum Ada</span>
                                         @endif
                                     </span>
-                                </div>
                                 <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                                    <span class="text-slate-400 font-medium">Nilai Dosen:</span>
+                                    <span class="text-slate-500 font-medium">Nilai Dosen:</span>
                                     @if ($isMentorOnly)
                                         <span class="text-slate-500 text-[11px]">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
                                     @else

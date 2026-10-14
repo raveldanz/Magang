@@ -183,7 +183,7 @@ class DashboardController extends Controller
 
         // Authorization Check
         $placement = $report->placement;
-        if ($placement->mentor_id !== $mentor->id && $placement->pembimbing_id !== $mentor->id) {
+        if (! $placement->isAssignedFieldMentor($mentor)) {
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi laporan ini.');
         }
 
