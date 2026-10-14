@@ -82,6 +82,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
 | **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
+| **LRN-073** | 2026-10-14 | Master Instansi & Seeder Cleanup | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dinas Perpustakaan dan Kearsipan serta kaskade relasi aman | RESOLVED |
 
 ---
 
@@ -1692,7 +1693,17 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Mengganti aset `public/images/logos/ui.png` dan `storage/app/public/images/logos/ui.png` dengan gambar PNG Makara UI resmi beresolusi tinggi (427x468 piksel) dengan latar belakang transparan penuh tanpa padding kosong berlebih (*tight bounding box*).
   2. Memverifikasi symlink dan keselarasan model `University::getLogoUrlAttribute()`.
   3. Menjalankan `php artisan optimize:clear && php artisan view:clear` dan memastikan 261/261 unit & feature test suite tetap lulus 100% (Strict Exit Code 0).
-- **Prevention Rule**: Seluruh aset gambar logo institusi (kampus dan dinas) wajib memiliki *tight bounding box* (proporsi gambar mengisi ruang kanvas tanpa margin transparan kosong berlebih). Hal ini untuk memastikan ketika logo dibatasi oleh dimensi styling Tailwind `w-9 h-9 object-contain` atau `h-12 w-auto`, lambang tetap tampil jelas, proporsional, dan tajam.
+### [LRN-073] Pembersihan Massal Instansi Dinas Terpadu & Sinkronisasi Seeder (Dispusip Only)
+- **Tanggal**: 2026-10-14
+- **Komponen**: `database/seeders/SurabayaAgenciesSeeder.php`, `App\Models\AgencyProfile`, `App\Models\Unit`, `App\Models\User`
+- **Problem / Symptom**: Sistem memuat 23 master data OPD/instansi kedinasan Pemkot Surabaya, dan pengguna menghendaki seluruh instansi selain "Dinas Perpustakaan dan Kearsipan" dihapus secara permanen dari sistem dan seeder.
+- **Root Cause**: Kebutuhan penyederhanaan operasional pilot/khusus yang hanya berfokus pada ekosistem Dinas Perpustakaan dan Kearsipan.
+- **Fix Applied**: 
+  1. Menjalankan skrip transaksi database terisolasi untuk membersihkan 22 instansi selain Dinas Perpustakaan dan Kearsipan beserta dependensi kaskadenya (50 unit kerja, percakapan chat instansi/mentor, riwayat pengajuan, penempatan, evaluasi, dan akun personil admin/mentor kedinasan terkait) tanpa merusak integritas referensial.
+  2. Mempertahankan secara utuh data Dinas Perpustakaan dan Kearsipan (ID: 2) beserta 3 bidang kerja (Pelayanan & Otomasi Perpustakaan Digital, Preservasi Arsip, Minat Baca) dan seluruh akun personilnya (admin & 3 mentor).
+  3. Memperbarui `database/seeders/SurabayaAgenciesSeeder.php` agar hanya mendefinisikan Dinas Perpustakaan dan Kearsipan sehingga aman dari polusi data saat re-seeding.
+  4. Membersihkan cache aplikasi dan memvalidasi test suite hingga seluruh 281/281 test suite passed (100% Strict Exit Code 0).
+- **Prevention Rule**: Operasi penghapusan massal instansi induk wajib mematuhi pembersihan kaskade bertahap (chat -> child placements -> applications -> units -> agency staff -> agency profile) di dalam transaksi database atomik guna mencegah foreign key constraint violation pada PostgreSQL.
 
 ---
 
