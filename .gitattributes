@@ -9,3 +9,12 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# GitHub Linguist Overrides (Ignore scripts & any python files from language stats)
+*.py linguist-detectable=false
+*.py linguist-vendored
+scripts/** linguist-vendored
+
+# Institutional Memory Git Merge Strategy (Auto-union append without conflict)
+.antigravity/memory/learnings.md merge=union
+

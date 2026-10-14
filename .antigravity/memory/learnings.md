@@ -78,11 +78,12 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-066** | 2026-10-08 | Scheduler, Queue Heartbeat & Model Guarding | Validasi otomatis sinkronisasi status magang & monitoring kesehatan worker | RESOLVED |
 | **LRN-067** | 2026-10-08 | Audit Komprehensif Sistem, Metrik Kampus & Type-Safety | Distorsi metrik makro kampus saat filter tabel, nullsafe dashboard mahasiswa, filter notifikasi DPL per skema evaluasi kampus, & alias kuota unit | RESOLVED |
 | **LRN-068** | 2026-10-08 | DPL Student Detail Redesign | Paritas Civic Hero Banner dengan portal mahasiswa, eliminasi BAP, grid 4 pilar konteks & KPI evaluasi | RESOLVED |
-| **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Portal Dosen Pembimbing | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
+| **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Seluruh Fitur Role Dosen | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
 | **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
 | **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
-| **LRN-073** | 2026-10-14 | Master Instansi & Seeder Cleanup | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dinas Perpustakaan dan Kearsipan serta kaskade relasi aman | RESOLVED |
+| **LRN-073** | 2026-10-11 | Rekonsiliasi Merge Konflik Portal Dosen | Paritas tata letak, evaluasi komparatif, dan eliminasi form bimbingan obsolete | RESOLVED |
+| **LRN-074** | 2026-10-14 | Master Instansi & Seeder Cleanup | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dinas Perpustakaan dan Kearsipan serta kaskade relasi aman | RESOLVED |
 
 ---
 
@@ -1693,7 +1694,23 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Mengganti aset `public/images/logos/ui.png` dan `storage/app/public/images/logos/ui.png` dengan gambar PNG Makara UI resmi beresolusi tinggi (427x468 piksel) dengan latar belakang transparan penuh tanpa padding kosong berlebih (*tight bounding box*).
   2. Memverifikasi symlink dan keselarasan model `University::getLogoUrlAttribute()`.
   3. Menjalankan `php artisan optimize:clear && php artisan view:clear` dan memastikan 261/261 unit & feature test suite tetap lulus 100% (Strict Exit Code 0).
-### [LRN-073] Pembersihan Massal Instansi Dinas Terpadu & Sinkronisasi Seeder (Dispusip Only)
+### [LRN-073] Rekonsiliasi Merge Konflik Portal Dosen (Paritas Tata Letak, Evaluasi Komparatif & Eliminasi Form Bimbingan Obsolete)
+- **Tanggal**: 2026-10-11
+- **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `tests/Feature/LecturerInnovationsTest.php`, `tests/Feature/LecturerFeaturesUpdateTest.php`
+- **Problem / Symptom**: Terjadi konflik merge git pada `resources/views/lecturer/dashboard.blade.php` dan `resources/views/lecturer/student-detail.blade.php` saat menggabungkan pembaruan dari `origin/main` ke branch `AkhirMagang-Evan`. Konflik ini memicu `syntax error, unexpected token "else"` pada kompilasi view blade dan menghentikan pipeline pengujian otomatis.
+- **Root Cause**:
+  1. Pada `dashboard.blade.php`, terdapat benturan antara penataan kolom nilai dan tombol aksi (tampilan BAP vs Detail tunggal modern tanpa BAP, serta perbedaan markup indikator nilai dinas dan nilai akademik DPL di kartu mobile).
+  2. Pada `student-detail.blade.php`, branch `main` mencoba menyisipkan form input sesi bimbingan legacy ke bagian bawah Tab 1 (Ringkasan), sementara pada branch `AkhirMagang-Evan` fitur tersebut telah ditata ulang secara terisolasi dan elegan di Tab 4 (`CATATAN BIMBINGAN DPL`) dan Tab 1 telah dilengkapi kartu Catatan Pribadi Pembimbing (`advisor_notes`).
+- **Fix Applied**:
+  1. Menyelesaikan konflik pada `dashboard.blade.php` dengan mempertahankan estetika modern borderless, dual-indicator evaluasi (Dinas & DPL), kolom Nilai Akhir mandiri yang konsisten dengan 8 kolom header tabel, dan tombol aksi "Detail" tunggal.
+  2. Menyelesaikan konflik pada `student-detail.blade.php` dengan mempertahankan kartu privat `advisor_notes` di Tab 1 serta membuang duplikasi form sesi bimbingan legacy karena seluruh fungsionalitas konsultasi bimbingan akademik telah aktif dan terpusat di Tab 4.
+  3. Membersihkan seluruh cache bootstrap via `php artisan optimize:clear` dan `php artisan view:clear`.
+  4. Menjalankan seluruh test suite aplikasi (`php artisan test`): 275/276 passed (1 skipped), 1.885 assertions, Strict Exit Code 0.
+- **Prevention Rule**: Selalu periksa pembagian tab pada view sebelum menggabungkan form lama; form yang sudah dipindahkan ke tab khusus tidak boleh disisipkan kembali ke tab utama. Jalankan pembersihan cache dan verifikasi seluruh test suite sebelum menyimpulkan merge commit.
+
+---
+
+### [LRN-074] Pembersihan Massal Instansi Dinas Terpadu & Sinkronisasi Seeder (Dispusip Only)
 - **Tanggal**: 2026-10-14
 - **Komponen**: `database/seeders/SurabayaAgenciesSeeder.php`, `App\Models\AgencyProfile`, `App\Models\Unit`, `App\Models\User`
 - **Problem / Symptom**: Sistem memuat 23 master data OPD/instansi kedinasan Pemkot Surabaya, dan pengguna menghendaki seluruh instansi selain "Dinas Perpustakaan dan Kearsipan" dihapus secara permanen dari sistem dan seeder.
