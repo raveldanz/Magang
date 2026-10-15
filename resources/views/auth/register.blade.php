@@ -1,24 +1,31 @@
 <x-guest-layout>
     <div class="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <!-- Logo Pemkot Surabaya -->
-        <div class="flex justify-center mb-4">
+        <!-- Logo Pemkot Surabaya & Dispusip -->
+        <div class="flex items-center justify-center gap-3 mb-4">
             <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Pemerintah Kota Surabaya">
                 <img src="{{ asset('images/logos/surabaya.png') }}" 
                      alt="Logo Pemkot Surabaya"
-                     class="h-16 w-auto object-contain drop-shadow-sm transition-all"
-                     style="aspect-ratio: 960/1234; height: 64px; width: auto; max-height: 72px; object-fit: contain;">
+                     class="h-14 w-auto object-contain drop-shadow-2xs transition-all"
+                     style="aspect-ratio: 960/1234; height: 56px; width: auto; max-height: 60px; object-fit: contain;">
+            </a>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Dinas Perpustakaan dan Kearsipan Kota Surabaya">
+                <img src="{{ asset('images/logos/dispusip.png') }}" 
+                     alt="Logo Dispusip Surabaya"
+                     class="h-14 w-auto object-contain drop-shadow-2xs transition-all"
+                     style="height: 56px; width: auto; max-height: 60px; object-fit: contain;">
             </a>
         </div>
 
         <!-- Header Text -->
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">
-            Pendaftaran Akun Magang
+            Pendaftaran Magang Dispusip
         </h2>
         <p class="text-xs font-bold uppercase tracking-wider text-blue-700 mt-1">
-            Pemerintah Kota Surabaya
+            Dinas Perpustakaan dan Kearsipan Kota Surabaya
         </p>
         <p class="text-xs text-slate-500 mt-1">
-            Buat akun untuk mengajukan magang di instansi Pemkot Surabaya
+            Buat akun untuk mengajukan magang di Dinas Perpustakaan dan Kearsipan
         </p>
     </div>
 
@@ -80,6 +87,6 @@
 
     <!-- Footer Tagline -->
     <p class="text-center text-xs text-slate-400 mt-6">
-        &copy; {{ date('Y') }} Pemerintah Kota Surabaya. All rights reserved.
+        &copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.
     </p>
 </x-guest-layout>

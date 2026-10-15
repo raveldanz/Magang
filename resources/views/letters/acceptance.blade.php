@@ -315,15 +315,15 @@
         // Mengambil profil instansi dinamis dari unit magang atau default
         $agencyProfile = $application->unit->agencyProfile ?? $agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya';
-        $agencyName = $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika';
-        $address = $agencyProfile->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272';
-        $phone = $agencyProfile->phone ?? '(031) 5312144';
-        $email = $agencyProfile->email ?? 'diskominfo@surabaya.go.id';
-        $website = $agencyProfile->website ?? 'surabaya.go.id';
+        $agencyName = $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
+        $address = $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293';
+        $phone = $agencyProfile->phone ?? '(031) 8707682';
+        $email = $agencyProfile->email ?? 'dispusip@surabaya.go.id';
+        $website = $agencyProfile->website ?? 'https://dispusip.surabaya.go.id';
         $cityName = $agencyProfile->city ?? 'Surabaya';
-        $signeeName = $agencyProfile->signee_name ?? 'Drs. H. M. NASER, M.Si';
-        $signeeNip = $agencyProfile->signee_nip ?? '19700101 199503 1 002';
-        $signeePosition = $agencyProfile->signee_position ?? 'KEPALA DINAS KOMUNIKASI DAN INFORMATIKA';
+        $signeeName = $agencyProfile->signee_name ?? 'Mia Santi Dewi, S.H., M.Si.';
+        $signeeNip = $agencyProfile->signee_nip ?? '19720315 199803 2 004';
+        $signeePosition = $agencyProfile->signee_position ?? 'KEPALA DINAS PERPUSTAKAAN DAN KEARSIPAN';
 
         // Logo Utama Instansi Dinamis Berbasis Base64 (Untuk Kompatibilitas Tinggi & DOMPDF)
         $logoPath = null;

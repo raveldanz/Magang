@@ -216,7 +216,7 @@
         <!-- 3. TUJUAN SURAT -->
         <div class="text-[12px] mb-5">
             <p>Kepada Yth.</p>
-            <p class="font-bold">Kepala {{ $agency?->agency_name ?? 'Dinas Komunikasi dan Informatika' }}</p>
+            <p class="font-bold">Kepala {{ $agency?->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}</p>
             <p>{{ $agency?->government_name ?? 'Pemerintah Kota Surabaya' }}</p>
             <p class="mt-0.5">di - <span class="underline">Tempat</span></p>
         </div>

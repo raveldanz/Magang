@@ -55,33 +55,23 @@
                             </div>
                         @endif
 
-                        <!-- Filter Instansi Dinas (Khusus Super Admin) -->
-                        @if ($isSuperAdmin && isset($agencies) && count($agencies) > 0)
-                            <div class="w-full lg:w-56">
-                                <select name="agency_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
-                                    <option value="">-- Semua Instansi Dinas --</option>
-                                    @foreach ($agencies as $ag)
-                                        <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                            {{ $ag->agency_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
-
                         <!-- Filter Unit / Divisi (w-64) -->
                         <div class="w-full lg:w-64">
                             <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
                                 <option value="">-- Semua Unit/Divisi --</option>
                                 @if (isset($groupedUnits) && $groupedUnits !== null)
                                     @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label=" {{ $agencyName }}">
+                                        @if(count($groupedUnits) > 1)
+                                            <optgroup label=" {{ $agencyName }}">
+                                        @endif
                                             @foreach ($agencyUnits as $u)
                                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
                                                     {{ $u->name }}
                                                 </option>
                                             @endforeach
-                                        </optgroup>
+                                        @if(count($groupedUnits) > 1)
+                                            </optgroup>
+                                        @endif
                                     @endforeach
                                 @elseif(isset($units))
                                     @foreach ($units as $u)

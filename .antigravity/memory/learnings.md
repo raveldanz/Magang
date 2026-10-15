@@ -1767,6 +1767,65 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-075] Kustomisasi & Spesialisasi Sistem Khusus Dinas Perpustakaan dan Kearsipan Kota Surabaya
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/auth/`, `resources/views/student/application/create.blade.php`, `resources/views/dashboard.blade.php`, `resources/views/certificates/`, `config/app.php`, `.env`
+- **Problem / Symptom**: Portal web masih menggunakan teks generik "Pemerintah Kota Surabaya di seluruh Organisasi Perangkat Daerah (OPD)", navbar hanya menampilkan logo tunggal pemkot, formulir mahasiswa mengharuskan pencarian instansi padahal hanya ada 1 OPD aktif, dan template surat/sertifikat masih menyimpan fallback legacy generic/Diskominfo.
+- **Root Cause**: Sistem sebelumnya dirancang multi-tenant untuk 23 OPD secara umum sebelum difokuskan secara pilot/khusus ke Dinas Perpustakaan dan Kearsipan.
+- **Fix Applied**: 
+  1. Mentransformasi `welcome.blade.php` menjadi portal berestetika tinggi khusus Dispusip Surabaya dengan logo ganda resmi (Pemkot Surabaya & Dispusip), headline khusus Dispusip, kontak kantor Jl. Rungkut Asri Tengah, serta showcase 4 bidang kerja resmi Dispusip (Bidang Sekretariat, Bidang Pembinaan dan Pengelolaan Perpustakaan, Bidang Pembinaan dan Layanan Kearsipan, Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan) dengan kuota live dinamis.
+  2. Memperbarui navbar utama (`layouts/navigation.blade.php`) dengan logo berdampingan dan label "Portal Magang Dispusip Kota Surabaya".
+  3. Memperbarui halaman login & registrasi dengan lencana Dispusip resmi.
+  4. Menyederhanakan formulir pendaftaran mahasiswa (`student/application/create.blade.php`) dengan kartu identitas resmi Dispusip dan seleksi langsung 4 divisi resmi Dispusip tanpa perlu mencari OPD lain.
+  5. Memperbarui seeder (`SurabayaAgenciesSeeder.php` & `CleanEcosystemSeeder.php`) dan migrasi data unit untuk memuat 4 bidang resmi Dispusip dengan relasi aplikasi & penempatan mahasiswa yang tetap terjaga utuh.
+  6. Memperbarui seluruh fallback dokumen resmi (surat penerimaan, sertifikat kelulusan, lembar nilai, transkrip) ke Dinas Perpustakaan dan Kearsipan beserta pejabat resmi penandatangan (Mia Santi Dewi, S.H., M.Si.).
+  7. Membersihkan cache aplikasi dan memvalidasi test suite hingga 100% lulus (Strict Exit Code 0).
+- **Prevention Rule**: Saat sebuah portal dikhususkan untuk instansi tertentu, seluruh titik kontak visual (Landing, Navbar, Auth, Pendaftaran, Dashboard, Surat, dan Sertifikat) wajib diselaraskan agar tidak ada inkonsistensi nama instansi, fallback kuno, atau dropdown tunggal yang membingungkan pemohon.
+
+---
+
+### [LRN-076] Eliminasi Card Dispusip & Akses Langsung Pusat Kendali Instansi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/admin/agencies/edit.blade.php`
+- **Problem / Symptom**: Saat menekan menu "Instansi" di navigasi, admin melihat halaman kartu berulang (`admin.agencies.index`) yang hanya berisi 1 kartu Dispusip, sehingga harus menekan tombol "Kelola Dinas" lagi untuk melihat pusat kendali lengkap.
+- **Root Cause**: Menu navigasi masih menautkan ke rute index generik multi-instansi `admin.agencies.index` tanpa mengenali bahwa sistem beroperasi untuk ekosistem tunggal Dispusip.
+- **Fix Applied**: 
+  1. Memperbarui menu "Instansi" pada desktop navbar, profile dropdown, dan mobile drawer di `navigation.blade.php` agar langsung menautkan ke rute `admin.agencies.show` instansi Dispusip.
+  2. Menambahkan auto-redirect cerdas pada `AgencyController::index()` saat ekosistem berjalan spesifik Dispusip (tanpa parameter `list`), sehingga akses langsung URL `/admin/agencies` langsung dialihkan ke Pusat Kendali Dispusip lengkap.
+  3. Mengeliminasi tombol kembali pada header `admin.agencies.show` karena halaman ini kini telah menjadi menu utama top-level (setara dengan menu Pengajuan, Universitas, dan Pengguna yang tidak memerlukan tombol kembali), serta mengarahkan tombol batal/kembali pada `admin.agencies.edit` menuju `admin.agencies.show`.
+  4. Memastikan kompatibilitas operator string database (`ilike` untuk PostgreSQL, `like` untuk SQLite saat testing).
+  5. Menambahkan test feature `DispusipInstansiMenuDirectAccessTest` untuk menjamin stabilitas fungsionalitas dan navigasi langsung ke halaman lengkap Dispusip.
+- **Prevention Rule**: Pada aplikasi yang telah dikhususkan untuk entitas tunggal (*single-tenant specialized*), hindari menyajikan halaman ringkasan kartu dengan 1 item saja. Arahkan pengguna langsung ke pusat manajemen data komprehensif, dan selalu sediakan tombol kembali yang kontekstual.
+
+---
+
+### [LRN-077] Redireksi Kontekstual Sesi Penyamaran (Impersonasi)
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Http/Controllers/Admin/ImpersonationController.php`, `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**: Saat Super Admin melakukan *Login As* (penyamaran) ke akun admin dinas dari halaman Pusat Kendali Instansi, kemudian menekan tombol "Kembali" pada banner penyamaran, sistem selalu mengarahkan ke halaman Kelola Pengguna (`/admin/users`), bukan kembali ke halaman instansi asal.
+- **Root Cause**: Method `leave()` pada `ImpersonationController` di-hardcode ke `return redirect()->route('admin.users.index')`, tanpa melacak URL asal saat penyamaran dimulai (`referer` / `return_to`).
+- **Fix Applied**: 
+  1. Pada method `impersonate()`, sistem kini menangkap URL asal via `return_to`, `referer`, atau `url()->previous()` dan menyimpannya di session (`impersonator_return_to`).
+  2. Menyertakan `<input type="hidden" name="return_to" value="{{ url()->current() }}">` pada seluruh form *Login As* di `show.blade.php`.
+  3. Pada method `leave()`, sistem membaca `impersonator_return_to` dari session dengan fallback cerdas berbasis konteks akun (`agency_profile_id` mengarah ke `admin.agencies.show`, `university_id` ke `admin.universities.show`, dan role mentor ke `admin.mentors.index`).
+  4. Menambahkan test otomatis di `DispusipInstansiMenuDirectAccessTest` guna memverifikasi alur impersonasi dan kembali ke halaman dinas secara presisi.
+- **Prevention Rule**: Jangan pernah men-hardcode rute pengembalian (*return/exit route*) pada fitur impersonasi/penyamaran. Selalu simpan URL referer asal dan sediakan fallback dinamis berbasis atribut domain akun yang disamar.
+
+---
+
+### [LRN-078] Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**: Pada baris filter halaman Pengajuan Magang (`admin.applications.index`), terdapat dropdown filter `-- Semua Instansi Dinas --` yang hanya memiliki 1 opsi yaitu "Dinas Perpustakaan dan Kearsipan", membuat antarmuka menjadi berantakan, redundan, dan memakan ruang baris filter.
+- **Root Cause**: Desain halaman sebelumnya berasumsi sistem multi-instansi dengan banyak OPD. Setelah portal dikhususkan (*single-tenant*) untuk Dispusip, filter instansi menjadi tidak relevan karena seluruh unit kerja dan pengajuan otomatis terikat pada Dispusip.
+- **Fix Applied**: 
+  1. Menghapus dropdown filter instansi (`agency_id`) pada `resources/views/admin/applications/index.blade.php`, serta merapikan dropdown Unit/Divisi agar menampilkan langsung 4 bidang resmi Dispusip tanpa pembungkus `<optgroup>` redundan ketika hanya ada 1 instansi.
+  2. Memasang guard kondisional `@if(isset($agencies) && count($agencies) > 1)` pada filter instansi di `resources/views/admin/mentors/index.blade.php` dan `resources/views/admin/users/index.blade.php`, sehingga hanya tampil dinamis jika sistem memiliki lebih dari 1 instansi.
+  3. Memvalidasi tampilan dan memastikan seluruh unit/feature test tetap lulus (Exit Code 0).
+- **Prevention Rule**: Seluruh elemen form filter antarmuka yang mengagregasi data entitas induk (seperti OPD/Instansi) harus memiliki kondisional pemeriksaan kuantitas (`count > 1`) atau dihapus jika sistem berjalan dalam mode portal khusus/spesifik, guna menjaga kebersihan visual dan ergonomi pengguna.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 
