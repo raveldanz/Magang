@@ -17,7 +17,7 @@
                     $appStatus = $application->status;
                     $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
                 @endphp
-                @if (in_array($rawStatus, ['accepted', 'active', 'completed', 'verified']))
+                @if (in_array($rawStatus, ['accepted', 'active', 'completed']))
                     <a href="{{ route('university.students.letter', $application->id) }}" target="_blank"
                        class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

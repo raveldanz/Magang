@@ -280,25 +280,29 @@
                     @method('PUT')
 
                     @php
+                        $userAuth = auth()->user();
+                        $isSupervisorOrSuperAdmin = ($userAuth && ($userAuth->role === 'supervisor' || $userAuth->isSuperAdmin()));
                         $canComplete = $application->can_complete;
+                        $isAlreadyRejected = ($currentStatusVal === 'rejected');
+                        
+                        // Menentukan fase siklus: Tahap seleksi awal (belum diterima) vs Tahap magang aktif
+                        $isInitialStage = in_array($currentStatusVal, ['pending', 'waiting_approval', 'rejected'], true);
+                        
+                        // Kunci status ACCEPTED bagi staf biasa jika berada di waiting_approval
+                        $isWaitingApproval = ($currentStatusVal === 'waiting_approval');
+                        $isAcceptLockedForStaff = ($isWaitingApproval && !$isSupervisorOrSuperAdmin);
                     @endphp
 
                     <!-- Form Status Pipeline (Synchronized with visual cards) -->
                     <select id="status-select" name="status" x-model="status" class="hidden" aria-hidden="true">
                         <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::PENDING->label() }}</option>
-                        <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::VERIFIED->label() }}</option>
+                        <option value="waiting_approval" {{ $currentStatus == 'waiting_approval' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</option>
                         <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</option>
                         <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</option>
                         <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</option>
                         <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</option>
                         <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</option>
                     </select>
-
-                    @php
-                        $isAlreadyRejected = ($currentStatusVal === 'rejected');
-                        $isAcceptDisabled = !in_array($currentStatusVal, ['pending', 'verified', 'accepted'], true);
-                        $isRejectDisabled = !in_array($currentStatusVal, ['pending', 'verified', 'rejected'], true);
-                    @endphp
 
                     @if($isAlreadyRejected)
                         <div class="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3">
@@ -312,200 +316,227 @@
                         </div>
                     @endif
 
-                    <!-- Interactive Status Selection Cards (7 Status Pipeline Baku) -->
+                    <!-- Interactive Status Selection Cards (Context-Aware Pipeline) -->
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
+                            Pilih Status Keputusan Pengajuan
                         </label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
-                            
-                            <!-- 1. PENDING -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'pending'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                                    <span :class="status === 'pending' ? 'opacity-100 text-amber-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::PENDING->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::PENDING->description() }}</div>
-                                </div>
-                            </button>
 
-                            <!-- 2. VERIFIED -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'verified'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'verified' ? 'border-sky-400 bg-sky-50/70 ring-2 ring-sky-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-                                    <span :class="status === 'verified' ? 'opacity-100 text-sky-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::VERIFIED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::VERIFIED->description() }}</div>
-                                </div>
-                            </button>
-
-                            <!-- 2B. WAITING_APPROVAL (Kirim ke Atasan / Double ACC) -->
-                            <button type="button" 
-                                    @if(!$isAcceptDisabled) @click="status = 'waiting_approval'" @endif
-                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
-                                    :class="status === 'waiting_approval' ? 'border-purple-500 bg-purple-50/70 ring-2 ring-purple-500/20 shadow-xs' : '{{ $isAcceptDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-purple-200 hover:bg-purple-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                                    <span :class="status === 'waiting_approval' ? 'opacity-100 text-purple-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->description() }}</div>
-                                </div>
-                            </button>
-
-                            <!-- 3. ACCEPTED -->
-                            <button type="button" 
-                                    @if(!$isAcceptDisabled) @click="status = 'accepted'" @endif
-                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
-                                    :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $isAcceptDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                                    <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                        {{ $isAcceptDisabled && $currentStatusVal !== 'accepted' ? 'Hanya dari PENDING atau VERIFIED' : \App\Enums\ApplicationStatus::ACCEPTED->description() }}
+                        @if($isInitialStage)
+                            {{-- FASE 1: SELEKSI AWAL (Hanya Tampilkan PENDING, WAITING_APPROVAL, ACCEPTED, REJECTED) --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                                
+                                <!-- 1. PENDING -->
+                                <button type="button" 
+                                        @if(!$isAlreadyRejected) @click="status = 'pending'" @endif
+                                        {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                        :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                        <span :class="status === 'pending' ? 'opacity-100 text-amber-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
                                     </div>
-                                </div>
-                            </button>
-
-                            <!-- 4. ACTIVE -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'active'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                    <span :class="status === 'active' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
-                                </div>
-                            </button>
-
-                            <!-- 5. COMPLETED -->
-                            @php
-                                $canComplete = $application->can_complete;
-                                $isCompleteDisabled = (!$canComplete && $currentStatusVal !== 'completed') || $isAlreadyRejected;
-
-                                $completedSubtitle = \App\Enums\ApplicationStatus::COMPLETED->description();
-                                if ($isAlreadyRejected) {
-                                    $completedSubtitle = 'Pengajuan Ditolak';
-                                } elseif ($isCompleteDisabled) {
-                                    $missingItems = [];
-                                    if (!$application->has_filled_logbook) {
-                                        $missingItems[] = 'Logbook';
-                                    }
-                                    if (!$application->has_approved_report) {
-                                        $missingItems[] = 'Laporan';
-                                    }
-                                    if (!$application->has_complete_evaluation) {
-                                        $missingItems[] = 'Nilai';
-                                    }
-
-                                    if (!empty($missingItems)) {
-                                        $completedSubtitle = implode(' & ', $missingItems) . ' Belum Lengkap';
-                                    } else {
-                                        $completedSubtitle = 'Syarat Belum Terpenuhi';
-                                    }
-                                }
-                            @endphp
-                            <button type="button" 
-                                    @if(!$isCompleteDisabled)
-                                        @click="status = 'completed'"
-                                    @endif
-                                    @if($isCompleteDisabled)
-                                        disabled
-                                        title="{{ $completedSubtitle }}"
-                                    @endif
-                                    :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                                    <span :class="status === 'completed' ? 'opacity-100 text-blue-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1">
-                                        <span>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
-                                        @if($isCompleteDisabled)
-                                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                        @endif
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::PENDING->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::PENDING->description() }}</div>
                                     </div>
-                                    <div class="text-[11px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
-                                        {{ $completedSubtitle }}
+                                </button>
+
+                                <!-- 2. WAITING_APPROVAL (Ajukan ACC ke Atasan) -->
+                                <button type="button" 
+                                        @if(!$isAlreadyRejected) @click="status = 'waiting_approval'" @endif
+                                        {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                        :class="status === 'waiting_approval' ? 'border-purple-500 bg-purple-50/70 ring-2 ring-purple-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-purple-200 hover:bg-purple-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                        <span :class="status === 'waiting_approval' ? 'opacity-100 text-purple-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
                                     </div>
-                                </div>
-                            </button>
-
-                            <!-- 6. REJECTED -->
-                            <button type="button" 
-                                    @if(!$isRejectDisabled) @click="status = 'rejected'" @endif
-                                    {{ $isRejectDisabled ? 'disabled title="Aksi penolakan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
-                                    :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : '{{ $isRejectDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                                    <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                        {{ $isRejectDisabled && $currentStatusVal !== 'rejected' ? 'Hanya dari PENDING atau VERIFIED' : \App\Enums\ApplicationStatus::REJECTED->description() }}
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->description() }}</div>
                                     </div>
-                                </div>
-                            </button>
+                                </button>
 
-                            <!-- 7. RESIGNED -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'resigned'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-                                    <span :class="status === 'resigned' ? 'opacity-100 text-slate-700' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::RESIGNED->description() }}</div>
-                                </div>
-                            </button>
+                                <!-- 3. ACCEPTED (Hanya bisa aktif setelah di-ACC oleh Atasan) -->
+                                @php
+                                    $acceptButtonDisabled = $isAlreadyRejected || $isAcceptLockedForStaff;
+                                    $acceptButtonTooltip = $isAlreadyRejected ? 'Pengajuan telah ditolak' : ($isAcceptLockedForStaff ? 'Persetujuan akhir (ACC) hanya dapat disahkan oleh Atasan (Supervisor) atau Super Admin.' : '');
+                                @endphp
+                                <button type="button" 
+                                        @if(!$acceptButtonDisabled) @click="status = 'accepted'" @endif
+                                        @if($acceptButtonDisabled) disabled title="{{ $acceptButtonTooltip }}" @endif
+                                        :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $acceptButtonDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                        <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1.5">
+                                            <span>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</span>
+                                            @if($isAcceptLockedForStaff)
+                                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Kunci ACC</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                            @if($isAcceptLockedForStaff)
+                                                Menunggu ACC Atasan Tim Kerja Umum
+                                            @elseif(!$isSupervisorOrSuperAdmin && $currentStatusVal === 'pending')
+                                                Usulkan pengesahan penerimaan ke Atasan
+                                            @else
+                                                {{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </button>
 
-                        </div>
+                                <!-- 4. REJECTED -->
+                                <button type="button" 
+                                        @if(!$isAlreadyRejected) @click="status = 'rejected'" @endif
+                                        {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                        :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                        <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::REJECTED->description() }}</div>
+                                    </div>
+                                </button>
+
+                            </div>
+                        @else
+                            {{-- FASE 2: MASA MAGANG BERJALAN (Tampilkan ACCEPTED, ACTIVE, COMPLETED, RESIGNED, REJECTED) --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                                
+                                <!-- 1. ACCEPTED -->
+                                <button type="button" 
+                                        @click="status = 'accepted'"
+                                        :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                        <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}</div>
+                                    </div>
+                                </button>
+
+                                <!-- 2. ACTIVE -->
+                                <button type="button" 
+                                        @click="status = 'active'"
+                                        :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                        <span :class="status === 'active' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
+                                    </div>
+                                </button>
+
+                                <!-- 3. COMPLETED -->
+                                @php
+                                    $isCompleteDisabled = (!$canComplete && $currentStatusVal !== 'completed');
+                                    $completedSubtitle = \App\Enums\ApplicationStatus::COMPLETED->description();
+                                    if ($isCompleteDisabled) {
+                                        $missingItems = [];
+                                        if (!$application->has_filled_logbook) {
+                                            $missingItems[] = 'Logbook';
+                                        }
+                                        if (!$application->has_approved_report) {
+                                            $missingItems[] = 'Laporan';
+                                        }
+                                        if (!$application->has_complete_evaluation) {
+                                            $missingItems[] = 'Nilai';
+                                        }
+
+                                        if (!empty($missingItems)) {
+                                            $completedSubtitle = implode(' & ', $missingItems) . ' Belum Lengkap';
+                                        } else {
+                                            $completedSubtitle = 'Syarat Belum Terpenuhi';
+                                        }
+                                    }
+                                @endphp
+                                <button type="button" 
+                                        @if(!$isCompleteDisabled) @click="status = 'completed'" @endif
+                                        @if($isCompleteDisabled) disabled title="{{ $completedSubtitle }}" @endif
+                                        :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                                        <span :class="status === 'completed' ? 'opacity-100 text-blue-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1">
+                                            <span>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
+                                            @if($isCompleteDisabled)
+                                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            @endif
+                                        </div>
+                                        <div class="text-[11px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
+                                            {{ $completedSubtitle }}
+                                        </div>
+                                    </div>
+                                </button>
+
+                                <!-- 4. RESIGNED -->
+                                <button type="button" 
+                                        @click="status = 'resigned'"
+                                        :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                                        <span :class="status === 'resigned' ? 'opacity-100 text-slate-700' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::RESIGNED->description() }}</div>
+                                    </div>
+                                </button>
+
+                                <!-- 5. REJECTED -->
+                                <button type="button" 
+                                        @click="status = 'rejected'"
+                                        :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                        <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::REJECTED->description() }}</div>
+                                    </div>
+                                </button>
+
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Container Khusus Jika Status = WAITING_APPROVAL / ACCEPTED / ACTIVE / COMPLETED -->
@@ -606,6 +637,20 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Surat Balasan</label>
                                 <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
+                                    class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
+                            </div>
+                        </div>
+
+                        <!-- Grid Tanggal Pelaksanaan Magang -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Mulai Magang</label>
+                                <input type="date" name="start_date" value="{{ old('start_date', optional($application->placement)->start_date ? \Carbon\Carbon::parse($application->placement->start_date)->format('Y-m-d') : ($application->start_date ? \Carbon\Carbon::parse($application->start_date)->format('Y-m-d') : '')) }}" 
+                                    class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Selesai Magang</label>
+                                <input type="date" name="end_date" value="{{ old('end_date', optional($application->placement)->end_date ? \Carbon\Carbon::parse($application->placement->end_date)->format('Y-m-d') : ($application->end_date ? \Carbon\Carbon::parse($application->end_date)->format('Y-m-d') : '')) }}" 
                                     class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
                             </div>
                         </div>

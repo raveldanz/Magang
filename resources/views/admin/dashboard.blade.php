@@ -271,7 +271,7 @@
                     </div>
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
                 </div>
-                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">PENDING dan VERIFIED</div>
+                <div class="text-[10px] text-slate-500 mt-2 leading-tight truncate">PENDING dan MENUNGGU ACC</div>
             </div>
 
             {{-- Diterima --}}

@@ -188,7 +188,7 @@ class ApplicationController extends Controller
         }
 
         $rules = [
-            'status' => 'required|in:pending,waiting_approval,accepted,active,completed,rejected,resigned',
+            'status' => 'required|in:pending,verified,waiting_approval,accepted,active,completed,rejected,resigned',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',
@@ -232,12 +232,12 @@ class ApplicationController extends Controller
 
         // Alur Double ACC: Jika Admin Dinas staf biasa menyetujui pengajuan awal (dari pending),
         // otomatis arahkan status ke waiting_approval (Menunggu ACC Atasan)
-        if (! $isSuperAdmin && ! $isSupervisor && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
+        if (! $isSuperAdmin && ! $isSupervisor && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'verified', 'waiting_approval'], true)) {
             $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
         }
 
         // Validasi State Ketat: keputusan terima/ajukan hanya dari tahap seleksi (PENDING atau WAITING_APPROVAL)
-        $decisionStatuses = ['pending', 'waiting_approval'];
+        $decisionStatuses = ['pending', 'verified', 'waiting_approval'];
         if (($newStatus === 'accepted' || $newStatus === 'waiting_approval') && ! in_array($oldStatus, [...$decisionStatuses, 'accepted', 'active'], true)) {
             return redirect()->back()
                 ->with('error', "Gagal memproses pengajuan: Aksi persetujuan hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'waiting_approval'. Status saat ini: '{$oldStatus}'.")

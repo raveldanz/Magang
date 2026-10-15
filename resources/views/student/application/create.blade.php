@@ -80,7 +80,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <span>
-                                    @if(in_array($actSt, ['pending', 'verified']))
+                                    @if(in_array($actSt, ['pending', 'waiting_approval']))
                                         Pengajuan Magang Sedang Diproses
                                     @elseif($actSt === 'accepted')
                                         Pengajuan Magang Anda Telah Diterima
@@ -96,7 +96,7 @@
                             </div>
                         </div>
                         <p class="text-xs leading-relaxed">
-                            @if(in_array($actSt, ['pending', 'verified']))
+                            @if(in_array($actSt, ['pending', 'waiting_approval']))
                                 Berkas pengajuan magang Anda di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}) saat ini sedang dalam tahap seleksi & verifikasi oleh Tim Admin Dinas. Anda belum dapat mengajukan magang baru sampai proses ini selesai.
                             @elseif(in_array($actSt, ['accepted', 'active']))
                                 Selamat! Anda telah resmi diterima magang di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}). Silakan fokus pada pelaksanaan kegiatan magang harian Anda.

@@ -53,7 +53,7 @@
                 </div>
 
             {{-- KONDISI 1: JIKA STATUS MASIH DALAM VERIFIKASI SELEKSI INSTANSI --}}
-            @elseif (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'VERIFIED']) || !$placement)
+            @elseif (in_array(strtoupper($lifecycle ?? ''), ['PENDING', 'WAITING_APPROVAL']) || !$placement)
                 
                 <!-- Status Banner Kuning / Amber -->
                 <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">

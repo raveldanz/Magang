@@ -19,7 +19,7 @@
     $code = strtolower($case?->value ?? $raw);
     $pill = "inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold tracking-wide rounded-full border whitespace-nowrap {$tone}";
 
-    $isSuccess = in_array($code, ['approved', 'active', 'accepted', 'completed', 'verified', 'resolved', 'closed'], true);
+    $isSuccess = in_array($code, ['approved', 'active', 'accepted', 'completed', 'resolved', 'closed'], true);
     $isDanger  = in_array($code, ['rejected', 'inactive'], true);
     $isWarning = in_array($code, ['pending', 'waiting', 'waiting_approval'], true);
     $isInfo    = in_array($code, ['revision', 'in_progress'], true);

@@ -24,7 +24,7 @@ class ApplicationStatusArchitectureTest extends TestCase
     public function test_application_status_enum_values_and_helpers()
     {
         $this->assertEquals('pending', ApplicationStatus::PENDING->value);
-        $this->assertEquals('verified', ApplicationStatus::VERIFIED->value);
+        $this->assertEquals('waiting_approval', ApplicationStatus::WAITING_APPROVAL->value);
         $this->assertEquals('accepted', ApplicationStatus::ACCEPTED->value);
         $this->assertEquals('active', ApplicationStatus::ACTIVE->value);
         $this->assertEquals('completed', ApplicationStatus::COMPLETED->value);
@@ -34,7 +34,7 @@ class ApplicationStatusArchitectureTest extends TestCase
         $this->assertTrue(ApplicationStatus::ACTIVE->isOngoing());
         $this->assertFalse(ApplicationStatus::PENDING->isOngoing());
         $this->assertTrue(ApplicationStatus::ACTIVE->canLogbook());
-        $this->assertFalse(ApplicationStatus::ACCEPTED->canLogbook());
+        $this->assertTrue(ApplicationStatus::ACCEPTED->canLogbook());
 
         $this->assertNotEmpty(ApplicationStatus::ACTIVE->label());
         $this->assertNotEmpty(ApplicationStatus::ACTIVE->badgeColor());
@@ -204,7 +204,7 @@ class ApplicationStatusArchitectureTest extends TestCase
         $app = Application::create([
             'user_id' => $student->id,
             'unit_id' => $unit->id,
-            'status' => ApplicationStatus::VERIFIED,
+            'status' => ApplicationStatus::WAITING_APPROVAL,
             'start_date' => Carbon::now(),
             'end_date' => Carbon::now()->addMonths(3),
         ]);
@@ -213,7 +213,7 @@ class ApplicationStatusArchitectureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('id="status-select"', false);
         $response->assertSee('value="pending"', false);
-        $response->assertSee('value="verified"', false);
+        $response->assertSee('value="waiting_approval"', false);
         $response->assertSee('value="accepted"', false);
         $response->assertSee('value="active"', false);
         $response->assertSee('value="completed"', false);

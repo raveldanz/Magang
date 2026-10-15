@@ -97,7 +97,7 @@ class AdminWorkflowSelectionTest extends TestCase
     }
 
     /**
-     * 2b. Alur resmi pending → verified → accepted: pengajuan VERIFIED dapat langsung diterima atau ditolak.
+     * 2b. Alur resmi pending → waiting_approval → accepted: pengajuan pending diusulkan dan disahkan atau ditolak.
      */
     public function test_admin_can_accept_or_reject_verified_application(): void
     {
@@ -105,14 +105,14 @@ class AdminWorkflowSelectionTest extends TestCase
         $mhsPending = User::where('email', 'mhs.qa.pending@test.local')->firstOrFail();
         $app = Application::where('user_id', $mhsPending->id)->firstOrFail();
 
-        $app->update(['status' => 'verified']);
+        $app->update(['status' => 'pending']);
         $this->actingAs($adminQa)->put(route('admin.applications.updateStatus', $app->id), [
             'status' => 'accepted',
             'letter_number' => '500.12.1/TEST-VER/2026',
             'letter_date' => now()->toDateString(),
         ])->assertSessionHas('success');
 
-        // Alur Double ACC: admin verifikasi mengarahkan ke waiting_approval
+        // Alur Double ACC: admin staf mengarahkan ke waiting_approval
         $this->assertEquals(ApplicationStatus::WAITING_APPROVAL, $app->fresh()->status);
 
         // Tahap 2: Supervisor mengesahkan
@@ -126,9 +126,9 @@ class AdminWorkflowSelectionTest extends TestCase
         $this->assertEquals(ApplicationStatus::ACCEPTED, $app->fresh()->status);
         $this->assertNotNull(Placement::where('application_id', $app->id)->first());
 
-        // Pengajuan kedua yang juga VERIFIED, langsung ditolak
+        // Pengajuan kedua yang masih pending, langsung ditolak
         $app = $app->replicate(['letter_number', 'letter_token']);
-        $app->status = 'verified';
+        $app->status = 'pending';
         $app->save();
         $this->actingAs($adminQa)->put(route('admin.applications.updateStatus', $app->id), [
             'status' => 'rejected',

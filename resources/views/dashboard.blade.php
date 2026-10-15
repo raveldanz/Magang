@@ -205,8 +205,6 @@
                                                     Silakan buat permohonan magang baru untuk melanjutkan program magang.
                                                 @elseif($rawSt === 'waiting_approval')
                                                     Berkas dan usulan penempatan Anda telah diverifikasi oleh Admin. Saat ini pengajuan Anda sedang dalam tahap pengesahan akhir (ACC) oleh Atasan (Tim Kerja Umum &amp; Kepegawaian Dispusip).
-                                                @elseif($rawSt === 'verified')
-                                                    Berkas Anda sudah lolos verifikasi. Menunggu keputusan penerimaan dari instansi dinas terkait.
                                                 @elseif(!in_array($rawSt, ['accepted', 'active', 'completed'], true))
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
                                                 @elseif($isPassed)
@@ -315,7 +313,7 @@
                                                 </span>
                                             @else
                                                 <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
-                                                    {{ $rawSt === 'verified' ? 'Menunggu Keputusan Dinas' : 'Menunggu Verifikasi Dinas' }}
+                                                    Menunggu Verifikasi Dinas
                                                 </span>
                                             @endif
                                         @else

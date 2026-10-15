@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-            @elseif (in_array($lifecycle, ['PENDING', 'SUBMITTED', 'VERIFIED', 'WAITING_APPROVAL']))
+            @elseif (in_array($lifecycle, ['PENDING', 'SUBMITTED', 'WAITING_APPROVAL']))
                 <div class="bg-amber-50 border-l-4 {{ $lifecycle === 'WAITING_APPROVAL' ? 'border-purple-500' : 'border-amber-400' }} p-6 rounded-2xl shadow-xs">
                     <div class="flex items-start justify-between flex-wrap gap-4">
                         <div class="flex items-start gap-3">

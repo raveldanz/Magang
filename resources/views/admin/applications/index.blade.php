@@ -227,7 +227,7 @@
                             @forelse ($applications as $app)
                                 <tr class="border-b hover:bg-gray-50/50">
                                     <td class="p-3 text-center">
-                                        @if(in_array($app->statusValue(), ['pending', 'verified']))
+                                        @if(in_array($app->statusValue(), ['pending', 'waiting_approval']))
                                             <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                         @endif
                                     </td>
@@ -320,7 +320,7 @@
                                 && $app->has_approved_report && $app->has_complete_evaluation && !$app->has_filled_logbook;
                         @endphp
                         <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 relative">
-                            @if(in_array($rawStatus, ['pending', 'verified']))
+                            @if(in_array($rawStatus, ['pending', 'waiting_approval']))
                                 <div class="absolute top-4 right-4 z-10">
                                     <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                 </div>
@@ -330,7 +330,7 @@
                                     <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
                                     <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">({{ $app->user?->studentProfile?->jurusan ?? '-' }})</span></p>
                                 </div>
-                                <div class="text-right shrink-0 {{ in_array($rawStatus, ['pending', 'verified']) ? 'pr-8' : '' }}">
+                                <div class="text-right shrink-0 {{ in_array($rawStatus, ['pending', 'waiting_approval']) ? 'pr-8' : '' }}">
                                     <x-status-badge :status="$app->status" />
                                     @if($app->isPastEndDate())
                                         <div class="mt-1 text-[10px] font-bold text-rose-700">Lewat {{ $app->daysPastEndDate() }} hari</div>

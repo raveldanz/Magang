@@ -18,13 +18,13 @@ use Tests\TestCase;
  */
 class StatusViewGuardTest extends TestCase
 {
-    private const CODES = 'PENDING|VERIFIED|WAITING APPROVAL|WAITING_APPROVAL|ACCEPTED|ACTIVE|COMPLETED|REJECTED|RESIGNED|APPROVED|REVISION|IN PROGRESS|RESOLVED|CLOSED';
+    private const CODES = 'PENDING|WAITING APPROVAL|WAITING_APPROVAL|ACCEPTED|ACTIVE|COMPLETED|REJECTED|RESIGNED|APPROVED|REVISION|IN PROGRESS|RESOLVED|CLOSED';
 
     private const LEGACY_NAMES = 'Aktif|Nonaktif|Non-Aktif|Cuti|Sedang Magang|Magang Aktif|Lulus|Lulus Magang|Diterima|Ditolak'
         .'|Disetujui|Menunggu Review|Menunggu Verifikasi|Lolos Berkas|Terverifikasi|Selesai Magang|Mengundurkan Diri'
         .'|Revisi|Pending|Approved|Rejected';
 
-    private const STATUS_VALUES = 'pending|verified|waiting_approval|accepted|active|completed|rejected|resigned|approved|revision|in_progress|resolved|closed|inactive';
+    private const STATUS_VALUES = 'pending|waiting_approval|accepted|active|completed|rejected|resigned|approved|revision|in_progress|resolved|closed|inactive';
 
     public function test_views_do_not_hardcode_status_names(): void
     {
