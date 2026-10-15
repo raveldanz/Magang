@@ -26,7 +26,10 @@ trait DisplaysStatusCode
             return null;
         }
 
-        return static::tryFrom(strtolower(trim($status)));
+        $raw = strtolower(trim($status));
+        $normalized = str_replace(' ', '_', $raw);
+
+        return static::tryFrom($raw) ?? static::tryFrom($normalized);
     }
 
     /**

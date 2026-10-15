@@ -19,6 +19,7 @@
                 @php
                     $user = Auth::user();
                     $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
+                    $isSupervisor = $user && ($user->role === 'supervisor' || ($user->isSupervisor() ?? false));
                     $isAdminDinas = $user && ($user->role === 'admin' && !is_null($user->agency_profile_id));
                     $isMahasiswa = $user && $user->role === 'mahasiswa';
                     $isDosen = $user && ($user->role === 'dosen' || $user->role === 'academic_advisor');
@@ -26,7 +27,9 @@
                     $isUniversitas = $user && $user->role === 'universitas';
 
                     $dashboardRoute = route('dashboard');
-                    if ($isSuperAdmin || $isAdminDinas) {
+                    if ($isSupervisor) {
+                        $dashboardRoute = route('supervisor.dashboard');
+                    } elseif ($isSuperAdmin || $isAdminDinas) {
                         $dashboardRoute = route('admin.dashboard');
                     } elseif ($isMentor) {
                         $dashboardRoute = route('mentor.dashboard');
@@ -141,6 +144,20 @@
                                 </a>
                             </div>
                         </div>
+
+                    @elseif ($isSupervisor)
+                        <a href="{{ route('supervisor.dashboard') }}" 
+                           class="transition py-1 {{ request()->routeIs('supervisor.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Monitoring Bidang & Kepegawaian
+                        </a>
+                        <a href="{{ route('supervisor.applications.index') }}" 
+                           class="transition py-1 {{ request()->routeIs('supervisor.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Persetujuan Pengajuan
+                        </a>
+                        <a href="{{ route('supervisor.certificates.index') }}" 
+                           class="transition py-1 {{ request()->routeIs('supervisor.certificates.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Pengesahan Sertifikat
+                        </a>
 
                     @elseif ($isAdminDinas)
                         <a href="{{ route('admin.dashboard') }}" 
@@ -396,6 +413,19 @@
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengaturan Akun
                             </a>
+                        @elseif ($isSupervisor)
+                            <a href="{{ route('supervisor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Monitoring Bidang & Kepegawaian
+                            </a>
+                            <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Persetujuan Pengajuan Magang
+                            </a>
+                            <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Pengesahan Sertifikat
+                            </a>
+                            <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Pengaturan Akun
+                            </a>
                         @elseif ($isAdminDinas)
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Dashboard
@@ -614,6 +644,29 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
                         <span>Mentor Lapangan</span>
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <span>Pengaturan Akun</span>
+                    </a>
+
+                @elseif ($isSupervisor)
+                    <a href="{{ route('supervisor.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <span>Monitoring Bidang & Kepegawaian</span>
+                    </a>
+                    <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <span>Persetujuan Pengajuan Magang</span>
+                    </a>
+                    <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/></svg>
+                        </div>
+                        <span>Pengesahan Sertifikat</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Pengaturan Akun</span>

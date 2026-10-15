@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-mobile-list-style />
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -30,6 +30,7 @@
                             $mScore = $mEval ? (float) $mEval->nilai_akhir : 0;
                             $mGrade = $mEval ? $mEval->grade_calculated : '-';
                             $mInitials = collect(explode(' ', trim(preg_replace('/\s*\([^)]*\)/', '', $app->user->name))))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
+                            $mCert = $app->placement?->certificate;
                         @endphp
                         <div class="mcard">
                             <div class="mcard-head">
@@ -45,10 +46,32 @@
                                     <span>{{ $mGrade !== '-' ? 'Grade ' . $mGrade : 'Nilai' }}</span>
                                 </div>
                             </div>
-                            <div class="mcard-body">
+                            <div class="mcard-body space-y-2">
                                 <div>
                                     <div class="mfield-label">Unit Tempat Magang</div>
                                     <div class="mfield-value">{{ $app->unit->name ?? '-' }}</div>
+                                </div>
+                                <div>
+                                    <div class="mfield-label">Status ACC Atasan</div>
+                                    <div class="mfield-value mt-1">
+                                        @if(!$mCert)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">
+                                                Belum Diterbitkan
+                                            </span>
+                                        @elseif($mCert->approval_status === 'approved')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                Disahkan (ACC)
+                                            </span>
+                                        @elseif($mCert->approval_status === 'revision')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                                Perlu Revisi
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                Menunggu ACC Atasan
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                             <div class="mcard-foot">
@@ -75,11 +98,17 @@
                                 <th class="py-3.5 px-4">Universitas / NIM</th>
                                 <th class="py-3.5 px-4">Unit Tempat Magang</th>
                                 <th class="py-3.5 px-4 text-center">Nilai Akhir</th>
+                                <th class="py-3.5 px-4 text-center">Status ACC Atasan</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($applications as $app)
+                                @php
+                                    $eval = $app->placement?->evaluation;
+                                    $rataRata = $eval ? (float) $eval->nilai_akhir : 0;
+                                    $cert = $app->placement?->certificate;
+                                @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
                                     <td class="py-4 px-4 font-bold text-gray-900 text-xs sm:text-sm">
                                         {{ $app->user->name }}
@@ -92,14 +121,28 @@
                                         {{ $app->unit->name ?? '-' }}
                                     </td>
                                     <td class="py-4 px-4 text-center">
-                                        @php
-                                            // Nilai akhir gabungan (dinas + DPL sesuai bobot kampus), sama dengan yang tercetak di sertifikat
-                                            $eval = $app->placement?->evaluation;
-                                            $rataRata = $eval ? (float) $eval->nilai_akhir : 0;
-                                        @endphp
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                                              {{ $rataRata > 0 ? $rataRata : '-' }}
                                         </span>
+                                    </td>
+                                    <td class="py-4 px-4 text-center">
+                                        @if(!$cert)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">
+                                                Belum Diterbitkan
+                                            </span>
+                                        @elseif($cert->approval_status === 'approved')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                Disahkan (ACC)
+                                            </span>
+                                        @elseif($cert->approval_status === 'revision')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200" title="{{ $cert->notes }}">
+                                                Perlu Revisi
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                                Menunggu ACC Atasan
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">

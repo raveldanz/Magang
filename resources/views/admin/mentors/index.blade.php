@@ -82,7 +82,7 @@
                             <tr>
                                 <th class="py-3.5 px-4 ">Nama Mentor</th>
                                 <th class="py-3.5 px-4 text-center">Email Resmi / Login</th>
-                                <th class="py-3.5 px-4 text-center">Instansi Dinas</th>
+                                <th class="py-3.5 px-4 text-center">Bidang Dispusip</th>
                                 <th class="py-3.5 px-4 text-center">Beban Bimbingan</th>
                                 <th class="py-3.5 px-4 text-center">Status</th>
                                 <th class="py-3.5 px-4 text-center">Aksi</th>
@@ -97,8 +97,10 @@
                                     <td class="py-4 px-4 font-mono text-gray-600">
                                         {{ $m->email }}
                                     </td>
-                                    <td class="py-4 px-4 text-gray-700">
-                                        {{ $m->agencyProfile?->agency_name ?? '-' }}
+                                    <td class="py-4 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                            {{ $m->unit?->name ?? 'Belum Ditentukan' }}
+                                        </span>
                                     </td>
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
@@ -201,11 +203,11 @@
                                 </div>
                             </div>
 
-                            <!-- Info Box: Instansi & Beban Bimbingan -->
+                            <!-- Info Box: Bidang Dispusip & Beban Bimbingan -->
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
                                 <div class="flex items-center justify-between gap-2">
-                                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Instansi Dinas:</span>
-                                    <span class="text-[11px] font-semibold text-slate-700 text-right truncate">{{ $m->agencyProfile?->agency_name ?? '-' }}</span>
+                                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Bidang Dispusip:</span>
+                                    <span class="text-[11px] font-semibold text-slate-700 text-right truncate">{{ $m->unit?->name ?? 'Belum Ditentukan' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Beban Bimbingan:</span>

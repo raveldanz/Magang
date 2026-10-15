@@ -54,7 +54,19 @@
                         <input type="email" name="email" value="{{ old('email', $mentor->email) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                     </div>
 
-                    @if($isSuperAdmin)
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Bidang Resmi Dispusip Tempat Bertugas <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="unit_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                            <option value="">-- Pilih Salah Satu dari 4 Bidang Resmi --</option>
+                            @foreach($units as $u)
+                                <option value="{{ $u->id }}" {{ old('unit_id', $mentor->unit_id) == $u->id ? 'selected' : '' }}>{{ $u->name }} (Kuota: {{ $u->quota }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    @if($isSuperAdmin && $agencies->count() > 1)
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Instansi Dinas <span class="text-rose-500">*</span>
@@ -64,9 +76,11 @@
                                 placeholder="-- Pilih Dinas --"
                                 :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
                                 :selected="old('agency_profile_id', $mentor->agency_profile_id)"
-                                :required="true"
+                                :required="false"
                             />
                         </div>
+                    @else
+                        <input type="hidden" name="agency_profile_id" value="{{ $mentor->agency_profile_id ?? ($currentAgency?->id ?? 1) }}">
                     @endif
 
                     <div>

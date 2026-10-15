@@ -92,7 +92,7 @@
                                     Selamat Datang, {{ Auth::user()->name }}!
                                 </h1>
                                 <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90 max-w-xl">
-                                    Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Pemerintah Kota Surabaya
+                                    Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Dinas Perpustakaan dan Kearsipan Kota Surabaya
                                 </p>
                             </div>
 
@@ -203,6 +203,8 @@
                                                 @elseif(in_array($rawSt, ['resigned', 'rejected'], true))
                                                     {{ $rawSt === 'rejected' ? 'Pengajuan magang Anda sebelumnya ditolak.' : 'Anda telah mengundurkan diri dari magang sebelumnya.' }}
                                                     Silakan buat permohonan magang baru untuk melanjutkan program magang.
+                                                @elseif($rawSt === 'waiting_approval')
+                                                    Berkas dan usulan penempatan Anda telah diverifikasi oleh Admin. Saat ini pengajuan Anda sedang dalam tahap pengesahan akhir (ACC) oleh Atasan (Tim Kerja Umum &amp; Kepegawaian Dispusip).
                                                 @elseif($rawSt === 'verified')
                                                     Berkas Anda sudah lolos verifikasi. Menunggu keputusan penerimaan dari instansi dinas terkait.
                                                 @elseif(!in_array($rawSt, ['accepted', 'active', 'completed'], true))
@@ -233,6 +235,10 @@
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
                                                     Daftar Magang
                                                 </a>
+                                            @elseif($rawSt === 'waiting_approval')
+                                                <span class="px-3 py-1 rounded-lg bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 inline-block">
+                                                    Menunggu ACC Atasan
+                                                </span>
                                             @elseif(!in_array($rawSt, ['accepted', 'active', 'completed']))
                                                 <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
                                                     Dalam Peninjauan
@@ -303,9 +309,15 @@
                                                 Buat Pengajuan Baru
                                             </a>
                                         @elseif($application)
-                                            <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
-                                                {{ $rawSt === 'verified' ? 'Menunggu Keputusan Dinas' : 'Menunggu Verifikasi Dinas' }}
-                                            </span>
+                                            @if($rawSt === 'waiting_approval')
+                                                <span class="px-2.5 py-1 rounded-md font-bold bg-purple-50 text-purple-700 border border-purple-200 inline-block">
+                                                    Menunggu ACC Atasan
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
+                                                    {{ $rawSt === 'verified' ? 'Menunggu Keputusan Dinas' : 'Menunggu Verifikasi Dinas' }}
+                                                </span>
+                                            @endif
                                         @else
                                             <a href="{{ route('student.application.create') }}"
                                                 class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
@@ -569,6 +581,8 @@
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
                                         <span>Daftar Magang Baru</span> &rarr;
                                     </a>
+                                @elseif ($rawAppSt === 'waiting_approval')
+                                    <span class="text-[11px] text-purple-700 font-semibold">Menunggu ACC Atasan</span>
                                 @else
                                     <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
                                 @endif

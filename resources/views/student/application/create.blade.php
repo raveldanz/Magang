@@ -125,7 +125,7 @@
                             })->values()->all();
 
                             $unitItems = $units->map(function ($u) {
-                                $agencyName = $u->agencyProfile->agency_name ?? 'Pemkot Surabaya';
+                                $agencyName = $u->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan (Dispusip)';
                                 $rem = $u->remaining_quota;
                                 return [
                                     'id' => $u->id,
@@ -166,14 +166,14 @@
                                 }
                             }
                         }" class="space-y-4">
-                            <!-- 1. Pemilihan Instansi Kedinasan (OPD Surabaya) -->
+                            <!-- 1. Pemilihan Instansi Kedinasan (Dispusip Surabaya) -->
                             <div>
                                 <x-searchable-select
                                     name="agency_profile_id"
                                     :items="$agencyItems"
                                     :selected="$selectedAgencyId"
-                                    label="1. Pilih Instansi Dinas / Badan Daerah (OPD Pemkot Surabaya)"
-                                    placeholder="-- Cari Instansi (Ketik nama, misal: Diskominfo, Bapenda, Dinkes) --"
+                                    label="1. Instansi Penempatan: Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya"
+                                    placeholder="-- Pilih Instansi Penempatan (Dispusip Surabaya) --"
                                     :required="true"
                                     :show-asterisk="false"
                                 />
@@ -182,15 +182,15 @@
                                 @enderror
                             </div>
 
-                            <!-- 2. Pemilihan Divisi / Unit Kerja Magang -->
+                            <!-- 2. Pemilihan Bidang Resmi Dispusip -->
                             <div>
                                 <x-searchable-select
                                     name="unit_id"
                                     :items="$unitItems"
                                     :selected="$selectedUnitId"
                                     parent-listener="update-units-list"
-                                    label="2. Pilih Bidang / Divisi Kerja Magang"
-                                    placeholder="-- Cari Divisi / Unit Kerja Magang --"
+                                    label="2. Pilih Salah Satu dari 4 Bidang Resmi Dispusip Surabaya"
+                                    placeholder="-- Pilih Bidang Resmi Dispusip Surabaya --"
                                     :required="true"
                                     :show-asterisk="false"
                                 />
@@ -201,7 +201,7 @@
                                     <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span>Pilihan bidang kerja akan otomatis disaring sesuai instansi dinas yang Anda pilih di atas.</span>
+                                    <span>Pilihan bidang kerja sesuai 4 bidang resmi Dispusip Kota Surabaya.</span>
                                 </p>
                             </div>
                         </div>

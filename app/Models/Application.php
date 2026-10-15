@@ -120,9 +120,18 @@ class Application extends Model
         $hasDosen = ($eval->nilai_dosen > 0 || $eval->nilai_akademik > 0 || ($eval->score_mastery > 0 && $eval->score_report > 0 && $eval->score_attitude > 0));
 
         $univ = $eval->getUniversity();
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-        if ($scheme === 'mentor_only') {
+        if (! $univ && $this->user) {
+            $univ = app(\App\Services\UniversityResolver::class)->forUser($this->user);
+        }
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+
+        if ($scheme === 'mentor_only' || $weightLecturer === 0) {
             return $hasMentor;
+        }
+        if ($weightMentor === 0) {
+            return $hasDosen;
         }
 
         return ($hasMentor && $hasDosen) || $eval->is_complete;
@@ -151,10 +160,11 @@ class Application extends Model
 
     /**
      * Certificate Gate: daftar syarat penerbitan E-Sertifikat yang BELUM terpenuhi (kosong = boleh terbit).
-     *  1. Evaluasi kinerja Mentor Lapangan lengkap (nilai disiplin, kinerja, laporan terisi).
-     *  2. Laporan akhir mahasiswa disetujui (status approved).
-     *  3. Mahasiswa telah mengisi logbook aktivitas magang.
-     *  4. Status magang sudah dinyatakan lulus (COMPLETED).
+     *  1. Evaluasi kinerja Mentor Lapangan lengkap (jika bobot mentor > 0).
+     *  2. Evaluasi akademik DPL Kampus lengkap (jika bobot DPL > 0).
+     *  3. Laporan akhir mahasiswa disetujui (status approved).
+     *  4. Mahasiswa telah mengisi logbook aktivitas magang.
+     *  5. Status magang sudah dinyatakan lulus (COMPLETED).
      *
      * @return array<int, string>
      */
@@ -164,13 +174,36 @@ class Application extends Model
         $eval = $placement?->evaluation;
         $blockers = [];
 
+        $univ = $eval ? $eval->getUniversity() : null;
+        if (! $univ && $this->user) {
+            $univ = app(\App\Services\UniversityResolver::class)->forUser($this->user);
+        }
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+
+        $mentorRequired = ($scheme !== 'mentor_only' ? ($weightMentor > 0) : true);
+        $lecturerRequired = ($scheme !== 'mentor_only' && $weightLecturer > 0);
+
         $mentorEvalComplete = $eval
             && (float) ($eval->nilai_disiplin ?? 0) > 0
             && (float) ($eval->nilai_kinerja ?? 0) > 0
             && (float) ($eval->nilai_laporan ?? 0) > 0;
 
-        if (! $mentorEvalComplete) {
+        $lecturerEvalComplete = $eval
+            && (
+                ((float) ($eval->score_mastery ?? 0) > 0 && (float) ($eval->score_report ?? 0) > 0 && (float) ($eval->score_attitude ?? 0) > 0)
+                || (float) ($eval->nilai_dosen_calculated ?? 0) > 0
+                || (float) ($eval->nilai_dosen ?? 0) > 0
+                || (float) ($eval->nilai_akademik ?? 0) > 0
+            );
+
+        if ($mentorRequired && ! $mentorEvalComplete) {
             $blockers[] = 'Nilai evaluasi kinerja dari Mentor Lapangan (dinas) belum lengkap.';
+        }
+
+        if ($lecturerRequired && ! $lecturerEvalComplete) {
+            $blockers[] = 'Nilai evaluasi akademik dari Dosen Pembimbing Lapangan (kampus) belum lengkap.';
         }
 
         if (! $this->has_approved_report) {
@@ -311,7 +344,7 @@ class Application extends Model
         $ongoing = in_array($status, ['accepted', 'active'], true);
 
         return match (true) {
-            in_array($status, ['pending', 'verified'], true) => 1,
+            in_array($status, ['pending', 'verified', 'waiting_approval'], true) => 1,
             $status === 'active' && $this->can_complete => 2,
             $ongoing && $this->missingSupervisor($requireAdvisor ?? $this->requiresAdvisor()) !== null => 3,
             $status === 'active' => 4,
@@ -389,8 +422,9 @@ class Application extends Model
     public static function actionPrioritySql(): string
     {
         $univField = fn (string $field) => "(SELECT un.{$field} FROM users u JOIN universities un ON un.id = u.university_id WHERE u.id = applications.user_id)";
-        $mentorOnly = "COALESCE({$univField('evaluation_scheme')}, 'dual_evaluation') = 'mentor_only'";
-        $requireDpl = "COALESCE({$univField('require_dpl')}, TRUE) = TRUE";
+        $mentorOnly = "(COALESCE({$univField('evaluation_scheme')}, 'mentor_only') = 'mentor_only' OR COALESCE({$univField('weight_lecturer')}, 0) = 0)";
+        $lecturerOnly = "(COALESCE({$univField('weight_mentor')}, 100) = 0 AND COALESCE({$univField('weight_lecturer')}, 0) > 0)";
+        $requireDpl = "(COALESCE({$univField('require_dpl')}, FALSE) = TRUE AND NOT ({$mentorOnly}))";
 
         $mentorSum = 'COALESCE(ev.nilai_disiplin, 0) + COALESCE(ev.nilai_kinerja, 0) + COALESCE(ev.nilai_laporan, 0)';
         $mentorAll = 'COALESCE(ev.nilai_disiplin, 0) > 0 AND COALESCE(ev.nilai_kinerja, 0) > 0 AND COALESCE(ev.nilai_laporan, 0) > 0';
@@ -401,7 +435,8 @@ class Application extends Model
             WHERE p.application_id = applications.id AND (
                 COALESCE(ev.final_score, 0) > 0
                 OR ({$mentorOnly} AND {$mentorAll})
-                OR (NOT ({$mentorOnly}) AND {$mentorSum} > 0 AND {$dosenAny})
+                OR ({$lecturerOnly} AND {$dosenAny})
+                OR (NOT ({$mentorOnly}) AND NOT ({$lecturerOnly}) AND {$mentorSum} > 0 AND {$dosenAny})
             ))";
         $reportApproved = "EXISTS (SELECT 1 FROM placements p JOIN final_reports fr ON fr.placement_id = p.id
             WHERE p.application_id = applications.id AND LOWER(fr.status) = 'approved')";
@@ -412,7 +447,7 @@ class Application extends Model
         $dosenMissing = 'EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id AND p.academic_advisor_id IS NULL)';
 
         return "(CASE
-            WHEN applications.status IN ('pending', 'verified') THEN 1
+            WHEN applications.status IN ('pending', 'verified', 'waiting_approval') THEN 1
             WHEN applications.status = 'active' AND {$reportApproved} AND {$evaluationComplete} AND {$logbookFilled} THEN 2
             WHEN applications.status IN ('accepted', 'active') AND ({$mentorMissing} OR ({$dosenMissing} AND {$requireDpl})) THEN 3
             WHEN applications.status = 'active' THEN 4

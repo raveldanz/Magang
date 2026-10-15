@@ -135,14 +135,15 @@ class CertificateController extends Controller
             abort(404, 'Data pengajuan magang / sertifikat tidak ditemukan.');
         }
 
-        // Otorisasi: Mahasiswa pemilik, DPL, Mentor, Admin Dinas, Super Admin, atau Universitas
+        // Otorisasi: Mahasiswa pemilik, DPL, Mentor, Admin Dinas, Super Admin, Supervisor, atau Universitas
         $isOwner = ($user && $user->id === $application->user_id);
         $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
+        $isSupervisor = ($user?->isSupervisor() ?? false);
         $isAgencyAdmin = ($user && $user->role === 'admin' && ($user->agency_profile_id === null || $user->agency_profile_id === $application->unit?->agency_profile_id));
         $isAdvisor = ($placement && ($placement->academic_advisor_id === $user?->id || $placement->mentor_id === $user?->id || $placement->pembimbing_id === $user?->id));
         $isUnivAdmin = ($user && $user->role === 'universitas' && ($user->university_id === $application->user?->university_id || $user->university_id === optional($application->user?->studentProfile)->university_id));
 
-        if (! $isOwner && ! $isSuperAdmin && ! $isAgencyAdmin && ! $isAdvisor && ! $isUnivAdmin) {
+        if (! $isOwner && ! $isSuperAdmin && ! $isSupervisor && ! $isAgencyAdmin && ! $isAdvisor && ! $isUnivAdmin) {
             abort(403, 'Akses Ditolak: Anda tidak berhak melihat atau mengunduh sertifikat ini.');
         }
 
@@ -152,7 +153,14 @@ class CertificateController extends Controller
             $application->setRelation('placement', $placement);
         }
         $blockers = $application->certificateBlockers();
-        if ($blockers !== []) {
+
+        // Cek pengesahan Atasan (Double ACC): Mahasiswa hanya bisa mengunduh jika sudah disahkan oleh supervisor/super_admin
+        $certRecord = \App\Models\Certificate::where('placement_id', $placement?->id)->first();
+        if ($isOwner && $certRecord && $certRecord->approval_status !== 'approved') {
+            $blockers[] = 'Sertifikat magang Anda telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+        }
+
+        if (! $isSupervisor && ! $isSuperAdmin && ! $isAgencyAdmin && $blockers !== []) {
             throw new HttpResponseException(response()->view('certificates.locked', [
                 'application' => $application,
                 'blockers' => $blockers,

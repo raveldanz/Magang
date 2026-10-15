@@ -355,6 +355,24 @@
                                 </div>
                             </button>
 
+                            <!-- 2B. WAITING_APPROVAL (Kirim ke Atasan / Double ACC) -->
+                            <button type="button" 
+                                    @if(!$isAcceptDisabled) @click="status = 'waiting_approval'" @endif
+                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
+                                    :class="status === 'waiting_approval' ? 'border-purple-500 bg-purple-50/70 ring-2 ring-purple-500/20 shadow-xs' : '{{ $isAcceptDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-purple-200 hover:bg-purple-50/20 cursor-pointer' }}'"
+                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                    <span :class="status === 'waiting_approval' ? 'opacity-100 text-purple-600' : 'opacity-0'" class="transition-opacity">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->description() }}</div>
+                                </div>
+                            </button>
+
                             <!-- 3. ACCEPTED -->
                             <button type="button" 
                                     @if(!$isAcceptDisabled) @click="status = 'accepted'" @endif
@@ -490,9 +508,9 @@
                         </div>
                     </div>
 
-                    <!-- Container Khusus Jika Status = ACCEPTED / ACTIVE / COMPLETED -->
+                    <!-- Container Khusus Jika Status = WAITING_APPROVAL / ACCEPTED / ACTIVE / COMPLETED -->
                     <div id="acceptance-box"
-                         x-show="status === 'accepted' || status === 'active' || status === 'completed'" 
+                         x-show="status === 'waiting_approval' || status === 'accepted' || status === 'active' || status === 'completed'" 
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
@@ -531,12 +549,14 @@
                             $selectedMentorId = old('mentor_id', optional($application->placement)->mentor_id ?? optional($application->placement)->pembimbing_id ?? '');
                             $selectedDosenId = old('academic_advisor_id', optional($application->placement)->academic_advisor_id ?? '');
 
-                            $mentorItems = $pembimbings->map(function ($m) {
+                            $mentorItems = $pembimbings->map(function ($m) use ($application) {
+                                $unitName = $m->unit?->name;
+                                $isSameUnit = ($application->unit_id && (int) $m->unit_id === (int) $application->unit_id);
                                 return [
                                     'id' => $m->id,
-                                    'name' => $m->name,
+                                    'name' => $m->name . ($unitName ? ' [' . $unitName . ']' : '') . ($isSameUnit ? ' ⭐ (Sesuai Bidang)' : ''),
                                     'acronym' => 'Mentor',
-                                    'meta' => $m->email . ($m->phone ? ' • ' . $m->phone : ''),
+                                    'meta' => ($unitName ? $unitName . ' • ' : '') . $m->email . ($m->phone ? ' • ' . $m->phone : ''),
                                 ];
                             })->values()->all();
 

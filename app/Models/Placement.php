@@ -56,6 +56,21 @@ class Placement extends Model
         return $this->belongsTo(Application::class);
     }
 
+    public function certificate()
+    {
+        return $this->hasOne(Certificate::class);
+    }
+
+    public function isCertificateApproved(): bool
+    {
+        $cert = $this->certificate;
+        if (! $cert) {
+            return false;
+        }
+
+        return $cert->approval_status === 'approved';
+    }
+
     /**
      * Apakah penempatan sudah memiliki mentor lapangan teknis (mentor_id / pembimbing_id legacy).
      */

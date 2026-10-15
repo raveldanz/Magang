@@ -87,7 +87,7 @@
                 <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs space-y-3">
                     <div class="border-b border-slate-100 pb-3">
                         <h3 class="font-bold text-sm text-slate-900 leading-tight">Penempatan Magang</h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Instansi Pemkot Surabaya</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Dispusip Surabaya</p>
                     </div>
 
                     <div class="space-y-1.5 text-xs">

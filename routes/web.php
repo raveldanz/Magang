@@ -170,6 +170,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/student.php';
 require __DIR__.'/admin.php';
+require __DIR__.'/supervisor.php';
 require __DIR__.'/mentor.php';
 require __DIR__.'/lecturer.php';
 require __DIR__.'/university.php';

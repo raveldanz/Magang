@@ -12,16 +12,14 @@
                         <span
                             class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold tracking-wider"
                             style="background-color: rgba(251, 191, 36, 0.2) !important; color: #fde047 !important; border: 1px solid rgba(251, 191, 36, 0.4) !important;">
-                            Administrator Utama
+                            Super Admin Dispusip &bull; Administrator Utama
                         </span>
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight"
                             style="color: #ffffff !important;">
-                            Pusat Kendali & Tata Kelola Eksekutif
+                            Pusat Kendali & Tata Kelola Dispusip Surabaya
                         </h1>
                         <p class="text-xs sm:text-sm leading-relaxed" style="color: #dbeafe !important;">
-                            Pantau ekosistem magang Pemkot Surabaya secara terpusat: kuota multi-instansi dinas, integrasi
-                            kemitraan perguruan tinggi, supervisi penilaian multi-role, dan jejak aktivitas audit sistem
-                            secara komprehensif.
+                            Pantau ekosistem magang Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya secara terpusat: kuota 4 bidang resmi, penugasan tim kerja pembimbing (mentor), integrasi kemitraan perguruan tinggi, supervisi penilaian multi-role, dan pengesahan sertifikat.
                         </p>
                     @else
                         <span
@@ -327,6 +325,107 @@
             </div>
         </div>
 
+        {{-- MATRIKS 4 BIDANG RESMI DISPUSIP (MONITORING TIM KERJA & BEBAN BIMBINGAN) --}}
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+                        <h2 class="text-base sm:text-lg font-black text-slate-900">
+                            Matriks 4 Bidang Resmi Dinas Perpustakaan dan Kearsipan (Dispusip)
+                        </h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Rekapitulasi pembimbing tim kerja (mentor), beban bimbingan aktif, alokasi kuota, dan status peserta magang.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('admin.units.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-white border border-slate-200 px-3.5 py-2 rounded-xl transition shadow-2xs">
+                        <span>Kelola 4 Bidang</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                            <th class="py-3.5 px-6">Nama Bidang & Kepala Bidang</th>
+                            <th class="py-3.5 px-6">Tim Kerja (Mentor & Beban Bimbingan)</th>
+                            <th class="py-3.5 px-4 text-center">Kuota Total</th>
+                            <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
+                            <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
+                            <th class="py-3.5 px-4 text-center">Menunggu ACC</th>
+                            <th class="py-3.5 px-4 text-center">Mhs Lulus</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($dispusipUnits ?? [] as $dUnit)
+                            @php
+                                $uActive = $dUnit->applications->whereIn('status', ['accepted', 'active'])->count();
+                                $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
+                                $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
+                                $uRemaining = max(0, $dUnit->quota - $uActive);
+                            @endphp
+                            <tr class="hover:bg-slate-50/70 transition">
+                                <td class="py-4 px-6">
+                                    <div class="font-bold text-slate-900 text-sm">{{ $dUnit->name }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5">
+                                        <span>Kepala:</span>
+                                        <span class="font-semibold text-slate-700">{{ $dUnit->headUser?->name ?? 'Belum Ditugaskan' }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    @if($dUnit->mentors && $dUnit->mentors->count() > 0)
+                                        <div class="flex flex-wrap gap-1.5">
+                                            @foreach($dUnit->mentors as $mentor)
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-medium border border-slate-200">
+                                                    <span>{{ $mentor->name }}</span>
+                                                    <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
+                                                        {{ $mentor->active_students_count ?? 0 }} mhs
+                                                    </span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-slate-400 italic">Belum ada mentor bertugas</span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-4 text-center font-bold text-slate-700">
+                                    <span class="px-2.5 py-1 rounded-lg bg-slate-100">{{ $dUnit->quota }}</span>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="px-2.5 py-1 rounded-lg font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        {{ $uActive }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-center font-bold {{ $uRemaining > 0 ? 'text-blue-600' : 'text-rose-600' }}">
+                                    {{ $uRemaining }}
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    @if($uWaiting > 0)
+                                        <span class="px-2.5 py-1 rounded-lg font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                            {{ $uWaiting }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400">0</span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-4 text-center font-bold text-slate-700">
+                                    {{ $uCompleted }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="py-8 text-center text-slate-400">Data 4 Bidang Dispusip belum dimuat.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         {{-- 3. DISTRIBUSI SEBARAN SESUAI SCOPE ROLE --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -338,7 +437,7 @@
                     <div class="min-w-0 flex-1">
                         @if($isSuperAdmin)
                             <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Penempatan Instansi Dinas</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di Dispusip Surabaya</p>
                         @else
                             <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Divisi & Unit Kerja Dinas</h3>
                             <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dinas' }}</p>

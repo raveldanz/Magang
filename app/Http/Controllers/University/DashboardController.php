@@ -86,7 +86,7 @@ class DashboardController extends Controller
         $totalActive = (clone $applicationsQuery)->where('status', 'active')->count();
         $totalAccepted = (clone $applicationsQuery)->whereIn('status', ['accepted', 'active', 'completed'])->count();
         $totalCompleted = (clone $applicationsQuery)->where('status', 'completed')->count();
-        $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'verified', 'waiting_approval'])->count();
         $totalResigned = (clone $applicationsQuery)->where('status', 'resigned')->count();
 
         // Sebaran Dinas / Instansi Penempatan

@@ -50,7 +50,14 @@ class Phase1OnboardingTest extends TestCase
 
         $this->agencyA = AgencyProfile::create(['agency_name' => 'Dinas A']);
         $this->agencyB = AgencyProfile::create(['agency_name' => 'Dinas B']);
-        $this->univ = University::create(['name' => 'Universitas Terdaftar', 'code' => 'UT']);
+        $this->univ = University::create([
+            'name' => 'Universitas Terdaftar',
+            'code' => 'UT',
+            'evaluation_scheme' => 'dual_evaluation',
+            'weight_mentor' => 50,
+            'weight_lecturer' => 50,
+            'require_dpl' => true,
+        ]);
 
         $this->superAdmin = User::factory()->create(['role' => 'super_admin']);
         $this->adminA = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $this->agencyA->id]);

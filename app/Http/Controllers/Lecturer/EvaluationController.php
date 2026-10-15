@@ -105,8 +105,10 @@ class EvaluationController extends Controller
                 $univ = University::find($u->university_id);
             }
         }
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-        $isMentorOnly = ($scheme === 'mentor_only');
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+        $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
 
         $rules = [
             'catatan_dosen' => 'nullable|string|max:1500',
@@ -137,10 +139,30 @@ class EvaluationController extends Controller
 
         $nilaiDosen = null;
         if (! $isMentorOnly) {
+            $custom = is_array($evaluation->custom_components) ? $evaluation->custom_components : [];
+            if ($request->has('custom_components') && is_array($request->custom_components)) {
+                $lecturerComps = [];
+                foreach ($request->custom_components as $comp) {
+                    if (!empty($comp['name'])) {
+                        $lecturerComps[] = [
+                            'name' => trim($comp['name']),
+                            'score' => isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null,
+                        ];
+                    }
+                }
+                if (!empty($lecturerComps)) {
+                    $custom['lecturer'] = $lecturerComps;
+                }
+            }
+            $evaluation->custom_components = !empty($custom) ? $custom : null;
+
             $mastery = (float) $request->score_mastery;
             $report = (float) $request->score_report;
             $attitude = (float) $request->score_attitude;
-            $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
+            
+            // Gunakan calculated score dari custom_components jika ada
+            $calcDosen = $evaluation->nilai_dosen_calculated;
+            $nilaiDosen = ($calcDosen > 0) ? $calcDosen : round(($mastery + $report + $attitude) / 3, 2);
 
             $evaluation->nilai_disiplin = $evaluation->nilai_disiplin ?? 0;
             $evaluation->nilai_kinerja = $evaluation->nilai_kinerja ?? 0;
@@ -154,17 +176,26 @@ class EvaluationController extends Controller
 
         // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
         $nilaiDinas = $evaluation->nilai_pembimbing ?? 0;
-        if ($nilaiDinas > 0) {
-            $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
-            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
-
-            if ($isMentorOnly) {
+        if ($isMentorOnly) {
+            if ($nilaiDinas > 0) {
                 $final = $nilaiDinas;
-            } else {
-                $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * ($nilaiDosen ?? 0)), 2);
+                $evaluation->final_score = $final;
+                $evaluation->grade = Grade::letter($final);
             }
-            $evaluation->final_score = $final;
-            $evaluation->grade = Grade::letter($final);
+        } elseif ($weightMentor === 0) {
+            // 100% Kampus / DPL
+            if ($nilaiDosen !== null) {
+                $final = $nilaiDosen;
+                $evaluation->final_score = $final;
+                $evaluation->grade = Grade::letter($final);
+            }
+        } else {
+            // Dual evaluation: kedua nilai wajib ada
+            if ($nilaiDinas > 0 && $nilaiDosen !== null) {
+                $final = round((($weightMentor / 100) * $nilaiDinas) + (($weightLecturer / 100) * $nilaiDosen), 2);
+                $evaluation->final_score = $final;
+                $evaluation->grade = Grade::letter($final);
+            }
         }
 
         $evaluation->save();
@@ -267,9 +298,9 @@ class EvaluationController extends Controller
             }
         }
 
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-        $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
-        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int)$univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 0;
 
         return view('lecturer.grade-sheet', compact(
             'placement',

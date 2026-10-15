@@ -75,6 +75,18 @@ class AdminWorkflowSelectionTest extends TestCase
         $response->assertRedirect(route('admin.applications.index'));
         $response->assertSessionHas('success');
 
+        // Alur Double ACC: persetujuan admin mengarahkan ke waiting_approval (Menunggu ACC Atasan)
+        $appPending->refresh();
+        $this->assertEquals(ApplicationStatus::WAITING_APPROVAL, $appPending->status);
+
+        // Tahap 2: Supervisor mengesahkan (ACC) dan menerbitkan surat balasan resmi
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $appPending->id), [
+            'letter_number' => '500.12.1/TEST-APP/2026',
+        ])->assertSessionHas('success');
+
         $appPending->refresh();
         $this->assertEquals(ApplicationStatus::ACCEPTED, $appPending->status);
         $this->assertEquals('500.12.1/TEST-APP/2026', $appPending->letter_number);
@@ -99,6 +111,18 @@ class AdminWorkflowSelectionTest extends TestCase
             'letter_number' => '500.12.1/TEST-VER/2026',
             'letter_date' => now()->toDateString(),
         ])->assertSessionHas('success');
+
+        // Alur Double ACC: admin verifikasi mengarahkan ke waiting_approval
+        $this->assertEquals(ApplicationStatus::WAITING_APPROVAL, $app->fresh()->status);
+
+        // Tahap 2: Supervisor mengesahkan
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $app->id), [
+            'letter_number' => '500.12.1/TEST-VER/2026',
+        ])->assertSessionHas('success');
+
         $this->assertEquals(ApplicationStatus::ACCEPTED, $app->fresh()->status);
         $this->assertNotNull(Placement::where('application_id', $app->id)->first());
 

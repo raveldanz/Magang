@@ -12,26 +12,118 @@ class Evaluation extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'custom_components' => 'array',
+    ];
+
     public function placement()
     {
         return $this->belongsTo(Placement::class);
     }
 
     /**
-     * Nilai Akhir Pembimbing Lapangan Dinas (Rata-rata 3 Aspek: Disiplin, Kinerja/Teknis, Laporan/Inisiatif)
+     * Mengambil daftar komponen penilaian Mentor Lapangan Dinas (dinamis atau fallback ke 3 kriteria standar).
+     * @return array<int, array{name: string, score: float|int|null}>
+     */
+    public function getMentorComponents(): array
+    {
+        $custom = $this->custom_components;
+        if (is_array($custom)) {
+            if (isset($custom['mentor']) && is_array($custom['mentor']) && ! empty($custom['mentor'])) {
+                return $custom['mentor'];
+            }
+            if (array_is_list($custom) && ! empty($custom) && ! isset($custom['lecturer'])) {
+                return $custom;
+            }
+        }
+
+        $univ = $this->getUniversity();
+
+        return [
+            [
+                'name' => $univ ? $univ->getDinasComponent(1) : \App\Models\University::DEFAULT_DINAS_COMPONENTS[1],
+                'score' => $this->nilai_disiplin !== null ? (float) $this->nilai_disiplin : null,
+            ],
+            [
+                'name' => $univ ? $univ->getDinasComponent(2) : \App\Models\University::DEFAULT_DINAS_COMPONENTS[2],
+                'score' => $this->nilai_kinerja !== null ? (float) $this->nilai_kinerja : null,
+            ],
+            [
+                'name' => $univ ? $univ->getDinasComponent(3) : \App\Models\University::DEFAULT_DINAS_COMPONENTS[3],
+                'score' => $this->nilai_laporan !== null ? (float) $this->nilai_laporan : null,
+            ],
+        ];
+    }
+
+    /**
+     * Mengambil daftar komponen penilaian Dosen Pembimbing Lapangan (dinamis atau fallback ke 3 kriteria standar).
+     * @return array<int, array{name: string, score: float|int|null}>
+     */
+    public function getLecturerComponents(): array
+    {
+        $custom = $this->custom_components;
+        if (is_array($custom) && isset($custom['lecturer']) && is_array($custom['lecturer']) && ! empty($custom['lecturer'])) {
+            return $custom['lecturer'];
+        }
+
+        $univ = $this->getUniversity();
+
+        return [
+            [
+                'name' => $univ ? $univ->getDplComponent(1) : \App\Models\University::DEFAULT_DPL_COMPONENTS[1],
+                'score' => $this->dosenAspectScore('score_mastery'),
+            ],
+            [
+                'name' => $univ ? $univ->getDplComponent(2) : \App\Models\University::DEFAULT_DPL_COMPONENTS[2],
+                'score' => $this->dosenAspectScore('score_report'),
+            ],
+            [
+                'name' => $univ ? $univ->getDplComponent(3) : \App\Models\University::DEFAULT_DPL_COMPONENTS[3],
+                'score' => $this->dosenAspectScore('score_attitude'),
+            ],
+        ];
+    }
+
+    /**
+     * Nilai Akhir Pembimbing Lapangan Dinas (Rata-rata aspek dinas dari custom_components atau 3 aspek standar)
      */
     public function getNilaiPembimbingAttribute()
     {
+        $custom = $this->custom_components;
+        $items = null;
+        if (is_array($custom)) {
+            if (isset($custom['mentor']) && is_array($custom['mentor']) && ! empty($custom['mentor'])) {
+                $items = $custom['mentor'];
+            } elseif (array_is_list($custom) && ! empty($custom) && ! isset($custom['lecturer'])) {
+                $items = $custom;
+            }
+        }
+
+        if ($items && count($items) > 0) {
+            $scores = array_filter(array_map(fn ($it) => isset($it['score']) && is_numeric($it['score']) ? (float) $it['score'] : null, $items), fn ($s) => $s !== null);
+            if (count($scores) > 0) {
+                return round(array_sum($scores) / count($scores), 2);
+            }
+        }
+
         $sum = ($this->nilai_disiplin ?? 0) + ($this->nilai_kinerja ?? 0) + ($this->nilai_laporan ?? 0);
 
         return $sum > 0 ? round($sum / 3, 2) : 0;
     }
 
     /**
-     * Nilai Akademik Dosen Pembimbing Lapangan (Rata-rata 3 Aspek: Mastery, Report, Attitude)
+     * Nilai Akademik Dosen Pembimbing Lapangan (Rata-rata aspek dosen dari custom_components atau 3 aspek standar)
      */
     public function getNilaiDosenCalculatedAttribute()
     {
+        $custom = $this->custom_components;
+        if (is_array($custom) && isset($custom['lecturer']) && is_array($custom['lecturer']) && ! empty($custom['lecturer'])) {
+            $scores = array_filter(array_map(fn ($it) => isset($it['score']) && is_numeric($it['score']) ? (float) $it['score'] : null, $custom['lecturer']), fn ($s) => $s !== null);
+            if (count($scores) > 0) {
+                return round(array_sum($scores) / count($scores), 2);
+            }
+        }
+
         if (isset($this->attributes['dosen_evaluation_score']) && (float) $this->attributes['dosen_evaluation_score'] > 0) {
             return (float) $this->attributes['dosen_evaluation_score'];
         }
@@ -119,7 +211,10 @@ class Evaluation extends Model
     public function getIsCompleteAttribute(): bool
     {
         $univ = $this->getUniversity();
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+
         $hasMentor = $this->nilai_pembimbing > 0;
         $hasDosen = $this->nilai_dosen_calculated > 0 || ($this->nilai_dosen ?? 0) > 0 || ($this->nilai_akademik ?? 0) > 0;
 
@@ -127,10 +222,17 @@ class Evaluation extends Model
             return true;
         }
 
-        if ($scheme === 'mentor_only') {
+        // 1. Skema 100% Dinas
+        if ($scheme === 'mentor_only' || $weightLecturer === 0) {
             return $hasMentor;
         }
 
+        // 2. Skema 100% Universitas / DPL
+        if ($weightMentor === 0) {
+            return $hasDosen;
+        }
+
+        // 3. Skema Kolaborasi Dua Pihak
         return $hasMentor && $hasDosen;
     }
 
@@ -143,9 +245,9 @@ class Evaluation extends Model
         $nilaiDosen = $this->nilai_dosen_calculated;
         $univ = $this->getUniversity();
 
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-        $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
-        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
 
         // 1. Jika terdapat final_score resmi yang tersimpan di DB
         if (isset($this->attributes['final_score']) && (float) $this->attributes['final_score'] > 0) {
@@ -153,11 +255,16 @@ class Evaluation extends Model
         }
 
         // 2. Skema Penilaian Penuh Dinas (100% Mentor)
-        if ($scheme === 'mentor_only') {
+        if ($scheme === 'mentor_only' || $weightLecturer === 0) {
             return (float) $nilaiDinas;
         }
 
-        // 3. Skema Penilaian Ganda (Dual Evaluation: Mentor + DPL)
+        // 3. Skema Penilaian Penuh Kampus (100% DPL)
+        if ($weightMentor === 0) {
+            return (float) $nilaiDosen;
+        }
+
+        // 4. Skema Penilaian Ganda (Dual Evaluation: Mentor + DPL)
         // Wajib lengkap keduanya agar menghasilkan nilai akhir sah
         if ($nilaiDinas > 0 && $nilaiDosen > 0) {
             return (float) round(($nilaiDinas * ($weightMentor / 100)) + ($nilaiDosen * ($weightLecturer / 100)), 2);

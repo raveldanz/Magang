@@ -307,6 +307,18 @@ class NotificationService
                         'action_label' => 'Pantau Status',
                         'is_action_required' => false,
                     ];
+                } elseif ($status === 'waiting_approval') {
+                    $actionable[] = [
+                        'id' => 'student_waiting_approval',
+                        'type' => 'warning',
+                        'category' => 'application',
+                        'title' => 'Pengajuan Magang Menunggu ACC Atasan Dispusip',
+                        'message' => 'Berkas dan pembimbing lapangan Anda telah diverifikasi oleh Admin Dinas dan saat ini sedang menunggu pengesahan akhir oleh Atasan (Tim Kerja Umum & Kepegawaian).',
+                        'time' => 'Menunggu ACC',
+                        'action_url' => route('dashboard'),
+                        'action_label' => 'Lihat Status',
+                        'is_action_required' => false,
+                    ];
                 } elseif (in_array($status, ['accepted', 'active'])) {
                     $placement = Placement::where('application_id', $latestApp->id)->first();
                     $requiresAdvisor = $latestApp->requiresAdvisor();
@@ -435,8 +447,54 @@ class NotificationService
                 ];
             }
         }
+        // 7. SUPERVISOR (ATASAN TIM KERJA UMUM & KEPEGAWAIAN DISPUSIP) NOTIFICATIONS
+        elseif ($role === 'supervisor') {
+            $waitingApps = Application::where('status', 'waiting_approval')->count();
+            if ($waitingApps > 0) {
+                $actionable[] = [
+                    'id' => 'supervisor_apps_waiting',
+                    'type' => 'urgent',
+                    'category' => 'application',
+                    'title' => "Terdapat {$waitingApps} Pengajuan Magang Menunggu ACC Atasan",
+                    'message' => 'Admin telah memverifikasi berkas mahasiswa dan menentukan pembimbing lapangan. Silakan periksa dan berikan pengesahan (Double ACC).',
+                    'time' => 'Menunggu ACC',
+                    'action_url' => route('supervisor.applications.index'),
+                    'action_label' => 'Periksa & Sahkan',
+                    'is_action_required' => true,
+                ];
+            }
 
-        // 7. DATABASE STORED NOTIFICATIONS
+            $waitingCerts = \App\Models\Certificate::where('approval_status', 'waiting_approval')->count();
+            if ($waitingCerts > 0) {
+                $actionable[] = [
+                    'id' => 'supervisor_certs_waiting',
+                    'type' => 'urgent',
+                    'category' => 'evaluation',
+                    'title' => "Terdapat {$waitingCerts} Sertifikat Kelulusan Menunggu Pengesahan",
+                    'message' => 'Peserta magang telah menuntaskan seluruh kewajiban dan evaluasi. Silakan periksa transkrip nilai dan sahkan e-sertifikat.',
+                    'time' => 'Menunggu pengesahan',
+                    'action_url' => route('supervisor.certificates.index'),
+                    'action_label' => 'Sahkan Sertifikat',
+                    'is_action_required' => true,
+                ];
+            }
+
+            if ($waitingApps === 0 && $waitingCerts === 0) {
+                $actionable[] = [
+                    'id' => 'supervisor_all_good',
+                    'type' => 'info',
+                    'category' => 'general',
+                    'title' => 'Seluruh Pengajuan & Sertifikat Telah Disahkan',
+                    'message' => 'Tidak ada pengajuan magang atau e-sertifikat yang tertunda saat ini. Anda dapat memantau sebaran pembimbing di menu Monitoring.',
+                    'time' => 'Terbarui',
+                    'action_url' => route('supervisor.dashboard'),
+                    'action_label' => 'Buka Monitoring',
+                    'is_action_required' => false,
+                ];
+            }
+        }
+
+        // 8. DATABASE STORED NOTIFICATIONS
         $dbNotifications = SystemNotification::forUser($user)->latest()->take(10)->get();
         foreach ($dbNotifications as $dn) {
             $actionable[] = [

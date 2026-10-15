@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class UniversityController extends Controller
 {
@@ -229,23 +230,29 @@ class UniversityController extends Controller
             'weight_mentor' => 'nullable|integer|min:0|max:100',
             'weight_lecturer' => 'nullable|integer|min:0|max:100',
             'require_dpl' => 'nullable',
+            'dinas_components' => 'nullable|array',
+            'dinas_components.*' => 'nullable|string|max:255',
+            'dpl_components' => 'nullable|array',
+            'dpl_components.*' => 'nullable|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
         ]);
 
-        $evaluationScheme = $request->input('evaluation_scheme', $univ->evaluation_scheme ?? 'dual_evaluation');
+        $evaluationScheme = $request->input('evaluation_scheme', $univ->evaluation_scheme ?? 'mentor_only');
         if ($evaluationScheme === 'mentor_only') {
             $weightMentor = 100;
             $weightLecturer = 0;
             $requireDpl = false;
         } else {
-            $weightMentor = (int) $request->input('weight_mentor', $univ->weight_mentor ?? 40);
-            $weightLecturer = (int) $request->input('weight_lecturer', $univ->weight_lecturer ?? 60);
+            $weightMentor = (int) $request->input('weight_mentor', $univ->weight_mentor ?? 100);
+            $weightLecturer = (int) $request->input('weight_lecturer', $univ->weight_lecturer ?? 0);
 
             if (($weightMentor + $weightLecturer) !== 100) {
-                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.');
+                throw ValidationException::withMessages([
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                ]);
             }
 
-            $requireDpl = $request->boolean('require_dpl', true);
+            $requireDpl = $request->boolean('require_dpl', $weightLecturer > 0);
         }
 
         $data = [
@@ -262,6 +269,28 @@ class UniversityController extends Controller
             'weight_lecturer' => $weightLecturer,
             'require_dpl' => $requireDpl,
         ];
+
+        if ($request->has('dinas_components')) {
+            $raw = (array) $request->input('dinas_components');
+            $isZeroIndexed = array_key_exists(0, $raw);
+            $dinasArray = [
+                1 => trim((string) ($isZeroIndexed ? ($raw[0] ?? '') : ($raw[1] ?? ''))) ?: null,
+                2 => trim((string) ($isZeroIndexed ? ($raw[1] ?? '') : ($raw[2] ?? ''))) ?: null,
+                3 => trim((string) ($isZeroIndexed ? ($raw[2] ?? '') : ($raw[3] ?? ''))) ?: null,
+            ];
+            $data['dinas_components'] = empty(array_filter($dinasArray)) ? null : $dinasArray;
+        }
+
+        if ($request->has('dpl_components')) {
+            $raw = (array) $request->input('dpl_components');
+            $isZeroIndexed = array_key_exists(0, $raw);
+            $dplArray = [
+                1 => trim((string) ($isZeroIndexed ? ($raw[0] ?? '') : ($raw[1] ?? ''))) ?: null,
+                2 => trim((string) ($isZeroIndexed ? ($raw[1] ?? '') : ($raw[2] ?? ''))) ?: null,
+                3 => trim((string) ($isZeroIndexed ? ($raw[2] ?? '') : ($raw[3] ?? ''))) ?: null,
+            ];
+            $data['dpl_components'] = empty(array_filter($dplArray)) ? null : $dplArray;
+        }
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');

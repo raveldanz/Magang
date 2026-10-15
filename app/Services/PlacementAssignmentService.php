@@ -102,6 +102,11 @@ class PlacementAssignmentService
             ]);
         }
 
+        // Jika mentor belum terikat unit/bidang dan pengajuan memiliki unit kerja, kaitkan secara otomatis
+        if (! $mentor->unit_id && $application->unit_id) {
+            $mentor->update(['unit_id' => $application->unit_id]);
+        }
+
         return $mentor;
     }
 

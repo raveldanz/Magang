@@ -15,7 +15,7 @@
                         <span class="text-slate-400">&bull;</span>
                         <span>{{ $selectedAgency->government_name ?? 'Pemerintah Kota Surabaya' }}</span>
                     @else
-                        <span>{{ Auth::user()->agencyProfile->agency_name ?? 'Super Administrator (Semua Instansi Pemkot Surabaya)' }}</span>
+                        <span>{{ Auth::user()->agencyProfile->agency_name ?? 'Super Admin Dispusip' }}</span>
                     @endif
                 </p>
             </div>
@@ -204,7 +204,7 @@
                                                 action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                 title: 'Hapus Divisi / Lowongan Magang',
                                                 name: '{{ addslashes($unit->name) }}',
-                                                desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
+                                                desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                             })"
                                             class="mbtn mbtn-danger">Hapus</button>
                                 </div>
@@ -335,7 +335,7 @@
                                                         action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                         title: 'Hapus Divisi / Lowongan Magang',
                                                         name: '{{ addslashes($unit->name) }}',
-                                                        desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dinas Pemkot') }} &bull; Kuota: {{ $unit->quota }}'
+                                                        desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                     })" 
                                                     class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
                                                     title="Hapus Divisi">

@@ -125,6 +125,7 @@
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Dinas / Super Admin</option>
+                        <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Atasan (Supervisor)</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
                         <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing</option>
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
@@ -240,6 +241,10 @@
                                         @elseif($u->role === 'admin')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                 Admin Dinas
+                                            </span>
+                                        @elseif($u->role === 'supervisor')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                                Atasan (Supervisor)
                                             </span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
@@ -419,6 +424,10 @@
                                             @elseif($u->role === 'admin')
                                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                     Admin Dinas
+                                                </span>
+                                            @elseif($u->role === 'supervisor')
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                                    Atasan (Supervisor)
                                                 </span>
                                             @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">

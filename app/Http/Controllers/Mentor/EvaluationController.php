@@ -80,21 +80,40 @@ class EvaluationController extends Controller
             'nilai_laporan.max' => 'Nilai maksimal adalah 100.',
         ]);
 
-        $evaluation = Evaluation::updateOrCreate(
-            ['placement_id' => $placement->id],
-            [
-                'nilai_disiplin' => $request->nilai_disiplin,
-                'nilai_kinerja' => $request->nilai_kinerja,
-                'nilai_laporan' => $request->nilai_laporan,
-                'catatan' => $request->catatan,
-            ]
-        );
+        $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
+        $custom = is_array($evaluation->custom_components) ? $evaluation->custom_components : [];
+
+        if ($request->has('custom_components') && is_array($request->custom_components)) {
+            $mentorComps = [];
+            foreach ($request->custom_components as $comp) {
+                if (!empty($comp['name'])) {
+                    $mentorComps[] = [
+                        'name' => trim($comp['name']),
+                        'score' => isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null,
+                    ];
+                }
+            }
+            if (!empty($mentorComps)) {
+                $custom['mentor'] = $mentorComps;
+            }
+        }
+
+        $evaluation->fill([
+            'nilai_disiplin' => $request->nilai_disiplin,
+            'nilai_kinerja' => $request->nilai_kinerja,
+            'nilai_laporan' => $request->nilai_laporan,
+            'catatan' => $request->catatan,
+            'custom_components' => !empty($custom) ? $custom : null,
+        ]);
+        $evaluation->save();
 
         // Cek skema kampus mahasiswa
         $univ = $evaluation->getUniversity();
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
 
-        if ($scheme === 'mentor_only') {
+        if ($scheme === 'mentor_only' || $weightLecturer === 0) {
             $finalScore = $evaluation->nilai_pembimbing;
             $grade = Grade::letter($finalScore);
 
@@ -106,11 +125,19 @@ class EvaluationController extends Controller
             // Cek kelengkapan evaluasi dan sinkronkan status COMPLETED
             $placement->syncCompletionStatus();
         } else {
-            // Skema Dual Evaluation: hitung ulang jika nilai dosen sudah ada
+            // Skema Dual Evaluation atau 100% Kampus
             $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
-            if ($dosenScore > 0) {
-                $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
-                $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
+            if ($weightMentor === 0) {
+                if ($dosenScore > 0) {
+                    $finalScore = $dosenScore;
+                    $grade = Grade::letter($finalScore);
+                    $evaluation->update([
+                        'final_score' => $finalScore,
+                        'grade' => $grade,
+                    ]);
+                    $placement->syncCompletionStatus();
+                }
+            } elseif ($dosenScore > 0) {
                 $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
                 $grade = Grade::letter($finalScore);
 

@@ -188,6 +188,11 @@ class Phase3SecurityDataIntegrityTest extends TestCase
         $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $app->id), [
             'status' => 'accepted', 'mentor_id' => $this->mentor->id, 'academic_advisor_id' => $this->dosenUnesa->id,
         ])->assertSessionHasNoErrors();
+        $this->assertSame('waiting_approval', $app->fresh()->statusValue());
+
+        $supervisor = User::factory()->create(['role' => 'supervisor']);
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $app->id))
+            ->assertSessionHas('success');
         $this->assertSame('accepted', $app->fresh()->statusValue());
     }
 

@@ -20,6 +20,17 @@ class Unit extends Model
         return $this->belongsTo(User::class, 'head_user_id');
     }
 
+    public function headUser()
+    {
+        return $this->belongsTo(User::class, 'head_user_id');
+    }
+
+    // Relasi: Anggota Tim Kerja / Mentor yang bertugas di Bidang ini
+    public function mentors()
+    {
+        return $this->hasMany(User::class, 'unit_id')->where('role', 'mentor');
+    }
+
     // Relasi: Satu Unit memiliki banyak pengajuan magang
     public function applications()
     {

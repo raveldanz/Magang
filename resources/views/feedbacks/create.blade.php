@@ -54,7 +54,7 @@
                                     Ditujukan Kepada <span class="text-rose-500">*</span>
                                 </label>
                                 <select name="target_role" x-model="targetRole" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
-                                    <option value="super_admin">Super Administrator (Pengelola Pusat Pemkot)</option>
+                                    <option value="super_admin">Super Admin Dispusip (Pengelola IT Sistem)</option>
                                     <option value="admin_dinas">Admin Instansi Kedinasan</option>
                                     <option value="universitas">Pihak Perguruan Tinggi (Universitas)</option>
                                 </select>
@@ -66,8 +66,8 @@
                             <!-- Case 1: Super Admin -->
                             <div x-show="targetRole === 'super_admin'" class="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center gap-3">
                                 <div>
-                                    <div class="text-xs font-bold text-blue-950">Pengelola Pusat (Super Admin)</div>
-                                    <div class="text-[11px] text-blue-700">Laporan ditangani langsung oleh Administrator Utama Pemkot Surabaya</div>
+                                    <div class="text-xs font-bold text-blue-950">Super Admin Dispusip</div>
+                                    <div class="text-[11px] text-blue-700">Laporan ditangani langsung oleh Super Admin Dispusip Surabaya</div>
                                 </div>
                             </div>
 

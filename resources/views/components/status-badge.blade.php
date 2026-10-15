@@ -21,7 +21,7 @@
 
     $isSuccess = in_array($code, ['approved', 'active', 'accepted', 'completed', 'verified', 'resolved', 'closed'], true);
     $isDanger  = in_array($code, ['rejected', 'inactive'], true);
-    $isWarning = in_array($code, ['pending', 'waiting'], true);
+    $isWarning = in_array($code, ['pending', 'waiting', 'waiting_approval'], true);
     $isInfo    = in_array($code, ['revision', 'in_progress'], true);
     $isNeutral = in_array($code, ['resigned', 'cancelled'], true);
 

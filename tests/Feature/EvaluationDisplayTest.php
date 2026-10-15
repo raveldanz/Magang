@@ -26,7 +26,15 @@ class EvaluationDisplayTest extends TestCase
     {
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Uji']);
         $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Unit Uji', 'quota' => 5]);
-        $student = User::factory()->create(['role' => 'mahasiswa', 'name' => 'Anisa Uji']);
+        $univ = \App\Models\University::create([
+            'name' => 'Unesa',
+            'code' => 'UNESA',
+            'evaluation_scheme' => 'dual_evaluation',
+            'weight_mentor' => 40,
+            'weight_lecturer' => 60,
+            'require_dpl' => true,
+        ]);
+        $student = User::factory()->create(['role' => 'mahasiswa', 'name' => 'Anisa Uji', 'university_id' => $univ->id]);
         $student->studentProfile()->create(['nim' => '22081010014', 'universitas' => 'Unesa', 'jurusan' => 'TI', 'phone' => '08']);
 
         $application = Application::create([

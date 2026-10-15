@@ -83,6 +83,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
 | **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
 | **LRN-073** | 2026-10-11 | Rekonsiliasi Merge Konflik Portal Dosen | Paritas tata letak, evaluasi komparatif, dan eliminasi form bimbingan obsolete | RESOLVED |
+| **LRN-074** | 2026-10-15 | Evaluasi Fleksibel, Kustomisasi Komponen & Sertifikat Dinamis | Default 100% Dinas, kustomisasi komponen per kampus, penyembunyian pihak 0% di sertifikat & penyesuaian huruf A/B | RESOLVED |
+| **LRN-075** | 2026-10-15 | Standarisasi Dispusip Single-Agency, 4 Bidang & Double ACC | Pembersihan ekosistem OPD non-Dispusip, relasi unit_id mentor, role supervisor (Atasan Kepegawaian), dan Double ACC pengajuan & sertifikat | RESOLVED |
 
 ---
 
@@ -1713,7 +1715,65 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Menjalankan seluruh test suite aplikasi (`php artisan test`): 275/276 passed (1 skipped), 1.885 assertions, Strict Exit Code 0.
 - **Prevention Rule**: Selalu periksa pembagian tab pada view sebelum menggabungkan form lama; form yang sudah dipindahkan ke tab khusus tidak boleh disisipkan kembali ke tab utama. Jalankan pembersihan cache dan verifikasi seluruh test suite sebelum menyimpulkan merge commit.
 
->>>>>>> origin/main
+---
+
+### [LRN-074] Fleksibilitas Skema Evaluasi (Default 100% Dinas), Kustomisasi Komponen Penilaian & Sertifikat Dinamis
+- **Tanggal**: 2026-10-15
+- **Komponen**: `database/migrations/2026_10_14_150000_add_evaluation_components_to_universities_table.php`, `App\Models\University`, `App\Models\Evaluation`, `App\Models\Application`, `App\Http\Controllers\University\ProfileController`, `App\Http\Controllers\Admin\UniversityController`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/university/profile/index.blade.php`, `resources/views/admin/universities/edit.blade.php`
+- **Problem / Symptom**:
+  1. Skema evaluasi universitas default-nya adalah "Kemitraan Terpadu (Dua Pihak)" (50:50 / 40:60) yang mewajibkan input nilai DPL, padahal instansi pemerintah mengutamakan penilaian mandiri dinas (100% Dinas).
+  2. Aspek/komponen penilaian kompetensi (3 aspek dinas & 3 aspek DPL) bersifat kaku (*hardcoded*) dan tidak dapat disesuaikan dengan kurikulum unik tiap perguruan tinggi.
+  3. Lembar sertifikat magang selalu menampilkan kedua bagian penilaian (Bagian A Dinas & Bagian B DPL) secara statis sehingga membingungkan mahasiswa/instansi ketika skema evaluasi kampus diatur 100% Dinas atau 100% DPL.
+- **Root Cause**:
+  1. Default kolom migrasi dan fallback accessor berakar pada `dual_evaluation` (`require_dpl = true`).
+  2. Ketiadaan kolom penyimpanan JSON untuk kustomisasi label aspek di tabel `universities`.
+  3. View sertifikat `internship_certificate.blade.php` tidak memiliki percabangan kondisional untuk menyembunyikan blok penilaian berbobot 0% serta re-lettering huruf kategori (A/B).
+- **Fix Applied**:
+  1. Membuat migrasi `2026_10_14_150000_add_evaluation_components_to_universities_table.php` untuk menambah kolom JSON `dinas_components` & `dpl_components` dan mengubah default kolom menjadi `mentor_only` (100% Dinas, 0% DPL, require_dpl = false).
+  2. Menambahkan array cast, konstanta default (`DEFAULT_DINAS_COMPONENTS`, `DEFAULT_DPL_COMPONENTS`), dan helper accessor di `University.php` dengan penanganan array 0-indexed dan 1-indexed.
+  3. Memperbarui formulir dan controller (`ProfileController` & `Admin\UniversityController`) untuk validasi bobot total 100% (menggunakan `ValidationException`) dan penyimpanan komponen kustom beserta fitur reset.
+  4. Memperbarui form penilaian Mentor dan Dosen (`score-form.blade.php`) agar merender label komponen dinamis kampus mahasiswa.
+  5. Memperbarui `internship_certificate.blade.php` agar:
+     - Menyembunyikan Bagian B (DPL) dan subtotalnya bila 100% Dinas.
+     - Menyembunyikan Bagian A (Dinas) dan subtotalnya serta memberi label huruf "A" pada DPL bila 100% DPL.
+     - Menampilkan kedua bagian (A & B) bila skema Dua Pihak, lengkap dengan perhitungan skor tertimbang yang presisi.
+  6. Menulis suite pengujian komprehensif `tests/Feature/EvaluationPolicyAndComponentsTest.php` dan memverifikasi seluruh test suite aplikasi lulus 100% (288 tests, 1.976 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  1. Dalam sistem penilaian multi-tenant, jangan meng-hardcode nama aspek penilaian di view atau controller. Gunakan helper accessor di Model dengan fallback default yang kuat.
+  2. Saat menangani input array dinamis dari form HTML vs payload JSON/API, perhitungkan kompatibilitas 0-indexed dan 1-indexed secara eksplisit menggunakan `array_key_exists(0, $arr)`.
+  3. Pastikan accessor kelengkapan evaluasi (`is_complete`), nilai akhir (`nilai_akhir`), dan penghalang sertifikat (`certificateBlockers`) selalu memeriksa skema dan bobot aktif (`weight_lecturer == 0` atau `weight_mentor == 0`) sehingga pihak dengan bobot 0% tidak memblokir penerbitan sertifikat.
+
+---
+
+### [LRN-075] Standarisasi Dispusip Single-Agency, 4 Bidang Resmi, Role Supervisor (Atasan Kepegawaian), dan Alur Double ACC
+- **Tanggal**: 2026-10-15
+- **Komponen**: `database/migrations/2026_10_15_100000_standardize_dispusip_supervisor_and_components.php`, `App\Models\User`, `App\Models\Unit`, `App\Models\Certificate`, `App\Models\Application`, `App\Enums\ApplicationStatus`, `App\Http\Controllers\Supervisor\*`, `App\Http\Controllers\Admin\ApplicationController`, `App\Http\Controllers\Admin\CertificateController`, `App\Http\Controllers\Student\CertificateController`, `resources/views/supervisor\*`, `resources/views/admin/dashboard.blade.php`, `database/seeders\*`
+- **Problem / Symptom**:
+  1. Sistem magang sebelumnya memuat referensi dan seeder berbagai OPD di luar Dinas Perpustakaan dan Kearsipan (Dispusip), serta label UI Super Admin masih mengindikasikan tingkat Pemkot secara generik.
+  2. Akun Mentor belum terikat secara formal pada salah satu bidang Dispusip, menyulitkan monitoring beban bimbingan per bidang.
+  3. Ketiadaan peran Atasan (Tim Kerja Umum & Kepegawaian) untuk alur persetujuan bertingkat (*Double ACC*) pada penerimaan pengajuan magang dan pengesahan sertifikat kelulusan.
+  4. Penambahan enum status `waiting_approval` memicu regresi pada assertion status huruf kapital dan spasi di `DisplaysStatusCode` trait dan `StatusViewGuardTest`.
+- **Root Cause**:
+  1. Multi-agency seeder lama (`DatabaseSeeder`, `SurabayaAgenciesSeeder`, `DemoE2ESeeder`) menginstansiasi OPD Dinkes, Kominfo, Dukcapil.
+  2. Skema tabel `users` belum memiliki foreign key `unit_id` bertipe nullable.
+  3. Alur persetujuan admin langsung mengaktifkan penempatan tanpa verifikasi pimpinan kepegawaian.
+  4. Label status dengan underscore (`waiting_approval`) dikonversi menjadi spasi oleh `DisplaysStatusCode::label()` (`WAITING APPROVAL`), sementara test membandingkan string mentah `strtoupper($case->value)` tanpa normalisasi.
+- **Fix Applied**:
+  1. Membuat migrasi `2026_10_15_100000_standardize_dispusip_supervisor_and_components.php` yang menambahkan kolom `users.unit_id`, `certificates.approval_status`, `certificates.approved_by`, `certificates.approved_at`, `certificates.notes`, dan mengunci 4 Bidang Resmi Dispusip:
+     - Bidang Sekretariat
+     - Bidang Pembinaan dan Pengelolaan Perpustakaan
+     - Bidang Pembinaan dan Layanan Kearsipan
+     - Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan
+  2. Mendaftarkan role `supervisor` dengan penamaan UI "Atasan (Tim Kerja Umum & Kepegawaian)", interface ramah senior (*Senior-Friendly*, kontras tinggi, navigasi 3 menu utama, bebas tombol destruktif/hapus master data).
+  3. Mengimplementasikan alur *Double ACC*:
+     - Pengajuan: Admin verifikasi berkas & pilih mentor -> status `waiting_approval` ("Menunggu ACC Atasan") -> Supervisor review -> ACC ("Setujui & Terbitkan Surat") -> status `accepted`/`active` & terbitkan surat; atau "Kembalikan ke Admin (Revisi)" beserta catatan.
+     - Sertifikat: Admin generate -> record `Certificate` berstatus `waiting_approval` -> Supervisor ACC -> status `approved`. Mahasiswa hanya dapat mengunduh sertifikat resmi setelah statusnya disahkan Atasan.
+  4. Menambahkan relasi `unit()` di `User.php`, `mentors()` di `Unit.php`, serta visualisasi matriks 4 Bidang di Dashboard Admin dan Dashboard Supervisor.
+  5. Menyempurnakan `DisplaysStatusCode::resolve()` agar mendukung input dengan spasi maupun underscore, serta menyelaraskan unit test end-to-end (288 tests, 1.992 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  1. Setiap penambahan status enum baru dengan karakter underscore (`_`) wajib diverifikasi pada `DisplaysStatusCode` dan didaftarkan pada regex `CODES` di `StatusViewGuardTest`.
+  2. Pada sistem kedinasan dengan alur persetujuan berjenjang (Double ACC), otorisasi penerbitan surat/sertifikat wajib mengunci status pengesahan dari Atasan sebelum diizinkan untuk diunduh oleh publik/mahasiswa.
+
 ---
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)

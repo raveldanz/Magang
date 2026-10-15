@@ -15,10 +15,10 @@
             Pendaftaran Akun Magang
         </h2>
         <p class="text-xs font-bold uppercase tracking-wider text-blue-700 mt-1">
-            Pemerintah Kota Surabaya
+            Dinas Perpustakaan dan Kearsipan Kota Surabaya
         </p>
         <p class="text-xs text-slate-500 mt-1">
-            Buat akun untuk mengajukan magang di instansi Pemkot Surabaya
+            Buat akun untuk mengajukan magang di Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya
         </p>
     </div>
 

@@ -150,7 +150,7 @@ class ApplicationController extends Controller
 
         // Dropdown 'Pilih Pembimbing Lapangan' HANYA memuat user role 'mentor' yang terdaftar di instansi yang bersangkutan
         $targetAgencyId = $application->unit?->agency_profile_id ?? $user?->agency_profile_id;
-        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing']);
+        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing'])->with('unit');
 
         if ($targetAgencyId !== null) {
             $pembimbingQuery->where('agency_profile_id', $targetAgencyId);
@@ -183,7 +183,7 @@ class ApplicationController extends Controller
         }
 
         $rules = [
-            'status' => 'required|in:pending,verified,accepted,active,completed,rejected,resigned',
+            'status' => 'required|in:pending,verified,waiting_approval,accepted,active,completed,rejected,resigned',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',
@@ -215,12 +215,18 @@ class ApplicationController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
         }
 
+        // Alur Double ACC: Jika Admin Dinas menyetujui pengajuan awal (dari pending/verified),
+        // arahkan status ke waiting_approval (Menunggu ACC Atasan)
+        if (! $isSuperAdmin && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'verified', 'waiting_approval'], true)) {
+            $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
+        }
+
         // Validasi State Ketat: keputusan terima/tolak hanya dari tahap seleksi (PENDING atau VERIFIED),
-        // sesuai alur resmi pending → verified → accepted.
-        $decisionStatuses = ['pending', 'verified'];
-        if ($newStatus === 'accepted' && ! in_array($oldStatus, [...$decisionStatuses, 'accepted'], true)) {
+        // sesuai alur resmi pending → verified → waiting_approval → accepted.
+        $decisionStatuses = ['pending', 'verified', 'waiting_approval'];
+        if (($newStatus === 'accepted' || $newStatus === 'waiting_approval') && ! in_array($oldStatus, [...$decisionStatuses, 'accepted'], true)) {
             return redirect()->back()
-                ->with('error', "Gagal menyetujui pengajuan: Aksi persetujuan (Approve) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->with('error', "Gagal memproses pengajuan: Aksi persetujuan hanya dapat dilakukan pada pengajuan yang berstatus 'pending', 'verified', atau 'waiting_approval'. Status saat ini: '{$oldStatus}'.")
                 ->withInput();
         }
 
@@ -294,7 +300,7 @@ class ApplicationController extends Controller
         $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
         $letterToken = $application->letter_token ?: Str::random(32);
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
-        $placementEligibleStatuses = ['accepted', 'active', 'completed'];
+        $placementEligibleStatuses = ['waiting_approval', 'accepted', 'active', 'completed'];
 
         DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses) {
             $application->update([

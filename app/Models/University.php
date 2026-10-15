@@ -30,6 +30,15 @@ class University extends Model
         'weight_mentor',
         'weight_lecturer',
         'require_dpl',
+        'dinas_components',
+        'dpl_components',
+    ];
+
+    protected $attributes = [
+        'evaluation_scheme' => 'mentor_only',
+        'weight_mentor' => 100,
+        'weight_lecturer' => 0,
+        'require_dpl' => false,
     ];
 
     protected $casts = [
@@ -37,7 +46,89 @@ class University extends Model
         'weight_lecturer' => 'integer',
         'require_dpl' => 'boolean',
         'is_verified' => 'boolean',
+        'dinas_components' => 'array',
+        'dpl_components' => 'array',
     ];
+
+    /** Default komponen penilaian dinas (1-3) */
+    public const DEFAULT_DINAS_COMPONENTS = [
+        1 => 'Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan',
+        2 => 'Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja',
+        3 => 'Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas',
+    ];
+
+    /** Default komponen penilaian DPL kampus (1-3) */
+    public const DEFAULT_DPL_COMPONENTS = [
+        1 => 'Penguasaan Materi, Teori Ilmiah, & Solusi Teknis Magang',
+        2 => 'Kualitas, Sistematika Penulisan, & Ketajaman Analisis Laporan Akhir',
+        3 => 'Sikap, Komunikasi, & Keaktifan Konsultasi Bimbingan',
+    ];
+
+    /**
+     * Mengambil array komponen penilaian dinas dengan fallback ke default.
+     * Mendukung jumlah komponen dinamis (bisa diedit, ditambah, atau dihapus).
+     * @return array<int, string>
+     */
+    public function getDinasComponents(): array
+    {
+        $saved = $this->dinas_components;
+        if (! is_array($saved) || empty($saved)) {
+            return self::DEFAULT_DINAS_COMPONENTS;
+        }
+
+        $clean = [];
+        $i = 1;
+        foreach ($saved as $k => $v) {
+            $name = is_array($v) ? ($v['name'] ?? '') : (string) $v;
+            $name = trim($name);
+            if ($name !== '') {
+                $clean[$i++] = $name;
+            }
+        }
+
+        return ! empty($clean) ? $clean : self::DEFAULT_DINAS_COMPONENTS;
+    }
+
+    /**
+     * Mengambil array komponen penilaian DPL dengan fallback ke default.
+     * Mendukung jumlah komponen dinamis (bisa diedit, ditambah, atau dihapus).
+     * @return array<int, string>
+     */
+    public function getDplComponents(): array
+    {
+        $saved = $this->dpl_components;
+        if (! is_array($saved) || empty($saved)) {
+            return self::DEFAULT_DPL_COMPONENTS;
+        }
+
+        $clean = [];
+        $i = 1;
+        foreach ($saved as $k => $v) {
+            $name = is_array($v) ? ($v['name'] ?? '') : (string) $v;
+            $name = trim($name);
+            if ($name !== '') {
+                $clean[$i++] = $name;
+            }
+        }
+
+        return ! empty($clean) ? $clean : self::DEFAULT_DPL_COMPONENTS;
+    }
+
+    /**
+     * Label komponen dinas per indeks (1, 2, atau 3).
+     */
+    public function getDinasComponent(int $index): string
+    {
+        return $this->getDinasComponents()[$index] ?? (self::DEFAULT_DINAS_COMPONENTS[$index] ?? '');
+    }
+
+    /**
+     * Label komponen DPL kampus per indeks (1, 2, atau 3).
+     */
+    public function getDplComponent(int $index): string
+    {
+        return $this->getDplComponents()[$index] ?? (self::DEFAULT_DPL_COMPONENTS[$index] ?? '');
+    }
 
     /** Label status verifikasi kampus (satu sumber teks untuk badge & pesan). */
     public const LABEL_VERIFIED = 'Terverifikasi';
@@ -51,15 +142,15 @@ class University extends Model
 
     /**
      * Menentukan apakah perguruan tinggi mewajibkan penetapan Dosen Pembimbing (DPL).
-     * Jika skema evaluasi 'mentor_only', DPL tidak diperlukan.
+     * Jika skema evaluasi 'mentor_only' atau bobot DPL 0%, DPL tidak diperlukan.
      */
     public function requiresAdvisor(): bool
     {
-        if ($this->evaluation_scheme === 'mentor_only') {
+        if ($this->evaluation_scheme === 'mentor_only' || (int) ($this->weight_lecturer ?? 0) === 0) {
             return false;
         }
 
-        return (bool) ($this->require_dpl ?? true);
+        return (bool) ($this->require_dpl ?? false);
     }
 
     protected static function booted(): void

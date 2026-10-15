@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>403 — Akses Ditolak | Portal Magang Pemkot Surabaya</title>
+    <title>403 — Akses Ditolak | SIM Magang Dispusip Surabaya</title>
     <!-- Favicon Resmi Pemerintah Kota Surabaya -->
     <!-- Favicon Resmi Pemerintah Kota Surabaya (Square Canvas Preserving Aspect Ratio) -->
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=2">

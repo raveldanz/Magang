@@ -184,6 +184,26 @@ class DashboardController extends Controller
             'pending_agencies_count' => $pendingAgencies->count(),
         ];
 
+        // Matriks 4 Bidang Resmi Dispusip (Monitoring Tim Kerja & Beban Bimbingan)
+        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
+            ?? AgencyProfile::first();
+
+        $dispusipUnits = Unit::with([
+            'headUser',
+            'mentors' => function ($q) {
+                $q->withCount([
+                    'mentorPlacements as active_students_count' => function ($pq) {
+                        $pq->whereHas('application', fn ($aq) => $aq->whereIn('status', ['accepted', 'active']));
+                    },
+                ]);
+            },
+            'applications' => function ($q) {
+                $q->select('id', 'unit_id', 'status');
+            },
+        ])
+            ->where('agency_profile_id', $dispusip?->id ?? 1)
+            ->get();
+
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
 
         return view('admin.dashboard', compact(
@@ -202,7 +222,9 @@ class DashboardController extends Controller
             'pendingUniversities',
             'pendingAgencies',
             'unverifiedUniversities',
-            'systemIssues'
+            'systemIssues',
+            'dispusip',
+            'dispusipUnits'
         ));
     }
 }

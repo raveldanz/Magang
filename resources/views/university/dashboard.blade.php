@@ -44,7 +44,7 @@
                     </div>
                     <h3 class="text-xl sm:text-2xl font-black">{{ $university->name ?? $user->name }}</h3>
                     <p class="text-blue-100 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                        Pemantauan partisipasi, distribusi penempatan dinas, dan evaluasi mahasiswa magang di Pemerintah Kota Surabaya.
+                        Pemantauan partisipasi, distribusi penempatan, dan evaluasi mahasiswa magang di Dinas Perpustakaan dan Kearsipan Kota Surabaya.
                     </p>
                 </div>
                 <div class="hidden sm:block text-right shrink-0">
@@ -75,9 +75,9 @@
                 </div>
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
                      style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Menunggu Seleksi</span>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Menunggu Seleksi / ACC</span>
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
-                    <div class="text-[11px] text-slate-500 mt-1">PENDING dan VERIFIED</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Verifikasi Admin &amp; ACC Atasan</div>
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-sm font-bold text-slate-800 leading-snug">Sebaran Penempatan Mahasiswa</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di Dispusip Surabaya</p>
                     </div>
                     @if($totalAgenciesCount > $activeAgenciesCount)
                         <button type="button" @click="showAll = !showAll"

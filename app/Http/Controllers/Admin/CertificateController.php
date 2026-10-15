@@ -61,6 +61,7 @@ class CertificateController extends Controller
     public function show($placementId)
     {
         $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        $data['certificateRecord'] = \App\Models\Certificate::where('placement_id', $placementId)->first();
 
         return view('certificates.internship_certificate', $data);
     }
@@ -68,8 +69,38 @@ class CertificateController extends Controller
     // Generate & Cetak E-Sertifikat
     public function generate($placementId)
     {
-        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        $placement = Placement::with(['application.user'])->findOrFail($placementId);
 
-        return view('certificates.internship_certificate', $data);
+        if (! $placement->application || ! $placement->application->isCertificateEligible()) {
+            abort(403, 'Sertifikat belum dapat diterbitkan karena syarat kelulusan belum terpenuhi.');
+        }
+
+        $user = Auth::user();
+
+        $year = date('Y');
+        $paddedId = str_pad($placement->id, 3, '0', STR_PAD_LEFT);
+        $certNumber = $placement->certificate_number ?: "SERT/{$paddedId}/DISPUSIP-SBY/{$year}";
+
+        if (empty($placement->certificate_number) || empty($placement->certificate_hash)) {
+            $placement->certificate_number = $certNumber;
+            $placement->certificate_hash = $placement->certificate_hash ?: \Illuminate\Support\Str::random(32);
+            $placement->save();
+        }
+
+        $certificate = \App\Models\Certificate::firstOrCreate(
+            ['placement_id' => $placement->id],
+            [
+                'certificate_number' => $certNumber,
+                'file_path' => 'certificates/' . str_replace('/', '_', $certNumber) . '.pdf',
+                'approval_status' => 'waiting_approval',
+                'issued_at' => now()->toDateString(),
+            ]
+        );
+
+        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, $user);
+        $data['certificateRecord'] = $certificate;
+
+        return view('certificates.internship_certificate', $data)
+            ->with('success', 'Sertifikat magang berhasil diterbitkan dan diteruskan ke Atasan (Tim Kerja Umum & Kepegawaian) untuk disahkan (ACC).');
     }
 }

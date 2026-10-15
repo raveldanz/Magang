@@ -39,7 +39,14 @@ class ActionPriorityDisplayTest extends TestCase
     {
         parent::setUp();
 
-        $this->univ = University::create(['name' => 'Universitas Uji', 'code' => 'UJI']);
+        $this->univ = University::create([
+            'name' => 'Universitas Uji',
+            'code' => 'UJI',
+            'evaluation_scheme' => 'dual_evaluation',
+            'weight_mentor' => 40,
+            'weight_lecturer' => 60,
+            'require_dpl' => true,
+        ]);
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Uji']);
         $this->unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Uji', 'quota' => 10]);
         $this->superAdmin = User::factory()->create(['role' => 'super_admin']);

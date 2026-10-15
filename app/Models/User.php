@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role', 'status', 'agency_profile_id', 'university', 'university_id', 'last_notification_read_at', 'phone'])]
+#[Fillable(['name', 'email', 'password', 'role', 'status', 'agency_profile_id', 'unit_id', 'university', 'university_id', 'last_notification_read_at', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -66,6 +66,14 @@ class User extends Authenticatable
             || ($this->role === 'admin' && is_null($this->agency_profile_id));
     }
 
+    /**
+     * Supervisor = Atasan (Tim Kerja Umum & Kepegawaian Dispusip).
+     */
+    public function isSupervisor(): bool
+    {
+        return $this->role === 'supervisor';
+    }
+
     public function studentProfile()
     {
         return $this->hasOne(StudentProfile::class);
@@ -74,6 +82,11 @@ class User extends Authenticatable
     public function agencyProfile()
     {
         return $this->belongsTo(AgencyProfile::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
     public function university()
