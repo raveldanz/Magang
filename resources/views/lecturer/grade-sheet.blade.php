@@ -205,9 +205,16 @@
 
         @php
             $nilaiDinas = $evaluation?->nilai_pembimbing ?? 0;
-            $aspectMastery = $evaluation?->dosenAspectScore('score_mastery') ?? 0;
-            $aspectReport = $evaluation?->dosenAspectScore('score_report') ?? 0;
-            $aspectAttitude = $evaluation?->dosenAspectScore('score_attitude') ?? 0;
+            $dosenAspects = $evaluation?->dosen_aspects_list ?? [];
+            if (empty($dosenAspects)) {
+                $dosenAspects = [
+                    ['name' => 'Penguasaan Materi & Pemecahan Masalah', 'score' => $evaluation?->dosenAspectScore('score_mastery') ?? 0],
+                    ['name' => 'Sistematika & Mutu Naskah Laporan Akhir', 'score' => $evaluation?->dosenAspectScore('score_report') ?? 0],
+                    ['name' => 'Sikap, Komunikasi, & Etika Akademik', 'score' => $evaluation?->dosenAspectScore('score_attitude') ?? 0],
+                ];
+            }
+            $totalDosenAspects = count($dosenAspects);
+            $mentorAspects = $evaluation?->mentor_aspects_list ?? [];
             $nilaiDosen = $evaluation?->nilai_dosen_calculated ?? 0;
             $finalScore = $evaluation?->nilai_akhir ?? 0;
             $grade = $evaluation?->grade_calculated ?? '-';
@@ -231,7 +238,13 @@
                     <td class="border border-slate-300 py-1.5 text-center font-bold">1</td>
                     <td class="border border-slate-300 py-1.5 px-3">
                         <span class="font-bold text-slate-900 block">Evaluasi Kinerja Teknis Lapangan</span>
-                        <span class="text-[11px] text-slate-500">Disiplin ({{ $evaluation?->nilai_disiplin ?? 0 }}), Kinerja ({{ $evaluation?->nilai_kinerja ?? 0 }}), Pelaporan Teknis ({{ $evaluation?->nilai_laporan ?? 0 }})</span>
+                        <span class="text-[11px] text-slate-500">
+                            @if (!empty($mentorAspects))
+                                {{ implode(', ', array_map(fn($a) => $a['name'] . ' (' . ($a['score'] ?? 0) . ')', $mentorAspects)) }}
+                            @else
+                                Disiplin ({{ $evaluation?->nilai_disiplin ?? 0 }}), Kinerja ({{ $evaluation?->nilai_kinerja ?? 0 }}), Pelaporan Teknis ({{ $evaluation?->nilai_laporan ?? 0 }})
+                            @endif
+                        </span>
                     </td>
                     <td class="border border-slate-300 py-1.5 text-center text-slate-700">Mentor Lapangan Dinas</td>
                     <td class="border border-slate-300 py-1.5 text-center font-semibold">{{ $weightMentor }}%</td>
@@ -241,31 +254,30 @@
                     </td>
                 </tr>
 
-                <!-- 2. Nilai Akademik (DPL) -->
-                <tr>
-                    <td class="border border-slate-300 py-1.5 text-center font-bold" rowspan="3">2</td>
-                    <td class="border border-slate-300 py-1.5 px-3">
-                        <span class="font-semibold text-slate-800">a. Penguasaan Materi & Pemecahan Masalah</span>
-                    </td>
-                    <td class="border border-slate-300 py-1.5 text-center text-slate-700" rowspan="3">Dosen Pembimbing (DPL)</td>
-                    <td class="border border-slate-300 py-1.5 text-center font-semibold" rowspan="3">{{ $weightLecturer }}%</td>
-                    <td class="border border-slate-300 py-1.5 text-center text-slate-800">{{ number_format($aspectMastery, 1) }}</td>
-                    <td class="border border-slate-300 py-1.5 text-center font-bold text-slate-900" rowspan="3">
-                        {{ number_format(($weightLecturer / 100) * $nilaiDosen, 2) }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-300 py-1.5 px-3">
-                        <span class="font-semibold text-slate-800">b. Sistematika & Mutu Naskah Laporan Akhir</span>
-                    </td>
-                    <td class="border border-slate-300 py-1.5 text-center text-slate-800">{{ number_format($aspectReport, 1) }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-300 py-1.5 px-3">
-                        <span class="font-semibold text-slate-800">c. Sikap, Komunikasi, & Etika Akademik</span>
-                    </td>
-                    <td class="border border-slate-300 py-1.5 text-center text-slate-800">{{ number_format($aspectAttitude, 1) }}</td>
-                </tr>
+                <!-- 2. Nilai Akademik (DPL) Dinamis Sesuai Aspek Kampus -->
+                @foreach ($dosenAspects as $idx => $aspect)
+                    @php
+                        $letterIndex = chr(97 + $idx); // a, b, c, d...
+                    @endphp
+                    <tr>
+                        @if ($idx === 0)
+                            <td class="border border-slate-300 py-1.5 text-center font-bold" rowspan="{{ $totalDosenAspects }}">2</td>
+                        @endif
+                        <td class="border border-slate-300 py-1.5 px-3">
+                            <span class="font-semibold text-slate-800">{{ $letterIndex }}. {{ $aspect['name'] }}</span>
+                        </td>
+                        @if ($idx === 0)
+                            <td class="border border-slate-300 py-1.5 text-center text-slate-700" rowspan="{{ $totalDosenAspects }}">Dosen Pembimbing (DPL)</td>
+                            <td class="border border-slate-300 py-1.5 text-center font-semibold" rowspan="{{ $totalDosenAspects }}">{{ $weightLecturer }}%</td>
+                        @endif
+                        <td class="border border-slate-300 py-1.5 text-center text-slate-800">{{ number_format((float)($aspect['score'] ?? 0), 1) }}</td>
+                        @if ($idx === 0)
+                            <td class="border border-slate-300 py-1.5 text-center font-bold text-slate-900" rowspan="{{ $totalDosenAspects }}">
+                                {{ number_format(($weightLecturer / 100) * $nilaiDosen, 2) }}
+                            </td>
+                        @endif
+                    </tr>
+                @endforeach
 
                 <!-- Rata-rata DPL -->
                 <tr class="bg-slate-50/75 font-semibold text-slate-800">
