@@ -1841,8 +1841,26 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
     2. `Evaluation.php`: Menyelaraskan accessor `nilai_pembimbing`, `nilai_dosen_calculated`, `getDosenAspectsListAttribute`, dan `getMentorAspectsListAttribute` sehingga mendukung aspek dinamis sekaligus komponen kustom kampus dan fallback kriteria default.
     3. `internship_certificate.blade.php`: Merapikan tabel transkrip sertifikat agar merender daftar aspek dinamis yang valid tanpa duplikasi header/subtotal.
     4. Menjalankan migrasi `2026_10_14_000001_add_custom_aspects_to_evaluations_table`, membersihkan cache (`optimize:clear`), memvalidasi seluruh test suite (Strict Exit Code 0), dan menyelesaikan merge commit.
+---
+
+### [LRN-080] Refaktorisasi Tampilan Minimalis Modern Kedinasan & Eliminasi Redundansi UI Dashboard Atasan / Admin
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/supervisor/dashboard.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/student/application/create.blade.php`, `resources/views/auth/register.blade.php`, `resources/views/admin/universities/partials/tab-policy.blade.php`
+- **Problem / Symptom**:
+  - Halaman Dashboard Atasan memiliki terlalu banyak variasi warna (ungu, hijau, amber, biru), card dengan ikon lingkaran dekoratif berlebih, subjudul redundan, badge atas ganda, serta panduan operasional "Double ACC" yang memakan ruang.
+  - Tabel matriks memuat kolom Tim Kerja pembimbing dan informasi "Kepala Bidang: Belum Ditugaskan" yang tidak esensial.
+  - Muncul penulisan singkatan berulang `(Dispusip)` pada nama instansi di beberapa view.
+  - Validasi arsitektur `StatusViewGuardTest` mendeteksi teks mentah `Aktif` dan `Lulus` pada grid mobile.
+- **Root Cause**:
+  - Desain antarmuka awal terlalu over-informative dan memakai skema multi-warna yang tidak seragam dengan estetika formal kedinasan Pemkot Surabaya.
+- **Fix Applied**:
+  1. Standardisasi card statistik utama ke gaya dinas minimalis modern: latar putih bersih (`bg-white border-slate-200 rounded-2xl`), teks tajam bernuansa slate, tanpa ikon dekoratif lingkaran tebal.
+  2. Menghapus teks deskripsi panjang ("Pemantauan beban pembimbing tim kerja..."), badge role redundan, panel operasional atasan, dan status sistem.
+  3. Menyederhanakan tabel: mengubah judul menjadi "Bidang Penempatan Magang", menghapus bullet biru, menghapus kolom mentor tim kerja, dan menghapus teks "Kepala Bidang: Belum Ditugaskan".
+  4. Menghilangkan seluruh kemunculan singkatan `(Dispusip)` di seluruh view publik, pendaftaran, dan dashboard.
+  5. Menyelaraskan teks grid ringkasan mobile ke `Mhs Aktif` dan `Mhs Lulus` sehingga 100% lulus `StatusViewGuardTest` dan lolos 292 pengujian PHPUnit (Strict Exit Code 0).
 - **Prevention Rule**:
-  - Setelah setiap proses `git merge`, selalu lakukan pemindaian grep untuk pola `<<<<<<<` di seluruh repositori dan jalankan `php artisan test` serta pre-commit sanity check sebelum menganggap merge selesai.
+  - Pertahankan filosofi antarmuka kedinasan: fokus pada esensi data operasional, minimalis, kontras tinggi, palet warna primer Pemkot (Slate/Navy & Blue), hindari elemen dekoratif non-fungsional, dan jangan menduplikasi singkatan instansi dalam kurung.
 
 ---
 

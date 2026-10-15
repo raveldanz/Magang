@@ -18,7 +18,7 @@
             Dinas Perpustakaan dan Kearsipan Kota Surabaya
         </p>
         <p class="text-xs text-slate-500 mt-1">
-            Buat akun untuk mengajukan magang di Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya
+            Buat akun untuk mengajukan magang di Dinas Perpustakaan dan Kearsipan Surabaya
         </p>
     </div>
 

@@ -125,7 +125,7 @@
                             })->values()->all();
 
                             $unitItems = $units->map(function ($u) {
-                                $agencyName = $u->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan (Dispusip)';
+                                $agencyName = $u->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
                                 $rem = $u->remaining_quota;
                                 return [
                                     'id' => $u->id,
@@ -166,14 +166,14 @@
                                 }
                             }
                         }" class="space-y-4">
-                            <!-- 1. Pemilihan Instansi Kedinasan (Dispusip Surabaya) -->
+                            <!-- 1. Pemilihan Instansi Kedinasan -->
                             <div>
                                 <x-searchable-select
                                     name="agency_profile_id"
                                     :items="$agencyItems"
                                     :selected="$selectedAgencyId"
-                                    label="1. Instansi Penempatan: Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya"
-                                    placeholder="-- Pilih Instansi Penempatan (Dispusip Surabaya) --"
+                                    label="1. Instansi Penempatan: Dinas Perpustakaan dan Kearsipan Surabaya"
+                                    placeholder="-- Pilih Instansi Penempatan: Dinas Perpustakaan dan Kearsipan Surabaya --"
                                     :required="true"
                                     :show-asterisk="false"
                                 />

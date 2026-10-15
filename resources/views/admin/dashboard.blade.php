@@ -19,7 +19,7 @@
                             Pusat Kendali & Tata Kelola Dispusip Surabaya
                         </h1>
                         <p class="text-xs sm:text-sm leading-relaxed" style="color: #dbeafe !important;">
-                            Pantau ekosistem magang Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya secara terpusat: kuota 4 bidang resmi, penugasan tim kerja pembimbing (mentor), integrasi kemitraan perguruan tinggi, supervisi penilaian multi-role, dan pengesahan sertifikat.
+                            Pantau ekosistem magang Dinas Perpustakaan dan Kearsipan Surabaya secara terpusat: alokasi kuota bidang, penugasan tim kerja pembimbing (mentor), integrasi kemitraan perguruan tinggi, supervisi penilaian multi-role, dan pengesahan sertifikat.
                         </p>
                     @else
                         <span
@@ -327,28 +327,20 @@
 
         {{-- MATRIKS 4 BIDANG RESMI DISPUSIP (MONITORING ALOKASI KUOTA & STATUS MAHASISWA) --}}
         <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <div class="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h2 class="text-base sm:text-lg font-black text-slate-900">
-                        Matriks 4 Bidang Resmi Dinas Perpustakaan dan Kearsipan (Dispusip)
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Rekapitulasi alokasi kuota, pimpinan bidang, dan status peserta magang.
-                    </p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.units.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-white border border-slate-200 px-3.5 py-2 rounded-xl transition shadow-2xs">
-                        <span>Kelola 4 Bidang</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                </div>
+            <div class="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-200">
+                <h2 class="text-base sm:text-lg font-black text-slate-900">
+                    Bidang Devisi Dinas Perpustakaan dan Kearsipan
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Rekapitulasi alokasi kuota dan status peserta magang per bidang / devisi. Klik nama bidang untuk melihat detail dashboard bidang.
+                </p>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-                            <th class="py-3.5 px-6">Nama Bidang & Kepala Bidang</th>
+                            <th class="py-3.5 px-6">Nama Bidang / Devisi</th>
                             <th class="py-3.5 px-4 text-center">Kuota Total</th>
                             <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
                             <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
@@ -366,11 +358,12 @@
                             @endphp
                             <tr class="hover:bg-slate-50/70 transition">
                                 <td class="py-4 px-6">
-                                    <div class="font-bold text-slate-900 text-sm">{{ $dUnit->name }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5">
-                                        <span>Kepala:</span>
-                                        <span class="font-semibold text-slate-700">{{ $dUnit->headUser?->name ?? 'Belum Ditugaskan' }}</span>
-                                    </div>
+                                    <a href="{{ route('admin.units.show', $dUnit->id) }}"
+                                       class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1.5 group"
+                                       title="Lihat Dashboard Bidang {{ $dUnit->name }}">
+                                        <span>{{ $dUnit->name }}</span>
+                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
                                 </td>
                                 <td class="py-4 px-4 text-center font-bold text-slate-700">
                                     <span class="px-2.5 py-1 rounded-lg bg-slate-100">{{ $dUnit->quota }}</span>
@@ -439,7 +432,10 @@
                         @endphp
                         <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
-                                <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $itemName }}</span>
+                                <a href="{{ isset($item['id']) ? route('admin.units.show', $item['id']) : '#' }}"
+                                   class="text-slate-700 font-medium truncate flex-1 min-w-0 hover:text-blue-600 transition">
+                                    {{ $itemName }}
+                                </a>
                                 <span class="text-blue-700 font-bold shrink-0">
                                     {{ $itemCount }} Mahasiswa
                                     @if($itemQuota > 0)

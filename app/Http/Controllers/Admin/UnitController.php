@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
+use App\Models\Application;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -127,11 +129,88 @@ class UnitController extends Controller
     }
 
     /**
-     * Tampilkan formulir edit divisi / unit magang
+     * Dashboard & Detail Unit / Bidang Kerja Magang
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return redirect()->route('admin.units.edit', $id);
+        $user = Auth::user();
+        $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
+
+        $unit = Unit::with(['agencyProfile', 'headUser', 'mentors'])->findOrFail($id);
+
+        if ($agencyId && $unit->agency_profile_id !== $agencyId) {
+            abort(403, 'Anda tidak memiliki hak akses untuk melihat unit instansi lain.');
+        }
+
+        // Query Pengajuan Mahasiswa di Bidang Ini
+        $applicationsQuery = Application::with([
+            'user.studentProfile',
+            'user.university',
+            'placement.mentor',
+        ])
+            ->where('unit_id', $unit->id);
+
+        if ($request->filled('search')) {
+            $search = strtolower(trim($request->search));
+            $applicationsQuery->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($uq) use ($search) {
+                    $uq->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                        ->orWhereHas('studentProfile', function ($sq) use ($search) {
+                            $sq->whereRaw('LOWER(nim) LIKE ?', ["%{$search}%"])
+                                ->orWhereRaw('LOWER(jurusan) LIKE ?', ["%{$search}%"]);
+                        })
+                        ->orWhereHas('university', function ($yq) use ($search) {
+                            $yq->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+                        });
+                });
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $applicationsQuery->where('status', $request->status);
+        }
+
+        $applications = $applicationsQuery->latest()->paginate(15)->withQueryString();
+
+        // Statistik Teragregasi Bidang (Single SQL query)
+        $statusCounts = Application::where('unit_id', $unit->id)
+            ->groupBy('status')
+            ->selectRaw('status, COUNT(*) as count')
+            ->pluck('count', 'status');
+
+        $waitingVal = ApplicationStatus::WAITING_APPROVAL->value;
+        $completedVal = ApplicationStatus::COMPLETED->value;
+        $rejectedVal = ApplicationStatus::REJECTED->value;
+
+        $totalActive = (int) ($statusCounts['accepted'] ?? 0) + (int) ($statusCounts['active'] ?? 0);
+        $totalWaiting = (int) ($statusCounts[$waitingVal] ?? 0) + (int) ($statusCounts['pending'] ?? 0);
+        $totalCompleted = (int) ($statusCounts[$completedVal] ?? 0);
+        $totalRejected = (int) ($statusCounts[$rejectedVal] ?? 0);
+        $totalQuota = (int) $unit->quota;
+        $remainingQuota = max(0, $totalQuota - $totalActive);
+        $occupancyRate = $totalQuota > 0 ? round(($totalActive / $totalQuota) * 100, 1) : 0;
+
+        $stats = [
+            'total_quota' => $totalQuota,
+            'active_students' => $totalActive,
+            'remaining_quota' => $remainingQuota,
+            'waiting_approval' => $totalWaiting,
+            'completed_students' => $totalCompleted,
+            'rejected_students' => $totalRejected,
+            'occupancy_rate' => $occupancyRate,
+            'total_applicants' => (int) $statusCounts->sum(),
+        ];
+
+        // Mentor Bertugas di Bidang Ini
+        $mentors = $unit->mentors()
+            ->withCount([
+                'mentorPlacements as active_students_count' => function ($pq) {
+                    $pq->whereHas('application', fn ($aq) => $aq->whereIn('status', ['accepted', 'active']));
+                },
+            ])
+            ->get();
+
+        return view('admin.units.show', compact('unit', 'applications', 'stats', 'mentors'));
     }
 
     public function edit(Request $request, $id)

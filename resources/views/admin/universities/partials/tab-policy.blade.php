@@ -31,7 +31,7 @@
                             </div>
                             <p class="text-xs text-slate-600 leading-relaxed">
                                 @if($university->evaluation_scheme === 'mentor_only')
-                                    Kampus menyerahkan sepenuhnya nilai evaluasi magang mahasiswa kepada Pembimbing Lapangan Dinas Perpustakaan dan Kearsipan (Dispusip) Surabaya. Nilai akhir diambil 100% dari nilai mentor lapangan.
+                                    Kampus menyerahkan sepenuhnya nilai evaluasi magang mahasiswa kepada Pembimbing Lapangan Dinas Perpustakaan dan Kearsipan Surabaya. Nilai akhir diambil 100% dari nilai mentor lapangan.
                                 @else
                                     Nilai akhir merupakan gabungan berbobot antara penilaian kinerja praktis oleh Pembimbing Lapangan Dispusip Surabaya dan evaluasi akademis oleh Dosen Pembimbing Lapangan.
                                 @endif
