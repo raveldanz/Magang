@@ -341,19 +341,17 @@
                                     Kebijakan kampus menerapkan 100% penilaian dari Mentor Lapangan.
                                 </p>
                             @else
-                                <div class="grid grid-cols-3 gap-2.5 text-center">
-                                    <div class="p-3 bg-white rounded-xl shadow-2xs">
-                                        <span class="text-[11px] text-slate-400 font-medium block">Materi</span>
-                                        <span class="text-base font-bold text-slate-900">{{ $eval?->score_mastery ?? '-' }}</span>
-                                    </div>
-                                    <div class="p-3 bg-white rounded-xl shadow-2xs">
-                                        <span class="text-[11px] text-slate-400 font-medium block">Laporan</span>
-                                        <span class="text-base font-bold text-slate-900">{{ $eval?->score_report ?? '-' }}</span>
-                                    </div>
-                                    <div class="p-3 bg-white rounded-xl shadow-2xs">
-                                        <span class="text-[11px] text-slate-400 font-medium block">Sikap</span>
-                                        <span class="text-base font-bold text-slate-900">{{ $eval?->score_attitude ?? '-' }}</span>
-                                    </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
+                                    @forelse ($eval?->dosen_aspects_list ?? [] as $dAspect)
+                                        <div class="p-2.5 bg-white rounded-xl shadow-2xs">
+                                            <span class="text-[11px] text-slate-500 font-medium block truncate" title="{{ $dAspect['name'] }}">{{ $dAspect['name'] }}</span>
+                                            <span class="text-base font-bold text-slate-900">{{ $dAspect['score'] ?? '-' }}</span>
+                                        </div>
+                                    @empty
+                                        <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-400 text-xs">
+                                            Belum ada nilai bimbingan akademik DPL.
+                                        </div>
+                                    @endforelse
                                 </div>
                                 <div class="text-xs text-slate-500 flex justify-between pt-1">
                                     <span>Bobot Kampus: {{ $univ->weight_lecturer ?? 40 }}%</span>
@@ -375,19 +373,17 @@
                                 @endif
                             </div>
 
-                            <div class="grid grid-cols-3 gap-2.5 text-center">
-                                <div class="p-3 bg-white rounded-xl shadow-2xs">
-                                    <span class="text-[11px] text-slate-400 font-medium block">Disiplin</span>
-                                    <span class="text-base font-bold text-slate-900">{{ $eval?->nilai_disiplin ?? '-' }}</span>
-                                </div>
-                                <div class="p-3 bg-white rounded-xl shadow-2xs">
-                                    <span class="text-[11px] text-slate-400 font-medium block">Kinerja</span>
-                                    <span class="text-base font-bold text-slate-900">{{ $eval?->nilai_kinerja ?? '-' }}</span>
-                                </div>
-                                <div class="p-3 bg-white rounded-xl shadow-2xs">
-                                    <span class="text-[11px] text-slate-400 font-medium block">Laporan</span>
-                                    <span class="text-base font-bold text-slate-900">{{ $eval?->nilai_laporan ?? '-' }}</span>
-                                </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
+                                @forelse ($eval?->mentor_aspects_list ?? [] as $mAspect)
+                                    <div class="p-2.5 bg-white rounded-xl shadow-2xs">
+                                        <span class="text-[11px] text-slate-500 font-medium block truncate" title="{{ $mAspect['name'] }}">{{ $mAspect['name'] }}</span>
+                                        <span class="text-base font-bold text-slate-900">{{ $mAspect['score'] ?? '-' }}</span>
+                                    </div>
+                                @empty
+                                    <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-400 text-xs">
+                                        Belum ada nilai mentor lapangan.
+                                    </div>
+                                @endforelse
                             </div>
 
                             <div class="text-xs text-slate-500 flex justify-between pt-1">

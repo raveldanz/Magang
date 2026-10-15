@@ -131,6 +131,7 @@
                                             <span class="text-slate-400 italic">Belum Ada</span>
                                         @endif
                                     </span>
+                                </div>
                                 <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
                                     <span class="text-slate-500 font-medium">Nilai Dosen:</span>
                                     @if ($isMentorOnly)
