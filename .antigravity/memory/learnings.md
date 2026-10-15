@@ -1827,6 +1827,23 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Menyelaraskan form Blade `score-form.blade.php` dan lembar cetak transkrip sertifikat `internship_certificate.blade.php`.
 - **Prevention Rule**: Selalu pertahankan backward-compatibility dan lakukan integrasi bertingkat: skema institusi (Universitas) sebagai template default, dan aspek dinamis (Form Input) sebagai kustomisasi level instansi/evaluator.
 
+### [LRN-079] Penanganan ParseError "<<" Akibat Konflik Git Merge Tak Terselesaikan
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Models/Application.php`, `app/Models/Evaluation.php`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/components/supervision/score-form.blade.php`
+- **Problem / Symptom**: 
+  - `ParseError: syntax error, unexpected token "<<" at app\Models\Application.php:177` saat mengakses URL `GET /admin/universities/4`.
+  - HTTP 500 Internal Server Error muncul saat browser memuat halaman admin universitas.
+- **Root Cause**:
+  - Operasi git merge antara `origin/main` (PR #99 yang menambahkan aspek penilaian dinamis `dosen_aspects` dan `mentor_aspects`) dan branch lokal `AlurPengajuan-Admin-Yasin` (yang memiliki fitur kebijakan evaluasi per universitas dan `custom_components`) menyisakan conflict marker `<<<<<<< HEAD` yang belum terselesaikan di dalam berkas kode.
+- **Fix Applied**:
+  - Menyelesaikan konflik secara komprehensif dengan memadukan kedua fitur:
+    1. `Application::certificateBlockers()`: Memadukan pengecekan bobot evaluasi kampus (apakah dinas/dosen berbobot > 0) dengan validasi aspek dinamis (`mentor_aspects_list` & `dosen_aspects_list`).
+    2. `Evaluation.php`: Menyelaraskan accessor `nilai_pembimbing`, `nilai_dosen_calculated`, `getDosenAspectsListAttribute`, dan `getMentorAspectsListAttribute` sehingga mendukung aspek dinamis sekaligus komponen kustom kampus dan fallback kriteria default.
+    3. `internship_certificate.blade.php`: Merapikan tabel transkrip sertifikat agar merender daftar aspek dinamis yang valid tanpa duplikasi header/subtotal.
+    4. Menjalankan migrasi `2026_10_14_000001_add_custom_aspects_to_evaluations_table`, membersihkan cache (`optimize:clear`), memvalidasi seluruh test suite (Strict Exit Code 0), dan menyelesaikan merge commit.
+- **Prevention Rule**:
+  - Setelah setiap proses `git merge`, selalu lakukan pemindaian grep untuk pola `<<<<<<<` di seluruh repositori dan jalankan `php artisan test` serta pre-commit sanity check sebelum menganggap merge selesai.
+
 ---
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
