@@ -46,13 +46,14 @@ const targetPath = getArg('--url', '/login');
 const baseUrl = targetPath.startsWith('http') ? targetPath : `http://127.0.0.1:8000${targetPath.startsWith('/') ? '' : '/'}${targetPath}`;
 const takeScreenshot = hasFlag('--screenshot') || true;
 const role = getArg('--role', null);
+const customEmail = getArg('--email', null);
 
 async function authenticateIfNeeded(page, targetRole) {
     if (!targetRole && !targetPath.startsWith('/admin')) {
         return;
     }
     const roleName = targetRole || 'admin';
-    const email = roleName === 'admin' ? 'admin.qa@test.local' : `${roleName}@test.local`;
+    const email = customEmail || (roleName === 'admin' ? 'admin@surabaya.go.id' : `${roleName}@test.local`);
     const password = 'password';
 
     console.log(`[YOLO] Otentikasi otomatis sebagai [${roleName}] (${email})...`);

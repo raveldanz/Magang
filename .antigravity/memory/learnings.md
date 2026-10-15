@@ -83,8 +83,12 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
 | **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
 | **LRN-073** | 2026-10-11 | Rekonsiliasi Merge Konflik Portal Dosen | Paritas tata letak, evaluasi komparatif, dan eliminasi form bimbingan obsolete | RESOLVED |
-| **LRN-074** | 2026-10-15 | Evaluasi Fleksibel, Kustomisasi Komponen & Sertifikat Dinamis | Default 100% Dinas, kustomisasi komponen per kampus, penyembunyian pihak 0% di sertifikat & penyesuaian huruf A/B | RESOLVED |
-| **LRN-075** | 2026-10-15 | Standarisasi Dispusip Single-Agency, 4 Bidang & Double ACC | Pembersihan ekosistem OPD non-Dispusip, relasi unit_id mentor, role supervisor (Atasan Kepegawaian), dan Double ACC pengajuan & sertifikat | RESOLVED |
+| **LRN-074** | 2026-10-14 | Pembersihan Massal Instansi Dinas Terpadu | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dispusip | RESOLVED |
+| **LRN-075** | 2026-10-14 | Evaluasi Adaptif Kampus: Aspek Penilaian Dinamis & Input Manual | Kriteria penilaian magang kaku 3 aspek tidak mencukupi disparitas standar rubrik antar-kampus | RESOLVED |
+| **LRN-076** | 2026-10-15 | Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop | Tag div unclosed di kartu mobile menyebabkan kontainer desktop tertelan masuk ke dalam blok sm:hidden | RESOLVED |
+| **LRN-077** | 2026-10-15 | Evaluasi Fleksibel, Kustomisasi Komponen & Sertifikat Dinamis | Default 100% Dinas, kustomisasi komponen per kampus, penyembunyian pihak 0% di sertifikat & penyesuaian huruf A/B | RESOLVED |
+| **LRN-078** | 2026-10-15 | Standarisasi Dispusip Single-Agency, 4 Bidang & Double ACC | Pembersihan ekosistem OPD non-Dispusip, relasi unit_id mentor, role supervisor (Atasan Kepegawaian), dan Double ACC pengajuan & sertifikat | RESOLVED |
+| **LRN-079** | 2026-10-15 | Integrasi & Harmonisasi Fitur Evaluasi Nilai | Penggabungan skema evaluasi kampus, komponen kustom universitas, dan input aspek dinamis Dosen/Mentor | RESOLVED |
 
 ---
 
@@ -1669,8 +1673,6 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-<<<<<<< HEAD
-=======
 ### [LRN-071] Penanganan Regresi Konflik Git Merge PR #92 & Pemulihan 22 Berkas Fitur Modern
 - **Tanggal**: 2026-10-12
 - **Komponen**: `routes/web.php`, `app/Http/Controllers/Admin/CertificateController.php`, Views (`dashboard.blade.php`, `admin/applications/`, `mentor/`, `lecturer/`, dll.)
@@ -1697,10 +1699,6 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Mengganti aset `public/images/logos/ui.png` dan `storage/app/public/images/logos/ui.png` dengan gambar PNG Makara UI resmi beresolusi tinggi (427x468 piksel) dengan latar belakang transparan penuh tanpa padding kosong berlebih (*tight bounding box*).
   2. Memverifikasi symlink dan keselarasan model `University::getLogoUrlAttribute()`.
   3. Menjalankan `php artisan optimize:clear && php artisan view:clear` dan memastikan 261/261 unit & feature test suite tetap lulus 100% (Strict Exit Code 0).
-- **Prevention Rule**: Seluruh aset gambar logo institusi (kampus dan dinas) wajib memiliki *tight bounding box* (proporsi gambar mengisi ruang kanvas tanpa margin transparan kosong berlebih). Hal ini untuk memastikan ketika logo dibatasi oleh dimensi styling Tailwind `w-9 h-9 object-contain` atau `h-12 w-auto`, lambang tetap tampil jelas, proporsional, dan tajam.
-
----
-
 ### [LRN-073] Rekonsiliasi Merge Konflik Portal Dosen (Paritas Tata Letak, Evaluasi Komparatif & Eliminasi Form Bimbingan Obsolete)
 - **Tanggal**: 2026-10-11
 - **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `tests/Feature/LecturerInnovationsTest.php`, `tests/Feature/LecturerFeaturesUpdateTest.php`
@@ -1713,11 +1711,52 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Menyelesaikan konflik pada `student-detail.blade.php` dengan mempertahankan kartu privat `advisor_notes` di Tab 1 serta membuang duplikasi form sesi bimbingan legacy karena seluruh fungsionalitas konsultasi bimbingan akademik telah aktif dan terpusat di Tab 4.
   3. Membersihkan seluruh cache bootstrap via `php artisan optimize:clear` dan `php artisan view:clear`.
   4. Menjalankan seluruh test suite aplikasi (`php artisan test`): 275/276 passed (1 skipped), 1.885 assertions, Strict Exit Code 0.
-- **Prevention Rule**: Selalu periksa pembagian tab pada view sebelum menggabungkan form lama; form yang sudah dipindahkan ke tab khusus tidak boleh disisipkan kembali ke tab utama. Jalankan pembersihan cache dan verifikasi seluruh test suite sebelum menyimpulkan merge commit.
 
 ---
 
-### [LRN-074] Fleksibilitas Skema Evaluasi (Default 100% Dinas), Kustomisasi Komponen Penilaian & Sertifikat Dinamis
+### [LRN-074] Pembersihan Massal Instansi Dinas Terpadu & Sinkronisasi Seeder (Dispusip Only)
+- **Tanggal**: 2026-10-14
+- **Komponen**: `database/seeders/SurabayaAgenciesSeeder.php`, `App\Models\AgencyProfile`, `App\Models\Unit`, `App\Models\User`
+- **Problem / Symptom**: Sistem memuat 23 master data OPD/instansi kedinasan Pemkot Surabaya, dan pengguna menghendaki seluruh instansi selain "Dinas Perpustakaan dan Kearsipan" dihapus secara permanen dari sistem dan seeder.
+- **Root Cause**: Kebutuhan penyederhanaan operasional pilot/khusus yang hanya berfokus pada ekosistem Dinas Perpustakaan dan Kearsipan.
+- **Fix Applied**: 
+  1. Menjalankan skrip transaksi database terisolasi untuk membersihkan 22 instansi selain Dinas Perpustakaan dan Kearsipan beserta dependensi kaskadenya (50 unit kerja, percakapan chat instansi/mentor, riwayat pengajuan, penempatan, evaluasi, dan akun personil admin/mentor kedinasan terkait) tanpa merusak integritas referensial.
+  2. Mempertahankan secara utuh data Dinas Perpustakaan dan Kearsipan (ID: 2) beserta 3 bidang kerja (Pelayanan & Otomasi Perpustakaan Digital, Preservasi Arsip, Minat Baca) dan seluruh akun personilnya (admin & 3 mentor).
+  3. Memperbarui `database/seeders/SurabayaAgenciesSeeder.php` agar hanya mendefinisikan Dinas Perpustakaan dan Kearsipan sehingga aman dari polusi data saat re-seeding.
+  4. Membersihkan cache aplikasi dan memvalidasi test suite hingga seluruh 281/281 test suite passed (100% Strict Exit Code 0).
+- **Prevention Rule**: Operasi penghapusan massal instansi induk wajib mematuhi pembersihan kaskade bertahap (chat -> child placements -> applications -> units -> agency staff -> agency profile) di dalam transaksi database atomik guna mencegah foreign key constraint violation pada PostgreSQL.
+
+---
+
+### [LRN-075] Evaluasi Adaptif Kampus: Aspek Penilaian Dinamis & Input Manual (Dynamic Rubric Attributes)
+- **Tanggal**: 2026-10-14
+- **Komponen**: `database/migrations/2026_10_14_000001_add_custom_aspects_to_evaluations_table.php`, `app/Models/Evaluation.php`, `app/Models/Application.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`, `app/Http/Controllers/Mentor/EvaluationController.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `resources/views/mentor/student-detail.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `tests/Feature/DynamicEvaluationAspectsTest.php`
+- **Problem / Symptom**: Sistem penilaian evaluasi magang sebelumnya mengunci kriteria hanya pada 3 aspek baku (DPL: Mastery, Report, Attitude; Mentor: Disiplin, Kinerja, Laporan). Setiap universitas mitra memiliki standar Capaian Pembelajaran Lulusan (CPL), bobot, dan nama rubrik penilaian magang yang berbeda-beda (misal: penambahan aspek Ujian Sidang Presentasi, Relevansi CPL, Inovasi Industri, atau Portofolio Teknis). Dokumen resmi akhir yang diterbitkan adalah E-Sertifikat (khususnya Halaman 2: Lampiran Transkrip Rincian Nilai Kompetensi Magang), namun tabel transkrip sertifikat sebelumnya masih berstatus hardcoded sehingga nama dan nilai aspek kustom tidak tercetak.
+- **Root Cause**: Kolom nilai pada tabel `evaluations` dirancang dengan skema statis (`score_mastery`, `score_report`, dll.), formulir penilaian belum menyediakan repeater dinamis, dan berkas Blade `internship_certificate.blade.php` masih memanggil atribut legacy secara hardcoded tanpa membaca skema JSON aspek dinamis.
+- **Fix Applied**:
+  1. Menambahkan kolom JSON `dosen_aspects` dan `mentor_aspects` pada tabel `evaluations` dengan migrasi baru tanpa merusak data lama.
+  2. Memperbarui model `Evaluation.php` dengan accessor `dosen_aspects_list`, `mentor_aspects_list`, serta kalkulasi nilai rata-rata dinamis berbasis jumlah aspek yang aktif, dengan fallback otomatis ke kolom legacy.
+  3. Mengembangkan formulir penilaian modern interaktif pada `score-form.blade.php` berbasis Alpine.js: evaluator dapat mengetik nama aspek secara manual, menambah baris aspek baru (`+ Tambah Aspek`), menghapus aspek yang tidak relevan, serta memanfaatkan *Quick Preset Chips* rekomendasi rubrik kampus.
+  4. Memperbarui `EvaluationController` pada role Dosen dan Mentor untuk memvalidasi dan menyimpan struktur `aspects` dinamis sekaligus menyinkronkan kolom legacy demi kompatibilitas pelaporan publik.
+  5. Memperbarui `resources/views/certificates/internship_certificate.blade.php` (Halaman 2: Lampiran Transkrip Nilai Kompetensi) agar secara dinamis menyusun baris tabel penilaian (Bagian A: Pembimbing Lapangan Dinas, Bagian B: Akademik DPL) mengikuti seluruh aspek kustom yang diinputkan evaluator, dengan fallback rapi ke format 3 kriteria standar jika aspek kustom belum diatur.
+  6. Memperbarui `certificateBlockers()` pada `app/Models/Application.php` agar mengenali kelengkapan nilai mentor berbasis `mentor_aspects_list`.
+  7. Menambahkan test suite komprehensif `tests/Feature/DynamicEvaluationAspectsTest.php` (4 test cases, 35 assertions, Exit Code 0) dan memastikan seluruh unit/feature tests lulus 100%.
+- **Prevention Rule**: Seluruh dokumen cetak resmi (terutama E-Sertifikat dan Transkrip Nilai Kompetensi) wajib membaca atribut evaluasi adaptif yang tersimpan di model `Evaluation` secara dinamis, sembari selalu menyertakan fallback anggun (*graceful fallback*) ke skema standar agar arsip dokumen historis tetap tercetak utuh tanpa error.
+
+### [LRN-076] Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop (sm:hidden Cascade Distortion)
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/lecturer/monitoring/index.blade.php`
+- **Problem / Symptom**: Pada halaman Monitoring Mahasiswa Bimbingan Dosen (`/lecturer/monitoring`), badge tab menunjukkan terdapat 1 mahasiswa (`Mahasiswa Aktif: 1`, `Calon Peserta: 1`), namun area tabel di bawahnya tampak kosong melompong (*blank white area*) tanpa baris mahasiswa dan tanpa pesan error.
+- **Root Cause**: Di dalam looping `@forelse` tampilan mobile (`<div class="block sm:hidden divide-y divide-slate-100">`), tag `<div class="flex items-center justify-between text-xs">` (blok Logbook & Laporan) tidak ditutup dengan `</div>` sebelum pembukaan blok Nilai Dosen. Akibat defisit 1 tag penutup `</div>`, tag penutup di akhir looping menutup kontainer yang salah, dan kontainer utama mobile (`sm:hidden`) tidak pernah ditutup sebelum blok desktop (`<div class="hidden sm:block overflow-x-auto">`). Akibatnya, tabel desktop tertelan masuk menjadi anak (*child element*) dari kontainer `sm:hidden`, sehingga pada viewport desktop (layar laptop/PC $\ge$ 640px) seluruh tabel desktop disembunyikan total oleh CSS `display: none`.
+- **Fix Applied**:
+  1. Menambahkan tag penutup `</div>` yang hilang pada baris logbook & laporan di kartu mobile `resources/views/lecturer/monitoring/index.blade.php`.
+  2. Menjalankan `php artisan view:clear` untuk memperbarui kompilasi view blade.
+  3. Memvalidasi visual E2E dengan Playwright headless pada resolusi desktop (1280x800) dan mobile (375x667), memastikan tabel desktop (Nama Mahasiswa, Instansi & Unit, Status, Logbook, Laporan, Nilai Dosen, Aksi) dan kartu mobile kembali tampil sempurna.
+- **Prevention Rule**: Saat merancang arsitektur tampilan responsif yang memisahkan blok mobile (`block sm:hidden`) dan desktop (`hidden sm:block`) secara berdampingan, pastikan seluruh tag `<div>` di dalam loop tertutup secara simetris dan lakukan audit nesting DOM secara ketat agar breakpoint utility Tailwind tidak menelan elemen tampilan lainnya.
+
+---
+
+### [LRN-077] Fleksibilitas Skema Evaluasi (Default 100% Dinas), Kustomisasi Komponen Penilaian & Sertifikat Dinamis
 - **Tanggal**: 2026-10-15
 - **Komponen**: `database/migrations/2026_10_14_150000_add_evaluation_components_to_universities_table.php`, `App\Models\University`, `App\Models\Evaluation`, `App\Models\Application`, `App\Http\Controllers\University\ProfileController`, `App\Http\Controllers\Admin\UniversityController`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/university/profile/index.blade.php`, `resources/views/admin/universities/edit.blade.php`
 - **Problem / Symptom**:
@@ -1745,7 +1784,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-075] Standarisasi Dispusip Single-Agency, 4 Bidang Resmi, Role Supervisor (Atasan Kepegawaian), dan Alur Double ACC
+### [LRN-078] Standarisasi Dispusip Single-Agency, 4 Bidang Resmi, Role Supervisor (Atasan Kepegawaian), dan Alur Double ACC
 - **Tanggal**: 2026-10-15
 - **Komponen**: `database/migrations/2026_10_15_100000_standardize_dispusip_supervisor_and_components.php`, `App\Models\User`, `App\Models\Unit`, `App\Models\Certificate`, `App\Models\Application`, `App\Enums\ApplicationStatus`, `App\Http\Controllers\Supervisor\*`, `App\Http\Controllers\Admin\ApplicationController`, `App\Http\Controllers\Admin\CertificateController`, `App\Http\Controllers\Student\CertificateController`, `resources/views/supervisor\*`, `resources/views/admin/dashboard.blade.php`, `database/seeders\*`
 - **Problem / Symptom**:
@@ -1773,6 +1812,20 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**:
   1. Setiap penambahan status enum baru dengan karakter underscore (`_`) wajib diverifikasi pada `DisplaysStatusCode` dan didaftarkan pada regex `CODES` di `StatusViewGuardTest`.
   2. Pada sistem kedinasan dengan alur persetujuan berjenjang (Double ACC), otorisasi penerbitan surat/sertifikat wajib mengunci status pengesahan dari Atasan sebelum diizinkan untuk diunduh oleh publik/mahasiswa.
+
+---
+
+### [LRN-079] Harmonisasi & Integrasi Fitur Skema Evaluasi Kampus dan Aspek Kustom Dinamis
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Models/Evaluation.php`, `app/Models/Application.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`, `app/Http/Controllers/Mentor/EvaluationController.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/certificates/internship_certificate.blade.php`
+- **Problem / Symptom**: Terjadi divergensi dan potensi tabrakan arsitektur antara pembaruan `origin/main` PR #99 (aspek kustom dinamis `dosen_aspects` dan `mentor_aspects` pada tabel `evaluations`) dengan modul skema evaluasi kampus (`dinas_components` dan `dpl_components` pada tabel `universities`).
+- **Root Cause**: Dua cabang pengembangan memodifikasi file inti penilaian yang sama: satu fokus pada fleksibilitas input dinamis saat form diisi, sementara yang lain fokus pada kebijakan multi-tenant perguruan tinggi (bobot 100% dinas / 100% DPL / dua pihak).
+- **Fix Applied**:
+  1. Mengharmonisasi model `Evaluation.php`: mendukung pembacaan `mentor_aspects` & `dosen_aspects` (JSON) sekaligus fallback ke konfigurasi komponen universitas via `getMentorComponents()` dan `getLecturerComponents()`.
+  2. Mengharmonisasi `Application::certificateBlockers()`: memeriksa kelengkapan evaluasi baik dari aspek dinamis maupun kolom legacy, serta menghormati bobot 0% (tidak memblokir jika skema 100% dinas).
+  3. Mengharmonisasi controller penilaian Mentor & Dosen: menyimpan payload `aspects` ke kolom JSON baru sekaligus mengupdate kolom numerik legacy dan menghitung nilai akhir adaptif.
+  4. Menyelaraskan form Blade `score-form.blade.php` dan lembar cetak transkrip sertifikat `internship_certificate.blade.php`.
+- **Prevention Rule**: Selalu pertahankan backward-compatibility dan lakukan integrasi bertingkat: skema institusi (Universitas) sebagai template default, dan aspek dinamis (Form Input) sebagai kustomisasi level instansi/evaluator.
 
 ---
 

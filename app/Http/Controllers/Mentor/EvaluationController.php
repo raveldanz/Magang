@@ -63,12 +63,29 @@ class EvaluationController extends Controller
             return redirect()->route('mentor.students.show', $placement->id)->with('error', $lockReason);
         }
 
-        $request->validate([
-            'nilai_disiplin' => 'required|numeric|min:0|max:100',
-            'nilai_kinerja' => 'required|numeric|min:0|max:100',
-            'nilai_laporan' => 'required|numeric|min:0|max:100',
-            'catatan' => 'nullable|string|max:1500',
-        ], [
+        if ($request->has('aspects')) {
+            $rules = [
+                'aspects' => 'required|array|min:1',
+                'aspects.*.name' => 'required|string|max:150',
+                'aspects.*.score' => 'required|numeric|min:0|max:100',
+                'catatan' => 'nullable|string|max:1500',
+            ];
+        } else {
+            $rules = [
+                'nilai_disiplin' => 'required|numeric|min:0|max:100',
+                'nilai_kinerja' => 'required|numeric|min:0|max:100',
+                'nilai_laporan' => 'required|numeric|min:0|max:100',
+                'catatan' => 'nullable|string|max:1500',
+            ];
+        }
+
+        $request->validate($rules, [
+            'aspects.required' => 'Setidaknya satu aspek penilaian wajib diisi.',
+            'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
+            'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
+            'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.min' => 'Nilai minimal adalah 0.',
+            'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'nilai_disiplin.required' => 'Nilai disiplin wajib diisi.',
             'nilai_disiplin.min' => 'Nilai minimal adalah 0.',
             'nilai_disiplin.max' => 'Nilai maksimal adalah 100.',
@@ -81,30 +98,62 @@ class EvaluationController extends Controller
         ]);
 
         $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
+        $evaluation->catatan = $request->catatan;
+
         $custom = is_array($evaluation->custom_components) ? $evaluation->custom_components : [];
 
-        if ($request->has('custom_components') && is_array($request->custom_components)) {
+        if ($request->has('aspects')) {
+            $rawAspects = (array) $request->input('aspects', []);
+            $cleanAspects = [];
+            $scores = [];
+            foreach ($rawAspects as $a) {
+                $name = trim($a['name'] ?? '');
+                if ($name !== '' && isset($a['score']) && is_numeric($a['score'])) {
+                    $val = (float) $a['score'];
+                    $cleanAspects[] = ['name' => $name, 'score' => $val];
+                    $scores[] = $val;
+                }
+            }
+            $avg = count($scores) > 0 ? round(array_sum($scores) / count($scores), 2) : 0.0;
+            $evaluation->mentor_aspects = $cleanAspects;
+            $evaluation->nilai_disiplin = (int) round($scores[0] ?? $avg);
+            $evaluation->nilai_kinerja = (int) round($scores[1] ?? $avg);
+            $evaluation->nilai_laporan = (int) round($scores[2] ?? $avg);
+        } elseif ($request->has('custom_components') && is_array($request->custom_components)) {
             $mentorComps = [];
+            $scores = [];
             foreach ($request->custom_components as $comp) {
                 if (!empty($comp['name'])) {
+                    $val = isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null;
                     $mentorComps[] = [
                         'name' => trim($comp['name']),
-                        'score' => isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null,
+                        'score' => $val,
                     ];
+                    if ($val !== null) {
+                        $scores[] = $val;
+                    }
                 }
             }
             if (!empty($mentorComps)) {
                 $custom['mentor'] = $mentorComps;
+                $evaluation->custom_components = $custom;
+                $evaluation->mentor_aspects = $mentorComps;
             }
+            $avg = count($scores) > 0 ? round(array_sum($scores) / count($scores), 2) : 0.0;
+            $evaluation->nilai_disiplin = (int) round($scores[0] ?? $avg);
+            $evaluation->nilai_kinerja = (int) round($scores[1] ?? $avg);
+            $evaluation->nilai_laporan = (int) round($scores[2] ?? $avg);
+        } else {
+            $evaluation->nilai_disiplin = $request->nilai_disiplin;
+            $evaluation->nilai_kinerja = $request->nilai_kinerja;
+            $evaluation->nilai_laporan = $request->nilai_laporan;
+            $univ = $placement->application?->user ? app(\App\Services\UniversityResolver::class)->forUser($placement->application->user) : null;
+            $evaluation->mentor_aspects = [
+                ['name' => $univ ? $univ->getDinasComponent(1) : 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],
+                ['name' => $univ ? $univ->getDinasComponent(2) : 'Kinerja Teknis & Kerjasama Tim', 'score' => (float) $request->nilai_kinerja],
+                ['name' => $univ ? $univ->getDinasComponent(3) : 'Inisiatif & Laporan Kedinasan', 'score' => (float) $request->nilai_laporan],
+            ];
         }
-
-        $evaluation->fill([
-            'nilai_disiplin' => $request->nilai_disiplin,
-            'nilai_kinerja' => $request->nilai_kinerja,
-            'nilai_laporan' => $request->nilai_laporan,
-            'catatan' => $request->catatan,
-            'custom_components' => !empty($custom) ? $custom : null,
-        ]);
         $evaluation->save();
 
         // Cek skema kampus mahasiswa

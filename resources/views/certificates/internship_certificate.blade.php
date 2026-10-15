@@ -413,8 +413,15 @@
     $isLecturerOnly = ($weightMentor === 0 && $weightLecturer > 0);
     $isDual = ! $isMentorOnly && ! $isLecturerOnly;
 
-    $mentorComponents = $eval ? $eval->getMentorComponents() : [];
-    $lecturerComponents = $eval ? $eval->getLecturerComponents() : [];
+    $mentorComponents = $eval ? $eval->mentor_aspects_list : [];
+    if (empty($mentorComponents) && $eval) {
+        $mentorComponents = $eval->getMentorComponents();
+    }
+
+    $lecturerComponents = $eval ? $eval->dosen_aspects_list : [];
+    if (empty($lecturerComponents) && $eval) {
+        $lecturerComponents = $eval->getLecturerComponents();
+    }
 @endphp
 
                         @if (! $isLecturerOnly)
@@ -428,9 +435,9 @@
                             @foreach ($mentorComponents as $idx => $mComp)
                                 <tr>
                                     <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
-                                    <td class="py-1.5 px-3">{{ $mComp['name'] }}</td>
+                                    <td class="py-1.5 px-3 font-medium">{{ $mComp['name'] ?? $mComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
                                     <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                                    <td class="py-1.5 px-3 text-center font-bold">{{ $mComp['score'] !== null ? $mComp['score'] : '-' }}</td>
+                                    <td class="py-1.5 px-3 text-center font-bold">{{ isset($mComp['score']) && is_numeric($mComp['score']) ? ((float)$mComp['score'] == (int)$mComp['score'] ? (int)$mComp['score'] : number_format((float)$mComp['score'], 1)) : ($mComp['score'] ?? '-') }}</td>
                                     <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                                 </tr>
                             @endforeach
@@ -455,9 +462,9 @@
                             @foreach ($lecturerComponents as $idx => $lComp)
                                 <tr>
                                     <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
-                                    <td class="py-1.5 px-3">{{ $lComp['name'] }}</td>
+                                    <td class="py-1.5 px-3 font-medium">{{ $lComp['name'] ?? $lComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
                                     <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                                    <td class="py-1.5 px-3 text-center font-bold">{{ $lComp['score'] !== null ? $lComp['score'] : '-' }}</td>
+                                    <td class="py-1.5 px-3 text-center font-bold">{{ isset($lComp['score']) && is_numeric($lComp['score']) ? ((float)$lComp['score'] == (int)$lComp['score'] ? (int)$lComp['score'] : number_format((float)$lComp['score'], 1)) : ($lComp['score'] ?? '-') }}</td>
                                     <td class="py-1.5 px-3 text-center text-slate-400">-</td>
                                 </tr>
                             @endforeach

@@ -14,6 +14,8 @@ class Evaluation extends Model
 
     protected $casts = [
         'custom_components' => 'array',
+        'dosen_aspects' => 'array',
+        'mentor_aspects' => 'array',
     ];
 
     public function placement()
@@ -27,6 +29,10 @@ class Evaluation extends Model
      */
     public function getMentorComponents(): array
     {
+        if (! empty($this->mentor_aspects) && is_array($this->mentor_aspects)) {
+            return $this->mentor_aspects;
+        }
+
         $custom = $this->custom_components;
         if (is_array($custom)) {
             if (isset($custom['mentor']) && is_array($custom['mentor']) && ! empty($custom['mentor'])) {
@@ -61,6 +67,10 @@ class Evaluation extends Model
      */
     public function getLecturerComponents(): array
     {
+        if (! empty($this->dosen_aspects) && is_array($this->dosen_aspects)) {
+            return $this->dosen_aspects;
+        }
+
         $custom = $this->custom_components;
         if (is_array($custom) && isset($custom['lecturer']) && is_array($custom['lecturer']) && ! empty($custom['lecturer'])) {
             return $custom['lecturer'];
@@ -89,6 +99,18 @@ class Evaluation extends Model
      */
     public function getNilaiPembimbingAttribute()
     {
+        if (! empty($this->mentor_aspects) && is_array($this->mentor_aspects)) {
+            $scores = [];
+            foreach ($this->mentor_aspects as $item) {
+                if (isset($item['score']) && is_numeric($item['score'])) {
+                    $scores[] = (float) $item['score'];
+                }
+            }
+            if (count($scores) > 0) {
+                return round(array_sum($scores) / count($scores), 2);
+            }
+        }
+
         $custom = $this->custom_components;
         $items = null;
         if (is_array($custom)) {
@@ -112,10 +134,22 @@ class Evaluation extends Model
     }
 
     /**
-     * Nilai Akademik Dosen Pembimbing Lapangan (Rata-rata aspek dosen dari custom_components atau 3 aspek standar)
+     * Nilai Akademik Dosen Pembimbing Lapangan (Rata-rata aspek kriteria dinamis dosen atau 3 aspek standar)
      */
     public function getNilaiDosenCalculatedAttribute()
     {
+        if (! empty($this->dosen_aspects) && is_array($this->dosen_aspects)) {
+            $scores = [];
+            foreach ($this->dosen_aspects as $item) {
+                if (isset($item['score']) && is_numeric($item['score'])) {
+                    $scores[] = (float) $item['score'];
+                }
+            }
+            if (count($scores) > 0) {
+                return round(array_sum($scores) / count($scores), 2);
+            }
+        }
+
         $custom = $this->custom_components;
         if (is_array($custom) && isset($custom['lecturer']) && is_array($custom['lecturer']) && ! empty($custom['lecturer'])) {
             $scores = array_filter(array_map(fn ($it) => isset($it['score']) && is_numeric($it['score']) ? (float) $it['score'] : null, $custom['lecturer']), fn ($s) => $s !== null);
@@ -138,6 +172,30 @@ class Evaluation extends Model
         }
 
         return (float) ($this->nilai_akademik ?? 0);
+    }
+
+    /**
+     * Dapatkan daftar aspek penilaian DPL yang terformat rapi (nama + skor)
+     */
+    public function getDosenAspectsListAttribute(): array
+    {
+        if (! empty($this->dosen_aspects) && is_array($this->dosen_aspects)) {
+            return $this->dosen_aspects;
+        }
+
+        return $this->getLecturerComponents();
+    }
+
+    /**
+     * Dapatkan daftar aspek penilaian Mentor yang terformat rapi (nama + skor)
+     */
+    public function getMentorAspectsListAttribute(): array
+    {
+        if (! empty($this->mentor_aspects) && is_array($this->mentor_aspects)) {
+            return $this->mentor_aspects;
+        }
+
+        return $this->getMentorComponents();
     }
 
     /**

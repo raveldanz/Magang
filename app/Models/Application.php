@@ -185,18 +185,28 @@ class Application extends Model
         $mentorRequired = ($scheme !== 'mentor_only' ? ($weightMentor > 0) : true);
         $lecturerRequired = ($scheme !== 'mentor_only' && $weightLecturer > 0);
 
-        $mentorEvalComplete = $eval
-            && (float) ($eval->nilai_disiplin ?? 0) > 0
-            && (float) ($eval->nilai_kinerja ?? 0) > 0
-            && (float) ($eval->nilai_laporan ?? 0) > 0;
+        $mentorAspects = $eval?->mentor_aspects_list ?? [];
+        if (! empty($mentorAspects)) {
+            $mentorEvalComplete = collect($mentorAspects)->every(fn ($a) => isset($a['score']) && (float) $a['score'] > 0);
+        } else {
+            $mentorEvalComplete = $eval
+                && (float) ($eval->nilai_disiplin ?? 0) > 0
+                && (float) ($eval->nilai_kinerja ?? 0) > 0
+                && (float) ($eval->nilai_laporan ?? 0) > 0;
+        }
 
-        $lecturerEvalComplete = $eval
-            && (
-                ((float) ($eval->score_mastery ?? 0) > 0 && (float) ($eval->score_report ?? 0) > 0 && (float) ($eval->score_attitude ?? 0) > 0)
-                || (float) ($eval->nilai_dosen_calculated ?? 0) > 0
-                || (float) ($eval->nilai_dosen ?? 0) > 0
-                || (float) ($eval->nilai_akademik ?? 0) > 0
-            );
+        $dosenAspects = $eval?->dosen_aspects_list ?? [];
+        if (! empty($dosenAspects)) {
+            $lecturerEvalComplete = collect($dosenAspects)->every(fn ($a) => isset($a['score']) && (float) $a['score'] > 0);
+        } else {
+            $lecturerEvalComplete = $eval
+                && (
+                    ((float) ($eval->score_mastery ?? 0) > 0 && (float) ($eval->score_report ?? 0) > 0 && (float) ($eval->score_attitude ?? 0) > 0)
+                    || (float) ($eval->nilai_dosen_calculated ?? 0) > 0
+                    || (float) ($eval->nilai_dosen ?? 0) > 0
+                    || (float) ($eval->nilai_akademik ?? 0) > 0
+                );
+        }
 
         if ($mentorRequired && ! $mentorEvalComplete) {
             $blockers[] = 'Nilai evaluasi kinerja dari Mentor Lapangan (dinas) belum lengkap.';
