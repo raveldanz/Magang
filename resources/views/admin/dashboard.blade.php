@@ -325,18 +325,15 @@
             </div>
         </div>
 
-        {{-- MATRIKS 4 BIDANG RESMI DISPUSIP (MONITORING TIM KERJA & BEBAN BIMBINGAN) --}}
+        {{-- MATRIKS 4 BIDANG RESMI DISPUSIP (MONITORING ALOKASI KUOTA & STATUS MAHASISWA) --}}
         <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div class="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-blue-600"></span>
-                        <h2 class="text-base sm:text-lg font-black text-slate-900">
-                            Matriks 4 Bidang Resmi Dinas Perpustakaan dan Kearsipan (Dispusip)
-                        </h2>
-                    </div>
+                    <h2 class="text-base sm:text-lg font-black text-slate-900">
+                        Matriks 4 Bidang Resmi Dinas Perpustakaan dan Kearsipan (Dispusip)
+                    </h2>
                     <p class="text-xs text-slate-500 mt-0.5">
-                        Rekapitulasi pembimbing tim kerja (mentor), beban bimbingan aktif, alokasi kuota, dan status peserta magang.
+                        Rekapitulasi alokasi kuota, pimpinan bidang, dan status peserta magang.
                     </p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -352,7 +349,6 @@
                     <thead>
                         <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                             <th class="py-3.5 px-6">Nama Bidang & Kepala Bidang</th>
-                            <th class="py-3.5 px-6">Tim Kerja (Mentor & Beban Bimbingan)</th>
                             <th class="py-3.5 px-4 text-center">Kuota Total</th>
                             <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
                             <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
@@ -375,22 +371,6 @@
                                         <span>Kepala:</span>
                                         <span class="font-semibold text-slate-700">{{ $dUnit->headUser?->name ?? 'Belum Ditugaskan' }}</span>
                                     </div>
-                                </td>
-                                <td class="py-4 px-6">
-                                    @if($dUnit->mentors && $dUnit->mentors->count() > 0)
-                                        <div class="flex flex-wrap gap-1.5">
-                                            @foreach($dUnit->mentors as $mentor)
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-medium border border-slate-200">
-                                                    <span>{{ $mentor->name }}</span>
-                                                    <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
-                                                        {{ $mentor->active_students_count ?? 0 }} mhs
-                                                    </span>
-                                                </span>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <span class="text-slate-400 italic">Belum ada mentor bertugas</span>
-                                    @endif
                                 </td>
                                 <td class="py-4 px-4 text-center font-bold text-slate-700">
                                     <span class="px-2.5 py-1 rounded-lg bg-slate-100">{{ $dUnit->quota }}</span>
@@ -418,7 +398,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-8 text-center text-slate-400">Data 4 Bidang Dispusip belum dimuat.</td>
+                                <td colspan="6" class="py-8 text-center text-slate-400">Data 4 Bidang Dispusip belum dimuat.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -429,36 +409,24 @@
         {{-- 3. DISTRIBUSI SEBARAN SESUAI SCOPE ROLE --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {{-- Distribusi Penempatan: Instansi (Jika Super Admin) atau Unit Divisi (Jika Admin Dinas) --}}
+            {{-- Distribusi Penempatan: Unit Kerja --}}
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
                 x-data="{ expanded: false }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
-                        @if($isSuperAdmin)
-                            <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Penempatan Instansi Dinas</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di Dispusip Surabaya</p>
-                        @else
-                            <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Divisi & Unit Kerja Dinas</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dinas' }}</p>
-                        @endif
+                        <h3 class="text-sm font-bold text-slate-800 leading-snug">Distribusi Penempatan Unit Kerja</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di unit/bidang {{ $currentAgency->agency_name ?? 'Dispusip Surabaya' }}</p>
                     </div>
-                    @if($isSuperAdmin)
-                        <a href="{{ route('admin.agencies.index') }}"
-                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
-                            <span>Kelola Dinas</span>
-                        </a>
-                    @else
-                        <a href="{{ route('admin.units.index') }}"
-                            class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
-                            <span>Kelola Unit</span>
-                        </a>
-                    @endif
+                    <a href="{{ route('admin.units.index') }}"
+                        class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 shadow-2xs">
+                        <span>Kelola Unit</span>
+                    </a>
                 </div>
 
                 @php
                     // Urutkan dari jumlah mahasiswa terbanyak; tampilkan 10 teratas, sisanya bisa dibuka.
-                    $distList = collect($isSuperAdmin ? ($agencyStats ?? []) : ($unitStats ?? []))
+                    $distList = collect($unitStats ?? [])
                         ->sortByDesc(fn ($row) => data_get($row, 'count', 0))->values()->all();
                 @endphp
                 <div class="space-y-4 pt-1">
@@ -474,7 +442,7 @@
                                 <span class="text-slate-700 font-medium truncate flex-1 min-w-0">{{ $itemName }}</span>
                                 <span class="text-blue-700 font-bold shrink-0">
                                     {{ $itemCount }} Mahasiswa
-                                    @if(!$isSuperAdmin)
+                                    @if($itemQuota > 0)
                                         <span class="text-slate-400 font-normal">/ Kuota {{ $itemQuota }}</span>
                                     @endif
                                     <span class="text-slate-400 font-normal">({{ $itemPercentage }}%)</span>
@@ -488,7 +456,7 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-6 text-xs text-slate-400">Belum ada data penempatan divisi/unit.</div>
+                        <div class="text-center py-6 text-xs text-slate-400">Belum ada data penempatan unit kerja.</div>
                     @endforelse
                 </div>
                 @if(count($distList) > 10)
