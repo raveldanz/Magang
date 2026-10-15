@@ -4,20 +4,13 @@
     <x-control-center-style />
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('admin.agencies.index') }}" 
-                   class="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition shadow-2xs cursor-pointer" 
-                   title="Kembali ke Master Instansi">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                </a>
-                <div>
-                    <h2 class="cc-title font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
-                        Pusat Kendali Instansi: {{ $agency->agency_name }}
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Manajemen terpadu Divisi Magang, Personel Kedinasan, Pengajuan, dan Penempatan Mahasiswa
-                    </p>
-                </div>
+            <div>
+                <h2 class="cc-title font-black text-xl sm:text-2xl text-gray-900 tracking-tight">
+                    Pusat Kendali Instansi: {{ $agency->agency_name }}
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Manajemen terpadu Divisi Magang, Personel Kedinasan, Pengajuan, dan Penempatan Mahasiswa
+                </p>
             </div>
 
             <!-- Header Quick Actions -->
@@ -152,6 +145,7 @@
                             @if($firstAdmin)
                                 <form action="{{ route('admin.impersonate', $firstAdmin->id) }}" method="POST" class="m-0">
                                     @csrf
+                                    <input type="hidden" name="return_to" value="{{ url()->current() }}">
                                     <button type="submit"
                                             class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
@@ -332,6 +326,7 @@
                                                 @if($isSuperAdmin)
                                                     <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="inline-flex items-center m-0 p-0 align-middle">
                                                         @csrf
+                                                        <input type="hidden" name="return_to" value="{{ url()->current() }}">
                                                         <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800 cursor-pointer" title="Login As ke Akun Ini">
                                                             Login As
                                                         </button>
@@ -406,6 +401,7 @@
                                         @if($isSuperAdmin)
                                             <form action="{{ route('admin.impersonate', $u->id) }}" method="POST">
                                                 @csrf
+                                                <input type="hidden" name="return_to" value="{{ url()->current() }}">
                                                 <button type="submit" class="mbtn mbtn-login">Login As</button>
                                             </form>
                                         @endif

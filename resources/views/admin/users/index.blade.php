@@ -146,16 +146,18 @@
                         </div>
 
                         <!-- Case 2: Admin Dinas / Mentor Lapangan / Default -->
-                        <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
-                            <select name="agency_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                <option value="">Semua Instansi Dinas</option>
-                                @foreach($agencies as $ag)
-                                    <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                        {{ $ag->agency_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        @if(isset($agencies) && count($agencies) > 1)
+                            <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
+                                <select name="agency_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                    <option value="">Semua Instansi Dinas</option>
+                                    @foreach($agencies as $ag)
+                                        <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
+                                            {{ $ag->agency_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Submit & Reset -->

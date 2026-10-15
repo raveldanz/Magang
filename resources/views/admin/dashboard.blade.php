@@ -41,7 +41,10 @@
                 {{-- Kolom Kanan: 4 Kartu Aksi Cepat (5 Kolom - Mengisi Seluruh Sisi Kanan Secara Seimbang & Mewah) --}}
                 <div class="lg:col-span-5 grid grid-cols-2 gap-3.5">
                     @if($isSuperAdmin)
-                        <a href="{{ route('admin.agencies.index') }}"
+                        @php
+                            $dispusipTargetId = $currentAgency?->id ?? ($agencies->first()?->id ?? 2);
+                        @endphp
+                        <a href="{{ route('admin.agencies.show', $dispusipTargetId) }}"
                             class="p-4 rounded-2xl transition-all duration-200 group shadow-sm hover:scale-[1.03] hover:shadow-md cursor-pointer flex flex-col justify-between"
                             style="background-color: rgba(255, 255, 255, 0.12) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; color: #ffffff !important;">
                             <div class="flex items-center justify-between mb-2">

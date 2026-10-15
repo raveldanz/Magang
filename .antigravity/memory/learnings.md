@@ -1892,9 +1892,95 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-075] Kustomisasi & Spesialisasi Sistem Khusus Dinas Perpustakaan dan Kearsipan Kota Surabaya
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/auth/`, `resources/views/student/application/create.blade.php`, `resources/views/dashboard.blade.php`, `resources/views/certificates/`, `config/app.php`, `.env`
+- **Problem / Symptom**: Portal web masih menggunakan teks generik "Pemerintah Kota Surabaya di seluruh Organisasi Perangkat Daerah (OPD)", navbar hanya menampilkan logo tunggal pemkot, formulir mahasiswa mengharuskan pencarian instansi padahal hanya ada 1 OPD aktif, dan template surat/sertifikat masih menyimpan fallback legacy generic/Diskominfo.
+- **Root Cause**: Sistem sebelumnya dirancang multi-tenant untuk 23 OPD secara umum sebelum difokuskan secara pilot/khusus ke Dinas Perpustakaan dan Kearsipan.
+- **Fix Applied**: 
+  1. Mentransformasi `welcome.blade.php` menjadi portal berestetika tinggi khusus Dispusip Surabaya dengan logo ganda resmi (Pemkot Surabaya & Dispusip), headline khusus Dispusip, kontak kantor Jl. Rungkut Asri Tengah, serta showcase 4 bidang kerja resmi Dispusip (Bidang Sekretariat, Bidang Pembinaan dan Pengelolaan Perpustakaan, Bidang Pembinaan dan Layanan Kearsipan, Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan) dengan kuota live dinamis.
+  2. Memperbarui navbar utama (`layouts/navigation.blade.php`) dengan logo berdampingan dan label "Portal Magang Dispusip Kota Surabaya".
+  3. Memperbarui halaman login & registrasi dengan lencana Dispusip resmi.
+  4. Menyederhanakan formulir pendaftaran mahasiswa (`student/application/create.blade.php`) dengan kartu identitas resmi Dispusip dan seleksi langsung 4 divisi resmi Dispusip tanpa perlu mencari OPD lain.
+  5. Memperbarui seeder (`SurabayaAgenciesSeeder.php` & `CleanEcosystemSeeder.php`) dan migrasi data unit untuk memuat 4 bidang resmi Dispusip dengan relasi aplikasi & penempatan mahasiswa yang tetap terjaga utuh.
+  6. Memperbarui seluruh fallback dokumen resmi (surat penerimaan, sertifikat kelulusan, lembar nilai, transkrip) ke Dinas Perpustakaan dan Kearsipan beserta pejabat resmi penandatangan (Mia Santi Dewi, S.H., M.Si.).
+  7. Membersihkan cache aplikasi dan memvalidasi test suite hingga 100% lulus (Strict Exit Code 0).
+- **Prevention Rule**: Saat sebuah portal dikhususkan untuk instansi tertentu, seluruh titik kontak visual (Landing, Navbar, Auth, Pendaftaran, Dashboard, Surat, dan Sertifikat) wajib diselaraskan agar tidak ada inkonsistensi nama instansi, fallback kuno, atau dropdown tunggal yang membingungkan pemohon.
+
+---
+
+### [LRN-076] Eliminasi Card Dispusip & Akses Langsung Pusat Kendali Instansi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/admin/agencies/edit.blade.php`
+- **Problem / Symptom**: Saat menekan menu "Instansi" di navigasi, admin melihat halaman kartu berulang (`admin.agencies.index`) yang hanya berisi 1 kartu Dispusip, sehingga harus menekan tombol "Kelola Dinas" lagi untuk melihat pusat kendali lengkap.
+- **Root Cause**: Menu navigasi masih menautkan ke rute index generik multi-instansi `admin.agencies.index` tanpa mengenali bahwa sistem beroperasi untuk ekosistem tunggal Dispusip.
+- **Fix Applied**: 
+  1. Memperbarui menu "Instansi" pada desktop navbar, profile dropdown, dan mobile drawer di `navigation.blade.php` agar langsung menautkan ke rute `admin.agencies.show` instansi Dispusip.
+  2. Menambahkan auto-redirect cerdas pada `AgencyController::index()` saat ekosistem berjalan spesifik Dispusip (tanpa parameter `list`), sehingga akses langsung URL `/admin/agencies` langsung dialihkan ke Pusat Kendali Dispusip lengkap.
+  3. Mengeliminasi tombol kembali pada header `admin.agencies.show` karena halaman ini kini telah menjadi menu utama top-level (setara dengan menu Pengajuan, Universitas, dan Pengguna yang tidak memerlukan tombol kembali), serta mengarahkan tombol batal/kembali pada `admin.agencies.edit` menuju `admin.agencies.show`.
+  4. Memastikan kompatibilitas operator string database (`ilike` untuk PostgreSQL, `like` untuk SQLite saat testing).
+  5. Menambahkan test feature `DispusipInstansiMenuDirectAccessTest` untuk menjamin stabilitas fungsionalitas dan navigasi langsung ke halaman lengkap Dispusip.
+- **Prevention Rule**: Pada aplikasi yang telah dikhususkan untuk entitas tunggal (*single-tenant specialized*), hindari menyajikan halaman ringkasan kartu dengan 1 item saja. Arahkan pengguna langsung ke pusat manajemen data komprehensif, dan selalu sediakan tombol kembali yang kontekstual.
+
+---
+
+### [LRN-077] Redireksi Kontekstual Sesi Penyamaran (Impersonasi)
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Http/Controllers/Admin/ImpersonationController.php`, `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**: Saat Super Admin melakukan *Login As* (penyamaran) ke akun admin dinas dari halaman Pusat Kendali Instansi, kemudian menekan tombol "Kembali" pada banner penyamaran, sistem selalu mengarahkan ke halaman Kelola Pengguna (`/admin/users`), bukan kembali ke halaman instansi asal.
+- **Root Cause**: Method `leave()` pada `ImpersonationController` di-hardcode ke `return redirect()->route('admin.users.index')`, tanpa melacak URL asal saat penyamaran dimulai (`referer` / `return_to`).
+- **Fix Applied**: 
+  1. Pada method `impersonate()`, sistem kini menangkap URL asal via `return_to`, `referer`, atau `url()->previous()` dan menyimpannya di session (`impersonator_return_to`).
+  2. Menyertakan `<input type="hidden" name="return_to" value="{{ url()->current() }}">` pada seluruh form *Login As* di `show.blade.php`.
+  3. Pada method `leave()`, sistem membaca `impersonator_return_to` dari session dengan fallback cerdas berbasis konteks akun (`agency_profile_id` mengarah ke `admin.agencies.show`, `university_id` ke `admin.universities.show`, dan role mentor ke `admin.mentors.index`).
+  4. Menambahkan test otomatis di `DispusipInstansiMenuDirectAccessTest` guna memverifikasi alur impersonasi dan kembali ke halaman dinas secara presisi.
+- **Prevention Rule**: Jangan pernah men-hardcode rute pengembalian (*return/exit route*) pada fitur impersonasi/penyamaran. Selalu simpan URL referer asal dan sediakan fallback dinamis berbasis atribut domain akun yang disamar.
+
+---
+
+### [LRN-078] Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**: Pada baris filter halaman Pengajuan Magang (`admin.applications.index`), terdapat dropdown filter `-- Semua Instansi Dinas --` yang hanya memiliki 1 opsi yaitu "Dinas Perpustakaan dan Kearsipan", membuat antarmuka menjadi berantakan, redundan, dan memakan ruang baris filter.
+- **Root Cause**: Desain halaman sebelumnya berasumsi sistem multi-instansi dengan banyak OPD. Setelah portal dikhususkan (*single-tenant*) untuk Dispusip, filter instansi menjadi tidak relevan karena seluruh unit kerja dan pengajuan otomatis terikat pada Dispusip.
+- **Fix Applied**: 
+  1. Menghapus dropdown filter instansi (`agency_id`) pada `resources/views/admin/applications/index.blade.php`, serta merapikan dropdown Unit/Divisi agar menampilkan langsung 4 bidang resmi Dispusip tanpa pembungkus `<optgroup>` redundan ketika hanya ada 1 instansi.
+  2. Memasang guard kondisional `@if(isset($agencies) && count($agencies) > 1)` pada filter instansi di `resources/views/admin/mentors/index.blade.php` dan `resources/views/admin/users/index.blade.php`, sehingga hanya tampil dinamis jika sistem memiliki lebih dari 1 instansi.
+  3. Memvalidasi tampilan dan memastikan seluruh unit/feature test tetap lulus (Exit Code 0).
+- **Prevention Rule**: Seluruh elemen form filter antarmuka yang mengagregasi data entitas induk (seperti OPD/Instansi) harus memiliki kondisional pemeriksaan kuantitas (`count > 1`) atau dihapus jika sistem berjalan dalam mode portal khusus/spesifik, guna menjaga kebersihan visual dan ergonomi pengguna.
+
+### [LRN-079] Rombak Total Pipeline Status Mahasiswa, Eliminasi Status Verified, Otomatisasi Transisi Active, dan Penyatuan Form Pembimbing Anti-Reset
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `app/Models/Application.php`, `app/Models/Placement.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Student/LogbookController.php`, `app/Console/Commands/SyncInternshipStatus.php`, `resources/views/admin/applications/show.blade.php`, `database/migrations/2026_10_15_180000_remove_verified_status_and_harmonize_pipeline.php`, `routes/admin.php`, `tests/Feature/ApplicationStatusPipelineReformTest.php`
+- **Problem / Symptom**:
+  1. Status perantara `verified` menimbulkan inkonsistensi dan kebingungan alur karena redundan dengan status `pending` dan `waiting_approval`.
+  2. Mahasiswa yang sudah tiba jadwal magang (`start_date <= today`) atau sudah mulai mengisi logbook kerap tertahan di status `accepted` dan tidak otomatis beralih ke `active`.
+  3. Form penugasan pembimbing di `admin/applications/show.blade.php` terbelah menjadi dua (form utama atas dan card susulan bawah `#penugasan-pembimbing`), serta mutasi data pembimbing/status sebelumnya berpotensi merusak/menghapus record `Placement` beserta relasi logbook mahasiswa.
+  4. Tombol status admin menampilkan seluruh status sekaligus tanpa memandang tahapan seleksi (pendaftar baru bisa langsung meloncat ke status akhir `active`/`completed`), serta staf admin biasa dapat melakukan ACC pengesahan langsung saat berada di status `waiting_approval`.
+- **Root Cause**:
+  1. Eksistensi nilai enum legacy `VERIFIED` yang tidak memiliki peran operasional terpisah dari proses verifikasi berkas pendaftaran awal.
+  2. Ketiadaan transisi otomatis saat mahasiswa mengisi logbook pertama dan pembatasan kaku pada scheduler sinkronisasi tanggal (`end_date > today`).
+  3. Desain UI admin yang tidak memisahkan fase pendaftaran awal dengan fase masa magang aktif (*context-unaware*), serta pemisahan blok card pembimbing yang memicu duplikasi input.
+- **Fix Applied**:
+  1. Menghapus status `VERIFIED` dari `ApplicationStatus` enum, memigrasikan seluruh data lama di database menjadi `pending`/`waiting_approval`, serta membersihkan query dashboard, scope, dan views.
+  2. Menstandarisasi alur seleksi awal menjadi: `PENDING` $\rightarrow$ `WAITING_APPROVAL` $\rightarrow$ `ACCEPTED` $\rightarrow$ `REJECTED`. Otorisasi ketat diterapkan: staf admin biasa dilarang langsung menyetujui (`accepted`) saat `waiting_approval` (tombol dikunci/disabled dan divalidasi di backend), dan jika staf admin menerima dari `pending` sistem otomatis mengarahkan ke `waiting_approval` untuk verifikasi atasan. Tombol pengesahan hanya dapat dieksekusi oleh Atasan (`supervisor`) atau `super_admin`.
+  3. Menerapkan Context-Aware UI pada kartu status di `admin/applications/show.blade.php`: status `ACTIVE`, `COMPLETED`, dan `RESIGNED` disembunyikan saat tahap pendaftaran awal dan hanya muncul secara kontekstual setelah mahasiswa berstatus `ACCEPTED`. Teks label status dibakukan menjadi `Pilih Status Keputusan Pengajuan`.
+  4. Mengeliminasi card penugasan pembimbing susulan di bagian bawah dan menyatukan seluruh input mentor dinas, dosen pembimbing, nomor/tanggal surat balasan, serta periode magang (`start_date` dan `end_date`) ke dalam form utama `#acceptance-box`.
+  5. Mengamankan data penempatan mahasiswa (Anti-Reset Logbook): pembaruan pembimbing atau status menggunakan `updateOrCreate()` / `update()` tanpa pernah memanggil `delete()` pada instance `Placement`, sehingga seluruh histori logbook, absensi, dan laporan akhir tetap utuh. Sinkronisasi obrolan grup mentor (`ChatGroupService::syncMentorGroup`) otomatis dijalankan saat pergantian mentor.
+  6. Mengaktifkan 3 pemicu otomatisasi ke status `ACTIVE`:
+     - Scheduler harian (`SyncInternshipStatus.php`): otomatis mengubah `accepted` ke `active` saat `start_date <= today()`.
+     - Aktivitas logbook (`Student/LogbookController.php`): mahasiswa berstatus `accepted` diizinkan mengisi logbook dan otomatis bertransisi ke `active` saat logbook pertama tersimpan.
+     - Helper on-the-fly (`autoActivateIfStarted()`): otomatis memperbarui status saat instance `Application` atau `Placement` diakses pada tanggal magang.
+  7. Membuka otorisasi rute `admin.applications.show` dan `updateStatus` untuk role `supervisor` agar Atasan dapat memproses pengesahan dari antarmuka admin.
+  8. Menulis test suite komprehensif `ApplicationStatusPipelineReformTest.php` dan memvalidasi seluruh test suite dengan hasil **100% PASS (49 tests, 297 assertions, Exit Code: 0)**.
+- **Prevention Rule**:
+  1. Dilarang keras memanggil `delete()` pada model `Placement` saat melakukan update pengajuan magang; selalu gunakan `update()` / `updateOrCreate()` demi menjaga integritas foreign key relasi logbook, presensi, dan evaluasi.
+  2. Sembunyikan status fase pelaksanaan (`active`, `completed`, `resigned`) saat mahasiswa masih berada dalam fase seleksi pendaftaran (`pending`, `waiting_approval`, `rejected`).
+  3. Status yang terikat durasi waktu wajib memiliki mekanisme multi-trigger (scheduler, event-driven aksi pengguna, dan on-the-fly check) agar status tidak pernah macet (*stale state*).
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
-
-
 
 ```markdown
 ### [LRN-XXX] [Judul Singkat Masalah / Fitur]
@@ -1905,4 +1991,5 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+
 

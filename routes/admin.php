@@ -29,8 +29,8 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     // Verifikasi Pengajuan Magang
     Route::get('/admin/applications', [AdminApplicationController::class, 'index'])->name('admin.applications.index');
     Route::post('/admin/applications/bulk-update', [AdminApplicationController::class, 'bulkUpdateStatus'])->name('admin.applications.bulk_update');
-    Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show');
-    Route::match(['put', 'patch'], '/admin/applications/{id}', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus');
+    Route::get('/admin/applications/{id}', [AdminApplicationController::class, 'show'])->name('admin.applications.show')->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
+    Route::match(['put', 'patch'], '/admin/applications/{id}', [AdminApplicationController::class, 'updateStatus'])->name('admin.applications.updateStatus')->withoutMiddleware(['role:admin,super_admin'])->middleware('role:admin,super_admin,supervisor');
     Route::get('/admin/applications/{id}/letter', [AdminApplicationController::class, 'downloadLetter'])->name('admin.applications.letter');
     Route::patch('/admin/applications/{id}/assignment', [PlacementAssignmentController::class, 'update'])->name('admin.applications.assignment');
 

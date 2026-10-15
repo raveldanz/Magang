@@ -52,6 +52,15 @@ class ImpersonationController extends Controller
             'target_role' => $targetUser->role,
         ]);
 
+        // Simpan URL asal untuk redirect kembali setelah sesi impersonasi selesai
+        $returnTo = $request->input('return_to')
+            ?? $request->headers->get('referer')
+            ?? url()->previous();
+
+        if ($returnTo && (str_contains($returnTo, '/login') || str_contains($returnTo, '/impersonate'))) {
+            $returnTo = null;
+        }
+
         // Login sebagai target user + buat ID sesi baru (mencegah session fixation)
         Auth::loginUsingId($targetUser->id);
         $request->session()->regenerate();
@@ -60,6 +69,9 @@ class ImpersonationController extends Controller
         $request->session()->put('impersonator_id', $impersonatorUser->id);
         $request->session()->put('impersonator_name', $impersonatorUser->name);
         $request->session()->put('impersonator_email', $impersonatorUser->email);
+        if ($returnTo) {
+            $request->session()->put('impersonator_return_to', $returnTo);
+        }
         $request->session()->save();
 
         // Redirect ke dashboard masing-masing role
@@ -89,6 +101,22 @@ class ImpersonationController extends Controller
         $originalUser = User::findOrFail($originalId);
         $impersonatedUser = Auth::user();
 
+        // Tentukan URL tujuan kembali sebelum sesi penyamaran dihapus
+        $returnUrl = $request->session()->get('impersonator_return_to');
+
+        // Fallback kontekstual cerdas jika return_to belum tersimpan di session
+        if (! $returnUrl) {
+            if ($impersonatedUser?->agency_profile_id) {
+                $returnUrl = route('admin.agencies.show', $impersonatedUser->agency_profile_id);
+            } elseif ($impersonatedUser?->university_id) {
+                $returnUrl = route('admin.universities.show', $impersonatedUser->university_id);
+            } elseif ($impersonatedUser && in_array($impersonatedUser->role, ['mentor', 'pembimbing'])) {
+                $returnUrl = route('admin.mentors.index');
+            } else {
+                $returnUrl = route('admin.dashboard');
+            }
+        }
+
         // Catat Audit Log
         AuditLog::record('IMPERSONATE_END', 'User', $impersonatedUser?->id, [
             'original_id' => $originalUser->id,
@@ -102,10 +130,10 @@ class ImpersonationController extends Controller
         $request->session()->regenerate();
 
         // Hapus session impersonasi
-        $request->session()->forget(['impersonator_id', 'impersonator_name', 'impersonator_email']);
+        $request->session()->forget(['impersonator_id', 'impersonator_name', 'impersonator_email', 'impersonator_return_to']);
         $request->session()->save();
 
-        return redirect()->route('admin.users.index')
+        return redirect()->to($returnUrl)
             ->with('success', "Sesi penyamaran berakhir. Selamat datang kembali, {$originalUser->name}!");
     }
 }

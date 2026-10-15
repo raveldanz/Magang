@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang — Pemerintah Kota Surabaya') }}</title>
+        <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang Dispusip — Dinas Perpustakaan dan Kearsipan Kota Surabaya') }}</title>
 
         <!-- Favicon Resmi Pemerintah Kota Surabaya (Square Canvas Preserving Aspect Ratio) -->
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=2">

@@ -109,18 +109,19 @@
                     <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang -->
+                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
                         @php
                             $selectedUnitId = old('unit_id', '');
                             $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
-                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? '');
+                            $defaultAgency = $agencies->first();
+                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? ($defaultAgency?->id ?? ''));
 
                             $agencyItems = $agencies->map(function ($a) {
                                 return [
                                     'id' => $a->id,
                                     'name' => $a->agency_name,
                                     'acronym' => $a->acronym,
-                                    'meta' => $a->address ?? 'Pemerintah Kota Surabaya',
+                                    'meta' => $a->address ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
                                 ];
                             })->values()->all();
 
