@@ -89,6 +89,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-077** | 2026-10-15 | Evaluasi Fleksibel, Kustomisasi Komponen & Sertifikat Dinamis | Default 100% Dinas, kustomisasi komponen per kampus, penyembunyian pihak 0% di sertifikat & penyesuaian huruf A/B | RESOLVED |
 | **LRN-078** | 2026-10-15 | Standarisasi Dispusip Single-Agency, 4 Bidang & Double ACC | Pembersihan ekosistem OPD non-Dispusip, relasi unit_id mentor, role supervisor (Atasan Kepegawaian), dan Double ACC pengajuan & sertifikat | RESOLVED |
 | **LRN-079** | 2026-10-15 | Integrasi & Harmonisasi Fitur Evaluasi Nilai | Penggabungan skema evaluasi kampus, komponen kustom universitas, dan input aspek dinamis Dosen/Mentor | RESOLVED |
+| **LRN-080** | 2026-10-15 | Standarisasi Nomenklatur Jabatan, Kunci 4 Bidang Dispusip & Integrasi Chat/Notifikasi Supervisor | Penguncian tepat 4 bidang Dispusip, nomenklatur 'Tim Kerja Umum dan Kepegawaian', eliminasi role mentah SUPERVISOR, komponen x-page-header, & dukungan penuh chat/notifikasi supervisor | RESOLVED |
 
 ---
 
@@ -1861,6 +1862,33 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   5. Menyelaraskan teks grid ringkasan mobile ke `Mhs Aktif` dan `Mhs Lulus` sehingga 100% lulus `StatusViewGuardTest` dan lolos 292 pengujian PHPUnit (Strict Exit Code 0).
 - **Prevention Rule**:
   - Pertahankan filosofi antarmuka kedinasan: fokus pada esensi data operasional, minimalis, kontras tinggi, palet warna primer Pemkot (Slate/Navy & Blue), hindari elemen dekoratif non-fungsional, dan jangan menduplikasi singkatan instansi dalam kurung.
+
+---
+
+### [LRN-080] Standarisasi Nomenklatur Jabatan, Kunci 4 Bidang Dispusip & Integrasi Chat/Notifikasi Supervisor
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Models/User.php`, `database/migrations/2026_10_15_160000_lock_dispusip_single_agency_and_four_units.php`, `database/seeders/`, `resources/views/components/page-header.blade.php`, `app/Services/Chat/`, `app/Services/NotificationService.php`, `app/Providers/AppServiceProvider.php`
+- **Problem / Symptom**:
+  1. Halaman `/supervisor/applications` masih menampilkan puluhan bidang OPD dinas luar pada dropdown karena basis data lama belum dibersihkan dan unit tidak terfilter spesifik Dispusip.
+  2. Banner mode penyamaran menampilkan kode role mentah kapital `SUPERVISOR`, dan nama akun di seeder menggunakan nama jabatan karangan ("Koordinator Tim Kerja Kepegawaian").
+  3. Halaman supervisor menggunakan layout custom dengan pill badge ungu buatan sendiri ("Double ACC Pengajuan Magang") yang menyimpang dari standar UI Admin.
+  4. Fitur chat dan kontak direktori belum mendukung role `supervisor` (tidak bisa chat dua arah dengan dinas/mahasiswa/DPL/kampus, tidak ada urutan `roleOrderSql`).
+  5. Notifikasi lonceng atasan tidak menghitung pengajuan dan sertifikat `waiting_approval`, dan saat admin meneruskan berkas belum ada push notifikasi ke supervisor.
+  6. Nama-nama mahasiswa dan mentor di seeder masih mengandung imbuhan kurung `(Lulus Magang)`, `(Aktif Magang)`, `(Tim Perpustakaan)`.
+- **Root Cause**:
+  - Inkonsistensi data migrasi awal dan seeder yang masih menyimpan residu multi-dinas OPD Surabaya, ketiadaan helper method `roleLabel()` terpusat di `User.php`, serta belum terdaftarnya role `supervisor` pada konstanta `AGENCY_STAFF_ROLES` di direktori chat.
+- **Fix Applied**:
+  1. Dibuat migrasi `2026_10_15_160000_lock_dispusip_single_agency_and_four_units.php` dan seeder dibersihkan sehingga tabel `agency_profiles` TEPAT 1 (Dispusip) dan tabel `units` TEPAT 4 (Bidang Sekretariat; Bidang Pembinaan dan Pengelolaan Perpustakaan; Bidang Pembinaan dan Layanan Kearsipan; Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan).
+  2. Dibuat method standar `User::roleLabel()` yang memetakan role `supervisor` -> `'Tim Kerja Umum dan Kepegawaian'`, `admin` -> `'Admin Dispusip'`, `super_admin` -> `'Super Admin'`, `mentor` -> `'Pembimbing Lapangan'`, `student` -> `'Mahasiswa Magang'`. Banner penyamaran diubah memakai `{{ auth()->user()->roleLabel() }}`.
+  3. Dibuat komponen reusable `<x-page-header>` dan diimplementasikan pada seluruh view supervisor (`dashboard`, `applications.index`, `applications.show`, `certificates.index`). Menghilangkan seluruh badge pill ungu buatan sendiri.
+  4. Diintegrasikan fitur Chat: `AGENCY_STAFF_ROLES` ditambahkan `supervisor`, relasi dua arah di `ChatContactDirectory` diaktifkan untuk `supervisor` ↔ `super_admin`/`admin`/`mentor`/`mahasiswa`/`dosen`/`universitas`, urutan kontak menerapkan `roleOrderSql()` dengan `WHEN 'supervisor' THEN 2`, serta izin broadcast channel di `ChatChannelService`.
+  5. Ditambahkan View Composer `layouts.navigation` di `AppServiceProvider` untuk menghitung `$unreadCount` dari `waiting_approval` (aplikasi + sertifikat), dan ditambahkan helper `NotificationService::notifySupervisorForApplication()` serta `notifySupervisorForCertificate()`.
+  6. Seluruh tanda kurung pada nama mahasiswa & mentor di seeder dihapus tuntas.
+  7. Dijalankan `php artisan migrate:fresh --seed` (Exit Code: 0) dan seluruh test suite lulus 292 tests (Exit Code: 0).
+- **Prevention Rule**:
+  - Dilarang keras menampilkan kode role mentah seperti `SUPERVISOR` atau `admin` di antarmuka; wajib panggil `$user->roleLabel()`.
+  - Dilarang mengarang nama jabatan sendiri; wajib gunakan nomenklatur resmi "Tim Kerja Umum dan Kepegawaian".
+  - Pastikan setiap query unit di controller selalu terikat ke `agency_profile_id` Dispusip.
 
 ---
 

@@ -67,11 +67,37 @@ class User extends Authenticatable
     }
 
     /**
-     * Supervisor = Atasan (Tim Kerja Umum & Kepegawaian Dispusip).
+     * Supervisor = Tim Kerja Umum dan Kepegawaian Dispusip.
      */
     public function isSupervisor(): bool
     {
         return $this->role === 'supervisor';
+    }
+
+    /**
+     * Standarisasi label role pengguna untuk seluruh antarmuka sistem.
+     */
+    public function roleLabel(): string
+    {
+        if ($this->isSuperAdmin()) {
+            return 'Super Admin';
+        }
+
+        return match ($this->role) {
+            'super_admin' => 'Super Admin',
+            'admin' => 'Admin Dispusip',
+            'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
+            'mentor', 'pembimbing' => 'Pembimbing Lapangan',
+            'lecturer', 'dosen', 'academic_advisor' => 'Dosen Pembimbing',
+            'university', 'universitas' => 'Admin Universitas',
+            'student', 'mahasiswa' => 'Mahasiswa Magang',
+            default => ucwords(str_replace('_', ' ', (string) $this->role)),
+        };
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return $this->roleLabel();
     }
 
     public function studentProfile()

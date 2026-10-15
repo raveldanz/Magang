@@ -88,11 +88,11 @@ class SurabayaAgenciesSeeder extends Seeder
             );
         }
 
-        // Hapus unit di luar 4 Bidang Resmi jika tidak dipakai oleh aplikasi magang aktif
-        Unit::where('agency_profile_id', $dispusip->id)
-            ->whereNotIn('name', array_keys($createdUnits))
-            ->whereDoesntHave('applications')
-            ->delete();
+        // Hapus SEMUA profil dinas selain Dispusip
+        AgencyProfile::where('id', '!=', $dispusip->id)->delete();
+
+        // Hapus unit di luar 4 Bidang Resmi Dispusip
+        Unit::whereNotIn('name', array_keys($createdUnits))->delete();
 
         // 3. Akun Super Admin Dispusip (Pengelola IT Sistem)
         User::updateOrCreate(
@@ -120,7 +120,7 @@ class SurabayaAgenciesSeeder extends Seeder
             ]
         );
 
-        // 5. Akun Atasan / Supervisor (Tim Kerja Umum & Kepegawaian Dispusip) — Double ACC
+        // 5. Akun Atasan / Supervisor (Tim Kerja Umum dan Kepegawaian Dispusip) — Double ACC
         User::updateOrCreate(
             ['email' => 'atasan.dispusip@surabaya.go.id'],
             [
@@ -137,7 +137,7 @@ class SurabayaAgenciesSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
-                'name' => 'Koordinator Tim Kerja Kepegawaian',
+                'name' => 'Tim Kerja Umum dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,
@@ -151,22 +151,22 @@ class SurabayaAgenciesSeeder extends Seeder
         $mentorSeedData = [
             [
                 'email' => 'mentor.sekretariat@dispusip.surabaya.go.id',
-                'name' => 'Siti Nurhaliza, S.AP (Tim Sekretariat)',
+                'name' => 'Siti Nurhaliza, S.AP',
                 'unit' => 'Bidang Sekretariat',
             ],
             [
                 'email' => 'mentor.dispusip1@surabaya.go.id',
-                'name' => 'Budi Santoso, S.ST., M.MT (Tim Perpustakaan)',
+                'name' => 'Budi Santoso, S.ST., M.MT',
                 'unit' => 'Bidang Pembinaan dan Pengelolaan Perpustakaan',
             ],
             [
                 'email' => 'mentor.layanan@dispusip.surabaya.go.id',
-                'name' => 'Dewi Lestari, S.Sos., M.A (Tim Layanan Arsip)',
+                'name' => 'Dewi Lestari, S.Sos., M.A',
                 'unit' => 'Bidang Pembinaan dan Layanan Kearsipan',
             ],
             [
                 'email' => 'mentor.preservasi@dispusip.surabaya.go.id',
-                'name' => 'Agus Pramono, S.Hum., M.P (Tim Preservasi Arsip)',
+                'name' => 'Agus Pramono, S.Hum., M.P',
                 'unit' => 'Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan',
             ],
         ];

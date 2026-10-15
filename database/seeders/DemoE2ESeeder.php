@@ -178,7 +178,7 @@ class DemoE2ESeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'atasan.dispusip@surabaya.go.id'],
             [
-                'name' => 'Koordinator Tim Kerja Kepegawaian',
+                'name' => 'Tim Kerja Umum dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,
@@ -192,7 +192,7 @@ class DemoE2ESeeder extends Seeder
         $mentorPerpus = User::updateOrCreate(
             ['email' => 'mentor.dispusip@surabaya.go.id'],
             [
-                'name' => 'Budi Santoso, S.ST., M.MT (Tim Perpustakaan)',
+                'name' => 'Budi Santoso, S.ST., M.MT',
                 'password' => $defaultPassword,
                 'role' => 'mentor',
                 'agency_profile_id' => $dispusip->id,
@@ -205,7 +205,7 @@ class DemoE2ESeeder extends Seeder
         $mentorArsip = User::updateOrCreate(
             ['email' => 'mentor.arsip@dispusip.surabaya.go.id'],
             [
-                'name' => 'Dewi Lestari, S.Sos., M.A (Tim Arsip)',
+                'name' => 'Dewi Lestari, S.Sos., M.A',
                 'password' => $defaultPassword,
                 'role' => 'mentor',
                 'agency_profile_id' => $dispusip->id,
@@ -236,7 +236,7 @@ class DemoE2ESeeder extends Seeder
         $dplUnesa = User::updateOrCreate(
             ['email' => 'dosen.unesa@unesa.ac.id'],
             [
-                'name' => 'Dr. Erina Nur Azizah, S.Kom., M.Cs (DPL UNESA)',
+                'name' => 'Dr. Erina Nur Azizah, S.Kom., M.Cs',
                 'password' => $defaultPassword,
                 'role' => 'dosen',
                 'university_id' => $unesa->id,
@@ -254,7 +254,7 @@ class DemoE2ESeeder extends Seeder
         $mhsLulus = User::updateOrCreate(
             ['email' => 'mahasiswa.lulus@unesa.ac.id'],
             [
-                'name' => 'Rizky Pratama (Lulus Magang)',
+                'name' => 'Rizky Pratama',
                 'password' => $defaultPassword,
                 'role' => 'mahasiswa',
                 'university_id' => $unesa->id,
@@ -342,7 +342,7 @@ class DemoE2ESeeder extends Seeder
         $mhsAktif = User::updateOrCreate(
             ['email' => 'mahasiswa.aktif@unesa.ac.id'],
             [
-                'name' => 'Dimas Wicaksono (Aktif Magang)',
+                'name' => 'Dimas Wicaksono',
                 'password' => $defaultPassword,
                 'role' => 'mahasiswa',
                 'university_id' => $unesa->id,
@@ -395,7 +395,7 @@ class DemoE2ESeeder extends Seeder
         $mhsWaiting = User::updateOrCreate(
             ['email' => 'mahasiswa.waiting@unesa.ac.id'],
             [
-                'name' => 'Anisa Rahmawati (Menunggu ACC Atasan)',
+                'name' => 'Anisa Rahmawati',
                 'password' => $defaultPassword,
                 'role' => 'mahasiswa',
                 'university_id' => $unesa->id,

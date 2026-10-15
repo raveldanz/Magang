@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
+use App\Models\Certificate;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
@@ -148,6 +150,39 @@ class NotificationService
                     'action_url' => route('admin.applications.index'),
                     'action_label' => 'Lihat Penempatan',
                     'is_action_required' => false,
+                ];
+            }
+        }
+
+        // 1.5. SUPERVISOR / TIM KERJA UMUM DAN KEPEGAWAIAN DISPUSIP
+        elseif ($role === 'supervisor' || $user->isSupervisor()) {
+            $waitingApps = Application::where('status', ApplicationStatus::WAITING_APPROVAL->value)->count();
+            if ($waitingApps > 0) {
+                $actionable[] = [
+                    'id' => 'supervisor_waiting_applications',
+                    'type' => 'warning',
+                    'category' => 'application',
+                    'title' => "{$waitingApps} Pengajuan Magang Menunggu Persetujuan",
+                    'message' => 'Berkas pendaftaran mahasiswa telah diverifikasi oleh Admin Dispusip dan memerlukan persetujuan akhir serta penerbitan Surat Balasan.',
+                    'time' => 'Menunggu ACC Atasan',
+                    'action_url' => route('supervisor.applications.index'),
+                    'action_label' => 'Persetujuan Pengajuan',
+                    'is_action_required' => true,
+                ];
+            }
+
+            $waitingCerts = Certificate::where('approval_status', 'waiting_approval')->count();
+            if ($waitingCerts > 0) {
+                $actionable[] = [
+                    'id' => 'supervisor_waiting_certificates',
+                    'type' => 'warning',
+                    'category' => 'certificate',
+                    'title' => "{$waitingCerts} Sertifikat Kelulusan Menunggu Pengesahan",
+                    'message' => 'Terdapat sertifikat kelulusan magang dengan nilai evaluasi akhir yang menunggu pengesahan resmi Atasan.',
+                    'time' => 'Menunggu Pengesahan',
+                    'action_url' => route('supervisor.certificates.index'),
+                    'action_label' => 'Pengesahan Sertifikat',
+                    'is_action_required' => true,
                 ];
             }
         }
@@ -570,5 +605,41 @@ class NotificationService
         }
 
         return $hasUrgentPending;
+    }
+
+    /**
+     * Kirim notifikasi ke akun supervisor ketika pengajuan diteruskan untuk disetujui.
+     */
+    public static function notifySupervisorForApplication(Application $application): void
+    {
+        $studentName = $application->user?->name ?? 'Mahasiswa';
+        SystemNotification::send(
+            title: 'Pengajuan Magang Menunggu Persetujuan Atasan',
+            message: "Pengajuan magang atas nama {$studentName} telah diverifikasi oleh Admin Dispusip dan menunggu persetujuan Anda.",
+            userId: null,
+            targetRole: 'supervisor',
+            actionUrl: route('supervisor.applications.show', $application->id),
+            actionLabel: 'Tinjau Pengajuan',
+            type: 'warning',
+            category: 'application'
+        );
+    }
+
+    /**
+     * Kirim notifikasi ke akun supervisor ketika sertifikat diterbitkan dan menunggu pengesahan.
+     */
+    public static function notifySupervisorForCertificate(Certificate $certificate): void
+    {
+        $studentName = $certificate->placement?->application?->user?->name ?? 'Mahasiswa';
+        SystemNotification::send(
+            title: 'Sertifikat Kelulusan Menunggu Pengesahan Atasan',
+            message: "Sertifikat magang untuk peserta {$studentName} telah diterbitkan dan menunggu pengesahan resmi Anda.",
+            userId: null,
+            targetRole: 'supervisor',
+            actionUrl: route('supervisor.certificates.index'),
+            actionLabel: 'Sahkan Sertifikat',
+            type: 'warning',
+            category: 'certificate'
+        );
     }
 }

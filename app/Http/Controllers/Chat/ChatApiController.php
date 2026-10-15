@@ -49,6 +49,7 @@ class ChatApiController extends Controller
                 $q->where(fn ($w) => $w->whereRaw('LOWER(name) LIKE ?', [$like])->orWhereRaw('LOWER(email) LIKE ?', [$like]));
             })
             ->with(['agencyProfile', 'universityRelation'])
+            ->orderByRaw(ChatContactDirectory::roleOrderSql())
             ->orderBy('name')
             ->limit(80)
             ->get();

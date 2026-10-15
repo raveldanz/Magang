@@ -148,7 +148,7 @@
                     @elseif ($isSupervisor)
                         <a href="{{ route('supervisor.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Monitoring Bidang & Kepegawaian
+                            Dashboard & Tim Kerja
                         </a>
                         <a href="{{ route('supervisor.applications.index') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -257,7 +257,7 @@
             <div class="hidden md:flex items-center gap-3">
 
                 @php
-                    $navHasUnreadDot = Auth::user() ? \App\Services\NotificationService::hasUnreadDot(Auth::user()) : false;
+                    $navHasUnreadDot = Auth::user() ? (\App\Services\NotificationService::hasUnreadDot(Auth::user()) || ((int) ($unreadCount ?? 0) > 0)) : false;
                     $navAllNotifs = Auth::user() ? \App\Services\NotificationService::getNotificationsForUser(Auth::user()) : [];
                     // Pesan chat belum dibaca didahulukan agar tidak tenggelam di bawah pemberitahuan otomatis lain
                     $navIsUnreadChat = fn ($n) => ($n['category'] ?? '') === 'chat' && empty($n['is_read']);
@@ -389,7 +389,7 @@
                                 @endif
                                 <div class="overflow-hidden">
                                     <div class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->name ?? 'User' }}</div>
-                                    <div class="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">{{ strtoupper(str_replace('_', ' ', Auth::user()->role ?? 'Role')) }}</div>
+                                    <div class="text-[10px] font-semibold text-blue-600 tracking-wide">{{ Auth::user()->roleLabel() }}</div>
                                 </div>
                             </div>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
@@ -415,10 +415,10 @@
                             </a>
                         @elseif ($isSupervisor)
                             <a href="{{ route('supervisor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Monitoring Bidang & Kepegawaian
+                                Dashboard & Tim Kerja
                             </a>
                             <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Persetujuan Pengajuan Magang
+                                Persetujuan Pengajuan
                             </a>
                             <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengesahan Sertifikat
@@ -600,7 +600,7 @@
                     @endif
                     <div>
                         <div class="text-xs font-bold text-slate-800 leading-tight">{{ Auth::user()->name ?? 'Pengguna' }}</div>
-                        <div class="text-[10px] font-semibold text-blue-600 uppercase">{{ strtoupper(str_replace('_', ' ', Auth::user()->role ?? 'Role')) }}</div>
+                        <div class="text-[10px] font-semibold text-blue-600">{{ Auth::user()->roleLabel() }}</div>
                     </div>
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Online</span>
@@ -654,13 +654,13 @@
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <span>Monitoring Bidang & Kepegawaian</span>
+                        <span>Dashboard & Tim Kerja</span>
                     </a>
                     <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
-                        <span>Persetujuan Pengajuan Magang</span>
+                        <span>Persetujuan Pengajuan</span>
                     </a>
                     <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">

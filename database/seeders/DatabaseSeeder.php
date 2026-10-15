@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             SurabayaAgenciesSeeder::class,
             DemoE2ESeeder::class,
             AdminWorkflowSeeder::class,
+            SupervisorDemoSeeder::class,
         ]);
     }
 }

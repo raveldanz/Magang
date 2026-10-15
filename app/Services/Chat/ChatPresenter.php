@@ -1406,12 +1406,14 @@ class ChatPresenter
         }
 
         return match ($user->role) {
-            'admin' => 'Admin Dinas',
-            'mentor', 'pembimbing' => 'Mentor Lapangan',
+            'super_admin' => 'Super Admin',
+            'admin' => 'Admin Dispusip',
+            'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
+            'mentor', 'pembimbing' => 'Pembimbing Lapangan',
             'dosen', 'academic_advisor' => 'Dosen Pembimbing',
-            'universitas' => 'Admin Kampus',
-            'mahasiswa' => 'Mahasiswa',
-            default => ucwords(str_replace('_', ' ', (string) $user->role)),
+            'universitas', 'university' => 'Admin Universitas',
+            'mahasiswa', 'student' => 'Mahasiswa Magang',
+            default => $user->roleLabel(),
         };
     }
 
@@ -1425,6 +1427,7 @@ class ChatPresenter
         }
 
         return match ($user->role) {
+            'supervisor' => 'agency',
             'admin' => 'agency',
             'mentor', 'pembimbing' => 'mentor',
             'dosen', 'academic_advisor' => 'lecturer',

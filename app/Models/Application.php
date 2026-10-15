@@ -330,7 +330,7 @@ class Application extends Model
 
     // ------------------------------------------------------------------
     // STANDAR PRIORITAS TINDAKAN ADMIN (dipakai halaman Pengajuan, pusat kendali dinas & kampus)
-    //   1 Perlu verifikasi / keputusan (pending, verified)
+    //   1 Perlu verifikasi / keputusan (pending, waiting_approval)
     //   2 Siap diluluskan (diterima/aktif + laporan disetujui + nilai lengkap)
     //   3 Pembimbing belum ditetapkan (mentor, atau DPL bila kampus mewajibkan)
     //   4 Magang aktif   5 Diterima (menunggu mulai)   6 Selesai
@@ -372,7 +372,7 @@ class Application extends Model
 
     /**
      * Keterangan tindakan yang TIDAK terbaca dari badge status (null jika tidak ada).
-     * Tingkat 1 (PENDING/VERIFIED) sengaja tanpa keterangan: badge-nya sudah menyatakan tindakannya.
+     * Tingkat 1 (PENDING/WAITING_APPROVAL) sengaja tanpa keterangan: badge-nya sudah menyatakan tindakannya.
      */
     public function actionHint(?bool $requireAdvisor = null): ?string
     {
@@ -383,6 +383,35 @@ class Application extends Model
             3 => $this->missingSupervisor($requireAdvisor) === 'mentor' ? 'Mentor belum ditetapkan' : 'Dosen pembimbing belum ditetapkan',
             default => null,
         };
+    }
+
+    /**
+     * Otomatisasi transisi status dari ACCEPTED ke ACTIVE secara on-the-fly jika tanggal mulai magang
+     * telah tiba (today >= start_date) dan mahasiswa belum berstatus active.
+     */
+    public function autoActivateIfStarted(): bool
+    {
+        $rawStatus = $this->statusValue();
+        $today = Carbon::today()->toDateString();
+
+        if ($rawStatus === ApplicationStatus::ACCEPTED->value
+            && $this->start_date
+            && Carbon::parse($this->start_date)->toDateString() <= $today) {
+
+            $this->update(['status' => ApplicationStatus::ACTIVE]);
+            $this->status = ApplicationStatus::ACTIVE;
+
+            AuditLog::record('AUTO_ACTIVATE_ON_THE_FLY', 'Application', $this->id, [
+                'student_name' => $this->user?->name,
+                'start_date' => $this->start_date,
+                'activated_at' => now()->toDateTimeString(),
+                'reason' => 'Otomatis diaktifkan secara on-the-fly karena tanggal mulai magang telah tiba.',
+            ]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

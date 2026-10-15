@@ -72,6 +72,22 @@ class Placement extends Model
     }
 
     /**
+     * Otomatisasi transisi status mahasiswa ke ACTIVE on-the-fly jika tanggal mulai magang telah tiba.
+     */
+    public function autoActivateIfStarted(): bool
+    {
+        return $this->application ? $this->application->autoActivateIfStarted() : false;
+    }
+
+    /**
+     * Backward-compatible status accessor yang merefleksikan status aplikasi induknya.
+     */
+    public function getStatusAttribute()
+    {
+        return $this->application?->status;
+    }
+
+    /**
      * Apakah penempatan sudah memiliki mentor lapangan teknis (mentor_id / pembimbing_id legacy).
      */
     public function hasFieldMentor(): bool

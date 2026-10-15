@@ -1,27 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                        Double ACC Pengesahan Sertifikat
-                    </span>
-                    <span class="text-xs text-slate-500 font-medium">Tim Kerja Umum & Kepegawaian Dispusip</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    Pengesahan Sertifikat Kelulusan Magang
-                </h1>
-                <p class="text-sm text-slate-600 mt-1">
-                    Validasi nilai evaluasi akhir peserta magang dan berikan pengesahan resmi agar sertifikat dapat diunduh oleh mahasiswa.
-                </p>
-            </div>
-            <div class="flex items-center gap-3">
+        <x-page-header 
+            title="Pengesahan Sertifikat Kelulusan Magang" 
+            description="Validasi nilai evaluasi akhir peserta magang dan berikan pengesahan resmi agar sertifikat dapat diunduh oleh mahasiswa.">
+            <x-slot name="actions">
                 <a href="{{ route('supervisor.dashboard') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border-2 border-slate-200 transition">
-                    &larr; Kembali ke Monitoring
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 transition">
+                    &larr; Monitoring Bidang
                 </a>
-            </div>
-        </div>
+            </x-slot>
+        </x-page-header>
     </x-slot>
 
     <div class="py-6 sm:py-8">
@@ -51,7 +39,7 @@
 
                 <a href="{{ route('supervisor.certificates.index', ['status' => 'approved']) }}" 
                    class="px-5 py-2.5 rounded-2xl text-sm font-black transition flex items-center gap-2.5 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
-                    <span>Telah Disahkan (ACC)</span>
+                    <span>Telah Disahkan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'approved' ? 'bg-white text-emerald-700' : 'bg-emerald-100 text-emerald-800' }}">
                         {{ $approvedCount }}
                     </span>
@@ -178,7 +166,7 @@
                                                     <button type="submit" 
                                                             class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition cursor-pointer">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                        <span>Sahkan (ACC)</span>
+                                                        <span>Sahkan</span>
                                                     </button>
                                                 </form>
 

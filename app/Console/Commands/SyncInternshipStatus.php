@@ -41,7 +41,7 @@ class SyncInternshipStatus extends Command
     }
 
     /**
-     * ACCEPTED → ACTIVE saat tanggal mulai magang tiba (dan belum lewat end_date).
+     * ACCEPTED → ACTIVE saat tanggal mulai magang tiba (start_date <= today).
      */
     private function activateStartedInternships(string $today): void
     {
@@ -49,10 +49,6 @@ class SyncInternshipStatus extends Command
             ->where('status', ApplicationStatus::ACCEPTED)
             ->whereNotNull('start_date')
             ->whereDate('start_date', '<=', $today)
-            ->where(function ($q) use ($today) {
-                $q->whereNull('end_date')
-                    ->orWhereDate('end_date', '>', $today);
-            })
             ->get();
 
         if ($applications->isEmpty()) {

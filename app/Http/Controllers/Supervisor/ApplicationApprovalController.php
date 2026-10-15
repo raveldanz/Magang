@@ -54,7 +54,10 @@ class ApplicationApprovalController extends Controller
 
         $applications = $query->latest()->paginate(10)->withQueryString();
 
-        $units = \App\Models\Unit::orderBy('name')->get();
+        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first() ?? AgencyProfile::first();
+        $units = \App\Models\Unit::when($dispusip, fn ($q) => $q->where('agency_profile_id', $dispusip->id))
+            ->orderBy('name')
+            ->get();
 
         $waitingCount = Application::where('status', ApplicationStatus::WAITING_APPROVAL->value)->count();
         $approvedCount = Application::whereIn('status', [ApplicationStatus::ACCEPTED->value, ApplicationStatus::ACTIVE->value, ApplicationStatus::COMPLETED->value])->count();
@@ -144,15 +147,15 @@ class ApplicationApprovalController extends Controller
     }
 
     /**
-     * Aksi Revisi: Kembalikan Berkas ke Admin Dinas dengan Catatan
+     * Aksi Revisi / Penolakan: Kembalikan Berkas ke Admin Dinas dengan Catatan Penolakan
      */
     public function revise(Request $request, $id)
     {
         $request->validate([
             'notes' => 'required|string|min:5',
         ], [
-            'notes.required' => 'Catatan revisi wajib diisi agar Admin Dinas mengetahui bagian yang perlu diperbaiki.',
-            'notes.min' => 'Catatan revisi minimal 5 karakter.',
+            'notes.required' => 'Catatan penolakan wajib diisi agar Admin Dinas mengetahui alasannya.',
+            'notes.min' => 'Catatan penolakan minimal 5 karakter.',
         ]);
 
         $application = Application::with(['user'])->findOrFail($id);
@@ -162,8 +165,8 @@ class ApplicationApprovalController extends Controller
 
         $application->update([
             'status' => ApplicationStatus::PENDING->value,
-            'rejection_note' => "Catatan Revisi Atasan: " . $request->notes,
-            'rejection_reason' => "Catatan Revisi Atasan: " . $request->notes,
+            'rejection_note' => "Catatan Penolakan Atasan: " . $request->notes,
+            'rejection_reason' => "Catatan Penolakan Atasan: " . $request->notes,
         ]);
 
         AuditLog::record('SUPERVISOR_APPLICATION_REVISED', 'Application', $application->id, [
@@ -176,6 +179,6 @@ class ApplicationApprovalController extends Controller
         ]);
 
         return redirect()->route('supervisor.applications.index')
-            ->with('success', "Pengajuan magang atas nama {$application->user?->name} telah dikembalikan ke Admin Dinas untuk direvisi.");
+            ->with('success', "Pengajuan magang atas nama {$application->user?->name} telah ditolak dan dikembalikan ke Admin Dinas.");
     }
 }

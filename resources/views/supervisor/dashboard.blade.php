@@ -1,28 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    Monitoring Bidang & Kepegawaian Magang
-                </h1>
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('supervisor.applications.index') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-xs transition">
-                    <span>Persetujuan Pengajuan</span>
-                    @if($pendingApplicationsCount > 0)
-                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-white text-blue-700">{{ $pendingApplicationsCount }}</span>
-                    @endif
-                </a>
-                <a href="{{ route('supervisor.certificates.index') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-xs transition">
-                    <span>Pengesahan Sertifikat</span>
-                    @if($pendingCertificatesCount > 0)
-                        <span class="px-2 py-0.5 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200">{{ $pendingCertificatesCount }}</span>
-                    @endif
-                </a>
-            </div>
-        </div>
+        <x-page-header 
+            title="Monitoring Bidang & Kepegawaian Magang" 
+            description="Pantau kuota penempatan, sebaran mahasiswa magang aktif di 4 Bidang Resmi Dispusip, serta progres persetujuan." 
+        />
     </x-slot>
 
     <div class="py-6 sm:py-8">
@@ -30,16 +11,17 @@
 
             {{-- 1. KARTU STATISTIK UTAMA (SIMPEL MINIMALIS MODERN - STYLE DINAS) --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <!-- Card 1: Pengajuan Menunggu ACC -->
+                <!-- Card 1: Pengajuan Menunggu Persetujuan -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Perlu Persetujuan (ACC)</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Perlu Persetujuan</span>
                         <div class="text-3xl sm:text-4xl font-black text-slate-900 mt-2">{{ $pendingApplicationsCount }}</div>
-                        <p class="text-xs text-slate-500 mt-1">Pengajuan magang menunggu ACC atasan</p>
+                        <p class="text-xs text-slate-500 mt-1">Pengajuan magang menunggu persetujuan atasan</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
-                        <a href="{{ route('supervisor.applications.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                            Buka Kotak Masuk ACC &rarr;
+                        <a href="{{ route('supervisor.applications.index') }}" 
+                           class="w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
+                            Persetujuan Pengajuan
                         </a>
                     </div>
                 </div>
@@ -52,8 +34,9 @@
                         <p class="text-xs text-slate-500 mt-1">Sertifikat selesai magang perlu disahkan</p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-slate-100">
-                        <a href="{{ route('supervisor.certificates.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
-                            Buka Pengesahan Sertifikat &rarr;
+                        <a href="{{ route('supervisor.certificates.index') }}" 
+                           class="w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition">
+                            Pengesahan Sertifikat
                         </a>
                     </div>
                 </div>
@@ -159,6 +142,12 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Footer Info Bar untuk menambah kenyamanan visual di bagian bawah tabel --}}
+                <div class="hidden md:flex px-6 py-4 bg-slate-50/60 border-t border-slate-100 items-center justify-between text-xs text-slate-500">
+                    <span class="font-medium">Total: {{ $units->count() }} Bidang Penempatan</span>
+                    <span class="font-semibold text-slate-600">Dinas Perpustakaan dan Kearsipan Kota Surabaya</span>
                 </div>
 
                 {{-- Tampilan Mobile / Tablet --}}

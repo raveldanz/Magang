@@ -97,6 +97,10 @@ class CertificateController extends Controller
             ]
         );
 
+        if ($certificate->wasRecentlyCreated || $certificate->approval_status === 'waiting_approval') {
+            \App\Services\NotificationService::notifySupervisorForCertificate($certificate);
+        }
+
         $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, $user);
         $data['certificateRecord'] = $certificate;
 
