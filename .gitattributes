@@ -17,4 +17,3 @@ scripts/** linguist-vendored
 
 # Institutional Memory Git Merge Strategy (Auto-union append without conflict)
 .antigravity/memory/learnings.md merge=union
-

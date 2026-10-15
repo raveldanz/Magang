@@ -114,12 +114,24 @@ class EvaluationController extends Controller
         ];
 
         if (! $isMentorOnly) {
-            $rules['score_mastery'] = 'required|numeric|min:0|max:100';
-            $rules['score_report'] = 'required|numeric|min:0|max:100';
-            $rules['score_attitude'] = 'required|numeric|min:0|max:100';
+            if ($request->has('aspects')) {
+                $rules['aspects'] = 'required|array|min:1';
+                $rules['aspects.*.name'] = 'required|string|max:150';
+                $rules['aspects.*.score'] = 'required|numeric|min:0|max:100';
+            } else {
+                $rules['score_mastery'] = 'required|numeric|min:0|max:100';
+                $rules['score_report'] = 'required|numeric|min:0|max:100';
+                $rules['score_attitude'] = 'required|numeric|min:0|max:100';
+            }
         }
 
         $request->validate($rules, [
+            'aspects.required' => 'Setidaknya satu aspek penilaian wajib diisi.',
+            'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
+            'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
+            'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.min' => 'Nilai minimal adalah 0.',
+            'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'score_mastery.required' => 'Nilai penguasaan materi wajib diisi.',
             'score_mastery.min' => 'Nilai minimal adalah 0.',
             'score_mastery.max' => 'Nilai maksimal adalah 100.',
@@ -137,19 +149,53 @@ class EvaluationController extends Controller
 
         $nilaiDosen = null;
         if (! $isMentorOnly) {
-            $mastery = (float) $request->score_mastery;
-            $report = (float) $request->score_report;
-            $attitude = (float) $request->score_attitude;
-            $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
-
             $evaluation->nilai_disiplin = $evaluation->nilai_disiplin ?? 0;
             $evaluation->nilai_kinerja = $evaluation->nilai_kinerja ?? 0;
             $evaluation->nilai_laporan = $evaluation->nilai_laporan ?? 0;
-            $evaluation->nilai_akademik = (int) round($nilaiDosen);
-            $evaluation->score_mastery = $mastery;
-            $evaluation->score_report = $report;
-            $evaluation->score_attitude = $attitude;
-            $evaluation->nilai_dosen = $nilaiDosen;
+
+            if ($request->has('aspects')) {
+                $rawAspects = (array) $request->input('aspects', []);
+                $cleanAspects = [];
+                $scores = [];
+
+                foreach ($rawAspects as $a) {
+                    $name = trim($a['name'] ?? '');
+                    if ($name !== '' && isset($a['score']) && is_numeric($a['score'])) {
+                        $val = (float) $a['score'];
+                        $cleanAspects[] = ['name' => $name, 'score' => $val];
+                        $scores[] = $val;
+                    }
+                }
+
+                if (count($scores) > 0) {
+                    $nilaiDosen = round(array_sum($scores) / count($scores), 2);
+                } else {
+                    $nilaiDosen = 0.0;
+                }
+
+                $evaluation->dosen_aspects = $cleanAspects;
+                $evaluation->score_mastery = $scores[0] ?? $nilaiDosen;
+                $evaluation->score_report = $scores[1] ?? $nilaiDosen;
+                $evaluation->score_attitude = $scores[2] ?? $nilaiDosen;
+                $evaluation->nilai_akademik = (int) round($nilaiDosen);
+                $evaluation->nilai_dosen = $nilaiDosen;
+            } else {
+                $mastery = (float) $request->score_mastery;
+                $report = (float) $request->score_report;
+                $attitude = (float) $request->score_attitude;
+                $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
+
+                $evaluation->dosen_aspects = [
+                    ['name' => 'Penguasaan Materi & Relevansi CPL', 'score' => $mastery],
+                    ['name' => 'Kualitas Laporan Akhir Magang', 'score' => $report],
+                    ['name' => 'Sikap, Komunikasi & Etika Bimbingan', 'score' => $attitude],
+                ];
+                $evaluation->score_mastery = $mastery;
+                $evaluation->score_report = $report;
+                $evaluation->score_attitude = $attitude;
+                $evaluation->nilai_akademik = (int) round($nilaiDosen);
+                $evaluation->nilai_dosen = $nilaiDosen;
+            }
         }
 
         // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
