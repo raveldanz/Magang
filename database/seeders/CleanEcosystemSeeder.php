@@ -189,12 +189,20 @@ class CleanEcosystemSeeder extends Seeder
             );
 
             $unitArsip = Unit::updateOrCreate(
-                ['agency_profile_id' => $dispusip->id, 'name' => 'Bidang Preservasi & Pengelolaan Arsip Statis Elektronik'],
+                ['agency_profile_id' => $dispusip->id, 'name' => 'Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan'],
                 ['description' => 'Digitalisasi naskah kuno dan arsip statis Pemkot Surabaya', 'quota' => 8]
             );
             $unitPerpus = Unit::updateOrCreate(
-                ['agency_profile_id' => $dispusip->id, 'name' => 'Bidang Pelayanan & Otomasi Perpustakaan Digital'],
-                ['description' => 'Pengembangan katalog digital e-Library Surabaya dan otomasi sirkulasi', 'quota' => 14]
+                ['agency_profile_id' => $dispusip->id, 'name' => 'Bidang Pembinaan dan Pengelolaan Perpustakaan'],
+                ['description' => 'Pengembangan katalog digital e-Library Surabaya dan otomasi sirkulasi', 'quota' => 10]
+            );
+            $unitLayananArsip = Unit::updateOrCreate(
+                ['agency_profile_id' => $dispusip->id, 'name' => 'Bidang Pembinaan dan Layanan Kearsipan'],
+                ['description' => 'Pembinaan kearsipan dan layanan naskah kearsipan daerah', 'quota' => 8]
+            );
+            $unitSekretariat = Unit::updateOrCreate(
+                ['agency_profile_id' => $dispusip->id, 'name' => 'Bidang Sekretariat'],
+                ['description' => 'Pelaksanaan koordinasi administrasi umum, kepegawaian, dan tata persuratan dinas', 'quota' => 8]
             );
 
             $unitPiak = Unit::updateOrCreate(

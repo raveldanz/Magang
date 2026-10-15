@@ -41,9 +41,10 @@ class SurabayaAgenciesSeeder extends Seeder
                 'admin_email' => 'admin.dispusip@surabaya.go.id',
                 'admin_name' => 'Admin Dispusip Surabaya',
                 'units' => [
-                    ['name' => 'Bidang Pelayanan & Otomasi Perpustakaan Digital', 'quota' => 10, 'description' => 'Pengelolaan katalog digital, automasi perpustakaan, dan kurasi literasi digital.'],
-                    ['name' => 'Bidang Preservasi & Pengelolaan Arsip Statis Elektronik', 'quota' => 8, 'description' => 'Digitalisasi naskah kuno, restorasi arsip bersejarah, dan kearsipan elektronik.'],
-                    ['name' => 'Bidang Pembinaan & Pengembangan Minat Baca', 'quota' => 8, 'description' => 'Edukasi literasi masyarakat, mobil perpustakaan keliling, dan kemitraan literasi publik.'],
+                    ['name' => 'Bidang Sekretariat', 'quota' => 8, 'description' => 'Pelaksanaan koordinasi administrasi umum, kepegawaian, tata persuratan dinas, perencanaan program, keuangan, dan kehumasan dinas.'],
+                    ['name' => 'Bidang Pembinaan dan Pengelolaan Perpustakaan', 'quota' => 10, 'description' => 'Pembinaan dan pengembangan perpustakaan, otomasi sistem temu balik informasi (OPAC), pengolahan bahan pustaka, dan layanan perpustakaan digital.'],
+                    ['name' => 'Bidang Pembinaan dan Layanan Kearsipan', 'quota' => 8, 'description' => 'Pembinaan kearsipan internal perangkat daerah, layanan pemanfaatan naskah arsip dinamis dan statis, serta edukasi sadar tertib arsip.'],
+                    ['name' => 'Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan', 'quota' => 8, 'description' => 'Akuisisi, pengelolaan arsip inaktif dan statis, preservasi dan restorasi naskah/arsip bersejarah, serta alih media arsip digital.'],
                 ],
             ],
         ];

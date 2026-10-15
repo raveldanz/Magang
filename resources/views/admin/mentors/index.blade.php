@@ -45,14 +45,16 @@
             @if($isSuperAdmin)
                 <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
                     <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
-                        <select name="agency_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Semua Instansi Dinas</option>
-                            @foreach($agencies as $ag)
-                                <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                    {{ $ag->agency_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        @if(isset($agencies) && count($agencies) > 1)
+                            <select name="agency_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Semua Instansi Dinas</option>
+                                @foreach($agencies as $ag)
+                                    <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
+                                        {{ $ag->agency_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
 
                         <div class="relative flex-1">
                             <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">

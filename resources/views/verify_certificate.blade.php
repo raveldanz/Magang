@@ -5,7 +5,7 @@
             ?? $placement->agencyProfile 
             ?? \App\Models\AgencyProfile::first();
         $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
-        $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
+        $agencyName = $agency->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
         $student = $placement->application?->user;
         $profile = $student?->studentProfile;
         $app = $placement->application;

@@ -183,10 +183,10 @@
                         {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
                     </h3>
                     <h2 class="font-serif-title font-black text-lg text-slate-900 tracking-wider mt-0.5 uppercase">
-                        {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}
+                        {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                     </h2>
                     <p class="text-[9.5px] text-slate-500 mt-0.5 leading-tight">
-                        {{ $agencyProfile->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272' }} &bull; Website: {{ $agencyProfile->website ?? 'https://surabaya.go.id' }}
+                        {{ $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kota Surabaya, Jawa Timur 60293' }} &bull; Website: {{ $agencyProfile->website ?? 'https://dispusip.surabaya.go.id' }}
                     </p>
                 </div>
 
@@ -231,7 +231,7 @@
                 <p class="text-xs text-slate-600 max-w-3xl mx-auto leading-relaxed pt-1">
                     Telah menyelesaikan seluruh rangkaian program <strong>Praktik Kerja Lapangan (PKL) / Magang MBKM</strong> pada unit kerja 
                     <strong>{{ $application->unit->name ?? 'Bidang Layanan Informatika & E-Government' }}</strong>, 
-                    {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}, Pemerintah Kota Surabaya 
+                    {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}, Pemerintah Kota Surabaya 
                     terhitung sejak tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong> 
                     sampai dengan <strong>{{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}</strong> dengan predikat:
                 </p>
@@ -342,7 +342,7 @@
                             {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
                         </h3>
                         <h2 class="font-black text-xs text-slate-900 uppercase">
-                            {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}
+                            {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                         </h2>
                     </div>
                 </div>

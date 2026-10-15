@@ -92,7 +92,7 @@
                                     Selamat Datang, {{ Auth::user()->name }}!
                                 </h1>
                                 <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90 max-w-xl">
-                                    Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Pemerintah Kota Surabaya
+                                    Portal Resmi Pelaksanaan Magang & Praktik Kerja Lapangan Dinas Perpustakaan dan Kearsipan Kota Surabaya
                                 </p>
                             </div>
 

@@ -168,7 +168,7 @@
                     <tr>
                         <td class="py-1 font-semibold text-slate-700">Instansi Mitra Penempatan</td>
                         <td class="py-1">:</td>
-                        <td class="py-1 text-slate-900 font-medium">Pemerintah Kota Surabaya &mdash; {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi dan Informatika' }}</td>
+                        <td class="py-1 text-slate-900 font-medium">Pemerintah Kota Surabaya &mdash; {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}</td>
                     </tr>
                     <tr>
                         <td class="py-1 font-semibold text-slate-700">Unit Kerja Penempatan</td>

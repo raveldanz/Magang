@@ -24,6 +24,22 @@ class AgencyController extends Controller
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
 
+        // Multi-Tenant / Dinas Admin: Langsung arahkan ke instansi miliknya
+        if (! $isSuperAdmin && $user->agency_profile_id) {
+            return redirect()->route('admin.agencies.show', $user->agency_profile_id);
+        }
+
+        // Khusus ekosistem Dispusip Surabaya: Jika sistem berjalan untuk Dispusip (single agency)
+        // dan tidak meminta view daftar eksplisit (?list=1), langsung buka Pusat Kendali Dispusip lengkap
+        $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+        $dispusip = AgencyProfile::where('agency_name', $like, '%perpustakaan%')
+            ->orWhere('acronym', $like, '%dispusip%')
+            ->first();
+
+        if ($dispusip && ! $request->has('list') && ! $request->has('search')) {
+            return redirect()->route('admin.agencies.show', $dispusip->id);
+        }
+
         $query = AgencyProfile::with(['units', 'users', 'agencyAdmin'])
             ->withCount('units')
             ->withExists([
@@ -286,7 +302,7 @@ class AgencyController extends Controller
             'name' => $agency->agency_name,
         ]);
 
-        return redirect()->route('admin.agencies.index')
+        return redirect()->route('admin.agencies.show', $agency->id)
             ->with('success', "Data Instansi '{$agency->agency_name}' berhasil diperbarui!");
     }
 
