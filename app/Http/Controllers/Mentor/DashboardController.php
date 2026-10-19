@@ -36,19 +36,10 @@ class DashboardController extends Controller
             });
         }
 
-        // Jangan sertakan yang mengundurkan diri atau ditolak kecuali jika diminta khusus
-        $tab = $request->get('tab');
-        if ($tab && in_array($tab, ['upcoming', 'completed', 'active'])) {
-            $baseQuery->whereRelation('application', 'status', match ($tab) {
-                'upcoming' => 'accepted',
-                'completed' => 'completed',
-                default => 'active',
-            });
-        } else {
-            $baseQuery->whereHas('application', function ($q) {
-                $q->whereNotIn('status', ['resigned', 'rejected']);
-            });
-        }
+        // Jangan sertakan yang mengundurkan diri atau ditolak
+        $baseQuery->whereHas('application', function ($q) {
+            $q->whereNotIn('status', ['resigned', 'rejected']);
+        });
 
         // Hitung statistik bimbingan mentor
         $totalStudents = (clone $baseQuery)->count();
@@ -91,6 +82,15 @@ class DashboardController extends Controller
             'finalreport',
             'academicAdvisor',
         ]);
+
+        $tab = $request->get('tab');
+        if ($tab && in_array($tab, ['upcoming', 'completed', 'active'], true)) {
+            $query->whereRelation('application', 'status', match ($tab) {
+                'upcoming' => 'accepted',
+                'completed' => 'completed',
+                default => 'active',
+            });
+        }
 
         // Filter pencarian nama / NIM / jurusan / kampus
         $search = trim((string) ($request->get('search') ?? $request->get('q', '')));

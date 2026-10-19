@@ -115,12 +115,14 @@ class DashboardController extends Controller
             $eval = $p->evaluation;
             $hasScore = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->dosenAspectScore('score_mastery') ?? 0) > 0);
             $app = $p->application;
-            if (!$app || $app->status === 'completed' || $app->status === 'rejected') return false;
+            if (!$app) return false;
+            $statusVal = $app->statusValue();
+            if (in_array($statusVal, ['completed', 'rejected', 'resigned'], true)) return false;
 
             $endDate = $app->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
             $isNearEnd = $endDate && $endDate->diffInDays(\Carbon\Carbon::now(), false) >= -14;
 
-            return !$hasScore && ($isNearEnd || $app->status === 'active');
+            return !$hasScore && ($isNearEnd || $statusVal === 'active');
         });
 
         $supervisedPlacementIds = $placements->pluck('id')->toArray();

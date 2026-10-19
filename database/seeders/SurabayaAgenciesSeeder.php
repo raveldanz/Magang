@@ -107,7 +107,7 @@ class SurabayaAgenciesSeeder extends Seeder
             ]
         );
 
-        // 4. Akun Admin Pengelola Magang Dispusip
+        // 4. Akun Admin Pengelola Magang Dispusip (Admin Dinas Keseluruhan / Seluruh Bidang)
         User::updateOrCreate(
             ['email' => 'admin.dispusip@surabaya.go.id'],
             [
@@ -115,10 +115,53 @@ class SurabayaAgenciesSeeder extends Seeder
                 'password' => $defaultPassword,
                 'role' => 'admin',
                 'agency_profile_id' => $dispusip->id,
+                'unit_id' => null,
                 'status' => 'active',
                 'email_verified_at' => now(),
             ]
         );
+
+        // 4.1. Akun Admin Khusus Per Bidang (Fokus Bidang Masing-masing)
+        $bidangAdminSeedData = [
+            [
+                'email' => 'admin.sekretariat@surabaya.go.id',
+                'name' => 'Admin Bidang Sekretariat',
+                'unit' => 'Bidang Sekretariat',
+            ],
+            [
+                'email' => 'admin.perpustakaan@surabaya.go.id',
+                'name' => 'Admin Bidang Pembinaan & Pengelolaan Perpustakaan',
+                'unit' => 'Bidang Pembinaan dan Pengelolaan Perpustakaan',
+            ],
+            [
+                'email' => 'admin.layananarsip@surabaya.go.id',
+                'name' => 'Admin Bidang Pembinaan & Layanan Kearsipan',
+                'unit' => 'Bidang Pembinaan dan Layanan Kearsipan',
+            ],
+            [
+                'email' => 'admin.penyelamatanarsip@surabaya.go.id',
+                'name' => 'Admin Bidang Pengelolaan, Perlindungan & Penyelamatan Kearsipan',
+                'unit' => 'Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan',
+            ],
+        ];
+
+        foreach ($bidangAdminSeedData as $adminData) {
+            $unitModel = $createdUnits[$adminData['unit']] ?? null;
+            if ($unitModel) {
+                User::updateOrCreate(
+                    ['email' => $adminData['email']],
+                    [
+                        'name' => $adminData['name'],
+                        'password' => $defaultPassword,
+                        'role' => 'admin',
+                        'agency_profile_id' => $dispusip->id,
+                        'unit_id' => $unitModel->id,
+                        'status' => 'active',
+                        'email_verified_at' => now(),
+                    ]
+                );
+            }
+        }
 
         // 5. Akun Atasan / Supervisor (Tim Kerja Umum dan Kepegawaian Dispusip) — Double ACC
         User::updateOrCreate(

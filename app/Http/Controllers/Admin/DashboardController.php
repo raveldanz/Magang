@@ -27,7 +27,10 @@ class DashboardController extends Controller
         // Base Query Applications
         $appQuery = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.evaluation', 'placement.finalreport']);
 
-        if ($agencyId) {
+        // Isolasi Bidang & Multi-Tenant:
+        if (! $isSuperAdmin && $user->unit_id) {
+            $appQuery->where('unit_id', $user->unit_id);
+        } elseif ($agencyId) {
             $appQuery->whereHas('unit', function ($q) use ($agencyId) {
                 $q->where('agency_profile_id', $agencyId);
             });
@@ -51,7 +54,9 @@ class DashboardController extends Controller
 
         // Kuota Unit Magang
         $unitsQuery = Unit::with('agencyProfile');
-        if ($agencyId) {
+        if (! $isSuperAdmin && $user->unit_id) {
+            $unitsQuery->where('id', $user->unit_id);
+        } elseif ($agencyId) {
             $unitsQuery->where('agency_profile_id', $agencyId);
         }
         $units = $unitsQuery->get();
@@ -62,7 +67,14 @@ class DashboardController extends Controller
         $totalAgencies = AgencyProfile::count();
         $totalUniversities = University::count();
         $totalUsers = User::count();
-        $totalMentors = User::whereIn('role', ['mentor', 'pembimbing'])->when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->count();
+        
+        $totalMentorsQuery = User::whereIn('role', ['mentor', 'pembimbing']);
+        if (! $isSuperAdmin && $user->unit_id) {
+            $totalMentorsQuery->where('unit_id', $user->unit_id);
+        } elseif ($agencyId) {
+            $totalMentorsQuery->where('agency_profile_id', $agencyId);
+        }
+        $totalMentors = $totalMentorsQuery->count();
         $totalLecturers = User::whereIn('role', ['dosen', 'academic_advisor'])->count();
 
         // Distribusi Sebaran Instansi & Unit Kerja
@@ -77,9 +89,9 @@ class DashboardController extends Controller
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : $dispusip;
         $targetAgencyId = $currentAgency?->id;
 
-        $targetUnits = $targetAgencyId
-            ? Unit::where('agency_profile_id', $targetAgencyId)->get()
-            : $units;
+        $targetUnits = (! $isSuperAdmin && $user->unit_id)
+            ? Unit::where('id', $user->unit_id)->get()
+            : ($targetAgencyId ? Unit::where('agency_profile_id', $targetAgencyId)->get() : $units);
 
         $countsByUnit = Application::query()
             ->whereIn('unit_id', $targetUnits->pluck('id'))
@@ -196,7 +208,7 @@ class DashboardController extends Controller
         ];
 
         // Matriks 4 Bidang Resmi Dispusip (Monitoring Tim Kerja & Beban Bimbingan)
-        $dispusipUnits = Unit::with([
+        $dispusipUnitsQuery = Unit::with([
             'headUser',
             'mentors' => function ($q) {
                 $q->withCount([
@@ -209,8 +221,13 @@ class DashboardController extends Controller
                 $q->select('id', 'unit_id', 'status');
             },
         ])
-            ->where('agency_profile_id', $dispusip?->id ?? 1)
-            ->get();
+            ->where('agency_profile_id', $dispusip?->id ?? 1);
+
+        if (! $isSuperAdmin && $user->unit_id) {
+            $dispusipUnitsQuery->where('id', $user->unit_id);
+        }
+
+        $dispusipUnits = $dispusipUnitsQuery->get();
 
         return view('admin.dashboard', compact(
             'isSuperAdmin',

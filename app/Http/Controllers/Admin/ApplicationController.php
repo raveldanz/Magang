@@ -47,8 +47,12 @@ class ApplicationController extends Controller
         // Sama persis dengan pusat kendali dinas & kampus.
         $query->orderByActionPriority();
 
-        // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
-        if ($agencyId) {
+        // Isolasi Bidang & Multi-Tenant:
+        // Jika user adalah Admin Bidang, otomatis kunci hanya melihat pengajuan pada bidangnya sendiri
+        if (! $isSuperAdmin && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        } elseif ($agencyId) {
+            // Admin dinas keseluruhan (unit_id null) melihat semua pengajuan pada instansinya
             $query->whereHas('unit', function ($q) use ($agencyId) {
                 $q->where('agency_profile_id', $agencyId);
             });
@@ -74,8 +78,10 @@ class ApplicationController extends Controller
                 : $query->where('status', strtolower($request->status));
         }
 
-        // 3. Filter Berdasarkan Unit / Divisi Kerja
-        if ($request->filled('unit_id')) {
+        // 3. Filter Berdasarkan Unit / Divisi Kerja (Hanya jika Super Admin atau Admin Dinas Keseluruhan)
+        if (! $isSuperAdmin && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        } elseif ($request->filled('unit_id')) {
             $query->where('unit_id', $request->unit_id);
         }
 
@@ -96,8 +102,11 @@ class ApplicationController extends Controller
             });
         }
 
-        // Query Unit untuk Filter Dropdown (Scoped per instansi untuk Admin Dinas, atau All untuk Superadmin)
-        if ($agencyId) {
+        // Query Unit untuk Filter Dropdown (Scoped per bidang untuk Admin Bidang, scoped per dinas untuk Admin Dinas, all untuk Superadmin)
+        if (! $isSuperAdmin && $user->unit_id) {
+            $units = Unit::where('id', $user->unit_id)->get();
+            $groupedUnits = null;
+        } elseif ($agencyId) {
             $units = Unit::where('agency_profile_id', $agencyId)->get();
             $groupedUnits = null;
         } else {
@@ -147,9 +156,13 @@ class ApplicationController extends Controller
         // Pemicu Otomatis 3: jika mahasiswa sudah mencapai tanggal mulai (today >= start_date) dan belum berstatus active, sistem langsung memperbarui statusnya secara on-the-fly
         $application->autoActivateIfStarted();
 
-        // Multi-Tenant Authorization Check
+        // Multi-Tenant & Bidang Authorization Check
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke data pengajuan bidang lain.');
         }
 
         // Dropdown 'Pilih Pembimbing Lapangan' HANYA memuat user role 'mentor' yang terdaftar di instansi yang bersangkutan
@@ -158,6 +171,10 @@ class ApplicationController extends Controller
 
         if ($targetAgencyId !== null) {
             $pembimbingQuery->where('agency_profile_id', $targetAgencyId);
+        }
+
+        if (! $isSuperAdmin && $user->unit_id) {
+            $pembimbingQuery->where('unit_id', $user->unit_id);
         }
 
         $pembimbings = $pembimbingQuery->orderBy('name')->get();
@@ -217,9 +234,13 @@ class ApplicationController extends Controller
         $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : strtolower((string) $application->status);
         $newStatus = $request->status;
 
-        // Multi-Tenant Authorization Check
+        // Multi-Tenant & Bidang Authorization Check
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan bidang lain.');
         }
 
         // Penguncian Otorisasi: Saat status berada di WAITING_APPROVAL, status ACCEPTED dan ACTIVE
@@ -488,6 +509,13 @@ class ApplicationController extends Controller
                 continue;
             }
 
+            // Bidang Isolation Check: Admin bidang hanya boleh memproses pengajuan bidangnya
+            if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+                $failCount++;
+
+                continue;
+            }
+
             $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : strtolower((string) $application->status);
 
             // Hanya bisa terima/tolak jika status pending atau waiting_approval
@@ -617,6 +645,10 @@ class ApplicationController extends Controller
         // Multi-Tenant Authorization Check
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke surat pengajuan instansi lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke surat pengajuan bidang lain.');
         }
 
         return view('letters.acceptance', compact('application'));

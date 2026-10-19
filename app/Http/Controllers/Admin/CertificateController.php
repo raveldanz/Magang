@@ -54,8 +54,10 @@ class CertificateController extends Controller
                     ->whereHas('logbooks');
             });
 
-        // Multi-Tenant Isolation: Admin instansi hanya melihat sertifikat pada unit instansinya sendiri
-        if ($user && $user->agency_profile_id !== null) {
+        // Multi-Tenant & Isolasi Bidang:
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        } elseif ($user && $user->agency_profile_id !== null) {
             $query->whereHas('unit', function ($q) use ($user) {
                 $q->where('agency_profile_id', $user->agency_profile_id);
             });
@@ -70,7 +72,13 @@ class CertificateController extends Controller
     // Pratinjau & Cetak E-Sertifikat Lengkap (Format Resmi Mahasiswa & Transkrip 2 Halaman)
     public function show($placementId)
     {
-        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        $user = Auth::user();
+        $placement = Placement::with('application')->findOrFail($placementId);
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($placement->application)->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke sertifikat bidang lain.');
+        }
+
+        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, $user);
         $data['certificateRecord'] = \App\Models\Certificate::where('placement_id', $placementId)->first();
 
         return view('certificates.internship_certificate', $data);
@@ -86,6 +94,9 @@ class CertificateController extends Controller
         }
 
         $user = Auth::user();
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($placement->application)->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk menerbitkan sertifikat bidang lain.');
+        }
 
         $year = date('Y');
         $paddedId = str_pad($placement->id, 3, '0', STR_PAD_LEFT);
@@ -136,6 +147,11 @@ class CertificateController extends Controller
         ])->findOrFail($placementId);
 
         $application = $placement->application;
+        $user = Auth::user();
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($application)->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk merevisi sertifikat bidang lain.');
+        }
+
         $student = $application?->user;
         $profile = $student?->studentProfile;
         $evaluation = $placement->evaluation;
@@ -213,6 +229,10 @@ class CertificateController extends Controller
 
         $user = Auth::user();
         $application = $placement->application;
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($application)->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk merevisi sertifikat bidang lain.');
+        }
+
         $student = $application->user;
         $profile = $student->studentProfile;
 

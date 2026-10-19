@@ -75,6 +75,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Memeriksa apakah user adalah Admin Bidang spesifik.
+     */
+    public function isBidangAdmin(): bool
+    {
+        return $this->role === 'admin' && ! is_null($this->unit_id);
+    }
+
+    /**
+     * Memeriksa apakah user memiliki akses dinas keseluruhan (Super Admin atau Admin Dinas tanpa unit khusus).
+     */
+    public function isAgencyWideAdmin(): bool
+    {
+        return $this->isSuperAdmin() || ($this->role === 'admin' && is_null($this->unit_id));
+    }
+
+    /**
      * Standarisasi label role pengguna untuk seluruh antarmuka sistem.
      */
     public function roleLabel(): string
@@ -83,9 +99,16 @@ class User extends Authenticatable
             return 'Super Admin';
         }
 
+        if ($this->role === 'admin') {
+            if ($this->unit_id) {
+                $unit = $this->relationLoaded('unit') ? $this->unit : Unit::find($this->unit_id);
+                return $unit ? 'Admin ' . $unit->name : 'Admin Bidang';
+            }
+            return 'Admin Dispusip';
+        }
+
         return match ($this->role) {
             'super_admin' => 'Super Admin',
-            'admin' => 'Admin Dispusip',
             'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
             'mentor', 'pembimbing' => 'Pembimbing Lapangan',
             'lecturer', 'dosen', 'academic_advisor' => 'Dosen Pembimbing',

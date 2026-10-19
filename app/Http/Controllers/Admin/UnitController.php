@@ -25,8 +25,12 @@ class UnitController extends Controller
         $query = Unit::with(['agencyProfile', 'applications']);
         $selectedAgency = null;
 
-        // Multi-Tenant Isolation: Admin Instansi hanya melihat unit di bawah dinasnya
-        if ($agencyId) {
+        // Isolasi Bidang & Multi-Tenant:
+        if (! $user->isSuperAdmin() && $user->unit_id) {
+            $query->where('id', $user->unit_id);
+            $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
+            $selectedAgency = $agencies->first();
+        } elseif ($agencyId) {
             $query->where('agency_profile_id', $agencyId);
             $agencies = AgencyProfile::where('id', $agencyId)->get();
             $selectedAgency = $agencies->first();
@@ -69,6 +73,10 @@ class UnitController extends Controller
     public function create(Request $request)
     {
         $user = Auth::user();
+        if (! $user->isSuperAdmin() && $user->unit_id) {
+            abort(403, 'Hanya Admin Dinas yang berwenang menambah bidang/divisi baru.');
+        }
+
         $agencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
 
         if ($agencyId) {
@@ -90,6 +98,10 @@ class UnitController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
+        if (! $user->isSuperAdmin() && $user->unit_id) {
+            abort(403, 'Hanya Admin Dinas yang berwenang menambah bidang/divisi baru.');
+        }
+
         $userAgencyId = $user ? ($user->agency_profile_id ?? $user->agency_id ?? optional($user->agencyProfile)->id) : null;
 
         $request->validate([
@@ -140,6 +152,10 @@ class UnitController extends Controller
 
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk melihat unit instansi lain.');
+        }
+
+        if (! $user->isSuperAdmin() && $user->unit_id && (int) $unit->id !== (int) $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk melihat bidang lain.');
         }
 
         // Query Pengajuan Mahasiswa di Bidang Ini
@@ -223,6 +239,10 @@ class UnitController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
         }
 
+        if (! $user->isSuperAdmin() && $user->unit_id && (int) $unit->id !== (int) $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah bidang lain.');
+        }
+
         $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
         $returnTo = $request->query('return_to', url()->previous());
 
@@ -246,6 +266,10 @@ class UnitController extends Controller
 
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah unit instansi lain.');
+        }
+
+        if (! $user->isSuperAdmin() && $user->unit_id && (int) $unit->id !== (int) $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah bidang lain.');
         }
 
         $occupied = $unit->occupied_count;
@@ -310,6 +334,13 @@ class UnitController extends Controller
                 return response()->json(['success' => false, 'message' => 'Anda tidak memiliki hak akses ke unit instansi lain.'], 403);
             }
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah kuota unit instansi lain.');
+        }
+
+        if (! $user->isSuperAdmin() && $user->unit_id && (int) $unit->id !== (int) $user->unit_id) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Anda tidak memiliki hak akses ke bidang lain.'], 403);
+            }
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah kuota bidang lain.');
         }
 
         $action = $request->input('action');
@@ -387,6 +418,10 @@ class UnitController extends Controller
         // penempatan, logbook, nilai, dan sertifikat di dalamnya. Divisi yang punya riwayat apa pun
         // (termasuk alumni) wajib dipertahankan sebagai arsip.
         $unit = Unit::withCount('applications')->findOrFail($id);
+
+        if (! $user->isSuperAdmin() && $user->unit_id) {
+            abort(403, 'Hanya Admin Dinas yang berwenang menghapus bidang/divisi.');
+        }
 
         if ($agencyId && $unit->agency_profile_id !== $agencyId) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus unit instansi lain.');
