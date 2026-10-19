@@ -96,6 +96,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-084** | 2026-10-15 | Supervisor UI Refinements: Menu Dashboard, Tombol Sertifikat Biru, Tab Menunggu Persetujuan & Status Menunggu ACC | Simplifikasi navbar 'Dashboard', pewarnaan biru tombol Pengesahan Sertifikat, pergantian tab 'Menunggu Persetujuan', dan deskripsi khusus status WAITING_APPROVAL 'Menunggu ACC' bagi supervisor | RESOLVED |
 | **LRN-085** | 2026-10-15 | Double ACC Approval Workflow & Elimination of Browser Confirm() Popups | Audit menyeluruh alur status persetujuan bertingkat (Double ACC): eliminasi confirm() browser menjadi modal dialog dua lapis, pengesahan sertifikat, dan harmonisasi status desktop/mobile | RESOLVED |
 | **LRN-086** | 2026-10-19 | Audit Holistik Single-Agency Dispusip, Filter 4 Bidang Lintas Role & Eliminasi Residu Obsolete | Harmonisasi alur seluruh peran ke ekosistem tunggal Dispusip (4 bidang), eliminasi residu status verified & placeholder lama, optimasi filter bidang pada Dosen/Kampus/Mentor | RESOLVED |
+| **LRN-087** | 2026-10-19 | Optimalisasi Mendalam Algoritma Mentor per Bidang, Form Bantuan Single-Agency, & Penyelarasan Residu Terakhir | Filter unit_id pada admin mentor, fallback profil instansi Dispusip di feedback tiket, penyelarasan placeholder | RESOLVED |
+| **LRN-088** | 2026-10-19 | Form Tunggal Terpadu Seleksi & Penugasan Pembimbing (Eliminasi Card Redundan) | Eliminasi card penugasan pembimbing redundan di halaman detail pengajuan admin, sentralisasi penugasan & mutasi mentor/dosen ke form status utama dengan audit log & resync chat | RESOLVED |
 
 ---
 
@@ -2143,6 +2145,27 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Menghitung metrik aktif, calon peserta, lulus, dan logbook pending mentor secara dinamis, serta menampilkan badge nama bidang kerja mentor di header dashboard.
   5. Memperbaiki urutan import Kernel pada scripts dan membersihkan seluruh cache aplikasi.
 - **Prevention Rule**: Ketika sistem bertransisi dari arsitektur multi-tenant ke single-agency terspesialisasi, seluruh filter instansi wajib dikonversi menjadi filter divisi/bidang kerja internal dinas tersebut. Seluruh rule validasi status wajib bersumber atau diselaraskan secara konsisten dengan BackedEnum `ApplicationStatus`.
+
+---
+
+### [LRN-087] Optimalisasi Mendalam Algoritma Mentor per Bidang, Form Bantuan Single-Agency, & Penyelarasan Residu Terakhir
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/MentorController.php`, `app/Http/Controllers/FeedbackController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Models/AgencyProfile.php`, Views (`admin/mentors/index`, `admin/mentors/create`, `admin/mentors/edit`, `feedbacks/create`, `admin/units/create`, `chat/partials/modals`), Tests (`tests/Feature/SystemAuditFixesTest.php`)
+- **Problem / Symptom**:
+  1. Filter manajemen mentor internal dinas di `admin.mentors.index` sebelumnya terkunci khusus `@if($isSuperAdmin)` dan tidak mendukung filter per-Bidang (`unit_id`), sehingga Admin Dinas Dispusip tidak dapat memfilter daftar mentor menurut 4 Bidang resmi.
+  2. Formulir pengiriman tiket kendala / masukan (`feedbacks/create`) masih menampilkan dropdown pencarian multi-instansi terbuka ("Pilih Instansi Kedinasan Terkait") ketika pengguna memilih target Admin Dinas.
+  3. Placeholder input tambah bidang di `admin.units.create` masih memuat nama bidang dinas lain ("Bidang Layanan Informatika & E-Government"), dan placeholder modal chat kelompok masih merujuk ke instansi lain.
+  4. Pesan penolakan sisa kuota di controller pendaftaran mahasiswa masih menyebut "instansi/unit" secara ambigu.
+- **Root Cause**:
+  Sisa konfigurasi UI/UX dan alur query yang belum disinkronkan sepenuhnya ke model instansi tunggal (Dispusip) dan struktur spesialisasi 4 Bidang Resmi.
+- **Fix Applied**:
+  1. Menambahkan filtering `unit_id` pada query `Admin\MentorController@index` dan membuka search bar serta dropdown filter 4 Bidang Dispusip kepada Admin Dinas maupun Super Admin.
+  2. Mengunci target instansi pada form masukan pengguna (`feedbacks/create`) langsung ke kartu resmi Dispusip jika hanya ada 1 instansi, serta menambahkan fallback `AgencyProfile::first()?->id` pada `FeedbackController@store`.
+  3. Memperbarui seluruh placeholder di `admin/units/create`, `admin/mentors/create`, `admin/mentors/edit`, dan `chat/partials/modals` agar seragam menggunakan entitas Dispusip Surabaya.
+  4. Menyelaraskan pesan kegagalan kuota di `Student\ApplicationController` agar eksplisit merujuk ke "Bidang Dispusip".
+  5. Menambahkan unit test baru di `SystemAuditFixesTest` untuk memvalidasi filter bidang mentor dan fallback instansi tiket feedback (Exit Code 0).
+- **Prevention Rule**:
+  Seluruh alur manajemen personil dinas wajib menyediakan kemampuan pemfilteran eksplisit per `unit_id` (Bidang), dan setiap pengiriman data yang menargetkan dinas wajib memiliki fallback otomatis ke instansi utama ketika sistem berjalan dalam konfigurasi single-agency.
 
 ---
 

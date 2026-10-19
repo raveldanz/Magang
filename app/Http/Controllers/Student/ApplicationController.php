@@ -114,7 +114,7 @@ class ApplicationController extends Controller
         if ($unit->remaining_quota <= 0) {
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['unit_id' => 'Kuota untuk instansi/unit ini sudah penuh. Silakan pilih unit kerja lain.']);
+                ->withErrors(['unit_id' => 'Kuota untuk Bidang ini sudah penuh. Silakan pilih Bidang Dispusip lain.']);
         }
 
         // Upload Berkas ke disk privat 'local' (storage/app/private/documents/applications), TIDAK bisa

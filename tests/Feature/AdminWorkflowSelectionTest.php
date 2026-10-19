@@ -314,5 +314,92 @@ class AdminWorkflowSelectionTest extends TestCase
         $responseDashboard->assertDontSee('Dashboard &amp; Tim Kerja');
         $responseDashboard->assertDontSee('Dashboard & Tim Kerja');
     }
+
+    public function test_unified_form_can_update_mentor_and_dosen_on_active_application(): void
+    {
+        $admin = User::where('role', 'admin')->first() ?? User::factory()->create(['role' => 'admin']);
+        $unit = \App\Models\Unit::first();
+        if (! $unit) {
+            $agency = \App\Models\AgencyProfile::first() ?? \App\Models\AgencyProfile::create(['name' => 'Dispusip']);
+            $unit = \App\Models\Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Kearsipan', 'quota' => 10]);
+        }
+        if ($admin->agency_profile_id === null && $unit->agency_profile_id) {
+            $admin->update(['agency_profile_id' => $unit->agency_profile_id]);
+        }
+
+        $student = User::factory()->create(['role' => 'student']);
+        $univ = \App\Models\University::first() ?? \App\Models\University::create(['name' => 'Universitas Airlangga']);
+        \App\Models\StudentProfile::create([
+            'user_id' => $student->id,
+            'university_id' => $univ->id,
+            'nim' => '12345678',
+            'universitas' => $univ->name,
+            'jurusan' => 'Sistem Informasi',
+            'phone' => '08123456789',
+        ]);
+
+        $mentorA = User::factory()->create([
+            'role' => 'mentor',
+            'agency_profile_id' => $unit->agency_profile_id,
+            'unit_id' => $unit->id,
+        ]);
+        $mentorB = User::factory()->create([
+            'role' => 'mentor',
+            'agency_profile_id' => $unit->agency_profile_id,
+            'unit_id' => $unit->id,
+        ]);
+        $dosen = User::factory()->create([
+            'role' => 'dosen',
+            'university_id' => $univ->id,
+        ]);
+
+        $app = Application::create([
+            'user_id' => $student->id,
+            'unit_id' => $unit->id,
+            'status' => 'active',
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addMonths(3)->toDateString(),
+            'letter_number' => '500.12.1/TEST/2026',
+            'letter_date' => now()->toDateString(),
+        ]);
+
+        $placement = \App\Models\Placement::create([
+            'application_id' => $app->id,
+            'mentor_id' => $mentorA->id,
+            'pembimbing_id' => $mentorA->id,
+            'start_date' => $app->start_date,
+            'end_date' => $app->end_date,
+        ]);
+
+        // 1. Verifikasi show page: form tunggal hadir, form redundan tidak ada
+        $responseShow = $this->actingAs($admin)->get(route('admin.applications.show', $app->id));
+        $responseShow->assertOk();
+        $responseShow->assertSee('Data Penempatan, Surat &amp; Penugasan Pembimbing', false);
+        $responseShow->assertSee('Simpan Keputusan &amp; Penugasan', false);
+        $responseShow->assertDontSee('Simpan Penugasan Pembimbing');
+
+        // 2. Kirim update penugasan melalui form tunggal updateStatus
+        $responseUpdate = $this->actingAs($admin)->put(route('admin.applications.updateStatus', $app->id), [
+            'status' => 'active',
+            'mentor_id' => $mentorB->id,
+            'academic_advisor_id' => $dosen->id,
+            'letter_number' => '500.12.1/TEST/2026',
+            'letter_date' => now()->toDateString(),
+        ]);
+
+        $responseUpdate->assertRedirect(route('admin.applications.index'));
+        $responseUpdate->assertSessionHas('success');
+
+        $placement->refresh();
+        $this->assertEquals($mentorB->id, $placement->mentor_id);
+        $this->assertEquals($dosen->id, $placement->academic_advisor_id);
+
+        // Verifikasi audit log mutasi/reassign tercatat
+        $audit = \App\Models\AuditLog::where('action', 'PLACEMENT_SUPERVISOR_REASSIGN')
+            ->where('target_id', $placement->id)
+            ->latest('id')
+            ->first();
+        $this->assertNotNull($audit);
+    }
 }
 

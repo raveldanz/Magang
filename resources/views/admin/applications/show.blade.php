@@ -546,9 +546,16 @@
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
                          class="space-y-4 mb-5 p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 shadow-2xs">
-                        <div class="flex items-center gap-2 border-b border-emerald-200/60 pb-3">
-                            <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                            <h4 class="font-bold text-emerald-900 text-xs sm:text-sm">Data Balasan Penerimaan & Penempatan Magang</h4>
+                        <div id="penugasan-pembimbing" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                                    <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-emerald-950 text-xs sm:text-sm">Data Penempatan, Surat &amp; Penugasan Pembimbing</h4>
+                                    <p class="text-[11px] text-emerald-700 mt-0.5">Penugasan Pembimbing (Susulan / Ganti), penetapan mentor dinas, dosen pembimbing, dan surat balasan resmi.</p>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Surat Pengantar dari Kampus untuk Pengecekan Cepat Admin -->
@@ -611,6 +618,45 @@
                                 ];
                             })->values()->all();
                         @endphp
+
+                        @php
+                            $currPlacement = $application->placement;
+                            $currMentor = $currPlacement?->mentor ?? $currPlacement?->pembimbing;
+                            $currAdvisor = $currPlacement?->academicAdvisor;
+                        @endphp
+
+                        @if ($currPlacement && in_array($currentStatusVal, ['accepted', 'active', 'completed'], true))
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mb-2">
+                                <div class="p-3.5 rounded-xl border bg-white/95 {{ $currMentor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mentor Dinas Saat Ini</div>
+                                    <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
+                                        <span>{{ $currMentor?->name ?? 'Belum Ditugaskan' }}</span>
+                                        @if($currMentor)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu</span>
+                                        @endif
+                                    </div>
+                                    @unless ($currMentor)
+                                        <div class="text-[11px] text-amber-700 mt-1">Logbook aktivitas sementara divalidasi langsung oleh Admin Dinas.</div>
+                                    @endunless
+                                </div>
+                                <div class="p-3.5 rounded-xl border bg-white/95 {{ $currAdvisor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dosen Pembimbing Kampus Saat Ini</div>
+                                    <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
+                                        <span>{{ $currAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
+                                        @if($currAdvisor)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu SK</span>
+                                        @endif
+                                    </div>
+                                    @unless ($currAdvisor)
+                                        <div class="text-[11px] text-amber-700 mt-1">Menunggu penetapan penugasan dosen dari perguruan tinggi.</div>
+                                    @endunless
+                                </div>
+                            </div>
+                        @endif
 
                         <!-- Dropdown Pembimbing Lapangan (Searchable Combobox) -->
                         <div>
@@ -692,7 +738,7 @@
                             <button type="submit" 
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                <span>Simpan Perubahan Status</span>
+                                <span>Simpan Keputusan &amp; Penugasan</span>
                             </button>
                         @else
                             <button type="button" disabled
@@ -725,71 +771,6 @@
                     </div>
                 </form>
             </div>
-
-            {{-- 6. Penugasan Pembimbing (Susulan / Ganti) untuk Mahasiswa yang Sudah Berjalan --}}
-            @if ($application->placement && in_array($currentStatusVal, ['accepted', 'active', 'completed'], true))
-                @php
-                    $asgPlacement = $application->placement;
-                    $asgMentor = $asgPlacement->mentor ?? $asgPlacement->pembimbing;
-                    $asgAdvisor = $asgPlacement->academicAdvisor;
-                @endphp
-                <div id="penugasan-pembimbing" class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
-                    <div class="pb-4 border-b border-slate-100 mb-5">
-                        <h3 class="text-base font-bold text-slate-900">Penugasan Pembimbing (Susulan / Ganti)</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; Dosen Pembimbing tanpa mengulang verifikasi status. Histori logbook yang sudah divalidasi tetap tersimpan aman.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5 text-xs">
-                        <div class="p-3 rounded-xl border {{ $asgMentor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
-                            <div class="text-slate-500 font-semibold">Mentor Dinas saat ini</div>
-                            <div class="font-bold text-slate-900 mt-0.5">{{ $asgMentor?->name ?? 'Belum Ditugaskan' }}</div>
-                            @unless ($asgMentor)
-                                <div class="text-[11px] text-amber-700 mt-1">Sementara logbook divalidasi oleh Admin Dinas instansi.</div>
-                            @endunless
-                        </div>
-                        <div class="p-3 rounded-xl border {{ $asgAdvisor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
-                            <div class="text-slate-500 font-semibold">Dosen Pembimbing Kampus saat ini</div>
-                            <div class="font-bold text-slate-900 mt-0.5">{{ $asgAdvisor?->name ?? 'Belum Ditugaskan' }}</div>
-                            @unless ($asgAdvisor)
-                                <div class="text-[11px] text-amber-700 mt-1">Menunggu SK / penugasan dari kampus.</div>
-                            @endunless
-                        </div>
-                    </div>
-
-                    <form action="{{ route('admin.applications.assignment', $application->id) }}" method="POST" class="space-y-4">
-                        @csrf
-                        @method('PATCH')
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="asg_mentor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mentor Dinas</label>
-                                <select id="asg_mentor_id" name="mentor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
-                                    <option value="">-- Tidak diubah --</option>
-                                    @foreach ($pembimbings as $pembimbing)
-                                        <option value="{{ $pembimbing->id }}" @selected((int) ($asgMentor?->id ?? 0) === (int) $pembimbing->id)>{{ $pembimbing->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('mentor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label for="asg_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Dosen Pembimbing Kampus</label>
-                                <select id="asg_advisor_id" name="academic_advisor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
-                                    <option value="">-- Tidak diubah --</option>
-                                    @foreach ($dosens as $dosen)
-                                        <option value="{{ $dosen->id }}" @selected((int) ($asgAdvisor?->id ?? 0) === (int) $dosen->id)>{{ $dosen->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('academic_advisor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-
-                        <div class="pt-2 flex justify-end">
-                            <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
-                                <span>Simpan Penugasan Pembimbing</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            @endif
         </div>
     </div>
 

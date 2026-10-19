@@ -73,15 +73,25 @@
 
                             <!-- Case 2: Admin Dinas -->
                             <div x-show="targetRole === 'admin_dinas'" x-cloak>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Pilih Instansi Kedinasan Terkait <span class="text-rose-500">*</span>
-                                </label>
-                                <x-searchable-select
-                                    name="target_agency_id"
-                                    placeholder="-- Cari atau Pilih Dinas / Badan Terkait --"
-                                    :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
-                                    :selected="old('target_agency_id')"
-                                />
+                                @if(isset($agencies) && $agencies->count() > 1)
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                        Pilih Instansi Kedinasan Terkait <span class="text-rose-500">*</span>
+                                    </label>
+                                    <x-searchable-select
+                                        name="target_agency_id"
+                                        placeholder="-- Cari atau Pilih Dinas Terkait --"
+                                        :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
+                                        :selected="old('target_agency_id', 1)"
+                                    />
+                                @else
+                                    <div class="p-3.5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center gap-3">
+                                        <div>
+                                            <div class="text-xs font-bold text-blue-950">Dinas Perpustakaan dan Kearsipan Kota Surabaya</div>
+                                            <div class="text-[11px] text-blue-700">Laporan ditujukan langsung kepada Tim Admin Dinas Dispusip</div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="target_agency_id" value="{{ $agencies->first()?->id ?? 1 }}">
+                                @endif
                             </div>
 
                             <!-- Case 3: Universitas -->

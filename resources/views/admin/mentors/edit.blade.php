@@ -73,7 +73,7 @@
                             </label>
                             <x-searchable-select
                                 name="agency_profile_id"
-                                placeholder="-- Pilih Dinas --"
+                                placeholder="-- Pilih Instansi Dispusip --"
                                 :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
                                 :selected="old('agency_profile_id', $mentor->agency_profile_id)"
                                 :required="false"

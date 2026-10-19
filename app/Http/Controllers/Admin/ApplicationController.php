@@ -316,7 +316,7 @@ class ApplicationController extends Controller
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
         $placementEligibleStatuses = ['waiting_approval', 'accepted', 'active', 'completed'];
 
-        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses) {
+        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses, $user) {
             $appUpdateData = [
                 'status' => $newStatus,
                 'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
@@ -347,10 +347,31 @@ class ApplicationController extends Controller
 
             $existingPlacement = Placement::where('application_id', $application->id)->first();
             $oldMentor = $existingPlacement?->mentor ?? $existingPlacement?->pembimbing;
+            $oldAdvisor = $existingPlacement?->academicAdvisor;
 
             if (in_array($newStatus, $placementEligibleStatuses)) {
                 $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
                 $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+            }
+
+            $reassignChanges = [];
+            if ($assignedMentorId && (int) ($existingPlacement?->mentor_id ?? 0) !== (int) $assignedMentorId) {
+                $newMentorObj = User::find($assignedMentorId);
+                $reassignChanges['mentor'] = [
+                    'from' => $oldMentor?->name,
+                    'to' => $newMentorObj?->name ?? (string) $assignedMentorId,
+                ];
+            }
+
+            if ($request->filled('academic_advisor_id')) {
+                $newAdvisorId = (int) $request->academic_advisor_id;
+                if ((int) ($existingPlacement?->academic_advisor_id ?? 0) !== $newAdvisorId) {
+                    $newAdvisorObj = User::find($newAdvisorId);
+                    $reassignChanges['academic_advisor'] = [
+                        'from' => $oldAdvisor?->name,
+                        'to' => $newAdvisorObj?->name ?? (string) $newAdvisorId,
+                    ];
+                }
             }
 
             // Anti-Reset: gunakan update() pada instance yang sudah ada agar ID, logbook, absensi, dan laporan akhir tetap utuh
@@ -359,22 +380,52 @@ class ApplicationController extends Controller
                     $existingPlacement->update($placementData);
                 }
             } elseif (! empty($placementData) || in_array($newStatus, $placementEligibleStatuses)) {
-                Placement::create(array_merge(
+                $existingPlacement = Placement::create(array_merge(
                     ['application_id' => $application->id],
                     $placementData
                 ));
             }
 
-            // Sinkronkan grup bimbingan chat jika mentor berganti
-            if ($assignedMentorId && $oldMentor && (int) $oldMentor->id !== (int) $assignedMentorId) {
+            // Catat audit log khusus mutasi/pergantian pembimbing jika ada perubahan
+            if (! empty($reassignChanges) && $existingPlacement) {
+                AuditLog::record('PLACEMENT_SUPERVISOR_REASSIGN', 'Placement', $existingPlacement->id, [
+                    'student_name' => $application->user?->name,
+                    'application_status' => $newStatus,
+                    'changes' => $reassignChanges,
+                    'actor_role' => $user->role,
+                ]);
+            }
+
+            // Sinkronkan grup bimbingan chat jika mentor ditetapkan/berganti
+            if ($assignedMentorId && (! $oldMentor || (int) $oldMentor->id !== (int) $assignedMentorId)) {
                 try {
                     $chatGroups = app(\App\Services\Chat\ChatGroupService::class);
-                    $chatGroups->syncMentorGroup($oldMentor);
+                    if ($oldMentor) {
+                        $chatGroups->syncMentorGroup($oldMentor);
+                    }
                     if ($newMentor = User::find($assignedMentorId)) {
                         $chatGroups->syncMentorGroup($newMentor);
                     }
                 } catch (\Throwable $e) {
                     report($e);
+                }
+            }
+
+            // Sinkronkan grup bimbingan chat jika Dosen Pembimbing ditetapkan/berganti
+            if ($request->filled('academic_advisor_id')) {
+                $newAdvisorId = (int) $request->academic_advisor_id;
+                if (! $oldAdvisor || (int) $oldAdvisor->id !== $newAdvisorId) {
+                    try {
+                        $chatGroups = app(\App\Services\Chat\ChatGroupService::class);
+                        if ($oldAdvisor) {
+                            $chatGroups->syncDplGroup($oldAdvisor);
+                        }
+                        if ($newAdvisor = User::find($newAdvisorId)) {
+                            $chatGroups->syncDplGroup($newAdvisor);
+                        }
+                    } catch (\Throwable $e) {
+                        report($e);
+                    }
                 }
             }
 
@@ -394,6 +445,10 @@ class ApplicationController extends Controller
                 NotificationService::notifySupervisorForApplication($application);
             }
         });
+
+        if ($request->filled('return_to')) {
+            return redirect()->to($request->input('return_to'))->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
+        }
 
         return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
     }

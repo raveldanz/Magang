@@ -13,7 +13,7 @@
         </div>
 
         <div x-show="contactMode === 'group'" class="px-5 pb-3 space-y-2 shrink-0">
-            <input type="text" x-ref="groupTitle" x-model="groupForm.title" maxlength="100" placeholder="Nama grup, mis. Magang Diskominfo Batch Oktober" aria-label="Nama grup"
+            <input type="text" x-ref="groupTitle" x-model="groupForm.title" maxlength="100" placeholder="Nama grup, mis. Bimbingan Magang Dispusip Surabaya" aria-label="Nama grup"
                    class="w-full h-11 px-3.5 rounded-xl border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500">
             <textarea x-model="groupForm.description" rows="2" maxlength="300" placeholder="Deskripsi (opsional)" aria-label="Deskripsi grup"
                       class="w-full px-3.5 py-2.5 rounded-xl border-slate-200 text-sm resize-none focus:border-blue-500 focus:ring-blue-500"></textarea>

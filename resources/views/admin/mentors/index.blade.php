@@ -41,38 +41,53 @@
                 </div>
             @endif
 
-            <!-- Filter Instansi jika Super Admin -->
-            @if($isSuperAdmin)
-                <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
-                    <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
-                        @if(isset($agencies) && count($agencies) > 1)
-                            <select name="agency_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Semua Instansi Dinas</option>
-                                @foreach($agencies as $ag)
-                                    <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                        {{ $ag->agency_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        @endif
+            <!-- Filter & Pencarian Mentor (Bidang Dispusip & Kata Kunci) -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
+                <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+                    @if($isSuperAdmin && isset($agencies) && count($agencies) > 1)
+                        <select name="agency_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Semua Instansi Dinas</option>
+                            @foreach($agencies as $ag)
+                                <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
+                                    {{ $ag->agency_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
 
-                        <div class="relative flex-1">
-                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email mentor..." 
-                                   class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-                                   style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
+                    @if(isset($units) && $units->count() > 0)
+                        <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Semua Bidang / Divisi Dispusip --</option>
+                            @foreach($units as $u)
+                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                    {{ $u->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
                         </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email mentor..." 
+                               class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
+                    </div>
 
-                        <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer w-full sm:w-auto text-center">
-                            Cari
-                        </button>
-                    </form>
-                </div>
-            @endif
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer w-full sm:w-auto text-center">
+                        Cari
+                    </button>
+
+                    @if(request('search') || request('unit_id') || request('agency_id'))
+                        <a href="{{ route('admin.mentors.index') }}" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center">
+                            Reset
+                        </a>
+                    @endif
+                </form>
+            </div>
 
             <!-- Mentors Presentation Card (Desktop Table + Mobile Card View) -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">

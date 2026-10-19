@@ -55,7 +55,7 @@
                     <div>
                         <x-input-label for="name" value="Nama Bidang / Divisi / Unit Kerja" />
                         <input type="text" id="name" name="name" value="{{ old('name') }}"
-                            placeholder="Contoh: Bidang Layanan Informatika & E-Government"
+                            placeholder="Contoh: Bidang Pembinaan dan Pengelolaan Perpustakaan"
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required>
                         @error('name')

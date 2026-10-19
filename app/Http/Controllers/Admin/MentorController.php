@@ -30,6 +30,10 @@ class MentorController extends Controller
             $query->where('agency_profile_id', $agencyId);
         }
 
+        if ($request->filled('unit_id')) {
+            $query->where('unit_id', $request->unit_id);
+        }
+
         if ($request->filled('search')) {
             $search = strtolower($request->search);
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';

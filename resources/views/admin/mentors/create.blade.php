@@ -50,7 +50,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Kedinasan / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="mentor.kominfo@surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="mentor.perpus@dispusip.surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         <p class="text-[11px] text-gray-400 mt-1">Password bawaan akun: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-bold">password</code></p>
                     </div>
 
@@ -73,7 +73,7 @@
                             </label>
                             <x-searchable-select
                                 name="agency_profile_id"
-                                placeholder="-- Pilih Dinas --"
+                                placeholder="-- Pilih Instansi Dispusip --"
                                 :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
                                 :selected="old('agency_profile_id', $currentAgency?->id)"
                                 :required="false"
