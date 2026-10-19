@@ -21,6 +21,7 @@
                     $isSuperAdmin = ($user?->isSuperAdmin() ?? false);
                     $isSupervisor = $user && ($user->role === 'supervisor' || ($user->isSupervisor() ?? false));
                     $isAdminDinas = $user && ($user->role === 'admin' && !is_null($user->agency_profile_id));
+                    $isBidangAdmin = $user && ($user->isBidangAdmin() ?? false);
                     $isMahasiswa = $user && $user->role === 'mahasiswa';
                     $isDosen = $user && ($user->role === 'dosen' || $user->role === 'academic_advisor');
                     $isMentor = $user && ($user->role === 'mentor' || $user->role === 'pembimbing');
@@ -197,10 +198,12 @@
                            class="transition py-1 {{ request()->routeIs('admin.certificates.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Sertifikat
                         </a>
-                        <a href="{{ route('admin.agency_profile.edit') }}" 
-                           class="transition py-1 {{ request()->routeIs('admin.agency_profile.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Profil Dinas
-                        </a>
+                        @if (! $isBidangAdmin)
+                            <a href="{{ route('admin.agency_profile.edit') }}" 
+                               class="transition py-1 {{ request()->routeIs('admin.agency_profile.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                                Profil Dinas
+                            </a>
+                        @endif
 
                     @elseif ($isMahasiswa)
                         <a href="{{ route('dashboard') }}" 
@@ -722,12 +725,14 @@
                         </div>
                         <span>Terbitkan Sertifikat</span>
                     </a>
-                    <a href="{{ route('admin.agency_profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.agency_profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.agency_profile.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </div>
-                        <span>Profil Dinas</span>
-                    </a>
+                    @if (! $isBidangAdmin)
+                        <a href="{{ route('admin.agency_profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.agency_profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.agency_profile.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            </div>
+                            <span>Profil Dinas</span>
+                        </a>
+                    @endif
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Pengaturan Akun</span>
                     </a>

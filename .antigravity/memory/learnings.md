@@ -2189,6 +2189,25 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-089] Penyelarasan Integrasi Status Lintas Peran, Otomatisasi Lifecycle On-The-Fly, & Preservasi Metrik Dashboard
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Student/DashboardController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`, `tests/Feature/RoleStatusIntegrationWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Mahasiswa yang telah disahkan (*Double ACC*) oleh Atasan dan telah mencapai tanggal mulai magang (`start_date <= today`) tidak langsung melihat statusnya berubah menjadi `ACTIVE` saat membuka `/dashboard` jika belum mengklik menu Logbook.
+  2. Tab filter status pada Dashboard Mentor (`?tab=active`, `?tab=upcoming`, `?tab=completed`) memfilter `$baseQuery` secara langsung sebelum proses agregasi statistik, menyebabkan seluruh counter metrik bimbingan tereduksi menjadi 0 saat tab diklik.
+  3. Filter peringatan kelulusan DPL pada `Lecturer\DashboardController` membandingkan Enum `status` secara string ketat (`$app->status === 'completed'`), menghasilkan false-negative pada PHP 8.2+.
+- **Root Cause**:
+  Ketidaksinkronan trigger on-the-fly pada entry point dasbor mahasiswa, mutasi variabel query dasar sebelum kloning agregasi, dan perbandingan tipe data Enum Backed vs String literal.
+- **Fix Applied**:
+  1. Menambahkan pemicu otomatis `$application?->autoActivateIfStarted()` langsung pada `Student\DashboardController@index` sehingga status langsung menjadi `ACTIVE` saat dasbor dibuka di hari H magang.
+  2. Memisahkan `$tab` dari `$baseQuery` pada `Mentor\DashboardController@index`, mengisolasi filter tab hanya pada `$query` listing sehingga widget metrik bimbingan selalu akurat 100%.
+  3. Menggunakan method accessor `$app->statusValue()` pada `Lecturer\DashboardController` untuk memvalidasi kelulusan secara type-safe.
+  4. Menambahkan automated feature test komprehensif `RoleStatusIntegrationWorkflowTest` (6/6 tests PASS, 29 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  Setiap transisi status yang bergantung pada waktu (`start_date` / `end_date`) wajib memiliki trigger on-the-fly di entry point controller peran terkait di samping scheduler cron `app:sync-internship-status`. Dilarang memodifikasi `$baseQuery` dengan parameter tab sebelum menjalankan perhitungan agregat/count.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
