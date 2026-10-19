@@ -2169,6 +2169,26 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-088] Form Tunggal Terpadu Seleksi & Penugasan Pembimbing (Eliminasi Card Redundan)
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/applications/show.blade.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `tests/Feature/AdminWorkflowSelectionTest.php`, `tests/Feature/Phase1OnboardingTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman detail verifikasi aplikasi admin (`/admin/applications/{id}`), saat status pengajuan sudah `ACCEPTED` atau `ACTIVE`, terdapat dua formulir terpisah dengan dua tombol submit berbeda ("Simpan Perubahan Status" vs "Simpan Penugasan Pembimbing") yang membingungkan admin dinas.
+  2. Kebutuhan mutasi pembimbing (susulan Dosen Kampus atau pergantian Mentor Lapangan Dinas) rawan terpecah logikanya jika form penugasan di bawah berdiri sendiri.
+- **Root Cause**:
+  Form keputusan status awal (`#acceptance-box`) tetap menampilkan input mentor dan dosen, namun secara historis dibuat card terpisah `#penugasan-pembimbing` di bagian bawah dengan rute `admin.applications.assignment`. Hal ini memicu duplikasi input (redundan) pada layar yang sama.
+- **Fix Applied**:
+  1. Menghapus tuntas blok fisik card redundan `#penugasan-pembimbing` di bagian bawah `resources/views/admin/applications/show.blade.php`.
+  2. Menyatukan seluruh alur seleksi, nomor surat dinas balasan, tanggal magang, plotting mentor dinas, dan dosen pembimbing kampus ke dalam satu form terpadu (`#acceptance-box`) dengan tombol aksi tunggal **"Simpan Keputusan & Penugasan"**.
+  3. Menambahkan kartu status pembimbing aktif (*Mentor Dinas Saat Ini* & *Dosen Pembimbing Kampus Saat Ini*) dengan indikator *Aktif* / *Menunggu* langsung di atas dropdown pencarian combobox.
+  4. Memperkaya logika `ApplicationController::updateStatus` agar otomatis mencatat `AuditLog::record('PLACEMENT_SUPERVISOR_REASSIGN')` ketika terjadi perubahan mentor atau dosen pada penempatan yang sudah ada, serta otomatis menyinkronkan keanggotaan mahasiswa di grup chat bimbingan (baik mentor dinas maupun dosen kampus).
+  5. Menambahkan automated feature test `test_unified_form_can_update_mentor_and_dosen_on_active_application` pada `AdminWorkflowSelectionTest` (11/11 PASS) dan memvalidasi `Phase1OnboardingTest` (13/13 PASS).
+  6. Mengambil tangkapan layar Playwright headless Google Chrome lokal (Desktop & Mobile) untuk memverifikasi tata letak visual bebas overflow dan tanpa icon emotikon.
+- **Prevention Rule**:
+  Seluruh aksi administrasi pada entitas detail pengajuan/penempatan wajib berpusat pada satu formulir tunggal per konteks halaman. Dilarang menduplikasi field input atau tombol simpan pada halaman yang sama guna menjaga konsistensi alur kerja dan kejelasan antarmuka bagi pengguna.
+
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
