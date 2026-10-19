@@ -160,15 +160,54 @@
                                             </a>
 
                                             @if($cert->approval_status === 'waiting_approval')
-                                                {{-- Tombol Sahkan (ACC) --}}
-                                                <form method="POST" action="{{ route('supervisor.certificates.approve', $cert->id) }}" onsubmit="return confirm('Apakah Anda yakin mengesahkan sertifikat magang atas nama {{ $student?->name }}?')">
-                                                    @csrf
-                                                    <button type="submit" 
-                                                            class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition cursor-pointer">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                        <span>Sahkan</span>
-                                                    </button>
-                                                </form>
+                                                {{-- Tombol Sahkan (ACC) dengan Modal Konfirmasi --}}
+                                                <div x-data="{ showApproveCertModal: false }">
+                                                    <form id="approve-cert-form-{{ $cert->id }}" method="POST" action="{{ route('supervisor.certificates.approve', $cert->id) }}">
+                                                        @csrf
+                                                        <button type="button" 
+                                                                @click="showApproveCertModal = true"
+                                                                class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition cursor-pointer">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                            <span>Sahkan</span>
+                                                        </button>
+                                                    </form>
+
+                                                    {{-- Modal Konfirmasi Sahkan Sertifikat --}}
+                                                    <div x-show="showApproveCertModal" 
+                                                         x-cloak 
+                                                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs text-left"
+                                                         @keydown.escape.window="showApproveCertModal = false">
+                                                        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4"
+                                                             @click.outside="showApproveCertModal = false">
+                                                            <div class="flex items-start gap-3 pb-3 border-b border-slate-100">
+                                                                <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                                </div>
+                                                                <div>
+                                                                    <h3 class="text-sm font-extrabold text-slate-900">Pengesahan E-Sertifikat Kelulusan</h3>
+                                                                    <p class="text-xs text-slate-500 mt-0.5">Sahkan sertifikat dan transkrip nilai resmi</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                                                                <div class="text-slate-500">Nama Mahasiswa:</div>
+                                                                <div class="font-bold text-slate-900 text-sm">{{ $student?->name }}</div>
+                                                                <div class="text-[11px] text-slate-500">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
+                                                            </div>
+                                                            <p class="text-xs text-slate-600 leading-relaxed">
+                                                                Setelah disahkan, mahasiswa yang bersangkutan akan dapat mengunduh E-Sertifikat resmi Dispusip beserta transkrip nilai.
+                                                            </p>
+                                                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                                                <button type="button" @click="showApproveCertModal = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                                                    Batal
+                                                                </button>
+                                                                <button type="button" @click="document.getElementById('approve-cert-form-{{ $cert->id }}').submit()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-emerald-600/20">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                    <span>Ya, Sahkan Sertifikat</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 {{-- Modal / Dropdown Revisi --}}
                                                 <div x-data="{ openRev: false }" class="relative">

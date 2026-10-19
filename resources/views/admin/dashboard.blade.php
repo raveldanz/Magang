@@ -123,7 +123,7 @@
                                     Unit</span>
                             </div>
                             <div>
-                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Divisi & Kuota
+                                <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Bidang Devisi
                                 </div>
                                 <div class="text-[11px]" style="color: #bfdbfe !important;">Alokasi Slot Magang</div>
                             </div>
@@ -435,10 +435,9 @@
                         @endphp
                         <div @if($loop->index >= 10) x-show="expanded" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
-                                <a href="{{ isset($item['id']) ? route('admin.units.show', $item['id']) : '#' }}"
-                                   class="text-slate-700 font-medium truncate flex-1 min-w-0 hover:text-blue-600 transition">
+                                <span class="text-slate-700 font-medium truncate flex-1 min-w-0">
                                     {{ $itemName }}
-                                </a>
+                                </span>
                                 <span class="text-blue-700 font-bold shrink-0">
                                     {{ $itemCount }} Mahasiswa
                                     @if($itemQuota > 0)

@@ -336,7 +336,7 @@
                                                     Edit
                                                 </a>
                                                 @if($isSuperAdmin)
-                                                    @php $roleLabel = $u->role === 'admin' ? 'Admin Dinas' : (in_array($u->role, ['mentor', 'pembimbing']) ? 'Mentor Lapangan' : ucfirst($u->role)); @endphp
+                                                    @php $roleLabel = $u->roleLabel(); @endphp
                                                     <button type="button"
                                                             @click="$dispatch('open-reset-modal', {
                                                                 action: '{{ route('admin.users.reset_password', $u->id) }}',
@@ -483,8 +483,8 @@
                                         </td>
                                         <td class="rt-actions py-3.5 px-4 text-right" data-label="Aksi">
                                             <div class="inline-flex items-center justify-end gap-1.5 align-middle">
-                                                <a href="{{ route('admin.units.edit', ['unit' => $unit->id, 'return_to' => url()->current()]) }}" class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 cursor-pointer">
-                                                    Edit
+                                                <a href="{{ route('admin.units.show', $unit->id) }}" class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 cursor-pointer">
+                                                    Detail
                                                 </a>
                                             </div>
                                         </td>
@@ -525,7 +525,7 @@
                                     <div class="mbar"><i style="width: {{ $pct }}%; background: {{ $remaining > 0 ? '#3b82f6' : '#f43f5e' }};"></i></div>
                                 </div>
                                 <div class="mcard-foot">
-                                    <a href="{{ route('admin.units.edit', ['unit' => $unit->id, 'return_to' => url()->current()]) }}" class="mbtn mbtn-soft mbtn-block">Edit Divisi</a>
+                                    <a href="{{ route('admin.units.show', $unit->id) }}" class="mbtn mbtn-soft mbtn-block">Detail Bidang</a>
                                 </div>
                             </div>
                         @empty

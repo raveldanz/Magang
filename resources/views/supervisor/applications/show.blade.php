@@ -50,7 +50,7 @@
                             @if($st)
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border {{ $st->badgeColor() }}">
                                     <span class="w-2 h-2 rounded-full {{ $st->dotColor() }}"></span>
-                                    {{ $st->description() }}
+                                    {{ $st->description('supervisor') }}
                                 </span>
                             @endif
                         </div>
@@ -172,7 +172,16 @@
                 <div class="space-y-6">
 
                     {{-- Panel Aksi ACC --}}
-                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-5 sticky top-24">
+                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-5 sticky top-24"
+                         x-data="{ 
+                             showApproveModal: false, 
+                             confirmedCheck: false, 
+                             approveKeyword: '', 
+                             openReject: false,
+                             get canSubmitApprove() {
+                                 return this.confirmedCheck && this.approveKeyword.trim().toUpperCase() === 'SETUJUI';
+                             }
+                         }">
                         <div class="border-b border-slate-200 pb-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tindakan Eksekutif Atasan</span>
                             <h3 class="text-lg font-black text-slate-900 mt-0.5">Persetujuan & Pengesahan</h3>
@@ -181,15 +190,105 @@
                             </p>
                         </div>
 
-                        {{-- Aksi 1: Setujui (ACC) --}}
-                        <form method="POST" action="{{ route('supervisor.applications.approve', $application->id) }}" onsubmit="return confirm('Apakah Anda yakin menyetujui pengajuan magang ini dan menerbitkan Surat Balasan Resmi Dispusip?')">
+                        {{-- Aksi 1: Setujui (ACC) - Trigger Modal Konfirmasi --}}
+                        <form id="approve-form" method="POST" action="{{ route('supervisor.applications.approve', $application->id) }}">
                             @csrf
-                            <button type="submit" 
+                            <button type="button" 
+                                    @click="showApproveModal = true; confirmedCheck = false; approveKeyword = ''"
                                     class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-base shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-3 cursor-pointer">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Setujui & Terbitkan Surat</span>
                             </button>
                         </form>
+
+                        {{-- MODAL KONFIRMASI 2 KALI (PENGGANTI confirm() BROWSER) --}}
+                        <div x-show="showApproveModal" 
+                             x-cloak 
+                             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+                             @keydown.escape.window="showApproveModal = false">
+                            <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 text-left"
+                                 @click.outside="showApproveModal = false">
+                                
+                                {{-- Header Modal --}}
+                                <div class="flex items-start gap-3.5 pb-4 border-b border-slate-100">
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-extrabold text-slate-900">Konfirmasi Pengesahan Akhir (ACC)</h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">Pengesahan resmi penerimaan magang dan penerbitan Surat Balasan Resmi Dispusip.</p>
+                                    </div>
+                                </div>
+
+                                {{-- Rincian Berkas --}}
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Nama Mahasiswa:</span>
+                                        <span class="font-bold text-slate-900">{{ $application->user?->name }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Perguruan Tinggi:</span>
+                                        <span class="font-bold text-slate-900">{{ $application->user?->studentProfile?->universitas ?? '-' }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Bidang Penempatan:</span>
+                                        <span class="font-bold text-blue-700">{{ $application->unit?->name ?? '-' }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">Mentor Lapangan:</span>
+                                        <span class="font-bold text-slate-900">{{ $application->placement?->mentor?->name ?? $application->placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
+                                    </div>
+                                </div>
+
+                                {{-- Konfirmasi Lapis 1: Checkbox Pernyataan --}}
+                                <div class="space-y-1.5">
+                                    <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-black">1</span>
+                                        <span>Pernyataan Persetujuan</span>
+                                    </div>
+                                    <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition select-none">
+                                        <input type="checkbox" x-model="confirmedCheck" class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                        <span class="text-xs font-semibold text-slate-800 leading-snug">
+                                            Saya selaku Atasan (Tim Kerja Umum &amp; Kepegawaian) telah memeriksa berkas dan menyetujui penerimaan magang mahasiswa ini.
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {{-- Konfirmasi Lapis 2: Ketik Kata Kunci Tepat --}}
+                                <div class="space-y-1.5">
+                                    <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                        <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-black">2</span>
+                                        <span>Ketik Konfirmasi</span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                                        <p class="text-xs text-slate-600">Ketik kata kunci <strong class="text-emerald-700 font-mono">SETUJUI</strong> di bawah ini:</p>
+                                        <input type="text" 
+                                               x-model="approveKeyword" 
+                                               @input="approveKeyword = $event.target.value.toUpperCase()"
+                                               placeholder="Ketik 'SETUJUI' di sini..." 
+                                               class="w-full text-xs font-mono font-bold uppercase tracking-wider border-slate-300 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 py-2">
+                                    </div>
+                                </div>
+
+                                {{-- Tombol Modal --}}
+                                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                                    <button type="button" 
+                                            @click="showApproveModal = false"
+                                            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer">
+                                        Batal
+                                    </button>
+                                    <button type="button"
+                                            :disabled="!canSubmitApprove"
+                                            @click="document.getElementById('approve-form').submit()"
+                                            :class="canSubmitApprove ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md shadow-emerald-600/30' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                                            class="px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Sahkan & Terbitkan Surat</span>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
 
                         <div class="relative flex py-1 items-center">
                             <div class="flex-grow border-t border-slate-200"></div>
@@ -198,7 +297,7 @@
                         </div>
 
                         {{-- Aksi 2: Tolak --}}
-                        <div x-data="{ openReject: false }">
+                        <div>
                             <button @click="openReject = !openReject" 
                                     type="button" 
                                     class="w-full py-4 px-6 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white font-black text-base shadow-lg shadow-rose-600/30 transition flex items-center justify-center gap-3 cursor-pointer">

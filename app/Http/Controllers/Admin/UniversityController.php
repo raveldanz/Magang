@@ -385,7 +385,7 @@ class UniversityController extends Controller
         $activeDosenCount = $univ->dosens()
             ->whereHas('academicPlacements', function ($q) {
                 $q->whereHas('application', function ($aq) {
-                    $aq->whereIn('status', ['verified', ...Application::QUOTA_STATUSES]);
+                    $aq->whereIn('status', Application::QUOTA_STATUSES);
                 });
             })->count();
 

@@ -6,7 +6,7 @@
                 <nav class="flex items-center gap-2 text-xs text-slate-500 mb-1.5" aria-label="Breadcrumb">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
                     <span class="text-slate-400">/</span>
-                    <a href="{{ route('admin.units.index') }}" class="hover:text-blue-600 transition">Bidang & Devisi</a>
+                    <a href="{{ route('admin.units.index') }}" class="hover:text-blue-600 transition">Bidang Devisi</a>
                     <span class="text-slate-400">/</span>
                     <span class="text-slate-800 font-semibold truncate">{{ $unit->name }}</span>
                 </nav>

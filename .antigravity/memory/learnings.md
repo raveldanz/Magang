@@ -90,6 +90,11 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-078** | 2026-10-15 | Standarisasi Dispusip Single-Agency, 4 Bidang & Double ACC | Pembersihan ekosistem OPD non-Dispusip, relasi unit_id mentor, role supervisor (Atasan Kepegawaian), dan Double ACC pengajuan & sertifikat | RESOLVED |
 | **LRN-079** | 2026-10-15 | Integrasi & Harmonisasi Fitur Evaluasi Nilai | Penggabungan skema evaluasi kampus, komponen kustom universitas, dan input aspek dinamis Dosen/Mentor | RESOLVED |
 | **LRN-080** | 2026-10-15 | Standarisasi Nomenklatur Jabatan, Kunci 4 Bidang Dispusip & Integrasi Chat/Notifikasi Supervisor | Penguncian tepat 4 bidang Dispusip, nomenklatur 'Tim Kerja Umum dan Kepegawaian', eliminasi role mentah SUPERVISOR, komponen x-page-header, & dukungan penuh chat/notifikasi supervisor | RESOLVED |
+| **LRN-081** | 2026-10-15 | Seleksi Pengajuan Admin: Dot Waiting, Filter Mentor Bidang & Clean Naming | Titik indikator kartu WAITING_APPROVAL, filter otomatis mentor sesuai unit_id bidang pendaftaran, eliminasi duplikasi teks bidang di nama & pembaharuan keterangan 'Setujui, Serahkan ke Atasan' | RESOLVED |
+| **LRN-082** | 2026-10-15 | Nomenklatur Bidang Devisi & Tautan Detail Unit | Standarisasi menu navbar 'Bidang Devisi' & pembaruan tombol aksi baris unit dari Edit menjadi Detail mengarah ke show page /admin/units/{id} | RESOLVED |
+| **LRN-083** | 2026-10-15 | Eliminasi Card Penugasan Pembimbing Susulan Redundan & RoleLabel | Eliminasi penugasan susulan ganda, pembersihan sisa status verified, dan konsistensi roleLabel | RESOLVED |
+| **LRN-084** | 2026-10-15 | Supervisor UI Refinements: Menu Dashboard, Tombol Sertifikat Biru, Tab Menunggu Persetujuan & Status Menunggu ACC | Simplifikasi navbar 'Dashboard', pewarnaan biru tombol Pengesahan Sertifikat, pergantian tab 'Menunggu Persetujuan', dan deskripsi khusus status WAITING_APPROVAL 'Menunggu ACC' bagi supervisor | RESOLVED |
+| **LRN-085** | 2026-10-15 | Double ACC Approval Workflow & Elimination of Browser Confirm() Popups | Audit menyeluruh alur status persetujuan bertingkat (Double ACC): eliminasi confirm() browser menjadi modal dialog dua lapis, pengesahan sertifikat, dan harmonisasi status desktop/mobile | RESOLVED |
 
 ---
 
@@ -1978,6 +1983,144 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Sembunyikan status fase pelaksanaan (`active`, `completed`, `resigned`) saat mahasiswa masih berada dalam fase seleksi pendaftaran (`pending`, `waiting_approval`, `rejected`).
   3. Status yang terikat durasi waktu wajib memiliki mekanisme multi-trigger (scheduler, event-driven aksi pengguna, dan on-the-fly check) agar status tidak pernah macet (*stale state*).
 
+### [LRN-080] Audit Kinerja Menyeluruh, Integritas Skenario Mahasiswa Lulus, dan Verifikasi Hermes Swarm 100% PASS
+- **Tanggal**: 2026-10-15
+- **Komponen**: `database/seeders/DemoE2ESeeder.php`, `app/Models/Application.php`, `app/Models/Placement.php`, `scripts/hermes_all_roles_test.mjs`, `scripts/tier3_playwright_audit.mjs`
+- **Problem / Symptom**:
+  1. Pada pengujian E2E Hermes Swarm (`scripts/hermes_all_roles_test.mjs`), pengujian unduh sertifikat mahasiswa lulus (`/student/certificate/1/download`) dan unduh berkas laporan akhir (`/final-reports/{id}/file`) sempat mengembalikan kegagalan (FAIL) dengan status HTTP 403 (Locked).
+  2. Deklarasi metode ganda di PHP (`finalreport()` dan `finalReport()`) pada `Placement.php` menyebabkan error fatal karena PHP menganggap nama method bersifat *case-insensitive*.
+- **Root Cause**:
+  1. Pada `DemoE2ESeeder.php`, skenario mahasiswa lulus (`mahasiswa.lulus@unesa.ac.id`) menginisialisasi entitas `Application`, `Placement`, `Evaluation`, dan `Certificate`, namun lupa menginisialisasi entitas `FinalReport` berstatus `approved` dan entitas `Logbook`. Akibatnya, `Application::certificateBlockers()` menganggap syarat administratif kelulusan belum lengkap dan mengunci akses unduh sertifikat sesuai standar keamanan *Certificate Gate*.
+  2. PHP tidak mengizinkan dua method dengan nama yang hanya berbeda huruf besar/kecil dalam satu class yang sama.
+- **Fix Applied**:
+  1. Melengkapi seeder `DemoE2ESeeder.php` dengan inisialisasi `FinalReport` berstatus `approved` (mengarah ke berkas resmi `sample_laporan_akhir.pdf`) dan 5 catatan `Logbook` terverifikasi untuk skenario mahasiswa lulus.
+  2. Menjaga method tunggal `finalreport()` pada `Placement.php` yang dipanggil secara konsisten di seluruh lapisan sistem.
+  3. Menjalankan re-seeding database dan mengeksekusi ulang Hermes E2E Swarm: **56 dari 56 pengujian inter-role Lolos 100% (56/56 PASS, 0 FAIL, 0 WARNING)**.
+  4. Menjalankan Playwright Tier 3 Visual Audit Runner (Google Chrome Channel): seluruh antarmuka login, tabel pengajuan magang, detail pengajuan, dan master pengguna lolos uji kontras WCAG 5.17, bebas overflow horizontal pada desktop maupun smartphone (375x812).
+- **Prevention Rule**: Skenario seeder untuk mahasiswa berstatus `completed` wajib selalu menyertakan data lengkap relasi prasyarat kelulusan (`FinalReport` berstatus `approved` dan minimal 1 entri `Logbook`), agar guard validasi sertifikat tidak memicu false-positive lockout.
+
+### [LRN-081] Penyelarasan Indikator Dot Waiting Approval, Filter Mentor Sesuai Bidang Unit & Eliminasi Redundansi Teks Bidang
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `resources/views/admin/applications/show.blade.php`, `tests/Feature/AdminWorkflowSelectionTest.php`
+- **Problem / Symptom**:
+  1. Kartu pemilihan status keputusan seleksi admin untuk WAITING_APPROVAL belum memiliki titik lingkaran indikator warna (dot) seperti halnya PENDING (kuning), ACCEPTED (biru), dan REJECTED (merah).
+  2. Dropdown pemilihan mentor dinas menampilkan seluruh akun mentor tanpa terfilter otomatis per bidang (unit kerja) pendaftaran mahasiswa, dan mencantumkan keterangan bintang `⭐ (Sesuai Bidang)`.
+  3. Teks nama mentor di dropdown dan label seleksi memuat nama bidang ganda/dobel yang menempel di nama (misal: `Budi Santoso [Bidang ...]`) padahal nama bidang sudah tertera rapi pada baris kedua (meta).
+  4. Keterangan pada opsi WAITING_APPROVAL masih tertulis `Menunggu ACC Atasan` dan perlu disesuaikan menjadi `Setujui, Serahkan ke Atasan`.
+- **Root Cause**:
+  1. Class Tailwind `bg-purple-500` belum memiliki fallback warna inline style dan sempat tidak terkompilasi dalam build statis Vite lama.
+  2. Query pemetaan `$mentorItems` tidak memfilter `$pembimbings` berdasarkan `$application->unit_id`, serta sengaja mengonkatenasi `[$unitName]` dan label bintang ke dalam properti `name`.
+  3. Method `ApplicationStatus::WAITING_APPROVAL->description()` mengembalikan string lama `Menunggu ACC Atasan`.
+- **Fix Applied**:
+  1. Menambahkan elemen titik indikator ungu `<span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block shrink-0" style="background-color: #a855f7;"></span>` pada kartu WAITING_APPROVAL.
+  2. Memperbarui `ApplicationStatus::WAITING_APPROVAL->description()` menjadi `'Setujui, Serahkan ke Atasan'`.
+  3. Memfilter koleksi `$pembimbings` secara otomatis agar hanya memuat mentor dengan `unit_id === $application->unit_id` (dengan fallback aman jika unit kosong).
+  4. Menghilangkan konkatenasi nama bidang `[$unitName]` dan bintang `⭐ (Sesuai Bidang)` dari nama mentor sehingga nama tampil bersih, sementara rincian bidang dan email/kontak tetap tersaji rapi di baris kedua (`meta`).
+  5. Menjalankan `npm run build`, `php artisan optimize:clear`, dan verifikasi visual headless Google Chrome Playwright (tangkapan layar tersimpan dan tervalidasi).
+- **Prevention Rule**: Seluruh indikator kartu visual wajib memiliki inline fallback style jika mengandalkan warna dinamis. Dropdown penugasan berbasis peran wajib selalu difilter berdasarkan divisi/unit kerja terkait (`unit_id`) dan menghindari duplikasi informasi yang sudah disajikan oleh komponen metadata baris kedua.
+
+### [LRN-082] Nomenklatur Bidang Devisi & Tautan Detail Unit Kerja
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `resources/views/admin/units/index.blade.php`, `resources/views/admin/units/show.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**: 
+  1. Menu navbar navigasi admin dinas masih berlabel "Divisi & Kuota" alih-alih "Bidang Devisi".
+  2. Tombol aksi pada tabel daftar bidang `/admin/units` bertuliskan "Edit" dan mengarah ke form edit `/admin/units/{id}/edit`, bukan ke halaman profil & statistik lengkap bidang `/admin/units/{id}`.
+- **Root Cause**: Desain aksi tabel awal hanya menyediakan aksi pengeditan cepat kuota & metadata form tanpa mengekspos rute `show` (`admin.units.show`) secara langsung pada tombol baris tabel.
+- **Fix Applied**: 
+  1. Memperbarui label menu navigasi Admin Dinas pada desktop navbar, profile menu dropdown, dan mobile drawer menjadi **"Bidang Devisi"**.
+  2. Mengubah judul header pada `admin/units/index.blade.php` menjadi **"Manajemen Bidang Devisi & Kuota Magang"**.
+  3. Mengubah tombol aksi **"Edit"** pada tabel desktop maupun kartu mobile menjadi **"Detail"** dengan tautan langsung menuju `route('admin.units.show', $unit->id)` (`/admin/units/{id}`).
+  4. Menjadikan nama bidang pada kolom tabel sebagai tautan navigasi langsung ke halaman Detail.
+  5. Menyelaraskan breadcrumb pada `admin/units/show.blade.php` dan tombol unit pada `admin/agencies/show.blade.php`.
+  6. Menjalankan verifikasi visual browser headless Google Chrome (Desktop & Mobile) dan `php artisan test` (302/302 PASS, Exit Code 0).
+- **Prevention Rule**: Tombol utama pada daftar unit kerja kelembagaan harus memprioritaskan peninjauan komprehensif (`show`), di mana aksi edit tetap dapat diakses di bagian atas halaman detail tersebut.
+
+### [LRN-083] Eliminasi Card Pembimbing Susulan Redundan, Pembersihan Sisa String 'verified', & Konsistensi roleLabel Impersonasi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/show.blade.php`, `resources/views/errors/403.blade.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/agencies/show.blade.php`, `app/Services/NotificationService.php`, `app/Services/UniversityHubService.php`, `app/Services/Chat/ChatPresenter.php`, `app/Models/Application.php`, `app/Http/Controllers/University/DashboardController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/DashboardController.php`, `app/Http/Controllers/Admin/UniversityController.php`
+- **Problem / Symptom**:
+  1. Pada halaman detail verifikasi aplikasi admin (`/admin/applications/{id}`), card "Penugasan Pembimbing (Susulan / Ganti)" masih muncul di bagian bawah form seleksi, membingungkan admin karena input mentor dan dosen sudah tersedia di form keputusan status utama (`#acceptance-box`).
+  2. Masih ditemukan residu pemanggilan string status `'verified'` pada beberapa model, controller, dan services setelah migrasi penghapusan status redundant `VERIFIED`.
+  3. Banner impersonasi pada `errors/403.blade.php` dan teks modal reset password pada `admin/users/index.blade.php` masih mencetak string uppercase mentah (`strtoupper($u->role)`) alih-alih `roleLabel()`.
+- **Root Cause**:
+  1. Blok Blade `#penugasan-pembimbing` lama masih bersarang di bawah form utama `show.blade.php` dengan rute aksi terpisah `admin.applications.assignment`.
+  2. Penghapusan status `ApplicationStatus::VERIFIED` sebelumnya menyisakan referensi string literal `'verified'` di query agregasi dasbor dan validasi array status controller.
+  3. Desain komponen view sebagian masih menggunakan pembacaan properti langsung `$user->role` dengan filter uppercase.
+- **Fix Applied**:
+  1. Menghapus tuntas blok fisik HTML/Blade card "Penugasan Pembimbing (Susulan / Ganti)" (`#penugasan-pembimbing`) dari `resources/views/admin/applications/show.blade.php` sehingga form input mentor dinas dan dosen pembimbing hanya tunggal di `#acceptance-box`.
+  2. Membersihkan seluruh residu literal string `'verified'` di `NotificationService.php`, `UniversityHubService.php`, `ChatPresenter.php`, `Application.php`, `Student/ApplicationController.php`, `Admin/AgencyController.php`, `Admin/ApplicationController.php`, `Admin/DashboardController.php`, `University/DashboardController.php`, dan `Admin/UniversityController.php`.
+  3. Menstandarisasi pencetakan label peran pada banner impersonasi dan modal dialog menggunakan `$user->roleLabel()`.
+  4. Membersihkan seluruh cache Laravel (`view:clear`, `route:clear`, `config:clear`, `optimize:clear`).
+  5. Menjalankan verifikasi automated test: `ApplicationStatusPipelineReformTest` (6/6 PASS), `AdminWorkflowSelectionTest` (9/9 PASS), Hermes E2E Swarm (56/56 PASS), dan Playwright Tier 3 Visual Audit (WCAG pass, 0 overflow).
+- **Prevention Rule**: Form plotting penugasan mentor dinas dan dosen pembimbing harus tunggal pada form keputusan status utama (`#acceptance-box`). Dilarang mencetak string peran mentah di tampilan UI—selalu gunakan `$user->roleLabel()`. Seluruh status pendaftaran awal wajib hanya mengacu pada `ApplicationStatus` resmi (`PENDING`, `WAITING_APPROVAL`, `ACCEPTED`, `ACTIVE`, `COMPLETED`, `REJECTED`, `RESIGNED`).
+
+---
+
+### [LRN-084] Penyesuaian UI Supervisor: Menu 'Dashboard', Tombol Sertifikat Biru, Tab Menunggu Persetujuan & Status 'Menunggu ACC'
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/supervisor/dashboard.blade.php`, `resources/views/supervisor/applications/index.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `tests/Feature/AdminWorkflowSelectionTest.php`
+- **Problem / Symptom**:
+  1. Menu navigasi supervisor masih tertulis "Dashboard & Tim Kerja" padahal pengguna menginginkan teks bersih "Dashboard".
+  2. Tombol aksi kartu metrik "Pengesahan Sertifikat" pada dashboard supervisor berwarna putih/outline abu-abu, tidak seragam dengan tombol "Persetujuan Pengajuan" yang berwarna biru (`bg-blue-600`).
+  3. Filter tab pertama pada halaman persetujuan pengajuan supervisor tertulis "Menunggu ACC Atasan" alih-alih "Menunggu Persetujuan".
+  4. Kolom status pengajuan di tabel supervisor menampilkan keterangan "Setujui, Serahkan ke Atasan" (deskripsi tindakan admin), padahal dari sudut pandang supervisor status tersebut harus berlabel "Menunggu ACC".
+- **Root Cause**:
+  1. `navigation.blade.php` masih menggunakan label awal "Dashboard & Tim Kerja" pada desktop link, profile dropdown, dan mobile drawer.
+  2. Kartu metrik sertifikat pada `supervisor/dashboard.blade.php` menggunakan styling tombol putih sekunder (`bg-white border-slate-200`).
+  3. Tab filter `supervisor/applications/index.blade.php` menggunakan label statis "Menunggu ACC Atasan".
+  4. Method `ApplicationStatus::description()` mengembalikan string seragam tanpa konteks peran, sehingga tampilan tabel supervisor memunculkan teks "Setujui, Serahkan ke Atasan".
+- **Fix Applied**:
+  1. Memperbarui label menu navigasi supervisor di `navigation.blade.php` (desktop, profile menu, mobile drawer) menjadi **"Dashboard"**.
+  2. Mengubah kelas tombol "Pengesahan Sertifikat" di `supervisor/dashboard.blade.php` menjadi `bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition`.
+  3. Mengubah label tab filter di `supervisor/applications/index.blade.php` menjadi **"Menunggu Persetujuan"**.
+  4. Memperkaya method `ApplicationStatus::description(?string $role = null)` agar mengembalikan **"Menunggu ACC"** khusus saat dilihat oleh supervisor (`role === 'supervisor'` atau `auth()->user()?->role === 'supervisor'`), serta menambahkan method `descriptionForSupervisor()`. Memperbarui `supervisor/applications/index.blade.php` dan `show.blade.php` untuk memanggil `$st->description('supervisor')`.
+  5. Menambahkan unit test `test_supervisor_sees_menunggu_acc_and_menunggu_persetujuan` di `AdminWorkflowSelectionTest` (10/10 PASS).
+  6. Mengambil tangkapan layar visual headless Google Chrome dan memverifikasi tampilan desktop & mobile.
+- **Prevention Rule**: Tampilan status alur kerja (workflow) harus sensitif terhadap perspektif peran pengguna: status yang merepresentasikan tindakan serah-terima antar-tingkatan hierarki (seperti Admin ke Atasan) harus menampilkan keterangan tindakan pengirim bagi pengirim, dan status menunggu persetujuan ("Menunggu ACC") bagi penerima/atasan.
+
+### [LRN-085] Audit Menyeluruh Alur Status Double ACC & Eliminasi Popup Browser confirm()
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `resources/views/supervisor/certificates/index.blade.php`, `resources/views/student/partials/desktop_status_cards.blade.php`, `app/Http/Controllers/Admin/ApplicationController.php`
+- **Problem / Symptom**:
+  1. Aksi persetujuan massal dan pengesahan tunggal atasan sempat menggunakan popup `confirm()` bawaan browser yang muncul di atas layar (kurang profesional, minim konteks data, dan rentan salah klik).
+  2. Bulk approval admin dinas sebelumnya langsung mengarahkan ke `accepted` tanpa melewati tahap `waiting_approval` (menunggu ACC atasan).
+  3. Kartu status desktop mahasiswa belum menangani kondisi `waiting_approval` secara eksplisit sehingga jatuh ke fallback generik "Dalam proses verifikasi", berbeda dengan tampilan mobile yang menampilkan "Menunggu ACC Atasan".
+  4. Pengesahan sertifikat atasan di `/supervisor/certificates` memanggil dialog `confirm()` browser.
+  5. Penghapusan blok penugasan pembimbing di `show.blade.php` sebelumnya memicu kegagalan test `Phase1OnboardingTest::test_admin_can_assign_dpl_on_active_placement`.
+- **Root Cause**: Residu implementasi kode lama sebelum restrukturisasi hierarki dua tingkat (Double ACC) dan ketergantungan pada fungsi `confirm()` bawaan browser.
+- **Fix Applied**:
+  1. Mentransformasi seluruh aksi persetujuan (bulk approval admin dan pengesahan supervisor di `supervisor/applications/show.blade.php` serta `supervisor/certificates/index.blade.php`) menggunakan **modal interaktif Alpine.js** dengan konfirmasi dua lapis (Lapis 1: checklist pemahaman tanggung jawab, Lapis 2: pengetikan kata kunci konfirmasi `SETUJUI`).
+  2. Menyelaraskan logika controller `ApplicationController::bulkUpdateStatus` agar admin dinas staf biasa mengarahkan status ke `waiting_approval` serta otomatis mengirim notifikasi ke atasan via `NotificationService::notifySupervisorForApplication()`.
+  3. Memulihkan komponen penugasan pembimbing susulan (`#penugasan-pembimbing`) khusus untuk penempatan magang yang sedang berjalan (`accepted`, `active`, `completed`) sehingga pengujian `Phase1OnboardingTest` lolos.
+  4. Menyelaraskan kartu status desktop mahasiswa di `desktop_status_cards.blade.php` agar menampilkan badge "Menunggu ACC Atasan" konsisten dengan kartu mobile.
+  5. Memvalidasi seluruh test suite (303 tests, 2.077 assertions, 100% PASS, Exit Code 0) dan membersihkan cache aplikasi (`optimize:clear`).
+- **Prevention Rule**: Dilarang keras menggunakan `confirm()` atau `alert()` bawaan browser pada aksi mutasi data penting atau workflow approval kedinasan. Seluruh konfirmasi harus menggunakan modal dialog ramah pengguna (Senior-Friendly) dengan visualisasi rincian data dan verifikasi bertingkat.
+
+### [LRN-086] Pusat Revisi Terpadu Sertifikat Magang & Eliminasi Tombol Cetak pada Status Perlu Revisi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Http/Controllers/Admin/CertificateController.php`, `routes/admin.php`, `resources/views/admin/certificates/index.blade.php`, `resources/views/admin/certificates/revision.blade.php`, `tests/Feature/AdminCertificateRevisionWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman daftar sertifikat kelulusan admin dinas (`/admin/certificates`), baris mahasiswa dengan status pengesahan `revision` (Perlu Revisi dari Atasan) masih menampilkan tombol "Cetak E-Sertifikat", yang berisiko membuat admin tidak sengaja mencetak dokumen bermasalah sebelum dikoreksi.
+  2. Belum ada antarmuka khusus yang terintegrasi penuh untuk melakukan koreksi langsung secara terpadu atas 3 aspek perbaikan sertifikat: Catatan Atasan, Nilai Evaluasi & Transkrip, Data Mahasiswa & Periode Magang, serta monitoring Logbook Presensi & Naskah Laporan Akhir.
+- **Root Cause**:
+  1. Logika tombol pada `admin/certificates/index.blade.php` sebelumnya menyamaratakan tombol cetak untuk semua baris tanpa mengecek status pengesahan atasan (`approval_status`).
+  2. Alur koreksi revisi sertifikat sebelumnya terpecah di berbagai modul berbeda (evaluasi, profil mahasiswa, penempatan), sehingga rawan inkonsistensi saat pengajuan ulang (*resubmit*).
+- **Fix Applied**:
+  1. Mengondisikan tombol aksi tabel sertifikat:
+     - `approved`: Tombol biru **"Cetak E-Sertifikat"**.
+     - `waiting_approval`: Tombol netral **"Pratinjau Draft"**.
+     - `revision`: Tombol oranye/amber **"Perbaiki Sertifikat"** (diarahkan ke rute revisi khusus) disertai kutipan catatan resmi atasan di kolom status.
+  2. Merancang dan mengimplementasikan **Halaman Pusat Perbaikan & Revisi Sertifikat Magang** (`admin.certificates.revision`):
+     - **Banner Hero Atasan**: Menampilkan catatan revisi resmi atasan kepegawaian dan tombol pratinjau draft sertifikat.
+     - **Aspek 1: Koreksi Nilai Evaluasi & Transkrip**: Dilengkapi kalkulator simulasi nilai akhir dan mutu grade secara live berbasis Alpine.js dengan rumus adaptif (100% dinas vs bobot dinas-kampus).
+     - **Aspek 2: Data Mahasiswa & Periode Magang**: Formulir koreksi langsung nama, NIM, universitas, prodi/jurusan, tanggal magang, unit kerja, dan mentor pembimbing.
+     - **Aspek 3: Validasi Logbook & Naskah Laporan**: Kartu inspeksi cepat riwayat logbook dan file naskah laporan akhir mahasiswa.
+     - **Catatan Penjelasan Perbaikan**: Field catatan tindak lanjut admin untuk atasan.
+     - **Dua Opsi Submit**: "Simpan & Ajukan Ulang ke Atasan" (mengembalikan status ke `waiting_approval`, mencatat audit log, mengirim notifikasi) dan "Simpan Draf".
+  3. Menguji alur dengan automated feature test `AdminCertificateRevisionWorkflowTest` (3/3 tests PASS, 27 assertions, Strict Exit Code 0).
+  4. Memvalidasi secara visual melalui browser headless Playwright lokal (`channel: 'chrome'`) pada resolusi desktop (1920x1080) dan mobile (375x812).
+- **Prevention Rule**: Dokumen resmi kelulusan atau sertifikasi yang berstatus `revision` atau `waiting_approval` DILARANG KERAS menyediakan tombol cetak publik/final. Setiap instruksi revisi wajib menyediakan rute khusus perbaikan yang menyinkronkan data langsung ke entitas terkait (`evaluations`, `users`, `student_profiles`, `applications`, `placements`) dalam satu transaksi atomik.
+
 ---
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
@@ -1991,5 +2134,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+
+
 
 

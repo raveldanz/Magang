@@ -232,12 +232,12 @@ class ApplicationController extends Controller
 
         // Alur Double ACC: Jika Admin Dinas staf biasa menyetujui pengajuan awal (dari pending),
         // otomatis arahkan status ke waiting_approval (Menunggu ACC Atasan)
-        if (! $isSuperAdmin && ! $isSupervisor && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'verified', 'waiting_approval'], true)) {
+        if (! $isSuperAdmin && ! $isSupervisor && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
             $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
         }
 
         // Validasi State Ketat: keputusan terima/ajukan hanya dari tahap seleksi (PENDING atau WAITING_APPROVAL)
-        $decisionStatuses = ['pending', 'verified', 'waiting_approval'];
+        $decisionStatuses = ['pending', 'waiting_approval'];
         if (($newStatus === 'accepted' || $newStatus === 'waiting_approval') && ! in_array($oldStatus, [...$decisionStatuses, 'accepted', 'active'], true)) {
             return redirect()->back()
                 ->with('error', "Gagal memproses pengajuan: Aksi persetujuan hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'waiting_approval'. Status saat ini: '{$oldStatus}'.")
@@ -479,23 +479,30 @@ class ApplicationController extends Controller
                 }
             }
 
-            DB::transaction(function () use ($application, $action, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $assignedMentorId, $isSuperAdmin) {
+            // Alur Double ACC Massal: Admin Dinas staf biasa → waiting_approval → Atasan ACC akhir
+            // Selaraskan dengan logika single-update di updateStatus()
+            $effectiveAction = $action;
+            if ($action === 'accepted' && ! $isSuperAdmin && ! ($user->role === 'supervisor')) {
+                $effectiveAction = ApplicationStatus::WAITING_APPROVAL->value;
+            }
+
+            DB::transaction(function () use ($application, $effectiveAction, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $assignedMentorId, $isSuperAdmin) {
                 $application->update([
-                    'status' => $action,
-                    'rejection_note' => $action === 'rejected' ? $request->bulk_rejection_note : null,
-                    'rejection_reason' => $action === 'rejected' ? $request->bulk_rejection_note : null,
-                    'letter_number' => $action === 'accepted' ? ($application->letter_number ?: $autoLetterNumber) : null,
-                    'letter_date' => $action === 'accepted' ? ($application->letter_date ?: date('Y-m-d')) : null,
-                    'letter_token' => $action === 'accepted' ? $letterToken : $application->letter_token,
+                    'status' => $effectiveAction,
+                    'rejection_note' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                    'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                    'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($application->letter_number ?: $autoLetterNumber) : null,
+                    'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($application->letter_date ?: date('Y-m-d')) : null,
+                    'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? $letterToken : $application->letter_token,
                 ]);
 
-                if ($action === 'accepted' || $assignedMentorId) {
+                if (in_array($effectiveAction, ['waiting_approval', 'accepted']) || $assignedMentorId) {
                     $placementData = [];
                     if ($assignedMentorId) {
                         $placementData['mentor_id'] = $assignedMentorId;
                         $placementData['pembimbing_id'] = $assignedMentorId;
                     }
-                    if ($action === 'accepted') {
+                    if (in_array($effectiveAction, ['waiting_approval', 'accepted'])) {
                         $existingPlacement = Placement::where('application_id', $application->id)->first();
                         $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
                         $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
@@ -513,9 +520,14 @@ class ApplicationController extends Controller
 
                 AuditLog::record('APPLICATION_STATUS_UPDATE_BULK', 'Application', $application->id, [
                     'old_status' => $oldStatus,
-                    'new_status' => $action,
+                    'new_status' => $effectiveAction,
                     'is_super_admin' => $isSuperAdmin,
                 ]);
+
+                // Kirim notifikasi ke Atasan jika status diteruskan ke waiting_approval (Double ACC)
+                if ($effectiveAction === ApplicationStatus::WAITING_APPROVAL->value) {
+                    NotificationService::notifySupervisorForApplication($application);
+                }
             });
 
             $successCount++;

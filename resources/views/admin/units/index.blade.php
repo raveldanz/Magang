@@ -7,7 +7,7 @@
                     <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    {{ __('Manajemen Divisi & Kuota Magang') }}
+                    {{ __('Manajemen Bidang Devisi & Kuota Magang') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1 flex items-center gap-2">
                     @if(isset($selectedAgency) && $selectedAgency)
@@ -198,7 +198,7 @@
                                     <button type="button" onclick="adjustQuota({{ $unit->id }}, 1, this)" aria-label="Tambah kuota">+</button>
                                 </div>
                                 <div style="display:flex;gap:6px">
-                                    <a href="{{ route('admin.units.edit', $unit->id) }}" class="mbtn mbtn-soft">Edit</a>
+                                    <a href="{{ route('admin.units.show', $unit->id) }}" class="mbtn mbtn-soft">Detail</a>
                                     <button type="button"
                                             @click="$dispatch('open-delete-modal', {
                                                 action: '{{ route('admin.units.destroy', $unit->id) }}',
@@ -242,7 +242,9 @@
                                     
                                     <!-- Nama Divisi & Deskripsi -->
                                     <td class="py-4 px-4 max-w-xs">
-                                        <div class="font-bold text-gray-900 leading-snug">{{ $unit->name }}</div>
+                                        <div class="font-bold text-gray-900 leading-snug">
+                                            <a href="{{ route('admin.units.show', $unit->id) }}" class="hover:text-blue-600 transition">{{ $unit->name }}</a>
+                                        </div>
                                         <div class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ $unit->description ?? 'Tidak ada deskripsi' }}</div>
                                     </td>
 
@@ -324,10 +326,10 @@
                                     <!-- Aksi Edit & Hapus -->
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
                                         <div class="inline-flex items-center justify-end gap-1.5 align-middle">
-                                            <a href="{{ route('admin.units.edit', $unit->id) }}" 
+                                            <a href="{{ route('admin.units.show', $unit->id) }}" 
                                                class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white" 
-                                               title="Edit Divisi">
-                                                Edit
+                                               title="Detail Bidang">
+                                                Detail
                                             </a>
 
                                             <button type="button" 

@@ -20,17 +20,30 @@ enum ApplicationStatus: string
      * Keterangan Bahasa Indonesia untuk kode status. Tampil sebagai baris kedua di area
      * yang lapang (kartu/panel) dan sebagai tooltip pada badge ringkas di tabel.
      */
-    public function description(): string
+    public function description(?string $role = null): string
     {
+        $role = $role ?? auth()->user()?->role;
+        if ($this === self::WAITING_APPROVAL && $role === 'supervisor') {
+            return 'Menunggu ACC';
+        }
+
         return match ($this) {
             self::PENDING => 'Menunggu Verifikasi Berkas',
-            self::WAITING_APPROVAL => 'Menunggu ACC Atasan',
+            self::WAITING_APPROVAL => 'Setujui, Serahkan ke Atasan',
             self::ACCEPTED => 'Diterima, Belum Mulai Magang',
             self::ACTIVE => 'Aktif Magang',
             self::COMPLETED => 'Selesai Magang',
             self::REJECTED => 'Pengajuan Ditolak',
             self::RESIGNED => 'Mengundurkan Diri',
         };
+    }
+
+    /**
+     * Deskripsi khusus untuk peran Supervisor / Atasan
+     */
+    public function descriptionForSupervisor(): string
+    {
+        return $this === self::WAITING_APPROVAL ? 'Menunggu ACC' : $this->description();
     }
 
     /**

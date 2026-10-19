@@ -325,6 +325,32 @@ class DemoE2ESeeder extends Seeder
             ]
         );
 
+        // Laporan Akhir Mahasiswa Lulus (ACC)
+        FinalReport::updateOrCreate(
+            ['placement_id' => $placementLulus->id],
+            [
+                'title' => 'Laporan Akhir Praktik Kerja Lapangan Sistem Otomasi Katalog Digital Dispusip Surabaya',
+                'file_path' => 'final_reports/sample_laporan_akhir.pdf',
+                'final_report_path' => 'final_reports/sample_laporan_akhir.pdf',
+                'status' => 'approved',
+                'feedback' => 'Naskah laporan akhir sangat komprehensif, analisis tajam, dan telah memenuhi standar kelulusan.',
+            ]
+        );
+
+        // Logbook Aktivitas Mahasiswa Lulus
+        for ($day = 1; $day <= 5; $day++) {
+            Logbook::updateOrCreate(
+                [
+                    'placement_id' => $placementLulus->id,
+                    'date' => Carbon::now()->subMonths(2)->addDays($day)->toDateString(),
+                ],
+                [
+                    'activity' => 'Melaksanakan kegiatan magang Dispusip hari ke-' . $day . ': Digitalisasi dan penataan arsip.',
+                    'status' => 'approved',
+                ]
+            );
+        }
+
         // Sertifikat Selesai Magang telah disahkan (ACC) oleh Supervisor
         Certificate::updateOrCreate(
             ['placement_id' => $placementLulus->id],

@@ -31,7 +31,7 @@
             <div class="flex flex-wrap gap-2 border-b-2 border-slate-200 pb-3">
                 <a href="{{ route('supervisor.applications.index', ['status' => 'waiting_approval']) }}" 
                    class="px-5 py-2.5 rounded-2xl text-sm font-black transition flex items-center gap-2.5 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
-                    <span>Menunggu ACC Atasan</span>
+                    <span>Menunggu Persetujuan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'waiting_approval' ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-800' }}">
                         {{ $waitingCount }}
                     </span>
@@ -138,7 +138,7 @@
                                         @if($st)
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border whitespace-nowrap {{ $st->badgeColor() }}">
                                                 <span class="w-2 h-2 rounded-full shrink-0 {{ $st->dotColor() }}"></span>
-                                                <span class="whitespace-nowrap">{{ $st->description() }}</span>
+                                                <span class="whitespace-nowrap">{{ $st->description('supervisor') }}</span>
                                             </span>
                                         @else
                                             <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 whitespace-nowrap">{{ $app->status }}</span>

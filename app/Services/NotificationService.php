@@ -330,7 +330,7 @@ class NotificationService
             $latestApp = Application::where('user_id', $user->id)->latest()->first();
             if ($latestApp) {
                 $status = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : strtolower((string) $latestApp->status);
-                if (in_array($status, ['pending', 'verified'])) {
+                if ($status === 'pending') {
                     $actionable[] = [
                         'id' => 'student_app_pending',
                         'type' => 'warning',

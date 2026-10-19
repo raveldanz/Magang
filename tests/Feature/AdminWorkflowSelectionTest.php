@@ -255,4 +255,64 @@ class AdminWorkflowSelectionTest extends TestCase
         $appRejected->refresh();
         $this->assertEquals(ApplicationStatus::REJECTED, $appRejected->status);
     }
+
+    /**
+     * 8. Verifikasi bahwa dropdown mentor terfilter otomatis sesuai bidang unit_id dan deskripsi WAITING_APPROVAL sesuai permintaan.
+     */
+    public function test_application_show_mentor_filtered_by_bidang_and_clean_naming(): void
+    {
+        $adminQa = User::where('email', 'admin.qa@test.local')->firstOrFail();
+        $app = Application::with('unit')->whereNotNull('unit_id')->firstOrFail();
+
+        // Pastikan deskripsi WAITING_APPROVAL adalah 'Setujui, Serahkan ke Atasan'
+        $this->assertEquals('Setujui, Serahkan ke Atasan', ApplicationStatus::WAITING_APPROVAL->description());
+
+        $response = $this->actingAs($adminQa)->get(route('admin.applications.show', $app->id));
+        $response->assertOk();
+        $response->assertSee('Setujui, Serahkan ke Atasan');
+        $response->assertDontSee('⭐ (Sesuai Bidang)');
+    }
+
+    /**
+     * 9. Verifikasi bahwa supervisor melihat status 'Menunggu ACC', tab 'Menunggu Persetujuan', dan tombol pengesahan sertifikat biru.
+     */
+    public function test_supervisor_sees_menunggu_acc_and_menunggu_persetujuan(): void
+    {
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+
+        $this->assertEquals('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->description('supervisor'));
+        $this->assertEquals('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->descriptionForSupervisor());
+
+        // Pastikan saat actingAs supervisor, description() otomatis menghasilkan 'Menunggu ACC'
+        $this->actingAs($supervisor);
+        $this->assertEquals('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->description());
+
+        // Cek halaman index supervisor
+        $responseIndex = $this->get(route('supervisor.applications.index'));
+        $responseIndex->assertOk();
+        $responseIndex->assertSee('Menunggu Persetujuan');
+        $responseIndex->assertDontSee('Menunggu ACC Atasan');
+
+        // Jika ada aplikasi waiting_approval
+        $appWaiting = Application::where('status', ApplicationStatus::WAITING_APPROVAL->value)->first();
+        if ($appWaiting) {
+            $responseIndex->assertSee('Menunggu ACC');
+            $responseIndex->assertDontSee('Setujui, Serahkan ke Atasan');
+
+            $responseShow = $this->get(route('supervisor.applications.show', $appWaiting->id));
+            $responseShow->assertOk();
+            $responseShow->assertSee('Menunggu ACC');
+            $responseShow->assertDontSee('Setujui, Serahkan ke Atasan');
+        }
+
+        // Cek halaman dashboard supervisor
+        $responseDashboard = $this->get(route('supervisor.dashboard'));
+        $responseDashboard->assertOk();
+        $responseDashboard->assertSee('Pengesahan Sertifikat');
+        $responseDashboard->assertSee('Dashboard');
+        $responseDashboard->assertDontSee('Dashboard &amp; Tim Kerja');
+        $responseDashboard->assertDontSee('Dashboard & Tim Kerja');
+    }
 }
+

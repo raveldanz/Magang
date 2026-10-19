@@ -28,8 +28,8 @@
                     </span>
                     <span>
                         Mode Penyamaran: Anda sedang mengelola akun <strong class="font-bold text-white">{{ auth()->user()?->name ?? 'Pengguna' }}</strong> 
-                        <span class="inline-flex items-center font-bold tracking-wider uppercase text-[11px] bg-white/20 px-2 py-0.5 rounded-md ml-1 border border-white/25">
-                            {{ auth()->user()?->role ?? '-' }}
+                        <span class="inline-flex items-center font-bold tracking-wider text-[11px] bg-white/20 px-2 py-0.5 rounded-md ml-1 border border-white/25">
+                            {{ auth()->user()?->roleLabel() ?? '-' }}
                         </span>
                     </span>
                 </div>

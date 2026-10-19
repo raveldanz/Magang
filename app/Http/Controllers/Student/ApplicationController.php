@@ -39,7 +39,7 @@ class ApplicationController extends Controller
         // 2. Cek apakah ada pengajuan yang sedang berjalan atau aktif (pending, waiting_approval, accepted, active, completed)
         $activeApplication = Application::with(['unit.agencyProfile', 'placement'])
             ->where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'verified', 'waiting_approval', 'accepted', 'active', 'completed'])
+            ->whereIn('status', ['pending', 'waiting_approval', 'accepted', 'active', 'completed'])
             ->latest()
             ->first();
 
@@ -67,13 +67,13 @@ class ApplicationController extends Controller
 
         // 2. Cegah pengajuan ganda jika sudah ada pengajuan aktif / diterima / selesai
         $existingActive = Application::where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'verified', 'waiting_approval', 'accepted', 'active', 'completed'])
+            ->whereIn('status', ['pending', 'waiting_approval', 'accepted', 'active', 'completed'])
             ->first();
 
         if ($existingActive) {
             $existingStatusVal = $existingActive->status instanceof \BackedEnum ? $existingActive->status->value : (string) $existingActive->status;
             $msg = match ($existingStatusVal) {
-                'pending', 'verified', 'waiting_approval' => 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.',
+                'pending', 'waiting_approval' => 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.',
                 'accepted', 'active' => 'Akses ditolak: Anda sudah memiliki penempatan magang aktif yang sedang berjalan.',
                 'completed' => 'Anda telah menyelesaikan program magang MBKM pada instansi sebelumnya.',
                 default => 'Anda sudah memiliki pengajuan magang aktif.'
@@ -131,7 +131,7 @@ class ApplicationController extends Controller
             User::whereKey($user->id)->lockForUpdate()->first();
 
             $alreadyActive = Application::where('user_id', $user->id)
-                ->whereIn('status', ['pending', 'verified', 'waiting_approval', 'accepted', 'active', 'completed'])
+                ->whereIn('status', ['pending', 'waiting_approval', 'accepted', 'active', 'completed'])
                 ->exists();
             if ($alreadyActive) {
                 return null;

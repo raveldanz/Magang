@@ -161,7 +161,7 @@
                     @elseif ($isSupervisor)
                         <a href="{{ route('supervisor.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Dashboard & Tim Kerja
+                            Dashboard
                         </a>
                         <a href="{{ route('supervisor.applications.index') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -179,11 +179,11 @@
                         </a>
                         <a href="{{ route('admin.applications.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Verifikasi
+                            Pengajuan
                         </a>
                         <a href="{{ route('admin.units.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Divisi & Kuota
+                            Bidang Devisi
                         </a>
                         <a href="{{ route('admin.mentors.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -415,7 +415,7 @@
                                 Dashboard
                             </a>
                             <a href="{{ route('admin.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Verifikasi Pengajuan
+                                Pengajuan
                             </a>
                             <a href="{{ $instansiNavUrl }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Instansi
@@ -428,7 +428,7 @@
                             </a>
                         @elseif ($isSupervisor)
                             <a href="{{ route('supervisor.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Dashboard & Tim Kerja
+                                Dashboard
                             </a>
                             <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Persetujuan Pengajuan
@@ -444,10 +444,10 @@
                                 Dashboard
                             </a>
                             <a href="{{ route('admin.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Verifikasi Pengajuan
+                                Pengajuan
                             </a>
                             <a href="{{ route('admin.units.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Divisi & Kuota Unit
+                                Bidang Devisi
                             </a>
                             <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Mentor Lapangan
@@ -667,7 +667,7 @@
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <span>Dashboard & Tim Kerja</span>
+                        <span>Dashboard</span>
                     </a>
                     <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
@@ -696,13 +696,13 @@
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.applications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
-                        <span>Verifikasi Pengajuan</span>
+                        <span>Pengajuan</span>
                     </a>
                     <a href="{{ route('admin.units.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.units.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.units.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                         </div>
-                        <span>Divisi & Kuota Unit</span>
+                        <span>Bidang Devisi</span>
                     </a>
                     <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">

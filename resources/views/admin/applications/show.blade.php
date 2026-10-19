@@ -351,7 +351,7 @@
                                         :class="status === 'waiting_approval' ? 'border-purple-500 bg-purple-50/70 ring-2 ring-purple-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-purple-200 hover:bg-purple-50/20 cursor-pointer' }}'"
                                         class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
                                     <div class="flex items-center justify-between mb-1.5">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block shrink-0" style="background-color: #a855f7;"></span>
                                         <span :class="status === 'waiting_approval' ? 'opacity-100 text-purple-600' : 'opacity-0'" class="transition-opacity">
                                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                         </span>
@@ -580,12 +580,22 @@
                             $selectedMentorId = old('mentor_id', optional($application->placement)->mentor_id ?? optional($application->placement)->pembimbing_id ?? '');
                             $selectedDosenId = old('academic_advisor_id', optional($application->placement)->academic_advisor_id ?? '');
 
-                            $mentorItems = $pembimbings->map(function ($m) use ($application) {
+                            // Filter mentor otomatis sesuai dengan bidang (unit_id) pengajuan mahasiswa
+                            $filteredPembimbings = $pembimbings;
+                            if ($application->unit_id) {
+                                $matchingMentors = $pembimbings->filter(function ($m) use ($application) {
+                                    return (int) $m->unit_id === (int) $application->unit_id;
+                                });
+                                if ($matchingMentors->isNotEmpty()) {
+                                    $filteredPembimbings = $matchingMentors;
+                                }
+                            }
+
+                            $mentorItems = $filteredPembimbings->map(function ($m) {
                                 $unitName = $m->unit?->name;
-                                $isSameUnit = ($application->unit_id && (int) $m->unit_id === (int) $application->unit_id);
                                 return [
                                     'id' => $m->id,
-                                    'name' => $m->name . ($unitName ? ' [' . $unitName . ']' : '') . ($isSameUnit ? ' ⭐ (Sesuai Bidang)' : ''),
+                                    'name' => $m->name,
                                     'acronym' => 'Mentor',
                                     'meta' => ($unitName ? $unitName . ' • ' : '') . $m->email . ($m->phone ? ' • ' . $m->phone : ''),
                                 ];
@@ -611,7 +621,7 @@
                                 label="Plotting Pembimbing Lapangan (Mentor Dinas Terkait)"
                                 placeholder="-- Cari atau Pilih Mentor Lapangan (Ketik nama / email) --"
                             />
-                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi pada {{ $application->unit->name ?? 'bidang terkait' }}.</p>
                         </div>
 
                         <!-- Dropdown Dosen Pembimbing (Searchable Combobox) -->
@@ -716,8 +726,8 @@
                 </form>
             </div>
 
-            {{-- 6. Penugasan Pembimbing Susulan (penempatan sudah berjalan: ACCEPTED / ACTIVE) --}}
-            @if ($application->placement && in_array($currentStatus, \App\Services\PlacementAssignmentService::ASSIGNABLE_STATUSES, true))
+            {{-- 6. Penugasan Pembimbing (Susulan / Ganti) untuk Mahasiswa yang Sudah Berjalan --}}
+            @if ($application->placement && in_array($currentStatusVal, ['accepted', 'active', 'completed'], true))
                 @php
                     $asgPlacement = $application->placement;
                     $asgMentor = $asgPlacement->mentor ?? $asgPlacement->pembimbing;
@@ -726,7 +736,7 @@
                 <div id="penugasan-pembimbing" class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="pb-4 border-b border-slate-100 mb-5">
                         <h3 class="text-base font-bold text-slate-900">Penugasan Pembimbing (Susulan / Ganti)</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; Dosen Pembimbing tanpa mengulang verifikasi. Histori logbook yang sudah divalidasi tetap tersimpan.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; Dosen Pembimbing tanpa mengulang verifikasi status. Histori logbook yang sudah divalidasi tetap tersimpan aman.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5 text-xs">
@@ -771,14 +781,15 @@
                                 @error('academic_advisor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
-                        @error('assignment') <p class="text-xs text-rose-600 font-semibold">{{ $message }}</p> @enderror
-                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                            Simpan Penugasan Pembimbing
-                        </button>
+
+                        <div class="pt-2 flex justify-end">
+                            <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                                <span>Simpan Penugasan Pembimbing</span>
+                            </button>
+                        </div>
                     </form>
                 </div>
             @endif
-
         </div>
     </div>
 
@@ -794,7 +805,7 @@
                 if (val === 'rejected') {
                     rejectionBox.style.display = '';
                     acceptanceBox.style.display = 'none';
-                } else if (['accepted', 'active', 'completed'].includes(val)) {
+                } else if (['waiting_approval', 'accepted', 'active', 'completed'].includes(val)) {
                     acceptanceBox.style.display = '';
                     rejectionBox.style.display = 'none';
                 } else {

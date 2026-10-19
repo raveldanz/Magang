@@ -42,7 +42,7 @@ class DashboardController extends Controller
 
         // Metrik Agregat Mahasiswa (Direct Database Query Aggregation)
         $totalStudents = (clone $appQuery)->count();
-        $totalPending = (clone $appQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalPending = (clone $appQuery)->whereIn('status', ['pending', 'waiting_approval'])->count();
         $totalAccepted = (clone $appQuery)->where('status', 'accepted')->count();
         $totalActive = (clone $appQuery)->where('status', 'active')->count();
         $totalCompleted = (clone $appQuery)->where('status', 'completed')->count();

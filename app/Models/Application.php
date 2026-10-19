@@ -354,7 +354,7 @@ class Application extends Model
         $ongoing = in_array($status, ['accepted', 'active'], true);
 
         return match (true) {
-            in_array($status, ['pending', 'verified', 'waiting_approval'], true) => 1,
+            in_array($status, ['pending', 'waiting_approval'], true) => 1,
             $status === 'active' && $this->can_complete => 2,
             $ongoing && $this->missingSupervisor($requireAdvisor ?? $this->requiresAdvisor()) !== null => 3,
             $status === 'active' => 4,
@@ -486,7 +486,7 @@ class Application extends Model
         $dosenMissing = 'EXISTS (SELECT 1 FROM placements p WHERE p.application_id = applications.id AND p.academic_advisor_id IS NULL)';
 
         return "(CASE
-            WHEN applications.status IN ('pending', 'verified', 'waiting_approval') THEN 1
+            WHEN applications.status IN ('pending', 'waiting_approval') THEN 1
             WHEN applications.status = 'active' AND {$reportApproved} AND {$evaluationComplete} AND {$logbookFilled} THEN 2
             WHEN applications.status IN ('accepted', 'active') AND ({$mentorMissing} OR ({$dosenMissing} AND {$requireDpl})) THEN 3
             WHEN applications.status = 'active' THEN 4

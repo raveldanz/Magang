@@ -1071,11 +1071,11 @@ class ChatPresenter
         $status = $app->statusValue();
         $priority = $app->actionPriority();
 
-        // Tingkat 1: Tindakan seleksi / verifikasi masuk (Pending / Verified)
+        // Tingkat 1: Tindakan seleksi / verifikasi masuk (Pending / Waiting Approval)
         if ($priority === 1) {
             return [
                 'code' => 'urgent',
-                'label' => $status === 'verified' ? 'Lolos Berkas' : 'Seleksi Masuk',
+                'label' => $status === 'waiting_approval' ? 'Menunggu ACC' : 'Seleksi Masuk',
                 'theme' => 'urgent',
                 'is_urgent' => true,
                 'role_group' => $roleGroup,

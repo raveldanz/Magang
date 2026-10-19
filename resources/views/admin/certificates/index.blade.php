@@ -66,6 +66,11 @@
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                 Perlu Revisi
                                             </span>
+                                            @if($mCert->notes)
+                                                <div class="text-[11px] text-rose-600 mt-1 leading-snug font-medium">
+                                                    "{{ $mCert->notes }}"
+                                                </div>
+                                            @endif
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
                                                 Menunggu ACC Atasan
@@ -75,10 +80,22 @@
                                 </div>
                             </div>
                             <div class="mcard-foot">
-                                <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="mbtn mbtn-primary mbtn-block">
-                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                                    Cetak E-Sertifikat
-                                </a>
+                                @if(!$mCert || $mCert->approval_status === 'waiting_approval')
+                                    <a href="{{ route('admin.certificates.show', $app->placement->id) }}" target="_blank" class="mbtn mbtn-block bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-300">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        Pratinjau Draft
+                                    </a>
+                                @elseif($mCert->approval_status === 'revision')
+                                    <a href="{{ route('admin.certificates.revision', $app->placement->id) }}" class="mbtn mbtn-block bg-amber-600 hover:bg-amber-700 text-white font-black shadow-xs">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        Perbaiki Sertifikat
+                                    </a>
+                                @else
+                                    <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="mbtn mbtn-primary mbtn-block">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                        Cetak E-Sertifikat
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     @empty
@@ -138,6 +155,11 @@
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200" title="{{ $cert->notes }}">
                                                 Perlu Revisi
                                             </span>
+                                            @if($cert->notes)
+                                                <div class="text-[11px] text-rose-600 mt-1 max-w-[180px] mx-auto truncate font-medium" title="{{ $cert->notes }}">
+                                                    "{{ $cert->notes }}"
+                                                </div>
+                                            @endif
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
                                                 Menunggu ACC Atasan
@@ -145,9 +167,22 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                                             Cetak E-Sertifikat
-                                        </a>
+                                        @if(!$cert || $cert->approval_status === 'waiting_approval')
+                                            <a href="{{ route('admin.certificates.show', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300 shadow-2xs transition active:scale-95 cursor-pointer" title="Pratinjau Draf Sertifikat">
+                                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                <span>Pratinjau Draft</span>
+                                            </a>
+                                        @elseif($cert->approval_status === 'revision')
+                                            <a href="{{ route('admin.certificates.revision', $app->placement->id) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black shadow-xs transition active:scale-95 cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                <span>Perbaiki Sertifikat</span>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('admin.certificates.generate', $app->placement->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                                <span>Cetak E-Sertifikat</span>
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

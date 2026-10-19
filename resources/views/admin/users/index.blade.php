@@ -316,7 +316,7 @@
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
                                                             name: '{{ addslashes($u->name) }}',
                                                             email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ strtoupper($u->role) }}'
+                                                            role: '{{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white" 
                                                         title="Reset password ke default: password">
@@ -331,7 +331,7 @@
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
                                                             name: '{{ addslashes($u->name) }}',
-                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
+                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white" 
                                                         title="Hapus Pengguna">
@@ -492,7 +492,7 @@
                                                     action: '{{ route('admin.users.reset_password', $u->id) }}',
                                                     name: '{{ addslashes($u->name) }}',
                                                     email: '{{ addslashes($u->email) }}',
-                                                    role: '{{ strtoupper($u->role) }}'
+                                                    role: '{{ addslashes($u->roleLabel()) }}'
                                                 })" 
                                                 class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer" 
                                                 title="Reset password ke default: password">
@@ -507,7 +507,7 @@
                                                     action: '{{ route('admin.users.destroy', $u->id) }}',
                                                     title: 'Hapus Akun Pengguna',
                                                     name: '{{ addslashes($u->name) }}',
-                                                    desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
+                                                    desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                 })" 
                                                 class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
                                                 title="Hapus Pengguna">

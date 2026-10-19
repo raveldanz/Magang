@@ -138,7 +138,7 @@ class UniversityHubService
             'total_dosens' => $dosens->count(),
             'active_interns' => $students->filter(fn ($s) => $latestStatus($s) === 'active')->count(),
             'completed_interns' => $students->filter(fn ($s) => $latestStatus($s) === 'completed')->count(),
-            'pending_applications' => $students->filter(fn ($s) => in_array($latestStatus($s), ['pending', 'verified'], true))->count(),
+            'pending_applications' => $students->filter(fn ($s) => in_array($latestStatus($s), ['pending', 'waiting_approval'], true))->count(),
             'needs_action' => $students->filter(fn ($s) => $priorities[$s->id] <= Application::ACTION_THRESHOLD)->count(),
             'average_score' => $scores->isNotEmpty() ? round($scores->avg(), 1) : null,
         ];
