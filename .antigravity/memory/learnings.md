@@ -98,6 +98,9 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-086** | 2026-10-19 | Audit Holistik Single-Agency Dispusip, Filter 4 Bidang Lintas Role & Eliminasi Residu Obsolete | Harmonisasi alur seluruh peran ke ekosistem tunggal Dispusip (4 bidang), eliminasi residu status verified & placeholder lama, optimasi filter bidang pada Dosen/Kampus/Mentor | RESOLVED |
 | **LRN-087** | 2026-10-19 | Optimalisasi Mendalam Algoritma Mentor per Bidang, Form Bantuan Single-Agency, & Penyelarasan Residu Terakhir | Filter unit_id pada admin mentor, fallback profil instansi Dispusip di feedback tiket, penyelarasan placeholder | RESOLVED |
 | **LRN-088** | 2026-10-19 | Form Tunggal Terpadu Seleksi & Penugasan Pembimbing (Eliminasi Card Redundan) | Eliminasi card penugasan pembimbing redundan di halaman detail pengajuan admin, sentralisasi penugasan & mutasi mentor/dosen ke form status utama dengan audit log & resync chat | RESOLVED |
+| **LRN-089** | 2026-10-19 | Lifecycle Status Integration, On-The-Fly Auto-Activation & Mentor Metric Preservation | Ketidaksinkronan status ACTIVE hari H, tab filter mentor mereduksi metrik jadi 0 & BackedEnum DPL | RESOLVED |
+| **LRN-090** | 2026-10-19 | Spesialisasi Akun Admin Per Bidang & Isolasi Multi-Tenant Unit/Bidang Dispusip | Ketiadaan akun admin per bidang, ketiadaan filter bidang otomatis di modul aplikasi/mentor/logbook/sertifikat | RESOLVED |
+| **LRN-091** | 2026-10-19 | Perombakan Total & Optimalisasi Fungsi Operasional Admin Bidang Pasca Evolusi Single-Agency | Eliminasi residu multi-agency & matriks 4-bidang redundan di dashboard admin bidang, sentralisasi ruang kerja unit, penguncian bidang form mentor, eliminasi teks logo dinas redundan di pengajuan, dan harmonisasi validasi logbook | RESOLVED |
 
 ---
 
@@ -2205,6 +2208,106 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Menambahkan automated feature test komprehensif `RoleStatusIntegrationWorkflowTest` (6/6 tests PASS, 29 assertions, Strict Exit Code 0).
 - **Prevention Rule**:
   Setiap transisi status yang bergantung pada waktu (`start_date` / `end_date`) wajib memiliki trigger on-the-fly di entry point controller peran terkait di samping scheduler cron `app:sync-internship-status`. Dilarang memodifikasi `$baseQuery` dengan parameter tab sebelum menjalankan perhitungan agregat/count.
+
+### [LRN-090] Spesialisasi Akun Admin Per Bidang & Isolasi Multi-Tenant Data Magang Tingkat Unit/Bidang Dispusip
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Models/User.php`, `database/seeders/SurabayaAgenciesSeeder.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/MentorController.php`, `app/Http/Controllers/Admin/UnitController.php`, `app/Http/Controllers/Admin/LogbookController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Admin/DashboardController.php`, `app/Http/Controllers/Admin/AgencyProfileController.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/logbooks/index.blade.php`, `resources/views/admin/units/index.blade.php`, `tests/Feature/AdminBidangScopingTest.php`
+- **Problem / Symptom**: Sistem sebelumnya hanya memiliki Super Admin dan Admin Dinas Instansi (`unit_id = null`) sehingga seluruh admin melihat data 1 dinas secara global tanpa ada pemisahan wewenang per bidang kerja (Sekretariat, Perpustakaan, Kearsipan Layanan, Kearsipan Preservasi). Belum tersedia akun admin khusus masing-masing bidang, dan daftar pengajuan magang, mentor, divisi, logbook, serta sertifikat belum difilter otomatis sesuai bidang tugas.
+- **Root Cause**:
+  1. `User::roleLabel()` menyamaratakan role `'admin'` menjadi "Admin Dispusip" tanpa mempertimbangkan kolom `unit_id`.
+  2. Controller admin mengasumsikan seluruh akun dengan role `'admin'` memiliki visibilitas lintas bidang di instansi tersebut.
+  3. Form filter di Blade views menyediakan dropdown seluruh unit untuk semua admin tanpa mengunci bidang kerja admin yang bersangkutan.
+- **Fix Applied**:
+  1. Menambahkan method helper `isBidangAdmin()` dan `isAgencyWideAdmin()` pada `User.php` serta memperkaya `roleLabel()` untuk merender nama bidang secara otomatis ("Admin Bidang Sekretariat", dll.).
+  2. Menambahkan 4 akun admin bidang resmi Dispusip di `SurabayaAgenciesSeeder.php` dan database:
+     - `admin.sekretariat@surabaya.go.id` (Bidang Sekretariat)
+     - `admin.perpustakaan@surabaya.go.id` (Bidang Pembinaan dan Pengelolaan Perpustakaan)
+     - `admin.layananarsip@surabaya.go.id` (Bidang Pembinaan dan Layanan Kearsipan)
+     - `admin.penyelamatanarsip@surabaya.go.id` (Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan)
+  3. Menerapkan isolasi query otomatis dan proteksi otorisasi (HTTP 403) pada seluruh controller admin:
+     - `ApplicationController`: Query otomatis difilter ke `$user->unit_id`, show & update pengajuan bidang lain menghasilkan 403 Forbidden.
+     - `MentorController`: Query mentor difilter ke `$user->unit_id`, form create/update mengunci unit ke bidang admin, edit/destroy mentor bidang lain diblokir 403.
+     - `UnitController`: Index hanya menampilkan bidang milik admin, form create/store dan aksi destroy diblokir 403 (khusus wewenang Admin Dinas Utama / Super Admin).
+     - `LogbookController`: Query placement, unit, dan statistik logbook difilter otomatis ke bidang admin; review/show logbook bidang lain diblokir 403.
+     - `CertificateController`: Query kelulusan difilter ke bidang admin; show, generate, dan revision sertifikat bidang lain diblokir 403.
+     - `DashboardController`: Seluruh metrik agregat, kuota, total mentor, dan matriks bidang difokuskan secara spesifik ke unit milik admin bidang.
+     - `AgencyProfileController`: Pengeditan profil dinas dibatasi khusus Super Admin dan Admin Dinas Utama (Admin Bidang diblokir 403).
+  4. Memperbarui antarmuka Blade views:
+     - `layouts/navigation.blade.php`: Menyembunyikan menu Profil Dinas untuk Admin Bidang di desktop dan mobile drawer.
+     - `admin/applications/index.blade.php`: Mengganti dropdown filter unit menjadi badge informasi bidang terkunci yang elegan.
+     - `admin/mentors/index.blade.php` & `admin/logbooks/index.blade.php`: Mengunci filter unit menjadi badge bidang aktif.
+     - `admin/units/index.blade.php`: Menyembunyikan tombol tambah dan hapus divisi bagi Admin Bidang.
+  5. Membuat test suite komprehensif `AdminBidangScopingTest.php` (9/9 PASS, 34 assertions), menjalankan core admin suites (33/33 PASS, Strict Exit Code 0), serta memvalidasi tampilan visual nyata via browser runner Playwright lokal.
+- **Prevention Rule**:
+  Setiap penambahan fitur baru pada modul Admin wajib memeriksa hak akses bersusun: Super Admin -> Admin Dinas Utama (`unit_id = null`) -> Admin Bidang (`unit_id != null`). Akses lintas bidang oleh Admin Bidang wajib di-guard di level query dan otorisasi (`abort(403)`), serta form input tidak boleh membiarkan admin bidang memilih bidang selain bidang yang ditugaskan kepadanya.
+
+---
+
+### [LRN-091] Perombakan Total Antarmuka & Optimalisasi Fungsi Operasional Admin Bidang Pasca Evolusi Single-Agency Dispusip
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/UnitController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/units/show.blade.php`, `resources/views/admin/mentors/create.blade.php`, `resources/views/admin/mentors/edit.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/logbooks/show.blade.php`, `resources/views/admin/logbooks/index.blade.php`, `resources/views/admin/applications/show.blade.php`, `tests/Feature/AdminBidangScopingTest.php`
+- **Problem / Symptom**:
+  1. Pasca migrasi sistem dari multi-dinas (banyak OPD) menjadi single-agency (khusus Dispusip Surabaya), antarmuka role admin masih membawa residu tata kelola lama:
+     - Admin Bidang yang masuk ke dashboard melihat tabel perbandingan 4 bidang dinas (yang tidak relevan bagi pengelola 1 bidang spesifik) alih-alih ruang kerja operasional bidangnya.
+     - Di daftar pengajuan (`applications.index`), kolom tabel menampilkan teks instansi panjang `"Dinas Perpustakaan dan Kearsipan Kota Surabaya"` yang berulang di setiap baris, sementara status mentor pembimbing bidang tidak terlihat.
+     - Admin Bidang yang membuka menu Bidang Devisi (`/admin/units`) melihat daftar 4 bidang dalam bentuk tabel global bukannya langsung menuju ruang kerja formasinya.
+     - Form penambahan mentor masih menampilkan dropdown pemilihan bidang yang berisiko salah pilih.
+     - Label role pengguna di manajemen pengguna dan teks catatan validasi logbook masih tertulis umum `"Admin Dispusip"` atau `"Admin Dinas"`.
+- **Root Cause**:
+  Arsitektur view dan alur admin awalnya dibangun saat setiap admin mewakili instansi dinas yang berbeda (multi-agency). Ketika model berubah menjadi single-agency terpadu dengan Super Admin di level dinas dan Admin Bidang di level operasional divisi, hierarki visual dan fungsionalitas belum disesuaikan secara holistik untuk menonjolkan tugas operasional harian bidang (verifikasi berkas, plotting mentor, alokasi kapasitas formasi).
+- **Fix Applied**:
+  1. **Redesain Total Dashboard Admin Bidang (`admin/dashboard.blade.php`)**:
+     - *Hero Operational Banner*: Menyajikan badge resmi `ADMIN OPERASIONAL BIDANG • DISPUSIP SURABAYA`, nama bidang aktif (`$user->unit->name`), dan peran operasionalnya.
+     - *4 Quick Action Cards*: Tombol langsung menuju Verifikasi Berkas (`total_pending`), Ruang Kerja Bidang (`total_quota_available`), Pembimbing Lapangan (`total_mentors`), dan Sertifikat Lulus (`total_completed`).
+     - *Panel Kerja Bidang (Menggantikan Matriks 4 Bidang)*:
+       - Sisi Kiri: Deskripsi & Lingkup Tugas Bidang, Penanggung Jawab / Kepala Unit, serta Bar Progress Kapasitas Kuota Bidang terisi vs kuota total dengan persentase utilisasi dan slot tersisa.
+       - Sisi Kanan: Daftar Tim Pembimbing Lapangan (Mentor) aktif di bidang tersebut beserta jumlah mahasiswa bimbingannya dan tombol aksi `+ Tambah Mentor`.
+     - *Sebaran Bawah*: Menghapus pie chart distribusi multi-unit lama dan menggantinya dengan widget **"Pendaftar Terbaru Bidang"** (`$recentApplications`) dan **"Distribusi Kampus Mahasiswa Bidang"** (`$universityStats`).
+  2. **Redirect & Navigasi Ruang Kerja Bidang (`UnitController.php` & `units/show.blade.php`)**:
+     - Di method `UnitController@index`, Admin Bidang diarahkan otomatis (*instant redirect*) ke ruang kerja bidangnya (`admin.units.show`).
+     - Breadcrumb dan tombol kembali pada halaman `units/show` disesuaikan menjadi `Dashboard Bidang` bagi Admin Bidang.
+  3. **Penguncian Form Penambahan & Pengeditan Mentor (`mentors/create.blade.php` & `edit.blade.php`)**:
+     - Pilihan bidang `unit_id` dikunci otomatis ke bidang admin yang sedang aktif via input hidden dan kartu informasi terkunci, mencegah kesalahan alokasi bidang.
+  4. **Pembersihan Residu Redundan pada Daftar Pengajuan (`applications/index.blade.php`)**:
+     - Mengubah kolom tabel `Instansi & Unit Tujuan` menjadi `Bidang & Pembimbing`: menampilkan nama bidang dan status penugasan mentor (`Mentor: [Nama Mentor]` atau badge amber `Belum Ada Mentor`), mengeliminasi pengulangan nama dinas.
+  5. **Harmonisasi Nomenklatur Validasi Logbook & User Management**:
+     - Menyesuaikan label role di tabel pengguna menjadi dinamis (`Admin [Nama Bidang]`).
+     - Menyesuaikan judul validasi sementara logbook: `Validasi Sementara oleh Admin Bidang` (jika login sebagai admin bidang) dengan tetap menyediakan fallback `Admin Dinas` demi mempertahankan *backward-compatibility* dengan test suite lama (`Phase1OnboardingTest`).
+  6. **Automated Testing & Visual E2E Validation**:
+     - Memperbarui `AdminBidangScopingTest.php` untuk menguji redirect otomatis `units.index` dan proteksi 403 lintas bidang (9/9 tests PASS).
+     - Seluruh rangkaian test inti (`AdminWorkflowSelectionTest`, `Phase1OnboardingTest`, `AdminBidangScopingTest`) lulus 100% (**33/33 tests PASS, 181 assertions, Strict Exit Code 0**).
+     - Memvalidasi tampilan visual nyata tanpa emotikon melalui browser runner Playwright lokal (`browser-runner.mjs --url /admin/dashboard`, `/admin/units`, `/admin/applications`).
+- **Prevention Rule**:
+  Antarmuka dan alur kerja admin bidang wajib selalu berpusat pada konteks unit kerja operasionalnya (*single-unit operational view*). Dilarang menampilkan informasi multi-instansi/multi-bidang yang redundan pada akun yang sudah terspesialisasi, dan seluruh form input yang bergantung pada relasi divisi wajib dikunci otomatis ke unit yang terasosiasi dengan akun tersebut.
+
+---
+
+### [LRN-090] Integrasi Status Lintas 7 Role & Penguncian Otorisasi Isolasi Bidang (Bidang Scoping Guards)
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/PlacementAssignmentController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Admin/UserController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `tests/Feature/AdminBidangScopingTest.php`
+- **Problem / Symptom**:
+  1. Admin Bidang berpotensi memodifikasi alokasi pembimbing lapangan (penugasan mentor susulan) pada pengajuan yang berada di bawah wewenang bidang lain melalui endpoint `admin.applications.assignment`.
+  2. Form revisi sertifikat kelulusan (`admin.certificates.revision`) menampilkan daftar seluruh unit kerja dan seluruh mentor se-dinas tanpa filter pembatas, serta mengizinkan Admin Bidang mengubah formasi unit siswa ke bidang lain saat submit perbaikan.
+  3. Master Pengguna (`admin/users`) tidak membatasi tampilan akun pengguna jika diakses oleh Admin Bidang, berpotensi mengekspos personil bidang lain dan mengizinkan reset password atau hapus akun lintas bidang.
+  4. Transisi status magang mahasiswa dari `ACCEPTED` ke `ACTIVE` saat `start_date` tiba sebelumnya hanya bergantung pada eksekusi cron harian `app:sync-internship-status` (00:05 WIB) atau kunjungan mahasiswa ke dashboardnya. Jika mahasiswa belum membuka dashboard dan cron belum berjalan, status di dashboard Mentor dan Dosen Pembimbing Lapangan (DPL) dapat tetap terbaca `accepted` (upcoming) alih-alih `active`.
+- **Root Cause**:
+  Otorisasi multi-tenant pada controller admin sebelumnya hanya memeriksa tingkat instansi (`agency_profile_id`), belum menerapkan pemeriksaan turunan `unit_id` bagi akun Admin Bidang. Di sisi siklus hidup, trigger on-the-fly auto-activation belum disuntikkan ke pintu masuk portal Mentor dan DPL.
+- **Fix Applied**:
+  1. **Proteksi Penugasan Pembimbing Susulan (`PlacementAssignmentController.php`)**: Menambahkan guard `abort(403)` jika Admin Bidang mencoba mengubah mentor atau DPL pada pengajuan milik bidang lain (`$application->unit_id !== $user->unit_id`).
+  2. **Isolasi Form Revisi Sertifikat (`CertificateController.php`)**:
+     - Memfilter koleksi `$mentors` dan `$units` pada method `revision()` agar terkunci ke `$user->unit_id` ketika pengguna adalah Admin Bidang.
+     - Mengunci kolom `'unit_id'` pada `updateRevision()` agar nilai unit siswa tidak dapat digeser ke bidang lain oleh Admin Bidang.
+  3. **Isolasi Pengelolaan Pengguna (`UserController.php`)**:
+     - Pada `canManageUser()`, menambahkan aturan ketat: Admin Bidang dilarang mengelola, mereset password, atau menghapus pengguna yang memiliki `unit_id` berbeda, serta dilarang menyentuh akun Admin lain.
+     - Pada `index()`, mengisolasi query pengguna (`$query->where('unit_id', $currentUser->unit_id)`) bagi Admin Bidang.
+     - Pada `store()` dan `update()`, mengunci `'unit_id'` ke unit Admin Bidang secara otomatis.
+  4. **Sinkronisasi Status Real-Time Multi-Role (`Mentor` & `Lecturer` `DashboardController.php`)**:
+     - Menyuntikkan pemindaian on-the-fly `$app->autoActivateIfStarted()` pada pembukaan dashboard Mentor dan DPL, sehingga saat hari pertama magang tiba, status mahasiswa langsung terpromosikan menjadi `ACTIVE` seketika saat salah satu pihak (Mahasiswa, Admin, Mentor, atau DPL) berinteraksi dengan sistem.
+  5. **Automated Testing**:
+     - Menambahkan unit test di `AdminBidangScopingTest.php` untuk menguji: penolakan re-assign lintas bidang (403), isolasi master users (403), dan real-time on-the-fly activation lintas role (Mahasiswa, Mentor, Dosen).
+     - Seluruh rangkaian test suite (46 tests, 228 assertions) lulus 100% dengan Exit Code 0.
+- **Prevention Rule**:
+  Setiap controller admin yang menangani operasi mutasi data (CREATE, UPDATE, DELETE, REASSIGN) WAJIB memeriksa `unit_id` jika pengguna adalah Admin Bidang (`! $isSuperAdmin && $user->unit_id`), selain pemeriksaan `agency_profile_id`. Transisi siklus hidup magang harus memiliki redundansi ganda: scheduler terjadwal (cron) DAN trigger on-the-fly di setiap titik temu antarmuka role terkait.
 
 ---
 

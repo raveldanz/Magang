@@ -3,11 +3,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                   
-                    <span>Kelola Mentor Lapangan {{ $currentAgency->agency_name ?? ($isSuperAdmin ? 'Seluruh Instansi' : 'Dinas') }}</span>
+                    <span>Kelola Pembimbing Lapangan (Mentor) {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : ($currentAgency->agency_name ?? 'Dinas') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun pembimbing teknis dinas yang bertugas membimbing dan mengevaluasi mahasiswa magang
+                    Kelola akun pembimbing lapangan {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? (auth()->user()->unit->name ?? 'bidang') : 'dinas' }} yang bertugas membimbing dan mengevaluasi mahasiswa magang
                 </p>
             </div>
 
@@ -55,7 +54,12 @@
                         </select>
                     @endif
 
-                    @if(isset($units) && $units->count() > 0)
+                    @if(auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
+                        <div class="w-full sm:w-auto flex items-center px-3.5 py-2.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
+                            <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
+                            <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                        </div>
+                    @elseif(isset($units) && $units->count() > 0)
                         <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Semua Bidang / Divisi Dispusip --</option>
                             @foreach($units as $u)

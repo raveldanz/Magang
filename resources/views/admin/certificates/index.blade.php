@@ -4,11 +4,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span></span>
-                    <span>{{ __('Manajemen Sertifikat Kelulusan') }}</span>
+                    <span>Manajemen Sertifikat Kelulusan {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Cetak dan terbitkan sertifikat magang resmi untuk mahasiswa yang telah menyelesaikan program
+                    Supervisi dan penerbitan sertifikat magang resmi untuk mahasiswa {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'pada ' . (auth()->user()->unit->name ?? 'bidang terkait') : 'Dispusip' }} yang telah menyelesaikan program
                 </p>
             </div>
         </div>

@@ -20,12 +20,14 @@
                 </p>
             </div>
 
-            <a href="{{ route('admin.units.create', request('agency_id') ? ['agency_id' => request('agency_id')] : []) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                </svg>
-                Tambah Divisi / Lowongan Baru
-            </a>
+            @if(Auth::user()->isSuperAdmin() || (Auth::user()->role === 'admin' && is_null(Auth::user()->unit_id)))
+                <a href="{{ route('admin.units.create', request('agency_id') ? ['agency_id' => request('agency_id')] : []) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Divisi / Lowongan Baru
+                </a>
+            @endif
         </div>
     </x-slot>
 
@@ -199,14 +201,16 @@
                                 </div>
                                 <div style="display:flex;gap:6px">
                                     <a href="{{ route('admin.units.show', $unit->id) }}" class="mbtn mbtn-soft">Detail</a>
-                                    <button type="button"
-                                            @click="$dispatch('open-delete-modal', {
-                                                action: '{{ route('admin.units.destroy', $unit->id) }}',
-                                                title: 'Hapus Divisi / Lowongan Magang',
-                                                name: '{{ addslashes($unit->name) }}',
-                                                desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
-                                            })"
-                                            class="mbtn mbtn-danger">Hapus</button>
+                                    @if(Auth::user()->isSuperAdmin() || (Auth::user()->role === 'admin' && is_null(Auth::user()->unit_id)))
+                                        <button type="button"
+                                                @click="$dispatch('open-delete-modal', {
+                                                    action: '{{ route('admin.units.destroy', $unit->id) }}',
+                                                    title: 'Hapus Divisi / Lowongan Magang',
+                                                    name: '{{ addslashes($unit->name) }}',
+                                                    desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
+                                                })"
+                                                class="mbtn mbtn-danger">Hapus</button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -332,17 +336,19 @@
                                                 Detail
                                             </a>
 
-                                            <button type="button" 
-                                                    @click="$dispatch('open-delete-modal', {
-                                                        action: '{{ route('admin.units.destroy', $unit->id) }}',
-                                                        title: 'Hapus Divisi / Lowongan Magang',
-                                                        name: '{{ addslashes($unit->name) }}',
-                                                        desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
-                                                    })" 
-                                                    class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
-                                                    title="Hapus Divisi">
-                                                Hapus
-                                            </button>
+                                            @if(Auth::user()->isSuperAdmin() || (Auth::user()->role === 'admin' && is_null(Auth::user()->unit_id)))
+                                                <button type="button" 
+                                                        @click="$dispatch('open-delete-modal', {
+                                                            action: '{{ route('admin.units.destroy', $unit->id) }}',
+                                                            title: 'Hapus Divisi / Lowongan Magang',
+                                                            name: '{{ addslashes($unit->name) }}',
+                                                            desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
+                                                        })" 
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
+                                                        title="Hapus Divisi">
+                                                    Hapus
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
 

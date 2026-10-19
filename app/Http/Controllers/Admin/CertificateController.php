@@ -176,12 +176,13 @@ class CertificateController extends Controller
 
         $mentors = User::where('role', 'mentor')
             ->when($agencyProfileId, fn ($q) => $q->where('agency_profile_id', $agencyProfileId))
+            ->when(! $user->isSuperAdmin() && $user->unit_id, fn ($q) => $q->where('unit_id', $user->unit_id))
             ->orderBy('name')
             ->get();
 
-        $units = Unit::where('agency_profile_id', $agencyProfileId)
-            ->orderBy('name')
-            ->get();
+        $units = (! $user->isSuperAdmin() && $user->unit_id)
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::where('agency_profile_id', $agencyProfileId)->orderBy('name')->get();
 
         $logbookCount = $placement->logbooks()->count();
         $verifiedLogbookCount = $placement->logbooks()->where('status', 'approved')->count();
@@ -253,7 +254,7 @@ class CertificateController extends Controller
             $application->update([
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
-                'unit_id' => $request->unit_id ?: $application->unit_id,
+                'unit_id' => (! $user->isSuperAdmin() && $user->unit_id) ? $user->unit_id : ($request->unit_id ?: $application->unit_id),
             ]);
 
             if ($request->filled('mentor_id')) {

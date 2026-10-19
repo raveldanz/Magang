@@ -27,9 +27,7 @@ class UnitController extends Controller
 
         // Isolasi Bidang & Multi-Tenant:
         if (! $user->isSuperAdmin() && $user->unit_id) {
-            $query->where('id', $user->unit_id);
-            $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
-            $selectedAgency = $agencies->first();
+            return redirect()->route('admin.units.show', $user->unit_id);
         } elseif ($agencyId) {
             $query->where('agency_profile_id', $agencyId);
             $agencies = AgencyProfile::where('id', $agencyId)->get();
@@ -312,7 +310,12 @@ class UnitController extends Controller
             return redirect($request->return_to)->with('success', $successMsg);
         }
 
-        // 2. Balik ke detail instansi terkait
+        // Jika Admin Bidang, langsung kembali ke ruang kerja bidangnya
+        if (! $user->isSuperAdmin() && $user->unit_id) {
+            return redirect()->route('admin.units.show', $unit->id)->with('success', $successMsg);
+        }
+
+        // 2. Balik ke detail instansi terkait (untuk Admin Dinas Utama / Super Admin)
         if ($unit->agency_profile_id) {
             return redirect()->route('admin.agencies.show', $unit->agency_profile_id)->with('success', $successMsg);
         }

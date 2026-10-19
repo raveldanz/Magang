@@ -39,6 +39,19 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $lecturer = Auth::user();
+
+        // On-the-fly auto-activation bagi mahasiswa bimbingan yang sudah tiba tanggal mulainya
+        $startedApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::ACCEPTED)
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', now()->toDateString())
+            ->whereHas('placement', function ($q) use ($lecturer) {
+                $q->where('academic_advisor_id', $lecturer->id);
+            })
+            ->get();
+        foreach ($startedApps as $stApp) {
+            $stApp->autoActivateIfStarted();
+        }
+
         $query = $this->getLecturerPlacementsQuery();
 
         if ($request->filled('search')) {

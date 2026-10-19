@@ -1,8 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-gray-900 leading-tight">
-            {{ __('Daftar Pengajuan Magang') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+                <h2 class="font-bold text-2xl text-gray-900 leading-tight">
+                    {{ __('Daftar Pengajuan Magang') }}
+                </h2>
+                @if(auth()->user()->isBidangAdmin())
+                    <p class="text-xs text-blue-600 font-semibold mt-0.5">
+                        Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }} &bull; Verifikasi Berkas & Kelayakan Peserta
+                    </p>
+                @endif
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-5 sm:py-8 lg:py-10">
@@ -56,32 +65,39 @@
                         @endif
 
                         <!-- Filter Unit / Divisi (w-64) -->
-                        <div class="w-full lg:w-64">
-                            <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
-                                <option value="">-- Semua Unit/Divisi --</option>
-                                @if (isset($groupedUnits) && $groupedUnits !== null)
-                                    @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        @if(count($groupedUnits) > 1)
-                                            <optgroup label=" {{ $agencyName }}">
-                                        @endif
-                                            @foreach ($agencyUnits as $u)
-                                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
-                                                    {{ $u->name }}
-                                                </option>
-                                            @endforeach
-                                        @if(count($groupedUnits) > 1)
-                                            </optgroup>
-                                        @endif
-                                    @endforeach
-                                @elseif(isset($units))
-                                    @foreach ($units as $u)
-                                        <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
-                                            {{ $u->name }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                        </div>
+                        @if (auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
+                            <div class="w-full lg:w-64 flex items-center px-3.5 h-10 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-md shadow-2xs">
+                                <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
+                                <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                            </div>
+                        @else
+                            <div class="w-full lg:w-64">
+                                <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                                    <option value="">-- Semua Unit/Divisi --</option>
+                                    @if (isset($groupedUnits) && $groupedUnits !== null)
+                                        @foreach ($groupedUnits as $agencyName => $agencyUnits)
+                                            @if(count($groupedUnits) > 1)
+                                                <optgroup label=" {{ $agencyName }}">
+                                            @endif
+                                                @foreach ($agencyUnits as $u)
+                                                    <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                                        {{ $u->name }}
+                                                    </option>
+                                                @endforeach
+                                            @if(count($groupedUnits) > 1)
+                                                </optgroup>
+                                            @endif
+                                        @endforeach
+                                    @elseif(isset($units))
+                                        @foreach ($units as $u)
+                                            <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                                {{ $u->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        @endif
 
                         <!-- Filter Status (w-44) -->
                         <div class="w-full lg:w-44">
@@ -398,7 +414,7 @@
                                 <th class="p-3">Tanggal Pengajuan</th>
                                 <th class="p-3">Nama Mahasiswa</th>
                                 <th class="p-3">Universitas / Jurusan</th>
-                                <th class="p-3">Instansi & Unit Tujuan</th>
+                                <th class="p-3">{{ auth()->user()->isBidangAdmin() ? 'Bidang & Pembimbing' : 'Instansi & Unit Tujuan' }}</th>
                                 <th class="p-3">Status</th>
                                 <th class="p-3 text-center">Aksi</th>
                             </tr>
@@ -423,7 +439,16 @@
                                             <div class="font-bold text-gray-900 leading-snug">
                                                 {{ $app->unit->name ?? '-' }}
                                             </div>
-                                            @if($app->unit?->agencyProfile)
+                                            @if(auth()->user()->isBidangAdmin())
+                                                @if($app->placement?->mentor)
+                                                    <div class="text-[11px] text-slate-600 flex items-center gap-1">
+                                                        <span class="text-slate-400 font-medium">Mentor:</span>
+                                                        <span class="text-slate-900 font-semibold truncate max-w-[180px]">{{ $app->placement->mentor->name }}</span>
+                                                    </div>
+                                                @else
+                                                    <span class="text-[11px] text-amber-600 font-semibold italic">Belum Ada Mentor</span>
+                                                @endif
+                                            @elseif($app->unit?->agencyProfile)
                                                 <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/90 border border-blue-200/80 rounded-md text-[11px] text-blue-800 font-semibold">
                                                     <svg class="w-3 h-3 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -534,10 +559,12 @@
 
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
                                 <div class="flex items-start justify-between text-slate-600 gap-2">
-                                    <span class="text-slate-400 shrink-0">Instansi & Unit:</span>
+                                    <span class="text-slate-400 shrink-0">{{ auth()->user()->isBidangAdmin() ? 'Bidang & Mentor:' : 'Instansi & Unit:' }}</span>
                                     <div class="text-right">
                                         <div class="font-bold text-slate-900">{{ $app->unit->name ?? '-' }}</div>
-                                        @if($app->unit?->agencyProfile)
+                                        @if(auth()->user()->isBidangAdmin() && $app->placement?->mentor)
+                                            <div class="text-[11px] text-slate-600 font-medium mt-0.5">Mentor: {{ $app->placement->mentor->name }}</div>
+                                        @elseif(! auth()->user()->isBidangAdmin() && $app->unit?->agencyProfile)
                                             <div class="text-[11px] text-blue-700 font-medium mt-0.5">{{ $app->unit->agencyProfile->agency_name }}</div>
                                         @endif
                                     </div>

@@ -6,7 +6,7 @@
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun seluruh role: Mahasiswa, Admin Dinas, Mentor Lapangan, DPL Kampus, & Universitas
+                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, DPL Kampus, & Universitas
                 </p>
             </div>
 
@@ -124,7 +124,7 @@
                     <select name="role" x-model="role" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Dinas / Super Admin</option>
+                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
                         <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Atasan (Supervisor)</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
                         <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing</option>
@@ -242,7 +242,7 @@
                                             </span>
                                         @elseif($u->role === 'admin')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                Admin Dinas
+                                                {{ $u->unit_id ? ('Admin ' . ($u->unit->name ?? 'Bidang')) : 'Admin Dispusip' }}
                                             </span>
                                         @elseif($u->role === 'supervisor')
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
@@ -425,7 +425,7 @@
                                                 </span>
                                             @elseif($u->role === 'admin')
                                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                    Admin Dinas
+                                                    {{ $u->unit_id ? ('Admin ' . ($u->unit->name ?? 'Bidang')) : 'Admin Dispusip' }}
                                                 </span>
                                             @elseif($u->role === 'supervisor')
                                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">

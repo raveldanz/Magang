@@ -6,9 +6,13 @@
                 <nav class="flex items-center gap-2 text-xs text-slate-500 mb-1.5" aria-label="Breadcrumb">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
                     <span class="text-slate-400">/</span>
-                    <a href="{{ route('admin.units.index') }}" class="hover:text-blue-600 transition">Bidang Devisi</a>
-                    <span class="text-slate-400">/</span>
-                    <span class="text-slate-800 font-semibold truncate">{{ $unit->name }}</span>
+                    @if(Auth::user()->isBidangAdmin())
+                        <span class="text-slate-800 font-semibold truncate">Bidang Saya</span>
+                    @else
+                        <a href="{{ route('admin.units.index') }}" class="hover:text-blue-600 transition">Bidang Devisi</a>
+                        <span class="text-slate-400">/</span>
+                        <span class="text-slate-800 font-semibold truncate">{{ $unit->name }}</span>
+                    @endif
                 </nav>
 
                 <div class="flex items-center gap-2.5">
@@ -32,7 +36,7 @@
                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    <span>Dashboard Utama</span>
+                    <span>{{ Auth::user()->isBidangAdmin() ? 'Dashboard Bidang' : 'Dashboard Utama' }}</span>
                 </a>
                 <a href="{{ route('admin.units.edit', $unit->id) }}"
                    class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-2xs transition">

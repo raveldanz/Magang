@@ -19,10 +19,10 @@
                     <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
-                    {{ __('Rekapitulasi Logbook Mahasiswa Magang') }}
+                    <span>Rekapitulasi Logbook Mahasiswa {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
-                    Pantau progres pengisian logbook harian seluruh mahasiswa magang per unit kerja secara agregat
+                    Pantau progres pengisian logbook harian mahasiswa magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'di ' . (auth()->user()->unit->name ?? 'bidang kerja') : 'per unit kerja' }} secara agregat
                 </p>
             </div>
         </div>
@@ -139,14 +139,21 @@
                         @endif
 
                         <!-- Filter Unit -->
-                        <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Semua Unit Penempatan --</option>
-                            @foreach ($units as $unit)
-                                <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
-                                     {{ $unit->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        @if (auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
+                            <div class="w-full sm:w-auto flex items-center px-3 py-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
+                                <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
+                                <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                            </div>
+                        @else
+                            <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Semua Unit Penempatan --</option>
+                                @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
+                                         {{ $unit->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
 
                         <!-- Filter Status Logbook -->
                         <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
@@ -208,7 +215,7 @@
                                 <p class="text-xs text-gray-600 mt-0.5">
                                     Unit: <strong>{{ $selUnit->name ?? '-' }}</strong> &bull; Pembimbing Lapangan: <strong>{{ $selMentor->name ?? 'Belum Ditentukan' }}</strong>
                                     @unless ($selMentor)
-                                        &bull; <span class="text-amber-700 font-semibold">Logbook dapat divalidasi sementara oleh Admin Dinas (buka Detail)</span>
+                                        &bull; <span class="text-amber-700 font-semibold">{{ Auth::user()->isBidangAdmin() ? 'Logbook dapat divalidasi sementara oleh Admin Bidang (buka Detail)' : 'Logbook dapat divalidasi sementara oleh Admin Dinas (buka Detail)' }}</span>
                                     @endunless
                                 </p>
                             </div>
@@ -314,8 +321,8 @@
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
                                         @unless ($mentor)
-                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas">
-                                                Validasi sementara oleh Admin Dinas
+                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="{{ Auth::user()->isBidangAdmin() ? 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Bidang' : 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas' }}">
+                                                {{ Auth::user()->isBidangAdmin() ? 'Validasi sementara oleh Admin Bidang' : 'Validasi sementara oleh Admin Dinas' }}
                                             </div>
                                         @endunless
                                     </td>

@@ -638,7 +638,7 @@
                                         @endif
                                     </div>
                                     @unless ($currMentor)
-                                        <div class="text-[11px] text-amber-700 mt-1">Logbook aktivitas sementara divalidasi langsung oleh Admin Dinas.</div>
+                                        <div class="text-[11px] text-amber-700 mt-1">Logbook aktivitas sementara divalidasi langsung oleh Admin Bidang.</div>
                                     @endunless
                                 </div>
                                 <div class="p-3.5 rounded-xl border bg-white/95 {{ $currAdvisor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
@@ -664,7 +664,7 @@
                                 name="mentor_id"
                                 :items="$mentorItems"
                                 :selected="$selectedMentorId"
-                                label="Plotting Pembimbing Lapangan (Mentor Dinas Terkait)"
+                                label="Penugasan Pembimbing Lapangan (Mentor Bidang)"
                                 placeholder="-- Cari atau Pilih Mentor Lapangan (Ketik nama / email) --"
                             />
                             <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi pada {{ $application->unit->name ?? 'bidang terkait' }}.</p>

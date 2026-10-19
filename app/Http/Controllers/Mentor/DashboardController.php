@@ -23,6 +23,18 @@ class DashboardController extends Controller
     {
         $mentor = Auth::user();
 
+        // On-the-fly auto-activation bagi mahasiswa bimbingan yang sudah tiba tanggal mulainya
+        $startedApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::ACCEPTED)
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', now()->toDateString())
+            ->whereHas('placement', function ($q) use ($mentor) {
+                $q->where('mentor_id', $mentor->id)->orWhere('pembimbing_id', $mentor->id);
+            })
+            ->get();
+        foreach ($startedApps as $stApp) {
+            $stApp->autoActivateIfStarted();
+        }
+
         // Base query penempatan yang diplot ke mentor ini
         $baseQuery = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
