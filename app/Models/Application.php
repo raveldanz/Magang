@@ -150,6 +150,51 @@ class Application extends Model
     }
 
     /**
+     * Memeriksa dan melakukan transisi otomatis dari ACCEPTED ke ACTIVE secara on-demand
+     * jika tanggal mulai magang telah tiba (start_date <= today).
+     * Mencegah mahasiswa terblokir dari pengisian logbook akibat scheduler server belum berjalan.
+     */
+    public function checkAndSyncActiveStatus(): bool
+    {
+        $rawStatus = $this->statusValue();
+        if ($rawStatus !== ApplicationStatus::ACCEPTED->value) {
+            return false;
+        }
+
+        if (! $this->start_date) {
+            return false;
+        }
+
+        $today = Carbon::today()->toDateString();
+        $startDateStr = Carbon::parse($this->start_date)->toDateString();
+
+        if ($startDateStr <= $today) {
+            // Jika ada end_date dan sudah lewat, jangan aktifkan di sini
+            if ($this->end_date && Carbon::parse($this->end_date)->toDateString() < $today) {
+                return false;
+            }
+
+            $this->update(['status' => ApplicationStatus::ACTIVE]);
+            $this->refresh();
+
+            if (class_exists(\App\Models\AuditLog::class)) {
+                \App\Models\AuditLog::record('AUTO_ACTIVATE_INTERNSHIP', 'Application', $this->id, [
+                    'student_name' => $this->user?->name,
+                    'nim' => $this->user?->studentProfile?->nim,
+                    'unit_name' => $this->unit?->name,
+                    'start_date' => $this->start_date,
+                    'activated_at' => now()->toDateTimeString(),
+                    'reason' => 'Tanggal mulai magang telah tiba (On-demand auto sync)',
+                ]);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Certificate Gate: daftar syarat penerbitan E-Sertifikat yang BELUM terpenuhi (kosong = boleh terbit).
      *  1. Evaluasi kinerja Mentor Lapangan lengkap (nilai disiplin, kinerja, laporan terisi).
      *  2. Laporan akhir mahasiswa disetujui (status approved).

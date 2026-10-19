@@ -89,6 +89,8 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
+        $application?->checkAndSyncActiveStatus();
+
         $university = $user->university_id ? University::find($user->university_id) : null;
         $univName = $university?->name ?? $user->university ?? $profile?->universitas;
 

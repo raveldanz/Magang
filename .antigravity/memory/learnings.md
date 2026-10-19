@@ -86,6 +86,9 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-074** | 2026-10-14 | Master Instansi & Seeder Cleanup | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dinas Perpustakaan dan Kearsipan serta kaskade relasi aman | RESOLVED |
 | **LRN-075** | 2026-10-14 | Evaluasi Adaptif Kampus: Aspek Penilaian Dinamis & Input Manual | Kriteria penilaian magang kaku 3 aspek tidak mencukupi disparitas standar rubrik antar-kampus | RESOLVED |
 | **LRN-076** | 2026-10-15 | Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop | Tag div unclosed di kartu mobile menyebabkan kontainer desktop tertelan masuk ke dalam blok sm:hidden | RESOLVED |
+| **LRN-077** | 2026-10-15 | Redireksi Kontekstual Sesi Penyamaran (Impersonasi) | Sesi impersonasi kembali ke referer asal bukan hardcode users index | RESOLVED |
+| **LRN-078** | 2026-10-15 | Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin | Pembersihan filter instansi tunggal pada halaman admin | RESOLVED |
+| **LRN-079** | 2026-10-19 | Audit Sistem, Migrasi Pending & Integritas Rute Modular | Pemulihan rute staged monolitik ke modular, eksekusi migrasi pending PostgreSQL & pembetulan import Kernel CLI scripts | RESOLVED |
 
 ---
 
@@ -1683,11 +1686,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Mengembalikan struktur rute modular terpisah (`routes/student.php`, `routes/admin.php`, `routes/mentor.php`, dll.) serta suite rute Chat lengkap di `routes/web.php`.
   3. Mengembalikan validasi gerbang kelulusan (*Certificate Gate* & logbook completion check) pada `CertificateController.php`.
   4. Membersihkan cache aplikasi (`php artisan optimize:clear`) dan memvalidasi test suite hingga seluruh **281 Feature/Unit Tests (1.914 assertions) berstatus 100% PASS (Exit Code 0)**.
-- **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit stabil terakhir dan jalankan `php artisan test` segera setelah proses merge selesai untuk memastikan tidak ada fitur atau rute yang hilang.
-
----
-
-### [LRN-072] Resolusi Kanvas & Margin Transparan Logo Universitas Indonesia (UI)
+- **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit ### [LRN-072] Resolusi Kanvas & Margin Transparan Logo Universitas Indonesia (UI)
 - **Tanggal**: 2026-10-12
 - **Komponen**: `public/images/logos/ui.png`, `storage/app/public/images/logos/ui.png`, `resources/views/admin/universities/index.blade.php`, `App\Models\University`
 - **Problem / Symptom**: Pada kartu perguruan tinggi Universitas Indonesia di halaman Manajemen Kampus Super Admin (`/admin/universities`), logo UI tidak tampak dan hanya terlihat titik/speck kuning mikroskopis di tengah kotak logo.
@@ -1696,6 +1695,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   1. Mengganti aset `public/images/logos/ui.png` dan `storage/app/public/images/logos/ui.png` dengan gambar PNG Makara UI resmi beresolusi tinggi (427x468 piksel) dengan latar belakang transparan penuh tanpa padding kosong berlebih (*tight bounding box*).
   2. Memverifikasi symlink dan keselarasan model `University::getLogoUrlAttribute()`.
   3. Menjalankan `php artisan optimize:clear && php artisan view:clear` dan memastikan 261/261 unit & feature test suite tetap lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**: Selalu verifikasi bahwa berkas aset gambar logo institusi memiliki padding minimal (*cropped tight*) pada kanvasnya agar teknik penskalaan CSS `object-contain` dapat merender simbol logo secara proporsional dan jelas.
+
+---
+
 ### [LRN-073] Rekonsiliasi Merge Konflik Portal Dosen (Paritas Tata Letak, Evaluasi Komparatif & Eliminasi Form Bimbingan Obsolete)
 - **Tanggal**: 2026-10-11
 - **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `tests/Feature/LecturerInnovationsTest.php`, `tests/Feature/LecturerFeaturesUpdateTest.php`
@@ -1740,6 +1743,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   7. Menambahkan test suite komprehensif `tests/Feature/DynamicEvaluationAspectsTest.php` (4 test cases, 35 assertions, Exit Code 0) dan memastikan seluruh unit/feature tests lulus 100%.
 - **Prevention Rule**: Seluruh dokumen cetak resmi (terutama E-Sertifikat dan Transkrip Nilai Kompetensi) wajib membaca atribut evaluasi adaptif yang tersimpan di model `Evaluation` secara dinamis, sembari selalu menyertakan fallback anggun (*graceful fallback*) ke skema standar agar arsip dokumen historis tetap tercetak utuh tanpa error.
 
+---
+
 ### [LRN-076] Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop (sm:hidden Cascade Distortion)
 - **Tanggal**: 2026-10-15
 - **Komponen**: `resources/views/lecturer/monitoring/index.blade.php`
@@ -1753,63 +1758,13 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-074] Pembersihan Massal Instansi Dinas Terpadu & Sinkronisasi Seeder (Dispusip Only)
-- **Tanggal**: 2026-10-14
-- **Komponen**: `database/seeders/SurabayaAgenciesSeeder.php`, `App\Models\AgencyProfile`, `App\Models\Unit`, `App\Models\User`
-- **Problem / Symptom**: Sistem memuat 23 master data OPD/instansi kedinasan Pemkot Surabaya, dan pengguna menghendaki seluruh instansi selain "Dinas Perpustakaan dan Kearsipan" dihapus secara permanen dari sistem dan seeder.
-- **Root Cause**: Kebutuhan penyederhanaan operasional pilot/khusus yang hanya berfokus pada ekosistem Dinas Perpustakaan dan Kearsipan.
-- **Fix Applied**: 
-  1. Menjalankan skrip transaksi database terisolasi untuk membersihkan 22 instansi selain Dinas Perpustakaan dan Kearsipan beserta dependensi kaskadenya (50 unit kerja, percakapan chat instansi/mentor, riwayat pengajuan, penempatan, evaluasi, dan akun personil admin/mentor kedinasan terkait) tanpa merusak integritas referensial.
-  2. Mempertahankan secara utuh data Dinas Perpustakaan dan Kearsipan (ID: 2) beserta 3 bidang kerja (Pelayanan & Otomasi Perpustakaan Digital, Preservasi Arsip, Minat Baca) dan seluruh akun personilnya (admin & 3 mentor).
-  3. Memperbarui `database/seeders/SurabayaAgenciesSeeder.php` agar hanya mendefinisikan Dinas Perpustakaan dan Kearsipan sehingga aman dari polusi data saat re-seeding.
-  4. Membersihkan cache aplikasi dan memvalidasi test suite hingga seluruh 281/281 test suite passed (100% Strict Exit Code 0).
-- **Prevention Rule**: Operasi penghapusan massal instansi induk wajib mematuhi pembersihan kaskade bertahap (chat -> child placements -> applications -> units -> agency staff -> agency profile) di dalam transaksi database atomik guna mencegah foreign key constraint violation pada PostgreSQL.
-
----
-
-### [LRN-075] Kustomisasi & Spesialisasi Sistem Khusus Dinas Perpustakaan dan Kearsipan Kota Surabaya
+### [LRN-077] Eliminasi Card Dispusip, Akses Langsung Pusat Kendali & Redireksi Impersonasi
 - **Tanggal**: 2026-10-15
-- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/auth/`, `resources/views/student/application/create.blade.php`, `resources/views/dashboard.blade.php`, `resources/views/certificates/`, `config/app.php`, `.env`
-- **Problem / Symptom**: Portal web masih menggunakan teks generik "Pemerintah Kota Surabaya di seluruh Organisasi Perangkat Daerah (OPD)", navbar hanya menampilkan logo tunggal pemkot, formulir mahasiswa mengharuskan pencarian instansi padahal hanya ada 1 OPD aktif, dan template surat/sertifikat masih menyimpan fallback legacy generic/Diskominfo.
-- **Root Cause**: Sistem sebelumnya dirancang multi-tenant untuk 23 OPD secara umum sebelum difokuskan secara pilot/khusus ke Dinas Perpustakaan dan Kearsipan.
-- **Fix Applied**: 
-  1. Mentransformasi `welcome.blade.php` menjadi portal berestetika tinggi khusus Dispusip Surabaya dengan logo ganda resmi (Pemkot Surabaya & Dispusip), headline khusus Dispusip, kontak kantor Jl. Rungkut Asri Tengah, serta showcase 4 bidang kerja resmi Dispusip (Bidang Sekretariat, Bidang Pembinaan dan Pengelolaan Perpustakaan, Bidang Pembinaan dan Layanan Kearsipan, Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan) dengan kuota live dinamis.
-  2. Memperbarui navbar utama (`layouts/navigation.blade.php`) dengan logo berdampingan dan label "Portal Magang Dispusip Kota Surabaya".
-  3. Memperbarui halaman login & registrasi dengan lencana Dispusip resmi.
-  4. Menyederhanakan formulir pendaftaran mahasiswa (`student/application/create.blade.php`) dengan kartu identitas resmi Dispusip dan seleksi langsung 4 divisi resmi Dispusip tanpa perlu mencari OPD lain.
-  5. Memperbarui seeder (`SurabayaAgenciesSeeder.php` & `CleanEcosystemSeeder.php`) dan migrasi data unit untuk memuat 4 bidang resmi Dispusip dengan relasi aplikasi & penempatan mahasiswa yang tetap terjaga utuh.
-  6. Memperbarui seluruh fallback dokumen resmi (surat penerimaan, sertifikat kelulusan, lembar nilai, transkrip) ke Dinas Perpustakaan dan Kearsipan beserta pejabat resmi penandatangan (Mia Santi Dewi, S.H., M.Si.).
-  7. Membersihkan cache aplikasi dan memvalidasi test suite hingga 100% lulus (Strict Exit Code 0).
-- **Prevention Rule**: Saat sebuah portal dikhususkan untuk instansi tertentu, seluruh titik kontak visual (Landing, Navbar, Auth, Pendaftaran, Dashboard, Surat, dan Sertifikat) wajib diselaraskan agar tidak ada inkonsistensi nama instansi, fallback kuno, atau dropdown tunggal yang membingungkan pemohon.
-
----
-
-### [LRN-076] Eliminasi Card Dispusip & Akses Langsung Pusat Kendali Instansi
-- **Tanggal**: 2026-10-15
-- **Komponen**: `resources/views/layouts/navigation.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/admin/agencies/edit.blade.php`
-- **Problem / Symptom**: Saat menekan menu "Instansi" di navigasi, admin melihat halaman kartu berulang (`admin.agencies.index`) yang hanya berisi 1 kartu Dispusip, sehingga harus menekan tombol "Kelola Dinas" lagi untuk melihat pusat kendali lengkap.
-- **Root Cause**: Menu navigasi masih menautkan ke rute index generik multi-instansi `admin.agencies.index` tanpa mengenali bahwa sistem beroperasi untuk ekosistem tunggal Dispusip.
-- **Fix Applied**: 
-  1. Memperbarui menu "Instansi" pada desktop navbar, profile dropdown, dan mobile drawer di `navigation.blade.php` agar langsung menautkan ke rute `admin.agencies.show` instansi Dispusip.
-  2. Menambahkan auto-redirect cerdas pada `AgencyController::index()` saat ekosistem berjalan spesifik Dispusip (tanpa parameter `list`), sehingga akses langsung URL `/admin/agencies` langsung dialihkan ke Pusat Kendali Dispusip lengkap.
-  3. Mengeliminasi tombol kembali pada header `admin.agencies.show` karena halaman ini kini telah menjadi menu utama top-level (setara dengan menu Pengajuan, Universitas, dan Pengguna yang tidak memerlukan tombol kembali), serta mengarahkan tombol batal/kembali pada `admin.agencies.edit` menuju `admin.agencies.show`.
-  4. Memastikan kompatibilitas operator string database (`ilike` untuk PostgreSQL, `like` untuk SQLite saat testing).
-  5. Menambahkan test feature `DispusipInstansiMenuDirectAccessTest` untuk menjamin stabilitas fungsionalitas dan navigasi langsung ke halaman lengkap Dispusip.
-- **Prevention Rule**: Pada aplikasi yang telah dikhususkan untuk entitas tunggal (*single-tenant specialized*), hindari menyajikan halaman ringkasan kartu dengan 1 item saja. Arahkan pengguna langsung ke pusat manajemen data komprehensif, dan selalu sediakan tombol kembali yang kontekstual.
-
----
-
-### [LRN-077] Redireksi Kontekstual Sesi Penyamaran (Impersonasi)
-- **Tanggal**: 2026-10-15
-- **Komponen**: `app/Http/Controllers/Admin/ImpersonationController.php`, `resources/views/admin/agencies/show.blade.php`
-- **Problem / Symptom**: Saat Super Admin melakukan *Login As* (penyamaran) ke akun admin dinas dari halaman Pusat Kendali Instansi, kemudian menekan tombol "Kembali" pada banner penyamaran, sistem selalu mengarahkan ke halaman Kelola Pengguna (`/admin/users`), bukan kembali ke halaman instansi asal.
-- **Root Cause**: Method `leave()` pada `ImpersonationController` di-hardcode ke `return redirect()->route('admin.users.index')`, tanpa melacak URL asal saat penyamaran dimulai (`referer` / `return_to`).
-- **Fix Applied**: 
-  1. Pada method `impersonate()`, sistem kini menangkap URL asal via `return_to`, `referer`, atau `url()->previous()` dan menyimpannya di session (`impersonator_return_to`).
-  2. Menyertakan `<input type="hidden" name="return_to" value="{{ url()->current() }}">` pada seluruh form *Login As* di `show.blade.php`.
-  3. Pada method `leave()`, sistem membaca `impersonator_return_to` dari session dengan fallback cerdas berbasis konteks akun (`agency_profile_id` mengarah ke `admin.agencies.show`, `university_id` ke `admin.universities.show`, dan role mentor ke `admin.mentors.index`).
-  4. Menambahkan test otomatis di `DispusipInstansiMenuDirectAccessTest` guna memverifikasi alur impersonasi dan kembali ke halaman dinas secara presisi.
-- **Prevention Rule**: Jangan pernah men-hardcode rute pengembalian (*return/exit route*) pada fitur impersonasi/penyamaran. Selalu simpan URL referer asal dan sediakan fallback dinamis berbasis atribut domain akun yang disamar.
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/ImpersonationController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**: Menu Instansi menampilkan kartu tunggal Dispusip redundan dan sesi penyamaran Super Admin kembali ke halaman users bukan ke halaman instansi asal.
+- **Root Cause**: Rute navigasi mengarah ke index generik tanpa mengenali single-tenant Dispusip dan `ImpersonationController::leave()` di-hardcode ke `admin.users.index`.
+- **Fix Applied**: Menautkan menu instansi langsung ke `admin.agencies.show`, menyimpan referer session pada impersonasi, dan menambahkan test otomatis `DispusipInstansiMenuDirectAccessTest`.
+- **Prevention Rule**: Jangan sajikan kartu berulang pada aplikasi single-tenant dan simpan referer session pada fitur impersonasi.
 
 ---
 
@@ -1823,6 +1778,28 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Memasang guard kondisional `@if(isset($agencies) && count($agencies) > 1)` pada filter instansi di `resources/views/admin/mentors/index.blade.php` dan `resources/views/admin/users/index.blade.php`, sehingga hanya tampil dinamis jika sistem memiliki lebih dari 1 instansi.
   3. Memvalidasi tampilan dan memastikan seluruh unit/feature test tetap lulus (Exit Code 0).
 - **Prevention Rule**: Seluruh elemen form filter antarmuka yang mengagregasi data entitas induk (seperti OPD/Instansi) harus memiliki kondisional pemeriksaan kuantitas (`count > 1`) atau dihapus jika sistem berjalan dalam mode portal khusus/spesifik, guna menjaga kebersihan visual dan ergonomi pengguna.
+
+---
+
+### [LRN-079] Audit Menyeluruh Sistem: Penanganan Staged Monolithic Route, Migrasi Pending PostgreSQL, & Hardening Runner Testing
+- **Tanggal**: 2026-10-19
+- **Komponen**: `routes/web.php`, `database/migrations/`, `scripts/health_check.php`, `scripts/audit_verifier.php`, `scripts/tier3_playwright_audit.mjs`, `scripts/browser-runner.mjs`
+- **Problem / Symptom**:
+  1. Berkas `routes/web.php` ter-stage dengan modifikasi yang mengganti rute modular dengan versi monolitik lama, menyebabkan 33 pengujian otomatis gagal akibat `Route [chat.start] not defined` dan hilangnya file route modular (`student.php`, `admin.php`, dll.).
+  2. Terdapat 2 migrasi tertunda (*Pending*) pada PostgreSQL: `create_academic_consultations_table` dan `add_advisor_notes_to_placements_table`.
+  3. Skrip verifikasi mandiri (`health_check.php`, `audit_verifier.php`, `dev_credentials.php`) melempar `ReflectionException: Target class [Kernel] does not exist` karena deklarasi `use Kernel;` terletak setelah instansiasi.
+  4. Pengujian visual Playwright gagal login karena menembak akun dummy `admin.qa@test.local` yang tidak terdaftar di database.
+- **Root Cause**:
+  1. Penulisan ulang manual tanpa menyertakan modul rute modern.
+  2. Migrasi baru ditambahkan di codebase namun belum dieksekusi di database PostgreSQL lokal.
+  3. Kesalahan urutan deklarasi namespace `use` sebelum pemanggilan `$app->make(Kernel::class)` pada skrip CLI mandiri.
+  4. Kredensial hardcoded tidak selaras dengan akun admin resmi hasil seeding (`admin@surabaya.go.id`).
+- **Fix Applied**:
+  1. Memulihkan `routes/web.php` ke versi modular HEAD terpisah, memvalidasi test suite hingga 281/281 test (1.914 assertions) berstatus 100% PASS (Exit Code 0).
+  2. Menjalankan `php artisan migrate` untuk mengaktifkan tabel konsultasi dan kolom catatan dosen.
+  3. Memperbaiki urutan `use` import pada seluruh skrip audit mandiri.
+  4. Mengupdate kredensial audit visual ke `admin@surabaya.go.id`, menginstal devDependencies `playwright`, dan memverifikasi pengujian visual E2E Chrome channel (100% PASS).
+- **Prevention Rule**: Selalu pastikan `routes/web.php` mempertahankan impor modular terpisah; selalu jalankan `php artisan migrate:status` sebelum pengujian; dan pastikan skrip pengujian visual selalu menggunakan kredensial master dari seeder resmi.
 
 ---
 

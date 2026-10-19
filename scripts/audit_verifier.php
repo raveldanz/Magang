@@ -1,13 +1,13 @@
 <?php
 
+use App\Models\AgencyProfile;
+use App\Models\University;
+use Illuminate\Contracts\Console\Kernel;
+
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
-
-use App\Models\AgencyProfile;
-use App\Models\University;
-use Illuminate\Contracts\Console\Kernel;
 
 echo "========================================================================================================================\n";
 echo "                         AUDIT AKURASI & VALIDASI FAKTUAL RESMI MASTER DATA SURABAYA                                   \n";
