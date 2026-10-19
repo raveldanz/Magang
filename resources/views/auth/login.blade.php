@@ -1,21 +1,26 @@
 <x-guest-layout>
     <div class="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <!-- Logo Pemkot Surabaya -->
-        <div class="flex justify-center mb-4">
-            <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block">
-                <img src="{{ asset('images/logos/surabaya.png') }}" 
-                     alt="Logo Pemkot Surabaya"
-                     class="h-20 w-auto object-contain drop-shadow-md"
-                     style="height: 72px; width: auto; max-height: 80px;">
+        <!-- Logo Pemkot Surabaya & Dispusip -->
+        <div class="flex items-center justify-center gap-3 mb-4">
+            <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Pemerintah Kota Surabaya">
+                <img src="{{ asset('images/logos/surabaya.png') }}" alt="Logo Pemkot Surabaya"
+                    class="h-14 w-auto object-contain drop-shadow-2xs transition-all"
+                    style="aspect-ratio: 960/1234; height: 56px; width: auto; max-height: 60px; object-fit: contain;">
+            </a>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <a href="/" class="group transition-transform duration-300 hover:scale-105 inline-block focus:outline-none" title="Dinas Perpustakaan dan Kearsipan Kota Surabaya">
+                <img src="{{ asset('images/logos/dispusip.png') }}" alt="Logo Dispusip Surabaya"
+                    class="h-14 w-auto object-contain drop-shadow-2xs transition-all"
+                    style="height: 56px; width: auto; max-height: 60px; object-fit: contain;">
             </a>
         </div>
 
         <!-- Header Text -->
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">
-            Portal Magang MBKM
+            Portal Magang Dispusip
         </h2>
         <p class="text-xs font-bold uppercase tracking-wider text-blue-700 mt-1">
-            Pemerintah Kota Surabaya
+            Dinas Perpustakaan dan Kearsipan Kota Surabaya
         </p>
         <p class="text-xs text-slate-500 mt-1">
             Silakan masuk untuk mengakses panel kendali & layanan magang
@@ -33,9 +38,9 @@
             <div>
                 <x-input-label for="email" value="{{ __('Email Resmi / Akun') }}"
                     class="font-bold text-slate-700 text-xs uppercase tracking-wider" />
-                <x-text-input id="email"
+                <input id="email"
                     class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition"
-                    type="email" name="email" :value="old('email')" required autofocus autocomplete="username"
+                    type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
                     placeholder="nama@surabaya.go.id / email pendaftar" />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
@@ -53,19 +58,19 @@
                     @endif
                 </div>
 
-                <x-text-input id="password"
+                <input id="password"
                     class="block mt-1.5 w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 text-xs sm:text-sm shadow-2xs py-2.5 px-3.5 transition"
                     type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
-
-            <!-- Remember Me -->
-            <div class="flex items-center">
-                <input id="remember_me" type="checkbox"
-                    class="rounded-md border-slate-300 text-blue-600 shadow-2xs focus:ring-blue-500 w-4 h-4 cursor-pointer"
-                    name="remember">
-                <label for="remember_me" class="ml-2 text-xs text-slate-600 font-medium cursor-pointer select-none">
-                    {{ __('Ingat saya di perangkat ini') }}
+            <!-- Remember Me Block -->
+            <div class="flex items-center mt-4">
+                <label for="remember_me" class="inline-flex items-center cursor-pointer select-none">
+                    <input id="remember_me" type="checkbox" name="remember"
+                        class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2 transition cursor-pointer">
+                    <span class="ms-2 text-xs text-slate-600 font-medium">
+                        Ingat saya di perangkat ini
+                    </span>
                 </label>
             </div>
 
@@ -92,6 +97,6 @@
 
     <!-- Footer Tagline -->
     <p class="text-center text-xs text-slate-400 mt-6">
-        &copy; {{ date('Y') }} Pemerintah Kota Surabaya. All rights reserved.
+        &copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.
     </p>
 </x-guest-layout>

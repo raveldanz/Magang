@@ -14,43 +14,53 @@ class CheckRole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             abort(403, 'Anda belum login.');
         }
 
         $user = Auth::user();
         $userRole = $user->role;
 
-        // Super Admin (role 'super_admin' ATAU role 'admin' dengan agency_profile_id null)
+        // Super Admin bypass (kecuali jika sedang menyamar sebagai role lain)
         $isSuperAdmin = ($userRole === 'super_admin' || ($userRole === 'admin' && is_null($user->agency_profile_id)));
 
-        // 1. Direct match
         if (in_array($userRole, $roles)) {
             return $next($request);
         }
 
-        // 2. Super Admin bypass to any admin or super_admin routes
         if ($isSuperAdmin && (in_array('admin', $roles) || in_array('super_admin', $roles))) {
             return $next($request);
         }
 
-        // 3. Role aliases
+        // Aliases
         if (in_array('mentor', $roles) && in_array($userRole, ['mentor', 'pembimbing'])) {
             return $next($request);
         }
-
         if (in_array('pembimbing', $roles) && in_array($userRole, ['mentor', 'pembimbing'])) {
             return $next($request);
         }
-
         if (in_array('dosen', $roles) && in_array($userRole, ['dosen', 'academic_advisor'])) {
             return $next($request);
         }
-
         if (in_array('academic_advisor', $roles) && in_array($userRole, ['dosen', 'academic_advisor'])) {
             return $next($request);
+        }
+
+        // Jika sedang dalam mode penyamaran (impersonation) dan mengakses halaman luar wewenang role target,
+        // redirect ke dashboard aktifnya agar tidak mengalami blank error 403.
+        if ($request->session()->has('impersonator_id')) {
+            $dest = match ($userRole) {
+                'admin' => route('admin.dashboard'),
+                'mentor', 'pembimbing' => route('mentor.dashboard'),
+                'dosen', 'academic_advisor' => route('lecturer.dashboard'),
+                'universitas' => route('university.dashboard'),
+                default => route('dashboard'),
+            };
+
+            return redirect()->to($dest)
+                ->with('error', 'Halaman yang Anda tuju tidak tersedia untuk peran '.strtoupper($userRole).'. Anda tetap dapat kembali ke Super Admin melalui bilah merah di atas.');
         }
 
         abort(403, 'Anda tidak memiliki hak akses ke halaman ini.');

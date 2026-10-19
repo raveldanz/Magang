@@ -1,25 +1,28 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Pengajuan Magang & Riwayat') }}
-            </h2>
-        </div>
+        <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
+            {{ __('Pengajuan Magang') }}
+        </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="py-8 bg-[#F5F8FC] min-h-screen text-slate-900 font-sans">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
+            <!-- Flash Success Message -->
             @if (session('success'))
-                <div class="p-4 bg-green-100 text-green-800 rounded-lg text-sm font-semibold">
-                    {{ session('success') }}
+                <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-3 text-sm font-semibold shadow-sm">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
-            <!-- Menampilkan Error Validasi Jika Ada yang Gagal -->
+
+            <!-- Error Validasi Input -->
             @if ($errors->any())
-                <div class="p-4 mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">
+                <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-xs space-y-1 shadow-sm">
                     <p class="font-bold">Pengajuan Gagal Dikirim:</p>
-                    <ul class="mt-1 list-disc list-inside">
+                    <ul class="list-disc list-inside">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -27,216 +30,554 @@
                 </div>
             @endif
 
-            <!-- ALERT PENOLAKAN DARI ADMIN (JIKA PENGAJUAN TERAKHIR REJECTED) -->
-            @if ($applicationHistory->first() && $applicationHistory->first()->status === 'rejected')
-                <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 8 0 100-16 8 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-bold text-red-800">Mohon Maaf, Pengajuan Magang Anda Ditolak</h3>
-                            <div class="mt-2 text-sm text-red-700">
-                                <p class="font-semibold">Catatan / Alasan dari Admin:</p>
-                                <p class="mt-1 italic bg-white p-3 rounded border border-red-200 font-mono text-gray-800">
-                                    "{{ $applicationHistory->first()->rejection_note ?? 'Tidak ada catatan spesifik dari admin.' }}"
-                                </p>
-                            </div>
-                            <p class="mt-3 text-xs text-red-600">
-                                *Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan
-                                admin di atas.
-                            </p>
-                        </div>
+            <!-- Alert Penolakan dari Admin -->
+            @if ($applicationHistory->first()?->statusValue() === 'rejected')
+                <div class="p-5 bg-red-50 border border-red-200 rounded-2xl shadow-sm space-y-2">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <h3 class="text-sm font-bold text-red-900">Mohon Maaf, Pengajuan Magang Anda Ditolak</h3>
                     </div>
+                    <div class="text-xs text-red-800">
+                        <p class="font-semibold">Catatan / Alasan dari Admin:</p>
+                        <p class="mt-1 italic bg-white p-3 rounded-xl border border-red-200 font-mono text-slate-800">
+                            "{{ $applicationHistory->first()->rejection_note ?? 'Tidak ada catatan spesifik dari admin.' }}"
+                        </p>
+                    </div>
+                    <p class="text-[11px] text-red-600">
+                        Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.
+                    </p>
                 </div>
             @endif
 
-            <!-- 1. FORM PENGAJUAN BARU -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Form Buat Pengajuan Magang</h3>
+            <!-- Alert Pengunduran Diri -->
+            @if ($applicationHistory->first()?->statusValue() === 'resigned')
+                <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm space-y-2">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-sm font-bold text-slate-800">
+                            Anda Telah Mengundurkan Diri dari Program Magang Sebelumnya
+                        </h3>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Anda dapat mendaftar kembali ke program magang dengan memilih instansi & divisi kerja yang tersedia di bawah serta mengirimkan berkas pengajuan baru.
+                    </p>
+                </div>
+            @endif
+
+            <!-- 1. FORM PENGAJUAN BARU / STATUS BANNER -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 p-6 sm:p-8 space-y-6">
 
                 @if ($activeApplication)
-                    <!-- Alert jika masih ada berkas yang statusnya PENDING -->
-                    <div class="p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 border border-yellow-200">
-                        <span class="font-bold">Perhatian:</span> Anda masih memiliki pengajuan magang yang sedang diproses
-                        (Status: <strong>PENDING</strong>).
-                        Anda belum dapat membuat pengajuan baru hingga pengajuan tersebut selesai diverifikasi oleh Admin.
-                    </div>
-                @else
-                    <!-- Form Input Magang Baru -->
-                    <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data"
-                        class="space-y-4">
-                        @csrf
-
-                        <!-- Pemilihan Unit (Grouped per Instansi) -->
-                        <div>
-                            <x-input-label for="unit_id" value="Pilih Instansi & Unit Kerja / Divisi Magang" />
-                            @php
-                                $totalAvailable = $units->filter(fn($unit) => $unit->remaining_quota > 0)->count();
-                            @endphp
-
-                            <select id="unit_id" name="unit_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm text-sm"
-                                {{ $totalAvailable === 0 ? 'disabled' : '' }} required>
-                                
-                                @if ($totalAvailable === 0)
-                                    <option value="" disabled selected>-- Maaf, saat ini seluruh kuota divisi magang sudah penuh --</option>
-                                @else
-                                    <option value="">-- Pilih Instansi & Bidang/Divisi Magang --</option>
-                                    @foreach ($groupedUnits as $agencyName => $agencyUnits)
-                                        <optgroup label="🏛️ {{ strtoupper($agencyName) }}">
-                                            @foreach ($agencyUnits as $unit)
-                                                <option value="{{ $unit->id }}" 
-                                                    {{ old('unit_id') == $unit->id ? 'selected' : '' }}
-                                                    {{ $unit->remaining_quota <= 0 ? 'disabled class=text-gray-400' : '' }}>
-                                                    {{ $unit->name }} &bull; Sisa Kuota: {{ $unit->remaining_quota }} {{ $unit->remaining_quota <= 0 ? '(PENUH)' : 'orang' }}
-                                                </option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                @endif
-                            </select>
-                            <p class="mt-1 text-xs text-gray-500">Unit kerja telah dikelompokkan secara rapi berdasarkan instansi induk.</p>
-                            @error('unit_id')
-                                <p class="mt-2 text-sm text-red-600 font-semibold">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Periode Magang (Datepicker) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="start_date" name="start_date" type="date" min="{{ date('Y-m-d') }}" class="mt-1 block w-full text-xs sm:text-sm"
-                                    :value="old('start_date')" required />
-                                <p class="text-[11px] text-gray-400 mt-1">Pilih tanggal awal mulai kegiatan magang.</p>
-                                <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
+                    @php $actSt = $activeApplication->statusValue(); @endphp
+                    <div class="p-4 sm:p-5 rounded-2xl border {{ in_array($actSt, ['accepted', 'active'], true) ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : ($actSt === 'completed' ? 'bg-indigo-50 border-indigo-200 text-indigo-950' : 'bg-amber-50 border-amber-200 text-amber-950') }} shadow-xs space-y-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div class="flex items-center gap-2 font-bold text-sm">
+                                <svg class="w-5 h-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>
+                                    @if(in_array($actSt, ['pending', 'verified']))
+                                        Pengajuan Magang Sedang Diproses
+                                    @elseif($actSt === 'accepted')
+                                        Pengajuan Magang Anda Telah Diterima
+                                    @elseif($actSt === 'active')
+                                        Anda Sedang Menjalani Magang
+                                    @elseif($actSt === 'completed')
+                                        Program Magang MBKM Telah Selesai
+                                    @endif
+                                </span>
                             </div>
                             <div>
-                                <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-bold uppercase tracking-wider" />
-                                <x-text-input id="end_date" name="end_date" type="date" class="mt-1 block w-full text-xs sm:text-sm"
-                                    :value="old('end_date')" required />
-                                <p class="text-[11px] text-gray-400 mt-1">Pilih tanggal berakhirnya kegiatan magang.</p>
+                                <x-status-badge :status="$activeApplication->status" />
+                            </div>
+                        </div>
+                        <p class="text-xs leading-relaxed">
+                            @if(in_array($actSt, ['pending', 'verified']))
+                                Berkas pengajuan magang Anda di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}) saat ini sedang dalam tahap seleksi & verifikasi oleh Tim Admin Dinas. Anda belum dapat mengajukan magang baru sampai proses ini selesai.
+                            @elseif(in_array($actSt, ['accepted', 'active']))
+                                Selamat! Anda telah resmi diterima magang di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}). Silakan fokus pada pelaksanaan kegiatan magang harian Anda.
+                            @elseif($actSt === 'completed')
+                                Anda telah menyelesaikan seluruh rangkaian kegiatan magang MBKM serta menerima penilaian akhir resmi. Anda dapat mengunduh E-Sertifikat dan arsip laporan melalui menu <strong>Laporan Akhir</strong>.
+                            @endif
+                        </p>
+                    </div>
+                @else
+                    <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        @csrf
+
+                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
+                        @php
+                            $selectedUnitId = old('unit_id', '');
+                            $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
+                            $defaultAgency = $agencies->first();
+                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? ($defaultAgency?->id ?? ''));
+
+                            $agencyItems = $agencies->map(function ($a) {
+                                return [
+                                    'id' => $a->id,
+                                    'name' => $a->agency_name,
+                                    'acronym' => $a->acronym,
+                                    'meta' => $a->address ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
+                                ];
+                            })->values()->all();
+
+                            $unitItems = $units->map(function ($u) {
+                                $agencyName = $u->agencyProfile->agency_name ?? 'Dispusip Kota Surabaya';
+                                $rem = $u->remaining_quota;
+                                return [
+                                    'id' => $u->id,
+                                    'agency_profile_id' => $u->agency_profile_id,
+                                    'name' => $u->name,
+                                    'acronym' => $u->agencyProfile?->acronym,
+                                    'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " • {$agencyName}",
+                                    'remaining_quota' => $rem,
+                                    'disabled' => $rem <= 0,
+                                ];
+                            })->values()->all();
+                        @endphp
+
+                        <div x-data="{
+                            selectedAgencyId: '{{ $selectedAgencyId }}',
+                            selectedUnitId: '{{ $selectedUnitId }}',
+                            allUnits: {{ \Illuminate\Support\Js::from($unitItems) }},
+                            filteredUnits: [],
+
+                            init() {
+                                this.filterUnits();
+                                window.addEventListener('searchable-select-changed', (e) => {
+                                    if (e.detail.name === 'agency_profile_id') {
+                                        this.selectedAgencyId = e.detail.value;
+                                        this.filterUnits();
+                                        window.dispatchEvent(new CustomEvent('update-units-list', {
+                                            detail: { items: this.filteredUnits }
+                                        }));
+                                    }
+                                });
+                            },
+
+                            filterUnits() {
+                                if (!this.selectedAgencyId) {
+                                    this.filteredUnits = this.allUnits;
+                                } else {
+                                    this.filteredUnits = this.allUnits.filter(u => String(u.agency_profile_id) === String(this.selectedAgencyId));
+                                }
+                            }
+                        }" class="space-y-4">
+                            
+                            @if ($agencies->count() <= 1 && $defaultAgency)
+                                <!-- Instansi Kedinasan Khusus: Dispusip Surabaya -->
+                                <input type="hidden" name="agency_profile_id" value="{{ $defaultAgency->id }}">
+                                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-white to-slate-50 border border-blue-200/90 shadow-2xs">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-12 h-12 rounded-2xl bg-white border border-blue-200/80 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                                                <img src="{{ asset('images/logos/dispusip.png') }}" alt="Logo Dispusip" class="w-full h-full object-contain">
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-md">Instansi Resmi Magang</span>
+                                                    <span class="text-[10px] font-semibold text-slate-500">Pemkot Surabaya</span>
+                                                </div>
+                                                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">{{ $defaultAgency->agency_name }}</h3>
+                                                <p class="text-xs text-slate-500 mt-0.5">{{ $defaultAgency->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right shrink-0">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                Kuota Magang Terbuka
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <!-- 1. Pemilihan Instansi Kedinasan (Multi-Agency Fallback) -->
+                                <div>
+                                    <x-searchable-select
+                                        name="agency_profile_id"
+                                        :items="$agencyItems"
+                                        :selected="$selectedAgencyId"
+                                        label="1. Pilih Instansi Dinas (OPD Pemkot Surabaya)"
+                                        placeholder="-- Cari Instansi Dinas --"
+                                        :required="true"
+                                        :show-asterisk="false"
+                                    />
+                                    @error('agency_profile_id')
+                                        <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endif
+
+                            <!-- 2. Pemilihan Divisi / Unit Kerja Magang Dispusip -->
+                            <div>
+                                <x-searchable-select
+                                    name="unit_id"
+                                    :items="$unitItems"
+                                    :selected="$selectedUnitId"
+                                    parent-listener="update-units-list"
+                                    label="Pilih Bidang / Divisi Kerja Magang di Dispusip"
+                                    placeholder="-- Pilih Bidang Kerja Magang Dispusip --"
+                                    :required="true"
+                                    :show-asterisk="false"
+                                />
+                                @error('unit_id')
+                                    <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                @enderror
+                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
+                                    <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Pilih bidang keahlian magang yang sesuai dengan program studi Anda di Dinas Perpustakaan dan Kearsipan Kota Surabaya.</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Bagian B: Periode Magang -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" 
+                             x-data="{ 
+                                 startDate: '{{ old('start_date', '') }}',
+                                 endDate: '{{ old('end_date', '') }}',
+                                 today: '{{ date('Y-m-d') }}'
+                             }">
+                            
+                            <!-- Tanggal Mulai -->
+                            <div class="space-y-1.5">
+                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-text-input id="start_date" 
+                                              name="start_date" 
+                                              type="date" 
+                                              x-model="startDate"
+                                              class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                              :value="old('start_date')"
+                                              required />
+                                <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
+                            </div>
+
+                            <!-- Tanggal Selesai -->
+                            <div class="space-y-1.5">
+                                <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                <x-text-input id="end_date" 
+                                              name="end_date" 
+                                              type="date" 
+                                              x-bind:min="startDate"
+                                              x-model="endDate"
+                                              class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                              :value="old('end_date')"
+                                              required />
                                 <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
                             </div>
                         </div>
 
-                        <hr class="my-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-sm text-gray-800 flex items-center gap-2">
-                                <span>📁 Upload Dokumen Persyaratan Magang</span>
-                            </h4>
-                            <p class="text-xs text-gray-500">Seluruh dokumen wajib berformat PDF dengan ukuran maksimum 2MB per file</p>
+                        <hr class="border-slate-100">
+
+                        <!-- Upload Dokumen Persyaratan Magang -->
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-800">Upload Dokumen Persyaratan Magang</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- 1. Surat Pengantar / Proposal Kampus -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                1. Surat Pengantar / Proposal Kampus
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="surat_pengantar" 
+                       name="surat_pengantar" 
+                       accept=".pdf" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
+
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
+                                </div>
+
+        <!-- 2. Curriculum Vitae (CV) -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                2. Curriculum Vitae (CV)
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="cv" 
+                       name="cv" 
+                       accept=".pdf" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
+
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('cv')" class="mt-1" />
+                                </div>
+
+        <!-- 3. Transkrip Nilai Akademik Terakhir -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                3. Transkrip Nilai Akademik Terakhir
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="transkrip" 
+                       name="transkrip" 
+                       accept=".pdf" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
+
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
+                                </div>
+
+        <!-- 4. Kartu Tanda Mahasiswa (KTM / ID Card) -->
+        <div x-data="{ 
+                fileName: '', 
+                fileUrl: null, 
+                handleFile(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.fileName = file.name;
+                        this.fileUrl = URL.createObjectURL(file);
+                    } else {
+                        this.fileName = '';
+                        this.fileUrl = null;
+                    }
+                } 
+             }" 
+             class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
+            <label class="block text-xs font-bold text-slate-700">
+                4. Kartu Tanda Mahasiswa (KTM / ID Card)
+            </label>
+            
+            <div class="flex items-center gap-2">
+                <input type="file" 
+                       id="id_card" 
+                       name="id_card" 
+                       accept=".pdf,image/png,image/jpeg,image/jpg" 
+                       required 
+                       @change="handleFile($event)" 
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition" />
+            </div>
+
+                                    <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                        <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            Lihat Berkas
+                                        </a>
+                                    </div>
+                                    <p x-show="!fileUrl" class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
+                                    <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
+                                </div>
+
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <div>
-                                <x-input-label for="surat_pengantar" value="1. Surat Pengantar / Proposal Kampus *" class="text-xs font-bold" />
-                                <input id="surat_pengantar" name="surat_pengantar" type="file" accept=".pdf"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
-                                <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="cv" value="2. Curriculum Vitae (CV) *" class="text-xs font-bold" />
-                                <input id="cv" name="cv" type="file" accept=".pdf"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
-                                <x-input-error :messages="$errors->get('cv')" class="mt-1" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="transkrip" value="3. Transkrip Nilai Akademik Terakhir *" class="text-xs font-bold" />
-                                <input id="transkrip" name="transkrip" type="file" accept=".pdf"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
-                                <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="id_card" value="4. Kartu Tanda Mahasiswa (KTM) / KTP (Opsional)" class="text-xs font-bold" />
-                                <input id="id_card" name="id_card" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                                    class="mt-1 block w-full text-xs border border-gray-300 rounded-xl p-2.5 bg-gray-50/50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-3 pt-4 border-t border-gray-100">
-                            <x-primary-button class="text-xs px-5 py-2.5">
-                                {{ __('Kirim Pengajuan Magang') }}
-                            </x-primary-button>
-
-                            <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                                {{ __('Kembali') }}
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-5 border-t border-slate-100">
+                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-150 text-center flex items-center justify-center">
+                                {{ __('Kembali ke dashboard') }}
                             </a>
+                            <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer flex items-center justify-center">
+                                {{ __('Kirim Pengajuan Magang') }}
+                            </button>
                         </div>
                     </form>
                 @endif
             </div>
 
             <!-- 2. TABEL RIWAYAT PENGAJUAN MAGANG -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Riwayat Pengajuan Magang Anda</h3>
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm shadow-slate-200/50 overflow-hidden">
+                <div class="p-5 sm:p-6 border-b border-slate-100">
+                    <h3 class="text-base font-bold text-slate-900">Riwayat Pengajuan Magang Anda</h3>
+                </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <!-- Desktop View (Tabel Pas Presisi Tanpa Scrollbar Horizontal) -->
+                <div class="hidden md:block w-full">
+                    <table class="w-full table-fixed text-left border-collapse">
                         <thead>
-                            <tr class="border-b bg-gray-50 text-xs font-semibold text-gray-600 uppercase">
-                                <th class="p-3">Tanggal Pengajuan</th>
-                                <th class="p-3">Unit Instansi</th>
-                                <th class="p-3">Periode Magang</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Catatan / Alasan Admin</th>
-                                <th class="p-3">Surat Penerimaan</th>
+                            <tr class="bg-slate-50/60 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="w-[16%] py-3.5 px-4">Tanggal Pengajuan</th>
+                                <th class="w-[28%] py-3.5 px-4">Unit Instansi</th>
+                                <th class="w-[22%] py-3.5 px-4">Periode Magang</th>
+                                <th class="w-[12%] py-3.5 px-4 text-center">Status</th>
+                                <th class="w-[10%] py-3.5 px-4 text-center">Catatan</th>
+                                <th class="w-[12%] py-3.5 px-4 text-right">Surat Penerimaan</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm divide-y">
+                        <tbody class="text-sm divide-y divide-slate-100">
                             @forelse ($applicationHistory as $app)
-                                <tr>
-                                    <td class="p-3 text-gray-500 font-mono text-xs">{{ $app->created_at->format('d M Y, H:i') }}</td>
-                                    <td class="p-3">
-                                        <div class="font-semibold text-gray-900">{{ $app->unit->name ?? '-' }}</div>
-                                        <div class="text-xs text-gray-500">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
+                                @php $st = $app->statusValue(); @endphp
+                                <tr class="hover:bg-slate-50/70 transition-colors duration-150">
+                                    <td class="py-4 px-4 text-slate-500 font-mono text-xs">
+                                        {{ $app->created_at->format('d M Y, H:i') }}
                                     </td>
-                                    <td class="p-3">{{ $app->start_date }} s/d {{ $app->end_date }}</td>
-                                    <td class="p-3">
-                                        <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                                {{ $app->status === 'accepted' ? 'bg-green-100 text-green-800' : '' }}
-                                                {{ $app->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                                {{ $app->status === 'verified' ? 'bg-blue-100 text-blue-800' : '' }}
-                                                {{ $app->status === 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
-                                            {{ strtoupper($app->status) }}
-                                        </span>
+                                    <td class="py-4 px-4 pr-3">
+                                        <div class="font-bold text-slate-900 text-xs leading-snug break-words">
+                                            {{ $app->unit->name ?? '-' }}
+                                        </div>
+                                        <div class="text-[11px] text-slate-400 mt-0.5 break-words">
+                                            {{ $app->unit->agencyProfile->agency_name ?? '-' }}
+                                        </div>
                                     </td>
-                                    <td class="p-3">
-                                        @if ($app->status === 'rejected')
-                                            <span
-                                                class="text-red-600 font-medium bg-red-50 px-2 py-1 rounded border border-red-200 inline-block">
-                                                {{ $app->rejection_note ?? 'Tidak ada catatan' }}
+                                    <td class="py-4 px-4 text-xs text-slate-700 leading-relaxed">
+                                        {{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}
+                                    </td>
+                                    <td class="py-4 px-4 text-center">
+                                        <x-status-badge :status="$app->status" />
+                                    </td>
+                                    <td class="py-4 px-4 text-center text-xs">
+                                        @if ($st === 'rejected')
+                                            <span class="text-red-700 font-medium bg-red-50 px-2 py-0.5 rounded-md border border-red-200 inline-block text-[11px] truncate max-w-full" title="{{ $app->rejection_note }}">
+                                                {{ $app->rejection_note ?? 'Ditolak' }}
                                             </span>
                                         @else
-                                            <span class="text-gray-500">-</span>
+                                            <span class="text-slate-400">-</span>
                                         @endif
                                     </td>
-                                    <td class="p-3">
-                                        @if ($app->status === 'accepted')
+                                    <td class="py-4 px-4 text-right">
+                                        @if (in_array($st, ['accepted', 'active', 'completed']))
                                             <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
-                                                class="inline-flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-sm transition cursor-pointer">
-                                                <span>📄 Download Surat PDF</span>
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition shrink-0">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                <span>Unduh PDF</span>
                                             </a>
                                         @else
-                                            <span class="text-gray-400 text-xs italic">Belum tersedia</span>
+                                            <span class="text-slate-400 text-xs italic">Belum tersedia</span>
                                         @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="p-4 text-center text-gray-500">Belum ada riwayat pengajuan magang.</td>
+                                    <td colspan="6" class="py-8 text-center text-slate-400 text-xs">
+                                        Belum ada riwayat pengajuan magang.
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile View (Cards) -->
+                <div class="block md:hidden border-t border-slate-100 divide-y divide-slate-100">
+                    @forelse ($applicationHistory as $app)
+                        @php $st = $app->statusValue(); @endphp
+                        <div class="p-5 space-y-3 hover:bg-slate-50/70 transition-colors duration-150">
+                            <!-- Header: Tanggal & Status -->
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="text-xs text-slate-400 font-mono">
+                                    {{ $app->created_at->format('d M Y, H:i') }}
+                                </div>
+                                <x-status-badge :status="$app->status" />
+                            </div>
+
+                            <!-- Body: Unit -->
+                            <div>
+                                <div class="font-bold text-slate-900 text-sm leading-snug">{{ $app->unit->name ?? '-' }}</div>
+                                <div class="text-xs text-slate-500 mt-0.5">{{ $app->unit->agencyProfile->agency_name ?? '-' }}</div>
+                            </div>
+                            
+                            <!-- Body: Periode Magang -->
+                            <div class="text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <span class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Periode</span>
+                                <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') }} – {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}</span>
+                            </div>
+
+                            <!-- Footer: Catatan & Surat -->
+                            @if ($st === 'rejected')
+                                <div class="text-xs">
+                                    <span class="font-semibold block text-slate-700 mb-1">Catatan Admin:</span>
+                                    <span class="text-red-700 font-medium bg-red-50 px-3 py-2 rounded-xl border border-red-200 block">
+                                        {{ $app->rejection_note ?? 'Tidak ada catatan' }}
+                                    </span>
+                                </div>
+                            @endif
+
+                            @if (in_array($st, ['accepted', 'active', 'completed']))
+                                <div class="pt-1">
+                                    <a href="{{ route('student.application.letter', $app->id) }}" target="_blank" 
+                                       class="inline-flex w-full justify-center items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-100 rounded-xl text-xs font-semibold transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                        <span>Unduh Surat PDF</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-slate-400 text-xs">
+                            Belum ada riwayat pengajuan magang.
+                        </div>
+                    @endforelse
                 </div>
             </div>
 

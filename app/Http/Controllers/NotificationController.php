@@ -26,7 +26,7 @@ class NotificationController extends Controller
             });
         } elseif ($category === 'urgent') {
             $notifications = array_filter($notifications, function ($item) {
-                return !empty($item['is_action_required']) || in_array($item['type'] ?? '', ['urgent', 'warning']);
+                return ! empty($item['is_action_required']) || in_array($item['type'] ?? '', ['urgent', 'warning']);
             });
         } else {
             $notifications = array_filter($notifications, function ($item) use ($category) {
@@ -47,11 +47,13 @@ class NotificationController extends Controller
         $user = Auth::user();
         if (str_starts_with($id, 'db_')) {
             $dbId = str_replace('db_', '', $id);
-            SystemNotification::where('id', $dbId)
-                ->where(function ($q) use ($user) {
-                    $q->where('user_id', $user->id)->orWhereNull('user_id');
-                })
-                ->update(['read_at' => now()]);
+            if (is_numeric($dbId)) {
+                SystemNotification::where('id', (int) $dbId)
+                    ->where(function ($q) use ($user) {
+                        $q->where('user_id', $user->id)->orWhereNull('user_id');
+                    })
+                    ->update(['read_at' => now()]);
+            }
         }
 
         return redirect()->back()->with('success', 'Pemberitahuan ditandai sudah dibaca.');

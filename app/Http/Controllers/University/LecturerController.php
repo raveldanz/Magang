@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\University;
 
+use App\Enums\AccountStatus;
+use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class LecturerController extends Controller
 {
@@ -18,8 +21,8 @@ class LecturerController extends Controller
     {
         $user = Auth::user();
         $universityId = $user->university_id;
-        $university = $universityId 
-            ? University::find($universityId) 
+        $university = $universityId
+            ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
         $univName = $university?->name ?? $user->university;
 
@@ -34,10 +37,10 @@ class LecturerController extends Controller
             ->with(['academicPlacements.application.user', 'academicPlacements.finalreport', 'academicPlacements.evaluation']);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -50,15 +53,17 @@ class LecturerController extends Controller
 
         foreach ($lecturers as $lecturer) {
             $activeCount = $lecturer->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && !$isPassed;
+                $status = optional($p->application)->status;
+                $val = $status instanceof ApplicationStatus ? $status->value : (string) $status;
+
+                return in_array($val, ['active', 'accepted']);
             })->count();
 
             $completedCount = $lecturer->academicPlacements->filter(function ($p) {
-                $isAccepted = optional($p->application)->status === 'accepted';
-                $isPassed = optional($p->finalreport)->status === 'approved' && optional($p->evaluation)->nilai_akademik > 0;
-                return $isAccepted && $isPassed;
+                $status = optional($p->application)->status;
+                $val = $status instanceof ApplicationStatus ? $status->value : (string) $status;
+
+                return $val === 'completed';
             })->count();
 
             $lecturer->active_students_count = $activeCount;
@@ -92,8 +97,8 @@ class LecturerController extends Controller
     {
         $user = Auth::user();
         $universityId = $user->university_id;
-        $university = $universityId 
-            ? University::find($universityId) 
+        $university = $universityId
+            ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
         $univName = $university?->name ?? $user->university ?? 'Perguruan Tinggi';
 
@@ -108,8 +113,8 @@ class LecturerController extends Controller
         ]);
 
         $dosenName = trim($request->name);
-        if ($request->filled('nidn') && !str_contains($dosenName, 'NIDN')) {
-            $dosenName .= ' (NIDN: ' . trim($request->nidn) . ')';
+        if ($request->filled('nidn') && ! str_contains($dosenName, 'NIDN')) {
+            $dosenName .= ' (NIDN: '.trim($request->nidn).')';
         }
 
         $lecturer = User::create([
@@ -133,8 +138,8 @@ class LecturerController extends Controller
     {
         $user = Auth::user();
         $universityId = $user->university_id;
-        $university = $universityId 
-            ? University::find($universityId) 
+        $university = $universityId
+            ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
         $univName = $university?->name ?? $user->university;
 
@@ -142,19 +147,19 @@ class LecturerController extends Controller
 
         // Tenant Scoping Authorization Check
         $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (!$isSameUniv && $univName) {
+        if (! $isSameUniv && $univName) {
             $isSameUniv = ($lecturer->university === $univName);
         }
 
-        if (!$isSameUniv) {
+        if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengedit data dosen kampus lain.');
         }
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $lecturer->id,
+            'email' => 'required|email|max:255|unique:users,email,'.$lecturer->id,
             'nidn' => 'nullable|string|max:50',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ], [
             'name.required' => 'Nama lengkap dosen wajib diisi.',
             'email.required' => 'Email resmi dosen wajib diisi.',
@@ -162,8 +167,8 @@ class LecturerController extends Controller
         ]);
 
         $dosenName = trim($request->name);
-        if ($request->filled('nidn') && !str_contains($dosenName, 'NIDN')) {
-            $dosenName .= ' (NIDN: ' . trim($request->nidn) . ')';
+        if ($request->filled('nidn') && ! str_contains($dosenName, 'NIDN')) {
+            $dosenName .= ' (NIDN: '.trim($request->nidn).')';
         }
 
         $lecturer->update([
@@ -183,8 +188,8 @@ class LecturerController extends Controller
     {
         $user = Auth::user();
         $universityId = $user->university_id;
-        $university = $universityId 
-            ? University::find($universityId) 
+        $university = $universityId
+            ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
         $univName = $university?->name ?? $user->university;
 
@@ -192,11 +197,11 @@ class LecturerController extends Controller
 
         // Tenant Scoping Authorization Check
         $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (!$isSameUniv && $univName) {
+        if (! $isSameUniv && $univName) {
             $isSameUniv = ($lecturer->university === $univName);
         }
 
-        if (!$isSameUniv) {
+        if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk mereset password dosen kampus lain.');
         }
 
@@ -215,8 +220,8 @@ class LecturerController extends Controller
     {
         $user = Auth::user();
         $universityId = $user->university_id;
-        $university = $universityId 
-            ? University::find($universityId) 
+        $university = $universityId
+            ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
         $univName = $university?->name ?? $user->university;
 
@@ -224,24 +229,21 @@ class LecturerController extends Controller
 
         // Tenant Scoping Authorization Check
         $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (!$isSameUniv && $univName) {
+        if (! $isSameUniv && $univName) {
             $isSameUniv = ($lecturer->university === $univName);
         }
 
-        if (!$isSameUniv) {
+        if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus dosen kampus lain.');
         }
 
-        // Periksa apakah dosen masih membimbing mahasiswa aktif
-        $activePlacementsCount = $lecturer->academicPlacements()
-            ->whereHas('application', function ($q) {
-                $q->whereIn('status', ['accepted', 'pending']);
-            })
-            ->count();
+        // Periksa riwayat bimbingan (aktif maupun alumni): placements.academic_advisor_id ON DELETE SET NULL
+        // akan mengosongkan nama DPL pada arsip nilai & sertifikat alumni.
+        $historyCount = $lecturer->academicPlacements()->count();
 
-        if ($activePlacementsCount > 0) {
+        if ($historyCount > 0) {
             return redirect()->route('university.lecturers.index')
-                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena masih membimbing {$activePlacementsCount} mahasiswa aktif. Silakan alihkan bimbingan ke dosen lain terlebih dahulu.");
+                ->with('error', "Dosen '{$lecturer->name}' tidak dapat dihapus karena tercatat membimbing {$historyCount} mahasiswa (termasuk arsip alumni). Ubah status dosen menjadi Nonaktif untuk mencabut aksesnya.");
         }
 
         $lecturerName = $lecturer->name;

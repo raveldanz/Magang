@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
-use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\SystemHealth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,12 +21,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isSuperAdmin = ($user->role === 'super_admin' || ($user->role === 'admin' && is_null($user->agency_profile_id)));
+        $isSuperAdmin = $user->isSuperAdmin();
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
 
         // Base Query Applications
         $appQuery = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.evaluation', 'placement.finalreport']);
-        
+
         if ($agencyId) {
             $appQuery->whereHas('unit', function ($q) use ($agencyId) {
                 $q->where('agency_profile_id', $agencyId);
@@ -40,26 +40,14 @@ class DashboardController extends Controller
             });
         }
 
-        $allApplications = $appQuery->latest()->get();
-
-        // Metrik Agregat Mahasiswa
-        $totalStudents = $allApplications->count();
-        $totalPending = $allApplications->whereIn('status', ['pending', 'submitted'])->count();
-        $totalAccepted = $allApplications->whereIn('status', ['accepted', 'verified'])->count();
-        $totalRejected = $allApplications->where('status', 'rejected')->count();
-
-        $today = now();
-        $totalActive = $allApplications->filter(function ($app) use ($today) {
-            $isAccepted = in_array(strtolower($app->status), ['accepted', 'verified']);
-            $isStarted = $app->start_date && $today->gte(\Carbon\Carbon::parse($app->start_date));
-            $isNotDone = !($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED' && optional($app->placement?->evaluation)->nilai_akademik > 0);
-            return $isAccepted && $isStarted && $isNotDone;
-        })->count();
-
-        $totalCompleted = $allApplications->filter(function ($app) {
-            return ($app->finalReport && strtoupper($app->finalReport->status) === 'APPROVED') ||
-                   ($app->placement && optional($app->placement->finalreport)->status === 'approved' && optional($app->placement->evaluation)->nilai_akademik > 0);
-        })->count();
+        // Metrik Agregat Mahasiswa (Direct Database Query Aggregation)
+        $totalStudents = (clone $appQuery)->count();
+        $totalPending = (clone $appQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalAccepted = (clone $appQuery)->where('status', 'accepted')->count();
+        $totalActive = (clone $appQuery)->where('status', 'active')->count();
+        $totalCompleted = (clone $appQuery)->where('status', 'completed')->count();
+        $totalRejected = (clone $appQuery)->where('status', 'rejected')->count();
+        $totalResigned = (clone $appQuery)->where('status', 'resigned')->count();
 
         // Kuota Unit Magang
         $unitsQuery = Unit::with('agencyProfile');
@@ -74,55 +62,77 @@ class DashboardController extends Controller
         $totalAgencies = AgencyProfile::count();
         $totalUniversities = University::count();
         $totalUsers = User::count();
-        $totalMentors = User::whereIn('role', ['mentor', 'pembimbing'])->when($agencyId, fn($q) => $q->where('agency_profile_id', $agencyId))->count();
+        $totalMentors = User::whereIn('role', ['mentor', 'pembimbing'])->when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->count();
         $totalLecturers = User::whereIn('role', ['dosen', 'academic_advisor'])->count();
 
         // Distribusi Sebaran Instansi (Jika Super Admin) atau Unit Divisi (Jika Admin Dinas)
+        // Agregasi dalam satu query GROUP BY per jenis (sebelumnya 1-2 query per instansi/unit/kampus).
         $agencies = AgencyProfile::all();
         $agencyStats = [];
         $unitStats = [];
+        $percent = fn (int $count) => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0;
+
         if ($isSuperAdmin) {
+            $countsByAgency = Application::query()
+                ->join('units', 'units.id', '=', 'applications.unit_id')
+                ->groupBy('units.agency_profile_id')
+                ->selectRaw('units.agency_profile_id as agency_id, COUNT(*) as total')
+                ->pluck('total', 'agency_id');
+            $quotaByAgency = Unit::query()
+                ->groupBy('agency_profile_id')
+                ->selectRaw('agency_profile_id, SUM(quota) as total')
+                ->pluck('total', 'agency_profile_id');
+
             foreach ($agencies as $ag) {
-                $count = Application::whereHas('unit', fn($q) => $q->where('agency_profile_id', $ag->id))->count();
-                $agQuota = Unit::where('agency_profile_id', $ag->id)->sum('quota');
+                $count = (int) ($countsByAgency[$ag->id] ?? 0);
                 $agencyStats[] = [
                     'id' => $ag->id,
                     'name' => $ag->agency_name,
                     'count' => $count,
-                    'quota' => $agQuota,
-                    'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+                    'quota' => (int) ($quotaByAgency[$ag->id] ?? 0),
+                    'percentage' => $percent($count),
                 ];
             }
-        } else if ($agencyId) {
+        } elseif ($agencyId) {
+            $countsByUnit = Application::query()
+                ->whereIn('unit_id', $units->pluck('id'))
+                ->groupBy('unit_id')
+                ->selectRaw('unit_id, COUNT(*) as total')
+                ->pluck('total', 'unit_id');
+
             foreach ($units as $u) {
-                $count = Application::where('unit_id', $u->id)->count();
+                $count = (int) ($countsByUnit[$u->id] ?? 0);
                 $unitStats[] = [
                     'id' => $u->id,
                     'name' => $u->name,
                     'count' => $count,
                     'quota' => $u->quota,
-                    'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+                    'percentage' => $percent($count),
                 ];
             }
         }
 
-        // Distribusi Kampus Universitas
+        // Distribusi Kampus Universitas (berdasarkan users.university_id — sudah dirapikan lewat migrasi backfill)
         $universities = University::all();
+        $countsByUniversity = Application::query()
+            ->join('users', 'users.id', '=', 'applications.user_id')
+            ->when($agencyId, fn ($q) => $q->join('units', 'units.id', '=', 'applications.unit_id')
+                ->where('units.agency_profile_id', $agencyId))
+            ->whereNotNull('users.university_id')
+            ->groupBy('users.university_id')
+            ->selectRaw('users.university_id as university_id, COUNT(*) as total')
+            ->pluck('total', 'university_id');
+
         $universityStats = [];
         foreach ($universities as $un) {
-            $count = Application::whereHas('user', function ($uq) use ($un) {
-                $uq->where('university_id', $un->id)->orWhere('university', $un->name);
-            })->when($agencyId, function ($aq) use ($agencyId) {
-                $aq->whereHas('unit', fn($uq) => $uq->where('agency_profile_id', $agencyId));
-            })->count();
-
+            $count = (int) ($countsByUniversity[$un->id] ?? 0);
             if ($count > 0 || $isSuperAdmin) {
                 $universityStats[] = [
                     'id' => $un->id,
                     'name' => $un->name,
                     'code' => $un->code,
                     'count' => $count,
-                    'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+                    'percentage' => $percent($count),
                 ];
             }
         }
@@ -131,12 +141,29 @@ class DashboardController extends Controller
         $recentAuditLogs = AuditLog::latest()->take(8)->get();
 
         // Pengajuan Magang Terbaru
-        $recentApplications = $allApplications->take(6);
+        $recentApplications = (clone $appQuery)->latest()->take(6)->get();
 
         // Perguruan tinggi baru yang belum punya akun portal
         $pendingUniversities = University::whereDoesntHave('users', function ($q) {
             $q->where('role', 'universitas');
         })->withCount('students')->get();
+
+        // Instansi dinas baru yang belum punya akun admin dinas
+        $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {
+            $q->where('role', 'admin');
+        })->withCount('units')->get();
+
+        // Fase 1: kampus baru hasil input mandiri mahasiswa (menunggu verifikasi Super Admin)
+        $unverifiedUniversities = $isSuperAdmin
+            ? University::pendingVerification()->withCount('students')->latest()->take(10)->get()
+            : collect();
+
+        // Kesehatan proses latar belakang (scheduler & queue worker) — hanya untuk Super Admin
+        // Di environment local (development) scheduler & queue worker biasanya tidak dijalankan,
+        // jadi peringatan ini hanya ditampilkan di server (staging/production).
+        $systemIssues = ($isSuperAdmin && ! app()->environment('local'))
+            ? app(SystemHealth::class)->status()['issues']
+            : [];
 
         $stats = [
             'total_students' => $totalStudents,
@@ -145,6 +172,7 @@ class DashboardController extends Controller
             'total_active' => $totalActive,
             'total_completed' => $totalCompleted,
             'total_rejected' => $totalRejected,
+            'total_resigned' => $totalResigned,
             'total_quota_available' => $totalQuotaAvailable,
             'total_units' => $totalUnits,
             'total_agencies' => $totalAgencies,
@@ -153,6 +181,7 @@ class DashboardController extends Controller
             'total_mentors' => $totalMentors,
             'total_lecturers' => $totalLecturers,
             'pending_universities_count' => $pendingUniversities->count(),
+            'pending_agencies_count' => $pendingAgencies->count(),
         ];
 
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
@@ -170,7 +199,10 @@ class DashboardController extends Controller
             'recentAuditLogs',
             'currentAgency',
             'agencyId',
-            'pendingUniversities'
+            'pendingUniversities',
+            'pendingAgencies',
+            'unverifiedUniversities',
+            'systemIssues'
         ));
     }
 }

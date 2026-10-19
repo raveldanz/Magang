@@ -28,7 +28,11 @@ class SystemFeedback extends Model
         'admin_response',
         'responded_by',
         'responded_at',
+        // Tiket kategori 'laporan_chat': pesan chat yang dilaporkan pengguna
+        'chat_message_id',
     ];
+
+    public const CATEGORY_CHAT_REPORT = 'laporan_chat';
 
     protected $casts = [
         'responded_at' => 'datetime',
@@ -63,7 +67,7 @@ class SystemFeedback extends Model
     {
         return $query->where(function ($q) {
             $q->where('target_role', 'super_admin')
-              ->orWhereNull('target_role');
+                ->orWhereNull('target_role');
         });
     }
 
@@ -71,7 +75,7 @@ class SystemFeedback extends Model
     {
         return $query->where(function ($q) use ($agencyId) {
             $q->where('target_role', 'admin_dinas')
-              ->where('target_agency_id', $agencyId);
+                ->where('target_agency_id', $agencyId);
         });
     }
 
@@ -79,7 +83,7 @@ class SystemFeedback extends Model
     {
         return $query->where(function ($q) use ($universityId) {
             $q->where('target_role', 'universitas')
-              ->where('target_university_id', $universityId);
+                ->where('target_university_id', $universityId);
         });
     }
 }

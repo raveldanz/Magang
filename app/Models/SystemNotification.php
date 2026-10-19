@@ -42,13 +42,13 @@ class SystemNotification extends Model
     {
         return $query->where(function ($q) use ($user) {
             $q->where('user_id', $user->id)
-              ->orWhere(function ($subQ) use ($user) {
-                  $subQ->whereNull('user_id')
-                       ->where(function ($roleQ) use ($user) {
-                           $roleQ->whereNull('target_role')
-                                 ->orWhere('target_role', $user->role);
-                       });
-              });
+                ->orWhere(function ($subQ) use ($user) {
+                    $subQ->whereNull('user_id')
+                        ->where(function ($roleQ) use ($user) {
+                            $roleQ->whereNull('target_role')
+                                ->orWhere('target_role', $user->role);
+                        });
+                });
         });
     }
 

@@ -315,37 +315,45 @@
         // Mengambil profil instansi dinamis dari unit magang atau default
         $agencyProfile = $application->unit->agencyProfile ?? $agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya';
-        $agencyName = $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika';
-        $address = $agencyProfile->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272';
-        $phone = $agencyProfile->phone ?? '(031) 5312144';
-        $email = $agencyProfile->email ?? 'diskominfo@surabaya.go.id';
-        $website = $agencyProfile->website ?? 'surabaya.go.id';
+        $agencyName = $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
+        $address = $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293';
+        $phone = $agencyProfile->phone ?? '(031) 8707682';
+        $email = $agencyProfile->email ?? 'dispusip@surabaya.go.id';
+        $website = $agencyProfile->website ?? 'https://dispusip.surabaya.go.id';
         $cityName = $agencyProfile->city ?? 'Surabaya';
-        $signeeName = $agencyProfile->signee_name ?? 'Drs. H. M. NASER, M.Si';
-        $signeeNip = $agencyProfile->signee_nip ?? '19700101 199503 1 002';
-        $signeePosition = $agencyProfile->signee_position ?? 'KEPALA DINAS KOMUNIKASI DAN INFORMATIKA';
+        $signeeName = $agencyProfile->signee_name ?? 'Mia Santi Dewi, S.H., M.Si.';
+        $signeeNip = $agencyProfile->signee_nip ?? '19720315 199803 2 004';
+        $signeePosition = $agencyProfile->signee_position ?? 'KEPALA DINAS PERPUSTAKAAN DAN KEARSIPAN';
 
         // Logo Utama Instansi Dinamis Berbasis Base64 (Untuk Kompatibilitas Tinggi & DOMPDF)
         $logoPath = null;
-        if (!empty($agencyProfile?->logo) && file_exists(storage_path('app/public/' . $agencyProfile->logo))) {
-            $logoPath = storage_path('app/public/' . $agencyProfile->logo);
-        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path('storage/' . $agencyProfile->logo))) {
-            $logoPath = public_path('storage/' . $agencyProfile->logo);
-        } elseif (!empty($agencyProfile?->logo) && file_exists(public_path($agencyProfile->logo))) {
-            $logoPath = public_path($agencyProfile->logo);
-        } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
-            $logoPath = public_path('images/logo-surabaya.png');
-        } elseif (file_exists(public_path('images/logo.png'))) {
-            $logoPath = public_path('images/logo.png');
+        $rawLogo = ltrim((string) ($agencyProfile?->logo ?? ''), '/');
+        if ($rawLogo !== '') {
+            if (file_exists(public_path($rawLogo))) {
+                $logoPath = public_path($rawLogo);
+            } elseif (file_exists(public_path('storage/' . $rawLogo))) {
+                $logoPath = public_path('storage/' . $rawLogo);
+            } elseif (file_exists(storage_path('app/public/' . $rawLogo))) {
+                $logoPath = storage_path('app/public/' . $rawLogo);
+            }
         }
 
+        if (!$logoPath) {
+            if (file_exists(public_path('images/logos/surabaya.png'))) {
+                $logoPath = public_path('images/logos/surabaya.png');
+            } elseif (file_exists(public_path('images/logo-surabaya.png'))) {
+                $logoPath = public_path('images/logo-surabaya.png');
+            } elseif (file_exists(public_path('images/logo.png'))) {
+                $logoPath = public_path('images/logo.png');
+            }
+        }
 
         $logoData = $logoPath ? @file_get_contents($logoPath) : '';
         $mime = ($logoPath && function_exists('mime_content_type')) ? (@mime_content_type($logoPath) ?: 'image/png') : 'image/png';
         $logoSrc = $logoData ? 'data:' . $mime . ';base64,' . base64_encode($logoData) : '';
 
         // Data mahasiswa & permohonan
-        $student = $application->user->studentProfile;
+        $student = $application->user?->studentProfile;
         $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas Mahasiswa';
         $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
         $nim = $student?->nim ?? '-';
@@ -367,13 +375,24 @@
             : '-';
 
         // Data Pembimbing
-        $pembimbing = optional($application->placement)->pembimbing;
-        $pembimbingName = $pembimbing ? $pembimbing->name : 'Pembimbing Lapangan / Unit Kerja Terkait';
-        $pembimbingPhone = $pembimbing->phone ?? optional($pembimbing->studentProfile)->phone ?? $phone ?? '-';
+        $pembimbing = $application->placement?->pembimbing ?? $application->placement?->mentor;
+        $pembimbingName = $pembimbing?->name ?? 'Pembimbing Lapangan / Unit Kerja Terkait';
+        $pembimbingPhone = $pembimbing?->phone ?? $pembimbing?->studentProfile?->phone ?? $phone ?? '-';
 
-        // QR Code Verifikasi Dokumen
-        $verifyUrl = route('verify.letter', $application->id);
-        $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
+        // Bersihkan nama mahasiswa dari embel-embel debug/seeder seperti (Accepted Future Date)
+        $cleanStudentName = preg_replace('/\s*\([^)]*\)/', '', $application->user?->name ?? '-');
+
+        // QR Code Verifikasi Dokumen (Lokal SVG Tanpa Ketergantungan Eksternal)
+        $verifyUrl = route('verify.letter', $application->ensureLetterToken());
+        $qrSvg = null;
+        if (class_exists('SimpleSoftwareIO\QrCode\Facades\QrCode')) {
+            try {
+                $qrSvg = (string) \SimpleSoftwareIO\QrCode\Facades\QrCode::size(68)->margin(0)->generate($verifyUrl);
+            } catch (\Throwable $e) {
+                $qrSvg = null;
+            }
+        }
+        // Tidak memakai layanan QR eksternal: URL verifikasi tidak boleh dikirim ke pihak ketiga.
 
         // Logo BSrE Base64
         $bsreLogoPath = public_path('images/bsre-logo.png');
@@ -392,14 +411,14 @@
     <!-- Bar Navigasi Aksi Cetak (Sembunyi saat diprint) -->
     <div class="no-print">
         <div style="font-size: 13px; font-weight: 500;">
-            📄 Surat Penerimaan Magang - {{ $application->user->name }}
+            Surat Penerimaan Magang - {{ $cleanStudentName }}
         </div>
         <div class="btn-group">
             <a href="{{ $backUrl }}" onclick="if(window.opener || window.history.length > 1){ if(window.opener){ window.close(); return false; } else { window.history.back(); return false; } }" class="btn btn-secondary">
-                &larr; Kembali
+                 Kembali
             </a>
             <button onclick="window.print()" class="btn btn-primary">
-                🖨️ Cetak / Simpan PDF
+                Cetak / Simpan PDF
             </button>
         </div>
     </div>
@@ -490,7 +509,7 @@
                 <tbody>
                     <tr>
                         <td style="text-align: center;">1</td>
-                        <td style="font-weight: bold;">{{ $application->user->name }}</td>
+                        <td style="font-weight: bold;">{{ $cleanStudentName }}</td>
                         <td style="text-align: center;">{{ $nim }}</td>
                         <td>{{ $jurusan }}</td>
                         <td>{{ $fakultas }}</td>
@@ -501,7 +520,7 @@
 
             <!-- 5. PARAGRAF PELAKSANAAN & NARAHUBUNG -->
             <p>
-                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Informasi lebih lanjut dapat menghubungi Sdr. <strong>{{ $pembimbingName }}</strong> dengan Nomor HP. <strong>{{ $pembimbingPhone }}</strong>.
+                Untuk melaksanakan Praktik Kerja Magang pada <strong>{{ $agencyName }}</strong> dengan jadwal pelaksanaan mulai tanggal <strong>{{ $startDateFormatted }}</strong> s.d. <strong>{{ $endDateFormatted }}</strong> pada Unit Kerja <strong>{{ $application->unit->name ?? 'Dinas' }}</strong>. Informasi lebih lanjut dapat menghubungi Sdr. <strong>{{ $pembimbingName }}</strong> dengan Kontak/HP: <strong>{{ $pembimbingPhone }}</strong>.
             </p>
 
             <p>
@@ -513,17 +532,27 @@
         <div class="tte-container">
             <table class="tte-table">
                 <tr>
-                    <td class="tte-qr-cell">
-                        <img src="{{ $qrApiUrl }}" alt="QR Code Verifikasi TTE" class="tte-qr-img">
+                    <td class="tte-qr-cell" data-verify-url="{{ $verifyUrl }}">
+                        @if(!empty($qrSvg))
+                            <div style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                {!! $qrSvg !!}
+                            </div>
+                        @else
+                            {{-- QR lokal gagal dibuat: tampilkan alamat verifikasi sebagai teks --}}
+                            <div style="width: 65px; font-size: 6pt; word-break: break-all; color: #333;">Verifikasi: {{ $verifyUrl }}</div>
+                        @endif
                     </td>
                     <td class="tte-text-cell">
-                        <div style="font-size: 8pt; color: #111;">Surat ini Ditandatangani Elektronik Oleh :</div>
+                        <div style="font-size: 8pt; color: #111; margin-bottom: 2px;">Surat ini Ditandatangani Elektronik Oleh :</div>
                         <div style="font-weight: bold; text-transform: uppercase;">{{ $signeePosition }},</div>
-                        <div style="margin-top: 2px;"><b><u>{{ $signeeName }}</u></b></div>
+                        <div style="margin-top: 2px; font-size: 9.5pt;"><b><u>{{ $signeeName }}</u></b></div>
                         <div>Pembina Utama Muda / IV/c</div>
                         @if (!empty($signeeNip))
                             <div>NIP. {{ $signeeNip }}</div>
                         @endif
+                        <div style="font-size: 7.5pt; color: #555; margin-top: 3px;">
+                            Verifikasi: <a href="{{ $verifyUrl }}" target="_blank" style="color: #0d6efd; text-decoration: none;">{{ $verifyUrl }}</a>
+                        </div>
                     </td>
                 </tr>
             </table>

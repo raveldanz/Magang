@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
@@ -10,7 +12,7 @@ use App\Models\SystemFeedback;
 use App\Models\SystemNotification;
 use App\Models\University;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class NotificationService
 {
@@ -22,7 +24,7 @@ class NotificationService
         $role = $user->role;
         $agencyId = $user->agency_profile_id;
         $isSuperAdmin = ($role === 'super_admin' || ($role === 'admin' && is_null($agencyId)));
-        $isAdminDinas = ($role === 'admin' && !is_null($agencyId));
+        $isAdminDinas = ($role === 'admin' && ! is_null($agencyId));
 
         $actionable = [];
 
@@ -35,53 +37,73 @@ class NotificationService
 
             foreach ($pendingUnivs as $u) {
                 $actionable[] = [
-                    'id' => 'univ_' . $u->id,
+                    'id' => 'univ_'.$u->id,
                     'type' => 'urgent',
                     'category' => 'university',
-                    'icon' => '🎓',
                     'title' => "Perguruan Tinggi Baru: {$u->name}",
                     'message' => "Terdaftar otomatis dari pendaftaran {$u->students_count} mahasiswa. Belum memiliki akun Admin Kampus / PIC.",
                     'time' => $u->created_at ? $u->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.universities.index'),
-                    'action_label' => '⚡ Buat Akun Kampus',
+                    'action_label' => 'Buat Akun Kampus',
                     'is_action_required' => true,
                 ];
             }
 
-            // B. Pengajuan Magang Baru Menunggu Verifikasi
-            $pendingAppsCount = Application::whereIn('status', ['submitted', 'pending'])->count();
+            // B. Instansi Dinas Baru Tanpa Akun Admin Dinas
+            $pendingAgencies = AgencyProfile::whereDoesntHave('users', function ($q) {
+                $q->where('role', 'admin');
+            })->get();
+
+            foreach ($pendingAgencies as $ag) {
+                $actionable[] = [
+                    'id' => 'agency_'.$ag->id,
+                    'type' => 'urgent',
+                    'category' => 'agency',
+                    'title' => "Instansi Dinas Baru: {$ag->agency_name}",
+                    'message' => 'Instansi dinas baru terdaftar dan belum memiliki akun Admin Dinas.',
+                    'time' => $ag->created_at ? $ag->created_at->diffForHumans() : 'Baru saja',
+                    'action_url' => route('admin.agencies.index'),
+                    'action_label' => 'Buat Akun Admin Dinas',
+                    'is_action_required' => true,
+                ];
+            }
+
+            // C. Pengajuan Magang Baru Menunggu Verifikasi
+            $pendingAppsCount = Application::where('status', 'pending')->count();
             if ($pendingAppsCount > 0) {
                 $actionable[] = [
                     'id' => 'apps_pending',
                     'type' => 'warning',
                     'category' => 'application',
-                    'icon' => '📋',
                     'title' => "{$pendingAppsCount} Pengajuan Magang Menunggu Verifikasi",
-                    'message' => "Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.",
+                    'message' => 'Terdapat permohonan magang mahasiswa yang menunggu pemeriksaan berkas oleh instansi dinas.',
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
-                    'action_label' => '🔍 Tinjau Pengajuan',
+                    'action_label' => 'Tinjau Pengajuan',
                     'is_action_required' => true,
                 ];
             }
 
             // C. Tiket Feedback & Laporan Kendala Terbaru
-            $pendingFeedbacks = \App\Models\SystemFeedback::where('status', 'pending')->latest()->take(6)->get();
+            $pendingFeedbacks = SystemFeedback::where('status', 'pending')->latest()->take(6)->get();
             foreach ($pendingFeedbacks as $fb) {
-                $catLabel = match($fb->category) {
+                $catLabel = match ($fb->category) {
                     'error_bug' => 'Kendala / Bug',
                     'saran_fitur' => 'Saran Fitur',
                     'pertanyaan' => 'Pertanyaan',
                     'koordinasi' => 'Koordinasi',
+                    'laporan_chat' => 'Laporan Pesan Chat',
                     default => 'Masukan',
                 };
                 $actionable[] = [
-                    'id' => 'fb_' . $fb->id,
-                    'type' => $fb->priority === 'urgent' || $fb->category === 'error_bug' ? 'urgent' : 'info',
+                    'id' => 'fb_'.$fb->id,
+                    'type' => $fb->priority === 'urgent' || in_array($fb->category, ['error_bug', 'laporan_chat'], true) ? 'urgent' : 'info',
                     'category' => 'feedback',
-                    'icon' => $fb->category === 'error_bug' ? '⚠️' : '💬',
+                    'icon' => match ($fb->category) {
+                        'error_bug' => '⚠️', 'laporan_chat' => '🚩', default => '💬'
+                    },
                     'title' => "Feedback: [{$catLabel}] {$fb->subject}",
-                    'message' => "Dari {$fb->sender_name} (" . strtoupper($fb->sender_role) . "): " . \Illuminate\Support\Str::limit($fb->message, 80),
+                    'message' => "Dari {$fb->sender_name} (".strtoupper($fb->sender_role).'): '.Str::limit($fb->message, 80),
                     'time' => $fb->created_at->diffForHumans(),
                     'action_url' => route('admin.feedbacks.show', $fb->id),
                     'action_label' => '✉️ Buka Tiket',
@@ -90,37 +112,41 @@ class NotificationService
             }
 
             // D. Log Audit & Aktivitas Sistem Terbaru
-            $recentAudits = \App\Models\AuditLog::latest()->take(8)->get();
+            $recentAudits = AuditLog::latest()->take(8)->get();
             foreach ($recentAudits as $log) {
                 $actionable[] = [
-                    'id' => 'audit_' . $log->id,
+                    'id' => 'audit_'.$log->id,
                     'type' => 'info',
                     'category' => 'audit',
-                    'icon' => '📜',
                     'title' => "Aktivitas: {$log->action}",
-                    'message' => "Oleh {$log->user_name} (" . strtoupper($log->user_role) . ") pada " . ($log->target_type ?? 'Sistem') . " #{$log->target_id}. " . \Illuminate\Support\Str::limit($log->details ?? '', 70),
+                    'message' => "Oleh {$log->user_name} (".strtoupper($log->user_role).') pada '.($log->target_type ?? 'Sistem')." #{$log->target_id}. ".Str::limit($log->details ?? '', 70),
                     'time' => $log->created_at ? $log->created_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('admin.audit_logs.index'),
-                    'action_label' => '📜 Buka Log Audit',
+                    'action_label' => 'Buka Log Audit',
                     'is_action_required' => false,
                 ];
             }
 
-            // D. Penetapan Pembimbing Belum Lengkap (Mahasiswa Diterima tapi Belum Ada DPL)
+            // D. Penetapan Pembimbing Belum Lengkap (Mahasiswa Diterima tapi Belum Ada DPL pada kampus yang mewajibkan DPL)
             $unassignedDpl = Placement::whereNull('academic_advisor_id')
-                ->whereHas('application', fn($q) => $q->where('status', 'accepted'))
+                ->whereHas('application', function ($q) {
+                    $q->whereIn('status', Application::QUOTA_STATUSES)
+                        ->whereHas('user.universityRelation', function ($uq) {
+                            $uq->where('require_dpl', true)
+                                ->where('evaluation_scheme', '!=', 'mentor_only');
+                        });
+                })
                 ->count();
             if ($unassignedDpl > 0) {
                 $actionable[] = [
                     'id' => 'unassigned_dpl',
                     'type' => 'info',
                     'category' => 'academic',
-                    'icon' => '👨‍🏫',
-                    'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki DPL",
-                    'message' => "Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing Lapangan (DPL) belum ditentukan.",
+                    'title' => "{$unassignedDpl} Mahasiswa Belum Memiliki Dosen Pembimbing",
+                    'message' => 'Mahasiswa telah diterima di instansi dinas namun data Dosen Pembimbing belum ditentukan.',
                     'time' => 'Perlu penetapan',
                     'action_url' => route('admin.applications.index'),
-                    'action_label' => '👥 Lihat Penempatan',
+                    'action_label' => 'Lihat Penempatan',
                     'is_action_required' => false,
                 ];
             }
@@ -128,44 +154,41 @@ class NotificationService
 
         // 2. ADMIN DINAS NOTIFICATIONS
         elseif ($isAdminDinas) {
-            $agencyAppsCount = Application::whereIn('status', ['submitted', 'pending'])
-                ->whereHas('unit', fn($q) => $q->where('agency_profile_id', $agencyId))
+            $agencyAppsCount = Application::where('status', 'pending')
+                ->whereHas('unit', fn ($q) => $q->where('agency_profile_id', $agencyId))
                 ->count();
             if ($agencyAppsCount > 0) {
                 $actionable[] = [
                     'id' => 'agency_apps_pending',
                     'type' => 'warning',
                     'category' => 'application',
-                    'icon' => '📋',
                     'title' => "{$agencyAppsCount} Berkas Pendaftar Menunggu Verifikasi",
-                    'message' => "Terdapat pendaftar magang baru di instansi dinas Anda yang menunggu proses verifikasi dan seleksi.",
+                    'message' => 'Terdapat pendaftar magang baru di instansi dinas Anda yang menunggu proses verifikasi dan seleksi.',
                     'time' => 'Memerlukan tindakan',
                     'action_url' => route('admin.applications.index'),
-                    'action_label' => '🔍 Verifikasi Berkas',
                     'is_action_required' => true,
                 ];
             }
 
-            $pendingLogbooks = Logbook::where('status', 'submitted')
-                ->whereHas('placement.application.unit', fn($q) => $q->where('agency_profile_id', $agencyId))
+            $pendingLogbooks = Logbook::where('status', 'pending')
+                ->whereHas('placement.application.unit', fn ($q) => $q->where('agency_profile_id', $agencyId))
                 ->count();
             if ($pendingLogbooks > 0) {
                 $actionable[] = [
                     'id' => 'agency_logbooks_pending',
                     'type' => 'info',
                     'category' => 'logbook',
-                    'icon' => '📖',
                     'title' => "{$pendingLogbooks} Logbook Mahasiswa Perlu Review",
-                    'message' => "Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.",
+                    'message' => 'Mahasiswa magang telah mengunggah logbook harian aktivitas kerja.',
                     'time' => 'Monitoring dinas',
                     'action_url' => route('admin.logbooks.index'),
-                    'action_label' => '📖 Cek Logbook',
+                    'action_label' => 'Cek Logbook',
                     'is_action_required' => false,
                 ];
             }
         }
 
-        // 3. DOSEN (DPL) NOTIFICATIONS
+        // 3. DOSEN PEMBIMBING NOTIFICATIONS
         elseif ($role === 'dosen' || $role === 'academic_advisor') {
             // Mahasiswa Bimbingan Baru
             $placements = Placement::where('academic_advisor_id', $user->id)
@@ -184,19 +207,18 @@ class NotificationService
                     'id' => 'dosen_logbook_pending',
                     'type' => 'warning',
                     'category' => 'logbook',
-                    'icon' => '📖',
                     'title' => "{$pendingLogbooksCount} Logbook Bimbingan Menunggu Evaluasi",
-                    'message' => "Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.",
+                    'message' => 'Mahasiswa bimbingan Anda telah mengisi logbook aktivitas harian yang perlu diberi catatan/tinjauan.',
                     'time' => 'Menunggu review',
                     'action_url' => route('lecturer.logbooks.index'),
-                    'action_label' => '✍️ Review Logbook',
+                    'action_label' => 'Review Logbook',
                     'is_action_required' => true,
                 ];
             }
 
             // Laporan Akhir Siap Dinilai
             $pendingReportsCount = FinalReport::whereIn('placement_id', $placements->pluck('id'))
-                ->where('status', 'submitted')
+                ->where('status', 'pending')
                 ->count();
 
             if ($pendingReportsCount > 0) {
@@ -204,12 +226,11 @@ class NotificationService
                     'id' => 'dosen_report_pending',
                     'type' => 'urgent',
                     'category' => 'evaluation',
-                    'icon' => '📊',
                     'title' => "{$pendingReportsCount} Laporan Akhir Mahasiswa Siap Dinilai",
-                    'message' => "Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.",
+                    'message' => 'Mahasiswa telah menyelesaikan masa magang dan mengunggah laporan akhir magang.',
                     'time' => 'Perlu penilaian',
                     'action_url' => route('lecturer.monitoring.index'),
-                    'action_label' => '📊 Beri Nilai Akhir',
+                    'action_label' => 'Beri Nilai Akhir',
                     'is_action_required' => true,
                 ];
             }
@@ -219,12 +240,10 @@ class NotificationService
                     'id' => 'dosen_students_active',
                     'type' => 'info',
                     'category' => 'academic',
-                    'icon' => '🎓',
                     'title' => "Total {$placements->count()} Mahasiswa dalam Bimbingan Anda",
-                    'message' => "Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.",
+                    'message' => 'Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.',
                     'time' => 'Portal DPL',
                     'action_url' => route('lecturer.monitoring.index'),
-                    'action_label' => '👥 Buka Bimbingan',
                     'is_action_required' => false,
                 ];
             }
@@ -232,14 +251,13 @@ class NotificationService
 
         // 4. MENTOR LAPANGAN NOTIFICATIONS
         elseif ($role === 'mentor' || $role === 'pembimbing') {
-            $mentorPlacements = Placement::where('mentor_id', $user->id)
-                ->orWhere(function ($q) use ($user) {
-                    if ($user->agency_profile_id) {
-                        $q->whereHas('application.unit', fn($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
-                    }
-                })->get();
+            // Lingkup sama persis dengan halaman Logbook mentor: mahasiswa bimbingan sendiri
+            // (mentor_id / pembimbing_id) + fallback Kepala Unit — bukan seluruh mahasiswa instansi.
+            $mentorPlacements = Placement::fieldReviewableBy($user)
+                ->whereHas('application', fn ($q) => $q->whereNotIn('status', ['resigned', 'rejected']))
+                ->get();
 
-            $pendingMentorLogbooks = Logbook::where('status', 'submitted')
+            $pendingMentorLogbooks = Logbook::where('status', 'pending')
                 ->whereIn('placement_id', $mentorPlacements->pluck('id'))
                 ->count();
 
@@ -248,12 +266,11 @@ class NotificationService
                     'id' => 'mentor_logbook_pending',
                     'type' => 'warning',
                     'category' => 'logbook',
-                    'icon' => '📖',
                     'title' => "{$pendingMentorLogbooks} Logbook Menunggu Validasi Mentor",
-                    'message' => "Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.",
+                    'message' => 'Mahasiswa di divisi Anda telah mengisi logbook aktivitas magang.',
                     'time' => 'Menunggu persetujuan',
                     'action_url' => route('mentor.logbooks.index'),
-                    'action_label' => '✅ Validasi Logbook',
+                    'action_label' => 'Validasi Logbook',
                     'is_action_required' => true,
                 ];
             }
@@ -263,12 +280,11 @@ class NotificationService
                     'id' => 'mentor_active_students',
                     'type' => 'info',
                     'category' => 'mentor',
-                    'icon' => '👔',
                     'title' => "Supervisi {$mentorPlacements->count()} Mahasiswa di Unit Kerja",
-                    'message' => "Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.",
+                    'message' => 'Pantau kehadiran, kinerja harian, dan berikan evaluasi lapangan.',
                     'time' => 'Portal Mentor',
                     'action_url' => route('mentor.dashboard'),
-                    'action_label' => '🏢 Dashboard Mentor',
+                    'action_label' => 'Dashboard Mentor',
                     'is_action_required' => false,
                 ];
             }
@@ -278,33 +294,32 @@ class NotificationService
         elseif ($role === 'mahasiswa') {
             $latestApp = Application::where('user_id', $user->id)->latest()->first();
             if ($latestApp) {
-                $status = strtolower($latestApp->status);
-                if ($status === 'pending' || $status === 'submitted') {
+                $status = $latestApp->status instanceof \BackedEnum ? $latestApp->status->value : strtolower((string) $latestApp->status);
+                if (in_array($status, ['pending', 'verified'])) {
                     $actionable[] = [
                         'id' => 'student_app_pending',
                         'type' => 'warning',
                         'category' => 'application',
-                        'icon' => '⏳',
                         'title' => 'Pengajuan Magang Sedang Diverifikasi Dinas',
                         'message' => 'Berkas pendaftaran Anda sedang dalam tahap seleksi oleh pihak instansi kedinasan.',
                         'time' => $latestApp->created_at ? $latestApp->created_at->diffForHumans() : 'Terkirim',
                         'action_url' => route('student.logbook.index'),
-                        'action_label' => '📋 Pantau Status',
+                        'action_label' => 'Pantau Status',
                         'is_action_required' => false,
                     ];
-                } elseif ($status === 'accepted') {
+                } elseif (in_array($status, ['accepted', 'active'])) {
                     $placement = Placement::where('application_id', $latestApp->id)->first();
-                    if (!$placement || empty($placement->academic_advisor_id)) {
+                    $requiresAdvisor = $latestApp->requiresAdvisor();
+                    if ($requiresAdvisor && (! $placement || empty($placement->academic_advisor_id))) {
                         $actionable[] = [
                             'id' => 'student_need_dpl',
                             'type' => 'urgent',
                             'category' => 'academic',
-                            'icon' => '👨‍🏫',
-                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih DPL',
-                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing Lapangan (DPL) pada dashboard.',
+                            'title' => 'Selamat! Pengajuan Diterima - Silakan Pilih Dosen Pembimbing',
+                            'message' => 'Permohonan magang Anda telah disetujui. Lengkapi data Dosen Pembimbing pada dashboard.',
                             'time' => 'Tindakan diperlukan',
                             'action_url' => route('dashboard'),
-                            'action_label' => '👨‍🏫 Pilih DPL',
+                            'action_label' => 'Pilih Dosen',
                             'is_action_required' => true,
                         ];
                     } else {
@@ -312,12 +327,13 @@ class NotificationService
                             'id' => 'student_ready',
                             'type' => 'success',
                             'category' => 'academic',
-                            'icon' => '🎉',
                             'title' => 'Data Pembimbing Lengkap & Magang Siap Dilaksanakan',
-                            'message' => "Mentor Dinas & DPL telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.",
+                            'message' => $requiresAdvisor
+                                ? 'Mentor Dinas & Dosen Pembimbing telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.'
+                                : 'Mentor Dinas telah terhubung. Jangan lupa untuk mengisi logbook harian secara berkala.',
                             'time' => 'Aktif',
                             'action_url' => route('student.logbook.index'),
-                            'action_label' => '📖 Buka Logbook',
+                            'action_label' => 'Buka Logbook',
                             'is_action_required' => false,
                         ];
                     }
@@ -326,12 +342,11 @@ class NotificationService
                         'id' => 'student_rejected',
                         'type' => 'urgent',
                         'category' => 'application',
-                        'icon' => '❌',
                         'title' => 'Pengajuan Magang Belum Diterima',
-                        'message' => 'Catatan: "' . ($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi') . '". Anda dapat mengajukan ulang.',
+                        'message' => 'Catatan: "'.($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi').'". Anda dapat mengajukan ulang.',
                         'time' => 'Pemberitahuan',
                         'action_url' => route('student.application.create'),
-                        'action_label' => '📝 Ajukan Ulang',
+                        'action_label' => 'Ajukan Ulang',
                         'is_action_required' => true,
                     ];
                 }
@@ -340,12 +355,11 @@ class NotificationService
                     'id' => 'student_no_app',
                     'type' => 'info',
                     'category' => 'application',
-                    'icon' => '📝',
                     'title' => 'Selamat Datang di Portal Magang Terpadu',
                     'message' => 'Silakan lengkapi profil Anda dan ajukan permohonan magang pada unit instansi yang tersedia.',
                     'time' => 'Langkah Awal',
                     'action_url' => route('student.application.create'),
-                    'action_label' => '🚀 Daftar Magang',
+                    'action_label' => 'Daftar Magang',
                     'is_action_required' => true,
                 ];
             }
@@ -359,15 +373,14 @@ class NotificationService
 
             foreach ($myAnsweredFeedbacks as $afb) {
                 $actionable[] = [
-                    'id' => 'my_fb_' . $afb->id,
+                    'id' => 'my_fb_'.$afb->id,
                     'type' => 'success',
                     'category' => 'feedback',
-                    'icon' => '✅',
                     'title' => "Tanggapan atas Masukan: {$afb->subject}",
-                    'message' => "Admin telah membalas masukan Anda: \"" . \Illuminate\Support\Str::limit($afb->admin_response, 80) . "\"",
+                    'message' => 'Admin telah membalas masukan Anda: "'.Str::limit($afb->admin_response, 80).'"',
                     'time' => $afb->responded_at ? $afb->responded_at->diffForHumans() : 'Baru saja',
                     'action_url' => route('feedbacks.show', $afb->id),
-                    'action_label' => '✉️ Lihat Tanggapan',
+                    'action_label' => 'Lihat Tanggapan',
                     'is_action_required' => false,
                 ];
             }
@@ -386,12 +399,11 @@ class NotificationService
                         'id' => 'univ_no_dosen',
                         'type' => 'warning',
                         'category' => 'university',
-                        'icon' => '👨‍🏫',
-                        'title' => 'Belum Ada Dosen Pembimbing (DPL) Terdaftar',
+                        'title' => 'Belum Ada Dosen Pembimbing Terdaftar',
                         'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih DPL dengan mudah.',
                         'time' => 'Perlu kelengkapan',
                         'action_url' => route('university.lecturers.index'),
-                        'action_label' => '➕ Tambah DPL',
+                        'action_label' => 'Tambah DPL',
                         'is_action_required' => true,
                     ];
                 }
@@ -401,12 +413,11 @@ class NotificationService
                         'id' => 'univ_profile_incomplete',
                         'type' => 'info',
                         'category' => 'university',
-                        'icon' => '🏛️',
                         'title' => 'Lengkapi Data Profil & Kop Surat Kampus',
                         'message' => 'Lengkapi data PIC Rektorat/Dekanat dan format kop surat resmi untuk penerbitan surat pengantar mahasiswa.',
                         'time' => 'Profil instansi',
                         'action_url' => route('university.profile.index'),
-                        'action_label' => '✏️ Lengkapi Profil',
+                        'action_label' => 'Lengkapi Profil',
                         'is_action_required' => false,
                     ];
                 }
@@ -415,12 +426,11 @@ class NotificationService
                     'id' => 'univ_overview',
                     'type' => 'info',
                     'category' => 'university',
-                    'icon' => '🎓',
                     'title' => "Portal Mitra MBKM: {$univ->name}",
                     'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen DPL aktif pada program magang Pemkot Surabaya.",
                     'time' => 'Terhubung',
-                    'action_url' => route('university.dashboard'),
-                    'action_label' => '🏛️ Buka Portal Kampus',
+                    'action_url' => route('university.profile.index'),
+                    'action_label' => 'Buka Profil Kampus',
                     'is_action_required' => false,
                 ];
             }
@@ -430,7 +440,7 @@ class NotificationService
         $dbNotifications = SystemNotification::forUser($user)->latest()->take(10)->get();
         foreach ($dbNotifications as $dn) {
             $actionable[] = [
-                'id' => 'db_' . $dn->id,
+                'id' => 'db_'.$dn->id,
                 'type' => $dn->type,
                 'category' => $dn->category,
                 'icon' => $dn->icon,
@@ -440,7 +450,7 @@ class NotificationService
                 'action_url' => $dn->action_url,
                 'action_label' => $dn->action_label ?? 'Buka Detail',
                 'is_action_required' => $dn->type === 'urgent' || $dn->type === 'warning',
-                'is_read' => !is_null($dn->read_at),
+                'is_read' => ! is_null($dn->read_at),
             ];
         }
 
@@ -455,10 +465,11 @@ class NotificationService
         $notifs = self::getNotificationsForUser($user);
         $count = 0;
         foreach ($notifs as $n) {
-            if (!empty($n['is_action_required']) || empty($n['is_read'])) {
+            if (! empty($n['is_action_required']) || empty($n['is_read'])) {
                 $count++;
             }
         }
+
         return $count;
     }
 
@@ -494,7 +505,7 @@ class NotificationService
         // Re-trigger red dot if there are unresolved urgent / action-required items
         $hasUrgentPending = false;
         foreach ($notifs as $n) {
-            if (!empty($n['is_action_required']) || in_array($n['type'] ?? '', ['urgent', 'warning'])) {
+            if (! empty($n['is_action_required']) || in_array($n['type'] ?? '', ['urgent', 'warning'])) {
                 $hasUrgentPending = true;
                 break;
             }

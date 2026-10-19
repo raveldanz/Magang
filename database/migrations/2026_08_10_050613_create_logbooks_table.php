@@ -10,18 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('logbooks', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('placement_id')->constrained()->onDelete('cascade');
-        $table->date('date');
-        $table->text('activity');
-        $table->string('attachment')->nullable();
-        $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-        $table->text('feedback')->nullable();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('logbooks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('placement_id')->constrained()->onDelete('cascade');
+            $table->date('date');
+            $table->text('activity');
+            $table->string('attachment')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->text('feedback')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

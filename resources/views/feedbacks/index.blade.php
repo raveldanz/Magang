@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>💬</span>
+                    
                     <span>Pusat Feedback & Tiket Kendala Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -25,7 +25,6 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -36,7 +35,6 @@
                 <div class="p-5 bg-white rounded-3xl border border-slate-100 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-slate-400 text-xs uppercase font-bold tracking-wider">Total Masukan</span>
-                        <span class="text-xl">📊</span>
                     </div>
                     <div class="text-2xl font-black text-slate-900">{{ $stats['total'] }}</div>
                     <div class="text-[11px] text-slate-400 mt-1">Seluruh tiket masuk</div>
@@ -44,29 +42,26 @@
 
                 <div class="p-5 bg-white rounded-3xl border border-amber-200 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-amber-700 text-xs uppercase font-bold tracking-wider">Menunggu Respon</span>
-                        <span class="text-xl">⏳</span>
+                        <span class="text-amber-700 text-xs uppercase font-bold tracking-wider">{{ \App\Enums\FeedbackStatus::PENDING->label() }}</span>
                     </div>
                     <div class="text-2xl font-black text-amber-600">{{ $stats['pending'] }}</div>
-                    <div class="text-[11px] text-amber-700 mt-1">Perlu ditanggapi admin</div>
+                    <div class="text-[11px] text-amber-700 mt-1">{{ \App\Enums\FeedbackStatus::PENDING->description() }}</div>
                 </div>
 
                 <div class="p-5 bg-white rounded-3xl border border-blue-200 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-blue-700 text-xs uppercase font-bold tracking-wider">Sedang Diproses</span>
-                        <span class="text-xl">⚙️</span>
+                        <span class="text-blue-700 text-xs uppercase font-bold tracking-wider">{{ \App\Enums\FeedbackStatus::IN_PROGRESS->label() }}</span>
                     </div>
                     <div class="text-2xl font-black text-blue-600">{{ $stats['in_progress'] }}</div>
-                    <div class="text-[11px] text-blue-700 mt-1">Investigasi / Pengerjaan</div>
+                    <div class="text-[11px] text-blue-700 mt-1">{{ \App\Enums\FeedbackStatus::IN_PROGRESS->description() }}</div>
                 </div>
 
                 <div class="p-5 bg-white rounded-3xl border border-emerald-200 shadow-2xs">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-emerald-700 text-xs uppercase font-bold tracking-wider">Selesai / Terjawab</span>
-                        <span class="text-xl">✅</span>
+                        <span class="text-emerald-700 text-xs uppercase font-bold tracking-wider">{{ \App\Enums\FeedbackStatus::RESOLVED->label() }}</span>
                     </div>
                     <div class="text-2xl font-black text-emerald-600">{{ $stats['resolved'] }}</div>
-                    <div class="text-[11px] text-emerald-700 mt-1">Telah diselesaikan</div>
+                    <div class="text-[11px] text-emerald-700 mt-1">{{ \App\Enums\FeedbackStatus::RESOLVED->description() }}</div>
                 </div>
             </div>
 
@@ -81,10 +76,9 @@
                     <div>
                         <select name="status" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             <option value="">-- Semua Status --</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ Menunggu (Pending)</option>
-                            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>⚙️ Sedang Diproses</option>
-                            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>✅ Selesai (Resolved)</option>
-                            <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>🔒 Ditutup (Closed)</option>
+                            @foreach(\App\Enums\FeedbackStatus::cases() as $feedbackCase)
+                                <option value="{{ $feedbackCase->value }}" {{ request('status') == $feedbackCase->value ? 'selected' : '' }}>{{ $feedbackCase->label() }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -106,26 +100,21 @@
                 @forelse($feedbacks as $fb)
                     @php
                         $catBadge = match($fb->category) {
-                            'error_bug' => 'bg-rose-50 text-rose-700 border-rose-200',
+                            'error_bug', 'laporan_chat' => 'bg-rose-50 text-rose-700 border-rose-200',
                             'saran_fitur' => 'bg-blue-50 text-blue-700 border-blue-200',
                             'pertanyaan' => 'bg-amber-50 text-amber-700 border-amber-200',
                             default => 'bg-slate-50 text-slate-700 border-slate-200',
                         };
 
                         $catLabel = match($fb->category) {
-                            'error_bug' => '⚠️ Bug / Error',
-                            'saran_fitur' => '💡 Saran Fitur',
-                            'pertanyaan' => '❓ Pertanyaan',
-                            'koordinasi' => '🤝 Koordinasi',
-                            default => '📝 Masukan',
+                            'error_bug' => 'Bug / Error',
+                            'saran_fitur' => 'Saran Fitur',
+                            'pertanyaan' => 'Pertanyaan',
+                            'koordinasi' => 'Koordinasi',
+                            'laporan_chat' => 'Laporan Pesan Chat',
+                            default => 'Masukan',
                         };
 
-                        $statusBadge = match($fb->status) {
-                            'pending' => 'bg-amber-100 text-amber-900 border-amber-300',
-                            'in_progress' => 'bg-blue-100 text-blue-900 border-blue-300',
-                            'resolved' => 'bg-emerald-100 text-emerald-900 border-emerald-300',
-                            default => 'bg-slate-100 text-slate-700 border-slate-200',
-                        };
                     @endphp
 
                     <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row sm:items-center justify-between gap-5">
@@ -135,13 +124,11 @@
                                     {{ $catLabel }}
                                 </span>
 
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $statusBadge }}">
-                                    Status: {{ strtoupper($fb->status) }}
-                                </span>
+                                <x-status-badge type="feedback" :status="$fb->status" />
 
                                 @if($fb->priority === 'urgent' || $fb->priority === 'high')
                                     <span class="px-2 py-0.5 bg-rose-100 text-rose-800 rounded-full text-[10px] font-black animate-pulse">
-                                        🚨 Prioritas: {{ strtoupper($fb->priority) }}
+                                        Prioritas: {{ strtoupper($fb->priority) }}
                                     </span>
                                 @endif
 
@@ -159,12 +146,18 @@
                             </p>
 
                             <div class="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                                <span>👤 <strong>{{ $fb->sender_name }}</strong> ({{ strtoupper($fb->sender_role) }})</span>
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span><strong>{{ $fb->sender_name }}</strong> ({{ strtoupper($fb->sender_role) }})</span>
+                                </span>
                                 @if($fb->targetAgency)
-                                    <span>🏛️ Dinas: {{ $fb->targetAgency->agency_name }}</span>
+                                    <span>• Dinas: {{ $fb->targetAgency->agency_name }}</span>
                                 @endif
                                 @if($fb->attachment)
-                                    <span class="text-blue-600 font-semibold">📎 Ada Lampiran</span>
+                                    <span class="text-blue-600 font-semibold inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                        Ada Lampiran
+                                    </span>
                                 @endif
                             </div>
                         </div>
@@ -180,9 +173,7 @@
                     </div>
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mx-auto">
-                            💬
-                        </div>
+                        
                         <h4 class="font-bold text-base text-gray-800">Belum Ada Tiket Masukan</h4>
                         <p class="text-xs text-gray-400">Semua masukan dan kendala pengguna yang masuk akan terdata di sini.</p>
                     </div>

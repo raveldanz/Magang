@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('system_feedbacks')) {
+        if (! Schema::hasTable('system_feedbacks')) {
             Schema::create('system_feedbacks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -34,14 +34,14 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('system_notifications')) {
+        if (! Schema::hasTable('system_notifications')) {
             Schema::create('system_notifications', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
                 $table->string('target_role')->nullable(); // null means all or specific user_id
                 $table->string('type')->default('info'); // info, warning, success, urgent, action_required
                 $table->string('category')->default('system'); // university, application, logbook, feedback, evaluation
-                $table->string('icon')->default('🔔');
+                $table->string('icon')->default('');
                 $table->string('title');
                 $table->text('message');
                 $table->string('action_url')->nullable();

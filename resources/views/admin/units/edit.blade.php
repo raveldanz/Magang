@@ -22,19 +22,22 @@
                 
                 <form action="{{ route('admin.units.update', $unit->id) }}" method="POST" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="return_to" value="{{ $returnTo ?? request('return_to') ?? old('return_to') }}">
+                   
                     @method('PUT')
 
                     <!-- Instansi Induk -->
                     @if (Auth::user()->agency_profile_id === null && count($agencies) > 1)
                         <div>
-                            <x-input-label for="agency_profile_id" value="Instansi Induk" />
-                            <select id="agency_profile_id" name="agency_profile_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
-                                @foreach ($agencies as $agency)
-                                    <option value="{{ $agency->id }}" {{ old('agency_profile_id', $unit->agency_profile_id) == $agency->id ? 'selected' : '' }}>
-                                        🏛️ {{ $agency->agency_name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <x-searchable-select
+                                id="agency_profile_id"
+                                name="agency_profile_id"
+                                label="Instansi Induk"
+                                placeholder="-- Cari atau Pilih Instansi Induk --"
+                                :items="$agencies->map(fn($agency) => ['id' => $agency->id, 'name' => $agency->agency_name, 'acronym' => $agency->acronym, 'meta' => $agency->city])"
+                                :selected="old('agency_profile_id', $unit->agency_profile_id)"
+                                :required="true"
+                            />
                             @error('agency_profile_id')
                                 <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                             @enderror
@@ -42,7 +45,7 @@
                     @else
                         <div>
                             <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Instansi Induk</span>
-                            <p class="text-sm font-semibold text-gray-800 mt-1">🏛️ {{ $unit->agencyProfile->agency_name ?? '-' }}</p>
+                            <p class="text-sm font-semibold text-gray-800 mt-1"> {{ $unit->agencyProfile->agency_name ?? '-' }}</p>
                         </div>
                     @endif
 
@@ -75,8 +78,23 @@
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required
                         >
-                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->applications->where('status', 'accepted')->count() }}</strong> mahasiswa diterima.</p>
+                        <p class="text-xs text-gray-500 mt-1">Saat ini: <strong>{{ $unit->occupied_count }}</strong> mahasiswa diterima/aktif menempati kuota ini.</p>
                         @error('quota')
+                            <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Kepala / Koordinator Unit (verifikator logbook sementara) -->
+                    <div>
+                        <x-input-label for="head_user_id" value="Kepala / Koordinator Unit (Opsional)" />
+                        <select id="head_user_id" name="head_user_id" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="">-- Belum ditentukan --</option>
+                            @foreach (($headCandidates ?? collect()) as $candidate)
+                                <option value="{{ $candidate->id }}" @selected((int) old('head_user_id', $unit->head_user_id) === (int) $candidate->id)>{{ $candidate->name }} ({{ $candidate->email }})</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Kepala Unit dapat memvalidasi logbook mahasiswa di unit ini selama mentor teknis belum ditunjuk.</p>
+                        @error('head_user_id')
                             <span class="text-rose-600 text-xs font-medium block mt-1">{{ $message }}</span>
                         @enderror
                     </div>

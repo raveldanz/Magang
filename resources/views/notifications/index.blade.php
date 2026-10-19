@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2.5">
-                    <span class="text-2xl">🔔</span>
+                    
                     <span>Pusat Pemberitahuan & Tindakan Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
@@ -39,7 +39,7 @@
             @if (session('success'))
                 <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xs flex items-center justify-between text-emerald-900 text-sm font-medium">
                     <div class="flex items-center gap-2">
-                        <span>✅</span>
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         <span>{{ session('success') }}</span>
                     </div>
                 </div>
@@ -53,34 +53,39 @@
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'urgent']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 {{ ($category ?? '') === 'urgent' ? 'bg-amber-500 text-white shadow-xs' : 'text-amber-700 hover:bg-amber-50' }}">
-                    <span>⚡ Perlu Tindakan Segera</span>
-                </a>
-
-                <a href="{{ route('notifications.index', ['category' => 'application']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    📋 Pendaftaran
-                </a>
-
-                <a href="{{ route('notifications.index', ['category' => 'university']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'university' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    🎓 Universitas
-                </a>
-
-                <a href="{{ route('notifications.index', ['category' => 'feedback']) }}" 
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'feedback' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    💬 Feedback
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 {{ ($category ?? '') === 'urgent' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Perlu Tindakan Segera
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'logbook']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'logbook' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    📖 Logbook
+                    Logbook
+                </a>
+
+                <a href="{{ route('notifications.index', ['category' => 'application']) }}" 
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Pendaftaran
+                </a>
+
+                <a href="{{ route('notifications.index', ['category' => 'university']) }}" 
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'university' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Universitas
+                </a>
+
+                <a href="{{ route('notifications.index', ['category' => 'feedback']) }}" 
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'feedback' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Feedback
+                </a>
+
+                <a href="{{ route('notifications.index', ['category' => 'chat']) }}"
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'chat' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Pesan Chat
                 </a>
 
                 @if(Auth::user() && (Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin'))
                     <a href="{{ route('notifications.index', ['category' => 'audit']) }}" 
                        class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'audit' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                        📜 Audit
+                         Audit
                     </a>
                 @endif
             </div>
@@ -98,9 +103,7 @@
 
                     <div class="rounded-3xl border {{ $cardBorder }} p-5 sm:p-6 shadow-xs hover:shadow-md transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 shadow-2xs {{ $isUrgent ? 'bg-amber-100 text-amber-800' : ($isWarning ? 'bg-amber-50 text-amber-700' : ($isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700')) }}">
-                                {{ $notif['icon'] ?? '🔔' }}
-                            </div>
+                            
 
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -143,8 +146,8 @@
                     </div>
                 @empty
                     <div class="py-16 text-center bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mx-auto">
-                            ☕
+                        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                         </div>
                         <h4 class="font-bold text-base text-gray-800">Tidak Ada Pemberitahuan</h4>
                         <p class="text-xs text-gray-400 max-w-md mx-auto">

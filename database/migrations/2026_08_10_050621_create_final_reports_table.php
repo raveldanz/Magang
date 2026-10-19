@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('final_reports', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('placement_id')->constrained()->onDelete('cascade');
-        $table->string('file_path');
-        $table->enum('status', ['pending', 'approved', 'revision'])->default('pending');
-        $table->text('feedback')->nullable();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('final_reports', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('placement_id')->constrained()->onDelete('cascade');
+            $table->string('file_path');
+            $table->enum('status', ['pending', 'approved', 'revision'])->default('pending');
+            $table->text('feedback')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
@@ -9,17 +10,71 @@ use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    /**
+     * Role yang terikat ke instansi (agency_profile_id). Admin Dinas hanya boleh
+     * mengelola akun dengan role ini jika berada di instansinya sendiri.
+     */
+    private const AGENCY_SCOPED_ROLES = ['admin', 'mentor', 'pembimbing'];
+
+    /**
+     * Role pihak kampus. Hanya Super Admin yang boleh membuat/mengubah/mereset akun ini
+     * (akun dosen dapat memberi nilai akademik & menyetujui logbook/laporan mahasiswa).
+     */
+    private const CAMPUS_ROLES = ['dosen', 'academic_advisor', 'universitas'];
+
+    /**
+     * Apakah pengguna aktif boleh mengelola (edit/reset/hapus) akun $target?
+     * - Super Admin: boleh semua.
+     * - Admin Dinas: tidak boleh menyentuh Super Admin / Admin Sistem, dan untuk
+     *   akun Admin/Mentor hanya yang berada di instansinya sendiri.
+     */
+    private function canManageUser(User $target): bool
+    {
+        $current = Auth::user();
+
+        if ($this->currentUserIsSuperAdmin($current)) {
+            return true;
+        }
+
+        if ($target->isSuperAdmin()) {
+            return false;
+        }
+
+        // Akun pihak kampus (dosen/DPL & admin universitas) hanya dikelola Super Admin
+        if (in_array($target->role, self::CAMPUS_ROLES, true)) {
+            return false;
+        }
+
+        if (in_array($target->role, self::AGENCY_SCOPED_ROLES, true)) {
+            return $current->agency_profile_id !== null
+                && (int) $target->agency_profile_id === (int) $current->agency_profile_id;
+        }
+
+        return true;
+    }
+
+    private function authorizeManageUser(User $target): void
+    {
+        abort_unless(
+            $this->canManageUser($target),
+            403,
+            'Anda tidak memiliki hak akses untuk mengelola akun ini. Admin Dinas hanya dapat mengelola akun di instansinya sendiri.'
+        );
+    }
+
     /**
      * Master Data Seluruh Pengguna Sistem SIP-MAGANG (Multi-Role)
      */
     public function index(Request $request)
     {
         $currentUser = Auth::user();
-        $isSuperAdmin = ($currentUser->role === 'super_admin' || ($currentUser->role === 'admin' && is_null($currentUser->agency_profile_id)));
+        $isSuperAdmin = $currentUser->isSuperAdmin();
 
         $query = User::with(['agencyProfile', 'university', 'studentProfile']);
 
@@ -36,32 +91,38 @@ class UserController extends Controller
         }
 
         // Filter Instansi
+        $selectedAgency = null;
         if ($request->filled('agency_id')) {
             $query->where('agency_profile_id', $request->agency_id);
+            $selectedAgency = AgencyProfile::find($request->agency_id);
         }
 
         // Filter Universitas
+        $selectedUniversity = null;
         if ($request->filled('university_id')) {
             $univId = $request->university_id;
             $univ = University::find($univId);
+            $selectedUniversity = $univ;
             $univName = $univ?->name;
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
-            $query->where(function ($q) use ($univId, $univName) {
+            $query->where(function ($q) use ($univId, $univName, $like) {
                 $q->where('university_id', $univId);
                 if ($univName) {
-                    $q->orWhere('university', 'like', "%{$univName}%")
-                      ->orWhereHas('studentProfile', fn($sp) => $sp->where('universitas', 'like', "%{$univName}%"));
+                    $q->orWhere('university', $like, "%{$univName}%")
+                        ->orWhereHas('studentProfile', fn ($sp) => $sp->where('universitas', $like, "%{$univName}%"));
                 }
             });
         }
 
         // Search
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('studentProfile', fn($sp) => $sp->where('nim', 'like', "%{$search}%"));
+            $search = strtolower($request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->where(function ($q) use ($search, $like) {
+                $q->where('name', $like, "%{$search}%")
+                    ->orWhere('email', $like, "%{$search}%")
+                    ->orWhereHas('studentProfile', fn ($sp) => $sp->where('nim', $like, "%{$search}%"));
             });
         }
 
@@ -74,18 +135,22 @@ class UserController extends Controller
             'agencies',
             'universities',
             'isSuperAdmin',
-            'currentUser'
+            'currentUser',
+            'selectedAgency',
+            'selectedUniversity'
         ));
     }
 
     /**
      * Form Tambah User Baru
      */
-    public function create()
+    public function create(Request $request)
     {
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        return view('admin.users.create', compact('agencies', 'universities'));
+        $returnTo = $request->query('return_to', url()->previous());
+
+        return view('admin.users.create', compact('agencies', 'universities', 'returnTo'));
     }
 
     /**
@@ -96,12 +161,20 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'role' => 'required|in:admin,mentor,dosen,universitas,mahasiswa',
+            'role' => 'required|in:'.($this->currentUserIsSuperAdmin() ? 'admin,mentor,dosen,universitas,mahasiswa' : 'admin,mentor,mahasiswa'),
             'password' => 'nullable|string|min:6',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
+            'return_to' => 'nullable|string',
         ]);
+
+        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
+        // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
+        $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
+        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+            $agencyProfileId = Auth::user()->agency_profile_id;
+        }
 
         $password = $request->filled('password') ? $request->password : 'password';
 
@@ -110,7 +183,7 @@ class UserController extends Controller
             'email' => strtolower(trim($request->email)),
             'password' => Hash::make($password),
             'role' => $request->role,
-            'agency_profile_id' => in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null,
+            'agency_profile_id' => $agencyProfileId,
             'university_id' => in_array($request->role, ['universitas', 'dosen', 'mahasiswa']) ? $request->university_id : null,
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
@@ -122,19 +195,48 @@ class UserController extends Controller
             'role' => $user->role,
         ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "Akun '{$user->name}' ({$user->role}) berhasil dibuat!");
+        $successMsg = "Akun '{$user->name}' ({$user->role}) berhasil dibuat!";
+
+        // 1. Prioritas return_to dari halaman pemanggil
+        $safeReturn = $this->safeReturnTo($request->return_to);
+        if ($safeReturn && ! str_contains($safeReturn, 'users/create')) {
+            return redirect($safeReturn)->with('success', $successMsg);
+        }
+
+        // 2. Fallback: Balik ke Instansi jika memiliki agency_profile_id
+        if ($user->agency_profile_id) {
+            return redirect()->route('admin.agencies.show', $user->agency_profile_id)->with('success', $successMsg);
+        }
+
+        // 3. Fallback: Balik ke Perguruan Tinggi jika memiliki university_id
+        if ($user->university_id && in_array($user->role, ['universitas', 'dosen'])) {
+            return redirect()->route('admin.universities.show', $user->university_id)->with('success', $successMsg);
+        }
+
+        // 4. Fallback: Halaman Master Pengguna
+        return redirect()->route('admin.users.index')->with('success', $successMsg);
+    }
+
+    /**
+     * Detail Pengguna (Redirect ke Form Edit)
+     */
+    public function show($id)
+    {
+        return redirect()->route('admin.users.edit', $id);
     }
 
     /**
      * Form Edit User
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        return view('admin.users.edit', compact('user', 'agencies', 'universities'));
+        $returnTo = $request->query('return_to', url()->previous());
+
+        return view('admin.users.edit', compact('user', 'agencies', 'universities', 'returnTo'));
     }
 
     /**
@@ -143,22 +245,32 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
+        $isSuperAdmin = $this->currentUserIsSuperAdmin();
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:admin,mentor,dosen,universitas,mahasiswa,super_admin',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'role' => 'required|in:'.($isSuperAdmin ? 'admin,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
-            'status' => 'nullable|string|in:active,on_leave,inactive',
+            'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
             'password' => 'nullable|string|min:6',
+            'return_to' => 'nullable|string',
         ]);
+
+        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
+        // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
+        $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
+        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+            $agencyProfileId = Auth::user()->agency_profile_id;
+        }
 
         $updateData = [
             'name' => $request->name,
             'email' => strtolower(trim($request->email)),
             'role' => $request->role,
-            'agency_profile_id' => in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null,
+            'agency_profile_id' => $agencyProfileId,
             'university_id' => in_array($request->role, ['universitas', 'dosen', 'mahasiswa']) ? $request->university_id : null,
             'status' => $request->status ?? 'active',
         ];
@@ -174,8 +286,26 @@ class UserController extends Controller
             'role' => $user->role,
         ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "Data pengguna '{$user->name}' berhasil diperbarui!");
+        $successMsg = "Data pengguna '{$user->name}' berhasil diperbarui!";
+
+        // 1. Prioritas return_to dari halaman pemanggil
+        $safeReturn = $this->safeReturnTo($request->return_to);
+        if ($safeReturn && ! str_contains($safeReturn, 'users/'.$id.'/edit')) {
+            return redirect($safeReturn)->with('success', $successMsg);
+        }
+
+        // 2. Fallback: Balik ke Instansi jika memiliki agency_profile_id
+        if ($user->agency_profile_id) {
+            return redirect()->route('admin.agencies.show', $user->agency_profile_id)->with('success', $successMsg);
+        }
+
+        // 3. Fallback: Balik ke Perguruan Tinggi jika memiliki university_id
+        if ($user->university_id && in_array($user->role, ['universitas', 'dosen'])) {
+            return redirect()->route('admin.universities.show', $user->university_id)->with('success', $successMsg);
+        }
+
+        // 4. Fallback: Halaman Master Pengguna
+        return redirect()->route('admin.users.index')->with('success', $successMsg);
     }
 
     /**
@@ -184,6 +314,7 @@ class UserController extends Controller
     public function resetPassword($id)
     {
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
         $user->update(['password' => Hash::make('password')]);
 
         AuditLog::record('USER_PASSWORD_RESET', 'User', $user->id, [
@@ -196,28 +327,175 @@ class UserController extends Controller
     }
 
     /**
-     * Hapus Pengguna
+     * Reset Password Massal (Bulk Reset Password ke 'password')
      */
-    public function destroy($id)
+    public function bulkResetPassword(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'required|integer|exists:users,id',
+        ]);
+
+        $currentUser = Auth::user();
+        $targetIds = array_unique($request->user_ids);
+
+        // Filter keamanan: larang reset akun sendiri atau akun Super Admin lain
+        $users = User::whereIn('id', $targetIds)
+            ->where('id', '!=', $currentUser->id)
+            ->where(function ($q) {
+                $q->where('role', '!=', 'super_admin')
+                    ->where(function ($sq) {
+                        $sq->where('role', '!=', 'admin')
+                            ->orWhereNotNull('agency_profile_id');
+                    });
+            })
+            ->get();
+
+        // Admin Dinas hanya boleh menyentuh akun yang berada dalam wewenangnya
+        $users = $users->filter(fn (User $u) => $this->canManageUser($u))->values();
+
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada akun valid yang dapat direset.');
+        }
+
+        $resetCount = 0;
+        $affectedNames = [];
+        $hashedPassword = Hash::make('password');
+
+        foreach ($users as $user) {
+            $user->update(['password' => $hashedPassword]);
+            $resetCount++;
+            $affectedNames[] = "{$user->name} ({$user->email})";
+        }
+
+        AuditLog::record('USER_BULK_PASSWORD_RESET', 'User', null, [
+            'total_reset' => $resetCount,
+            'affected_users' => array_slice($affectedNames, 0, 50),
+        ]);
+
+        return redirect()->back()
+            ->with('success', "Berhasil mereset password untuk {$resetCount} akun pengguna ke nilai default ('password').");
+    }
+
+    /**
+     * Hapus Satu Pengguna (Single Delete)
+     */
+    public function destroy(Request $request, $id)
     {
         $currentUser = Auth::user();
         $user = User::findOrFail($id);
+        $this->authorizeManageUser($user);
 
+        // Proteksi: tidak bisa hapus diri sendiri
         if ($user->id === $currentUser->id) {
             return redirect()->back()->with('error', 'Tidak dapat menghapus akun Anda sendiri.');
         }
 
-        // Cek proteksi relasi aktif
-        if ($user->applications()->count() > 0 || $user->academicPlacements()->count() > 0 || $user->mentorPlacements()->count() > 0) {
-            return redirect()->back()->with('error', "Gagal menghapus: Akun '{$user->name}' memiliki data relasi pengajuan atau penempatan aktif.");
+        // Proteksi: tidak bisa hapus Super Admin
+        if ($user->role === 'super_admin') {
+            return redirect()->back()->with('error', 'Akun Super Admin tidak dapat dihapus.');
         }
 
-        $name = $user->name;
+        // Proteksi: tidak bisa hapus Admin Sistem (admin tanpa agency_profile_id)
+        if ($user->role === 'admin' && is_null($user->agency_profile_id)) {
+            return redirect()->back()->with('error', 'Akun Admin Sistem tidak dapat dihapus melalui panel ini.');
+        }
+
+        // Proteksi arsip: akun dengan riwayat magang (pengajuan, bimbingan mentor/pembimbing/dosen) dipertahankan
+        if ($user->hasInternshipHistory()) {
+            return redirect()->back()->with('error', "Akun '{$user->name}' tidak dapat dihapus karena menyimpan riwayat magang (termasuk arsip alumni & sertifikat). Ubah status akun menjadi Nonaktif untuk mencabut aksesnya.");
+        }
+
+        $deletedName = $user->name;
+        $deletedEmail = $user->email;
+        $deletedRole = $user->role;
+        $agencyId = $user->agency_profile_id;
+        $universityId = $user->university_id;
+
+        AuditLog::record('USER_DELETE', 'User', $user->id, [
+            'name' => $deletedName,
+            'email' => $deletedEmail,
+            'role' => $deletedRole,
+        ]);
+
         $user->delete();
 
-        AuditLog::record('USER_DELETE', 'User', $id, ['name' => $name]);
+        $successMsg = "Akun '{$deletedName}' ({$deletedRole}) berhasil dihapus.";
 
-        return redirect()->route('admin.users.index')
-            ->with('success', "Akun '{$name}' berhasil dihapus dari sistem.");
+        // Kembalikan ke halaman asal jika ada parameter return_to atau redirect back
+        if ($safeReturn = $this->safeReturnTo($request->return_to)) {
+            return redirect($safeReturn)->with('success', $successMsg);
+        }
+
+        return redirect()->back()->with('success', $successMsg);
+    }
+
+    /**
+     * Hapus Pengguna Massal (Bulk Delete)
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'required|integer|exists:users,id',
+        ]);
+
+        $currentUser = Auth::user();
+        $targetIds = array_unique($request->user_ids);
+
+        // Filter keamanan: larang hapus akun sendiri atau akun Super Admin lain
+        $users = User::whereIn('id', $targetIds)
+            ->where('id', '!=', $currentUser->id)
+            ->where(function ($q) {
+                $q->where('role', '!=', 'super_admin')
+                    ->where(function ($sq) {
+                        $sq->where('role', '!=', 'admin')
+                            ->orWhereNotNull('agency_profile_id');
+                    });
+            })
+            ->get();
+
+        // Admin Dinas hanya boleh menyentuh akun yang berada dalam wewenangnya
+        $users = $users->filter(fn (User $u) => $this->canManageUser($u))->values();
+
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada akun yang diizinkan untuk dihapus (akun Super Admin dilindungi).');
+        }
+
+        $deletedCount = 0;
+        $skippedCount = 0;
+        $deletedNames = [];
+        $skippedNames = [];
+
+        foreach ($users as $user) {
+            // Proteksi arsip: akun dengan riwayat magang (pengajuan, bimbingan mentor/pembimbing/dosen) dilewati
+            if ($user->hasInternshipHistory()) {
+                $skippedCount++;
+                $skippedNames[] = $user->name;
+
+                continue;
+            }
+
+            $deletedNames[] = "{$user->name} ({$user->email})";
+            $user->delete();
+            $deletedCount++;
+        }
+
+        if ($deletedCount > 0) {
+            AuditLog::record('USER_BULK_DELETE', 'User', null, [
+                'total_deleted' => $deletedCount,
+                'total_skipped' => $skippedCount,
+                'deleted_users' => array_slice($deletedNames, 0, 50),
+            ]);
+        }
+
+        $message = "Berhasil menghapus {$deletedCount} akun pengguna.";
+        if ($skippedCount > 0) {
+            $message .= " Namun {$skippedCount} akun dilewati karena memiliki relasi data magang/penempatan aktif (".implode(', ', array_slice($skippedNames, 0, 3)).').';
+
+            return redirect()->back()->with('warning', $message);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }
