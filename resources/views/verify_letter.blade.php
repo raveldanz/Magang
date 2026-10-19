@@ -3,7 +3,7 @@
     @php
         $agency = $application->unit?->agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agency->government_name ?? 'Pemerintah Kota Surabaya';
-        $agencyName = $agency->agency_name ?? 'Dinas Komunikasi Dan Informatika';
+        $agencyName = $agency->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
     @endphp
 
 

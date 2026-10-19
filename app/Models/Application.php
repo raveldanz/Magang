@@ -209,10 +209,15 @@ class Application extends Model
         $eval = $placement?->evaluation;
         $blockers = [];
 
-        $mentorEvalComplete = $eval
-            && (float) ($eval->nilai_disiplin ?? 0) > 0
-            && (float) ($eval->nilai_kinerja ?? 0) > 0
-            && (float) ($eval->nilai_laporan ?? 0) > 0;
+        $mentorAspects = $eval?->mentor_aspects_list ?? [];
+        if (! empty($mentorAspects)) {
+            $mentorEvalComplete = collect($mentorAspects)->every(fn ($a) => isset($a['score']) && (float) $a['score'] > 0);
+        } else {
+            $mentorEvalComplete = $eval
+                && (float) ($eval->nilai_disiplin ?? 0) > 0
+                && (float) ($eval->nilai_kinerja ?? 0) > 0
+                && (float) ($eval->nilai_laporan ?? 0) > 0;
+        }
 
         if (! $mentorEvalComplete) {
             $blockers[] = 'Nilai evaluasi kinerja dari Mentor Lapangan (dinas) belum lengkap.';

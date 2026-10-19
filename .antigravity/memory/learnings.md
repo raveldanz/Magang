@@ -78,10 +78,17 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-066** | 2026-10-08 | Scheduler, Queue Heartbeat & Model Guarding | Validasi otomatis sinkronisasi status magang & monitoring kesehatan worker | RESOLVED |
 | **LRN-067** | 2026-10-08 | Audit Komprehensif Sistem, Metrik Kampus & Type-Safety | Distorsi metrik makro kampus saat filter tabel, nullsafe dashboard mahasiswa, filter notifikasi DPL per skema evaluasi kampus, & alias kuota unit | RESOLVED |
 | **LRN-068** | 2026-10-08 | DPL Student Detail Redesign | Paritas Civic Hero Banner dengan portal mahasiswa, eliminasi BAP, grid 4 pilar konteks & KPI evaluasi | RESOLVED |
-| **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Portal Dosen Pembimbing | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
+| **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Seluruh Fitur Role Dosen | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
 | **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
-| **LRN-072** | 2026-10-19 | Audit Sistem, Migrasi Pending & Integritas Rute Modular | Pemulihan rute staged monolitik ke modular, eksekusi migrasi pending PostgreSQL & pembetulan import Kernel CLI scripts | RESOLVED |
+| **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
+| **LRN-073** | 2026-10-11 | Rekonsiliasi Merge Konflik Portal Dosen | Paritas tata letak, evaluasi komparatif, dan eliminasi form bimbingan obsolete | RESOLVED |
+| **LRN-074** | 2026-10-14 | Master Instansi & Seeder Cleanup | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dinas Perpustakaan dan Kearsipan serta kaskade relasi aman | RESOLVED |
+| **LRN-075** | 2026-10-14 | Evaluasi Adaptif Kampus: Aspek Penilaian Dinamis & Input Manual | Kriteria penilaian magang kaku 3 aspek tidak mencukupi disparitas standar rubrik antar-kampus | RESOLVED |
+| **LRN-076** | 2026-10-15 | Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop | Tag div unclosed di kartu mobile menyebabkan kontainer desktop tertelan masuk ke dalam blok sm:hidden | RESOLVED |
+| **LRN-077** | 2026-10-15 | Redireksi Kontekstual Sesi Penyamaran (Impersonasi) | Sesi impersonasi kembali ke referer asal bukan hardcode users index | RESOLVED |
+| **LRN-078** | 2026-10-15 | Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin | Pembersihan filter instansi tunggal pada halaman admin | RESOLVED |
+| **LRN-079** | 2026-10-19 | Audit Sistem, Migrasi Pending & Integritas Rute Modular | Pemulihan rute staged monolitik ke modular, eksekusi migrasi pending PostgreSQL & pembetulan import Kernel CLI scripts | RESOLVED |
 
 ---
 
@@ -1679,11 +1686,102 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Mengembalikan struktur rute modular terpisah (`routes/student.php`, `routes/admin.php`, `routes/mentor.php`, dll.) serta suite rute Chat lengkap di `routes/web.php`.
   3. Mengembalikan validasi gerbang kelulusan (*Certificate Gate* & logbook completion check) pada `CertificateController.php`.
   4. Membersihkan cache aplikasi (`php artisan optimize:clear`) dan memvalidasi test suite hingga seluruh **281 Feature/Unit Tests (1.914 assertions) berstatus 100% PASS (Exit Code 0)**.
-- **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit stabil terakhir dan jalankan `php artisan test` segera setelah proses merge selesai untuk memastikan tidak ada fitur atau rute yang hilang.
+- **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit ### [LRN-072] Resolusi Kanvas & Margin Transparan Logo Universitas Indonesia (UI)
+- **Tanggal**: 2026-10-12
+- **Komponen**: `public/images/logos/ui.png`, `storage/app/public/images/logos/ui.png`, `resources/views/admin/universities/index.blade.php`, `App\Models\University`
+- **Problem / Symptom**: Pada kartu perguruan tinggi Universitas Indonesia di halaman Manajemen Kampus Super Admin (`/admin/universities`), logo UI tidak tampak dan hanya terlihat titik/speck kuning mikroskopis di tengah kotak logo.
+- **Root Cause**: Berkas aset lama `ui.png` memiliki resolusi kanvas 512x512 piksel, namun lambang Makara di dalamnya hanya berukuran 36x39 piksel (hanya ~7% lebar kanvas dengan 93% padding transparan kosong). Ketika elemen dirender di dalam kontainer berukuran `w-9 h-9` (36x36 piksel) dengan utility `object-contain`, logo menyusut drastis menjadi hanya ~2.5 piksel, membuatnya tampak seolah tidak ada gambar.
+- **Fix Applied**: 
+  1. Mengganti aset `public/images/logos/ui.png` dan `storage/app/public/images/logos/ui.png` dengan gambar PNG Makara UI resmi beresolusi tinggi (427x468 piksel) dengan latar belakang transparan penuh tanpa padding kosong berlebih (*tight bounding box*).
+  2. Memverifikasi symlink dan keselarasan model `University::getLogoUrlAttribute()`.
+  3. Menjalankan `php artisan optimize:clear && php artisan view:clear` dan memastikan 261/261 unit & feature test suite tetap lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**: Selalu verifikasi bahwa berkas aset gambar logo institusi memiliki padding minimal (*cropped tight*) pada kanvasnya agar teknik penskalaan CSS `object-contain` dapat merender simbol logo secara proporsional dan jelas.
 
 ---
 
-### [LRN-072] Audit Menyeluruh Sistem: Penanganan Staged Monolithic Route, Migrasi Pending PostgreSQL, & Hardening Runner Testing
+### [LRN-073] Rekonsiliasi Merge Konflik Portal Dosen (Paritas Tata Letak, Evaluasi Komparatif & Eliminasi Form Bimbingan Obsolete)
+- **Tanggal**: 2026-10-11
+- **Komponen**: `resources/views/lecturer/dashboard.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `tests/Feature/LecturerInnovationsTest.php`, `tests/Feature/LecturerFeaturesUpdateTest.php`
+- **Problem / Symptom**: Terjadi konflik merge git pada `resources/views/lecturer/dashboard.blade.php` dan `resources/views/lecturer/student-detail.blade.php` saat menggabungkan pembaruan dari `origin/main` ke branch `AkhirMagang-Evan`. Konflik ini memicu `syntax error, unexpected token "else"` pada kompilasi view blade dan menghentikan pipeline pengujian otomatis.
+- **Root Cause**:
+  1. Pada `dashboard.blade.php`, terdapat benturan antara penataan kolom nilai dan tombol aksi (tampilan BAP vs Detail tunggal modern tanpa BAP, serta perbedaan markup indikator nilai dinas dan nilai akademik DPL di kartu mobile).
+  2. Pada `student-detail.blade.php`, branch `main` mencoba menyisipkan form input sesi bimbingan legacy ke bagian bawah Tab 1 (Ringkasan), sementara pada branch `AkhirMagang-Evan` fitur tersebut telah ditata ulang secara terisolasi dan elegan di Tab 4 (`CATATAN BIMBINGAN DPL`) dan Tab 1 telah dilengkapi kartu Catatan Pribadi Pembimbing (`advisor_notes`).
+- **Fix Applied**:
+  1. Menyelesaikan konflik pada `dashboard.blade.php` dengan mempertahankan estetika modern borderless, dual-indicator evaluasi (Dinas & DPL), kolom Nilai Akhir mandiri yang konsisten dengan 8 kolom header tabel, dan tombol aksi "Detail" tunggal.
+  2. Menyelesaikan konflik pada `student-detail.blade.php` dengan mempertahankan kartu privat `advisor_notes` di Tab 1 serta membuang duplikasi form sesi bimbingan legacy karena seluruh fungsionalitas konsultasi bimbingan akademik telah aktif dan terpusat di Tab 4.
+  3. Membersihkan seluruh cache bootstrap via `php artisan optimize:clear` dan `php artisan view:clear`.
+  4. Menjalankan seluruh test suite aplikasi (`php artisan test`): 275/276 passed (1 skipped), 1.885 assertions, Strict Exit Code 0.
+
+---
+
+### [LRN-074] Pembersihan Massal Instansi Dinas Terpadu & Sinkronisasi Seeder (Dispusip Only)
+- **Tanggal**: 2026-10-14
+- **Komponen**: `database/seeders/SurabayaAgenciesSeeder.php`, `App\Models\AgencyProfile`, `App\Models\Unit`, `App\Models\User`
+- **Problem / Symptom**: Sistem memuat 23 master data OPD/instansi kedinasan Pemkot Surabaya, dan pengguna menghendaki seluruh instansi selain "Dinas Perpustakaan dan Kearsipan" dihapus secara permanen dari sistem dan seeder.
+- **Root Cause**: Kebutuhan penyederhanaan operasional pilot/khusus yang hanya berfokus pada ekosistem Dinas Perpustakaan dan Kearsipan.
+- **Fix Applied**: 
+  1. Menjalankan skrip transaksi database terisolasi untuk membersihkan 22 instansi selain Dinas Perpustakaan dan Kearsipan beserta dependensi kaskadenya (50 unit kerja, percakapan chat instansi/mentor, riwayat pengajuan, penempatan, evaluasi, dan akun personil admin/mentor kedinasan terkait) tanpa merusak integritas referensial.
+  2. Mempertahankan secara utuh data Dinas Perpustakaan dan Kearsipan (ID: 2) beserta 3 bidang kerja (Pelayanan & Otomasi Perpustakaan Digital, Preservasi Arsip, Minat Baca) dan seluruh akun personilnya (admin & 3 mentor).
+  3. Memperbarui `database/seeders/SurabayaAgenciesSeeder.php` agar hanya mendefinisikan Dinas Perpustakaan dan Kearsipan sehingga aman dari polusi data saat re-seeding.
+  4. Membersihkan cache aplikasi dan memvalidasi test suite hingga seluruh 281/281 test suite passed (100% Strict Exit Code 0).
+- **Prevention Rule**: Operasi penghapusan massal instansi induk wajib mematuhi pembersihan kaskade bertahap (chat -> child placements -> applications -> units -> agency staff -> agency profile) di dalam transaksi database atomik guna mencegah foreign key constraint violation pada PostgreSQL.
+
+---
+
+### [LRN-075] Evaluasi Adaptif Kampus: Aspek Penilaian Dinamis & Input Manual (Dynamic Rubric Attributes)
+- **Tanggal**: 2026-10-14
+- **Komponen**: `database/migrations/2026_10_14_000001_add_custom_aspects_to_evaluations_table.php`, `app/Models/Evaluation.php`, `app/Models/Application.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`, `app/Http/Controllers/Mentor/EvaluationController.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/lecturer/student-detail.blade.php`, `resources/views/mentor/student-detail.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `tests/Feature/DynamicEvaluationAspectsTest.php`
+- **Problem / Symptom**: Sistem penilaian evaluasi magang sebelumnya mengunci kriteria hanya pada 3 aspek baku (DPL: Mastery, Report, Attitude; Mentor: Disiplin, Kinerja, Laporan). Setiap universitas mitra memiliki standar Capaian Pembelajaran Lulusan (CPL), bobot, dan nama rubrik penilaian magang yang berbeda-beda (misal: penambahan aspek Ujian Sidang Presentasi, Relevansi CPL, Inovasi Industri, atau Portofolio Teknis). Dokumen resmi akhir yang diterbitkan adalah E-Sertifikat (khususnya Halaman 2: Lampiran Transkrip Rincian Nilai Kompetensi Magang), namun tabel transkrip sertifikat sebelumnya masih berstatus hardcoded sehingga nama dan nilai aspek kustom tidak tercetak.
+- **Root Cause**: Kolom nilai pada tabel `evaluations` dirancang dengan skema statis (`score_mastery`, `score_report`, dll.), formulir penilaian belum menyediakan repeater dinamis, dan berkas Blade `internship_certificate.blade.php` masih memanggil atribut legacy secara hardcoded tanpa membaca skema JSON aspek dinamis.
+- **Fix Applied**:
+  1. Menambahkan kolom JSON `dosen_aspects` dan `mentor_aspects` pada tabel `evaluations` dengan migrasi baru tanpa merusak data lama.
+  2. Memperbarui model `Evaluation.php` dengan accessor `dosen_aspects_list`, `mentor_aspects_list`, serta kalkulasi nilai rata-rata dinamis berbasis jumlah aspek yang aktif, dengan fallback otomatis ke kolom legacy.
+  3. Mengembangkan formulir penilaian modern interaktif pada `score-form.blade.php` berbasis Alpine.js: evaluator dapat mengetik nama aspek secara manual, menambah baris aspek baru (`+ Tambah Aspek`), menghapus aspek yang tidak relevan, serta memanfaatkan *Quick Preset Chips* rekomendasi rubrik kampus.
+  4. Memperbarui `EvaluationController` pada role Dosen dan Mentor untuk memvalidasi dan menyimpan struktur `aspects` dinamis sekaligus menyinkronkan kolom legacy demi kompatibilitas pelaporan publik.
+  5. Memperbarui `resources/views/certificates/internship_certificate.blade.php` (Halaman 2: Lampiran Transkrip Nilai Kompetensi) agar secara dinamis menyusun baris tabel penilaian (Bagian A: Pembimbing Lapangan Dinas, Bagian B: Akademik DPL) mengikuti seluruh aspek kustom yang diinputkan evaluator, dengan fallback rapi ke format 3 kriteria standar jika aspek kustom belum diatur.
+  6. Memperbarui `certificateBlockers()` pada `app/Models/Application.php` agar mengenali kelengkapan nilai mentor berbasis `mentor_aspects_list`.
+  7. Menambahkan test suite komprehensif `tests/Feature/DynamicEvaluationAspectsTest.php` (4 test cases, 35 assertions, Exit Code 0) dan memastikan seluruh unit/feature tests lulus 100%.
+- **Prevention Rule**: Seluruh dokumen cetak resmi (terutama E-Sertifikat dan Transkrip Nilai Kompetensi) wajib membaca atribut evaluasi adaptif yang tersimpan di model `Evaluation` secara dinamis, sembari selalu menyertakan fallback anggun (*graceful fallback*) ke skema standar agar arsip dokumen historis tetap tercetak utuh tanpa error.
+
+---
+
+### [LRN-076] Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop (sm:hidden Cascade Distortion)
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/lecturer/monitoring/index.blade.php`
+- **Problem / Symptom**: Pada halaman Monitoring Mahasiswa Bimbingan Dosen (`/lecturer/monitoring`), badge tab menunjukkan terdapat 1 mahasiswa (`Mahasiswa Aktif: 1`, `Calon Peserta: 1`), namun area tabel di bawahnya tampak kosong melompong (*blank white area*) tanpa baris mahasiswa dan tanpa pesan error.
+- **Root Cause**: Di dalam looping `@forelse` tampilan mobile (`<div class="block sm:hidden divide-y divide-slate-100">`), tag `<div class="flex items-center justify-between text-xs">` (blok Logbook & Laporan) tidak ditutup dengan `</div>` sebelum pembukaan blok Nilai Dosen. Akibat defisit 1 tag penutup `</div>`, tag penutup di akhir looping menutup kontainer yang salah, dan kontainer utama mobile (`sm:hidden`) tidak pernah ditutup sebelum blok desktop (`<div class="hidden sm:block overflow-x-auto">`). Akibatnya, tabel desktop tertelan masuk menjadi anak (*child element*) dari kontainer `sm:hidden`, sehingga pada viewport desktop (layar laptop/PC $\ge$ 640px) seluruh tabel desktop disembunyikan total oleh CSS `display: none`.
+- **Fix Applied**:
+  1. Menambahkan tag penutup `</div>` yang hilang pada baris logbook & laporan di kartu mobile `resources/views/lecturer/monitoring/index.blade.php`.
+  2. Menjalankan `php artisan view:clear` untuk memperbarui kompilasi view blade.
+  3. Memvalidasi visual E2E dengan Playwright headless pada resolusi desktop (1280x800) dan mobile (375x667), memastikan tabel desktop (Nama Mahasiswa, Instansi & Unit, Status, Logbook, Laporan, Nilai Dosen, Aksi) dan kartu mobile kembali tampil sempurna.
+- **Prevention Rule**: Saat merancang arsitektur tampilan responsif yang memisahkan blok mobile (`block sm:hidden`) dan desktop (`hidden sm:block`) secara berdampingan, pastikan seluruh tag `<div>` di dalam loop tertutup secara simetris dan lakukan audit nesting DOM secara ketat agar breakpoint utility Tailwind tidak menelan elemen tampilan lainnya.
+
+---
+
+### [LRN-077] Eliminasi Card Dispusip, Akses Langsung Pusat Kendali & Redireksi Impersonasi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/ImpersonationController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**: Menu Instansi menampilkan kartu tunggal Dispusip redundan dan sesi penyamaran Super Admin kembali ke halaman users bukan ke halaman instansi asal.
+- **Root Cause**: Rute navigasi mengarah ke index generik tanpa mengenali single-tenant Dispusip dan `ImpersonationController::leave()` di-hardcode ke `admin.users.index`.
+- **Fix Applied**: Menautkan menu instansi langsung ke `admin.agencies.show`, menyimpan referer session pada impersonasi, dan menambahkan test otomatis `DispusipInstansiMenuDirectAccessTest`.
+- **Prevention Rule**: Jangan sajikan kartu berulang pada aplikasi single-tenant dan simpan referer session pada fitur impersonasi.
+
+---
+
+### [LRN-078] Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**: Pada baris filter halaman Pengajuan Magang (`admin.applications.index`), terdapat dropdown filter `-- Semua Instansi Dinas --` yang hanya memiliki 1 opsi yaitu "Dinas Perpustakaan dan Kearsipan", membuat antarmuka menjadi berantakan, redundan, dan memakan ruang baris filter.
+- **Root Cause**: Desain halaman sebelumnya berasumsi sistem multi-instansi dengan banyak OPD. Setelah portal dikhususkan (*single-tenant*) untuk Dispusip, filter instansi menjadi tidak relevan karena seluruh unit kerja dan pengajuan otomatis terikat pada Dispusip.
+- **Fix Applied**: 
+  1. Menghapus dropdown filter instansi (`agency_id`) pada `resources/views/admin/applications/index.blade.php`, serta merapikan dropdown Unit/Divisi agar menampilkan langsung 4 bidang resmi Dispusip tanpa pembungkus `<optgroup>` redundan ketika hanya ada 1 instansi.
+  2. Memasang guard kondisional `@if(isset($agencies) && count($agencies) > 1)` pada filter instansi di `resources/views/admin/mentors/index.blade.php` dan `resources/views/admin/users/index.blade.php`, sehingga hanya tampil dinamis jika sistem memiliki lebih dari 1 instansi.
+  3. Memvalidasi tampilan dan memastikan seluruh unit/feature test tetap lulus (Exit Code 0).
+- **Prevention Rule**: Seluruh elemen form filter antarmuka yang mengagregasi data entitas induk (seperti OPD/Instansi) harus memiliki kondisional pemeriksaan kuantitas (`count > 1`) atau dihapus jika sistem berjalan dalam mode portal khusus/spesifik, guna menjaga kebersihan visual dan ergonomi pengguna.
+
+---
+
+### [LRN-079] Audit Menyeluruh Sistem: Penanganan Staged Monolithic Route, Migrasi Pending PostgreSQL, & Hardening Runner Testing
 - **Tanggal**: 2026-10-19
 - **Komponen**: `routes/web.php`, `database/migrations/`, `scripts/health_check.php`, `scripts/audit_verifier.php`, `scripts/tier3_playwright_audit.mjs`, `scripts/browser-runner.mjs`
 - **Problem / Symptom**:

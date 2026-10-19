@@ -63,12 +63,29 @@ class EvaluationController extends Controller
             return redirect()->route('mentor.students.show', $placement->id)->with('error', $lockReason);
         }
 
-        $request->validate([
-            'nilai_disiplin' => 'required|numeric|min:0|max:100',
-            'nilai_kinerja' => 'required|numeric|min:0|max:100',
-            'nilai_laporan' => 'required|numeric|min:0|max:100',
-            'catatan' => 'nullable|string|max:1500',
-        ], [
+        if ($request->has('aspects')) {
+            $rules = [
+                'aspects' => 'required|array|min:1',
+                'aspects.*.name' => 'required|string|max:150',
+                'aspects.*.score' => 'required|numeric|min:0|max:100',
+                'catatan' => 'nullable|string|max:1500',
+            ];
+        } else {
+            $rules = [
+                'nilai_disiplin' => 'required|numeric|min:0|max:100',
+                'nilai_kinerja' => 'required|numeric|min:0|max:100',
+                'nilai_laporan' => 'required|numeric|min:0|max:100',
+                'catatan' => 'nullable|string|max:1500',
+            ];
+        }
+
+        $request->validate($rules, [
+            'aspects.required' => 'Setidaknya satu aspek penilaian wajib diisi.',
+            'aspects.min' => 'Setidaknya satu aspek penilaian wajib diisi.',
+            'aspects.*.name.required' => 'Nama aspek penilaian tidak boleh kosong.',
+            'aspects.*.score.required' => 'Nilai aspek penilaian wajib diisi.',
+            'aspects.*.score.min' => 'Nilai minimal adalah 0.',
+            'aspects.*.score.max' => 'Nilai maksimal adalah 100.',
             'nilai_disiplin.required' => 'Nilai disiplin wajib diisi.',
             'nilai_disiplin.min' => 'Nilai minimal adalah 0.',
             'nilai_disiplin.max' => 'Nilai maksimal adalah 100.',
@@ -80,15 +97,38 @@ class EvaluationController extends Controller
             'nilai_laporan.max' => 'Nilai maksimal adalah 100.',
         ]);
 
-        $evaluation = Evaluation::updateOrCreate(
-            ['placement_id' => $placement->id],
-            [
-                'nilai_disiplin' => $request->nilai_disiplin,
-                'nilai_kinerja' => $request->nilai_kinerja,
-                'nilai_laporan' => $request->nilai_laporan,
-                'catatan' => $request->catatan,
-            ]
-        );
+        $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
+        $evaluation->catatan = $request->catatan;
+
+        if ($request->has('aspects')) {
+            $rawAspects = (array) $request->input('aspects', []);
+            $cleanAspects = [];
+            $scores = [];
+            foreach ($rawAspects as $a) {
+                $name = trim($a['name'] ?? '');
+                if ($name !== '' && isset($a['score']) && is_numeric($a['score'])) {
+                    $val = (float) $a['score'];
+                    $cleanAspects[] = ['name' => $name, 'score' => $val];
+                    $scores[] = $val;
+                }
+            }
+            $avg = count($scores) > 0 ? round(array_sum($scores) / count($scores), 2) : 0.0;
+            $evaluation->mentor_aspects = $cleanAspects;
+            $evaluation->nilai_disiplin = (int) round($scores[0] ?? $avg);
+            $evaluation->nilai_kinerja = (int) round($scores[1] ?? $avg);
+            $evaluation->nilai_laporan = (int) round($scores[2] ?? $avg);
+        } else {
+            $evaluation->nilai_disiplin = $request->nilai_disiplin;
+            $evaluation->nilai_kinerja = $request->nilai_kinerja;
+            $evaluation->nilai_laporan = $request->nilai_laporan;
+            $evaluation->mentor_aspects = [
+                ['name' => 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],
+                ['name' => 'Kinerja Teknis & Kerjasama Tim', 'score' => (float) $request->nilai_kinerja],
+                ['name' => 'Inisiatif & Laporan Kedinasan', 'score' => (float) $request->nilai_laporan],
+            ];
+        }
+
+        $evaluation->save();
 
         // Cek skema kampus mahasiswa
         $univ = $evaluation->getUniversity();

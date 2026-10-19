@@ -183,10 +183,10 @@
                         {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
                     </h3>
                     <h2 class="font-serif-title font-black text-lg text-slate-900 tracking-wider mt-0.5 uppercase">
-                        {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}
+                        {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                     </h2>
                     <p class="text-[9.5px] text-slate-500 mt-0.5 leading-tight">
-                        {{ $agencyProfile->address ?? 'Jl. Jimerto No. 25-27, Ketabang, Genteng, Kota Surabaya, Jawa Timur 60272' }} &bull; Website: {{ $agencyProfile->website ?? 'https://surabaya.go.id' }}
+                        {{ $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kota Surabaya, Jawa Timur 60293' }} &bull; Website: {{ $agencyProfile->website ?? 'https://dispusip.surabaya.go.id' }}
                     </p>
                 </div>
 
@@ -231,7 +231,7 @@
                 <p class="text-xs text-slate-600 max-w-3xl mx-auto leading-relaxed pt-1">
                     Telah menyelesaikan seluruh rangkaian program <strong>Praktik Kerja Lapangan (PKL) / Magang MBKM</strong> pada unit kerja 
                     <strong>{{ $application->unit->name ?? 'Bidang Layanan Informatika & E-Government' }}</strong>, 
-                    {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}, Pemerintah Kota Surabaya 
+                    {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}, Pemerintah Kota Surabaya 
                     terhitung sejak tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong> 
                     sampai dengan <strong>{{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}</strong> dengan predikat:
                 </p>
@@ -342,7 +342,7 @@
                             {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
                         </h3>
                         <h2 class="font-black text-xs text-slate-900 uppercase">
-                            {{ $agencyProfile->agency_name ?? 'Dinas Komunikasi Dan Informatika' }}
+                            {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                         </h2>
                     </div>
                 </div>
@@ -414,6 +414,8 @@
     $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
     $weightMentor = $univ ? (int)$univ->weight_mentor : 40;
     $weightLecturer = $univ ? (int)$univ->weight_lecturer : 60;
+    $hasCustomMentor = !empty($eval->mentor_aspects) && is_array($eval->mentor_aspects);
+    $hasCustomDosen = !empty($eval->dosen_aspects) && is_array($eval->dosen_aspects);
 @endphp
                         <!-- ASPEK I: KINERJA LAPANGAN -->
                         <tr class="bg-slate-100/90 font-bold text-slate-900">
@@ -422,27 +424,39 @@
                                 Penilaian Pembimbing Lapangan Dinas (Instansi Pemerintah Kota)
                             </td>
                         </tr>
-                        <tr>
-                            <td class="py-1.5 px-3 text-center text-slate-400">1</td>
-                            <td class="py-1.5 px-3">Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_disiplin ?? '-' }}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                        </tr>
-                        <tr>
-                            <td class="py-1.5 px-3 text-center text-slate-400">2</td>
-                            <td class="py-1.5 px-3">Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_kinerja ?? '-' }}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                        </tr>
-                        <tr>
-                            <td class="py-1.5 px-3 text-center text-slate-400">3</td>
-                            <td class="py-1.5 px-3">Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                            <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_laporan ?? '-' }}</td>
-                            <td class="py-1.5 px-3 text-center text-slate-400">-</td>
-                        </tr>
+                        @if ($hasCustomMentor)
+                            @foreach ($eval->mentor_aspects as $idx => $aspect)
+                                <tr>
+                                    <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
+                                    <td class="py-1.5 px-3 font-medium">{{ $aspect['name'] ?? $aspect['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
+                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                    <td class="py-1.5 px-3 text-center font-bold">{{ isset($aspect['score']) && is_numeric($aspect['score']) ? ((float)$aspect['score'] == (int)$aspect['score'] ? (int)$aspect['score'] : number_format((float)$aspect['score'], 1)) : '-' }}</td>
+                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td class="py-1.5 px-3 text-center text-slate-400">1</td>
+                                <td class="py-1.5 px-3">Disiplin, Kehadiran, & Ketaatan Tata Tertib Kedinasan</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_disiplin ?? '-' }}</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 px-3 text-center text-slate-400">2</td>
+                                <td class="py-1.5 px-3">Kinerja Teknis, Kualitas Output Proyek, & Tanggung Jawab Kerja</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_kinerja ?? '-' }}</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 px-3 text-center text-slate-400">3</td>
+                                <td class="py-1.5 px-3">Inisiatif, Komunikasi Lapangan, & Penyusunan Laporan Dinas</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                <td class="py-1.5 px-3 text-center font-bold">{{ $eval?->nilai_laporan ?? '-' }}</td>
+                                <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                            </tr>
+                        @endif
                         <tr class="bg-blue-50/70 font-bold">
                             <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
                             <td class="py-2 px-3 text-center text-blue-900">{{ $isMentorOnly ? '100%' : ($weightMentor . '%') }}</td>
@@ -471,6 +485,24 @@
                                 <td class="py-2 px-3 text-center text-blue-900">0%</td>
                                 <td class="py-2 px-3 text-center text-blue-900">N/A</td>
                                 <td class="py-2 px-3 text-center text-blue-950 font-black">0.00</td>
+                            </tr>
+                        @elseif ($hasCustomDosen)
+                            @foreach ($eval->dosen_aspects as $idx => $aspect)
+                                <tr>
+                                    <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
+                                    <td class="py-1.5 px-3 font-medium">{{ $aspect['name'] ?? $aspect['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
+                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                    <td class="py-1.5 px-3 text-center font-bold">{{ isset($aspect['score']) && is_numeric($aspect['score']) ? ((float)$aspect['score'] == (int)$aspect['score'] ? (int)$aspect['score'] : number_format((float)$aspect['score'], 1)) : '-' }}</td>
+                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                </tr>
+                            @endforeach
+                            <tr class="bg-blue-50/70 font-bold">
+                                <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL (Rata-rata):</td>
+                                <td class="py-2 px-3 text-center text-blue-900">{{ $weightLecturer }}%</td>
+                                <td class="py-2 px-3 text-center text-blue-900">{{ $eval?->nilai_dosen_calculated ?? 0 }}</td>
+                                <td class="py-2 px-3 text-center text-blue-950 font-black">
+                                    {{ round(($weightLecturer / 100) * ($eval?->nilai_dosen_calculated ?? 0), 2) }}
+                                </td>
                             </tr>
                         @else
                             <tr>

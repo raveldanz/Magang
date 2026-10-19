@@ -21,11 +21,10 @@ Seluruh runner visual mengunci ke instalasi Google Chrome sistem lokal (`channel
 
 ---
 
-## 2. Skrip Presentasi & Tangkapan Layar E2E
+## 2. Skrip Tangkapan Layar & Bukti Visual E2E
 
 | Nama Berkas | Bahasa | Fungsi & Kegunaan |
 | :--- | :--- | :--- |
-| **`generate_lecturer_test_ppt.py`** | Python (`python-pptx`) | Generator presentasi PowerPoint (.pptx) modern, widescreen 16:9, dengan navbar navigasi interaktif. |
 | **`capture_focused_screenshots.mjs`** | Node.js | Pengambil tangkapan layar tingkat komponen (*component-level crop*) untuk bahan bukti laporan QA. |
 
 ---

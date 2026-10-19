@@ -109,23 +109,24 @@
                     <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
-                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang -->
+                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
                         @php
                             $selectedUnitId = old('unit_id', '');
                             $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
-                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? '');
+                            $defaultAgency = $agencies->first();
+                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? ($defaultAgency?->id ?? ''));
 
                             $agencyItems = $agencies->map(function ($a) {
                                 return [
                                     'id' => $a->id,
                                     'name' => $a->agency_name,
                                     'acronym' => $a->acronym,
-                                    'meta' => $a->address ?? 'Pemerintah Kota Surabaya',
+                                    'meta' => $a->address ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
                                 ];
                             })->values()->all();
 
                             $unitItems = $units->map(function ($u) {
-                                $agencyName = $u->agencyProfile->agency_name ?? 'Pemkot Surabaya';
+                                $agencyName = $u->agencyProfile->agency_name ?? 'Dispusip Kota Surabaya';
                                 $rem = $u->remaining_quota;
                                 return [
                                     'id' => $u->id,
@@ -166,31 +167,60 @@
                                 }
                             }
                         }" class="space-y-4">
-                            <!-- 1. Pemilihan Instansi Kedinasan (OPD Surabaya) -->
-                            <div>
-                                <x-searchable-select
-                                    name="agency_profile_id"
-                                    :items="$agencyItems"
-                                    :selected="$selectedAgencyId"
-                                    label="1. Pilih Instansi Dinas / Badan Daerah (OPD Pemkot Surabaya)"
-                                    placeholder="-- Cari Instansi (Ketik nama, misal: Diskominfo, Bapenda, Dinkes) --"
-                                    :required="true"
-                                    :show-asterisk="false"
-                                />
-                                @error('agency_profile_id')
-                                    <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            
+                            @if ($agencies->count() <= 1 && $defaultAgency)
+                                <!-- Instansi Kedinasan Khusus: Dispusip Surabaya -->
+                                <input type="hidden" name="agency_profile_id" value="{{ $defaultAgency->id }}">
+                                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-white to-slate-50 border border-blue-200/90 shadow-2xs">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-12 h-12 rounded-2xl bg-white border border-blue-200/80 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                                                <img src="{{ asset('images/logos/dispusip.png') }}" alt="Logo Dispusip" class="w-full h-full object-contain">
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-md">Instansi Resmi Magang</span>
+                                                    <span class="text-[10px] font-semibold text-slate-500">Pemkot Surabaya</span>
+                                                </div>
+                                                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">{{ $defaultAgency->agency_name }}</h3>
+                                                <p class="text-xs text-slate-500 mt-0.5">{{ $defaultAgency->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right shrink-0">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                Kuota Magang Terbuka
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <!-- 1. Pemilihan Instansi Kedinasan (Multi-Agency Fallback) -->
+                                <div>
+                                    <x-searchable-select
+                                        name="agency_profile_id"
+                                        :items="$agencyItems"
+                                        :selected="$selectedAgencyId"
+                                        label="1. Pilih Instansi Dinas (OPD Pemkot Surabaya)"
+                                        placeholder="-- Cari Instansi Dinas --"
+                                        :required="true"
+                                        :show-asterisk="false"
+                                    />
+                                    @error('agency_profile_id')
+                                        <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endif
 
-                            <!-- 2. Pemilihan Divisi / Unit Kerja Magang -->
+                            <!-- 2. Pemilihan Divisi / Unit Kerja Magang Dispusip -->
                             <div>
                                 <x-searchable-select
                                     name="unit_id"
                                     :items="$unitItems"
                                     :selected="$selectedUnitId"
                                     parent-listener="update-units-list"
-                                    label="2. Pilih Bidang / Divisi Kerja Magang"
-                                    placeholder="-- Cari Divisi / Unit Kerja Magang --"
+                                    label="Pilih Bidang / Divisi Kerja Magang di Dispusip"
+                                    placeholder="-- Pilih Bidang Kerja Magang Dispusip --"
                                     :required="true"
                                     :show-asterisk="false"
                                 />
@@ -201,7 +231,7 @@
                                     <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span>Pilihan bidang kerja akan otomatis disaring sesuai instansi dinas yang Anda pilih di atas.</span>
+                                    <span>Pilih bidang keahlian magang yang sesuai dengan program studi Anda di Dinas Perpustakaan dan Kearsipan Kota Surabaya.</span>
                                 </p>
                             </div>
                         </div>

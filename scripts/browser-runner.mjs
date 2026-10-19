@@ -46,6 +46,7 @@ const targetPath = getArg('--url', '/login');
 const baseUrl = targetPath.startsWith('http') ? targetPath : `http://127.0.0.1:8000${targetPath.startsWith('/') ? '' : '/'}${targetPath}`;
 const takeScreenshot = hasFlag('--screenshot') || true;
 const role = getArg('--role', null);
+const customEmail = getArg('--email', null);
 
 async function authenticateIfNeeded(page, targetRole) {
     if (!targetRole && !targetPath.startsWith('/admin')) {
@@ -60,7 +61,7 @@ async function authenticateIfNeeded(page, targetRole) {
         universitas: 'admin@unesa.ac.id',
         mahasiswa: 'mahasiswa.aktif@unesa.ac.id',
     };
-    const email = emailMap[roleName] || `${roleName}@test.local`;
+    const email = customEmail || emailMap[roleName] || `${roleName}@test.local`;
     const password = 'password';
 
     console.log(`[YOLO] Otentikasi otomatis sebagai [${roleName}] (${email})...`);
