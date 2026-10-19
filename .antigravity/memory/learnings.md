@@ -95,6 +95,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-083** | 2026-10-15 | Eliminasi Card Penugasan Pembimbing Susulan Redundan & RoleLabel | Eliminasi penugasan susulan ganda, pembersihan sisa status verified, dan konsistensi roleLabel | RESOLVED |
 | **LRN-084** | 2026-10-15 | Supervisor UI Refinements: Menu Dashboard, Tombol Sertifikat Biru, Tab Menunggu Persetujuan & Status Menunggu ACC | Simplifikasi navbar 'Dashboard', pewarnaan biru tombol Pengesahan Sertifikat, pergantian tab 'Menunggu Persetujuan', dan deskripsi khusus status WAITING_APPROVAL 'Menunggu ACC' bagi supervisor | RESOLVED |
 | **LRN-085** | 2026-10-15 | Double ACC Approval Workflow & Elimination of Browser Confirm() Popups | Audit menyeluruh alur status persetujuan bertingkat (Double ACC): eliminasi confirm() browser menjadi modal dialog dua lapis, pengesahan sertifikat, dan harmonisasi status desktop/mobile | RESOLVED |
+| **LRN-086** | 2026-10-19 | Audit Holistik Single-Agency Dispusip, Filter 4 Bidang Lintas Role & Eliminasi Residu Obsolete | Harmonisasi alur seluruh peran ke ekosistem tunggal Dispusip (4 bidang), eliminasi residu status verified & placeholder lama, optimasi filter bidang pada Dosen/Kampus/Mentor | RESOLVED |
 
 ---
 
@@ -2120,6 +2121,28 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Menguji alur dengan automated feature test `AdminCertificateRevisionWorkflowTest` (3/3 tests PASS, 27 assertions, Strict Exit Code 0).
   4. Memvalidasi secara visual melalui browser headless Playwright lokal (`channel: 'chrome'`) pada resolusi desktop (1920x1080) dan mobile (375x812).
 - **Prevention Rule**: Dokumen resmi kelulusan atau sertifikasi yang berstatus `revision` atau `waiting_approval` DILARANG KERAS menyediakan tombol cetak publik/final. Setiap instruksi revisi wajib menyediakan rute khusus perbaikan yang menyinkronkan data langsung ke entitas terkait (`evaluations`, `users`, `student_profiles`, `applications`, `placements`) dalam satu transaksi atomik.
+
+---
+
+### [LRN-086] Audit Holistik Single-Agency Dispusip, Filter 4 Bidang Lintas Peran, & Eliminasi Residu Obsolete
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `app/Http/Controllers/Lecturer/MonitoringController.php`, `app/Http/Controllers/University/DashboardController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, Views Blade (`student/application/create`, `admin/applications/show`, `lecturer/dashboard`, `lecturer/monitoring/index`, `university/dashboard`, `mentor/dashboard`), Scripts (`scripts/health_check.php`, `scripts/dev_credentials.php`)
+- **Problem / Symptom**:
+  1. Pasca migrasi repositori menjadi single-agency murni ke Dinas Perpustakaan dan Kearsipan (Dispusip) Kota Surabaya, portal Dosen dan Universitas masih menampilkan dropdown filter "Semua Instansi" dan kartu "Sebaran Penempatan per Dinas" yang hanya memuat opsi tunggal Dispusip (100% redundan).
+  2. Formulir pendaftaran magang mahasiswa (`student/application/create`) masih mewajibkan pemilihan instansi via dropdown pencarian sebelum memilih bidang, menimbulkan gesekan UI/UX.
+  3. Controller Admin `ApplicationController` masih memuat validasi status `verified` yang sudah dihapus dari enum `ApplicationStatus`, serta placeholder nomor surat kedinasan yang masih menyisakan kode instansi lain (`APTIKA`).
+  4. Script utilitas `health_check.php` dan `dev_credentials.php` melempar `ReflectionException: Class "Kernel" does not exist` akibat urutan import sebelum `make(Kernel::class)`.
+  5. Metrik pada Dashboard Mentor menampilkan angka 0 statis untuk pendaftar akan datang, selesai, dan logbook pending.
+- **Root Cause**:
+  1. Relik kode lama dari era multi-agency belum diselaraskan secara komprehensif ke level 4 Bidang Resmi Dispusip (Sekretariat, Pembinaan & Pengelolaan Perpustakaan, Pembinaan & Layanan Kearsipan, Pengelolaan Perlindungan & Penyelamatan Kearsipan).
+  2. Validator Form Request pada `updateStatus` admin tertinggal dari migrasi batch penghapusan status `verified`.
+- **Fix Applied**:
+  1. Memodifikasi `ApplicationController` untuk menghapus `verified` dari rule validasi `in:...` dan memperbarui format placeholder nomor surat resmi ke `500.12.1/045/436.7.14/2026`.
+  2. Mendesain ulang form pendaftaran mahasiswa dengan kartu instansi terkunci resmi Dispusip (logo resmi, alamat, badge instansi resmi) dan pemilih langsung 4 Bidang Dispusip beserta kuota sisa.
+  3. Mengalihkan filter Dosen (`Lecturer/DashboardController` & `MonitoringController`) dan Universitas (`University/DashboardController`) dari filter instansi menjadi filter 4 Bidang Dispusip (`unit_id`), serta mengganti kartu sebaran kampus menjadi "Sebaran Bidang Penempatan di Dispusip Surabaya".
+  4. Menghitung metrik aktif, calon peserta, lulus, dan logbook pending mentor secara dinamis, serta menampilkan badge nama bidang kerja mentor di header dashboard.
+  5. Memperbaiki urutan import Kernel pada scripts dan membersihkan seluruh cache aplikasi.
+- **Prevention Rule**: Ketika sistem bertransisi dari arsitektur multi-tenant ke single-agency terspesialisasi, seluruh filter instansi wajib dikonversi menjadi filter divisi/bidang kerja internal dinas tersebut. Seluruh rule validasi status wajib bersumber atau diselaraskan secara konsisten dengan BackedEnum `ApplicationStatus`.
 
 ---
 

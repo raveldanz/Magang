@@ -63,16 +63,22 @@ class DashboardController extends Controller
         $totalReportsApproved = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', 'approved'))->count();
         $totalReportsPending = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', '!=', 'approved'))->count();
 
+        $activeStudents = (clone $baseQuery)->whereRelation('application', 'status', 'active')->count();
+        $upcomingStudents = (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count();
+        $completedStudents = (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count();
+        $placementIds = (clone $baseQuery)->pluck('id');
+        $pendingLogbooks = Logbook::whereIn('placement_id', $placementIds)->where('status', 'pending')->count();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_evaluated' => $totalEvaluated,
             'total_pending_eval' => $totalPendingEval,
             'total_reports_approved' => $totalReportsApproved,
             'total_reports_pending' => $totalReportsPending,
-            'active_students' => $totalStudents,
-            'upcoming_students' => 0,
-            'completed_students' => 0,
-            'pending_logbooks' => 0,
+            'active_students' => $activeStudents,
+            'upcoming_students' => $upcomingStudents,
+            'completed_students' => $completedStudents,
+            'pending_logbooks' => $pendingLogbooks,
         ];
 
         // Query penempatan dengan relasi lengkap

@@ -188,7 +188,7 @@ class ApplicationController extends Controller
         }
 
         $rules = [
-            'status' => 'required|in:pending,verified,waiting_approval,accepted,active,completed,rejected,resigned',
+            'status' => 'required|in:pending,waiting_approval,accepted,active,completed,rejected,resigned',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',

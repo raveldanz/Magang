@@ -9,7 +9,7 @@
             
             <div class="flex items-center gap-2">
                 <span class="px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-xs font-bold shadow-2xs">
-                   {{ Auth::user()->agencyProfile->agency_name ?? 'Instansi Pemerintah' }}
+                   {{ Auth::user()->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}@if(Auth::user()->unit) &bull; {{ Auth::user()->unit->name }}@endif
                 </span>
             </div>
         </div>

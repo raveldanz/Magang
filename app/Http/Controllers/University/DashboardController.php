@@ -72,8 +72,14 @@ class DashboardController extends Controller
             });
         }
 
-        if ($request->filled('agency_id')) {
+        if ($request->filled('unit_id')) {
+            $applicationsQuery->where('unit_id', $request->unit_id);
+            $placementsQuery->whereHas('application', fn ($aq) => $aq->where('unit_id', $request->unit_id));
+        } elseif ($request->filled('agency_id')) {
             $applicationsQuery->whereHas('unit', function ($q) use ($request) {
+                $q->where('agency_profile_id', $request->agency_id);
+            });
+            $placementsQuery->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });
         }
@@ -89,7 +95,36 @@ class DashboardController extends Controller
         $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'waiting_approval'])->count();
         $totalResigned = (clone $applicationsQuery)->where('status', 'resigned')->count();
 
-        // Sebaran Dinas / Instansi Penempatan
+        // Sebaran Bidang / Divisi Penempatan di Dispusip Surabaya
+        $units = Unit::with('agencyProfile')->orderBy('name')->get();
+        $unitDistribution = [];
+
+        foreach ($units as $u) {
+            $count = $allApplications->filter(function ($app) use ($u) {
+                return (int) $app->unit_id === (int) $u->id;
+            })->count();
+
+            $unitDistribution[] = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'quota' => (int) $u->quota,
+                'count' => $count,
+                'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+            ];
+        }
+
+        usort($unitDistribution, function ($a, $b) {
+            if ($b['count'] === $a['count']) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+
+            return $b['count'] <=> $a['count'];
+        });
+
+        $totalUnitsCount = count($unitDistribution);
+        $activeUnitsCount = count(array_filter($unitDistribution, fn ($d) => $d['count'] > 0));
+
+        // Sebaran Dinas / Instansi Penempatan (Fallback kompatibilitas)
         $agencies = AgencyProfile::orderBy('agency_name')->get();
         $agencyDistribution = [];
 
@@ -147,6 +182,10 @@ class DashboardController extends Controller
             'university',
             'allApplications',
             'stats',
+            'unitDistribution',
+            'units',
+            'totalUnitsCount',
+            'activeUnitsCount',
             'agencyDistribution',
             'agencies',
             'availableDosens',

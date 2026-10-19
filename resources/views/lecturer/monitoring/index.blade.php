@@ -25,11 +25,11 @@
                                class="w-full text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl pl-9 pr-3.5 py-2.5 transition">
                     </div>
 
-                    <select name="agency_id" onchange="this.form.submit()"
+                    <select name="unit_id" onchange="this.form.submit()"
                             class="text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium w-full sm:w-64 transition">
-                        <option value="">Semua Instansi</option>
-                        @foreach ($agencies as $agency)
-                            <option value="{{ $agency->id }}" {{ request('agency_id') == $agency->id ? 'selected' : '' }}>{{ $agency->agency_name }}</option>
+                        <option value="">Semua Bidang / Divisi</option>
+                        @foreach ($units ?? [] as $u)
+                            <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
                         @endforeach
                     </select>
 
@@ -37,7 +37,7 @@
                         <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
                             Cari
                         </button>
-                        @if (request()->filled('search') || request()->filled('agency_id'))
+                        @if (request()->filled('search') || request()->filled('unit_id') || request()->filled('agency_id'))
                             <a href="{{ route('lecturer.monitoring.index', ['tab' => $tab ?? 'active']) }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center">Reset</a>
                         @endif
                     </div>

@@ -36,7 +36,11 @@ class MonitoringController extends Controller
             });
         }
 
-        if ($request->filled('agency_id')) {
+        if ($request->filled('unit_id')) {
+            $baseQuery->whereHas('application', function ($q) use ($request) {
+                $q->where('unit_id', $request->unit_id);
+            });
+        } elseif ($request->filled('agency_id')) {
             $baseQuery->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });
@@ -71,8 +75,9 @@ class MonitoringController extends Controller
         $placements = $query->latest()->paginate(10)->withQueryString();
 
         $agencies = AgencyProfile::all();
+        $units = \App\Models\Unit::orderBy('name')->get();
 
-        return view('lecturer.monitoring.index', compact('placements', 'lecturer', 'agencies', 'stats', 'tab'));
+        return view('lecturer.monitoring.index', compact('placements', 'lecturer', 'agencies', 'units', 'stats', 'tab'));
     }
 
     /**
@@ -100,7 +105,11 @@ class MonitoringController extends Controller
             });
         }
 
-        if ($request->filled('agency_id')) {
+        if ($request->filled('unit_id')) {
+            $baseQuery->whereHas('application', function ($q) use ($request) {
+                $q->where('unit_id', $request->unit_id);
+            });
+        } elseif ($request->filled('agency_id')) {
             $baseQuery->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });

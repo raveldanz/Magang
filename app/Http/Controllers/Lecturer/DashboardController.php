@@ -54,7 +54,11 @@ class DashboardController extends Controller
             });
         }
 
-        if ($request->filled('agency_id')) {
+        if ($request->filled('unit_id')) {
+            $query->whereHas('application', function ($q) use ($request) {
+                $q->where('unit_id', $request->unit_id);
+            });
+        } elseif ($request->filled('agency_id')) {
             $query->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });
@@ -131,8 +135,9 @@ class DashboardController extends Controller
         ];
 
         $agencies = AgencyProfile::all();
+        $units = \App\Models\Unit::orderBy('name')->get();
 
-        return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies', 'actionAlerts'));
+        return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies', 'units', 'actionAlerts'));
     }
 
     /**

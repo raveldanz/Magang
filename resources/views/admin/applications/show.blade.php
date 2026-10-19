@@ -641,7 +641,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nomor Surat Balasan Dinas</label>
                                 <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
-                                    placeholder="Contoh: 500/123/APTIKA/2026"
+                                    placeholder="Contoh: 500.12.1/045/436.7.14/2026"
                                     class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
                             </div>
                             <div>

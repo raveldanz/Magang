@@ -140,71 +140,57 @@
                             })->values()->all();
                         @endphp
 
-                        <div x-data="{
-                            selectedAgencyId: '{{ $selectedAgencyId }}',
-                            selectedUnitId: '{{ $selectedUnitId }}',
-                            allUnits: {{ \Illuminate\Support\Js::from($unitItems) }},
-                            filteredUnits: [],
-
-                            init() {
-                                this.filterUnits();
-                                window.addEventListener('searchable-select-changed', (e) => {
-                                    if (e.detail.name === 'agency_profile_id') {
-                                        this.selectedAgencyId = e.detail.value;
-                                        this.filterUnits();
-                                        window.dispatchEvent(new CustomEvent('update-units-list', {
-                                            detail: { items: this.filteredUnits }
-                                        }));
-                                    }
-                                });
-                            },
-
-                            filterUnits() {
-                                if (!this.selectedAgencyId) {
-                                    this.filteredUnits = this.allUnits;
-                                } else {
-                                    this.filteredUnits = this.allUnits.filter(u => String(u.agency_profile_id) === String(this.selectedAgencyId));
-                                }
-                            }
-                        }" class="space-y-4">
-                            <!-- 1. Pemilihan Instansi Kedinasan -->
-                            <div>
-                                <x-searchable-select
-                                    name="agency_profile_id"
-                                    :items="$agencyItems"
-                                    :selected="$selectedAgencyId"
-                                    label="1. Instansi Penempatan: Dinas Perpustakaan dan Kearsipan Surabaya"
-                                    placeholder="-- Pilih Instansi Penempatan: Dinas Perpustakaan dan Kearsipan Surabaya --"
-                                    :required="true"
-                                    :show-asterisk="false"
-                                />
-                                @error('agency_profile_id')
-                                    <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
-                                @enderror
+                        <!-- 1. Instansi Penempatan Tunggal Resmi: Dinas Perpustakaan dan Kearsipan Kota Surabaya -->
+                        <input type="hidden" name="agency_profile_id" value="{{ $selectedAgencyId }}">
+                        
+                        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white border border-blue-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="w-12 h-12 rounded-xl bg-white border border-blue-100 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                                    <img src="{{ asset('images/logos/dispusip.png') }}" alt="Dispusip Surabaya" class="max-h-full max-w-full object-contain">
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-600 text-white uppercase tracking-wider">
+                                            Instansi Tunggal Resmi
+                                        </span>
+                                        <span class="text-xs text-slate-500 font-medium hidden sm:inline">&bull; Pemkot Surabaya</span>
+                                    </div>
+                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight mt-0.5 truncate">
+                                        Dinas Perpustakaan dan Kearsipan Kota Surabaya
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">
+                                        Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293
+                                    </p>
+                                </div>
                             </div>
-
-                            <!-- 2. Pemilihan Bidang Resmi Dispusip -->
-                            <div>
-                                <x-searchable-select
-                                    name="unit_id"
-                                    :items="$unitItems"
-                                    :selected="$selectedUnitId"
-                                    parent-listener="update-units-list"
-                                    label="2. Pilih Salah Satu dari 4 Bidang Resmi Dispusip Surabaya"
-                                    placeholder="-- Pilih Bidang Resmi Dispusip Surabaya --"
-                                    :required="true"
-                                    :show-asterisk="false"
-                                />
-                                @error('unit_id')
-                                    <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
-                                @enderror
-                                <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
-                                    <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span>Pilihan bidang kerja sesuai 4 bidang resmi Dispusip Kota Surabaya.</span>
-                                </p>
+                            <div class="shrink-0 flex items-center gap-1.5 self-start sm:self-auto px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Mitra Resmi Terpilih</span>
                             </div>
+                        </div>
+
+                        <!-- 2. Pemilihan Bidang Resmi Dispusip -->
+                        <div>
+                            <x-searchable-select
+                                name="unit_id"
+                                :items="$unitItems"
+                                :selected="$selectedUnitId"
+                                label="Pilihan Bidang / Divisi Resmi Dispusip Surabaya"
+                                placeholder="-- Cari atau Pilih Bidang Resmi Dispusip Surabaya --"
+                                :required="true"
+                                :show-asterisk="true"
+                            />
+                            @error('unit_id')
+                                <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                            @enderror
+                            <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1 font-medium">
+                                <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Tersedia 4 Bidang resmi: Sekretariat, Pengelolaan Perpustakaan, Layanan Kearsipan, dan Perlindungan/Preservasi Arsip.</span>
+                            </p>
                         </div>
 
                         <!-- Bagian B: Periode Magang -->
