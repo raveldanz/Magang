@@ -142,7 +142,7 @@ async function runTier3PlaywrightAudit() {
 
         // Login sebagai Admin QA
         await pageAdminDesktop.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
-        await pageAdminDesktop.fill('input[name="email"]', 'admin.qa@test.local');
+        await pageAdminDesktop.fill('input[name="email"]', 'admin@surabaya.go.id');
         await pageAdminDesktop.fill('input[name="password"]', 'password');
         await pageAdminDesktop.click('button[type="submit"]');
         await pageAdminDesktop.waitForURL(url => url.pathname.includes('/admin') || url.pathname.includes('/dashboard'), { timeout: 15000 });
@@ -247,7 +247,7 @@ async function runTier3PlaywrightAudit() {
 
         // Login sebagai Admin QA pada Mobile Viewport
         await pageAdminMobile.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
-        await pageAdminMobile.fill('input[name="email"]', 'admin.qa@test.local');
+        await pageAdminMobile.fill('input[name="email"]', 'admin@surabaya.go.id');
         await pageAdminMobile.fill('input[name="password"]', 'password');
         await pageAdminMobile.click('button[type="submit"]');
         await pageAdminMobile.waitForURL(url => url.pathname.includes('/admin') || url.pathname.includes('/dashboard'), { timeout: 15000 });

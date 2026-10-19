@@ -8,7 +8,7 @@ import os
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 
@@ -303,24 +303,14 @@ def create_logbook_docx():
     ]
 
     # Create Table: 5 columns
-    # Col 0: Tanggal (1.4 in)
-    # Col 1: Report (3.2 in)
-    # Col 2: Problem (2.0 in)
-    # Col 3: Solution (2.0 in)
-    # Col 4: To-do (1.9 in)
     col_widths = [Inches(1.4), Inches(3.2), Inches(2.0), Inches(2.0), Inches(1.9)]
     
-    # We add:
-    # Row 0: Super-Header (Tanggal | Evan - Mahasiswa Magang)
-    # Row 1: Sub-Headers (Tanggal | Report | Problem | Solution | To-do)
-    # Rows 2..N: Data rows
     total_rows = 2 + len(entries)
     table = doc.add_table(rows=total_rows, cols=5)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
 
     # Format Super-Header (Row 0)
-    # Cell 0: "Tanggal", Cells 1-4 merged: "Nama Mahasiswa: Evan (Web Developer / Fullstack Engineer)"
     r0 = table.rows[0]
     r0_c0 = r0.cells[0]
     r0_c1 = r0.cells[1]
@@ -444,11 +434,15 @@ def create_logbook_docx():
     )
     tblPr.append(borders)
 
-    # Save to Root and Public
-    project_root = r"C:\Magang-main"
-    out_root = os.path.join(project_root, "Rekapan_Logbook_Magang_10Agt_05Okt.docx")
-    out_public = os.path.join(project_root, "public", "Rekapan_Logbook_Magang_10Agt_05Okt.docx")
+   # Deteksi root folder proyek otomatis
+    current_script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_script_dir, ".."))
     
+    public_dir = os.path.join(project_root, "public")
+    os.makedirs(public_dir, exist_ok=True)
+
+    out_root = os.path.join(project_root, "Rekapan_Logbook_Magang_10Agt_05Okt.docx")
+    out_public = os.path.join(public_dir, "Rekapan_Logbook_Magang_10Agt_05Okt.docx")
     doc.save(out_root)
     doc.save(out_public)
     print(f"[OK] Berkas DOCX berhasil dibuat di: {out_root}")

@@ -52,7 +52,15 @@ async function authenticateIfNeeded(page, targetRole) {
         return;
     }
     const roleName = targetRole || 'admin';
-    const email = roleName === 'admin' ? 'admin.qa@test.local' : `${roleName}@test.local`;
+    const emailMap = {
+        admin: 'admin@surabaya.go.id',
+        super_admin: 'admin@surabaya.go.id',
+        mentor: 'mentor.kominfo@surabaya.go.id',
+        dosen: 'dosen.unesa@unesa.ac.id',
+        universitas: 'admin@unesa.ac.id',
+        mahasiswa: 'mahasiswa.aktif@unesa.ac.id',
+    };
+    const email = emailMap[roleName] || `${roleName}@test.local`;
     const password = 'password';
 
     console.log(`[YOLO] Otentikasi otomatis sebagai [${roleName}] (${email})...`);

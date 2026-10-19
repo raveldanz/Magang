@@ -81,6 +81,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-069** | 2026-10-08 | Redesain Menyeluruh UI/UX Portal Dosen Pembimbing | Eliminasi border berlebih, pembersihan subheadline & panah redundan, UX logbook terarah, & responsivitas mobile penuh | RESOLVED |
 | **LRN-070** | 2026-10-08 | 6 Fitur Praktis Bimbingan Dosen V1 & Human-Crafted Overhaul Detail Mahasiswa | Preset quick feedback chips, direct WhatsApp link, indikator keaktifan logbook, countdown sisa hari, catatan internal privat DPL (advisor_notes), & timestamp naskah laporan | RESOLVED |
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
+| **LRN-072** | 2026-10-19 | Audit Sistem, Migrasi Pending & Integritas Rute Modular | Pemulihan rute staged monolitik ke modular, eksekusi migrasi pending PostgreSQL & pembetulan import Kernel CLI scripts | RESOLVED |
 
 ---
 
@@ -1679,6 +1680,28 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Mengembalikan validasi gerbang kelulusan (*Certificate Gate* & logbook completion check) pada `CertificateController.php`.
   4. Membersihkan cache aplikasi (`php artisan optimize:clear`) dan memvalidasi test suite hingga seluruh **281 Feature/Unit Tests (1.914 assertions) berstatus 100% PASS (Exit Code 0)**.
 - **Prevention Rule**: Dilarang memilih "Accept Incoming Changes" secara membabi-buta saat rekonsiliasi merge conflict branch master/backup. Selalu bandingkan `git diff` terhadap commit stabil terakhir dan jalankan `php artisan test` segera setelah proses merge selesai untuk memastikan tidak ada fitur atau rute yang hilang.
+
+---
+
+### [LRN-072] Audit Menyeluruh Sistem: Penanganan Staged Monolithic Route, Migrasi Pending PostgreSQL, & Hardening Runner Testing
+- **Tanggal**: 2026-10-19
+- **Komponen**: `routes/web.php`, `database/migrations/`, `scripts/health_check.php`, `scripts/audit_verifier.php`, `scripts/tier3_playwright_audit.mjs`, `scripts/browser-runner.mjs`
+- **Problem / Symptom**:
+  1. Berkas `routes/web.php` ter-stage dengan modifikasi yang mengganti rute modular dengan versi monolitik lama, menyebabkan 33 pengujian otomatis gagal akibat `Route [chat.start] not defined` dan hilangnya file route modular (`student.php`, `admin.php`, dll.).
+  2. Terdapat 2 migrasi tertunda (*Pending*) pada PostgreSQL: `create_academic_consultations_table` dan `add_advisor_notes_to_placements_table`.
+  3. Skrip verifikasi mandiri (`health_check.php`, `audit_verifier.php`, `dev_credentials.php`) melempar `ReflectionException: Target class [Kernel] does not exist` karena deklarasi `use Kernel;` terletak setelah instansiasi.
+  4. Pengujian visual Playwright gagal login karena menembak akun dummy `admin.qa@test.local` yang tidak terdaftar di database.
+- **Root Cause**:
+  1. Penulisan ulang manual tanpa menyertakan modul rute modern.
+  2. Migrasi baru ditambahkan di codebase namun belum dieksekusi di database PostgreSQL lokal.
+  3. Kesalahan urutan deklarasi namespace `use` sebelum pemanggilan `$app->make(Kernel::class)` pada skrip CLI mandiri.
+  4. Kredensial hardcoded tidak selaras dengan akun admin resmi hasil seeding (`admin@surabaya.go.id`).
+- **Fix Applied**:
+  1. Memulihkan `routes/web.php` ke versi modular HEAD terpisah, memvalidasi test suite hingga 281/281 test (1.914 assertions) berstatus 100% PASS (Exit Code 0).
+  2. Menjalankan `php artisan migrate` untuk mengaktifkan tabel konsultasi dan kolom catatan dosen.
+  3. Memperbaiki urutan `use` import pada seluruh skrip audit mandiri.
+  4. Mengupdate kredensial audit visual ke `admin@surabaya.go.id`, menginstal devDependencies `playwright`, dan memverifikasi pengujian visual E2E Chrome channel (100% PASS).
+- **Prevention Rule**: Selalu pastikan `routes/web.php` mempertahankan impor modular terpisah; selalu jalankan `php artisan migrate:status` sebelum pengujian; dan pastikan skrip pengujian visual selalu menggunakan kredensial master dari seeder resmi.
 
 ---
 
