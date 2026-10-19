@@ -22,6 +22,10 @@ class AgencyProfileController extends Controller
         $user = Auth::user();
         $isSuperAdmin = $this->isSuperAdmin($user);
 
+        if ($user && ! $isSuperAdmin && $user->unit_id) {
+            abort(403, 'Profil Dinas hanya dapat dikelola oleh Admin Dinas Utama atau Super Admin.');
+        }
+
         if ($isSuperAdmin) {
             // Superadmin can view & switch any agency
             $requestedId = $request->query('agency_id', $request->query('id', 1));
@@ -51,6 +55,10 @@ class AgencyProfileController extends Controller
     {
         $user = Auth::user();
         $isSuperAdmin = $this->isSuperAdmin($user);
+
+        if ($user && ! $isSuperAdmin && $user->unit_id) {
+            abort(403, 'Profil Dinas hanya dapat dikelola oleh Admin Dinas Utama atau Super Admin.');
+        }
 
         $request->validate([
             'agency_id' => 'nullable|exists:agency_profiles,id',
