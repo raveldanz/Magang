@@ -11,6 +11,7 @@ use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\NotificationService;
 use App\Services\PlacementAssignmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +34,7 @@ class ApplicationController extends Controller
             'user.studentProfile',
             'user.universityRelation',
             'unit.agencyProfile',
+            'group',
             'documents',
             'placement.evaluation',
             'placement.finalreport',
@@ -46,8 +48,12 @@ class ApplicationController extends Controller
         // Sama persis dengan pusat kendali dinas & kampus.
         $query->orderByActionPriority();
 
-        // Multi-Tenant Isolation: Admin instansi hanya melihat pengajuan pada unit instansinya sendiri
-        if ($agencyId) {
+        // Isolasi Bidang & Multi-Tenant:
+        // Jika user adalah Admin Bidang, otomatis kunci hanya melihat pengajuan pada bidangnya sendiri
+        if (! $isSuperAdmin && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        } elseif ($agencyId) {
+            // Admin dinas keseluruhan (unit_id null) melihat semua pengajuan pada instansinya
             $query->whereHas('unit', function ($q) use ($agencyId) {
                 $q->where('agency_profile_id', $agencyId);
             });
@@ -73,8 +79,10 @@ class ApplicationController extends Controller
                 : $query->where('status', strtolower($request->status));
         }
 
-        // 3. Filter Berdasarkan Unit / Divisi Kerja
-        if ($request->filled('unit_id')) {
+        // 3. Filter Berdasarkan Unit / Divisi Kerja (Hanya jika Super Admin atau Admin Dinas Keseluruhan)
+        if (! $isSuperAdmin && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        } elseif ($request->filled('unit_id')) {
             $query->where('unit_id', $request->unit_id);
         }
 
@@ -95,8 +103,20 @@ class ApplicationController extends Controller
             });
         }
 
-        // Query Unit untuk Filter Dropdown (Scoped per instansi untuk Admin Dinas, atau All untuk Superadmin)
-        if ($agencyId) {
+        // 5. Filter Berdasarkan Tipe Pendaftaran (Individu vs Kelompok)
+        if ($request->filled('registration_type')) {
+            if ($request->registration_type === 'group') {
+                $query->whereNotNull('applications.group_id');
+            } elseif ($request->registration_type === 'individual') {
+                $query->whereNull('applications.group_id');
+            }
+        }
+
+        // Query Unit untuk Filter Dropdown (Scoped per bidang untuk Admin Bidang, scoped per dinas untuk Admin Dinas, all untuk Superadmin)
+        if (! $isSuperAdmin && $user->unit_id) {
+            $units = Unit::where('id', $user->unit_id)->get();
+            $groupedUnits = null;
+        } elseif ($agencyId) {
             $units = Unit::where('agency_profile_id', $agencyId)->get();
             $groupedUnits = null;
         } else {
@@ -135,25 +155,38 @@ class ApplicationController extends Controller
         $application = Application::with([
             'user.studentProfile',
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'documents',
             'placement.pembimbing',
             'placement.mentor',
             'placement.academicAdvisor',
             'placement.evaluation',
             'placement.finalreport',
+            'placement.internshipProjects',
         ])->findOrFail($id);
 
-        // Multi-Tenant Authorization Check
+        // Pemicu Otomatis 3: jika mahasiswa sudah mencapai tanggal mulai (today >= start_date) dan belum berstatus active, sistem langsung memperbarui statusnya secara on-the-fly
+        $application->autoActivateIfStarted();
+
+        // Multi-Tenant & Bidang Authorization Check
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
         }
 
+        if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke data pengajuan bidang lain.');
+        }
+
         // Dropdown 'Pilih Pembimbing Lapangan' HANYA memuat user role 'mentor' yang terdaftar di instansi yang bersangkutan
         $targetAgencyId = $application->unit?->agency_profile_id ?? $user?->agency_profile_id;
-        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing']);
+        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing'])->with('unit');
 
         if ($targetAgencyId !== null) {
             $pembimbingQuery->where('agency_profile_id', $targetAgencyId);
+        }
+
+        if (! $isSuperAdmin && $user->unit_id) {
+            $pembimbingQuery->where('unit_id', $user->unit_id);
         }
 
         $pembimbings = $pembimbingQuery->orderBy('name')->get();
@@ -174,6 +207,7 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
+        $isSupervisor = $user->role === 'supervisor';
 
         $statusInput = strtolower($request->status);
         $request->merge(['status' => $statusInput]);
@@ -183,12 +217,14 @@ class ApplicationController extends Controller
         }
 
         $rules = [
-            'status' => 'required|in:pending,verified,accepted,active,completed,rejected,resigned',
+            'status' => 'required|in:pending,waiting_approval,accepted,active,completed,rejected,resigned',
             'mentor_id' => 'nullable|exists:users,id',
             'pembimbing_id' => 'nullable|exists:users,id',
             'academic_advisor_id' => 'nullable|exists:users,id',
             'letter_number' => 'nullable|string|max:100',
             'letter_date' => 'nullable|date',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
             'override_reason' => 'nullable|string',
         ];
 
@@ -210,23 +246,40 @@ class ApplicationController extends Controller
         $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : strtolower((string) $application->status);
         $newStatus = $request->status;
 
-        // Multi-Tenant Authorization Check
+        // Multi-Tenant & Bidang Authorization Check
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan instansi lain.');
         }
 
-        // Validasi State Ketat: keputusan terima/tolak hanya dari tahap seleksi (PENDING atau VERIFIED),
-        // sesuai alur resmi pending → verified → accepted.
-        $decisionStatuses = ['pending', 'verified'];
-        if ($newStatus === 'accepted' && ! in_array($oldStatus, [...$decisionStatuses, 'accepted'], true)) {
+        if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah pengajuan bidang lain.');
+        }
+
+        // Penguncian Otorisasi: Saat status berada di WAITING_APPROVAL, status ACCEPTED dan ACTIVE
+        // HANYA dapat disahkan oleh Atasan (supervisor) atau super_admin
+        if ($oldStatus === 'waiting_approval' && in_array($newStatus, ['accepted', 'active'], true) && ! $isSuperAdmin && ! $isSupervisor) {
             return redirect()->back()
-                ->with('error', "Gagal menyetujui pengajuan: Aksi persetujuan (Approve) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->with('error', 'Status pengajuan saat ini sedang menunggu persetujuan Atasan. Persetujuan akhir (ACC) hanya dapat dilakukan oleh Atasan (Tim Kerja Umum dan Kepegawaian) atau Super Admin.')
+                ->withInput();
+        }
+
+        // Alur Double ACC: Jika Admin Dinas staf biasa menyetujui pengajuan awal (dari pending),
+        // otomatis arahkan status ke waiting_approval (Menunggu ACC Atasan)
+        if (! $isSuperAdmin && ! $isSupervisor && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
+            $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
+        }
+
+        // Validasi State Ketat: keputusan terima/ajukan hanya dari tahap seleksi (PENDING atau WAITING_APPROVAL)
+        $decisionStatuses = ['pending', 'waiting_approval'];
+        if (($newStatus === 'accepted' || $newStatus === 'waiting_approval') && ! in_array($oldStatus, [...$decisionStatuses, 'accepted', 'active'], true)) {
+            return redirect()->back()
+                ->with('error', "Gagal memproses pengajuan: Aksi persetujuan hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'waiting_approval'. Status saat ini: '{$oldStatus}'.")
                 ->withInput();
         }
 
         if ($newStatus === 'rejected' && ! in_array($oldStatus, $decisionStatuses, true)) {
             return redirect()->back()
-                ->with('error', "Gagal menolak pengajuan: Aksi penolakan (Reject) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'verified'. Status saat ini: '{$oldStatus}'.")
+                ->with('error', "Gagal menolak pengajuan: Aksi penolakan (Reject) hanya dapat dilakukan pada pengajuan yang berstatus 'pending' atau 'waiting_approval'. Status saat ini: '{$oldStatus}'.")
                 ->withInput();
         }
 
@@ -294,17 +347,26 @@ class ApplicationController extends Controller
         $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
         $letterToken = $application->letter_token ?: Str::random(32);
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
-        $placementEligibleStatuses = ['accepted', 'active', 'completed'];
+        $placementEligibleStatuses = ['waiting_approval', 'accepted', 'active', 'completed'];
 
-        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses) {
-            $application->update([
+        DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses, $user) {
+            $appUpdateData = [
                 'status' => $newStatus,
                 'rejection_note' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
                 'rejection_reason' => $newStatus === 'rejected' ? ($request->rejection_reason ?? $request->rejection_note) : null,
                 'letter_number' => in_array($newStatus, $placementEligibleStatuses) ? ($request->letter_number ?: ($application->letter_number ?: $autoLetterNumber)) : null,
                 'letter_date' => in_array($newStatus, $placementEligibleStatuses) ? ($request->letter_date ?: ($application->letter_date ?: date('Y-m-d'))) : null,
                 'letter_token' => in_array($newStatus, $placementEligibleStatuses) ? $letterToken : $application->letter_token,
-            ]);
+            ];
+
+            if ($request->filled('start_date')) {
+                $appUpdateData['start_date'] = $request->start_date;
+            }
+            if ($request->filled('end_date')) {
+                $appUpdateData['end_date'] = $request->end_date;
+            }
+
+            $application->update($appUpdateData);
 
             $placementData = [];
             if ($assignedMentorId) {
@@ -316,17 +378,128 @@ class ApplicationController extends Controller
                 $placementData['academic_advisor_id'] = $request->academic_advisor_id;
             }
 
+            $existingPlacement = Placement::where('application_id', $application->id)->first();
+            $oldMentor = $existingPlacement?->mentor ?? $existingPlacement?->pembimbing;
+            $oldAdvisor = $existingPlacement?->academicAdvisor;
+
             if (in_array($newStatus, $placementEligibleStatuses)) {
-                $existingPlacement = Placement::where('application_id', $application->id)->first();
                 $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
                 $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
             }
 
-            if (! empty($placementData) || in_array($newStatus, $placementEligibleStatuses)) {
-                Placement::updateOrCreate(
+            $reassignChanges = [];
+            if ($assignedMentorId && (int) ($existingPlacement?->mentor_id ?? 0) !== (int) $assignedMentorId) {
+                $newMentorObj = User::find($assignedMentorId);
+                $reassignChanges['mentor'] = [
+                    'from' => $oldMentor?->name,
+                    'to' => $newMentorObj?->name ?? (string) $assignedMentorId,
+                ];
+            }
+
+            if ($request->filled('academic_advisor_id')) {
+                $newAdvisorId = (int) $request->academic_advisor_id;
+                if ((int) ($existingPlacement?->academic_advisor_id ?? 0) !== $newAdvisorId) {
+                    $newAdvisorObj = User::find($newAdvisorId);
+                    $reassignChanges['academic_advisor'] = [
+                        'from' => $oldAdvisor?->name,
+                        'to' => $newAdvisorObj?->name ?? (string) $newAdvisorId,
+                    ];
+                }
+            }
+
+            // Anti-Reset: gunakan update() pada instance yang sudah ada agar ID, logbook, absensi, dan laporan akhir tetap utuh
+            if ($existingPlacement) {
+                if (! empty($placementData)) {
+                    $existingPlacement->update($placementData);
+                }
+            } elseif (! empty($placementData) || in_array($newStatus, $placementEligibleStatuses)) {
+                $existingPlacement = Placement::create(array_merge(
                     ['application_id' => $application->id],
                     $placementData
-                );
+                ));
+            }
+
+            // Sinkronkan seluruh anggota kelompok jika ini adalah pengajuan kelompok
+            if ($application->group_id) {
+                $group = \App\Models\InternshipGroup::find($application->group_id);
+                if ($group) {
+                    $group->update([
+                        'status' => $newStatus,
+                        'letter_number' => $appUpdateData['letter_number'] ?? $group->letter_number,
+                        'letter_date' => $appUpdateData['letter_date'] ?? $group->letter_date,
+                        'letter_token' => $group->letter_token ?: $letterToken,
+                        'rejection_reason' => $appUpdateData['rejection_reason'] ?? null,
+                    ]);
+
+                    $siblingApps = Application::where('group_id', $group->id)
+                        ->where('id', '!=', $application->id)
+                        ->get();
+
+                    foreach ($siblingApps as $sibling) {
+                        $siblingUpdateData = $appUpdateData;
+                        $siblingUpdateData['letter_token'] = $sibling->letter_token ?: Str::random(32);
+                        $sibling->update($siblingUpdateData);
+
+                        if ($assignedMentorId || in_array($newStatus, $placementEligibleStatuses)) {
+                            $sibPlacement = Placement::where('application_id', $sibling->id)->first();
+                            $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                            $sibPlacementData = $placementData;
+                            if (in_array($newStatus, $placementEligibleStatuses)) {
+                                $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
+                                $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
+                            }
+                            if ($sibPlacement) {
+                                $sibPlacement->update($sibPlacementData);
+                            } else {
+                                $sibPlacementData['application_id'] = $sibling->id;
+                                Placement::create($sibPlacementData);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Catat audit log khusus mutasi/pergantian pembimbing jika ada perubahan
+            if (! empty($reassignChanges) && $existingPlacement) {
+                AuditLog::record('PLACEMENT_SUPERVISOR_REASSIGN', 'Placement', $existingPlacement->id, [
+                    'student_name' => $application->user?->name,
+                    'application_status' => $newStatus,
+                    'changes' => $reassignChanges,
+                    'actor_role' => $user->role,
+                ]);
+            }
+
+            // Sinkronkan grup bimbingan chat jika mentor ditetapkan/berganti
+            if ($assignedMentorId && (! $oldMentor || (int) $oldMentor->id !== (int) $assignedMentorId)) {
+                try {
+                    $chatGroups = app(\App\Services\Chat\ChatGroupService::class);
+                    if ($oldMentor) {
+                        $chatGroups->syncMentorGroup($oldMentor);
+                    }
+                    if ($newMentor = User::find($assignedMentorId)) {
+                        $chatGroups->syncMentorGroup($newMentor);
+                    }
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+
+            // Sinkronkan grup bimbingan chat jika Dosen Pembimbing ditetapkan/berganti
+            if ($request->filled('academic_advisor_id')) {
+                $newAdvisorId = (int) $request->academic_advisor_id;
+                if (! $oldAdvisor || (int) $oldAdvisor->id !== $newAdvisorId) {
+                    try {
+                        $chatGroups = app(\App\Services\Chat\ChatGroupService::class);
+                        if ($oldAdvisor) {
+                            $chatGroups->syncDplGroup($oldAdvisor);
+                        }
+                        if ($newAdvisor = User::find($newAdvisorId)) {
+                            $chatGroups->syncDplGroup($newAdvisor);
+                        }
+                    } catch (\Throwable $e) {
+                        report($e);
+                    }
+                }
             }
 
             // Catat Audit Trail
@@ -339,7 +512,16 @@ class ApplicationController extends Controller
                 'override_reason' => $request->override_reason,
                 'is_super_admin' => $isSuperAdmin,
             ]);
+
+            // Kirim notifikasi jika pengajuan diteruskan ke Atasan (Double ACC)
+            if ($newStatus === ApplicationStatus::WAITING_APPROVAL->value) {
+                NotificationService::notifySupervisorForApplication($application);
+            }
         });
+
+        if ($request->filled('return_to')) {
+            return redirect()->to($request->input('return_to'))->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
+        }
 
         return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
     }
@@ -379,10 +561,17 @@ class ApplicationController extends Controller
                 continue;
             }
 
+            // Bidang Isolation Check: Admin bidang hanya boleh memproses pengajuan bidangnya
+            if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+                $failCount++;
+
+                continue;
+            }
+
             $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : strtolower((string) $application->status);
 
-            // Hanya bisa terima/tolak jika status pending/verified
-            if (! in_array($oldStatus, ['pending', 'verified'], true)) {
+            // Hanya bisa terima/tolak jika status pending atau waiting_approval
+            if (! in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
                 $failCount++;
 
                 continue;
@@ -395,6 +584,7 @@ class ApplicationController extends Controller
                 if ($unit) {
                     $overlappingInterns = $unit->applications()
                         ->whereIn('status', ['accepted', 'active'])
+                        ->where('id', '!=', $application->id)
                         ->where(function ($query) use ($application) {
                             $query->where('start_date', '<=', $application->end_date)
                                 ->where('end_date', '>=', $application->start_date);
@@ -424,38 +614,99 @@ class ApplicationController extends Controller
                 }
             }
 
-            DB::transaction(function () use ($application, $action, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $assignedMentorId, $isSuperAdmin) {
+            // Alur Double ACC Massal: Admin Dinas staf biasa → waiting_approval → Atasan ACC akhir
+            // Selaraskan dengan logika single-update di updateStatus()
+            $effectiveAction = $action;
+            if ($action === 'accepted' && ! $isSuperAdmin && ! ($user->role === 'supervisor')) {
+                $effectiveAction = ApplicationStatus::WAITING_APPROVAL->value;
+            }
+
+            DB::transaction(function () use ($application, $effectiveAction, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $assignedMentorId, $isSuperAdmin) {
                 $application->update([
-                    'status' => $action,
-                    'rejection_note' => $action === 'rejected' ? $request->bulk_rejection_note : null,
-                    'rejection_reason' => $action === 'rejected' ? $request->bulk_rejection_note : null,
-                    'letter_number' => $action === 'accepted' ? ($application->letter_number ?: $autoLetterNumber) : null,
-                    'letter_date' => $action === 'accepted' ? ($application->letter_date ?: date('Y-m-d')) : null,
-                    'letter_token' => $action === 'accepted' ? $letterToken : $application->letter_token,
+                    'status' => $effectiveAction,
+                    'rejection_note' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                    'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                    'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($application->letter_number ?: $autoLetterNumber) : null,
+                    'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($application->letter_date ?: date('Y-m-d')) : null,
+                    'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? $letterToken : $application->letter_token,
                 ]);
 
-                if ($action === 'accepted' || $assignedMentorId) {
+                if (in_array($effectiveAction, ['waiting_approval', 'accepted']) || $assignedMentorId) {
                     $placementData = [];
                     if ($assignedMentorId) {
                         $placementData['mentor_id'] = $assignedMentorId;
                         $placementData['pembimbing_id'] = $assignedMentorId;
                     }
-                    if ($action === 'accepted') {
+                    if (in_array($effectiveAction, ['waiting_approval', 'accepted'])) {
                         $existingPlacement = Placement::where('application_id', $application->id)->first();
                         $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
                         $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
                     }
 
                     if (! empty($placementData)) {
-                        Placement::updateOrCreate(['application_id' => $application->id], $placementData);
+                        $existingPlacement = Placement::where('application_id', $application->id)->first();
+                        if ($existingPlacement) {
+                            $existingPlacement->update($placementData);
+                        } else {
+                            Placement::create(array_merge(['application_id' => $application->id], $placementData));
+                        }
+                    }
+                }
+
+                // Sinkronkan seluruh anggota kelompok jika pengajuan kelompok diproses massal
+                if ($application->group_id) {
+                    $group = \App\Models\InternshipGroup::find($application->group_id);
+                    if ($group) {
+                        $group->update([
+                            'status' => $effectiveAction,
+                            'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($group->letter_number ?: $autoLetterNumber) : null,
+                            'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($group->letter_date ?: date('Y-m-d')) : null,
+                            'letter_token' => $group->letter_token ?: $letterToken,
+                            'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                        ]);
+
+                        $siblingApps = Application::where('group_id', $group->id)
+                            ->where('id', '!=', $application->id)
+                            ->get();
+
+                        foreach ($siblingApps as $sibling) {
+                            $sibling->update([
+                                'status' => $effectiveAction,
+                                'rejection_note' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                                'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                                'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_number ?: $autoLetterNumber) : null,
+                                'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_date ?: date('Y-m-d')) : null,
+                                'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_token ?: Str::random(32)) : $sibling->letter_token,
+                            ]);
+
+                            if (in_array($effectiveAction, ['waiting_approval', 'accepted']) || $assignedMentorId) {
+                                $sibPlacement = Placement::where('application_id', $sibling->id)->first();
+                                $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                                $sibPlacementData = $placementData ?? [];
+                                if (in_array($effectiveAction, ['waiting_approval', 'accepted'])) {
+                                    $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
+                                    $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
+                                }
+                                if ($sibPlacement) {
+                                    $sibPlacement->update($sibPlacementData);
+                                } else {
+                                    Placement::create(array_merge(['application_id' => $sibling->id], $sibPlacementData));
+                                }
+                            }
+                        }
                     }
                 }
 
                 AuditLog::record('APPLICATION_STATUS_UPDATE_BULK', 'Application', $application->id, [
                     'old_status' => $oldStatus,
-                    'new_status' => $action,
+                    'new_status' => $effectiveAction,
                     'is_super_admin' => $isSuperAdmin,
                 ]);
+
+                // Kirim notifikasi ke Atasan jika status diteruskan ke waiting_approval (Double ACC)
+                if ($effectiveAction === ApplicationStatus::WAITING_APPROVAL->value) {
+                    NotificationService::notifySupervisorForApplication($application);
+                }
             });
 
             $successCount++;
@@ -466,7 +717,7 @@ class ApplicationController extends Controller
         } elseif ($successCount > 0 && $failCount > 0) {
             return redirect()->route('admin.applications.index')->with('success', "Berhasil memperbarui $successCount pengajuan. Namun $failCount pengajuan gagal (mungkin kuota penuh atau status tidak valid).");
         } else {
-            return redirect()->route('admin.applications.index')->with('error', 'Gagal memperbarui status secara massal. Pastikan kuota tersedia dan pengajuan berstatus pending/verified.');
+            return redirect()->route('admin.applications.index')->with('error', 'Gagal memperbarui status secara massal. Pastikan kuota tersedia dan pengajuan berstatus pending.');
         }
     }
 
@@ -490,6 +741,10 @@ class ApplicationController extends Controller
         // Multi-Tenant Authorization Check
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke surat pengajuan instansi lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $application->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke surat pengajuan bidang lain.');
         }
 
         return view('letters.acceptance', compact('application'));

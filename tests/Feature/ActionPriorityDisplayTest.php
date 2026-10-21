@@ -39,7 +39,14 @@ class ActionPriorityDisplayTest extends TestCase
     {
         parent::setUp();
 
-        $this->univ = University::create(['name' => 'Universitas Uji', 'code' => 'UJI']);
+        $this->univ = University::create([
+            'name' => 'Universitas Uji',
+            'code' => 'UJI',
+            'evaluation_scheme' => 'dual_evaluation',
+            'weight_mentor' => 40,
+            'weight_lecturer' => 60,
+            'require_dpl' => true,
+        ]);
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Uji']);
         $this->unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Uji', 'quota' => 10]);
         $this->superAdmin = User::factory()->create(['role' => 'super_admin']);
@@ -107,7 +114,7 @@ class ActionPriorityDisplayTest extends TestCase
         $noDplUniv = University::create(['name' => 'Kampus Tanpa DPL', 'code' => 'KTD', 'require_dpl' => false]);
 
         $pendingOld = $this->makeApplication('pending', 'Antre Terlama', daysAgo: 10);
-        $verified = $this->makeApplication('verified', 'Lolos Berkas', daysAgo: 7);
+        $waitingApproval = $this->makeApplication('waiting_approval', 'Menunggu ACC', daysAgo: 7);
         $pendingNew = $this->makeApplication('pending', 'Antre Baru', daysAgo: 5);
         $readyDual = $this->makeApplication('active', 'Siap Lulus Ganda', daysAgo: 15, withMentor: true, withDosen: true);
         $this->gradeLegacy($readyDual);
@@ -142,7 +149,7 @@ class ActionPriorityDisplayTest extends TestCase
         $this->assertSame($phpTiers, $sqlTiers, 'Tingkat prioritas SQL berbeda dengan PHP');
         $this->assertSame(
             [1, 1, 1, 2, 2, 2, 4, 3, 3, 4, 4, 5, 6, 8, 8],
-            array_map(fn ($a) => $phpTiers[$a->id], [$pendingOld, $verified, $pendingNew, $readyDual, $readyAspects, $readyMentorOnly,
+            array_map(fn ($a) => $phpTiers[$a->id], [$pendingOld, $waitingApproval, $pendingNew, $readyDual, $readyAspects, $readyMentorOnly,
                 $partialMentorOnly, $noMentor, $noDosen, $noDosenFree, $active, $accepted, $completed, $rejected, $resigned])
         );
 
@@ -154,7 +161,7 @@ class ActionPriorityDisplayTest extends TestCase
 
         $this->assertSame($phpOrder, $sqlOrder, 'Urutan SQL berbeda dengan PHP');
         // Kelompok perlu tindakan = antrean (terlama dulu); kelompok lain = terbaru dulu
-        $this->assertSame([$pendingOld->id, $verified->id, $pendingNew->id], array_slice($sqlOrder, 0, 3));
+        $this->assertSame([$pendingOld->id, $waitingApproval->id, $pendingNew->id], array_slice($sqlOrder, 0, 3));
         $this->assertSame([$noDosen->id, $noMentor->id], array_slice($sqlOrder, 6, 2));
         $this->assertSame([$active->id, $noDosenFree->id, $partialMentorOnly->id], array_slice($sqlOrder, 8, 3));
         $this->assertSame([$rejected->id, $resigned->id], array_slice($sqlOrder, -2));
@@ -188,7 +195,7 @@ class ActionPriorityDisplayTest extends TestCase
     public function test_action_priority_and_hints(): void
     {
         $pending = $this->makeApplication('pending', 'A Pending');
-        $verified = $this->makeApplication('verified', 'B Verified');
+        $waitingApproval = $this->makeApplication('waiting_approval', 'B Menunggu ACC');
         $noMentor = $this->makeApplication('accepted', 'C Tanpa Mentor');
         $noDosen = $this->makeApplication('active', 'D Tanpa Dosen', withMentor: true);
         $ready = $this->makeApplication('active', 'E Siap Lulus', withMentor: true, withDosen: true);
@@ -197,9 +204,9 @@ class ActionPriorityDisplayTest extends TestCase
         $completed = $this->makeApplication('completed', 'F Lulus', withMentor: true, withDosen: true);
         $rejected = $this->makeApplication('rejected', 'G Ditolak');
 
-        // Tingkat 1 tanpa keterangan: badge PENDING/VERIFIED sudah menyatakan tindakannya
+        // Tingkat 1 tanpa keterangan: badge PENDING/WAITING_APPROVAL sudah menyatakan tindakannya
         $this->assertSame([1, null], [$pending->actionPriority(), $pending->actionHint()]);
-        $this->assertSame([1, null], [$verified->actionPriority(), $verified->actionHint()]);
+        $this->assertSame([1, null], [$waitingApproval->actionPriority(), $waitingApproval->actionHint()]);
         $this->assertSame([2, 'Siap diluluskan'], [$ready->actionPriority(true), $ready->actionHint(true)]);
 
         // Mahasiswa tanpa logbook tidak bisa siap diluluskan (masuk tingkat 4 / magang aktif)

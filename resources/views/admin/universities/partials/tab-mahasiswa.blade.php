@@ -8,7 +8,6 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-sm font-black text-slate-900">Daftar Mahasiswa Asal {{ $university->name }}</h3>
-                            <p class="text-xs text-slate-500">Pantau status pendaftaran, instansi penempatan, dosen pembimbing, dan perkembangan nilai</p>
                         </div>
 
                         <div class="cc-head-actions flex items-center gap-2">
@@ -99,6 +98,13 @@
                                                     <div class="stt-title" title="{{ $student->email }}">{{ $student->name }}</div>
                                                     <div class="stt-meta" title="{{ $metaLine }}">{{ $profile?->jurusan ?? '-' }}</div>
                                                     <div class="stt-meta stt-mono">NIM {{ $profile?->nim ?? '-' }} · Smt {{ $profile?->semester ?? '-' }}</div>
+                                                    @if($latestApp?->group_id && $latestApp?->group)
+                                                        <div class="mt-1">
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                                Kelompok: {{ $latestApp->group->name }} ({{ $latestApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                            </span>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
@@ -227,6 +233,13 @@
                                 <div class="mcard-main">
                                     <div class="mcard-title">{{ $student->name }}</div>
                                     <div class="mcard-sub">{{ $profile?->jurusan ?? '-' }}<br><span class="mono">NIM {{ $profile?->nim ?? '-' }}</span> &middot; Smt {{ $profile?->semester ?? '-' }}</div>
+                                    @if($latestApp?->group_id && $latestApp?->group)
+                                        <div class="mt-1">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                Kelompok: {{ $latestApp->group->name }} ({{ $latestApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                            </span>
+                                        </div>
+                                    @endif
                                 </div>
                                 @if($mScore > 0)
                                     <div class="mscore"><b>{{ number_format($mScore, 1) }}</b><span>Grade {{ $eval->grade_calculated }}</span></div>

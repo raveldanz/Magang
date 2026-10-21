@@ -53,6 +53,9 @@ class LogbookController extends Controller
                 ->with('error', 'Anda belum memiliki pengajuan magang aktif. Silakan daftar magang terlebih dahulu.');
         }
 
+        // Pemicu on-the-fly jika tanggal mulai telah tiba
+        $application->autoActivateIfStarted();
+
         // 3. Tentukan status lifecycle pengajuan
         $lifecycle = $application->status instanceof ApplicationStatus ? strtoupper($application->status->value) : strtoupper((string) $application->status);
 
@@ -98,17 +101,23 @@ class LogbookController extends Controller
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
 
-        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application) {
             return redirect()->route('student.logbook.index')
-                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+                ->with('error', 'Anda belum memiliki pengajuan magang.');
+        }
+
+        $application->autoActivateIfStarted();
+        $statusVal = $application->statusValue();
+
+        if (! in_array($statusVal, [ApplicationStatus::ACTIVE->value, ApplicationStatus::ACCEPTED->value], true)) {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah Diterima atau Aktif.');
         }
 
         $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        // DPL & mentor boleh menyusul: logbook tetap bisa diisi selama penempatan ACTIVE sudah ada.
-        // Validasi DPL tertunda (lecturer_status = pending) sampai DPL ditugaskan, dan selama mentor
-        // belum ditunjuk logbook divalidasi sementara oleh Admin Dinas (lihat Placement::allowsAgencyAdminLogbookFallback).
+        // DPL & mentor boleh menyusul: logbook tetap bisa diisi selama penempatan ACTIVE/ACCEPTED sudah ada.
         if (! $placement) {
             return redirect()->route('student.logbook.index')
                 ->with('warning', 'Pengisian logbook hanya dapat dilakukan setelah data penempatan magang Anda tersedia.');
@@ -122,17 +131,22 @@ class LogbookController extends Controller
         $user = Auth::user();
         $application = $this->getActiveInternship($user->id);
 
-        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application) {
             return redirect()->route('student.logbook.index')
-                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+                ->with('error', 'Anda belum memiliki pengajuan magang.');
+        }
+
+        $application->autoActivateIfStarted();
+        $statusVal = $application->statusValue();
+
+        if (! in_array($statusVal, [ApplicationStatus::ACTIVE->value, ApplicationStatus::ACCEPTED->value], true)) {
+            return redirect()->route('student.logbook.index')
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah Diterima atau Aktif.');
         }
 
         $placement = Placement::where('application_id', $application->id)->first();
         $requiresDpl = $this->isDplRequiredForStudent($user);
 
-        // DPL & mentor boleh menyusul: logbook tetap bisa diisi selama penempatan ACTIVE sudah ada.
-        // Validasi DPL tertunda (lecturer_status = pending) sampai DPL ditugaskan, dan selama mentor
-        // belum ditunjuk logbook divalidasi sementara oleh Admin Dinas (lihat Placement::allowsAgencyAdminLogbookFallback).
         if (! $placement) {
             return redirect()->route('student.logbook.index')
                 ->with('warning', 'Pengisian logbook hanya dapat dilakukan setelah data penempatan magang Anda tersedia.');
@@ -166,6 +180,18 @@ class LogbookController extends Controller
             'lecturer_verified_at' => $requiresDpl ? null : now(),
         ]);
 
+        // Pemicu Otomatis 2: jika status penempatan masih accepted, otomatis ubah status Application dan Placement menjadi active
+        if ($application->statusValue() === ApplicationStatus::ACCEPTED->value) {
+            $application->update(['status' => ApplicationStatus::ACTIVE]);
+            $application->status = ApplicationStatus::ACTIVE;
+
+            \App\Models\AuditLog::record('AUTO_ACTIVATE_ON_FIRST_LOGBOOK', 'Application', $application->id, [
+                'student_name' => $user->name,
+                'activity_date' => $request->date,
+                'reason' => 'Otomatis diaktifkan ke status ACTIVE saat logbook pertama berhasil disimpan.',
+            ]);
+        }
+
         // Evaluasi kelulusan otomatis jika naskah laporan & nilai sudah tuntas sebelumnya
         $placement->syncCompletionStatus();
 
@@ -186,9 +212,9 @@ class LogbookController extends Controller
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application || ! in_array($application->statusValue(), [ApplicationStatus::ACTIVE->value, ApplicationStatus::ACCEPTED->value], true)) {
             return redirect()->route('student.logbook.index')
-                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah Diterima atau Aktif.');
         }
 
         $logbook = Logbook::findOrFail($id);
@@ -211,9 +237,9 @@ class LogbookController extends Controller
     {
         $application = $this->getActiveInternship(Auth::id());
 
-        if (! $application || ($application->status !== ApplicationStatus::ACTIVE && $application->status !== 'active')) {
+        if (! $application || ! in_array($application->statusValue(), [ApplicationStatus::ACTIVE->value, ApplicationStatus::ACCEPTED->value], true)) {
             return redirect()->route('student.logbook.index')
-                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah ACTIVE.');
+                ->with('error', 'Logbook hanya dapat diisi jika status magang Anda sudah Diterima atau Aktif.');
         }
 
         $request->validate([

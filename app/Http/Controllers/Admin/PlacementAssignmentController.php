@@ -33,6 +33,11 @@ class PlacementAssignmentController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk menugaskan pembimbing pada penempatan instansi lain.');
         }
 
+        // Isolasi Bidang: Admin Bidang hanya boleh menugaskan pembimbing di bidangnya sendiri
+        if (! $this->currentUserIsSuperAdmin() && $user->unit_id && (int) $application->unit_id !== (int) $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk menugaskan pembimbing pada bidang lain.');
+        }
+
         try {
             $changes = $this->assignments->assign(
                 $application,

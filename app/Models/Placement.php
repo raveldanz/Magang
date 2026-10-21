@@ -56,6 +56,37 @@ class Placement extends Model
         return $this->belongsTo(Application::class);
     }
 
+    public function certificate()
+    {
+        return $this->hasOne(Certificate::class);
+    }
+
+    public function isCertificateApproved(): bool
+    {
+        $cert = $this->certificate;
+        if (! $cert) {
+            return false;
+        }
+
+        return $cert->approval_status === 'approved';
+    }
+
+    /**
+     * Otomatisasi transisi status mahasiswa ke ACTIVE on-the-fly jika tanggal mulai magang telah tiba.
+     */
+    public function autoActivateIfStarted(): bool
+    {
+        return $this->application ? $this->application->autoActivateIfStarted() : false;
+    }
+
+    /**
+     * Backward-compatible status accessor yang merefleksikan status aplikasi induknya.
+     */
+    public function getStatusAttribute()
+    {
+        return $this->application?->status;
+    }
+
     /**
      * Apakah penempatan sudah memiliki mentor lapangan teknis (mentor_id / pembimbing_id legacy).
      */
@@ -234,6 +265,16 @@ class Placement extends Model
     public function finalreport()
     {
         return $this->hasOne(FinalReport::class);
+    }
+
+    public function internshipProjects()
+    {
+        return $this->hasMany(InternshipProject::class)->latest();
+    }
+
+    public function projects()
+    {
+        return $this->internshipProjects();
     }
 
     public function evaluation()

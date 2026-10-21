@@ -138,4 +138,62 @@ class SystemAuditFixesTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Pengajuan Magang Sedang Diverifikasi');
     }
+
+    public function test_mentor_index_can_filter_by_bidang_unit_id_and_search()
+    {
+        $agency = AgencyProfile::create(['agency_name' => 'Dinas Perpustakaan dan Kearsipan Kota Surabaya']);
+        $unitA = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Sekretariat', 'quota' => 10]);
+        $unitB = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Layanan Kearsipan', 'quota' => 10]);
+
+        $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $agency->id]);
+
+        $mentorA = User::factory()->create([
+            'name' => 'Budi Mentor Perpus',
+            'email' => 'budi.mentor@dispusip.go.id',
+            'role' => 'mentor',
+            'agency_profile_id' => $agency->id,
+            'unit_id' => $unitA->id,
+        ]);
+
+        $mentorB = User::factory()->create([
+            'name' => 'Siti Mentor Arsip',
+            'email' => 'siti.mentor@dispusip.go.id',
+            'role' => 'mentor',
+            'agency_profile_id' => $agency->id,
+            'unit_id' => $unitB->id,
+        ]);
+
+        // Filter by unitA
+        $responseA = $this->actingAs($admin)->get(route('admin.mentors.index', ['unit_id' => $unitA->id]));
+        $responseA->assertOk();
+        $responseA->assertSee($mentorA->name);
+        $responseA->assertDontSee($mentorB->name);
+
+        // Filter by search
+        $responseSearch = $this->actingAs($admin)->get(route('admin.mentors.index', ['search' => 'Siti']));
+        $responseSearch->assertOk();
+        $responseSearch->assertSee($mentorB->name);
+        $responseSearch->assertDontSee($mentorA->name);
+    }
+
+    public function test_feedback_store_falls_back_to_primary_agency_when_target_role_is_admin_dinas()
+    {
+        $agency = AgencyProfile::first() ?? AgencyProfile::create(['agency_name' => 'Dinas Perpustakaan dan Kearsipan Kota Surabaya']);
+        $student = User::factory()->create(['role' => 'mahasiswa']);
+
+        $response = $this->actingAs($student)->post(route('feedbacks.store'), [
+            'category' => 'saran_fitur',
+            'subject' => 'Saran Layanan Preservasi',
+            'message' => 'Mohon ditambah fasilitas digitalisasi arsip kuno.',
+            'target_role' => 'admin_dinas',
+            // target_agency_id is intentionally omitted
+        ]);
+
+        $response->assertRedirect(route('feedbacks.my'));
+        $this->assertDatabaseHas('system_feedbacks', [
+            'subject' => 'Saran Layanan Preservasi',
+            'target_role' => 'admin_dinas',
+            'target_agency_id' => $agency->id,
+        ]);
+    }
 }

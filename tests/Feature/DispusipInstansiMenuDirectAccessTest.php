@@ -11,15 +11,28 @@ class DispusipInstansiMenuDirectAccessTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function getOrCreateDispusip(): AgencyProfile
+    {
+        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')
+            ->orWhere('acronym', 'like', '%Dispusip%')
+            ->first();
+
+        if (! $dispusip) {
+            $dispusip = AgencyProfile::create([
+                'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
+                'acronym' => 'Dispusip',
+                'email' => 'admin.dispusip@surabaya.go.id',
+                'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Surabaya',
+            ]);
+        }
+
+        return $dispusip;
+    }
+
     public function test_superadmin_accessing_agencies_index_redirects_directly_to_dispusip_show(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
-        $dispusip = AgencyProfile::create([
-            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
-            'acronym' => 'Dispusip',
-            'email' => 'admin.dispusip@surabaya.go.id',
-            'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Surabaya',
-        ]);
+        $dispusip = $this->getOrCreateDispusip();
 
         $response = $this->actingAs($admin)->get(route('admin.agencies.index'));
 
@@ -38,12 +51,7 @@ class DispusipInstansiMenuDirectAccessTest extends TestCase
     public function test_navigation_renders_direct_link_to_dispusip_show(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
-        $dispusip = AgencyProfile::create([
-            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
-            'acronym' => 'Dispusip',
-            'email' => 'admin.dispusip@surabaya.go.id',
-            'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Surabaya',
-        ]);
+        $dispusip = $this->getOrCreateDispusip();
 
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
@@ -55,12 +63,7 @@ class DispusipInstansiMenuDirectAccessTest extends TestCase
     public function test_impersonating_agency_admin_and_leaving_returns_to_agency_show_page(): void
     {
         $superAdmin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
-        $dispusip = AgencyProfile::create([
-            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
-            'acronym' => 'Dispusip',
-            'email' => 'admin.dispusip@surabaya.go.id',
-            'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Surabaya',
-        ]);
+        $dispusip = $this->getOrCreateDispusip();
         $dinasAdmin = User::factory()->create([
             'role' => 'admin',
             'agency_profile_id' => $dispusip->id,

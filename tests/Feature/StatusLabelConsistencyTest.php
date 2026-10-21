@@ -31,7 +31,7 @@ class StatusLabelConsistencyTest extends TestCase
     public function test_status_names_equal_system_codes(): void
     {
         foreach (ApplicationStatus::cases() as $case) {
-            $this->assertSame(strtoupper($case->value), $case->label());
+            $this->assertSame(str_replace('_', ' ', strtoupper($case->value)), $case->label());
             $this->assertNotSame('', $case->description());
             $this->assertSame($case, ApplicationStatus::resolve(' '.strtoupper($case->value)));
         }
@@ -168,7 +168,14 @@ class StatusLabelConsistencyTest extends TestCase
 
     public function test_logbook_and_report_show_same_review_status_for_every_role(): void
     {
-        $univ = University::create(['name' => 'Universitas Review', 'code' => 'URV']);
+        $univ = University::create([
+            'name' => 'Universitas Review',
+            'code' => 'URV',
+            'evaluation_scheme' => 'dual_evaluation',
+            'weight_mentor' => 50,
+            'weight_lecturer' => 50,
+            'require_dpl' => true,
+        ]);
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Review']);
         $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Review', 'quota' => 5]);
 

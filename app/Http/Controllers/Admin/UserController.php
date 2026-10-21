@@ -51,6 +51,16 @@ class UserController extends Controller
             return false;
         }
 
+        // Isolasi Admin Bidang: Admin Bidang hanya boleh mengelola akun di bidangnya sendiri
+        if ($current->unit_id) {
+            if ($target->unit_id && (int) $target->unit_id !== (int) $current->unit_id) {
+                return false;
+            }
+            if ($target->role === 'admin' && (int) $target->id !== (int) $current->id) {
+                return false;
+            }
+        }
+
         if (in_array($target->role, self::AGENCY_SCOPED_ROLES, true)) {
             return $current->agency_profile_id !== null
                 && (int) $target->agency_profile_id === (int) $current->agency_profile_id;
@@ -77,6 +87,13 @@ class UserController extends Controller
         $isSuperAdmin = $currentUser->isSuperAdmin();
 
         $query = User::with(['agencyProfile', 'university', 'studentProfile']);
+
+        // Isolasi Bidang & Multi-Tenant
+        if (! $isSuperAdmin && $currentUser->unit_id) {
+            $query->where('unit_id', $currentUser->unit_id);
+        } elseif (! $isSuperAdmin && $currentUser->agency_profile_id) {
+            $query->where('agency_profile_id', $currentUser->agency_profile_id);
+        }
 
         // Filter Role
         if ($request->filled('role')) {
@@ -177,6 +194,7 @@ class UserController extends Controller
         }
 
         $password = $request->filled('password') ? $request->password : 'password';
+        $assignedUnitId = (! $this->currentUserIsSuperAdmin() && Auth::user()->unit_id) ? Auth::user()->unit_id : null;
 
         $user = User::create([
             'name' => $request->name,
@@ -184,6 +202,7 @@ class UserController extends Controller
             'password' => Hash::make($password),
             'role' => $request->role,
             'agency_profile_id' => $agencyProfileId,
+            'unit_id' => $assignedUnitId,
             'university_id' => in_array($request->role, ['universitas', 'dosen', 'mahasiswa']) ? $request->university_id : null,
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
@@ -274,6 +293,10 @@ class UserController extends Controller
             'university_id' => in_array($request->role, ['universitas', 'dosen', 'mahasiswa']) ? $request->university_id : null,
             'status' => $request->status ?? 'active',
         ];
+
+        if (! $isSuperAdmin && Auth::user()->unit_id) {
+            $updateData['unit_id'] = Auth::user()->unit_id;
+        }
 
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);

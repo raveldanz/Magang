@@ -12,7 +12,7 @@
             </a>
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    Tambah Divisi / Lowongan Magang Baru
+                    Tambah Devisi
                 </h2>
                 <p class="text-xs text-gray-500 mt-0.5">Buka divisi kerja baru dan tentukan kuota penerimaan mahasiswa
                 </p>
@@ -55,7 +55,7 @@
                     <div>
                         <x-input-label for="name" value="Nama Bidang / Divisi / Unit Kerja" />
                         <input type="text" id="name" name="name" value="{{ old('name') }}"
-                            placeholder="Contoh: Bidang Layanan Informatika & E-Government"
+                            placeholder="Contoh: Bidang Pembinaan dan Pengelolaan Perpustakaan"
                             class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required>
                         @error('name')

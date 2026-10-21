@@ -50,23 +50,50 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Email Kedinasan / Akun Login <span class="text-rose-500">*</span>
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="mentor.kominfo@surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
+                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="mentor.perpus@dispusip.surabaya.go.id" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-mono">
                         <p class="text-[11px] text-gray-400 mt-1">Password bawaan akun: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-bold">password</code></p>
                     </div>
 
-                    @if($isSuperAdmin)
+                    @if(! $isSuperAdmin && auth()->user()->unit_id)
+                        <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Bidang Kerja Tempat Bertugas
+                            </label>
+                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 flex items-center justify-between">
+                                <span>{{ auth()->user()->unit->name ?? 'Bidang Kerja Aktif' }}</span>
+                                <span class="text-[10px] bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-md font-semibold">Terkunci Otomatis</span>
+                            </div>
+                        </div>
+                    @else
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                                Bidang Resmi Dispusip Tempat Bertugas <span class="text-rose-500">*</span>
+                            </label>
+                            <select name="unit_id" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                <option value="">-- Pilih Salah Satu dari 4 Bidang Resmi --</option>
+                                @foreach($units as $u)
+                                    <option value="{{ $u->id }}" {{ old('unit_id') == $u->id ? 'selected' : '' }}>{{ $u->name }} (Kuota: {{ $u->quota }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    @if($isSuperAdmin && $agencies->count() > 1)
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                                 Instansi Dinas <span class="text-rose-500">*</span>
                             </label>
                             <x-searchable-select
                                 name="agency_profile_id"
-                                placeholder="-- Pilih Dinas --"
+                                placeholder="-- Pilih Instansi Dispusip --"
                                 :items="$agencies->map(fn($ag) => ['id' => $ag->id, 'name' => $ag->agency_name, 'acronym' => $ag->acronym, 'meta' => $ag->city])"
-                                :selected="old('agency_profile_id')"
-                                :required="true"
+                                :selected="old('agency_profile_id', $currentAgency?->id)"
+                                :required="false"
                             />
                         </div>
+                    @else
+                        <input type="hidden" name="agency_profile_id" value="{{ $currentAgency?->id ?? 1 }}">
                     @endif
 
                     <div>

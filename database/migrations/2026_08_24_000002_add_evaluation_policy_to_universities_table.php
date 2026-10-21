@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::table('universities', function (Blueprint $table) {
             if (! Schema::hasColumn('universities', 'evaluation_scheme')) {
-                $table->string('evaluation_scheme', 32)->default('dual_evaluation')->after('logo');
+                $table->string('evaluation_scheme', 32)->default('mentor_only')->after('logo');
             }
             if (! Schema::hasColumn('universities', 'weight_mentor')) {
-                $table->unsignedTinyInteger('weight_mentor')->default(40)->after('evaluation_scheme');
+                $table->unsignedTinyInteger('weight_mentor')->default(100)->after('evaluation_scheme');
             }
             if (! Schema::hasColumn('universities', 'weight_lecturer')) {
-                $table->unsignedTinyInteger('weight_lecturer')->default(60)->after('weight_mentor');
+                $table->unsignedTinyInteger('weight_lecturer')->default(0)->after('weight_mentor');
             }
             if (! Schema::hasColumn('universities', 'require_dpl')) {
-                $table->boolean('require_dpl')->default(true)->after('weight_lecturer');
+                $table->boolean('require_dpl')->default(false)->after('weight_lecturer');
             }
         });
     }

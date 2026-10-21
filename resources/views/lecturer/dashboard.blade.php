@@ -179,11 +179,11 @@
                             <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah Laporan</option>
                         </select>
 
-                        <select name="agency_id" class="py-2.5 px-3.5 text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-auto transition">
-                            <option value="">Semua Instansi</option>
-                            @foreach($agencies as $ag)
-                                <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                    {{ $ag->agency_name }}
+                        <select name="unit_id" class="py-2.5 px-3.5 text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-auto transition">
+                            <option value="">Semua Bidang / Divisi</option>
+                            @foreach($units ?? [] as $u)
+                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                    {{ $u->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -193,7 +193,7 @@
                                 Filter
                             </button>
 
-                            @if(request()->hasAny(['search', 'agency_id', 'report_status']))
+                            @if(request()->hasAny(['search', 'unit_id', 'agency_id', 'report_status']))
                                 <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center">
                                     Reset
                                 </a>
@@ -235,6 +235,13 @@
                                     </div>
                                     <div class="min-w-0">
                                         <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        @if($p->application?->group_id && $p->application?->group)
+                                            <div class="mt-0.5">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kelompok: {{ $p->application->group->name }} ({{ $p->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                </span>
+                                            </div>
+                                        @endif
                                         <p class="text-xs text-slate-500 mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}</p>
                                     </div>
                                 </div>
@@ -335,6 +342,13 @@
                                     <!-- Student Info -->
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
+                                        @if($p->application?->group_id && $p->application?->group)
+                                            <div class="mt-0.5">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kelompok: {{ $p->application->group->name }} ({{ $p->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                </span>
+                                            </div>
+                                        @endif
                                         <div class="text-[11px] text-slate-500 font-medium">NIM: {{ $profile?->nim ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-600">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>

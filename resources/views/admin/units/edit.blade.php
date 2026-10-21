@@ -1,16 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.units.index') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm">
+            <a href="{{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? route('admin.units.show', $unit->id) : route('admin.units.index') }}" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition shadow-sm" title="Kembali ke Ruang Kerja">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
             </a>
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    Edit Divisi / Unit Kerja
+                    Edit Pengaturan {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'Bidang' : 'Divisi / Unit Kerja' }}
                 </h2>
-                <p class="text-xs text-gray-500 mt-0.5">Ubah informasi divisi, kualifikasi, atau kuota penerimaan</p>
+                <p class="text-xs text-gray-500 mt-0.5">Ubah informasi lingkup tugas, kualifikasi, atau kuota penerimaan {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? $unit->name : '' }}</p>
             </div>
         </div>
     </x-slot>
@@ -115,11 +115,11 @@
 
                     <!-- Action Buttons -->
                     <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
-                        <a href="{{ route('admin.units.index') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                        <a href="{{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? route('admin.units.show', $unit->id) : route('admin.units.index') }}" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                             Batal
                         </a>
                         <button type="submit" class="px-7 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
-                            Perbarui Data Divisi
+                            Perbarui Pengaturan Bidang
                         </button>
                     </div>
 

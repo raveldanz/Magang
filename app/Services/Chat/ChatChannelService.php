@@ -211,7 +211,7 @@ class ChatChannelService
                 return $user->isSuperAdmin();
             }
 
-            return $user->role === 'admin' && (int) $user->agency_profile_id === (int) $channel->agency_profile_id;
+            return in_array($user->role, ['admin', 'supervisor'], true) && (int) $user->agency_profile_id === (int) $channel->agency_profile_id;
         }
 
         if ($channel->scope_type === ChatConversation::SCOPE_UNIVERSITY) {

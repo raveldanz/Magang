@@ -32,29 +32,30 @@ class AdminWorkflowSeeder extends Seeder
         DB::transaction(function (): void {
             $defaultPassword = Hash::make('password');
 
-            // 1. Pastikan Instansi Dinas QA / Target Tersedia
-            $agency = AgencyProfile::where('agency_name', 'like', '%Komunikasi%')->first()
+            // 1. Pastikan Instansi Dinas QA / Target Tersedia (Dispusip)
+            $agency = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
                 ?? AgencyProfile::first();
             if (! $agency) {
                 $agency = AgencyProfile::create([
                     'government_name' => 'Pemerintah Kota Surabaya',
-                    'agency_name' => 'Dinas Komunikasi dan Informatika',
-                    'address' => 'Jl. Jimerto No. 25-27, Surabaya',
-                    'phone' => '(031) 5312144',
-                    'email' => 'diskominfo@surabaya.go.id',
-                    'website' => 'https://diskominfo.surabaya.go.id',
-                    'signee_name' => 'Drs. H. M. NASER, M.Si',
-                    'signee_nip' => '19700101 199503 1 002',
-                    'signee_position' => 'Kepala Dinas Komunikasi dan Informatika',
+                    'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
+                    'acronym' => 'Dispusip',
+                    'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293',
+                    'phone' => '(031) 8704207',
+                    'email' => 'dispusip@surabaya.go.id',
+                    'website' => 'https://dispusip.surabaya.go.id',
+                    'signee_name' => 'Mia Santi Dewi, S.H., M.Si.',
+                    'signee_nip' => '19720315 199803 2 004',
+                    'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
                     'city' => 'Surabaya',
                 ]);
             }
 
-            // 2. Pastikan Unit Kerja Penempatan QA Tersedia
+            // 2. Pastikan Unit Kerja Penempatan QA Tersedia (Salah satu dari 4 Bidang Resmi Dispusip)
             $unit = Unit::firstOrCreate(
                 [
                     'agency_profile_id' => $agency->id,
-                    'name' => 'Bidang Tata Kelola & Aplikasi Informatika QA',
+                    'name' => 'Bidang Pembinaan dan Pengelolaan Perpustakaan',
                 ],
                 [
                     'description' => 'Unit kerja khusus pengujian otomatisasi alur seleksi dan verifikasi admin QA.',

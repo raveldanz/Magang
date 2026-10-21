@@ -15,14 +15,11 @@
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                    {{ __('Rekapitulasi Logbook Mahasiswa Magang') }}
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    <span>Rekapitulasi Logbook Mahasiswa {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
-                    Pantau progres pengisian logbook harian seluruh mahasiswa magang per unit kerja secara agregat
+                    Pantau progres pengisian logbook harian mahasiswa magang {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? 'di ' . (auth()->user()->unit->name ?? 'bidang kerja') : 'per unit kerja' }} secara agregat
                 </p>
             </div>
         </div>
@@ -73,27 +70,27 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
+                        <span class="text-xs font-bold text-gray-500 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </span>
                     </div>
-                    <div class="text-2xl font-black text-emerald-700 mt-2">{{ $approvedLogs }}</div>
+                    <div class="text-2xl font-black text-gray-900 mt-2">{{ $approvedLogs }}</div>
                     <div class="text-[11px] text-gray-400 mt-0.5">Diverifikasi pembimbing</div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
+                        <span class="text-xs font-bold text-gray-500 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </span>
                     </div>
-                    <div class="text-2xl font-black text-amber-700 mt-2">{{ $pendingLogs }}</div>
+                    <div class="text-2xl font-black text-gray-900 mt-2">{{ $pendingLogs }}</div>
                     <div class="text-[11px] text-gray-400 mt-0.5">Perlu approval mentor</div>
                 </div>
             </div>
@@ -139,14 +136,21 @@
                         @endif
 
                         <!-- Filter Unit -->
-                        <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Semua Unit Penempatan --</option>
-                            @foreach ($units as $unit)
-                                <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
-                                     {{ $unit->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        @if (auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
+                            <div class="w-full sm:w-auto flex items-center px-3 py-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
+                                <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
+                                <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                            </div>
+                        @else
+                            <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Semua Unit Penempatan --</option>
+                                @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
+                                         {{ $unit->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
 
                         <!-- Filter Status Logbook -->
                         <select name="status_filter" onchange="this.form.submit()" class="w-full sm:w-auto text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
@@ -208,7 +212,7 @@
                                 <p class="text-xs text-gray-600 mt-0.5">
                                     Unit: <strong>{{ $selUnit->name ?? '-' }}</strong> &bull; Pembimbing Lapangan: <strong>{{ $selMentor->name ?? 'Belum Ditentukan' }}</strong>
                                     @unless ($selMentor)
-                                        &bull; <span class="text-amber-700 font-semibold">Logbook dapat divalidasi sementara oleh Admin Dinas (buka Detail)</span>
+                                        &bull; <span class="text-amber-700 font-semibold">{{ Auth::user()->isBidangAdmin() ? 'Logbook dapat divalidasi sementara oleh Admin Bidang (buka Detail)' : 'Logbook dapat divalidasi sementara oleh Admin Dinas (buka Detail)' }}</span>
                                     @endunless
                                 </p>
                             </div>
@@ -272,7 +276,7 @@
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
                                 <th class="py-3.5 px-4">Mahasiswa</th>
                                 <th class="py-3.5 px-4">Unit & Pembimbing</th>
-                                <th class="py-3.5 px-4 text-center">Rekap Logbook</th>
+                                <th class="py-3.5 px-4 text-center">Pending Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Progres Disetujui</th>
                                 <th class="py-3.5 px-4 text-center">Logbook Terakhir</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
@@ -314,33 +318,16 @@
                                             Mentor: <strong>{{ $mentor->name ?? 'Belum Ditentukan' }}</strong>
                                         </div>
                                         @unless ($mentor)
-                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas">
-                                                Validasi sementara oleh Admin Dinas
+                                            <div class="mt-1 inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold" title="{{ Auth::user()->isBidangAdmin() ? 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Bidang' : 'Mentor teknis belum ditunjuk: logbook divalidasi sementara oleh Admin Dinas' }}">
+                                                {{ Auth::user()->isBidangAdmin() ? 'Validasi sementara oleh Admin Bidang' : 'Validasi sementara oleh Admin Dinas' }}
                                             </div>
                                         @endunless
                                     </td>
 
-                                    <td class="py-4 px-4 text-center" data-label="Rekap Logbook">
-                                        <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
-                                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md" title="Total Kegiatan">
-                                                 {{ $totalStudentLogs }} Total
-                                            </span>
-                                            @if ($approvedCount > 0)
-                                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-md" title="Approved">
-                                                     {{ $approvedCount }}
-                                                </span>
-                                            @endif
-                                            @if ($pendingCount > 0)
-                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-md" title="Pending">
-                                                     {{ $pendingCount }}
-                                                </span>
-                                            @endif
-                                            @if ($rejectedCount > 0)
-                                                <span class="px-2 py-0.5 bg-rose-50 text-rose-700 text-[11px] font-bold rounded-md" title="Rejected">
-                                                     {{ $rejectedCount }}
-                                                </span>
-                                            @endif
-                                        </div>
+                                    <td class="py-4 px-4 text-center" data-label="Pending Logbook">
+                                        <span class="inline-flex items-center justify-center px-2.5 py-0.5 bg-gray-100 text-gray-800 text-xs font-bold rounded-md">
+                                            {{ $pendingCount }}
+                                        </span>
                                     </td>
 
                                     <td class="py-4 px-4 text-center" data-label="Progres Disetujui">

@@ -36,7 +36,7 @@ class AgencyController extends Controller
             ->orWhere('acronym', $like, '%dispusip%')
             ->first();
 
-        if ($dispusip && ! $request->has('list') && ! $request->has('search')) {
+        if ($dispusip && AgencyProfile::count() <= 1 && ! $request->has('list') && ! $request->has('search')) {
             return redirect()->route('admin.agencies.show', $dispusip->id);
         }
 
@@ -156,7 +156,7 @@ class AgencyController extends Controller
         $mentorUsers = $agency->users->whereIn('role', ['mentor', 'pembimbing'])->values();
 
         // Bandingkan sebagai string: status di-cast ke enum, sehingga where('status', '...') pada Collection selalu 0
-        $pendingAppsCount = $applications->filter(fn ($app) => in_array($app->statusValue(), ['pending', 'verified'], true))->count();
+        $pendingAppsCount = $applications->filter(fn ($app) => in_array($app->statusValue(), ['pending', 'waiting_approval'], true))->count();
         $acceptedAppsCount = $applications->filter(fn ($app) => $app->statusValue() === 'accepted')->count();
 
         $stats = [
@@ -322,7 +322,7 @@ class AgencyController extends Controller
         // 2. Proteksi Mentor dengan Bimbingan Aktif
         $activeMentorsCount = Placement::whereIn('mentor_id', User::where('agency_profile_id', $agency->id)->whereIn('role', ['mentor', 'pembimbing'])->pluck('id'))
             ->whereHas('application', function ($aq) {
-                $aq->whereIn('status', ['verified', ...Application::QUOTA_STATUSES]);
+                $aq->whereIn('status', Application::QUOTA_STATUSES);
             })->count();
 
         if ($activeMentorsCount > 0) {

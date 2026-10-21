@@ -3,11 +3,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                   
-                    <span>Kelola Mentor Lapangan {{ $currentAgency->agency_name ?? ($isSuperAdmin ? 'Seluruh Instansi' : 'Dinas') }}</span>
+                    <span>Kelola Mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : ($currentAgency->agency_name ?? 'Dinas') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun pembimbing teknis dinas yang bertugas membimbing dan mengevaluasi mahasiswa magang
+                    Kelola akun mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? (auth()->user()->unit->name ?? 'bidang') : 'dinas' }} yang bertugas membimbing dan mengevaluasi mahasiswa magang
                 </p>
             </div>
 
@@ -41,38 +40,58 @@
                 </div>
             @endif
 
-            <!-- Filter Instansi jika Super Admin -->
-            @if($isSuperAdmin)
-                <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
-                    <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
-                        @if(isset($agencies) && count($agencies) > 1)
-                            <select name="agency_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Semua Instansi Dinas</option>
-                                @foreach($agencies as $ag)
-                                    <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                        {{ $ag->agency_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        @endif
+            <!-- Filter & Pencarian Mentor (Bidang Dispusip & Kata Kunci) -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
+                <form method="GET" action="{{ route('admin.mentors.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+                    @if($isSuperAdmin && isset($agencies) && count($agencies) > 1)
+                        <select name="agency_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Semua Instansi Dinas</option>
+                            @foreach($agencies as $ag)
+                                <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
+                                    {{ $ag->agency_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
 
-                        <div class="relative flex-1">
-                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email mentor..." 
-                                   class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-                                   style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
+                    @if(auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
+                        <div class="w-full sm:w-auto flex items-center px-3.5 py-2.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
+                            <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
+                            <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
                         </div>
+                    @elseif(isset($units) && $units->count() > 0)
+                        <select name="unit_id" onchange="this.form.submit()" class="w-full sm:w-auto text-xs py-2.5 rounded-xl border-gray-200 shadow-2xs font-semibold focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Semua Bidang / Divisi Dispusip --</option>
+                            @foreach($units as $u)
+                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                    {{ $u->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
 
-                        <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer w-full sm:w-auto text-center">
-                            Cari
-                        </button>
-                    </form>
-                </div>
-            @endif
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email mentor..." 
+                               class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
+                               style="padding-left: 2.75rem !important; padding-right: 1rem !important; padding-top: 0.65rem !important; padding-bottom: 0.65rem !important;">
+                    </div>
+
+                    <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer w-full sm:w-auto text-center">
+                        Cari
+                    </button>
+
+                    @if(request('search') || request('unit_id') || request('agency_id'))
+                        <a href="{{ route('admin.mentors.index') }}" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center">
+                            Reset
+                        </a>
+                    @endif
+                </form>
+            </div>
 
             <!-- Mentors Presentation Card (Desktop Table + Mobile Card View) -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
@@ -84,7 +103,7 @@
                             <tr>
                                 <th class="py-3.5 px-4 ">Nama Mentor</th>
                                 <th class="py-3.5 px-4 text-center">Email Resmi / Login</th>
-                                <th class="py-3.5 px-4 text-center">Instansi Dinas</th>
+                                <th class="py-3.5 px-4 text-center">Bidang Dispusip</th>
                                 <th class="py-3.5 px-4 text-center">Beban Bimbingan</th>
                                 <th class="py-3.5 px-4 text-center">Status</th>
                                 <th class="py-3.5 px-4 text-center">Aksi</th>
@@ -99,8 +118,10 @@
                                     <td class="py-4 px-4 font-mono text-gray-600">
                                         {{ $m->email }}
                                     </td>
-                                    <td class="py-4 px-4 text-gray-700">
-                                        {{ $m->agencyProfile?->agency_name ?? '-' }}
+                                    <td class="py-4 px-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                            {{ $m->unit?->name ?? 'Belum Ditentukan' }}
+                                        </span>
                                     </td>
                                     <td class="py-4 px-4 text-center">
                                         <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
@@ -203,11 +224,11 @@
                                 </div>
                             </div>
 
-                            <!-- Info Box: Instansi & Beban Bimbingan -->
+                            <!-- Info Box: Bidang Dispusip & Beban Bimbingan -->
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
                                 <div class="flex items-center justify-between gap-2">
-                                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Instansi Dinas:</span>
-                                    <span class="text-[11px] font-semibold text-slate-700 text-right truncate">{{ $m->agencyProfile?->agency_name ?? '-' }}</span>
+                                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Bidang Dispusip:</span>
+                                    <span class="text-[11px] font-semibold text-slate-700 text-right truncate">{{ $m->unit?->name ?? 'Belum Ditentukan' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Beban Bimbingan:</span>

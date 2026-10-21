@@ -167,7 +167,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
     public function test_update_status_rejects_mentor_or_dpl_outside_scope(): void
     {
-        $app = $this->application('verified', [], ['start_date' => now()->addDays(3)->toDateString(), 'end_date' => now()->addDays(40)->toDateString()]);
+        $app = $this->application('pending', [], ['start_date' => now()->addDays(3)->toDateString(), 'end_date' => now()->addDays(40)->toDateString()]);
         $otherAgency = AgencyProfile::create(['agency_name' => 'Dinas B']);
         $foreignMentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $otherAgency->id]);
 
@@ -183,11 +183,16 @@ class Phase3SecurityDataIntegrityTest extends TestCase
             'status' => 'accepted', 'academic_advisor_id' => $this->dosenIts->id,
         ])->assertSessionHasErrors('academic_advisor_id');
 
-        $this->assertSame('verified', $app->fresh()->statusValue());
+        $this->assertSame('pending', $app->fresh()->statusValue());
 
         $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $app->id), [
             'status' => 'accepted', 'mentor_id' => $this->mentor->id, 'academic_advisor_id' => $this->dosenUnesa->id,
         ])->assertSessionHasNoErrors();
+        $this->assertSame('waiting_approval', $app->fresh()->statusValue());
+
+        $supervisor = User::factory()->create(['role' => 'supervisor']);
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $app->id))
+            ->assertSessionHas('success');
         $this->assertSame('accepted', $app->fresh()->statusValue());
     }
 

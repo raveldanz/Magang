@@ -24,10 +24,17 @@ class MentorController extends Controller
         $isSuperAdmin = $user->isSuperAdmin();
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
 
-        $query = User::whereIn('role', ['mentor', 'pembimbing'])->with('agencyProfile');
+        $query = User::whereIn('role', ['mentor', 'pembimbing'])->with(['agencyProfile', 'unit']);
 
         if ($agencyId) {
             $query->where('agency_profile_id', $agencyId);
+        }
+
+        // Isolasi Bidang: Admin bidang otomatis hanya melihat mentor di bidangnya
+        if (! $isSuperAdmin && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        } elseif ($request->filled('unit_id')) {
+            $query->where('unit_id', $request->unit_id);
         }
 
         if ($request->filled('search')) {
@@ -56,8 +63,11 @@ class MentorController extends Controller
 
         $agencies = AgencyProfile::all();
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
+        $units = (! $isSuperAdmin && $user->unit_id)
+            ? \App\Models\Unit::where('id', $user->unit_id)->get()
+            : \App\Models\Unit::when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->orderBy('name')->get();
 
-        return view('admin.mentors.index', compact('mentors', 'agencies', 'currentAgency', 'isSuperAdmin', 'agencyId'));
+        return view('admin.mentors.index', compact('mentors', 'agencies', 'currentAgency', 'units', 'isSuperAdmin', 'agencyId'));
     }
 
     public function show($id)
@@ -70,23 +80,29 @@ class MentorController extends Controller
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
         $agencies = AgencyProfile::all();
-        $currentAgency = $user->agency_profile_id ? AgencyProfile::find($user->agency_profile_id) : null;
+        $currentAgency = $user->agency_profile_id ? AgencyProfile::find($user->agency_profile_id) : AgencyProfile::first();
+        $units = (! $isSuperAdmin && $user->unit_id)
+            ? \App\Models\Unit::where('id', $user->unit_id)->get()
+            : \App\Models\Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
 
-        return view('admin.mentors.create', compact('agencies', 'currentAgency', 'isSuperAdmin'));
+        return view('admin.mentors.create', compact('agencies', 'currentAgency', 'units', 'isSuperAdmin'));
     }
 
     public function store(Request $request)
     {
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
-        $agencyId = $isSuperAdmin ? $request->agency_profile_id : $user->agency_profile_id;
+        $agencyId = $isSuperAdmin ? ($request->agency_profile_id ?: AgencyProfile::first()?->id) : $user->agency_profile_id;
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'agency_profile_id' => $isSuperAdmin ? 'required|exists:agency_profiles,id' : 'nullable',
+            'agency_profile_id' => $isSuperAdmin ? 'nullable|exists:agency_profiles,id' : 'nullable',
+            'unit_id' => 'nullable|exists:units,id',
             'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ]);
+
+        $assignedUnitId = (! $isSuperAdmin && $user->unit_id) ? $user->unit_id : $request->unit_id;
 
         $mentor = User::create([
             'name' => trim($request->name),
@@ -94,6 +110,7 @@ class MentorController extends Controller
             'password' => Hash::make('password'),
             'role' => 'mentor',
             'agency_profile_id' => $agencyId,
+            'unit_id' => $assignedUnitId,
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
         ]);
@@ -101,25 +118,33 @@ class MentorController extends Controller
         AuditLog::record('MENTOR_CREATE', 'User', $mentor->id, [
             'name' => $mentor->name,
             'agency_id' => $agencyId,
+            'unit_id' => $request->unit_id,
         ]);
 
-        return redirect()->route('admin.mentors.index')->with('success', "Mentor Lapangan '{$mentor->name}' berhasil didaftarkan!");
+        return redirect()->route('admin.mentors.index')->with('success', "Mentor Lapangan '{$mentor->name}' berhasil didaftarkan pada bidang yang dipilih!");
     }
 
     public function edit($id)
     {
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
-        $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->findOrFail($id);
+        $mentor = User::whereIn('role', ['mentor', 'pembimbing'])->with('unit')->findOrFail($id);
 
         if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses mengedit mentor dinas lain.');
         }
 
-        $agencies = AgencyProfile::all();
-        $currentAgency = $mentor->agency_profile_id ? AgencyProfile::find($mentor->agency_profile_id) : null;
+        if (! $isSuperAdmin && $user->unit_id && $mentor->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses mengedit mentor bidang lain.');
+        }
 
-        return view('admin.mentors.edit', compact('mentor', 'agencies', 'currentAgency', 'isSuperAdmin'));
+        $agencies = AgencyProfile::all();
+        $currentAgency = $mentor->agency_profile_id ? AgencyProfile::find($mentor->agency_profile_id) : AgencyProfile::first();
+        $units = (! $isSuperAdmin && $user->unit_id)
+            ? \App\Models\Unit::where('id', $user->unit_id)->get()
+            : \App\Models\Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
+
+        return view('admin.mentors.edit', compact('mentor', 'agencies', 'currentAgency', 'units', 'isSuperAdmin'));
     }
 
     public function update(Request $request, $id)
@@ -133,22 +158,31 @@ class MentorController extends Controller
             abort(403, 'Anda tidak memiliki hak akses mengedit mentor dinas lain.');
         }
 
+        if (! $isSuperAdmin && $user->unit_id && $mentor->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses mengedit mentor bidang lain.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$mentor->id,
-            'agency_profile_id' => $isSuperAdmin ? 'required|exists:agency_profiles,id' : 'nullable',
+            'agency_profile_id' => $isSuperAdmin ? 'nullable|exists:agency_profiles,id' : 'nullable',
+            'unit_id' => 'nullable|exists:units,id',
             'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
         ]);
+
+        $assignedUnitId = (! $isSuperAdmin && $user->unit_id) ? $user->unit_id : $request->unit_id;
 
         $mentor->update([
             'name' => trim($request->name),
             'email' => strtolower(trim($request->email)),
-            'agency_profile_id' => $isSuperAdmin ? $request->agency_profile_id : $mentor->agency_profile_id,
+            'agency_profile_id' => $isSuperAdmin ? ($request->agency_profile_id ?: $mentor->agency_profile_id) : $mentor->agency_profile_id,
+            'unit_id' => $assignedUnitId,
             'status' => $request->status ?? 'active',
         ]);
 
         AuditLog::record('MENTOR_UPDATE', 'User', $mentor->id, [
             'name' => $mentor->name,
+            'unit_id' => $request->unit_id,
         ]);
 
         return redirect()->route('admin.mentors.index')->with('success', "Data Mentor Lapangan '{$mentor->name}' berhasil diperbarui!");
@@ -163,6 +197,10 @@ class MentorController extends Controller
 
         if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses mereset password mentor dinas lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $mentor->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses mereset password mentor bidang lain.');
         }
 
         $mentor->update(['password' => Hash::make('password')]);
@@ -183,6 +221,10 @@ class MentorController extends Controller
 
         if (! $isSuperAdmin && $mentor->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses menghapus mentor dinas lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $mentor->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses menghapus mentor bidang lain.');
         }
 
         // Cek riwayat bimbingan (aktif maupun alumni): placements.mentor_id ON DELETE SET NULL

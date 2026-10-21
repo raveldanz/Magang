@@ -53,8 +53,8 @@
                                 </span>
                                 <span class="truncate">
                                     Mode Penyamaran: <strong class="font-bold text-white">{{ auth()->user()->name }}</strong> 
-                                    <span class="inline-flex items-center font-bold tracking-wider uppercase text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1 border border-white/25">
-                                        {{ auth()->user()->role }}
+                                    <span class="inline-flex items-center font-bold tracking-wider text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1 border border-white/25">
+                                        {{ auth()->user()->roleLabel() }}
                                     </span>
                                 </span>
                             </div>

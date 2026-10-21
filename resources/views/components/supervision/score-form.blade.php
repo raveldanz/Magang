@@ -21,10 +21,10 @@
     if (!$univ && $student) {
         $univ = app(\App\Services\UniversityResolver::class)->forUser($student);
     }
-    $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-    $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
-    $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
-    $isMentorOnly = ($scheme === 'mentor_only');
+    $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+    $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+    $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+    $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
     $dinasScore = (float) ($evaluation?->nilai_pembimbing ?? 0);
 
     // Persiapkan daftar aspek awal (dari old input, dari DB JSON, atau fallback ke 3 aspek standar)
@@ -38,15 +38,15 @@
         } else {
             if ($role === 'mentor') {
                 $initialAspects = [
-                    ['name' => 'Kedisiplinan & Tata Tertib Kerja', 'score' => ($evaluation?->nilai_disiplin > 0 ? (string)$evaluation->nilai_disiplin : '')],
-                    ['name' => 'Kinerja Teknis & Kerjasama Tim', 'score' => ($evaluation?->nilai_kinerja > 0 ? (string)$evaluation->nilai_kinerja : '')],
-                    ['name' => 'Inisiatif & Laporan Kedinasan', 'score' => ($evaluation?->nilai_laporan > 0 ? (string)$evaluation->nilai_laporan : '')],
+                    ['name' => $univ ? $univ->getDinasComponent(1) : 'Kedisiplinan & Tata Tertib Kerja', 'score' => ($evaluation?->nilai_disiplin > 0 ? (string)$evaluation->nilai_disiplin : '')],
+                    ['name' => $univ ? $univ->getDinasComponent(2) : 'Kinerja Teknis & Kerjasama Tim', 'score' => ($evaluation?->nilai_kinerja > 0 ? (string)$evaluation->nilai_kinerja : '')],
+                    ['name' => $univ ? $univ->getDinasComponent(3) : 'Inisiatif & Laporan Kedinasan', 'score' => ($evaluation?->nilai_laporan > 0 ? (string)$evaluation->nilai_laporan : '')],
                 ];
             } else {
                 $initialAspects = [
-                    ['name' => 'Penguasaan Materi & Relevansi CPL', 'score' => ($evaluation?->score_mastery > 0 ? (string)$evaluation->score_mastery : '')],
-                    ['name' => 'Kualitas Laporan Akhir Magang', 'score' => ($evaluation?->score_report > 0 ? (string)$evaluation->score_report : '')],
-                    ['name' => 'Sikap, Komunikasi & Etika Bimbingan', 'score' => ($evaluation?->score_attitude > 0 ? (string)$evaluation->score_attitude : '')],
+                    ['name' => $univ ? $univ->getDplComponent(1) : 'Penguasaan Materi & Relevansi CPL', 'score' => ($evaluation?->score_mastery > 0 ? (string)$evaluation->score_mastery : '')],
+                    ['name' => $univ ? $univ->getDplComponent(2) : 'Kualitas Laporan Akhir Magang', 'score' => ($evaluation?->score_report > 0 ? (string)$evaluation->score_report : '')],
+                    ['name' => $univ ? $univ->getDplComponent(3) : 'Sikap, Komunikasi & Etika Bimbingan', 'score' => ($evaluation?->score_attitude > 0 ? (string)$evaluation->score_attitude : '')],
                 ];
             }
         }

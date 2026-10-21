@@ -36,10 +36,11 @@ Route::get('/dashboard', [StudentDashboardController::class, 'index'])
 
 // Route Publik Verifikasi QR Code Surat Balasan (Hash Token Unik; fallback ID angka opsional via VERIFY_NUMERIC_FALLBACK)
 Route::get('/verify-letter/{token}', function ($token) {
-    $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor'])
+    $application = Application::with(['user.studentProfile', 'unit.agencyProfile', 'placement.pembimbing', 'placement.mentor', 'group.applications.user.studentProfile'])
         ->whereIn('status', ['accepted', 'active', 'completed'])
         ->where(function ($q) use ($token) {
-            $q->where('letter_token', $token);
+            $q->where('letter_token', $token)
+                ->orWhereHas('group', fn ($g) => $g->where('letter_token', $token));
             // Fallback ID angka hanya untuk dokumen lama & harus diaktifkan eksplisit (VERIFY_NUMERIC_FALLBACK=true),
             // karena ID berurutan memungkinkan siapa pun menebak & melihat data mahasiswa lain.
             if (config('app.verify_numeric_fallback') && ctype_digit((string) $token)) {
@@ -149,13 +150,19 @@ Route::middleware('auth')->group(function () {
     // Naskah Laporan Akhir (Akses Terpusat & Unduhan Multi-Role dengan Format Nama Baku)
     Route::get('/final-reports/{id}/file', [StudentFinalReportController::class, 'showFile'])->name('final_reports.show');
 
+    // Halaman Detail Penuh Proyek Inovasi Magang (Dapat diakses oleh Mahasiswa, Mentor, Dosen, Supervisor, Admin)
+    Route::get('/projects/{id}', [\App\Http\Controllers\ProjectDetailController::class, 'show'])->name('projects.show');
+
     // Dokumen Persyaratan Pengajuan (CV, Transkrip, KTM, Surat Pengantar) — akses terotorisasi, bukan URL publik
     Route::get('/documents/applications/{id}', [DocumentController::class, 'showApplicationDocument'])->name('documents.application');
     Route::get('/documents/applications/{id}/download', [DocumentController::class, 'downloadApplicationDocument'])->name('documents.application.download');
+    Route::get('/documents/groups/{id}/proposal', [DocumentController::class, 'showGroupProposal'])->name('documents.group.proposal');
+    Route::get('/documents/groups/{id}/proposal/download', [DocumentController::class, 'downloadGroupProposal'])->name('documents.group.proposal.download');
 
-    // Berkas pribadi di disk privat (lampiran logbook, foto profil, lampiran tiket) — akses terotorisasi
+    // Berkas pribadi di disk privat (lampiran logbook, foto profil, dokumen profil, lampiran tiket) — akses terotorisasi
     Route::get('/files/logbooks/{logbook}/attachment', [PrivateFileController::class, 'logbookAttachment'])->name('logbooks.attachment');
     Route::get('/files/students/{userId}/photo', [PrivateFileController::class, 'studentPhoto'])->whereNumber('userId')->name('student.photo');
+    Route::get('/files/students/{userId}/document/{type}', [PrivateFileController::class, 'studentDocument'])->whereNumber('userId')->name('student.document');
     Route::get('/files/feedbacks/{id}/attachment', [PrivateFileController::class, 'feedbackAttachment'])->name('feedbacks.attachment');
 
 });
@@ -170,6 +177,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/student.php';
 require __DIR__.'/admin.php';
+require __DIR__.'/supervisor.php';
 require __DIR__.'/mentor.php';
 require __DIR__.'/lecturer.php';
 require __DIR__.'/university.php';

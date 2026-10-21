@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>403 — Akses Ditolak | Portal Magang Pemkot Surabaya</title>
+    <title>403 — Akses Ditolak | SIM Magang Dispusip Surabaya</title>
     <!-- Favicon Resmi Pemerintah Kota Surabaya -->
     <!-- Favicon Resmi Pemerintah Kota Surabaya (Square Canvas Preserving Aspect Ratio) -->
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}?v=2">
@@ -28,8 +28,8 @@
                     </span>
                     <span>
                         Mode Penyamaran: Anda sedang mengelola akun <strong class="font-bold text-white">{{ auth()->user()?->name ?? 'Pengguna' }}</strong> 
-                        <span class="inline-flex items-center font-bold tracking-wider uppercase text-[11px] bg-white/20 px-2 py-0.5 rounded-md ml-1 border border-white/25">
-                            {{ auth()->user()?->role ?? '-' }}
+                        <span class="inline-flex items-center font-bold tracking-wider text-[11px] bg-white/20 px-2 py-0.5 rounded-md ml-1 border border-white/25">
+                            {{ auth()->user()?->roleLabel() ?? '-' }}
                         </span>
                     </span>
                 </div>

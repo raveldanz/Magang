@@ -7,6 +7,7 @@ use App\Models\University;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -65,26 +66,32 @@ class ProfileController extends Controller
             'weight_mentor' => 'nullable|integer|min:0|max:100',
             'weight_lecturer' => 'nullable|integer|min:0|max:100',
             'require_dpl' => 'nullable',
+            'dinas_components' => 'nullable|array',
+            'dinas_components.*' => 'nullable|string|max:255',
+            'dpl_components' => 'nullable|array',
+            'dpl_components.*' => 'nullable|string|max:255',
         ], [
             'name.required' => 'Nama resmi universitas / perguruan tinggi wajib diisi.',
             'logo.image' => 'File logo harus berupa gambar (PNG, JPG, WEBP, atau SVG).',
             'logo.max' => 'Ukuran file logo maksimal 2MB.',
         ]);
 
-        $evaluationScheme = $request->input('evaluation_scheme', 'dual_evaluation');
+        $evaluationScheme = $request->input('evaluation_scheme', $university->evaluation_scheme ?? 'mentor_only');
         if ($evaluationScheme === 'mentor_only') {
             $weightMentor = 100;
             $weightLecturer = 0;
             $requireDpl = false;
         } else {
-            $weightMentor = (int) $request->input('weight_mentor', 40);
-            $weightLecturer = (int) $request->input('weight_lecturer', 60);
+            $weightMentor = (int) $request->input('weight_mentor', $university->weight_mentor ?? 100);
+            $weightLecturer = (int) $request->input('weight_lecturer', $university->weight_lecturer ?? 0);
 
             if (($weightMentor + $weightLecturer) !== 100) {
-                return back()->withInput()->with('error', 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.');
+                throw ValidationException::withMessages([
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                ]);
             }
 
-            $requireDpl = $request->boolean('require_dpl', true);
+            $requireDpl = $request->boolean('require_dpl', $weightLecturer > 0);
         }
 
         $data = [
@@ -101,6 +108,32 @@ class ProfileController extends Controller
             'weight_lecturer' => $weightLecturer,
             'require_dpl' => $requireDpl,
         ];
+
+        if ($request->has('dinas_components')) {
+            $raw = (array) $request->input('dinas_components');
+            $clean = [];
+            $i = 1;
+            foreach ($raw as $v) {
+                $val = trim((string) (is_array($v) ? ($v['name'] ?? '') : $v));
+                if ($val !== '') {
+                    $clean[$i++] = $val;
+                }
+            }
+            $data['dinas_components'] = !empty($clean) ? $clean : null;
+        }
+
+        if ($request->has('dpl_components')) {
+            $raw = (array) $request->input('dpl_components');
+            $clean = [];
+            $i = 1;
+            foreach ($raw as $v) {
+                $val = trim((string) (is_array($v) ? ($v['name'] ?? '') : $v));
+                if ($val !== '') {
+                    $clean[$i++] = $val;
+                }
+            }
+            $data['dpl_components'] = !empty($clean) ? $clean : null;
+        }
 
         // Handle upload logo
         if ($request->hasFile('logo')) {

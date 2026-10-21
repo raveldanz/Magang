@@ -12,4 +12,9 @@ class ApplicationDocument extends Model
     {
         return $this->belongsTo(Application::class);
     }
+
+    public function getNameAttribute($value)
+    {
+        return $value ?: ($this->attributes['document_type'] ?? 'Dokumen Pengajuan');
+    }
 }

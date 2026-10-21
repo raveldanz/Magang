@@ -75,6 +75,18 @@ class AdminWorkflowSelectionTest extends TestCase
         $response->assertRedirect(route('admin.applications.index'));
         $response->assertSessionHas('success');
 
+        // Alur Double ACC: persetujuan admin mengarahkan ke waiting_approval (Menunggu ACC Atasan)
+        $appPending->refresh();
+        $this->assertEquals(ApplicationStatus::WAITING_APPROVAL, $appPending->status);
+
+        // Tahap 2: Supervisor mengesahkan (ACC) dan menerbitkan surat balasan resmi
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $appPending->id), [
+            'letter_number' => '500.12.1/TEST-APP/2026',
+        ])->assertSessionHas('success');
+
         $appPending->refresh();
         $this->assertEquals(ApplicationStatus::ACCEPTED, $appPending->status);
         $this->assertEquals('500.12.1/TEST-APP/2026', $appPending->letter_number);
@@ -85,7 +97,7 @@ class AdminWorkflowSelectionTest extends TestCase
     }
 
     /**
-     * 2b. Alur resmi pending → verified → accepted: pengajuan VERIFIED dapat langsung diterima atau ditolak.
+     * 2b. Alur resmi pending → waiting_approval → accepted: pengajuan pending diusulkan dan disahkan atau ditolak.
      */
     public function test_admin_can_accept_or_reject_verified_application(): void
     {
@@ -93,18 +105,30 @@ class AdminWorkflowSelectionTest extends TestCase
         $mhsPending = User::where('email', 'mhs.qa.pending@test.local')->firstOrFail();
         $app = Application::where('user_id', $mhsPending->id)->firstOrFail();
 
-        $app->update(['status' => 'verified']);
+        $app->update(['status' => 'pending']);
         $this->actingAs($adminQa)->put(route('admin.applications.updateStatus', $app->id), [
             'status' => 'accepted',
             'letter_number' => '500.12.1/TEST-VER/2026',
             'letter_date' => now()->toDateString(),
         ])->assertSessionHas('success');
+
+        // Alur Double ACC: admin staf mengarahkan ke waiting_approval
+        $this->assertEquals(ApplicationStatus::WAITING_APPROVAL, $app->fresh()->status);
+
+        // Tahap 2: Supervisor mengesahkan
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $app->id), [
+            'letter_number' => '500.12.1/TEST-VER/2026',
+        ])->assertSessionHas('success');
+
         $this->assertEquals(ApplicationStatus::ACCEPTED, $app->fresh()->status);
         $this->assertNotNull(Placement::where('application_id', $app->id)->first());
 
-        // Pengajuan kedua yang juga VERIFIED, langsung ditolak
+        // Pengajuan kedua yang masih pending, langsung ditolak
         $app = $app->replicate(['letter_number', 'letter_token']);
-        $app->status = 'verified';
+        $app->status = 'pending';
         $app->save();
         $this->actingAs($adminQa)->put(route('admin.applications.updateStatus', $app->id), [
             'status' => 'rejected',
@@ -231,4 +255,151 @@ class AdminWorkflowSelectionTest extends TestCase
         $appRejected->refresh();
         $this->assertEquals(ApplicationStatus::REJECTED, $appRejected->status);
     }
+
+    /**
+     * 8. Verifikasi bahwa dropdown mentor terfilter otomatis sesuai bidang unit_id dan deskripsi WAITING_APPROVAL sesuai permintaan.
+     */
+    public function test_application_show_mentor_filtered_by_bidang_and_clean_naming(): void
+    {
+        $adminQa = User::where('email', 'admin.qa@test.local')->firstOrFail();
+        $app = Application::with('unit')->whereNotNull('unit_id')->firstOrFail();
+
+        // Pastikan deskripsi WAITING_APPROVAL adalah 'Setujui, Serahkan ke Atasan'
+        $this->assertEquals('Setujui, Serahkan ke Atasan', ApplicationStatus::WAITING_APPROVAL->description());
+
+        $response = $this->actingAs($adminQa)->get(route('admin.applications.show', $app->id));
+        $response->assertOk();
+        $response->assertSee('Setujui, Serahkan ke Atasan');
+        $response->assertDontSee('⭐ (Sesuai Bidang)');
+    }
+
+    /**
+     * 9. Verifikasi bahwa supervisor melihat status 'Menunggu ACC', tab 'Menunggu Persetujuan', dan tombol pengesahan sertifikat biru.
+     */
+    public function test_supervisor_sees_menunggu_acc_and_menunggu_persetujuan(): void
+    {
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+
+        $this->assertEquals('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->description('supervisor'));
+        $this->assertEquals('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->descriptionForSupervisor());
+
+        // Pastikan saat actingAs supervisor, description() otomatis menghasilkan 'Menunggu ACC'
+        $this->actingAs($supervisor);
+        $this->assertEquals('Menunggu ACC', ApplicationStatus::WAITING_APPROVAL->description());
+
+        // Cek halaman index supervisor
+        $responseIndex = $this->get(route('supervisor.applications.index'));
+        $responseIndex->assertOk();
+        $responseIndex->assertSee('Menunggu Persetujuan');
+        $responseIndex->assertDontSee('Menunggu ACC Atasan');
+
+        // Jika ada aplikasi waiting_approval
+        $appWaiting = Application::where('status', ApplicationStatus::WAITING_APPROVAL->value)->first();
+        if ($appWaiting) {
+            $responseIndex->assertSee('Menunggu ACC');
+            $responseIndex->assertDontSee('Setujui, Serahkan ke Atasan');
+
+            $responseShow = $this->get(route('supervisor.applications.show', $appWaiting->id));
+            $responseShow->assertOk();
+            $responseShow->assertSee('Menunggu ACC');
+            $responseShow->assertDontSee('Setujui, Serahkan ke Atasan');
+        }
+
+        // Cek halaman dashboard supervisor
+        $responseDashboard = $this->get(route('supervisor.dashboard'));
+        $responseDashboard->assertOk();
+        $responseDashboard->assertSee('Pengesahan Sertifikat');
+        $responseDashboard->assertSee('Dashboard');
+        $responseDashboard->assertDontSee('Dashboard &amp; Tim Kerja');
+        $responseDashboard->assertDontSee('Dashboard & Tim Kerja');
+    }
+
+    public function test_unified_form_can_update_mentor_and_dosen_on_active_application(): void
+    {
+        $admin = User::where('role', 'admin')->first() ?? User::factory()->create(['role' => 'admin']);
+        $unit = \App\Models\Unit::first();
+        if (! $unit) {
+            $agency = \App\Models\AgencyProfile::first() ?? \App\Models\AgencyProfile::create(['name' => 'Dispusip']);
+            $unit = \App\Models\Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Kearsipan', 'quota' => 10]);
+        }
+        if ($admin->agency_profile_id === null && $unit->agency_profile_id) {
+            $admin->update(['agency_profile_id' => $unit->agency_profile_id]);
+        }
+
+        $student = User::factory()->create(['role' => 'student']);
+        $univ = \App\Models\University::first() ?? \App\Models\University::create(['name' => 'Universitas Airlangga']);
+        \App\Models\StudentProfile::create([
+            'user_id' => $student->id,
+            'university_id' => $univ->id,
+            'nim' => '12345678',
+            'universitas' => $univ->name,
+            'jurusan' => 'Sistem Informasi',
+            'phone' => '08123456789',
+        ]);
+
+        $mentorA = User::factory()->create([
+            'role' => 'mentor',
+            'agency_profile_id' => $unit->agency_profile_id,
+            'unit_id' => $unit->id,
+        ]);
+        $mentorB = User::factory()->create([
+            'role' => 'mentor',
+            'agency_profile_id' => $unit->agency_profile_id,
+            'unit_id' => $unit->id,
+        ]);
+        $dosen = User::factory()->create([
+            'role' => 'dosen',
+            'university_id' => $univ->id,
+        ]);
+
+        $app = Application::create([
+            'user_id' => $student->id,
+            'unit_id' => $unit->id,
+            'status' => 'active',
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addMonths(3)->toDateString(),
+            'letter_number' => '500.12.1/TEST/2026',
+            'letter_date' => now()->toDateString(),
+        ]);
+
+        $placement = \App\Models\Placement::create([
+            'application_id' => $app->id,
+            'mentor_id' => $mentorA->id,
+            'pembimbing_id' => $mentorA->id,
+            'start_date' => $app->start_date,
+            'end_date' => $app->end_date,
+        ]);
+
+        // 1. Verifikasi show page: form tunggal hadir, form redundan tidak ada
+        $responseShow = $this->actingAs($admin)->get(route('admin.applications.show', $app->id));
+        $responseShow->assertOk();
+        $responseShow->assertSee('Data Penempatan, Surat &amp; Penugasan Pembimbing', false);
+        $responseShow->assertSee('Simpan Keputusan &amp; Penugasan', false);
+        $responseShow->assertDontSee('Simpan Penugasan Pembimbing');
+
+        // 2. Kirim update penugasan melalui form tunggal updateStatus
+        $responseUpdate = $this->actingAs($admin)->put(route('admin.applications.updateStatus', $app->id), [
+            'status' => 'active',
+            'mentor_id' => $mentorB->id,
+            'academic_advisor_id' => $dosen->id,
+            'letter_number' => '500.12.1/TEST/2026',
+            'letter_date' => now()->toDateString(),
+        ]);
+
+        $responseUpdate->assertRedirect(route('admin.applications.index'));
+        $responseUpdate->assertSessionHas('success');
+
+        $placement->refresh();
+        $this->assertEquals($mentorB->id, $placement->mentor_id);
+        $this->assertEquals($dosen->id, $placement->academic_advisor_id);
+
+        // Verifikasi audit log mutasi/reassign tercatat
+        $audit = \App\Models\AuditLog::where('action', 'PLACEMENT_SUPERVISOR_REASSIGN')
+            ->where('target_id', $placement->id)
+            ->latest('id')
+            ->first();
+        $this->assertNotNull($audit);
+    }
 }
+

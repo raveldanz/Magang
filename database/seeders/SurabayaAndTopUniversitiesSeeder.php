@@ -458,10 +458,10 @@ class SurabayaAndTopUniversitiesSeeder extends Seeder
             $adminEmail = $item['admin_email'];
             unset($item['admin_email']);
 
-            $item['evaluation_scheme'] = $item['evaluation_scheme'] ?? 'dual_evaluation';
-            $item['weight_mentor'] = $item['weight_mentor'] ?? 50;
-            $item['weight_lecturer'] = $item['weight_lecturer'] ?? 50;
-            $item['require_dpl'] = $item['require_dpl'] ?? true;
+            $item['evaluation_scheme'] = $item['evaluation_scheme'] ?? 'mentor_only';
+            $item['weight_mentor'] = $item['weight_mentor'] ?? 100;
+            $item['weight_lecturer'] = $item['weight_lecturer'] ?? 0;
+            $item['require_dpl'] = $item['require_dpl'] ?? false;
             $item['is_verified'] = true;
             $item['acronym'] = $item['acronym'] ?? $item['code'];
             $item['status'] = 'active';

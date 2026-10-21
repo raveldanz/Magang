@@ -100,6 +100,8 @@ class EvaluationController extends Controller
         $evaluation = Evaluation::firstOrNew(['placement_id' => $placement->id]);
         $evaluation->catatan = $request->catatan;
 
+        $custom = is_array($evaluation->custom_components) ? $evaluation->custom_components : [];
+
         if ($request->has('aspects')) {
             $rawAspects = (array) $request->input('aspects', []);
             $cleanAspects = [];
@@ -117,24 +119,50 @@ class EvaluationController extends Controller
             $evaluation->nilai_disiplin = (int) round($scores[0] ?? $avg);
             $evaluation->nilai_kinerja = (int) round($scores[1] ?? $avg);
             $evaluation->nilai_laporan = (int) round($scores[2] ?? $avg);
+        } elseif ($request->has('custom_components') && is_array($request->custom_components)) {
+            $mentorComps = [];
+            $scores = [];
+            foreach ($request->custom_components as $comp) {
+                if (!empty($comp['name'])) {
+                    $val = isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null;
+                    $mentorComps[] = [
+                        'name' => trim($comp['name']),
+                        'score' => $val,
+                    ];
+                    if ($val !== null) {
+                        $scores[] = $val;
+                    }
+                }
+            }
+            if (!empty($mentorComps)) {
+                $custom['mentor'] = $mentorComps;
+                $evaluation->custom_components = $custom;
+                $evaluation->mentor_aspects = $mentorComps;
+            }
+            $avg = count($scores) > 0 ? round(array_sum($scores) / count($scores), 2) : 0.0;
+            $evaluation->nilai_disiplin = (int) round($scores[0] ?? $avg);
+            $evaluation->nilai_kinerja = (int) round($scores[1] ?? $avg);
+            $evaluation->nilai_laporan = (int) round($scores[2] ?? $avg);
         } else {
             $evaluation->nilai_disiplin = $request->nilai_disiplin;
             $evaluation->nilai_kinerja = $request->nilai_kinerja;
             $evaluation->nilai_laporan = $request->nilai_laporan;
+            $univ = $placement->application?->user ? app(\App\Services\UniversityResolver::class)->forUser($placement->application->user) : null;
             $evaluation->mentor_aspects = [
-                ['name' => 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],
-                ['name' => 'Kinerja Teknis & Kerjasama Tim', 'score' => (float) $request->nilai_kinerja],
-                ['name' => 'Inisiatif & Laporan Kedinasan', 'score' => (float) $request->nilai_laporan],
+                ['name' => $univ ? $univ->getDinasComponent(1) : 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],
+                ['name' => $univ ? $univ->getDinasComponent(2) : 'Kinerja Teknis & Kerjasama Tim', 'score' => (float) $request->nilai_kinerja],
+                ['name' => $univ ? $univ->getDinasComponent(3) : 'Inisiatif & Laporan Kedinasan', 'score' => (float) $request->nilai_laporan],
             ];
         }
-
         $evaluation->save();
 
         // Cek skema kampus mahasiswa
         $univ = $evaluation->getUniversity();
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
 
-        if ($scheme === 'mentor_only') {
+        if ($scheme === 'mentor_only' || $weightLecturer === 0) {
             $finalScore = $evaluation->nilai_pembimbing;
             $grade = Grade::letter($finalScore);
 
@@ -146,11 +174,19 @@ class EvaluationController extends Controller
             // Cek kelengkapan evaluasi dan sinkronkan status COMPLETED
             $placement->syncCompletionStatus();
         } else {
-            // Skema Dual Evaluation: hitung ulang jika nilai dosen sudah ada
+            // Skema Dual Evaluation atau 100% Kampus
             $dosenScore = $evaluation->nilai_dosen_calculated ?? $evaluation->nilai_dosen ?? $evaluation->nilai_akademik;
-            if ($dosenScore > 0) {
-                $weightMentor = $univ ? (int) $univ->weight_mentor : 40;
-                $weightLecturer = $univ ? (int) $univ->weight_lecturer : 60;
+            if ($weightMentor === 0) {
+                if ($dosenScore > 0) {
+                    $finalScore = $dosenScore;
+                    $grade = Grade::letter($finalScore);
+                    $evaluation->update([
+                        'final_score' => $finalScore,
+                        'grade' => $grade,
+                    ]);
+                    $placement->syncCompletionStatus();
+                }
+            } elseif ($dosenScore > 0) {
                 $finalScore = round((($weightMentor / 100) * $evaluation->nilai_pembimbing) + (($weightLecturer / 100) * $dosenScore), 2);
                 $grade = Grade::letter($finalScore);
 

@@ -25,6 +25,10 @@ class DashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
+        if ($user->role === 'supervisor') {
+            return redirect()->route('supervisor.dashboard');
+        }
+
         if ($user->role === 'mentor' || $user->role === 'pembimbing') {
             return redirect()->route('mentor.dashboard');
         }
@@ -54,6 +58,7 @@ class DashboardController extends Controller
         // Ambil pengajuan magang aktif mahasiswa (prioritaskan yang belum resigned/rejected)
         $application = Application::with([
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor.university',
@@ -67,6 +72,7 @@ class DashboardController extends Controller
             ->first()
         ?? Application::with([
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor.university',
@@ -79,6 +85,7 @@ class DashboardController extends Controller
             ->first()
         ?? Application::with([
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor.university',
@@ -89,7 +96,10 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
-        $application?->checkAndSyncActiveStatus();
+        if ($application) {
+            $application->autoActivateIfStarted();
+            $application->checkAndSyncActiveStatus();
+        }
 
         $university = $user->university_id ? University::find($user->university_id) : null;
         $univName = $university?->name ?? $user->university ?? $profile?->universitas;

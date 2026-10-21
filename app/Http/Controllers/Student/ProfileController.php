@@ -114,9 +114,18 @@ class ProfileController extends Controller
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:30',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'cv' => 'nullable|mimes:pdf|max:2048',
+            'transkrip' => 'nullable|mimes:pdf|max:2048',
+            'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
             'university_id.required' => 'Silakan pilih perguruan tinggi Anda.',
             'custom_university_name.required_if' => 'Nama perguruan tinggi wajib diisi jika memilih "Perguruan Tinggi Lainnya".',
+            'cv.mimes' => 'File CV harus berformat PDF.',
+            'cv.max' => 'Ukuran file CV maksimal 2MB.',
+            'transkrip.mimes' => 'File Transkrip Nilai harus berformat PDF.',
+            'transkrip.max' => 'Ukuran file Transkrip Nilai maksimal 2MB.',
+            'id_card.mimes' => 'File KTM atau Kartu Identitas harus berformat PDF, JPG, JPEG, atau PNG.',
+            'id_card.max' => 'Ukuran file KTM atau Kartu Identitas maksimal 2MB.',
         ]);
 
         $university = DB::transaction(fn () => $this->resolveUniversity($request));
@@ -133,16 +142,35 @@ class ProfileController extends Controller
         $major = $request->input('jurusan') ?? $request->input('major');
         $address = $request->input('alamat') ?? $request->input('address');
 
-        // Ambil profil saat ini untuk cek foto lama
+        // Ambil profil saat ini untuk cek berkas lama
         $currentProfile = $user->studentProfile;
         $photoPath = $currentProfile?->photo;
+        $cvPath = $currentProfile?->cv_path;
+        $transcriptPath = $currentProfile?->transcript_path;
+        $idCardPath = $currentProfile?->id_card_path;
 
-        // 3. Logika Upload Foto Profil & Hapus Foto Lama jika diganti
+        $storage = app(PrivateDocumentStorage::class);
+
+        // Upload Foto Profil
         if ($request->hasFile('photo')) {
-            // Foto disimpan di disk privat; ditampilkan lewat route student.photo (terotorisasi)
-            $storage = app(PrivateDocumentStorage::class);
             $storage->delete($photoPath);
             $photoPath = $storage->store($request->file('photo'), PrivateDocumentStorage::PROFILE_PHOTO_DIR);
+        }
+
+        // Upload Dokumen Personal Mahasiswa
+        if ($request->hasFile('cv')) {
+            $storage->delete($cvPath);
+            $cvPath = $storage->store($request->file('cv'), 'documents/student-profiles');
+        }
+
+        if ($request->hasFile('transkrip')) {
+            $storage->delete($transcriptPath);
+            $transcriptPath = $storage->store($request->file('transkrip'), 'documents/student-profiles');
+        }
+
+        if ($request->hasFile('id_card')) {
+            $storage->delete($idCardPath);
+            $idCardPath = $storage->store($request->file('id_card'), 'documents/student-profiles');
         }
 
         StudentProfile::updateOrCreate(
@@ -162,6 +190,9 @@ class ProfileController extends Controller
                 'emergency_contact_name' => $request->emergency_contact_name,
                 'emergency_contact_phone' => $request->emergency_contact_phone,
                 'photo' => $photoPath,
+                'cv_path' => $cvPath,
+                'transcript_path' => $transcriptPath,
+                'id_card_path' => $idCardPath,
             ]
         );
 

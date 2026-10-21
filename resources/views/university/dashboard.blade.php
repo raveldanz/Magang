@@ -44,7 +44,7 @@
                     </div>
                     <h3 class="text-xl sm:text-2xl font-black">{{ $university->name ?? $user->name }}</h3>
                     <p class="text-blue-100 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                        Pemantauan partisipasi, distribusi penempatan dinas, dan evaluasi mahasiswa magang di Pemerintah Kota Surabaya.
+                        Pemantauan partisipasi, distribusi penempatan, dan evaluasi mahasiswa magang di Dinas Perpustakaan dan Kearsipan Kota Surabaya.
                     </p>
                 </div>
                 <div class="hidden sm:block text-right shrink-0">
@@ -75,34 +75,34 @@
                 </div>
                 <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between"
                      style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Menunggu Seleksi</span>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Menunggu Seleksi / ACC</span>
                     <div class="text-2xl font-black text-slate-800">{{ $stats['total_pending'] ?? 0 }}</div>
-                    <div class="text-[11px] text-slate-500 mt-1">PENDING dan VERIFIED</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Verifikasi Admin &amp; ACC Atasan</div>
                 </div>
             </div>
 
-            <!-- Card Sebaran Mahasiswa per Dinas (Simpel, seperti dashboard admin) -->
+            <!-- Card Sebaran Mahasiswa per Bidang Dispusip (Simpel, seperti dashboard admin) -->
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
                  style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
-                 x-data="{ showAll: {{ $activeAgenciesCount > 0 ? 'false' : 'true' }} }">
+                 x-data="{ showAll: {{ ($activeUnitsCount ?? 0) > 0 ? 'false' : 'true' }} }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div class="min-w-0 flex-1">
-                        <h3 class="text-sm font-bold text-slate-800 leading-snug">Sebaran Penempatan Mahasiswa</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Sebaran mahasiswa magang di dinas Pemkot Surabaya</p>
+                        <h3 class="text-sm font-bold text-slate-800 leading-snug">Sebaran Bidang Penempatan Mahasiswa</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Distribusi mahasiswa magang pada 4 bidang resmi Dinas Perpustakaan dan Kearsipan Surabaya</p>
                     </div>
-                    @if($totalAgenciesCount > $activeAgenciesCount)
+                    @if(($totalUnitsCount ?? 0) > ($activeUnitsCount ?? 0))
                         <button type="button" @click="showAll = !showAll"
                                 class="self-start sm:self-auto shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition border border-blue-200 cursor-pointer">
-                            <span x-text="showAll ? 'Hanya Dinas Terisi' : 'Semua Dinas'"></span>
+                            <span x-text="showAll ? 'Hanya Bidang Terisi' : 'Semua 4 Bidang'"></span>
                         </button>
                     @endif
                 </div>
 
                 <div class="space-y-4 pt-1">
-                    @if($activeAgenciesCount === 0)
-                        <div x-show="!showAll" class="text-center py-6 text-xs text-slate-400">Belum ada mahasiswa yang ditempatkan di dinas.</div>
+                    @if(($activeUnitsCount ?? 0) === 0)
+                        <div x-show="!showAll" class="text-center py-6 text-xs text-slate-400">Belum ada mahasiswa yang aktif ditempatkan pada bidang Dispusip.</div>
                     @endif
-                    @foreach ($agencyDistribution as $dist)
+                    @foreach ($unitDistribution ?? [] as $dist)
                         @php $hasStudents = $dist['count'] > 0; @endphp
                         <div @if(!$hasStudents) x-show="showAll" x-cloak @endif>
                             <div class="flex items-center justify-between text-xs font-semibold mb-1.5 gap-2">
@@ -131,11 +131,11 @@
                             class="w-full text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
                     </div>
                     <div class="w-full sm:w-64">
-                        <select name="agency_id" class="w-full text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
-                            <option value="">-- Semua Dinas / Instansi --</option>
-                            @foreach ($agencies as $ag)
-                                <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                    {{ $ag->agency_name }}
+                        <select name="unit_id" class="w-full text-xs sm:text-sm border-slate-200 bg-slate-50 focus:bg-white rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-xs">
+                            <option value="">-- Semua Bidang / Divisi Dispusip --</option>
+                            @foreach ($units ?? [] as $u)
+                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
+                                    {{ $u->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -144,7 +144,7 @@
                         <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs">
                             Filter
                         </button>
-                        @if (request()->hasAny(['search', 'agency_id']))
+                        @if (request()->hasAny(['search', 'unit_id', 'agency_id']))
                             <a href="{{ route('university.dashboard') }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">
                                 Reset
                             </a>
@@ -186,6 +186,13 @@
                     <p class="font-bold text-xs text-slate-800 truncate leading-snug">
                         {{ $student->name }}
                     </p>
+                    @if($app->group_id && $app->group)
+                        <div class="mt-0.5">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                            </span>
+                        </div>
+                    @endif
                     <p class="text-[11px] text-slate-400 font-mono mt-0.5">
                         NIM: {{ $student->studentProfile->nim ?? '-' }}
                     </p>
@@ -234,6 +241,13 @@
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="px-4 py-4">
                             <div class="font-bold text-slate-900">{{ $student->name }}</div>
+                            @if($app->group_id && $app->group)
+                                <div class="mt-0.5">
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                        Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                    </span>
+                                </div>
+                            @endif
                             <div class="text-xs text-slate-400 font-mono">{{ $student->email }}</div>
                         </td>
                         <td class="px-4 py-4">

@@ -40,6 +40,8 @@
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
                                         <span>Daftar Magang Baru</span> &rarr;
                                     </a>
+                                @elseif ($rawAppSt === 'waiting_approval')
+                                    <span class="text-[11px] text-purple-700 font-semibold">Menunggu ACC Atasan</span>
                                 @else
                                     <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
                                 @endif

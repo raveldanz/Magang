@@ -23,6 +23,18 @@ class DashboardController extends Controller
     {
         $mentor = Auth::user();
 
+        // On-the-fly auto-activation bagi mahasiswa bimbingan yang sudah tiba tanggal mulainya
+        $startedApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::ACCEPTED)
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', now()->toDateString())
+            ->whereHas('placement', function ($q) use ($mentor) {
+                $q->where('mentor_id', $mentor->id)->orWhere('pembimbing_id', $mentor->id);
+            })
+            ->get();
+        foreach ($startedApps as $stApp) {
+            $stApp->autoActivateIfStarted();
+        }
+
         // Base query penempatan yang diplot ke mentor ini
         $baseQuery = Placement::where(function ($q) use ($mentor) {
             $q->where('mentor_id', $mentor->id)
@@ -36,19 +48,10 @@ class DashboardController extends Controller
             });
         }
 
-        // Jangan sertakan yang mengundurkan diri atau ditolak kecuali jika diminta khusus
-        $tab = $request->get('tab');
-        if ($tab && in_array($tab, ['upcoming', 'completed', 'active'])) {
-            $baseQuery->whereRelation('application', 'status', match ($tab) {
-                'upcoming' => 'accepted',
-                'completed' => 'completed',
-                default => 'active',
-            });
-        } else {
-            $baseQuery->whereHas('application', function ($q) {
-                $q->whereNotIn('status', ['resigned', 'rejected']);
-            });
-        }
+        // Jangan sertakan yang mengundurkan diri atau ditolak
+        $baseQuery->whereHas('application', function ($q) {
+            $q->whereNotIn('status', ['resigned', 'rejected']);
+        });
 
         // Hitung statistik bimbingan mentor
         $totalStudents = (clone $baseQuery)->count();
@@ -63,16 +66,22 @@ class DashboardController extends Controller
         $totalReportsApproved = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', 'approved'))->count();
         $totalReportsPending = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', '!=', 'approved'))->count();
 
+        $activeStudents = (clone $baseQuery)->whereRelation('application', 'status', 'active')->count();
+        $upcomingStudents = (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count();
+        $completedStudents = (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count();
+        $placementIds = (clone $baseQuery)->pluck('id');
+        $pendingLogbooks = Logbook::whereIn('placement_id', $placementIds)->where('status', 'pending')->count();
+
         $stats = [
             'total_students' => $totalStudents,
             'total_evaluated' => $totalEvaluated,
             'total_pending_eval' => $totalPendingEval,
             'total_reports_approved' => $totalReportsApproved,
             'total_reports_pending' => $totalReportsPending,
-            'active_students' => $totalStudents,
-            'upcoming_students' => 0,
-            'completed_students' => 0,
-            'pending_logbooks' => 0,
+            'active_students' => $activeStudents,
+            'upcoming_students' => $upcomingStudents,
+            'completed_students' => $completedStudents,
+            'pending_logbooks' => $pendingLogbooks,
         ];
 
         // Query penempatan dengan relasi lengkap
@@ -85,6 +94,15 @@ class DashboardController extends Controller
             'finalreport',
             'academicAdvisor',
         ]);
+
+        $tab = $request->get('tab');
+        if ($tab && in_array($tab, ['upcoming', 'completed', 'active'], true)) {
+            $query->whereRelation('application', 'status', match ($tab) {
+                'upcoming' => 'accepted',
+                'completed' => 'completed',
+                default => 'active',
+            });
+        }
 
         // Filter pencarian nama / NIM / jurusan / kampus
         $search = trim((string) ($request->get('search') ?? $request->get('q', '')));
@@ -132,16 +150,21 @@ class DashboardController extends Controller
     {
         $mentor = Auth::user();
 
-        $placement = Placement::with([
+        $placement = Placement::findOrFail($placementId);
+        $placement->autoActivateIfStarted();
+
+        $placement->load([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'logbooks' => function ($q) {
                 $q->orderBy('date', 'desc')->orderBy('id', 'desc');
             },
             'evaluation',
             'finalreport',
+            'internshipProjects',
             'academicAdvisor',
-        ])->findOrFail($placementId);
+        ]);
 
         // Mentor yang ditugaskan, atau Kepala Unit selama mentor belum ditunjuk (validasi sementara).
         abort_unless($placement->canFieldReviewLogbook($mentor), 403, 'Anda tidak memiliki hak akses ke data bimbingan mahasiswa ini.');

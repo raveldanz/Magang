@@ -32,8 +32,12 @@ class LogbookController extends Controller
             $q->whereIn('status', ['accepted', 'active', 'completed']);
         });
 
-        // Multi-Tenant Isolation untuk Admin Dinas
-        if ($user && $user->agency_profile_id !== null) {
+        // Isolasi Bidang & Multi-Tenant:
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            $query->whereHas('application', function ($q) use ($user) {
+                $q->where('unit_id', $user->unit_id);
+            });
+        } elseif ($user && $user->agency_profile_id !== null) {
             $query->whereHas('application.unit', function ($q) use ($user) {
                 $q->where('agency_profile_id', $user->agency_profile_id);
             });
@@ -44,7 +48,11 @@ class LogbookController extends Controller
         }
 
         // Filter Berdasarkan Unit
-        if ($request->filled('unit_id')) {
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            $query->whereHas('application', function ($q) use ($user) {
+                $q->where('unit_id', $user->unit_id);
+            });
+        } elseif ($request->filled('unit_id')) {
             $query->whereHas('application', function ($q) use ($request) {
                 $q->where('unit_id', $request->unit_id);
             });
@@ -98,7 +106,9 @@ class LogbookController extends Controller
 
         // Data Unit untuk Dropdown Filter
         $unitsQuery = Unit::query();
-        if ($user && $user->agency_profile_id !== null) {
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            $unitsQuery->where('id', $user->unit_id);
+        } elseif ($user && $user->agency_profile_id !== null) {
             $unitsQuery->where('agency_profile_id', $user->agency_profile_id);
         }
         $units = $unitsQuery->orderBy('name')->get();
@@ -106,7 +116,11 @@ class LogbookController extends Controller
 
         // Statistik Agregat Keseluruhan untuk Kartu Ringkasan
         $statsQuery = Logbook::query();
-        if ($user && $user->agency_profile_id !== null) {
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            $statsQuery->whereHas('placement.application', function ($uq) use ($user) {
+                $uq->where('unit_id', $user->unit_id);
+            });
+        } elseif ($user && $user->agency_profile_id !== null) {
             $statsQuery->whereHas('placement.application.unit', function ($uq) use ($user) {
                 $uq->where('agency_profile_id', $user->agency_profile_id);
             });
@@ -129,8 +143,12 @@ class LogbookController extends Controller
                 },
             ])->find($request->placement_id);
 
-            // Validasi kepemilikan instansi
-            if ($selectedPlacement && $user && $user->agency_profile_id !== null) {
+            // Validasi kepemilikan instansi & bidang
+            if ($selectedPlacement && $user && ! $user->isSuperAdmin() && $user->unit_id) {
+                if (optional($selectedPlacement->application)->unit_id !== $user->unit_id) {
+                    $selectedPlacement = null;
+                }
+            } elseif ($selectedPlacement && $user && $user->agency_profile_id !== null) {
                 if (optional($selectedPlacement->application?->unit)->agency_profile_id !== $user->agency_profile_id) {
                     $selectedPlacement = null;
                 }
@@ -167,9 +185,13 @@ class LogbookController extends Controller
 
         $placement = $logbook->placement;
 
-        // Multi-Tenant Authorization Check untuk Admin/Mentor Instansi
+        // Multi-Tenant & Bidang Authorization Check
         if ($user && $user->agency_profile_id !== null && optional($placement?->application?->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke logbook instansi lain.');
+        }
+
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($placement?->application)->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke logbook bidang lain.');
         }
 
         // Authorization Check untuk Dosen Kampus
@@ -212,9 +234,13 @@ class LogbookController extends Controller
         $logbook = Logbook::with(['placement.application.unit', 'placement.application.user'])->findOrFail($id);
         $placement = $logbook->placement;
 
-        // Multi-Tenant Authorization Check
+        // Multi-Tenant & Bidang Authorization Check
         if ($user && $user->agency_profile_id !== null && optional($placement?->application?->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk me-review logbook instansi lain.');
+        }
+
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($placement?->application)->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk me-review logbook bidang lain.');
         }
 
         if (! $placement || ! $placement->allowsAgencyAdminLogbookFallback($user)) {

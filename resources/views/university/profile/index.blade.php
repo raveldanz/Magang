@@ -165,9 +165,33 @@
 
                 <!-- Card 3: Skema Kebijakan & Pembobotan Nilai Kampus Adaptif -->
                 <div x-data="{ 
-                        scheme: '{{ old('evaluation_scheme', $university->evaluation_scheme ?? 'dual_evaluation') }}',
-                        weightMentor: {{ old('weight_mentor', $university->weight_mentor ?? 40) }},
-                        weightLecturer: {{ old('weight_lecturer', $university->weight_lecturer ?? 60) }},
+                        scheme: '{{ old('evaluation_scheme', $university->evaluation_scheme ?? 'mentor_only') }}',
+                        weightMentor: {{ old('weight_mentor', $university->weight_mentor ?? 100) }},
+                        weightLecturer: {{ old('weight_lecturer', $university->weight_lecturer ?? 0) }},
+                        dinasList: @js(array_values($university->getDinasComponents())),
+                        dplList: @js(array_values($university->getDplComponents())),
+                        addDinas() {
+                            this.dinasList.push('Aspek Penilaian Dinas ' + (this.dinasList.length + 1));
+                        },
+                        removeDinas(idx) {
+                            if (this.dinasList.length > 1) {
+                                this.dinasList.splice(idx, 1);
+                            }
+                        },
+                        addDpl() {
+                            this.dplList.push('Aspek Penilaian DPL ' + (this.dplList.length + 1));
+                        },
+                        removeDpl(idx) {
+                            if (this.dplList.length > 1) {
+                                this.dplList.splice(idx, 1);
+                            }
+                        },
+                        resetDinas() {
+                            this.dinasList = @js(array_values(\App\Models\University::DEFAULT_DINAS_COMPONENTS));
+                        },
+                        resetDpl() {
+                            this.dplList = @js(array_values(\App\Models\University::DEFAULT_DPL_COMPONENTS));
+                        },
                         updateLecturer() {
                             this.weightLecturer = Math.max(0, Math.min(100, 100 - this.weightMentor));
                         },
@@ -175,7 +199,7 @@
                             this.weightMentor = Math.max(0, Math.min(100, 100 - this.weightLecturer));
                         }
                      }" 
-                     class="bg-white rounded-2xl shadow-xs border border-gray-200 p-6 space-y-5">
+                     class="bg-white rounded-2xl shadow-xs border border-gray-200 p-6 space-y-6">
                     
                     <div class="border-b border-gray-100 pb-3 flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2">
@@ -192,28 +216,7 @@
                     <!-- Pilihan 2 Model Skema Evaluasi -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
-                        <!-- Option 1: Dual Evaluation (Kemitraan Dua Pihak) -->
-                        <label class="relative flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition select-none"
-                               :class="scheme === 'dual_evaluation' ? 'border-blue-600 bg-blue-50/40 shadow-xs' : 'border-gray-200 hover:border-gray-300 bg-white'">
-                            <div class="flex items-start gap-3">
-                                <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-1 text-blue-600 focus:ring-blue-500">
-                                <div>
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-xs sm:text-sm text-gray-900">Kemitraan Terpadu (Dua Pihak)</span>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Standar</span>
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                        Mahasiswa dibimbing & dinilai oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing</strong>. Logbook diverifikasi 2 arah.
-                                    </p>
-                                    <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
-                                        <span>✓ Wajib Pilih Dosen Pembimbing</span>
-                                        <span>✓ Verifikasi Logbook 2 Pihak</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-
-                        <!-- Option 2: Mentor Only (Penilaian Penuh Dinas 100%) -->
+                        <!-- Option 1: Mentor Only (Penilaian Penuh Dinas 100%) - DEFAULT & STANDAR -->
                         <label class="relative flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition select-none"
                                :class="scheme === 'mentor_only' ? 'border-blue-600 bg-blue-50/40 shadow-xs' : 'border-gray-200 hover:border-gray-300 bg-white'">
                             <div class="flex items-start gap-3">
@@ -221,6 +224,7 @@
                                 <div>
                                     <div class="flex items-center gap-1.5">
                                         <span class="font-bold text-xs sm:text-sm text-gray-900">Penilaian Mandiri Instansi (100% Dinas)</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">Standar</span>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
                                         Kampus mempercayakan 100% penilaian dan pengawasan kepada <strong>Mentor Lapangan Dinas</strong>. Dosen tidak diwajibkan menilai.
@@ -228,6 +232,26 @@
                                     <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
                                         <span>✓ Tidak Wajib Dosen Pembimbing</span>
                                         <span>✓ Cukup ACC Mentor Dinas</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option 2: Dual Evaluation (Kemitraan Dua Pihak / Fleksibel) -->
+                        <label class="relative flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition select-none"
+                               :class="scheme === 'dual_evaluation' ? 'border-blue-600 bg-blue-50/40 shadow-xs' : 'border-gray-200 hover:border-gray-300 bg-white'">
+                            <div class="flex items-start gap-3">
+                                <input type="radio" name="evaluation_scheme" value="dual_evaluation" x-model="scheme" class="mt-1 text-blue-600 focus:ring-blue-500">
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-bold text-xs sm:text-sm text-gray-900">Kemitraan Terpadu (Dua Pihak / Kustom)</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                        Mahasiswa dibimbing & dinilai secara fleksibel antara <strong>Mentor Dinas</strong> dan/atau <strong>Dosen Pembimbing</strong> (termasuk opsi 100% Kampus).
+                                    </p>
+                                    <div class="mt-2.5 pt-2 border-t border-gray-100/80 flex items-center gap-3 text-[11px] text-gray-600">
+                                        <span>✓ Bobot Pembagian Nilai Dinamis</span>
+                                        <span>✓ Verifikasi Logbook Berjenjang</span>
                                     </div>
                                 </div>
                             </div>
@@ -262,7 +286,7 @@
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightMentor" @input="updateLecturer()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
                                 <input type="number" name="weight_mentor" min="0" max="100" x-model="weightMentor" @input="updateLecturer()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
-                                <p class="text-[11px] text-gray-400">Porsi nilai kinerja teknis, kedisiplinan, dan inisiatif di kantor dinas.</p>
+                                <p class="text-[11px] text-gray-400">Atur 0% jika evaluasi murni diserahkan 100% ke Dosen Pembimbing Kampus.</p>
                             </div>
 
                             <!-- Bobot DPL Kampus -->
@@ -273,14 +297,14 @@
                                 </div>
                                 <input type="range" min="0" max="100" step="5" x-model="weightLecturer" @input="updateMentor()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
                                 <input type="number" name="weight_lecturer" min="0" max="100" x-model="weightLecturer" @input="updateMentor()" class="w-full text-xs border-gray-300 rounded-xl font-mono text-center font-bold">
-                                <p class="text-[11px] text-gray-400">Porsi nilai penguasaan materi, laporan akademik, dan sikap.</p>
+                                <p class="text-[11px] text-gray-400">Atur 100% jika kampus memberlakukan evaluasi tunggal oleh Dosen Pembimbing.</p>
                             </div>
 
                         </div>
 
                         <!-- Checkbox Wajib DPL -->
                         <div class="pt-2 border-t border-slate-200 flex items-center gap-2">
-                            <input type="checkbox" name="require_dpl" value="1" id="require_dpl" {{ old('require_dpl', $university->require_dpl ?? true) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" name="require_dpl" value="1" id="require_dpl" {{ old('require_dpl', $university->require_dpl ?? false) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <label for="require_dpl" class="text-xs text-gray-700 font-medium">
                                 <strong>Kunci Pengisian Logbook</strong> hingga mahasiswa memilih Dosen Pembimbing.
                             </label>
@@ -288,11 +312,101 @@
                     </div>
 
                     <!-- Notifikasi Banner Jika Skema 100% Dinas -->
-                    <div x-show="scheme === 'mentor_only'" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-                        <p class="font-bold">Informasi Mode Penilaian Penuh Instansi:</p>
-                        <p class="text-amber-800 leading-relaxed">
-                            Mahasiswa dari <strong>{{ $university->name }}</strong> dapat langsung mengisi logbook harian begitu diterima di dinas tanpa terhalang status penugasan dosen pembimbing. Nilai akhir di sertifikat magang dihitung murni 100% dari Mentor Dinas.
+                    <div x-show="scheme === 'mentor_only'" class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-xs text-blue-900 space-y-1">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Informasi Mode Penilaian Mandiri Instansi (100% Dinas):
                         </p>
+                        <p class="text-blue-800 leading-relaxed">
+                            Mahasiswa dari <strong>{{ $university->name }}</strong> dapat langsung mengisi logbook harian begitu diterima di dinas tanpa terhalang status penugasan dosen pembimbing. Lembar sertifikat kelulusan hanya memuat penilaian resmi dari Mentor Lapangan Kedinasan.
+                        </p>
+                    </div>
+
+                    <!-- Kustomisasi Komponen Penilaian Sertifikat -->
+                    <div class="pt-4 border-t border-gray-100 space-y-5">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <h4 class="font-bold text-sm sm:text-base text-gray-900">Kustomisasi Komponen Penilaian Sertifikat</h4>
+                                <p class="text-xs text-gray-400">Ubah penamaan aspek kompetensi penilaian agar selaras dengan kurikulum atau format transkrip kampus</p>
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                                Fleksibel & Dinamis
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            
+                            <!-- Kolom 1: Komponen Dinas -->
+                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                                        <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian Dinas (Instansi)</h5>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" @click="addDinas()" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
+                                            + Tambah
+                                        </button>
+                                        <span class="text-slate-300">|</span>
+                                        <button type="button" @click="resetDinas()" class="text-[11px] font-semibold text-slate-500 hover:text-slate-700 cursor-pointer">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2.5">
+                                    <template x-for="(comp, idx) in dinasList" :key="idx">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-bold text-slate-400 w-5 shrink-0" x-text="(idx + 1) + '.'"></span>
+                                            <input type="text" 
+                                                   :name="'dinas_components[' + (idx + 1) + ']'" 
+                                                   x-model="dinasList[idx]" 
+                                                   required
+                                                   placeholder="Nama aspek kompetensi dinas..."
+                                                   class="w-full text-xs border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                            <button type="button" @click="removeDinas(idx)" x-show="dinasList.length > 1" class="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus aspek ini">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Kolom 2: Komponen DPL Kampus -->
+                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+                                        <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian DPL (Akademik Kampus)</h5>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" @click="addDpl()" class="text-[11px] font-bold text-purple-600 hover:text-purple-800 cursor-pointer">
+                                            + Tambah
+                                        </button>
+                                        <span class="text-slate-300">|</span>
+                                        <button type="button" @click="resetDpl()" class="text-[11px] font-semibold text-slate-500 hover:text-slate-700 cursor-pointer">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2.5">
+                                    <template x-for="(comp, idx) in dplList" :key="idx">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-bold text-slate-400 w-5 shrink-0" x-text="(idx + 1) + '.'"></span>
+                                            <input type="text" 
+                                                   :name="'dpl_components[' + (idx + 1) + ']'" 
+                                                   x-model="dplList[idx]" 
+                                                   required
+                                                   placeholder="Nama aspek kompetensi akademik..."
+                                                   class="w-full text-xs border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 shadow-2xs font-medium">
+                                            <button type="button" @click="removeDpl(idx)" x-show="dplList.length > 1" class="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer" title="Hapus aspek ini">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
 
                 </div>

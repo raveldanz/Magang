@@ -83,9 +83,39 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-071** | 2026-10-12 | Git Merge Regression & Recovery PR #92 | Pemulihan rute modular, fitur chat, Certificate Gate, dan view modern yang terdegradasi akibat konflik git | RESOLVED |
 | **LRN-072** | 2026-10-12 | Media & Branding: Resolusi Kanvas Logo Universitas Indonesia (UI) | Ikon logo UI tampak sebagai titik kuning mikroskopis akibat kanvas aset 512x512 dengan 93% padding transparan kosong | RESOLVED |
 | **LRN-073** | 2026-10-11 | Rekonsiliasi Merge Konflik Portal Dosen | Paritas tata letak, evaluasi komparatif, dan eliminasi form bimbingan obsolete | RESOLVED |
-| **LRN-074** | 2026-10-14 | Master Instansi & Seeder Cleanup | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dinas Perpustakaan dan Kearsipan serta kaskade relasi aman | RESOLVED |
+| **LRN-074** | 2026-10-14 | Pembersihan Massal Instansi Dinas Terpadu | Pembersihan massal 22 master instansi dengan mempertahankan tunggal Dispusip | RESOLVED |
 | **LRN-075** | 2026-10-14 | Evaluasi Adaptif Kampus: Aspek Penilaian Dinamis & Input Manual | Kriteria penilaian magang kaku 3 aspek tidak mencukupi disparitas standar rubrik antar-kampus | RESOLVED |
 | **LRN-076** | 2026-10-15 | Unclosed HTML Tag pada Mobile Loop Menyembunyikan Tabel Desktop | Tag div unclosed di kartu mobile menyebabkan kontainer desktop tertelan masuk ke dalam blok sm:hidden | RESOLVED |
+| **LRN-077** | 2026-10-15 | Evaluasi Fleksibel, Kustomisasi Komponen & Sertifikat Dinamis | Default 100% Dinas, kustomisasi komponen per kampus, penyembunyian pihak 0% di sertifikat & penyesuaian huruf A/B | RESOLVED |
+| **LRN-078** | 2026-10-15 | Standarisasi Dispusip Single-Agency, 4 Bidang & Double ACC | Pembersihan ekosistem OPD non-Dispusip, relasi unit_id mentor, role supervisor (Atasan Kepegawaian), dan Double ACC pengajuan & sertifikat | RESOLVED |
+| **LRN-079** | 2026-10-15 | Integrasi & Harmonisasi Fitur Evaluasi Nilai | Penggabungan skema evaluasi kampus, komponen kustom universitas, dan input aspek dinamis Dosen/Mentor | RESOLVED |
+| **LRN-080** | 2026-10-15 | Standarisasi Nomenklatur Jabatan, Kunci 4 Bidang Dispusip & Integrasi Chat/Notifikasi Supervisor | Penguncian tepat 4 bidang Dispusip, nomenklatur 'Tim Kerja Umum dan Kepegawaian', eliminasi role mentah SUPERVISOR, komponen x-page-header, & dukungan penuh chat/notifikasi supervisor | RESOLVED |
+| **LRN-081** | 2026-10-15 | Seleksi Pengajuan Admin: Dot Waiting, Filter Mentor Bidang & Clean Naming | Titik indikator kartu WAITING_APPROVAL, filter otomatis mentor sesuai unit_id bidang pendaftaran, eliminasi duplikasi teks bidang di nama & pembaharuan keterangan 'Setujui, Serahkan ke Atasan' | RESOLVED |
+| **LRN-082** | 2026-10-15 | Nomenklatur Bidang Devisi & Tautan Detail Unit | Standarisasi menu navbar 'Bidang Devisi' & pembaruan tombol aksi baris unit dari Edit menjadi Detail mengarah ke show page /admin/units/{id} | RESOLVED |
+| **LRN-083** | 2026-10-15 | Eliminasi Card Penugasan Pembimbing Susulan Redundan & RoleLabel | Eliminasi penugasan susulan ganda, pembersihan sisa status verified, dan konsistensi roleLabel | RESOLVED |
+| **LRN-084** | 2026-10-15 | Supervisor UI Refinements: Menu Dashboard, Tombol Sertifikat Biru, Tab Menunggu Persetujuan & Status Menunggu ACC | Simplifikasi navbar 'Dashboard', pewarnaan biru tombol Pengesahan Sertifikat, pergantian tab 'Menunggu Persetujuan', dan deskripsi khusus status WAITING_APPROVAL 'Menunggu ACC' bagi supervisor | RESOLVED |
+| **LRN-085** | 2026-10-15 | Double ACC Approval Workflow & Elimination of Browser Confirm() Popups | Audit menyeluruh alur status persetujuan bertingkat (Double ACC): eliminasi confirm() browser menjadi modal dialog dua lapis, pengesahan sertifikat, dan harmonisasi status desktop/mobile | RESOLVED |
+| **LRN-086** | 2026-10-19 | Audit Holistik Single-Agency Dispusip, Filter 4 Bidang Lintas Role & Eliminasi Residu Obsolete | Harmonisasi alur seluruh peran ke ekosistem tunggal Dispusip (4 bidang), eliminasi residu status verified & placeholder lama, optimasi filter bidang pada Dosen/Kampus/Mentor | RESOLVED |
+| **LRN-087** | 2026-10-19 | Optimalisasi Mendalam Algoritma Mentor per Bidang, Form Bantuan Single-Agency, & Penyelarasan Residu Terakhir | Filter unit_id pada admin mentor, fallback profil instansi Dispusip di feedback tiket, penyelarasan placeholder | RESOLVED |
+| **LRN-088** | 2026-10-19 | Form Tunggal Terpadu Seleksi & Penugasan Pembimbing (Eliminasi Card Redundan) | Eliminasi card penugasan pembimbing redundan di halaman detail pengajuan admin, sentralisasi penugasan & mutasi mentor/dosen ke form status utama dengan audit log & resync chat | RESOLVED |
+| **LRN-089** | 2026-10-19 | Lifecycle Status Integration, On-The-Fly Auto-Activation & Mentor Metric Preservation | Ketidaksinkronan status ACTIVE hari H, tab filter mentor mereduksi metrik jadi 0 & BackedEnum DPL | RESOLVED |
+| **LRN-090** | 2026-10-19 | Spesialisasi Akun Admin Per Bidang & Isolasi Multi-Tenant Unit/Bidang Dispusip | Ketiadaan akun admin per bidang, ketiadaan filter bidang otomatis di modul aplikasi/mentor/logbook/sertifikat | RESOLVED |
+| **LRN-091** | 2026-10-19 | Perombakan Total & Optimalisasi Fungsi Operasional Admin Bidang Pasca Evolusi Single-Agency | Eliminasi residu multi-agency & matriks 4-bidang redundan di dashboard admin bidang, sentralisasi ruang kerja unit, penguncian bidang form mentor, eliminasi teks logo dinas redundan di pengajuan, dan harmonisasi validasi logbook | RESOLVED |
+| **LRN-092** | 2026-10-19 | Master Pengguna UI & Anti-Overflow Layout | Eliminasi horizontal overflow tabel pengguna, penghapusan avatar singkatan inisial AD/AN, simplifikasi kolom Instansi & badge role bertingkat | RESOLVED |
+| **LRN-093** | 2026-10-19 | Penyelarasan UI Logbook & Mentor Tanpa Kurung Serta Penyesuaian Kuota Bidang Mandiri | Penghapusan ikon clipboard & pewarnaan teks berlebih, simplifikasi kolom Pending Logbook (1 angka), penghapusan kurung '(Mentor)', eliminasi card deskripsi bidang, & fitur quick quota AJAX untuk bidangnya sendiri | RESOLVED |
+| **LRN-094** | 2026-10-19 | Penyederhanaan Halaman Bidang Devisi: Eliminasi Card & Ikon Redundan, Standardisasi Nomenklatur 'Tambah Devisi' | Eliminasi ikon gedung header, pemangkasan 2 kartu metrik redundan (Total Kuota & Kuota Terisi), penataan netral teks Sisa Kuota, penghapusan subteks panduan kuota, dan standarisasi istilah 'Tambah Devisi' | RESOLVED |
+| **LRN-095** | 2026-10-19 | Harmonisasi Kartu Metrik Instansi Dinas: Netralisasi Warna, Layout 1-Baris Personel & Eliminasi Subteks Aksi | Netralisasi warna teks Sisa Kuota & ACTIVE, relokasi jumlah admin/mentor ke kanan jumlah akun menjadi 1 baris, dan eliminasi tombol 'pengajuan perlu tindakan' | RESOLVED |
+| **LRN-096** | 2026-10-19 | Harmonisasi Kartu Metrik Perguruan Tinggi: Netralisasi Warna ACTIVE/COMPLETED & Eliminasi 'Perlu Tindakan' | Netralisasi warna teks angka ACTIVE & COMPLETED menjadi slate-900 dan eliminasi tombol/subteks 'perlu tindakan' di kartu Total Mahasiswa | RESOLVED |
+| **LRN-097** | 2026-10-19 | Eliminasi Sub-Deskripsi Header Tab Redundan pada Detail Instansi & Perguruan Tinggi | Menghapus 6 baris subteks keterangan di bawah header tab tabel untuk merapikan dan memadatkan antarmuka pengguna | RESOLVED |
+| **LRN-098** | 2026-10-19 | Penyesuaian Ruang Vertikal Header Tab Instansi Tanpa Subteks | Menambah padding bawah (pb-6 sm:pb-7) pada cc-panel-head agar garis border pembatas turun rapi memberi jarak ideal sebelum tabel | RESOLVED |
+| **LRN-099** | 2026-10-19 | Ergonomi Kolom Checkbox Bulk Action & Keseimbangan Padding Tabel Pengguna | Memperluas kolom checkbox tabel (pl-6 pr-3 w-16) dan menyeimbangkan padding kanan (pr-6) agar tidak mepet pojok kartu | RESOLVED |
+| **LRN-100** | 2026-10-19 | Refactoring UI Responsif Mobile (Android Touch-Friendly) & Eliminasi Tumpang Tindih Multi-Role Baru | Perombakan total tabel desktop menjadi kartu ergonomis bertumpuk di layar smartphone (<768px), touch target >=44px, eliminasi teks nama terpotong, dan pencegahan horizontal overflow | RESOLVED |
+| **LRN-101** | 2026-10-19 | Ergonomi Spacing Kolom Checkbox & Kolom Pengguna | Penambahan padding kiri (pl-8) dari pinggir tabel dan perapian gap kanan (w-px whitespace-nowrap pl-2) agar proporsional dan tidak mepet | RESOLVED |
+| **LRN-108** | 2026-10-21 | Arsitektur Kelompok Magang & Integrasi Pendaftaran Individu yang Aman | Penambahan model `InternshipGroup`, integrasi 1 surat penerimaan bersama kelompok, sinkronisasi status Double ACC, serta isolasi logbook, evaluasi, dan e-sertifikat mandiri per individu | RESOLVED |
+| **LRN-110** | 2026-10-21 | Desain Responsif 2-Baris Filter Pengajuan & Penyelarasan Center-Aligned Kolom AKSI | Layout 2 baris filter anti-squish di applications, penataan center-aligned header dan cell tombol AKSI di applications dan users | RESOLVED |
+| **LRN-111** | 2026-10-21 | Desentralisasi Berkas Identitas Personal Mahasiswa & Penyederhanaan Formulir Pendaftaran | Relokasi unggah CV, transkrip nilai, dan KTM ke Profil Saya, eliminasi beban dobel berkas pada pendaftaran individu dan kelompok (hanya 1 Surat Pengantar), serta snapshot berkas ke arsip dinas | RESOLVED |
+| **LRN-112** | 2026-10-21 | Multi-Kategori Inovasi Proyek Magang Non-IT, Pemisahan Bagian Akses Mandiri & Optimasi Grid 3-Kolom | Kategori dinamis (IT, Layanan Publik, Kearsipan, Desain/Media, Riset, Tata Kelola), pemisahan repositori kode ke IT saja, dan tampilan grid showcase | RESOLVED |
+| **LRN-113** | 2026-10-21 | Akses Proposal Kelompok dari Private Storage, Restrukturisasi Tombol Dokumen & Eliminasi Tombol Alih Jalur | Rute `documents.group.proposal` terotorisasi, perapian grouping tombol `Lihat PDF` + `Unduh` pada Dokumen Persyaratan, dan pembersihan tombol redundan alih jalur pendaftaran | RESOLVED |
 | **LRN-077** | 2026-10-15 | Redireksi Kontekstual Sesi Penyamaran (Impersonasi) | Sesi impersonasi kembali ke referer asal bukan hardcode users index | RESOLVED |
 | **LRN-078** | 2026-10-15 | Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin | Pembersihan filter instansi tunggal pada halaman admin | RESOLVED |
 | **LRN-079** | 2026-10-19 | Audit Sistem, Migrasi Pending & Integritas Rute Modular | Pemulihan rute staged monolitik ke modular, eksekusi migrasi pending PostgreSQL & pembetulan import Kernel CLI scripts | RESOLVED |
@@ -1758,6 +1788,142 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-077] Fleksibilitas Skema Evaluasi (Default 100% Dinas), Kustomisasi Komponen Penilaian & Sertifikat Dinamis
+- **Tanggal**: 2026-10-15
+- **Komponen**: `database/migrations/2026_10_14_150000_add_evaluation_components_to_universities_table.php`, `App\Models\University`, `App\Models\Evaluation`, `App\Models\Application`, `App\Http\Controllers\University\ProfileController`, `App\Http\Controllers\Admin\UniversityController`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/university/profile/index.blade.php`, `resources/views/admin/universities/edit.blade.php`
+- **Problem / Symptom**:
+  1. Skema evaluasi universitas default-nya adalah "Kemitraan Terpadu (Dua Pihak)" (50:50 / 40:60) yang mewajibkan input nilai DPL, padahal instansi pemerintah mengutamakan penilaian mandiri dinas (100% Dinas).
+  2. Aspek/komponen penilaian kompetensi (3 aspek dinas & 3 aspek DPL) bersifat kaku (*hardcoded*) dan tidak dapat disesuaikan dengan kurikulum unik tiap perguruan tinggi.
+  3. Lembar sertifikat magang selalu menampilkan kedua bagian penilaian (Bagian A Dinas & Bagian B DPL) secara statis sehingga membingungkan mahasiswa/instansi ketika skema evaluasi kampus diatur 100% Dinas atau 100% DPL.
+- **Root Cause**:
+  1. Default kolom migrasi dan fallback accessor berakar pada `dual_evaluation` (`require_dpl = true`).
+  2. Ketiadaan kolom penyimpanan JSON untuk kustomisasi label aspek di tabel `universities`.
+  3. View sertifikat `internship_certificate.blade.php` tidak memiliki percabangan kondisional untuk menyembunyikan blok penilaian berbobot 0% serta re-lettering huruf kategori (A/B).
+- **Fix Applied**:
+  1. Membuat migrasi `2026_10_14_150000_add_evaluation_components_to_universities_table.php` untuk menambah kolom JSON `dinas_components` & `dpl_components` dan mengubah default kolom menjadi `mentor_only` (100% Dinas, 0% DPL, require_dpl = false).
+  2. Menambahkan array cast, konstanta default (`DEFAULT_DINAS_COMPONENTS`, `DEFAULT_DPL_COMPONENTS`), dan helper accessor di `University.php` dengan penanganan array 0-indexed dan 1-indexed.
+  3. Memperbarui formulir dan controller (`ProfileController` & `Admin\UniversityController`) untuk validasi bobot total 100% (menggunakan `ValidationException`) dan penyimpanan komponen kustom beserta fitur reset.
+  4. Memperbarui form penilaian Mentor dan Dosen (`score-form.blade.php`) agar merender label komponen dinamis kampus mahasiswa.
+  5. Memperbarui `internship_certificate.blade.php` agar:
+     - Menyembunyikan Bagian B (DPL) dan subtotalnya bila 100% Dinas.
+     - Menyembunyikan Bagian A (Dinas) dan subtotalnya serta memberi label huruf "A" pada DPL bila 100% DPL.
+     - Menampilkan kedua bagian (A & B) bila skema Dua Pihak, lengkap dengan perhitungan skor tertimbang yang presisi.
+  6. Menulis suite pengujian komprehensif `tests/Feature/EvaluationPolicyAndComponentsTest.php` dan memverifikasi seluruh test suite aplikasi lulus 100% (288 tests, 1.976 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  1. Dalam sistem penilaian multi-tenant, jangan meng-hardcode nama aspek penilaian di view atau controller. Gunakan helper accessor di Model dengan fallback default yang kuat.
+  2. Saat menangani input array dinamis dari form HTML vs payload JSON/API, perhitungkan kompatibilitas 0-indexed dan 1-indexed secara eksplisit menggunakan `array_key_exists(0, $arr)`.
+  3. Pastikan accessor kelengkapan evaluasi (`is_complete`), nilai akhir (`nilai_akhir`), dan penghalang sertifikat (`certificateBlockers`) selalu memeriksa skema dan bobot aktif (`weight_lecturer == 0` atau `weight_mentor == 0`) sehingga pihak dengan bobot 0% tidak memblokir penerbitan sertifikat.
+
+---
+
+### [LRN-078] Standarisasi Dispusip Single-Agency, 4 Bidang Resmi, Role Supervisor (Atasan Kepegawaian), dan Alur Double ACC
+- **Tanggal**: 2026-10-15
+- **Komponen**: `database/migrations/2026_10_15_100000_standardize_dispusip_supervisor_and_components.php`, `App\Models\User`, `App\Models\Unit`, `App\Models\Certificate`, `App\Models\Application`, `App\Enums\ApplicationStatus`, `App\Http\Controllers\Supervisor\*`, `App\Http\Controllers\Admin\ApplicationController`, `App\Http\Controllers\Admin\CertificateController`, `App\Http\Controllers\Student\CertificateController`, `resources/views/supervisor\*`, `resources/views/admin/dashboard.blade.php`, `database/seeders\*`
+- **Problem / Symptom**:
+  1. Sistem magang sebelumnya memuat referensi dan seeder berbagai OPD di luar Dinas Perpustakaan dan Kearsipan (Dispusip), serta label UI Super Admin masih mengindikasikan tingkat Pemkot secara generik.
+  2. Akun Mentor belum terikat secara formal pada salah satu bidang Dispusip, menyulitkan monitoring beban bimbingan per bidang.
+  3. Ketiadaan peran Atasan (Tim Kerja Umum & Kepegawaian) untuk alur persetujuan bertingkat (*Double ACC*) pada penerimaan pengajuan magang dan pengesahan sertifikat kelulusan.
+  4. Penambahan enum status `waiting_approval` memicu regresi pada assertion status huruf kapital dan spasi di `DisplaysStatusCode` trait dan `StatusViewGuardTest`.
+- **Root Cause**:
+  1. Multi-agency seeder lama (`DatabaseSeeder`, `SurabayaAgenciesSeeder`, `DemoE2ESeeder`) menginstansiasi OPD Dinkes, Kominfo, Dukcapil.
+  2. Skema tabel `users` belum memiliki foreign key `unit_id` bertipe nullable.
+  3. Alur persetujuan admin langsung mengaktifkan penempatan tanpa verifikasi pimpinan kepegawaian.
+  4. Label status dengan underscore (`waiting_approval`) dikonversi menjadi spasi oleh `DisplaysStatusCode::label()` (`WAITING APPROVAL`), sementara test membandingkan string mentah `strtoupper($case->value)` tanpa normalisasi.
+- **Fix Applied**:
+  1. Membuat migrasi `2026_10_15_100000_standardize_dispusip_supervisor_and_components.php` yang menambahkan kolom `users.unit_id`, `certificates.approval_status`, `certificates.approved_by`, `certificates.approved_at`, `certificates.notes`, dan mengunci 4 Bidang Resmi Dispusip:
+     - Bidang Sekretariat
+     - Bidang Pembinaan dan Pengelolaan Perpustakaan
+     - Bidang Pembinaan dan Layanan Kearsipan
+     - Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan
+  2. Mendaftarkan role `supervisor` dengan penamaan UI "Atasan (Tim Kerja Umum & Kepegawaian)", interface ramah senior (*Senior-Friendly*, kontras tinggi, navigasi 3 menu utama, bebas tombol destruktif/hapus master data).
+  3. Mengimplementasikan alur *Double ACC*:
+     - Pengajuan: Admin verifikasi berkas & pilih mentor -> status `waiting_approval` ("Menunggu ACC Atasan") -> Supervisor review -> ACC ("Setujui & Terbitkan Surat") -> status `accepted`/`active` & terbitkan surat; atau "Kembalikan ke Admin (Revisi)" beserta catatan.
+     - Sertifikat: Admin generate -> record `Certificate` berstatus `waiting_approval` -> Supervisor ACC -> status `approved`. Mahasiswa hanya dapat mengunduh sertifikat resmi setelah statusnya disahkan Atasan.
+  4. Menambahkan relasi `unit()` di `User.php`, `mentors()` di `Unit.php`, serta visualisasi matriks 4 Bidang di Dashboard Admin dan Dashboard Supervisor.
+  5. Menyempurnakan `DisplaysStatusCode::resolve()` agar mendukung input dengan spasi maupun underscore, serta menyelaraskan unit test end-to-end (288 tests, 1.992 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  1. Setiap penambahan status enum baru dengan karakter underscore (`_`) wajib diverifikasi pada `DisplaysStatusCode` dan didaftarkan pada regex `CODES` di `StatusViewGuardTest`.
+  2. Pada sistem kedinasan dengan alur persetujuan berjenjang (Double ACC), otorisasi penerbitan surat/sertifikat wajib mengunci status pengesahan dari Atasan sebelum diizinkan untuk diunduh oleh publik/mahasiswa.
+
+---
+
+### [LRN-079] Harmonisasi & Integrasi Fitur Skema Evaluasi Kampus dan Aspek Kustom Dinamis
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Models/Evaluation.php`, `app/Models/Application.php`, `app/Http/Controllers/Lecturer/EvaluationController.php`, `app/Http/Controllers/Mentor/EvaluationController.php`, `resources/views/components/supervision/score-form.blade.php`, `resources/views/certificates/internship_certificate.blade.php`
+- **Problem / Symptom**: Terjadi divergensi dan potensi tabrakan arsitektur antara pembaruan `origin/main` PR #99 (aspek kustom dinamis `dosen_aspects` dan `mentor_aspects` pada tabel `evaluations`) dengan modul skema evaluasi kampus (`dinas_components` dan `dpl_components` pada tabel `universities`).
+- **Root Cause**: Dua cabang pengembangan memodifikasi file inti penilaian yang sama: satu fokus pada fleksibilitas input dinamis saat form diisi, sementara yang lain fokus pada kebijakan multi-tenant perguruan tinggi (bobot 100% dinas / 100% DPL / dua pihak).
+- **Fix Applied**:
+  1. Mengharmonisasi model `Evaluation.php`: mendukung pembacaan `mentor_aspects` & `dosen_aspects` (JSON) sekaligus fallback ke konfigurasi komponen universitas via `getMentorComponents()` dan `getLecturerComponents()`.
+  2. Mengharmonisasi `Application::certificateBlockers()`: memeriksa kelengkapan evaluasi baik dari aspek dinamis maupun kolom legacy, serta menghormati bobot 0% (tidak memblokir jika skema 100% dinas).
+  3. Mengharmonisasi controller penilaian Mentor & Dosen: menyimpan payload `aspects` ke kolom JSON baru sekaligus mengupdate kolom numerik legacy dan menghitung nilai akhir adaptif.
+  4. Menyelaraskan form Blade `score-form.blade.php` dan lembar cetak transkrip sertifikat `internship_certificate.blade.php`.
+- **Prevention Rule**: Selalu pertahankan backward-compatibility dan lakukan integrasi bertingkat: skema institusi (Universitas) sebagai template default, dan aspek dinamis (Form Input) sebagai kustomisasi level instansi/evaluator.
+
+### [LRN-079] Penanganan ParseError "<<" Akibat Konflik Git Merge Tak Terselesaikan
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Models/Application.php`, `app/Models/Evaluation.php`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/components/supervision/score-form.blade.php`
+- **Problem / Symptom**: 
+  - `ParseError: syntax error, unexpected token "<<" at app\Models\Application.php:177` saat mengakses URL `GET /admin/universities/4`.
+  - HTTP 500 Internal Server Error muncul saat browser memuat halaman admin universitas.
+- **Root Cause**:
+  - Operasi git merge antara `origin/main` (PR #99 yang menambahkan aspek penilaian dinamis `dosen_aspects` dan `mentor_aspects`) dan branch lokal `AlurPengajuan-Admin-Yasin` (yang memiliki fitur kebijakan evaluasi per universitas dan `custom_components`) menyisakan conflict marker `<<<<<<< HEAD` yang belum terselesaikan di dalam berkas kode.
+- **Fix Applied**:
+  - Menyelesaikan konflik secara komprehensif dengan memadukan kedua fitur:
+    1. `Application::certificateBlockers()`: Memadukan pengecekan bobot evaluasi kampus (apakah dinas/dosen berbobot > 0) dengan validasi aspek dinamis (`mentor_aspects_list` & `dosen_aspects_list`).
+    2. `Evaluation.php`: Menyelaraskan accessor `nilai_pembimbing`, `nilai_dosen_calculated`, `getDosenAspectsListAttribute`, dan `getMentorAspectsListAttribute` sehingga mendukung aspek dinamis sekaligus komponen kustom kampus dan fallback kriteria default.
+    3. `internship_certificate.blade.php`: Merapikan tabel transkrip sertifikat agar merender daftar aspek dinamis yang valid tanpa duplikasi header/subtotal.
+    4. Menjalankan migrasi `2026_10_14_000001_add_custom_aspects_to_evaluations_table`, membersihkan cache (`optimize:clear`), memvalidasi seluruh test suite (Strict Exit Code 0), dan menyelesaikan merge commit.
+---
+
+### [LRN-080] Refaktorisasi Tampilan Minimalis Modern Kedinasan & Eliminasi Redundansi UI Dashboard Atasan / Admin
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/supervisor/dashboard.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/student/application/create.blade.php`, `resources/views/auth/register.blade.php`, `resources/views/admin/universities/partials/tab-policy.blade.php`
+- **Problem / Symptom**:
+  - Halaman Dashboard Atasan memiliki terlalu banyak variasi warna (ungu, hijau, amber, biru), card dengan ikon lingkaran dekoratif berlebih, subjudul redundan, badge atas ganda, serta panduan operasional "Double ACC" yang memakan ruang.
+  - Tabel matriks memuat kolom Tim Kerja pembimbing dan informasi "Kepala Bidang: Belum Ditugaskan" yang tidak esensial.
+  - Muncul penulisan singkatan berulang `(Dispusip)` pada nama instansi di beberapa view.
+  - Validasi arsitektur `StatusViewGuardTest` mendeteksi teks mentah `Aktif` dan `Lulus` pada grid mobile.
+- **Root Cause**:
+  - Desain antarmuka awal terlalu over-informative dan memakai skema multi-warna yang tidak seragam dengan estetika formal kedinasan Pemkot Surabaya.
+- **Fix Applied**:
+  1. Standardisasi card statistik utama ke gaya dinas minimalis modern: latar putih bersih (`bg-white border-slate-200 rounded-2xl`), teks tajam bernuansa slate, tanpa ikon dekoratif lingkaran tebal.
+  2. Menghapus teks deskripsi panjang ("Pemantauan beban pembimbing tim kerja..."), badge role redundan, panel operasional atasan, dan status sistem.
+  3. Menyederhanakan tabel: mengubah judul menjadi "Bidang Penempatan Magang", menghapus bullet biru, menghapus kolom mentor tim kerja, dan menghapus teks "Kepala Bidang: Belum Ditugaskan".
+  4. Menghilangkan seluruh kemunculan singkatan `(Dispusip)` di seluruh view publik, pendaftaran, dan dashboard.
+  5. Menyelaraskan teks grid ringkasan mobile ke `Mhs Aktif` dan `Mhs Lulus` sehingga 100% lulus `StatusViewGuardTest` dan lolos 292 pengujian PHPUnit (Strict Exit Code 0).
+- **Prevention Rule**:
+  - Pertahankan filosofi antarmuka kedinasan: fokus pada esensi data operasional, minimalis, kontras tinggi, palet warna primer Pemkot (Slate/Navy & Blue), hindari elemen dekoratif non-fungsional, dan jangan menduplikasi singkatan instansi dalam kurung.
+
+---
+
+### [LRN-080] Standarisasi Nomenklatur Jabatan, Kunci 4 Bidang Dispusip & Integrasi Chat/Notifikasi Supervisor
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Models/User.php`, `database/migrations/2026_10_15_160000_lock_dispusip_single_agency_and_four_units.php`, `database/seeders/`, `resources/views/components/page-header.blade.php`, `app/Services/Chat/`, `app/Services/NotificationService.php`, `app/Providers/AppServiceProvider.php`
+- **Problem / Symptom**:
+  1. Halaman `/supervisor/applications` masih menampilkan puluhan bidang OPD dinas luar pada dropdown karena basis data lama belum dibersihkan dan unit tidak terfilter spesifik Dispusip.
+  2. Banner mode penyamaran menampilkan kode role mentah kapital `SUPERVISOR`, dan nama akun di seeder menggunakan nama jabatan karangan ("Koordinator Tim Kerja Kepegawaian").
+  3. Halaman supervisor menggunakan layout custom dengan pill badge ungu buatan sendiri ("Double ACC Pengajuan Magang") yang menyimpang dari standar UI Admin.
+  4. Fitur chat dan kontak direktori belum mendukung role `supervisor` (tidak bisa chat dua arah dengan dinas/mahasiswa/DPL/kampus, tidak ada urutan `roleOrderSql`).
+  5. Notifikasi lonceng atasan tidak menghitung pengajuan dan sertifikat `waiting_approval`, dan saat admin meneruskan berkas belum ada push notifikasi ke supervisor.
+  6. Nama-nama mahasiswa dan mentor di seeder masih mengandung imbuhan kurung `(Lulus Magang)`, `(Aktif Magang)`, `(Tim Perpustakaan)`.
+- **Root Cause**:
+  - Inkonsistensi data migrasi awal dan seeder yang masih menyimpan residu multi-dinas OPD Surabaya, ketiadaan helper method `roleLabel()` terpusat di `User.php`, serta belum terdaftarnya role `supervisor` pada konstanta `AGENCY_STAFF_ROLES` di direktori chat.
+- **Fix Applied**:
+  1. Dibuat migrasi `2026_10_15_160000_lock_dispusip_single_agency_and_four_units.php` dan seeder dibersihkan sehingga tabel `agency_profiles` TEPAT 1 (Dispusip) dan tabel `units` TEPAT 4 (Bidang Sekretariat; Bidang Pembinaan dan Pengelolaan Perpustakaan; Bidang Pembinaan dan Layanan Kearsipan; Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan).
+  2. Dibuat method standar `User::roleLabel()` yang memetakan role `supervisor` -> `'Tim Kerja Umum dan Kepegawaian'`, `admin` -> `'Admin Dispusip'`, `super_admin` -> `'Super Admin'`, `mentor` -> `'Pembimbing Lapangan'`, `student` -> `'Mahasiswa Magang'`. Banner penyamaran diubah memakai `{{ auth()->user()->roleLabel() }}`.
+  3. Dibuat komponen reusable `<x-page-header>` dan diimplementasikan pada seluruh view supervisor (`dashboard`, `applications.index`, `applications.show`, `certificates.index`). Menghilangkan seluruh badge pill ungu buatan sendiri.
+  4. Diintegrasikan fitur Chat: `AGENCY_STAFF_ROLES` ditambahkan `supervisor`, relasi dua arah di `ChatContactDirectory` diaktifkan untuk `supervisor` ↔ `super_admin`/`admin`/`mentor`/`mahasiswa`/`dosen`/`universitas`, urutan kontak menerapkan `roleOrderSql()` dengan `WHEN 'supervisor' THEN 2`, serta izin broadcast channel di `ChatChannelService`.
+  5. Ditambahkan View Composer `layouts.navigation` di `AppServiceProvider` untuk menghitung `$unreadCount` dari `waiting_approval` (aplikasi + sertifikat), dan ditambahkan helper `NotificationService::notifySupervisorForApplication()` serta `notifySupervisorForCertificate()`.
+  6. Seluruh tanda kurung pada nama mahasiswa & mentor di seeder dihapus tuntas.
+  7. Dijalankan `php artisan migrate:fresh --seed` (Exit Code: 0) dan seluruh test suite lulus 292 tests (Exit Code: 0).
+- **Prevention Rule**:
+  - Dilarang keras menampilkan kode role mentah seperti `SUPERVISOR` atau `admin` di antarmuka; wajib panggil `$user->roleLabel()`.
+  - Dilarang mengarang nama jabatan sendiri; wajib gunakan nomenklatur resmi "Tim Kerja Umum dan Kepegawaian".
+  - Pastikan setiap query unit di controller selalu terikat ke `agency_profile_id` Dispusip.
+
+---
+
+### [LRN-075] Kustomisasi & Spesialisasi Sistem Khusus Dinas Perpustakaan dan Kearsipan Kota Surabaya
 ### [LRN-077] Eliminasi Card Dispusip, Akses Langsung Pusat Kendali & Redireksi Impersonasi
 - **Tanggal**: 2026-10-15
 - **Komponen**: `resources/views/layouts/navigation.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/ImpersonationController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`
@@ -1778,6 +1944,1076 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Memasang guard kondisional `@if(isset($agencies) && count($agencies) > 1)` pada filter instansi di `resources/views/admin/mentors/index.blade.php` dan `resources/views/admin/users/index.blade.php`, sehingga hanya tampil dinamis jika sistem memiliki lebih dari 1 instansi.
   3. Memvalidasi tampilan dan memastikan seluruh unit/feature test tetap lulus (Exit Code 0).
 - **Prevention Rule**: Seluruh elemen form filter antarmuka yang mengagregasi data entitas induk (seperti OPD/Instansi) harus memiliki kondisional pemeriksaan kuantitas (`count > 1`) atau dihapus jika sistem berjalan dalam mode portal khusus/spesifik, guna menjaga kebersihan visual dan ergonomi pengguna.
+
+### [LRN-079] Rombak Total Pipeline Status Mahasiswa, Eliminasi Status Verified, Otomatisasi Transisi Active, dan Penyatuan Form Pembimbing Anti-Reset
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `app/Models/Application.php`, `app/Models/Placement.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Student/LogbookController.php`, `app/Console/Commands/SyncInternshipStatus.php`, `resources/views/admin/applications/show.blade.php`, `database/migrations/2026_10_15_180000_remove_verified_status_and_harmonize_pipeline.php`, `routes/admin.php`, `tests/Feature/ApplicationStatusPipelineReformTest.php`
+- **Problem / Symptom**:
+  1. Status perantara `verified` menimbulkan inkonsistensi dan kebingungan alur karena redundan dengan status `pending` dan `waiting_approval`.
+  2. Mahasiswa yang sudah tiba jadwal magang (`start_date <= today`) atau sudah mulai mengisi logbook kerap tertahan di status `accepted` dan tidak otomatis beralih ke `active`.
+  3. Form penugasan pembimbing di `admin/applications/show.blade.php` terbelah menjadi dua (form utama atas dan card susulan bawah `#penugasan-pembimbing`), serta mutasi data pembimbing/status sebelumnya berpotensi merusak/menghapus record `Placement` beserta relasi logbook mahasiswa.
+  4. Tombol status admin menampilkan seluruh status sekaligus tanpa memandang tahapan seleksi (pendaftar baru bisa langsung meloncat ke status akhir `active`/`completed`), serta staf admin biasa dapat melakukan ACC pengesahan langsung saat berada di status `waiting_approval`.
+- **Root Cause**:
+  1. Eksistensi nilai enum legacy `VERIFIED` yang tidak memiliki peran operasional terpisah dari proses verifikasi berkas pendaftaran awal.
+  2. Ketiadaan transisi otomatis saat mahasiswa mengisi logbook pertama dan pembatasan kaku pada scheduler sinkronisasi tanggal (`end_date > today`).
+  3. Desain UI admin yang tidak memisahkan fase pendaftaran awal dengan fase masa magang aktif (*context-unaware*), serta pemisahan blok card pembimbing yang memicu duplikasi input.
+- **Fix Applied**:
+  1. Menghapus status `VERIFIED` dari `ApplicationStatus` enum, memigrasikan seluruh data lama di database menjadi `pending`/`waiting_approval`, serta membersihkan query dashboard, scope, dan views.
+  2. Menstandarisasi alur seleksi awal menjadi: `PENDING` $\rightarrow$ `WAITING_APPROVAL` $\rightarrow$ `ACCEPTED` $\rightarrow$ `REJECTED`. Otorisasi ketat diterapkan: staf admin biasa dilarang langsung menyetujui (`accepted`) saat `waiting_approval` (tombol dikunci/disabled dan divalidasi di backend), dan jika staf admin menerima dari `pending` sistem otomatis mengarahkan ke `waiting_approval` untuk verifikasi atasan. Tombol pengesahan hanya dapat dieksekusi oleh Atasan (`supervisor`) atau `super_admin`.
+  3. Menerapkan Context-Aware UI pada kartu status di `admin/applications/show.blade.php`: status `ACTIVE`, `COMPLETED`, dan `RESIGNED` disembunyikan saat tahap pendaftaran awal dan hanya muncul secara kontekstual setelah mahasiswa berstatus `ACCEPTED`. Teks label status dibakukan menjadi `Pilih Status Keputusan Pengajuan`.
+  4. Mengeliminasi card penugasan pembimbing susulan di bagian bawah dan menyatukan seluruh input mentor dinas, dosen pembimbing, nomor/tanggal surat balasan, serta periode magang (`start_date` dan `end_date`) ke dalam form utama `#acceptance-box`.
+  5. Mengamankan data penempatan mahasiswa (Anti-Reset Logbook): pembaruan pembimbing atau status menggunakan `updateOrCreate()` / `update()` tanpa pernah memanggil `delete()` pada instance `Placement`, sehingga seluruh histori logbook, absensi, dan laporan akhir tetap utuh. Sinkronisasi obrolan grup mentor (`ChatGroupService::syncMentorGroup`) otomatis dijalankan saat pergantian mentor.
+  6. Mengaktifkan 3 pemicu otomatisasi ke status `ACTIVE`:
+     - Scheduler harian (`SyncInternshipStatus.php`): otomatis mengubah `accepted` ke `active` saat `start_date <= today()`.
+     - Aktivitas logbook (`Student/LogbookController.php`): mahasiswa berstatus `accepted` diizinkan mengisi logbook dan otomatis bertransisi ke `active` saat logbook pertama tersimpan.
+     - Helper on-the-fly (`autoActivateIfStarted()`): otomatis memperbarui status saat instance `Application` atau `Placement` diakses pada tanggal magang.
+  7. Membuka otorisasi rute `admin.applications.show` dan `updateStatus` untuk role `supervisor` agar Atasan dapat memproses pengesahan dari antarmuka admin.
+  8. Menulis test suite komprehensif `ApplicationStatusPipelineReformTest.php` dan memvalidasi seluruh test suite dengan hasil **100% PASS (49 tests, 297 assertions, Exit Code: 0)**.
+- **Prevention Rule**:
+  1. Dilarang keras memanggil `delete()` pada model `Placement` saat melakukan update pengajuan magang; selalu gunakan `update()` / `updateOrCreate()` demi menjaga integritas foreign key relasi logbook, presensi, dan evaluasi.
+  2. Sembunyikan status fase pelaksanaan (`active`, `completed`, `resigned`) saat mahasiswa masih berada dalam fase seleksi pendaftaran (`pending`, `waiting_approval`, `rejected`).
+  3. Status yang terikat durasi waktu wajib memiliki mekanisme multi-trigger (scheduler, event-driven aksi pengguna, dan on-the-fly check) agar status tidak pernah macet (*stale state*).
+
+### [LRN-080] Audit Kinerja Menyeluruh, Integritas Skenario Mahasiswa Lulus, dan Verifikasi Hermes Swarm 100% PASS
+- **Tanggal**: 2026-10-15
+- **Komponen**: `database/seeders/DemoE2ESeeder.php`, `app/Models/Application.php`, `app/Models/Placement.php`, `scripts/hermes_all_roles_test.mjs`, `scripts/tier3_playwright_audit.mjs`
+- **Problem / Symptom**:
+  1. Pada pengujian E2E Hermes Swarm (`scripts/hermes_all_roles_test.mjs`), pengujian unduh sertifikat mahasiswa lulus (`/student/certificate/1/download`) dan unduh berkas laporan akhir (`/final-reports/{id}/file`) sempat mengembalikan kegagalan (FAIL) dengan status HTTP 403 (Locked).
+  2. Deklarasi metode ganda di PHP (`finalreport()` dan `finalReport()`) pada `Placement.php` menyebabkan error fatal karena PHP menganggap nama method bersifat *case-insensitive*.
+- **Root Cause**:
+  1. Pada `DemoE2ESeeder.php`, skenario mahasiswa lulus (`mahasiswa.lulus@unesa.ac.id`) menginisialisasi entitas `Application`, `Placement`, `Evaluation`, dan `Certificate`, namun lupa menginisialisasi entitas `FinalReport` berstatus `approved` dan entitas `Logbook`. Akibatnya, `Application::certificateBlockers()` menganggap syarat administratif kelulusan belum lengkap dan mengunci akses unduh sertifikat sesuai standar keamanan *Certificate Gate*.
+  2. PHP tidak mengizinkan dua method dengan nama yang hanya berbeda huruf besar/kecil dalam satu class yang sama.
+- **Fix Applied**:
+  1. Melengkapi seeder `DemoE2ESeeder.php` dengan inisialisasi `FinalReport` berstatus `approved` (mengarah ke berkas resmi `sample_laporan_akhir.pdf`) dan 5 catatan `Logbook` terverifikasi untuk skenario mahasiswa lulus.
+  2. Menjaga method tunggal `finalreport()` pada `Placement.php` yang dipanggil secara konsisten di seluruh lapisan sistem.
+  3. Menjalankan re-seeding database dan mengeksekusi ulang Hermes E2E Swarm: **56 dari 56 pengujian inter-role Lolos 100% (56/56 PASS, 0 FAIL, 0 WARNING)**.
+  4. Menjalankan Playwright Tier 3 Visual Audit Runner (Google Chrome Channel): seluruh antarmuka login, tabel pengajuan magang, detail pengajuan, dan master pengguna lolos uji kontras WCAG 5.17, bebas overflow horizontal pada desktop maupun smartphone (375x812).
+- **Prevention Rule**: Skenario seeder untuk mahasiswa berstatus `completed` wajib selalu menyertakan data lengkap relasi prasyarat kelulusan (`FinalReport` berstatus `approved` dan minimal 1 entri `Logbook`), agar guard validasi sertifikat tidak memicu false-positive lockout.
+
+### [LRN-081] Penyelarasan Indikator Dot Waiting Approval, Filter Mentor Sesuai Bidang Unit & Eliminasi Redundansi Teks Bidang
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `resources/views/admin/applications/show.blade.php`, `tests/Feature/AdminWorkflowSelectionTest.php`
+- **Problem / Symptom**:
+  1. Kartu pemilihan status keputusan seleksi admin untuk WAITING_APPROVAL belum memiliki titik lingkaran indikator warna (dot) seperti halnya PENDING (kuning), ACCEPTED (biru), dan REJECTED (merah).
+  2. Dropdown pemilihan mentor dinas menampilkan seluruh akun mentor tanpa terfilter otomatis per bidang (unit kerja) pendaftaran mahasiswa, dan mencantumkan keterangan bintang `⭐ (Sesuai Bidang)`.
+  3. Teks nama mentor di dropdown dan label seleksi memuat nama bidang ganda/dobel yang menempel di nama (misal: `Budi Santoso [Bidang ...]`) padahal nama bidang sudah tertera rapi pada baris kedua (meta).
+  4. Keterangan pada opsi WAITING_APPROVAL masih tertulis `Menunggu ACC Atasan` dan perlu disesuaikan menjadi `Setujui, Serahkan ke Atasan`.
+- **Root Cause**:
+  1. Class Tailwind `bg-purple-500` belum memiliki fallback warna inline style dan sempat tidak terkompilasi dalam build statis Vite lama.
+  2. Query pemetaan `$mentorItems` tidak memfilter `$pembimbings` berdasarkan `$application->unit_id`, serta sengaja mengonkatenasi `[$unitName]` dan label bintang ke dalam properti `name`.
+  3. Method `ApplicationStatus::WAITING_APPROVAL->description()` mengembalikan string lama `Menunggu ACC Atasan`.
+- **Fix Applied**:
+  1. Menambahkan elemen titik indikator ungu `<span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block shrink-0" style="background-color: #a855f7;"></span>` pada kartu WAITING_APPROVAL.
+  2. Memperbarui `ApplicationStatus::WAITING_APPROVAL->description()` menjadi `'Setujui, Serahkan ke Atasan'`.
+  3. Memfilter koleksi `$pembimbings` secara otomatis agar hanya memuat mentor dengan `unit_id === $application->unit_id` (dengan fallback aman jika unit kosong).
+  4. Menghilangkan konkatenasi nama bidang `[$unitName]` dan bintang `⭐ (Sesuai Bidang)` dari nama mentor sehingga nama tampil bersih, sementara rincian bidang dan email/kontak tetap tersaji rapi di baris kedua (`meta`).
+  5. Menjalankan `npm run build`, `php artisan optimize:clear`, dan verifikasi visual headless Google Chrome Playwright (tangkapan layar tersimpan dan tervalidasi).
+- **Prevention Rule**: Seluruh indikator kartu visual wajib memiliki inline fallback style jika mengandalkan warna dinamis. Dropdown penugasan berbasis peran wajib selalu difilter berdasarkan divisi/unit kerja terkait (`unit_id`) dan menghindari duplikasi informasi yang sudah disajikan oleh komponen metadata baris kedua.
+
+### [LRN-082] Nomenklatur Bidang Devisi & Tautan Detail Unit Kerja
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `resources/views/admin/units/index.blade.php`, `resources/views/admin/units/show.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**: 
+  1. Menu navbar navigasi admin dinas masih berlabel "Divisi & Kuota" alih-alih "Bidang Devisi".
+  2. Tombol aksi pada tabel daftar bidang `/admin/units` bertuliskan "Edit" dan mengarah ke form edit `/admin/units/{id}/edit`, bukan ke halaman profil & statistik lengkap bidang `/admin/units/{id}`.
+- **Root Cause**: Desain aksi tabel awal hanya menyediakan aksi pengeditan cepat kuota & metadata form tanpa mengekspos rute `show` (`admin.units.show`) secara langsung pada tombol baris tabel.
+- **Fix Applied**: 
+  1. Memperbarui label menu navigasi Admin Dinas pada desktop navbar, profile menu dropdown, dan mobile drawer menjadi **"Bidang Devisi"**.
+  2. Mengubah judul header pada `admin/units/index.blade.php` menjadi **"Manajemen Bidang Devisi & Kuota Magang"**.
+  3. Mengubah tombol aksi **"Edit"** pada tabel desktop maupun kartu mobile menjadi **"Detail"** dengan tautan langsung menuju `route('admin.units.show', $unit->id)` (`/admin/units/{id}`).
+  4. Menjadikan nama bidang pada kolom tabel sebagai tautan navigasi langsung ke halaman Detail.
+  5. Menyelaraskan breadcrumb pada `admin/units/show.blade.php` dan tombol unit pada `admin/agencies/show.blade.php`.
+  6. Menjalankan verifikasi visual browser headless Google Chrome (Desktop & Mobile) dan `php artisan test` (302/302 PASS, Exit Code 0).
+- **Prevention Rule**: Tombol utama pada daftar unit kerja kelembagaan harus memprioritaskan peninjauan komprehensif (`show`), di mana aksi edit tetap dapat diakses di bagian atas halaman detail tersebut.
+
+### [LRN-083] Eliminasi Card Pembimbing Susulan Redundan, Pembersihan Sisa String 'verified', & Konsistensi roleLabel Impersonasi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/show.blade.php`, `resources/views/errors/403.blade.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/agencies/show.blade.php`, `app/Services/NotificationService.php`, `app/Services/UniversityHubService.php`, `app/Services/Chat/ChatPresenter.php`, `app/Models/Application.php`, `app/Http/Controllers/University/DashboardController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/DashboardController.php`, `app/Http/Controllers/Admin/UniversityController.php`
+- **Problem / Symptom**:
+  1. Pada halaman detail verifikasi aplikasi admin (`/admin/applications/{id}`), card "Penugasan Pembimbing (Susulan / Ganti)" masih muncul di bagian bawah form seleksi, membingungkan admin karena input mentor dan dosen sudah tersedia di form keputusan status utama (`#acceptance-box`).
+  2. Masih ditemukan residu pemanggilan string status `'verified'` pada beberapa model, controller, dan services setelah migrasi penghapusan status redundant `VERIFIED`.
+  3. Banner impersonasi pada `errors/403.blade.php` dan teks modal reset password pada `admin/users/index.blade.php` masih mencetak string uppercase mentah (`strtoupper($u->role)`) alih-alih `roleLabel()`.
+- **Root Cause**:
+  1. Blok Blade `#penugasan-pembimbing` lama masih bersarang di bawah form utama `show.blade.php` dengan rute aksi terpisah `admin.applications.assignment`.
+  2. Penghapusan status `ApplicationStatus::VERIFIED` sebelumnya menyisakan referensi string literal `'verified'` di query agregasi dasbor dan validasi array status controller.
+  3. Desain komponen view sebagian masih menggunakan pembacaan properti langsung `$user->role` dengan filter uppercase.
+- **Fix Applied**:
+  1. Menghapus tuntas blok fisik HTML/Blade card "Penugasan Pembimbing (Susulan / Ganti)" (`#penugasan-pembimbing`) dari `resources/views/admin/applications/show.blade.php` sehingga form input mentor dinas dan dosen pembimbing hanya tunggal di `#acceptance-box`.
+  2. Membersihkan seluruh residu literal string `'verified'` di `NotificationService.php`, `UniversityHubService.php`, `ChatPresenter.php`, `Application.php`, `Student/ApplicationController.php`, `Admin/AgencyController.php`, `Admin/ApplicationController.php`, `Admin/DashboardController.php`, `University/DashboardController.php`, dan `Admin/UniversityController.php`.
+  3. Menstandarisasi pencetakan label peran pada banner impersonasi dan modal dialog menggunakan `$user->roleLabel()`.
+  4. Membersihkan seluruh cache Laravel (`view:clear`, `route:clear`, `config:clear`, `optimize:clear`).
+  5. Menjalankan verifikasi automated test: `ApplicationStatusPipelineReformTest` (6/6 PASS), `AdminWorkflowSelectionTest` (9/9 PASS), Hermes E2E Swarm (56/56 PASS), dan Playwright Tier 3 Visual Audit (WCAG pass, 0 overflow).
+- **Prevention Rule**: Form plotting penugasan mentor dinas dan dosen pembimbing harus tunggal pada form keputusan status utama (`#acceptance-box`). Dilarang mencetak string peran mentah di tampilan UI—selalu gunakan `$user->roleLabel()`. Seluruh status pendaftaran awal wajib hanya mengacu pada `ApplicationStatus` resmi (`PENDING`, `WAITING_APPROVAL`, `ACCEPTED`, `ACTIVE`, `COMPLETED`, `REJECTED`, `RESIGNED`).
+
+---
+
+### [LRN-084] Penyesuaian UI Supervisor: Menu 'Dashboard', Tombol Sertifikat Biru, Tab Menunggu Persetujuan & Status 'Menunggu ACC'
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Enums/ApplicationStatus.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/supervisor/dashboard.blade.php`, `resources/views/supervisor/applications/index.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `tests/Feature/AdminWorkflowSelectionTest.php`
+- **Problem / Symptom**:
+  1. Menu navigasi supervisor masih tertulis "Dashboard & Tim Kerja" padahal pengguna menginginkan teks bersih "Dashboard".
+  2. Tombol aksi kartu metrik "Pengesahan Sertifikat" pada dashboard supervisor berwarna putih/outline abu-abu, tidak seragam dengan tombol "Persetujuan Pengajuan" yang berwarna biru (`bg-blue-600`).
+  3. Filter tab pertama pada halaman persetujuan pengajuan supervisor tertulis "Menunggu ACC Atasan" alih-alih "Menunggu Persetujuan".
+  4. Kolom status pengajuan di tabel supervisor menampilkan keterangan "Setujui, Serahkan ke Atasan" (deskripsi tindakan admin), padahal dari sudut pandang supervisor status tersebut harus berlabel "Menunggu ACC".
+- **Root Cause**:
+  1. `navigation.blade.php` masih menggunakan label awal "Dashboard & Tim Kerja" pada desktop link, profile dropdown, dan mobile drawer.
+  2. Kartu metrik sertifikat pada `supervisor/dashboard.blade.php` menggunakan styling tombol putih sekunder (`bg-white border-slate-200`).
+  3. Tab filter `supervisor/applications/index.blade.php` menggunakan label statis "Menunggu ACC Atasan".
+  4. Method `ApplicationStatus::description()` mengembalikan string seragam tanpa konteks peran, sehingga tampilan tabel supervisor memunculkan teks "Setujui, Serahkan ke Atasan".
+- **Fix Applied**:
+  1. Memperbarui label menu navigasi supervisor di `navigation.blade.php` (desktop, profile menu, mobile drawer) menjadi **"Dashboard"**.
+  2. Mengubah kelas tombol "Pengesahan Sertifikat" di `supervisor/dashboard.blade.php` menjadi `bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition`.
+  3. Mengubah label tab filter di `supervisor/applications/index.blade.php` menjadi **"Menunggu Persetujuan"**.
+  4. Memperkaya method `ApplicationStatus::description(?string $role = null)` agar mengembalikan **"Menunggu ACC"** khusus saat dilihat oleh supervisor (`role === 'supervisor'` atau `auth()->user()?->role === 'supervisor'`), serta menambahkan method `descriptionForSupervisor()`. Memperbarui `supervisor/applications/index.blade.php` dan `show.blade.php` untuk memanggil `$st->description('supervisor')`.
+  5. Menambahkan unit test `test_supervisor_sees_menunggu_acc_and_menunggu_persetujuan` di `AdminWorkflowSelectionTest` (10/10 PASS).
+  6. Mengambil tangkapan layar visual headless Google Chrome dan memverifikasi tampilan desktop & mobile.
+- **Prevention Rule**: Tampilan status alur kerja (workflow) harus sensitif terhadap perspektif peran pengguna: status yang merepresentasikan tindakan serah-terima antar-tingkatan hierarki (seperti Admin ke Atasan) harus menampilkan keterangan tindakan pengirim bagi pengirim, dan status menunggu persetujuan ("Menunggu ACC") bagi penerima/atasan.
+
+### [LRN-085] Audit Menyeluruh Alur Status Double ACC & Eliminasi Popup Browser confirm()
+- **Tanggal**: 2026-10-15
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `resources/views/supervisor/certificates/index.blade.php`, `resources/views/student/partials/desktop_status_cards.blade.php`, `app/Http/Controllers/Admin/ApplicationController.php`
+- **Problem / Symptom**:
+  1. Aksi persetujuan massal dan pengesahan tunggal atasan sempat menggunakan popup `confirm()` bawaan browser yang muncul di atas layar (kurang profesional, minim konteks data, dan rentan salah klik).
+  2. Bulk approval admin dinas sebelumnya langsung mengarahkan ke `accepted` tanpa melewati tahap `waiting_approval` (menunggu ACC atasan).
+  3. Kartu status desktop mahasiswa belum menangani kondisi `waiting_approval` secara eksplisit sehingga jatuh ke fallback generik "Dalam proses verifikasi", berbeda dengan tampilan mobile yang menampilkan "Menunggu ACC Atasan".
+  4. Pengesahan sertifikat atasan di `/supervisor/certificates` memanggil dialog `confirm()` browser.
+  5. Penghapusan blok penugasan pembimbing di `show.blade.php` sebelumnya memicu kegagalan test `Phase1OnboardingTest::test_admin_can_assign_dpl_on_active_placement`.
+- **Root Cause**: Residu implementasi kode lama sebelum restrukturisasi hierarki dua tingkat (Double ACC) dan ketergantungan pada fungsi `confirm()` bawaan browser.
+- **Fix Applied**:
+  1. Mentransformasi seluruh aksi persetujuan (bulk approval admin dan pengesahan supervisor di `supervisor/applications/show.blade.php` serta `supervisor/certificates/index.blade.php`) menggunakan **modal interaktif Alpine.js** dengan konfirmasi dua lapis (Lapis 1: checklist pemahaman tanggung jawab, Lapis 2: pengetikan kata kunci konfirmasi `SETUJUI`).
+  2. Menyelaraskan logika controller `ApplicationController::bulkUpdateStatus` agar admin dinas staf biasa mengarahkan status ke `waiting_approval` serta otomatis mengirim notifikasi ke atasan via `NotificationService::notifySupervisorForApplication()`.
+  3. Memulihkan komponen penugasan pembimbing susulan (`#penugasan-pembimbing`) khusus untuk penempatan magang yang sedang berjalan (`accepted`, `active`, `completed`) sehingga pengujian `Phase1OnboardingTest` lolos.
+  4. Menyelaraskan kartu status desktop mahasiswa di `desktop_status_cards.blade.php` agar menampilkan badge "Menunggu ACC Atasan" konsisten dengan kartu mobile.
+  5. Memvalidasi seluruh test suite (303 tests, 2.077 assertions, 100% PASS, Exit Code 0) dan membersihkan cache aplikasi (`optimize:clear`).
+- **Prevention Rule**: Dilarang keras menggunakan `confirm()` atau `alert()` bawaan browser pada aksi mutasi data penting atau workflow approval kedinasan. Seluruh konfirmasi harus menggunakan modal dialog ramah pengguna (Senior-Friendly) dengan visualisasi rincian data dan verifikasi bertingkat.
+
+### [LRN-086] Pusat Revisi Terpadu Sertifikat Magang & Eliminasi Tombol Cetak pada Status Perlu Revisi
+- **Tanggal**: 2026-10-15
+- **Komponen**: `app/Http/Controllers/Admin/CertificateController.php`, `routes/admin.php`, `resources/views/admin/certificates/index.blade.php`, `resources/views/admin/certificates/revision.blade.php`, `tests/Feature/AdminCertificateRevisionWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman daftar sertifikat kelulusan admin dinas (`/admin/certificates`), baris mahasiswa dengan status pengesahan `revision` (Perlu Revisi dari Atasan) masih menampilkan tombol "Cetak E-Sertifikat", yang berisiko membuat admin tidak sengaja mencetak dokumen bermasalah sebelum dikoreksi.
+  2. Belum ada antarmuka khusus yang terintegrasi penuh untuk melakukan koreksi langsung secara terpadu atas 3 aspek perbaikan sertifikat: Catatan Atasan, Nilai Evaluasi & Transkrip, Data Mahasiswa & Periode Magang, serta monitoring Logbook Presensi & Naskah Laporan Akhir.
+- **Root Cause**:
+  1. Logika tombol pada `admin/certificates/index.blade.php` sebelumnya menyamaratakan tombol cetak untuk semua baris tanpa mengecek status pengesahan atasan (`approval_status`).
+  2. Alur koreksi revisi sertifikat sebelumnya terpecah di berbagai modul berbeda (evaluasi, profil mahasiswa, penempatan), sehingga rawan inkonsistensi saat pengajuan ulang (*resubmit*).
+- **Fix Applied**:
+  1. Mengondisikan tombol aksi tabel sertifikat:
+     - `approved`: Tombol biru **"Cetak E-Sertifikat"**.
+     - `waiting_approval`: Tombol netral **"Pratinjau Draft"**.
+     - `revision`: Tombol oranye/amber **"Perbaiki Sertifikat"** (diarahkan ke rute revisi khusus) disertai kutipan catatan resmi atasan di kolom status.
+  2. Merancang dan mengimplementasikan **Halaman Pusat Perbaikan & Revisi Sertifikat Magang** (`admin.certificates.revision`):
+     - **Banner Hero Atasan**: Menampilkan catatan revisi resmi atasan kepegawaian dan tombol pratinjau draft sertifikat.
+     - **Aspek 1: Koreksi Nilai Evaluasi & Transkrip**: Dilengkapi kalkulator simulasi nilai akhir dan mutu grade secara live berbasis Alpine.js dengan rumus adaptif (100% dinas vs bobot dinas-kampus).
+     - **Aspek 2: Data Mahasiswa & Periode Magang**: Formulir koreksi langsung nama, NIM, universitas, prodi/jurusan, tanggal magang, unit kerja, dan mentor pembimbing.
+     - **Aspek 3: Validasi Logbook & Naskah Laporan**: Kartu inspeksi cepat riwayat logbook dan file naskah laporan akhir mahasiswa.
+     - **Catatan Penjelasan Perbaikan**: Field catatan tindak lanjut admin untuk atasan.
+     - **Dua Opsi Submit**: "Simpan & Ajukan Ulang ke Atasan" (mengembalikan status ke `waiting_approval`, mencatat audit log, mengirim notifikasi) dan "Simpan Draf".
+  3. Menguji alur dengan automated feature test `AdminCertificateRevisionWorkflowTest` (3/3 tests PASS, 27 assertions, Strict Exit Code 0).
+  4. Memvalidasi secara visual melalui browser headless Playwright lokal (`channel: 'chrome'`) pada resolusi desktop (1920x1080) dan mobile (375x812).
+- **Prevention Rule**: Dokumen resmi kelulusan atau sertifikasi yang berstatus `revision` atau `waiting_approval` DILARANG KERAS menyediakan tombol cetak publik/final. Setiap instruksi revisi wajib menyediakan rute khusus perbaikan yang menyinkronkan data langsung ke entitas terkait (`evaluations`, `users`, `student_profiles`, `applications`, `placements`) dalam satu transaksi atomik.
+
+---
+
+### [LRN-086] Audit Holistik Single-Agency Dispusip, Filter 4 Bidang Lintas Peran, & Eliminasi Residu Obsolete
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `app/Http/Controllers/Lecturer/MonitoringController.php`, `app/Http/Controllers/University/DashboardController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, Views Blade (`student/application/create`, `admin/applications/show`, `lecturer/dashboard`, `lecturer/monitoring/index`, `university/dashboard`, `mentor/dashboard`), Scripts (`scripts/health_check.php`, `scripts/dev_credentials.php`)
+- **Problem / Symptom**:
+  1. Pasca migrasi repositori menjadi single-agency murni ke Dinas Perpustakaan dan Kearsipan (Dispusip) Kota Surabaya, portal Dosen dan Universitas masih menampilkan dropdown filter "Semua Instansi" dan kartu "Sebaran Penempatan per Dinas" yang hanya memuat opsi tunggal Dispusip (100% redundan).
+  2. Formulir pendaftaran magang mahasiswa (`student/application/create`) masih mewajibkan pemilihan instansi via dropdown pencarian sebelum memilih bidang, menimbulkan gesekan UI/UX.
+  3. Controller Admin `ApplicationController` masih memuat validasi status `verified` yang sudah dihapus dari enum `ApplicationStatus`, serta placeholder nomor surat kedinasan yang masih menyisakan kode instansi lain (`APTIKA`).
+  4. Script utilitas `health_check.php` dan `dev_credentials.php` melempar `ReflectionException: Class "Kernel" does not exist` akibat urutan import sebelum `make(Kernel::class)`.
+  5. Metrik pada Dashboard Mentor menampilkan angka 0 statis untuk pendaftar akan datang, selesai, dan logbook pending.
+- **Root Cause**:
+  1. Relik kode lama dari era multi-agency belum diselaraskan secara komprehensif ke level 4 Bidang Resmi Dispusip (Sekretariat, Pembinaan & Pengelolaan Perpustakaan, Pembinaan & Layanan Kearsipan, Pengelolaan Perlindungan & Penyelamatan Kearsipan).
+  2. Validator Form Request pada `updateStatus` admin tertinggal dari migrasi batch penghapusan status `verified`.
+- **Fix Applied**:
+  1. Memodifikasi `ApplicationController` untuk menghapus `verified` dari rule validasi `in:...` dan memperbarui format placeholder nomor surat resmi ke `500.12.1/045/436.7.14/2026`.
+  2. Mendesain ulang form pendaftaran mahasiswa dengan kartu instansi terkunci resmi Dispusip (logo resmi, alamat, badge instansi resmi) dan pemilih langsung 4 Bidang Dispusip beserta kuota sisa.
+  3. Mengalihkan filter Dosen (`Lecturer/DashboardController` & `MonitoringController`) dan Universitas (`University/DashboardController`) dari filter instansi menjadi filter 4 Bidang Dispusip (`unit_id`), serta mengganti kartu sebaran kampus menjadi "Sebaran Bidang Penempatan di Dispusip Surabaya".
+  4. Menghitung metrik aktif, calon peserta, lulus, dan logbook pending mentor secara dinamis, serta menampilkan badge nama bidang kerja mentor di header dashboard.
+  5. Memperbaiki urutan import Kernel pada scripts dan membersihkan seluruh cache aplikasi.
+- **Prevention Rule**: Ketika sistem bertransisi dari arsitektur multi-tenant ke single-agency terspesialisasi, seluruh filter instansi wajib dikonversi menjadi filter divisi/bidang kerja internal dinas tersebut. Seluruh rule validasi status wajib bersumber atau diselaraskan secara konsisten dengan BackedEnum `ApplicationStatus`.
+
+---
+
+### [LRN-087] Optimalisasi Mendalam Algoritma Mentor per Bidang, Form Bantuan Single-Agency, & Penyelarasan Residu Terakhir
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/MentorController.php`, `app/Http/Controllers/FeedbackController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Models/AgencyProfile.php`, Views (`admin/mentors/index`, `admin/mentors/create`, `admin/mentors/edit`, `feedbacks/create`, `admin/units/create`, `chat/partials/modals`), Tests (`tests/Feature/SystemAuditFixesTest.php`)
+- **Problem / Symptom**:
+  1. Filter manajemen mentor internal dinas di `admin.mentors.index` sebelumnya terkunci khusus `@if($isSuperAdmin)` dan tidak mendukung filter per-Bidang (`unit_id`), sehingga Admin Dinas Dispusip tidak dapat memfilter daftar mentor menurut 4 Bidang resmi.
+  2. Formulir pengiriman tiket kendala / masukan (`feedbacks/create`) masih menampilkan dropdown pencarian multi-instansi terbuka ("Pilih Instansi Kedinasan Terkait") ketika pengguna memilih target Admin Dinas.
+  3. Placeholder input tambah bidang di `admin.units.create` masih memuat nama bidang dinas lain ("Bidang Layanan Informatika & E-Government"), dan placeholder modal chat kelompok masih merujuk ke instansi lain.
+  4. Pesan penolakan sisa kuota di controller pendaftaran mahasiswa masih menyebut "instansi/unit" secara ambigu.
+- **Root Cause**:
+  Sisa konfigurasi UI/UX dan alur query yang belum disinkronkan sepenuhnya ke model instansi tunggal (Dispusip) dan struktur spesialisasi 4 Bidang Resmi.
+- **Fix Applied**:
+  1. Menambahkan filtering `unit_id` pada query `Admin\MentorController@index` dan membuka search bar serta dropdown filter 4 Bidang Dispusip kepada Admin Dinas maupun Super Admin.
+  2. Mengunci target instansi pada form masukan pengguna (`feedbacks/create`) langsung ke kartu resmi Dispusip jika hanya ada 1 instansi, serta menambahkan fallback `AgencyProfile::first()?->id` pada `FeedbackController@store`.
+  3. Memperbarui seluruh placeholder di `admin/units/create`, `admin/mentors/create`, `admin/mentors/edit`, dan `chat/partials/modals` agar seragam menggunakan entitas Dispusip Surabaya.
+  4. Menyelaraskan pesan kegagalan kuota di `Student\ApplicationController` agar eksplisit merujuk ke "Bidang Dispusip".
+  5. Menambahkan unit test baru di `SystemAuditFixesTest` untuk memvalidasi filter bidang mentor dan fallback instansi tiket feedback (Exit Code 0).
+- **Prevention Rule**:
+  Seluruh alur manajemen personil dinas wajib menyediakan kemampuan pemfilteran eksplisit per `unit_id` (Bidang), dan setiap pengiriman data yang menargetkan dinas wajib memiliki fallback otomatis ke instansi utama ketika sistem berjalan dalam konfigurasi single-agency.
+
+---
+
+### [LRN-088] Form Tunggal Terpadu Seleksi & Penugasan Pembimbing (Eliminasi Card Redundan)
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/applications/show.blade.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `tests/Feature/AdminWorkflowSelectionTest.php`, `tests/Feature/Phase1OnboardingTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman detail verifikasi aplikasi admin (`/admin/applications/{id}`), saat status pengajuan sudah `ACCEPTED` atau `ACTIVE`, terdapat dua formulir terpisah dengan dua tombol submit berbeda ("Simpan Perubahan Status" vs "Simpan Penugasan Pembimbing") yang membingungkan admin dinas.
+  2. Kebutuhan mutasi pembimbing (susulan Dosen Kampus atau pergantian Mentor Lapangan Dinas) rawan terpecah logikanya jika form penugasan di bawah berdiri sendiri.
+- **Root Cause**:
+  Form keputusan status awal (`#acceptance-box`) tetap menampilkan input mentor dan dosen, namun secara historis dibuat card terpisah `#penugasan-pembimbing` di bagian bawah dengan rute `admin.applications.assignment`. Hal ini memicu duplikasi input (redundan) pada layar yang sama.
+- **Fix Applied**:
+  1. Menghapus tuntas blok fisik card redundan `#penugasan-pembimbing` di bagian bawah `resources/views/admin/applications/show.blade.php`.
+  2. Menyatukan seluruh alur seleksi, nomor surat dinas balasan, tanggal magang, plotting mentor dinas, dan dosen pembimbing kampus ke dalam satu form terpadu (`#acceptance-box`) dengan tombol aksi tunggal **"Simpan Keputusan & Penugasan"**.
+  3. Menambahkan kartu status pembimbing aktif (*Mentor Dinas Saat Ini* & *Dosen Pembimbing Kampus Saat Ini*) dengan indikator *Aktif* / *Menunggu* langsung di atas dropdown pencarian combobox.
+  4. Memperkaya logika `ApplicationController::updateStatus` agar otomatis mencatat `AuditLog::record('PLACEMENT_SUPERVISOR_REASSIGN')` ketika terjadi perubahan mentor atau dosen pada penempatan yang sudah ada, serta otomatis menyinkronkan keanggotaan mahasiswa di grup chat bimbingan (baik mentor dinas maupun dosen kampus).
+  5. Menambahkan automated feature test `test_unified_form_can_update_mentor_and_dosen_on_active_application` pada `AdminWorkflowSelectionTest` (11/11 PASS) dan memvalidasi `Phase1OnboardingTest` (13/13 PASS).
+  6. Mengambil tangkapan layar Playwright headless Google Chrome lokal (Desktop & Mobile) untuk memverifikasi tata letak visual bebas overflow dan tanpa icon emotikon.
+- **Prevention Rule**:
+  Seluruh aksi administrasi pada entitas detail pengajuan/penempatan wajib berpusat pada satu formulir tunggal per konteks halaman. Dilarang menduplikasi field input atau tombol simpan pada halaman yang sama guna menjaga konsistensi alur kerja dan kejelasan antarmuka bagi pengguna.
+
+---
+
+### [LRN-089] Penyelarasan Integrasi Status Lintas Peran, Otomatisasi Lifecycle On-The-Fly, & Preservasi Metrik Dashboard
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Student/DashboardController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`, `tests/Feature/RoleStatusIntegrationWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Mahasiswa yang telah disahkan (*Double ACC*) oleh Atasan dan telah mencapai tanggal mulai magang (`start_date <= today`) tidak langsung melihat statusnya berubah menjadi `ACTIVE` saat membuka `/dashboard` jika belum mengklik menu Logbook.
+  2. Tab filter status pada Dashboard Mentor (`?tab=active`, `?tab=upcoming`, `?tab=completed`) memfilter `$baseQuery` secara langsung sebelum proses agregasi statistik, menyebabkan seluruh counter metrik bimbingan tereduksi menjadi 0 saat tab diklik.
+  3. Filter peringatan kelulusan DPL pada `Lecturer\DashboardController` membandingkan Enum `status` secara string ketat (`$app->status === 'completed'`), menghasilkan false-negative pada PHP 8.2+.
+- **Root Cause**:
+  Ketidaksinkronan trigger on-the-fly pada entry point dasbor mahasiswa, mutasi variabel query dasar sebelum kloning agregasi, dan perbandingan tipe data Enum Backed vs String literal.
+- **Fix Applied**:
+  1. Menambahkan pemicu otomatis `$application?->autoActivateIfStarted()` langsung pada `Student\DashboardController@index` sehingga status langsung menjadi `ACTIVE` saat dasbor dibuka di hari H magang.
+  2. Memisahkan `$tab` dari `$baseQuery` pada `Mentor\DashboardController@index`, mengisolasi filter tab hanya pada `$query` listing sehingga widget metrik bimbingan selalu akurat 100%.
+  3. Menggunakan method accessor `$app->statusValue()` pada `Lecturer\DashboardController` untuk memvalidasi kelulusan secara type-safe.
+  4. Menambahkan automated feature test komprehensif `RoleStatusIntegrationWorkflowTest` (6/6 tests PASS, 29 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  Setiap transisi status yang bergantung pada waktu (`start_date` / `end_date`) wajib memiliki trigger on-the-fly di entry point controller peran terkait di samping scheduler cron `app:sync-internship-status`. Dilarang memodifikasi `$baseQuery` dengan parameter tab sebelum menjalankan perhitungan agregat/count.
+
+### [LRN-090] Spesialisasi Akun Admin Per Bidang & Isolasi Multi-Tenant Data Magang Tingkat Unit/Bidang Dispusip
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Models/User.php`, `database/seeders/SurabayaAgenciesSeeder.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/MentorController.php`, `app/Http/Controllers/Admin/UnitController.php`, `app/Http/Controllers/Admin/LogbookController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Admin/DashboardController.php`, `app/Http/Controllers/Admin/AgencyProfileController.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/logbooks/index.blade.php`, `resources/views/admin/units/index.blade.php`, `tests/Feature/AdminBidangScopingTest.php`
+- **Problem / Symptom**: Sistem sebelumnya hanya memiliki Super Admin dan Admin Dinas Instansi (`unit_id = null`) sehingga seluruh admin melihat data 1 dinas secara global tanpa ada pemisahan wewenang per bidang kerja (Sekretariat, Perpustakaan, Kearsipan Layanan, Kearsipan Preservasi). Belum tersedia akun admin khusus masing-masing bidang, dan daftar pengajuan magang, mentor, divisi, logbook, serta sertifikat belum difilter otomatis sesuai bidang tugas.
+- **Root Cause**:
+  1. `User::roleLabel()` menyamaratakan role `'admin'` menjadi "Admin Dispusip" tanpa mempertimbangkan kolom `unit_id`.
+  2. Controller admin mengasumsikan seluruh akun dengan role `'admin'` memiliki visibilitas lintas bidang di instansi tersebut.
+  3. Form filter di Blade views menyediakan dropdown seluruh unit untuk semua admin tanpa mengunci bidang kerja admin yang bersangkutan.
+- **Fix Applied**:
+  1. Menambahkan method helper `isBidangAdmin()` dan `isAgencyWideAdmin()` pada `User.php` serta memperkaya `roleLabel()` untuk merender nama bidang secara otomatis ("Admin Bidang Sekretariat", dll.).
+  2. Menambahkan 4 akun admin bidang resmi Dispusip di `SurabayaAgenciesSeeder.php` dan database:
+     - `admin.sekretariat@surabaya.go.id` (Bidang Sekretariat)
+     - `admin.perpustakaan@surabaya.go.id` (Bidang Pembinaan dan Pengelolaan Perpustakaan)
+     - `admin.layananarsip@surabaya.go.id` (Bidang Pembinaan dan Layanan Kearsipan)
+     - `admin.penyelamatanarsip@surabaya.go.id` (Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan)
+  3. Menerapkan isolasi query otomatis dan proteksi otorisasi (HTTP 403) pada seluruh controller admin:
+     - `ApplicationController`: Query otomatis difilter ke `$user->unit_id`, show & update pengajuan bidang lain menghasilkan 403 Forbidden.
+     - `MentorController`: Query mentor difilter ke `$user->unit_id`, form create/update mengunci unit ke bidang admin, edit/destroy mentor bidang lain diblokir 403.
+     - `UnitController`: Index hanya menampilkan bidang milik admin, form create/store dan aksi destroy diblokir 403 (khusus wewenang Admin Dinas Utama / Super Admin).
+     - `LogbookController`: Query placement, unit, dan statistik logbook difilter otomatis ke bidang admin; review/show logbook bidang lain diblokir 403.
+     - `CertificateController`: Query kelulusan difilter ke bidang admin; show, generate, dan revision sertifikat bidang lain diblokir 403.
+     - `DashboardController`: Seluruh metrik agregat, kuota, total mentor, dan matriks bidang difokuskan secara spesifik ke unit milik admin bidang.
+     - `AgencyProfileController`: Pengeditan profil dinas dibatasi khusus Super Admin dan Admin Dinas Utama (Admin Bidang diblokir 403).
+  4. Memperbarui antarmuka Blade views:
+     - `layouts/navigation.blade.php`: Menyembunyikan menu Profil Dinas untuk Admin Bidang di desktop dan mobile drawer.
+     - `admin/applications/index.blade.php`: Mengganti dropdown filter unit menjadi badge informasi bidang terkunci yang elegan.
+     - `admin/mentors/index.blade.php` & `admin/logbooks/index.blade.php`: Mengunci filter unit menjadi badge bidang aktif.
+     - `admin/units/index.blade.php`: Menyembunyikan tombol tambah dan hapus divisi bagi Admin Bidang.
+  5. Membuat test suite komprehensif `AdminBidangScopingTest.php` (9/9 PASS, 34 assertions), menjalankan core admin suites (33/33 PASS, Strict Exit Code 0), serta memvalidasi tampilan visual nyata via browser runner Playwright lokal.
+- **Prevention Rule**:
+  Setiap penambahan fitur baru pada modul Admin wajib memeriksa hak akses bersusun: Super Admin -> Admin Dinas Utama (`unit_id = null`) -> Admin Bidang (`unit_id != null`). Akses lintas bidang oleh Admin Bidang wajib di-guard di level query dan otorisasi (`abort(403)`), serta form input tidak boleh membiarkan admin bidang memilih bidang selain bidang yang ditugaskan kepadanya.
+
+---
+
+### [LRN-091] Perombakan Total Antarmuka & Optimalisasi Fungsi Operasional Admin Bidang Pasca Evolusi Single-Agency Dispusip
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/UnitController.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/admin/units/show.blade.php`, `resources/views/admin/mentors/create.blade.php`, `resources/views/admin/mentors/edit.blade.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/users/index.blade.php`, `resources/views/admin/logbooks/show.blade.php`, `resources/views/admin/logbooks/index.blade.php`, `resources/views/admin/applications/show.blade.php`, `tests/Feature/AdminBidangScopingTest.php`
+- **Problem / Symptom**:
+  1. Pasca migrasi sistem dari multi-dinas (banyak OPD) menjadi single-agency (khusus Dispusip Surabaya), antarmuka role admin masih membawa residu tata kelola lama:
+     - Admin Bidang yang masuk ke dashboard melihat tabel perbandingan 4 bidang dinas (yang tidak relevan bagi pengelola 1 bidang spesifik) alih-alih ruang kerja operasional bidangnya.
+     - Di daftar pengajuan (`applications.index`), kolom tabel menampilkan teks instansi panjang `"Dinas Perpustakaan dan Kearsipan Kota Surabaya"` yang berulang di setiap baris, sementara status mentor pembimbing bidang tidak terlihat.
+     - Admin Bidang yang membuka menu Bidang Devisi (`/admin/units`) melihat daftar 4 bidang dalam bentuk tabel global bukannya langsung menuju ruang kerja formasinya.
+     - Form penambahan mentor masih menampilkan dropdown pemilihan bidang yang berisiko salah pilih.
+     - Label role pengguna di manajemen pengguna dan teks catatan validasi logbook masih tertulis umum `"Admin Dispusip"` atau `"Admin Dinas"`.
+- **Root Cause**:
+  Arsitektur view dan alur admin awalnya dibangun saat setiap admin mewakili instansi dinas yang berbeda (multi-agency). Ketika model berubah menjadi single-agency terpadu dengan Super Admin di level dinas dan Admin Bidang di level operasional divisi, hierarki visual dan fungsionalitas belum disesuaikan secara holistik untuk menonjolkan tugas operasional harian bidang (verifikasi berkas, plotting mentor, alokasi kapasitas formasi).
+- **Fix Applied**:
+  1. **Redesain Total Dashboard Admin Bidang (`admin/dashboard.blade.php`)**:
+     - *Hero Operational Banner*: Menyajikan badge resmi `ADMIN OPERASIONAL BIDANG • DISPUSIP SURABAYA`, nama bidang aktif (`$user->unit->name`), dan peran operasionalnya.
+     - *4 Quick Action Cards*: Tombol langsung menuju Verifikasi Berkas (`total_pending`), Ruang Kerja Bidang (`total_quota_available`), Pembimbing Lapangan (`total_mentors`), dan Sertifikat Lulus (`total_completed`).
+     - *Panel Kerja Bidang (Menggantikan Matriks 4 Bidang)*:
+       - Sisi Kiri: Deskripsi & Lingkup Tugas Bidang, Penanggung Jawab / Kepala Unit, serta Bar Progress Kapasitas Kuota Bidang terisi vs kuota total dengan persentase utilisasi dan slot tersisa.
+       - Sisi Kanan: Daftar Tim Pembimbing Lapangan (Mentor) aktif di bidang tersebut beserta jumlah mahasiswa bimbingannya dan tombol aksi `+ Tambah Mentor`.
+     - *Sebaran Bawah*: Menghapus pie chart distribusi multi-unit lama dan menggantinya dengan widget **"Pendaftar Terbaru Bidang"** (`$recentApplications`) dan **"Distribusi Kampus Mahasiswa Bidang"** (`$universityStats`).
+  2. **Redirect & Navigasi Ruang Kerja Bidang (`UnitController.php` & `units/show.blade.php`)**:
+     - Di method `UnitController@index`, Admin Bidang diarahkan otomatis (*instant redirect*) ke ruang kerja bidangnya (`admin.units.show`).
+     - Breadcrumb dan tombol kembali pada halaman `units/show` disesuaikan menjadi `Dashboard Bidang` bagi Admin Bidang.
+  3. **Penguncian Form Penambahan & Pengeditan Mentor (`mentors/create.blade.php` & `edit.blade.php`)**:
+     - Pilihan bidang `unit_id` dikunci otomatis ke bidang admin yang sedang aktif via input hidden dan kartu informasi terkunci, mencegah kesalahan alokasi bidang.
+  4. **Pembersihan Residu Redundan pada Daftar Pengajuan (`applications/index.blade.php`)**:
+     - Mengubah kolom tabel `Instansi & Unit Tujuan` menjadi `Bidang & Pembimbing`: menampilkan nama bidang dan status penugasan mentor (`Mentor: [Nama Mentor]` atau badge amber `Belum Ada Mentor`), mengeliminasi pengulangan nama dinas.
+  5. **Harmonisasi Nomenklatur Validasi Logbook & User Management**:
+     - Menyesuaikan label role di tabel pengguna menjadi dinamis (`Admin [Nama Bidang]`).
+     - Menyesuaikan judul validasi sementara logbook: `Validasi Sementara oleh Admin Bidang` (jika login sebagai admin bidang) dengan tetap menyediakan fallback `Admin Dinas` demi mempertahankan *backward-compatibility* dengan test suite lama (`Phase1OnboardingTest`).
+  6. **Automated Testing & Visual E2E Validation**:
+     - Memperbarui `AdminBidangScopingTest.php` untuk menguji redirect otomatis `units.index` dan proteksi 403 lintas bidang (9/9 tests PASS).
+     - Seluruh rangkaian test inti (`AdminWorkflowSelectionTest`, `Phase1OnboardingTest`, `AdminBidangScopingTest`) lulus 100% (**33/33 tests PASS, 181 assertions, Strict Exit Code 0**).
+     - Memvalidasi tampilan visual nyata tanpa emotikon melalui browser runner Playwright lokal (`browser-runner.mjs --url /admin/dashboard`, `/admin/units`, `/admin/applications`).
+- **Prevention Rule**:
+  Antarmuka dan alur kerja admin bidang wajib selalu berpusat pada konteks unit kerja operasionalnya (*single-unit operational view*). Dilarang menampilkan informasi multi-instansi/multi-bidang yang redundan pada akun yang sudah terspesialisasi, dan seluruh form input yang bergantung pada relasi divisi wajib dikunci otomatis ke unit yang terasosiasi dengan akun tersebut.
+
+---
+
+### [LRN-090] Integrasi Status Lintas 7 Role & Penguncian Otorisasi Isolasi Bidang (Bidang Scoping Guards)
+- **Tanggal**: 2026-10-19
+- **Komponen**: `app/Http/Controllers/Admin/PlacementAssignmentController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Admin/UserController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `tests/Feature/AdminBidangScopingTest.php`
+- **Problem / Symptom**:
+  1. Admin Bidang berpotensi memodifikasi alokasi pembimbing lapangan (penugasan mentor susulan) pada pengajuan yang berada di bawah wewenang bidang lain melalui endpoint `admin.applications.assignment`.
+  2. Form revisi sertifikat kelulusan (`admin.certificates.revision`) menampilkan daftar seluruh unit kerja dan seluruh mentor se-dinas tanpa filter pembatas, serta mengizinkan Admin Bidang mengubah formasi unit siswa ke bidang lain saat submit perbaikan.
+  3. Master Pengguna (`admin/users`) tidak membatasi tampilan akun pengguna jika diakses oleh Admin Bidang, berpotensi mengekspos personil bidang lain dan mengizinkan reset password atau hapus akun lintas bidang.
+  4. Transisi status magang mahasiswa dari `ACCEPTED` ke `ACTIVE` saat `start_date` tiba sebelumnya hanya bergantung pada eksekusi cron harian `app:sync-internship-status` (00:05 WIB) atau kunjungan mahasiswa ke dashboardnya. Jika mahasiswa belum membuka dashboard dan cron belum berjalan, status di dashboard Mentor dan Dosen Pembimbing Lapangan (DPL) dapat tetap terbaca `accepted` (upcoming) alih-alih `active`.
+- **Root Cause**:
+  Otorisasi multi-tenant pada controller admin sebelumnya hanya memeriksa tingkat instansi (`agency_profile_id`), belum menerapkan pemeriksaan turunan `unit_id` bagi akun Admin Bidang. Di sisi siklus hidup, trigger on-the-fly auto-activation belum disuntikkan ke pintu masuk portal Mentor dan DPL.
+- **Fix Applied**:
+  1. **Proteksi Penugasan Pembimbing Susulan (`PlacementAssignmentController.php`)**: Menambahkan guard `abort(403)` jika Admin Bidang mencoba mengubah mentor atau DPL pada pengajuan milik bidang lain (`$application->unit_id !== $user->unit_id`).
+  2. **Isolasi Form Revisi Sertifikat (`CertificateController.php`)**:
+     - Memfilter koleksi `$mentors` dan `$units` pada method `revision()` agar terkunci ke `$user->unit_id` ketika pengguna adalah Admin Bidang.
+     - Mengunci kolom `'unit_id'` pada `updateRevision()` agar nilai unit siswa tidak dapat digeser ke bidang lain oleh Admin Bidang.
+  3. **Isolasi Pengelolaan Pengguna (`UserController.php`)**:
+     - Pada `canManageUser()`, menambahkan aturan ketat: Admin Bidang dilarang mengelola, mereset password, atau menghapus pengguna yang memiliki `unit_id` berbeda, serta dilarang menyentuh akun Admin lain.
+     - Pada `index()`, mengisolasi query pengguna (`$query->where('unit_id', $currentUser->unit_id)`) bagi Admin Bidang.
+     - Pada `store()` dan `update()`, mengunci `'unit_id'` ke unit Admin Bidang secara otomatis.
+  4. **Sinkronisasi Status Real-Time Multi-Role (`Mentor` & `Lecturer` `DashboardController.php`)**:
+     - Menyuntikkan pemindaian on-the-fly `$app->autoActivateIfStarted()` pada pembukaan dashboard Mentor dan DPL, sehingga saat hari pertama magang tiba, status mahasiswa langsung terpromosikan menjadi `ACTIVE` seketika saat salah satu pihak (Mahasiswa, Admin, Mentor, atau DPL) berinteraksi dengan sistem.
+  5. **Automated Testing**:
+     - Menambahkan unit test di `AdminBidangScopingTest.php` untuk menguji: penolakan re-assign lintas bidang (403), isolasi master users (403), dan real-time on-the-fly activation lintas role (Mahasiswa, Mentor, Dosen).
+     - Seluruh rangkaian test suite (46 tests, 228 assertions) lulus 100% dengan Exit Code 0.
+- **Prevention Rule**:
+  Setiap controller admin yang menangani operasi mutasi data (CREATE, UPDATE, DELETE, REASSIGN) WAJIB memeriksa `unit_id` jika pengguna adalah Admin Bidang (`! $isSuperAdmin && $user->unit_id`), selain pemeriksaan `agency_profile_id`. Transisi siklus hidup magang harus memiliki redundansi ganda: scheduler terjadwal (cron) DAN trigger on-the-fly di setiap titik temu antarmuka role terkait.
+
+---
+
+### [LRN-092] Eliminasi Horizontal Overflow Tabel Master Pengguna, Avatar Inisial AD/AN & Simplifikasi Kolom Instansi
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/users/index.blade.php`, `scripts/browser-runner.mjs`
+- **Problem / Symptom**:
+  1. Pada resolusi layar standar desktop/laptop (1366x768 dan 1280x720), tabel Master Pengguna Sistem (`/admin/users`) mengalami *horizontal overflow* yang parah ke arah kanan, menyebabkan kolom "Aksi Manajemen" (tombol Login As, Edit, Reset, Hapus) terpotong dari viewport layar.
+  2. Elemen inisial avatar box singkatan nama pengguna (seperti "AD", "AN") memakan ruang horizontal sebesar ~48px dan dinilai mengganggu estetika serta mempersempit kolom.
+  3. Header kolom tertulis panjang "Afiliasi / Instansi / Kampus" dan data instansi menampilkan teks berulang yang sangat panjang.
+  4. Badge role sistem untuk admin bidang diekspansi secara horizontal dalam satu baris teks panjang (misalnya `Admin Bidang Pembinaan dan Pengelolaan Perpustakaan` dengan panjang 51 karakter berkategori `whitespace-nowrap`), memakan lebar >380px secara kaku.
+- **Root Cause**:
+  Penggunaan kelas `whitespace-nowrap` pada string nama bidang yang sangat panjang di dalam badge role, dikombinasikan dengan header kolom yang lebar, avatar box inisial pengguna, dan string instansi yang berulang tanpa pembatasan lebar maksimal (`max-w`).
+- **Fix Applied**:
+  1. **Penghapusan Avatar Box Inisial**: Menghapus seluruh elemen avatar singkatan inisial dua huruf (`AD`, `AN`, dsb.) dari kolom pengguna di tabel desktop maupun mobile card view. Kolom pengguna kini fokus pada Nama Pengguna (font tebal tegas), Email resmi, dan NIM.
+  2. **Penyederhanaan Header Kolom**: Mengubah judul kolom tabel dari "Afiliasi / Instansi / Kampus" menjadi "Instansi".
+  3. **Refactoring Badge Role Bertingkat (Stacked Badge)**:
+     - Mengubah badge satu baris raksasa menjadi tata letak vertikal bertingkat: pill kecil `[Admin Bidang]` di atas dan nama bidang spesifik di bawahnya dengan kelas `max-w-[200px] leading-tight`, menghemat ruang lebar horizontal ~200px.
+  4. **Kompaksi Teks Instansi**: Menampilkan `Dispusip Surabaya` (subtext `Pemerintah Kota Surabaya`) untuk instansi dinas dan pembatasan `max-w-[200px]` untuk nama kampus.
+  5. **Standardisasi Ukuran Tombol Aksi**: Menggunakan padding `px-2.5 py-1 text-[11px]` sehingga seluruh 4 tombol aksi (`Login As`, `Edit`, `Reset`, `Hapus`) muat utuh dalam satu baris tanpa terpotong dengan sisa margin aman.
+  6. **Validasi Visual Headless E2E**: Menguji dengan Playwright Google Chrome lokal (`browser-runner.mjs --url /admin/users`) dan memverifikasi via multimodal vision bahwa seluruh kolom tabel muat 100% tanpa scrolling horizontal paksa di layar laptop.
+  7. **Redesain Total Kartu Mobile Terpisah (*Individual Card Grid Layout*)**:
+     - Memisahkan kartu pengguna menjadi kartu independen berlatar belakang empuk `bg-slate-50/70 p-3` dengan kontur border halus `rounded-2xl` dan shadow lembut.
+     - Menghilangkan form box abu-abu kaku bertingkat yang sesak, menggantinya dengan strip metadata baris pill chip yang modern dan ikon gedung/kampus halus.
+     - Menyusun tombol aksi ke dalam **2x2 Grid Simetris** (untuk Super Admin: `Login As` & `Edit` di baris 1; `Reset` & `Hapus` di baris 2) atau **3-Kolom Seimbang 1:1:1** untuk pengguna reguler, mengeliminasi tombol patah/gantung sendirian di pojok bawah.
+     - Memastikan seluruh perubahan mobile terisolasi di dalam blok `md:hidden` sehingga antarmuka desktop (`hidden md:block`) 100% aman dan tidak terpengaruh sama sekali.
+- **Prevention Rule**:
+  Tabel data dengan banyak kolom aksi dilarang menggunakan `whitespace-nowrap` pada string dinamis yang dapat memanjang (>25 karakter). Selalu gunakan badge bertingkat (*stacked pill + label*) atau `max-w-[...] truncate/leading-tight` untuk mencegah horizontal page spill pada resolusi standar 1366x768. Pada tampilan mobile, hindari `flex flex-wrap` liar untuk kelompok tombol aksi berlebih; selalu gunakan grid simetris (2x2 atau 3-cols) untuk menjaga touch target konsisten dan estetika kartu.
+
+---
+
+### [LRN-093] Penyelarasan UI Logbook & Mentor Tanpa Kurung Serta Penyesuaian Kuota Bidang Mandiri
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/logbooks/index.blade.php`, `resources/views/admin/mentors/index.blade.php`, `resources/views/admin/units/show.blade.php`, `app/Http/Controllers/Admin/UnitController.php`
+- **Problem / Symptom**:
+  1. Pada halaman Rekapitulasi Logbook (`/admin/logbooks`), terdapat ikon SVG clipboard di judul yang ingin dihilangkan; teks label dan angka pada kartu APPROVED dan PENDING berwarna mencolok (`text-emerald-600/700`, `text-amber-600/700`); serta kolom tabel "Rekap Logbook" menampilkan banyak pill badges (Total, Approved, Pending, Rejected) padahal pengguna hanya menginginkan indikator "Pending Logbook" dengan 1 angka tunggal saja.
+  2. Nomenklatur halaman mentor (`/admin/mentors`) masih memuat tanda kurung kaku `Kelola Pembimbing Lapangan (Mentor)` yang melanggar standardisasi penamaan role langsung tanpa kurung (mirip aturan Dosen Pembimbing / DPL).
+  3. Pada detail bidang (`/admin/units/{id}`), card "Deskripsi & Lingkup Kerja Bidang" memakan ruang vertikal; teks angka dan label pada kartu metrik (Mahasiswa Aktif, Sisa Kuota, Menunggu ACC) memiliki warna warni yang kurang netral; serta admin bidang belum memiliki kendali langsung untuk menyesuaikan kuota bidangnya sendiri dari halaman detail tersebut sebagaimana fitur cepat yang ada pada `/admin/units` milik Super Admin.
+- **Root Cause**:
+  Inkonsistensi desain residual antarmuka pada kartu metrik dan tabel logbook, keterikatan penamaan ganda dengan kurung `(Mentor)`, dan ketiadaan controller quick quota widget di halaman `show` bidang kerja.
+- **Fix Applied**:
+  1. **Logbook Admin**: Menghapus SVG clipboard pada header `Rekapitulasi Logbook Mahasiswa`; menetralkan warna teks kartu APPROVED dan PENDING ke `text-gray-500` dan `text-gray-900`; mengubah header kolom tabel menjadi `Pending Logbook` dan hanya menampilkan 1 angka tunggal (`$pendingCount`) dalam badge abu-abu bersih.
+  2. **Mentor Admin**: Menghapus tanda kurung `()` dan menyederhanakan judul menjadi `Kelola Mentor • [Nama Bidang]` serta subjudul `Kelola akun mentor [bidang]...`. Menghapus teks `(Mentor)` pada tabel unit show dan seksi Tim Mentor Bidang.
+  3. **Detail Bidang (`admin/units/show`)**:
+     - Menghapus card "Deskripsi & Lingkup Kerja Bidang".
+     - Menetralkan seluruh warna teks kartu metrik (Mahasiswa Aktif, Sisa Kuota, Menunggu ACC, Mahasiswa Lulus) menjadi `text-slate-500` dan `text-slate-900`.
+     - Mengintegrasikan fitur **Penyesuaian Cepat Kuota Bidang** tepat di bawah "Tingkat Keterisian Kuota Bidang" menggunakan stepper `[-] [input number] [+]` dengan AJAX real-time sync (`PATCH /admin/units/{id}/quota`) yang dilindungi otorisasi kepemilikan bidang (`unit_id`), auto-save checkmark, dan live synchronization metrik Kuota Total, Sisa Kuota, dan persentase keterisian tanpa refresh halaman.
+  4. **Quality & Test Compliance**:
+     - Memperbaiki import `Unit` pada `DashboardController.php` dan komentar `{{-- status-guard:ignore --}}` pada badge penugasan di `admin/applications/show.blade.php`.
+     - Seluruh 329 automated test suite passed 100% (Strict Exit Code 0).
+- **Prevention Rule**:
+  Gunakan nama role secara langsung tanpa tanda kurung `(Mentor)` atau `(DPL)`. Kolom agregat tabel yang diminta berfokus pada pending wajib menyajikan nilai skalar tunggal yang ringkas. Setiap halaman detail unit kerja wajib menyediakan akses cepat penyesuaian kuota mandiri bagi admin bidang pemilik unit dengan otorisasi ketat.
+
+---
+
+### [LRN-094] Penyederhanaan Halaman Bidang Devisi: Eliminasi Card & Ikon Redundan, Standardisasi Nomenklatur 'Tambah Devisi'
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/units/index.blade.php`, `resources/views/admin/units/create.blade.php`
+- **Problem / Symptom**:
+  1. Header halaman manajemen bidang devisi memiliki ikon gedung SVG yang ingin dihilangkan agar tampilan lebih bersih dan minimalis.
+  2. Kartu metrik rangkuman memiliki 4 kartu, di mana "Total Kuota Magang" dan "Kuota Terisi (Diterima)" dinilai redundan untuk ditampilkan secara mencolok, serta angka pada kartu "Sisa Kuota Tersedia" memiliki warna oranye/amber yang perlu dinetralkan agar selaras dengan kartu pertama.
+  3. Keterangan bantuan di bawah judul tabel ("Ketik angka kuota langsung atau klik tombol +/- untuk penyesuaian instan") membebani antarmuka secara visual.
+  4. Penamaan tombol dan judul formulir masih menggunakan teks panjang "Tambah Divisi / Lowongan Baru" dan "Tambah Divisi / Lowongan Magang Baru", yang perlu disederhanakan secara konsisten menjadi "Tambah Devisi".
+- **Root Cause**:
+  Pola teks bawaan sebelumnya menyertakan istilah "Lowongan Magang" dan sub-deskripsi yang tidak lagi diperlukan, serta tata letak 4 kartu metrik dengan pewarnaan aksen kuat.
+- **Fix Applied**:
+  1. **Hapus Ikon Header**: Menghapus SVG gedung di samping judul `Manajemen Bidang Devisi & Kuota Magang`.
+  2. **Pemangkasan Kartu Metrik**: Menghapus kartu "Total Kuota Magang" dan "Kuota Terisi (Diterima)", menyisakan 2 kartu utama ("Total Divisi / Bidang" dan "Sisa Kuota Tersedia") dengan grid 2 kolom (`grid-cols-1 sm:grid-cols-2`).
+  3. **Netralisasi Warna Teks**: Mengganti kelas `text-amber-600` pada angka kartu "Sisa Kuota Tersedia" menjadi `text-gray-900` netral.
+  4. **Pembersihan Subteks**: Menghapus teks instruksi penyesuaian kuota di bawah header tabel.
+  5. **Standardisasi 'Tambah Devisi'**: Mengubah teks tombol pada `index.blade.php` menjadi `Tambah Devisi`, dan judul header pada `create.blade.php` menjadi `Tambah Devisi`, serta menyelaraskan teks modal konfirmasi dan empty state menjadi `Tambah Devisi`.
+  6. **Verifikasi E2E & Visual Guard**:
+     - Visual screenshot audit berhasil lolos 100% menggunakan headless Chrome runner.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Pertahankan konsistensi penamaan "Devisi" sesuai arahan instansi. Gunakan palet netral pada angka kartu metrik jika kartu lainnya netral, dan hindari penumpukan subteks petunjuk jika interaksi UI sudah intuitif.
+
+---
+
+### [LRN-095] Harmonisasi Kartu Metrik Instansi Dinas: Netralisasi Warna, Layout 1-Baris Personel & Eliminasi Subteks Aksi
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**:
+  1. Pada 4 kartu ringkasan metrik di halaman detail instansi (`/admin/agencies/{id}`), angka pada kartu "Sisa Kuota" (`text-blue-600`) dan "ACTIVE" (`text-emerald-600`) memiliki warna teks yang tidak selaras dengan kartu lainnya yang berwarna netral.
+  2. Keterangan rincian personel ("6 admin · 7 mentor") diletakkan pada baris terpisah di bawah "13 akun", sehingga tinggi vertikal kartu Personel lebih tinggi daripada kartu Divisi Kerja dan Sisa Kuota.
+  3. Kartu "ACTIVE" memuat tombol/subteks aksi oranye "7 pengajuan perlu tindakan" yang menciptakan inkonsistensi visual dan asimetri tinggi antar-kartu.
+- **Root Cause**:
+  Pewarnaan hardcoded bawaan (`text-blue-600`, `text-emerald-600`) dan penempatan sub-baris terpisah menyebabkan grid 4 kartu metrik terlihat tidak seragam tinggi dan berantakan.
+- **Fix Applied**:
+  1. **Netralisasi Warna Teks**: Mengganti `text-blue-600` pada angka sisa kuota dan `text-emerald-600` pada angka mahasiswa aktif menjadi `text-slate-900` netral.
+  2. **Penyatuan Baris Personel**: Memindahkan rincian `{{ $stats['total_admins'] }} admin · {{ $stats['total_mentors'] }} mentor` ke samping kanan teks `akun` menggunakan kontainer flex dengan pemisah titik tengah (`·`), sehingga berada rapi dalam 1 baris (`13 akun · 6 admin · 7 mentor`).
+  3. **Eliminasi Subteks Aksi**: Menghapus blok tombol/subteks `{{ $stats['needs_action'] }} pengajuan perlu tindakan` pada kartu ACTIVE.
+  4. **Hasil Visual & Pengujian**:
+     - Keempat kartu metrik (Divisi Kerja, Sisa Kuota, Personel, ACTIVE) kini memiliki tinggi yang presisi sama (1 baris data rapi).
+     - Visual screenshot audit lolos 100% menggunakan headless Chrome runner.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Pertahankan keselarasan tinggi dan palet warna netral (`text-slate-900`) pada panel metrik ringkasan. Jika rincian agregasi (misal admin dan mentor) ditampilkan, tempatkan secara inline dengan pemisah titik tengah halus agar grid kartu tetap seimbang dan rapi.
+
+---
+
+### [LRN-096] Harmonisasi Kartu Metrik Perguruan Tinggi: Netralisasi Warna ACTIVE/COMPLETED & Eliminasi 'Perlu Tindakan'
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/universities/show.blade.php`
+- **Problem / Symptom**:
+  1. Pada 5 kartu ringkasan metrik di halaman detail universitas (`/admin/universities/{id}`), angka pada kartu "ACTIVE" (`text-blue-600`) dan "COMPLETED" (`text-emerald-600`) memiliki warna teks yang tidak konsisten dengan kartu lainnya yang menggunakan warna netral (`text-slate-900`).
+  2. Kartu "Total Mahasiswa" memuat tombol/subteks oranye "1 perlu tindakan" yang menyebabkan tinggi kartu asimetris dibanding kartu lainnya di baris yang sama.
+- **Root Cause**:
+  Hardcoded class warna teks aksen dan subteks badge aksi menimbulkan ketidakseragaman tinggi vertikal pada baris 5 kartu metrik kampus.
+- **Fix Applied**:
+  1. **Netralisasi Warna Teks**: Mengganti `text-blue-600` pada kartu ACTIVE dan `text-emerald-600` pada kartu COMPLETED menjadi `text-slate-900` netral.
+  2. **Eliminasi Subteks Aksi**: Menghapus blok tombol/subteks `{{ $stats['needs_action'] }} perlu tindakan` pada kartu Total Mahasiswa.
+  3. **Hasil Visual & Pengujian**:
+     - Kelima kartu metrik (Total Mahasiswa, Dosen Pembimbing, ACTIVE, COMPLETED, Rata-Rata Nilai) kini memiliki tinggi seragam yang rapi dalam 1 garis dasar (baseline).
+     - Visual screenshot audit lolos 100% menggunakan headless Chrome runner.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Terapkan warna netral (`text-slate-900`) secara seragam pada seluruh kartu ringkasan metrik profil entitas (dinas maupun universitas) dan hindari tombol/subteks aksi bertingkat di dalam kartu metrik makro agar kontainer grid tetap seimbang.
+
+---
+
+### [LRN-097] Eliminasi Sub-Deskripsi Header Tab Redundan pada Detail Instansi & Perguruan Tinggi
+- **Tanggal**: 2026-10-19
+- **Komponen**: 
+  - `resources/views/admin/agencies/show.blade.php`
+  - `resources/views/admin/universities/partials/tab-dosen.blade.php`
+  - `resources/views/admin/universities/partials/tab-mahasiswa.blade.php`
+- **Problem / Symptom**:
+  Terdapat 6 subteks deskripsi di bawah judul header tab yang membebani antarmuka secara visual dan tidak lagi diperlukan:
+  1. "Kelola akun dosen pembimbing akademik dari {nama_kampus} yang memantau & menilai logbook mahasiswa" (Tab Dosen Kampus)
+  2. "Pantau status pendaftaran, instansi penempatan, dosen pembimbing, dan perkembangan nilai" (Tab Mahasiswa Kampus)
+  3. "Admin Dinas (PIC) dan Mentor Lapangan yang memiliki akses kelola magang di dinas ini" (Tab Akun Personel Dinas)
+  4. "Daftar bidang unit kerja beserta kuota penerimaan peserta magang" (Tab Divisi & Kuota Magang)
+  5. "Semua berkas lamaran mahasiswa yang mendaftar ke divisi-divisi dinas ini" (Tab Pengajuan Magang Masuk)
+  6. "Peserta magang yang sedang aktif menjalani program di lingkungan dinas" (Tab Mahasiswa Aktif Magang)
+- **Root Cause**:
+  Sisa boilerplate deskriptif di panel header tabel menyebabkan tinggi panel berlebih dan layout header terdorong secara vertikal.
+- **Fix Applied**:
+  1. Menghapus tag `<p class="text-xs text-slate-500">...</p>` pada masing-masing 6 header tab di view terkait.
+  2. Memastikan judul `<h3>` tetap berdiri kokoh dan vertikal sejajar dengan tombol aksi di sisi kanan.
+  3. **Hasil Visual & Pengujian**:
+     - Antarmuka tabel menjadi jauh lebih padat (*compact*), bersih, dan selaras di kedua modul (Instansi & Perguruan Tinggi).
+     - Visual audit E2E lolos 100% pada kedua rute.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Jangan menyertakan teks deskripsi redundan di bawah judul tabel jika fungsi tabel sudah sepenuhnya jelas dari judul dan label kolomnya.
+
+---
+
+### [LRN-098] Penyesuaian Ruang Vertikal Header Tab Instansi Tanpa Subteks
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/agencies/show.blade.php`
+- **Problem / Symptom**:
+  Setelah subteks deskripsi di bawah judul "Daftar Akun Personel Kedinasan" dihapus, tinggi area panel header menyusut sehingga garis border bawah (`border-b border-slate-100`) berada terlalu rapat di bawah teks judul sebelum tabel dimulai. Pengguna menginginkan jarak vertikal tambahan ke bawah tanpa menambahkan teks deskripsi baru ("tambah panjang border nya kebawah dengan rapi").
+- **Root Cause**:
+  Penggunaan padding seragam default `p-4` (16px) saat tanpa sub-deskripsi menghasilkan ruang vertikal yang terasa terlalu sempit antara teks judul dan garis batas tabel.
+- **Fix Applied**:
+  1. Menyesuaikan kelas padding pada kontainer `.cc-panel-head` seluruh tab di halaman detail dinas menjadi:
+     `px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100`
+  2. Garis border pembatas turun secara elegan, memberikan ruang napas vertikal ~28px di bawah judul "Daftar Akun Personel Kedinasan" tanpa teks deskripsi tambahan.
+  3. **Hasil Visual & Pengujian**:
+     - Visual audit E2E terverifikasi dengan hasil tampilan bersih, lapang, dan proporsional.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Pada panel header tabel yang tidak memiliki subteks paragraf, gunakan padding vertikal asimetris (`pt-4 sm:pt-5 pb-6 sm:pb-7`) agar jarak visual antara judul dan garis border bawah tabel tetap seimbang dan lapang.
+
+---
+
+### [LRN-099] Ergonomi Kolom Checkbox Bulk Action & Keseimbangan Padding Tabel Pengguna
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**:
+  Pada tabel desktop Manajemen Pengguna (`/admin/users`), kolom checkbox aksi massal (*bulk action*) menggunakan lebar ketat `w-10` (40px) dan padding `px-3` (12px). Hal ini menyebabkan checkbox di `<thead>` dan seluruh baris `<tbody>` menempel terlalu rapat ke sudut pojok kiri kartu (*mepet pojok*) yang memiliki radius kelengkungan `rounded-2xl` (16px), serta menempel terlalu dekat ke kolom judul "PENGGUNA".
+- **Root Cause**:
+  Gutter kiri tidak memperhitungkan lengkungan `rounded-2xl` pada pembungkus tabel `overflow-hidden`, sehingga padding `12px` membuat elemen pertama tampak terhimpit di tepi kartu.
+- **Fix Applied**:
+  1. Menyesuaikan kolom `<th>` checkbox menjadi:
+     `py-3.5 pl-6 pr-3 w-16 text-center`
+  2. Menyesuaikan kolom `<td>` checkbox menjadi:
+     `py-3.5 pl-6 pr-3 text-center whitespace-nowrap`
+  3. Menyeimbangkan kolom paling kanan ("Aksi Manajemen") dengan menambahkan padding kanan `pr-6`:
+     - Header: `py-3.5 pl-4 pr-6 text-right`
+     - Baris isi: `py-4 pl-4 pr-6 text-right whitespace-nowrap`
+  4. **Hasil Visual & Pengujian**:
+     - Checkbox kini memiliki jarak lega 24px (`pl-6`) dari batas border kiri kartu, bebas dari kesan terjepit di pojok.
+     - Jarak antara checkbox dan kolom "Pengguna" menjadi proporsional (28px).
+     - Margin kiri dan kanan tabel seimbang simetris di 24px.
+     - Visual audit E2E terverifikasi dengan hasil rapi dan seimbang.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Pada tabel di dalam kartu dengan `rounded-2xl`, kolom pertama (terutama checkbox seleksi) wajib memiliki padding kiri minimal `pl-6` (24px) untuk mencegah elemen menempel pada radius sudut lengkungan kartu.
+
+---
+
+### [LRN-100] Refactoring UI Responsif Mobile (Android Touch-Friendly) & Eliminasi Tumpang Tindih Multi-Role Baru
+- **Tanggal**: 2026-10-19
+- **Komponen**:
+  - `resources/views/admin/dashboard.blade.php`
+  - `resources/views/admin/units/show.blade.php`
+  - `resources/views/supervisor/dashboard.blade.php`
+  - `resources/views/supervisor/applications/index.blade.php`
+  - `resources/views/supervisor/applications/show.blade.php`
+  - `resources/views/supervisor/certificates/index.blade.php`
+- **Problem / Symptom**:
+  Pengguna melaporkan tampilan antarmuka pada perangkat mobile berantakan, saling bertumpuk (*squished/overlapping*), dan tidak ramah pengguna (*not user-friendly*):
+  1. Pada Dashboard Admin Bidang, teks nama mahasiswa di panel pendaftar terbaru terpotong ("Ani...") karena tata letak flex baris tunggal dipaksa berbagi ruang dengan badge status seleksi yang lebar dan tombol periksa.
+  2. Pada Ruang Kerja Bidang (`/admin/units/show`), tabel daftar peserta magang memiliki 7 kolom desktop yang memicu horizontal scrollbar dan menyembunyikan tombol detail di luar layar.
+  3. Pada halaman Supervisor Pengajuan & Sertifikat (`/supervisor/applications`, `/supervisor/certificates`), tabel data mentah tidak memiliki alternatif tampilan kartu mobile sehingga tombol kritis "Tinjau Berkas", "Sahkan (ACC)", dan "Kembalikan" terpotong.
+  4. Residu tanda kurung `(Mentor Bidang)` dan `(Tim Kerja)` masih muncul di header subjudul.
+- **Root Cause**:
+  Pengembangan antarmuka awal berfokus pada layout desktop tabel horizontal (`<table>`), sehingga pada viewport sempit (< 768px atau smartphone Android 375x812), kontainer kaku mengalami *layout squeeze*, *text clipping*, dan elemen aksi keluar batas pandang layar.
+- **Fix Applied**:
+  1. **Arsitektur Dual-View Hybrid**:
+     - Desktop & Tablet (>= 768px): Tabel lengkap tetap dipertahankan dengan kelas `hidden md:block`.
+     - Mobile Smartphone (< 768px): Digantikan dengan kartu ergonomis vertikal mandiri (`md:hidden`) yang memuat seluruh metadata (Nama, NIM, Kampus, Prodi, Periode Magang, Pembimbing, dan Status Badge).
+  2. **Ergonomi Sentuh Mobile**:
+     - Seluruh tombol aksi diubah menjadi touch-friendly dengan tinggi minimal 44px (`min-h-[44px]`), teks informatif penuh, dan efek tekan `active:scale-95`.
+  3. **Penyelarasan Form Pencarian & Filter Tab**:
+     - Tab filter status dibuat ramah usapan horizontal (`overflow-x-auto pb-2 scrollbar-none flex-nowrap`).
+     - Input pencarian, select box, dan tombol submit/reset diperluas memenuhi lebar layar secara fleksibel (`w-full sm:w-auto`).
+  4. **Pembersihan Nomenklatur Tanpa Kurung**:
+     - Mengubah seluruh label menjadi formal kedinasan: "Tim Pembimbing Lapangan Bidang" dan "Mentor Lapangan Bidang".
+  5. **Hasil Visual & Pengujian**:
+     - Seluruh audit E2E Playwright dengan Google Chrome sistem lokal (`browser-runner.mjs`) pada mobile 375x812 menunjukkan `Mobile Horizontal Scroll : TIDAK ADA (PASS)`.
+     - Seluruh 329 test suite PHPUnit lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Setiap halaman index atau detail yang memiliki tabel tabular wajib menerapkan pola **Dual-View Hybrid**: tabel desktop untuk `>= md` dan kartu tersusun bertumpuk (*stacked cards*) dengan touch target $\ge 44$px untuk `< md`. Dilarang mengandalkan horizontal scrollbar pada layar ponsel.
+
+---
+
+### [LRN-101] Ergonomi Spacing Kolom Checkbox & Harmonisasi Layout Tabel Master Pengguna
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**: 
+  1. Checkbox di sisi kiri tabel tampak terlalu mepet ke pinggir tabel / sudut melengkung kartu (`rounded-2xl`).
+  2. Jarak (padding) di sebelah kanan checkbox menuju teks kolom "Pengguna" (nama & email) terlalu lebar / renggang (~40-50px) karena pemakaian `w-16 text-center` dan `px-4` pada kolom berikutnya.
+  3. Penggunaan `w-full` pada kolom nama secara berlebih berisiko meremas (*squish*) kolom-kolom kanan ke sudut layar dan menciptakan celah kosong menganga.
+- **Root Cause**: 
+  Tabel berlayout auto (`table-auto` dengan `min-w-full`) memerlukan distribusi proporsional alami. Menggunakan `w-full` pada satu kolom mendorong seluruh kolom lain ke kanan ekstrem, sedangkan `w-16 text-center` mengapungkan checkbox di tengah kolom lebar.
+- **Fix Applied**: 
+  1. Mengunci kolom checkbox dengan `w-px whitespace-nowrap text-left` serta padding kiri `pl-8` (32px) dan kanan `pr-3` (12px). Ini memberikan ruang bernapas yang sangat lega dari lengkungan kartu (`rounded-2xl`) sehingga checkbox tidak lagi mepet ke pinggir tabel.
+  2. Memberikan `w-full` pada kolom Pengguna serta padding `pl-3 pr-4`. Hal ini memaksa browser mengalokasikan sisa ruang tabel ke kolom nama/email, mencegah browser meregangkan kolom checkbox secara aneh, sehingga gap antara checkbox dan teks nama tepat 24px yang proporsional.
+  3. Menyeimbangkan kolom Aksi Manajemen di sisi kanan dengan padding `pr-8` (32px), simetris sempurna dengan padding kiri tabel.
+- **Prevention Rule**: 
+  Untuk kolom seleksi checkbox pada tabel dengan `min-w-full`:
+  - Gunakan `w-px whitespace-nowrap text-left pl-8 pr-3` pada kolom checkbox agar posisinya lega (32px) dari pinggir kartu tanpa melebar berlebih.
+  - Berikan `w-full` pada kolom teks utama berikutnya dengan `pl-3` agar tabel membagi sisa lebar secara stabil tanpa meregangkan kolom checkbox.
+### [LRN-102] Redesain Ergonomis Tabel Pengajuan Magang (Modern SaaS 6-Column Layout & Anti-Overflow)
+- **Tanggal**: 2026-10-19
+- **Komponen**: `resources/views/admin/applications/index.blade.php`
+- **Problem / Symptom**: 
+  1. Pada resolusi laptop/desktop standar (1366x768 atau skala 125%/150%), tombol "Detail >" di kolom paling kanan tabel pengajuan magang menabrak garis tepi kanan (border) dan tampak terpotong / sesak tanpa ruang bernapas.
+  2. Jarak antara checkbox dan kolom berikutnya terlalu renggang karena pemisahan 7 kolom terpisah (Checkbox, Tanggal Pengajuan, Nama Mahasiswa, Universitas/Jurusan, Instansi/Unit, Status, Aksi) yang memakan lebar total >1100px.
+- **Root Cause**: 
+  Pemisahan Nama Mahasiswa dan Universitas/Jurusan ke dalam 2 kolom terpisah memboroskan ruang horizontal horizontal secara signifikan. Selain itu, ketiadaan lebar tetap/min-width dan padding berlebih pada checkbox (`w-16`, `pl-6 pr-3`) mendorong kolom Aksi ke sudut kanan ekstrem.
+- **Fix Applied**: 
+  1. Menerapkan pola desain SaaS modern: Menggabungkan subjek mahasiswa dan asal kampus ke dalam 1 kolom terpadu yang elegan ("Mahasiswa & Perguruan Tinggi"), dilengkapi avatar inisial bulat bergradien halus (`A`, `B`, `F`, dll.).
+  2. Mengunci padding dan alignment checkbox secara tegas dengan `w-12 text-left pl-7 pr-1`, berpadu dengan padding kiri kolom berikutnya `pl-3`, sehingga gap antar-kolom persis 16px (1rem) tanpa ada ruang kosong menganga.
+  3. Membatasi lebar teks dengan `truncate max-w-[200px] sm:max-w-[240px]` pada nama, kampus, dan instansi agar tabel tidak membengkak melebihi kontainer dan muat 100% tanpa memicu horizontal scrollbar di layar laptop 1366px.
+  4. Menyelaraskan kolom Aksi ke kanan (`text-right`) dengan padding kanan luas `pr-8` (32px), memberikan ruang aman yang sangat lapang dari border kanan kartu sehingga tombol "Detail >" tidak menabrak tepi.
+  5. Memperbarui `colspan="6"` pada baris pencarian kosong (empty state) agar tabel tetap valid secara semantik HTML.
+- **Prevention Rule**: 
+  1. Untuk entitas pemohon/pengguna pada tabel data, satukan nama dan afiliasi/kampus/email ke dalam 1 kolom hierarkis dengan tipografi berjenjang daripada memecahnya menjadi banyak kolom berdampingan yang memicu horizontal overflow.
+  2. Gunakan `w-12 text-left pl-7 pr-1` pada checkbox dan `pl-3` pada kolom teks berikutnya untuk gap 16px yang ergonomis.
+  3. Pastikan kolom aksi terakhir selalu memiliki alignment `text-right` dan padding tepi luar minimal `pr-8` (32px) untuk menjamin tombol aksi tidak menyentuh garis batas kartu kontainer.
+
+---
+
+### [LRN-103] Fitur Luaran Proyek Inovasi Mahasiswa & Menu Pemantauan Eksekutif Laporan Supervisor (Style Dinas Minimalis)
+- **Tanggal**: 2026-10-19
+- **Komponen**: 
+  - `database/migrations/2026_10_19_170000_create_internship_projects_table.php`
+  - `app/Models/InternshipProject.php`, `app/Models/Placement.php`
+  - `app/Http/Controllers/Student/InternshipProjectController.php`
+  - `app/Http/Controllers/Student/FinalReportController.php`
+  - `app/Http/Controllers/Supervisor/StudentReportController.php`
+  - `resources/views/student/final_report.blade.php`
+  - `resources/views/components/supervision/report-review.blade.php`
+  - `resources/views/supervisor/reports/index.blade.php`, `resources/views/supervisor/reports/show.blade.php`
+  - `resources/views/layouts/navigation.blade.php`
+  - `routes/student.php`, `routes/supervisor.php`
+- **Problem / Symptom**: 
+  1. Pengguna membutuhkan penambahan luaran magang berupa **Proyek Inovasi Magang** selain sertifikat, logbook, dan naskah laporan akhir. Proyek harus memuat deskripsi apa proyeknya, manfaat bagi masyarakat, serta foto proyek yang ditampilkan langsung.
+  2. Mahasiswa harus dapat menambahkan lebih dari satu proyek (relasi One-to-Many).
+  3. Halaman laporan akhir mahasiswa harus terbagi menjadi 2 bagian terpisah: Bagian 1 Proyek Inovasi (atas) dan Bagian 2 Naskah Laporan Akhir (bawah).
+  4. Pembimbing (Mentor & Dosen) memerlukan galeri luaran proyek saat meninjau laporan mahasiswa.
+  5. Supervisor (atasan) memerlukan menu khusus untuk memantau kinerja dan seluruh luaran mahasiswa secara kondusif dan rapi tanpa fungsi penilaian.
+  6. Menu dan antarmuka harus mengikuti **style dinas, bersih, minimalis, rapi, tanpa emote/simbol apapun, serta penamaan menu teks murni "Laporan" (tanpa &, /, ())**.
+- **Root Cause**: 
+  Sebelumnya, luaran magang hanya memfasilitasi 1 berkas PDF naskah laporan (`final_reports`) per penempatan. Belum tersedia entitas proyek terpisah, rute aksi CRUD proyek mahasiswa, komponen galeri visual bagi mentor/dosen, serta modul pemantauan eksekutif untuk peran supervisor.
+- **Fix Applied**: 
+  1. **Skema & Model Relasi**:
+     - Membuat tabel `internship_projects` dengan kolom `id`, `placement_id`, `title`, `description`, `community_benefit`, `photo_path`, `demo_url`, dan `timestamps`.
+     - Model `InternshipProject` dengan proteksi mass-assignment, relasi `placement()`, dan accessor aman `photo_url` (`asset('storage/' . $this->photo_path)`).
+     - Menghubungkan relasi `internshipProjects()` di model `Placement`.
+  2. **Controller & Rute Mahasiswa**:
+     - Membuat `InternshipProjectController` (`store`, `update`, `destroy`) dengan validasi foto (`image|mimes:jpeg,png,jpg,webp|max:3072`) dan penyimpanan aman ke `storage/app/public/internship_projects`.
+     - Mendaftarkan rute terproteksi di `routes/student.php`.
+     - Mengembangkan `student/final_report.blade.php` dengan tata letak 2 bagian: Bagian 1 Proyek Inovasi (dilengkapi modal tambah/edit Alpine.js dan pratinjau gambar instan) dan Bagian 2 Naskah Laporan Akhir.
+  3. **Peninjauan Mentor & Dosen**:
+     - Memperbarui komponen `x-supervision.report-review` untuk menampilkan galeri kartu proyek (foto langsung `object-cover`, judul, deskripsi, manfaat untuk masyarakat, tautan demo) berdampingan dengan review naskah laporan PDF.
+  4. **Modul Pemantauan Supervisor ("Laporan")**:
+     - Membuat `StudentReportController` (`index` dan `show`) dengan query berkinerja tinggi, metrik pemantauan ringkas (Total Mahasiswa, Proyek Inovasi, Naskah Disetujui), serta filter bidang devisi dan status laporan.
+     - Menambahkan menu murni **"Laporan"** pada `navigation.blade.php` (desktop navbar, dropdown profil, dan mobile drawer).
+     - Merancang `supervisor/reports/index.blade.php` dan `show.blade.php` dengan estetika kedinasan Pemerintah Kota Surabaya: warna solid, tipografi formal, tanpa emoji, minimalis, dan rapi.
+  5. **Kompatibilitas Lintas Database (SQLite vs PostgreSQL)**:
+     - Menggunakan deteksi driver dinamis `DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like'` pada query pencarian teks mahasiswa/NIM/kampus agar berjalan mulus di lingkungan testing SQLite maupun PostgreSQL server.
+  6. **Pengujian & Validasi**:
+     - Membuat feature test `InternshipProjectAndSupervisorReportTest` (3 tests, 22 assertions).
+     - Seluruh tes lulus 100% termasuk `StatusViewGuardTest` dan `LecturerFeaturesUpdateTest` (Strict Exit Code 0).
+- **Prevention Rule**: 
+  - Penamaan menu dan antarmuka bertema dinas harus mematuhi aturan strict anti-emoji dan teks murni tanpa karakter dekoratif non-standar (`&`, `/`, `()`).
+  - Seluruh query filter berbasis teks yang menggunakan case-insensitive matching wajib mendeteksi driver database (`pgsql` vs `sqlite`) untuk mencegah query syntax failure pada suite pengujian otomatis.
+
+---
+
+### [LRN-104] Perapian Visual UI Proyek Mahasiswa (Eliminasi Thumbnail Tabel & Modal Pop-Up Proporsional Anti-Over)
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/supervisor/reports/index.blade.php`
+  - `resources/views/supervisor/reports/show.blade.php`
+  - `tests/Feature/InternshipProjectAndSupervisorReportTest.php`
+- **Problem / Symptom**:
+  1. Pada tabel rekapitulasi laporan mahasiswa role atasan (`/supervisor/reports`), pratinjau thumbnail gambar proyek di kolom tabel membuat tabel terlalu padat dan tidak diperlukan.
+  2. Saat membuka detail mahasiswa (`/supervisor/reports/{id}`), tampilan kartu proyek inovasi tidak pas: gambar berukuran terlalu besar (`aspect-video w-full`), tidak proporsional untuk foto berorientasi potret/non-16:9, sehingga visual terkesan berantakan dan mendominasi layar ("over").
+  3. Seluruh detail panjang (deskripsi lengkap & teks manfaat masyarakat) langsung dihamparkan di halaman luar, membuat layout kurang ringkas dan kurang rapi.
+- **Root Cause**:
+  Penyajian kartu proyek sebelumnya mengandalkan layout statis inline tanpa abstraksi modal, sehingga gambar proyek langsung dirender secara masif dalam kartu utama tanpa batasan dimensi yang fleksibel untuk berbagai rasio foto.
+- **Fix Applied**:
+  1. **Eliminasi Thumbnail di Tabel Rekapitulasi**:
+     - Menghapus tag `<img>` thumbnail pada kolom Proyek Inovasi di `resources/views/supervisor/reports/index.blade.php`, menggantikannya dengan teks murni yang bersih ("X Proyek" dan judul proyek pertama) sesuai standar tabel kedinasan.
+  2. **Kartu Luar Ringkas & Ergonomis (Style Dinas)**:
+     - Merombak grid kartu proyek di `resources/views/supervisor/reports/show.blade.php` menjadi kartu ringkas (`p-4 rounded-2xl flex gap-3.5 items-start`).
+     - Mengunci thumbnail gambar luar dengan dimensi kompak terkendali (`w-20 h-20 sm:w-22 sm:h-22 rounded-xl object-cover`).
+     - Membatasi teks judul (1 baris), deskripsi (1 baris `line-clamp-1`), dan ringkasan manfaat (1 baris `line-clamp-1`), serta indikator tombol aksi interaktif `Lihat Detail →`.
+  3. **Modal Pop-Up Detail Interaktif (Alpine.js)**:
+     - Menambahkan interaksi `@click="activeProject = @js($proj)"` pada kartu luar untuk memunculkan modal pop-up beresolusi penuh.
+     - Pratinjau foto di dalam modal dikemas dalam kanvas gelap (`bg-slate-950 rounded-2xl`) menggunakan `object-contain` dan `max-h-80 sm:max-h-96` dengan tombol "Buka Foto Asli ↗". Seluruh foto (landscape/portrait) tampil 100% utuh tanpa terpotong dan tidak memicu overflow ("anti-over").
+     - Menampilkan deskripsi lengkap proyek, callout box manfaat masyarakat ber-border rapi, serta tautan eksternal hasil karya/demo.
+  4. **Pengujian & Validasi**:
+     - Memperbarui pengujian di `InternshipProjectAndSupervisorReportTest` untuk memverifikasi ketiadaan thumbnail di index dan kehadiran modal binding di detail.
+     - Seluruh tes lulus (Strict Exit Code 0).
+- **Prevention Rule**:
+  Untuk komponen portofolio atau media luaran yang diunggah pengguna dengan rasio gambar dinamis, gunakan pola **Compact Card with Detail Modal**: tampilkan thumbnail kompak berukuran tetap di kartu luar, dan sediakan modal pop-up dengan `object-contain` pada kanvas netral/gelap untuk melihat detail gambar dan konten lengkap.
+
+### [LRN-105] [Master Pengguna: Perbaikan Proporsi Lebar Kolom Tabel & Harmonisasi Tombol Aksi Kedinasan]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**:
+  1. Tabel Master Pengguna (`/admin/users`) tampak timpang dan tidak proporsional: kolom Pengguna mengambil ruang raksasa yang menyisakan ruang putih lebar di tengah, sedangkan kolom Role Sistem dan Instansi terhimpit parah.
+  2. Nama bidang kerja (mis. "Bidang Pembinaan dan Pengelolaan Perpustakaan") dan instansi ("Pemerintah Kota Surabaya") terpotong melipat secara berantakan menjadi 4-5 baris sempit (hanya 1-2 kata per baris).
+  3. Baris pengguna kurang berbobot visual (tanpa identitas visual/avatar).
+  4. Tombol aksi di sisi kanan ("Login As", "Edit", "Reset", "Hapus") memiliki kontras warna pastel beraneka ragam yang tidak serasi dan terkesan penuh sesak.
+- **Root Cause**:
+  Tag `<th>` kolom Pengguna memiliki class `w-full` di dalam tabel `min-w-full`, sehingga memonopoli seluruh ruang tabel desktop dan memaksa kolom lain menyusut ke batas minimum.
+- **Fix Applied**:
+  1. **Proporsi Kolom Seimbang**: Menghapus `w-full` dari header kolom Pengguna, dan menerapkan batasan lebar yang seimbang (`w-12 text-center` untuk checkbox, `min-w-[220px]` untuk Pengguna, `min-w-[200px]` untuk Role Sistem, `min-w-[180px]` untuk Instansi/Kampus, `w-28 text-center` untuk Status, dan `text-right` untuk Aksi).
+  2. **Avatar Identitas Visual Berdasarkan Role**: Menambahkan badge avatar inisial (36x36px) dengan border halus dan palet warna tematik yang serasi untuk masing-masing role pengguna.
+  3. **Tipografi & Text Wrapping Rapi**: Mengatur wrapping nama unit bidang dan instansi agar tampil proporsional tanpa terpecah menjadi baris-baris sempit 1 kata.
+  4. **Harmonisasi Tombol Aksi Gaya Dinas**: Menyeragamkan dimensi tombol aksi (`px-2.5 py-1.5`, border elegan, ikon mikro SVG tajam, dan hover states yang bersih dan profesional).
+  5. **Pengujian**: Seluruh tes regresi `AdminBidangScopingTest` dan `StatusLabelConsistencyTest` lulus dengan Strict Exit Code 0 (21 tests, 292 assertions).
+- **Prevention Rule**:
+  Jangan pernah menyematkan class `w-full` pada salah satu elemen `<th>` dalam tabel data multi-kolom karena akan merusak alokasi lebar kolom lain. Selalu berikan lebar minimum yang proporsional (`min-w-[...]`) pada tiap kolom data agar teks panjang dapat bernapas lega.
+
+### [LRN-106] [Supervisor Reports: Perbaikan Text-Wrapping Tabel & Eloquent Appends Serialisasi Gambar Modal]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/supervisor/reports/index.blade.php`
+  - `app/Models/InternshipProject.php`
+  - `resources/views/supervisor/reports/show.blade.php`
+- **Problem / Symptom**:
+  1. Pada tabel rekapitulasi laporan atasan (`/supervisor/reports`), teks badge status ("Belum Mengunggah") dan tombol aksi ("Lihat Detail") mengalami text-wrapping vertikal yang kaku menjadi 2 baris bertumpuk per kata akibat ketiadaan `whitespace-nowrap` dan alokasi min-width.
+  2. Pada modal pop-up Detail Proyek Inovasi (`/supervisor/reports/{id}`), gambar proyek tidak muncul (broken image icon dengan alt teks).
+- **Root Cause**:
+  1. Header dan cell kolom Status Laporan serta Aksi tidak memiliki atribut `whitespace-nowrap` dan batasan `min-w`, sehingga peramban mempersempit kolom dan melipat kata-kata ke baris baru.
+  2. Accessor `getPhotoUrlAttribute()` pada model `InternshipProject` tidak didaftarkan pada properti `$appends = ['photo_url']`. Akibatnya, saat model diekspor ke format JSON via direktif `@js($proj)` untuk Alpine.js, atribut `photo_url` tidak ikut terserialisasi (bernilai `undefined`), menyebabkan tag `:src="activeProject?.photo_url"` memuat URL yang tidak valid.
+- **Fix Applied**:
+  1. **Tabel Bersih & Anti-Wrapping**: Menambahkan `whitespace-nowrap` pada kolom status dan aksi, menyematkan avatar inisial identitas mahasiswa, serta mengubah tombol menjadi `Detail` yang ringkas dan elegan dengan ikon panah SVG mikro.
+  2. **Model Appends Serialisasi**: Menambahkan `protected $appends = ['photo_url'];` pada `InternshipProject.php` serta memperkuat resolusi path URL aset publik, sehingga nilai `activeProject?.photo_url` selalu valid dan gambar langsung tampil jernih di dalam modal pop-up.
+  3. **Pengujian**: Seluruh tes regresi `InternshipProjectAndSupervisorReportTest` lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**:
+  Setiap model Eloquent yang memiliki custom accessor dan akan digunakan dalam reaktivitas frontend (Alpine.js via `@js()` atau `@json()`) **wajib** mendaftarkan nama atribut accessor tersebut ke dalam array `protected $appends = [...]` agar terserialisasi secara utuh ke JSON.
+
+### [LRN-107] [Master Pengguna: Penyelarasan Tabel Mengikuti Pola Acuan Kelola Mentor (Padding Ujung Lega & Tombol Pill Soft)]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**:
+  1. Tabel Master Pengguna (`/admin/users`) menabrak tepi kiri dan kanan card (checkbox mepet ke garis kiri, tombol aksi menabrak garis kanan card).
+  2. Nama pengguna terpotong tanda elipsis (`Admin Bidang Pembinaan & Pen...`) akibat penggunaan avatar inisial yang memakan lebar dan truncate kaku.
+  3. Tombol aksi terlalu lebar dan dominan (gelap dengan ikon berlebih) sehingga mendorong seluruh tabel keluar dari batas kontainer.
+- **Root Cause**:
+  1. Header dan cell ujung kiri tidak memiliki padding napas yang cukup (hanya `pl-6`), dan ujung kanan tidak memiliki padding `pr-8`.
+  2. Modifikasi sebelumnya menambahkan avatar inisial kotak dan ikon mikro SVG pada setiap tombol aksi, yang membuat total lebar kolom melampaui lebar kontainer desktop.
+- **Fix Applied**:
+  1. **Padding Ujung Lega Sesuai Acuan**: Menerapkan `pl-8 pr-3` pada kolom ujung kiri (checkbox) dan `pl-4 pr-8` pada kolom ujung kanan (aksi), persis seperti implementasi di tabel `admin/mentors/index.blade.php` yang dipuji pengguna.
+  2. **Nama Pengguna Utuh**: Menghilangkan kotak avatar dan truncate kaku sehingga nama panjang pejabat/mahasiswa tampil utuh, jelas, dan rapi dalam 1–2 baris natural.
+  3. **Tombol Pill Soft Pastel Kompak**: Mengembalikan tombol aksi menjadi tombol pill teks bersih (`px-3 py-1.5 text-xs font-medium rounded-lg border`) dengan palet warna lembut (`bg-slate-50`, `bg-blue-50`, `bg-amber-50`, `bg-rose-50`) tanpa ikon raksasa yang memadati ujung kanan.
+  4. **Pengujian**: Seluruh tes regresi `AdminBidangScopingTest` dan `StatusLabelConsistencyTest` lulus dengan Strict Exit Code 0 (21 tests, 298 assertions).
+- **Prevention Rule**:
+  Saat menyelaraskan tampilan tabel master data ke tabel acuan, selalu terapkan padding ujung yang lega (`pl-8` di ujung kiri dan `pr-8` di ujung kanan). Hindari menambahkan avatar atau ikon tombol tambahan jika hal tersebut mempersempit ruang nama atau membuat baris aksi menabrak garis tepi tabel.
+
+### [LRN-108] Penyelarasan Margin Ujung & Pencegahan Tabrakan Teks (Text Collision) Tabel Master Pengguna
+- **Tanggal**: 2026-10-21
+- **Komponen**: `resources/views/admin/users/index.blade.php`, Playwright E2E Runner
+- **Problem / Symptom**:
+  1. Teks nama unit panjang pada kolom Role Sistem (misal: "Bidang Pengelolaan, Perlindungan, dan Penyelamatan Kearsipan") bertabrakan / tumpang tindih (*text collision*) dengan kolom Instansi ("Pemerintah Kota Surabaya").
+  2. Pada resolusi layar standar laptop (1366x768), tabel melebihi batas kontainer kartu sehingga tombol Aksi mepet ke batas garis kanan kontainer.
+- **Root Cause**:
+  1. `<td>` pada kolom Role Sistem dan Instansi dipasangi `whitespace-nowrap` secara eksplisit, yang melarang teks berpindah baris meskipun elemen anak memiliki `max-w`. Hal ini menyebabkan teks meluap (*overflow*) ke kolom tetangga.
+  2. Teks 60 karakter tanpa pemecahan baris memaksa total lebar tabel membengkak hingga >1350px, melampaui lebar kontainer 1200px pada resolusi 1366px.
+- **Fix Applied**:
+  1. **Hapus `whitespace-nowrap` pada `<td>` Konten**: Menghapus kelas `whitespace-nowrap` pada kolom Role Sistem dan Instansi, menggantinya dengan pembatas lebar aman (`max-w-[220px]`) dan `break-words leading-snug` agar teks panjang membungkus rapi ke 2-3 baris natural persis seperti di `admin/mentors`.
+  2. **Margin Ujung Simetris & Seimbang**: Menerapkan `pl-6 pr-2 w-10 text-center` pada kolom Checkbox paling kiri dan `pl-3 pr-6 text-right` pada kolom Aksi paling kanan. Ini memberikan jarak napas 24px yang konsisten dan elegan di kedua sisi tepi kartu.
+  3. **Penamaan Kolom Ringkas**: Mengubah judul header `Aksi Manajemen` menjadi `Aksi` agar serasi dengan tabel mentor.
+  4. **Verifikasi Visual E2E 1366x768**: Diuji dan diverifikasi secara visual pada viewport 1366x768 menggunakan Chrome headless lokal. Seluruh teks tidak lagi bertabrakan dan memiliki ruang napas yang proporsional.
+- **Prevention Rule**:
+  Jangan pernah memasang `whitespace-nowrap` pada elemen `<td>` yang menampung string dinamis panjang (nama unit, jurusan, universitas). Selalu gunakan pembungkus teks alami (`break-words`, `leading-snug`) dengan batas `max-w` agar tabel tidak membengkak secara horizontal dan menabrak kolom lain atau garis tepi kontainer kartu.
+
+### [LRN-109] [Arsitektur Kelompok Magang & Integrasi Pendaftaran Individu yang Aman]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `database/migrations/2026_10_21_090000_create_internship_groups_table.php`
+  - `app/Models/InternshipGroup.php`
+  - `app/Models/Application.php`
+  - `app/Enums/ApplicationStatus.php`
+  - `app/Http/Controllers/Student/ApplicationController.php`
+  - `app/Http/Controllers/Admin/ApplicationController.php`
+  - `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`
+  - `app/Http/Controllers/Mentor/DashboardController.php`
+  - `app/Http/Controllers/Lecturer/DashboardController.php`
+  - `app/Http/Controllers/University/DashboardController.php`
+  - `resources/views/student/application/create.blade.php`
+  - `resources/views/letters/acceptance.blade.php`
+  - `resources/views/verify_letter.blade.php`
+  - `resources/views/admin/applications/index.blade.php`
+  - `resources/views/admin/applications/show.blade.php`
+  - `resources/views/mentor/student-detail.blade.php`
+  - `resources/views/lecturer/student-detail.blade.php`
+  - `resources/views/university/students/show.blade.php`
+  - `tests/Feature/InternshipGroupWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Kebutuhan penambahan skema Pendaftaran Kelompok Magang (1 Ketua Tim, kode gabung kelompok, 1 Surat Penerimaan resmi bersama yang memuat tabel seluruh anggota) berdampingan dengan pendaftaran Individu yang sudah ada.
+  2. Saat pengajuan kelompok diterima oleh Admin/Supervisor, terjadi potensi benturan integritas `SQLSTATE[23000]: UNIQUE constraint failed: applications.letter_token` jika token surat ketua diduplikasi ke seluruh baris aplikasi anggota.
+  3. `ApplicationStatus` enum belum memiliki status `draft` untuk mewadahi kelompok yang sedang mengumpulkan anggota sebelum diajukan secara resmi.
+  4. Kurangnya visibilitas kelompok di antarmuka Admin (filter tipe moda, panel rincian anggota tim di show), Supervisor, Mentor, Dosen, dan Kampus.
+- **Root Cause**:
+  1. Kolom `applications.letter_token` memiliki aturan integritas `unique()`. Diperlukan pemisahan token surat bersama kelompok (`internship_groups.letter_token`) dari token unik tiap entitas pendaftaran (`applications.letter_token`).
+  2. Alur Double ACC sistem mewajibkan verifikasi awal oleh Admin Dinas staf menghasilkan status `waiting_approval`, sebelum di-ACC oleh Atasan (`Supervisor`) menjadi status `accepted`.
+  3. Query filter `registration_type` di Controller perlu menggunakan penamaan kolom berkualifikasi tabel eksplisit `applications.group_id` agar tidak ambigu.
+- **Fix Applied**:
+  1. **Tabel & Relasi Independen**: Membuat tabel `internship_groups` (`code`, `name`, `leader_user_id`, `unit_id`, `start_date`, `end_date`, `status`, `proposal_letter_path`, `letter_number`, `letter_date`, `letter_token`) dan menambahkan foreign key nullable `group_id` serta `role_in_group` (`leader`/`member`) pada tabel `applications`.
+  2. **Backward-Compatibility Pendaftar Individu**: Kolom `group_id` bersifat nullable sehingga pendaftar individu tetap berjalan normal tanpa gangguan sedikit pun.
+  3. **Isolasi Logbook, Evaluasi & Sertifikat**: Setiap anggota kelompok tetap memiliki baris `Application` dan `Placement` sendiri. Dengan demikian, pengisian logbook harian, penilaian mentor/dosen, laporan akhir, dan e-sertifikat tetap bersifat pribadi per mahasiswa secara terisolasi.
+  4. **Penerbitan 1 Surat Resmi Bersama**: Template surat `resources/views/letters/acceptance.blade.php` secara otomatis mendeteksi apakah surat merupakan pengajuan kelompok (`$application->group_id`). Jika kelompok, data mahasiswa dirender dalam tabel rapi berisi seluruh nama anggota, NIM, jurusan, dan perannya (Ketua / Anggota).
+  5. **Verifikasi Publik Terintegrasi**: Halaman publik `/verify-letter/{token}` secara cerdas mengecek token kelompok (`InternshipGroup::where('letter_token', ...)`) dan menampilkan daftar seluruh anggota kelompok yang sah.
+  6. **Penyempurnaan Lintas Aktor**:
+     - Filter `-- Semua Moda --`, `Individu Saja`, `Kelompok Saja` pada index Admin.
+     - Panel Terintegrasi Kelompok Magang pada halaman verifikasi detail Admin (`admin.applications.show`).
+     - Badge & info kelompok magang di dashboard dan detail mahasiswa untuk Mentor, Dosen Pembimbing (DPL), dan PIC Universitas.
+   7. **Integrasi Aksi Massal & Sinkronisasi Penolakan (Admin & Supervisor)**:
+      - Di `Admin\ApplicationController::bulkUpdateStatus`, pemrosesan massal status `accepted` atau `rejected` secara atomik mensinkronkan status kelompok (`internship_groups.status`), catatan penolakan massal (`rejection_reason` / `rejection_note`), serta penerbitan nomor surat dan penempatan ke seluruh anggota tim.
+      - Di `Supervisor\ApplicationApprovalController::revise`, revisi/penolakan oleh Atasan secara serentak mengembalikan seluruh anggota kelompok dan grup induk ke status `pending` dengan mencatat alasan penolakan atasan agar diketahui staf dinas.
+   8. **Konsistensi Pelaporan & Ekspor CSV Lintas Peran**:
+      - Pada `Lecturer\MonitoringController::export` (DPL) dan `University\DashboardController::export` (PIC Kampus), ditambahkan kolom `Tipe Pendaftaran` (`Individu` / `Kelompok (Ketua)` / `Kelompok (Anggota)`) dan `Kelompok Magang` (nama tim) guna mempermudah rekapitulasi data akademik.
+      - Ditambahkan method helper alias `isGroupLeader()` pada Model `Application` yang memanggil `isLeader()` untuk memastikan kemudahan pemanggilan di Controller dan Blade.
+   9. **Pengujian Penuh (Strict Exit Code 0)**: Dibuat dan diperluas `InternshipGroupWorkflowTest` menjadi 12 test method yang menguji end-to-end pembuatan tim, join kode tim, proposal bersama, sinkronisasi Double ACC, filter pendaftaran admin, panel dashboard, detail profil mentor & dosen, penolakan massal admin, revisi atasan, serta stream ekspor CSV DPL dan Universitas. Seluruh test suite (344 tests, 2.327 assertions) lulus 100% dengan Exit Code 0.
+- **Prevention Rule**:
+  Jangan pernah menduplikasi nilai kolom yang ber-constraint UNIQUE antar record anak dalam relasi grup/kelompok. Selalu gunakan token tingkat grup (`group.letter_token`) untuk verifikasi publik dokumen bersama, dan berikan token acak unik untuk masing-masing baris aplikasi anggota. Selalu sediakan backward compatibility penuh untuk pengajuan bertipe individu (`group_id = null`).
+
+---
+
+### [LRN-110] [Desain Responsif 2-Baris Filter Pengajuan & Penyelarasan Center-Aligned Kolom AKSI]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/admin/applications/index.blade.php`
+  - `resources/views/admin/users/index.blade.php`
+- **Problem / Symptom**:
+  1. Penambahan filter tipe kelompok (`registration_type`) di `/admin/applications` memadatkan form filter 1 baris flex horizontal dengan 6 elemen kontrol sehingga teks opsi terpotong di layar laptop.
+  2. Ikon kaca pembesar (search) pada form filter menumpuk di atas teks placeholder ("Cari nama...") akibat kelas Tailwind `pl-10` tertimpa oleh default `@tailwindcss/forms` plugin CSS reset.
+  3. Kolom checkbox bulk action pada tabel pengajuan terlalu mepet dengan pinggir kiri kartu tabel (`pl-7 pr-1 text-left`).
+  4. Pada tabel `/admin/applications` dan `/admin/users`, teks header `AKSI` posisinya tidak pas di tengah (center-aligned) terhadap tombol aksi di bawahnya (`text-right` / `justify-end`).
+- **Root Cause**:
+  1. Ketiadaan CSS specificity override pada input search yang menggunakan form reset default.
+  2. Penggunaan `text-left` dengan padding kiri minim pada kolom checkbox tabel.
+  3. Perataan `text-right` menyelaraskan teks "AKSI" ke tepi terkanan tombol paling kanan, bukan titik tengah simetri vertikal.
+- **Fix Applied**:
+  1. **Layout 2-Baris Filter Responsif & Proteksi Search Icon**:
+     - Memasang `style="padding-left: 1rem !important;"` pada ikon svg dan `style="padding-left: 2.75rem !important;"` pada input search sehingga ikon dan teks placeholder terpisah dengan jarak 12px yang bersih tanpa overlap.
+     - 4 dropdown filter proporsional dalam grid 4-kolom lega tanpa teks terpotong.
+  2. **Ruang Napas Kolom Checkbox (`admin.applications.index`)**:
+     - Mengubah kolom checkbox dari `pl-7 pr-1 w-12 text-left` menjadi `pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap`, memberikan jarak 32px-40px dari pinggir kiri kartu tabel secara simetris selaras dengan Master Pengguna (`admin/users`).
+  3. **Penyelarasan Terpusat Kolom AKSI (Dipertahankan Presisi & Tidak Menabrak)**:
+     - Header `th` dan sel `td` kolom Aksi tetap `text-center px-6` sehingga teks `AKSI` berada presisi di tengah-tengah tombol `Detail >` tanpa menabrak border kanan.
+  4. **Strict Exit Code 0**: 47 Application tests passing, 12 InternshipGroupWorkflow tests passing, 344/344 test suite passing (2.327 assertions).
+- **Prevention Rule**:
+  Selalu gunakan inline style `style="padding-left: 2.75rem !important;"` pada input bertipe teks yang menampung icon absolute di sisi kiri agar tidak tertimpa styling form reset `@tailwindcss/forms`. Kolom checkbox tabel wajib menggunakan `pl-8 sm:pl-10 pr-3 text-center` untuk memastikan ruang napas yang cukup dari garis batas kiri kartu. Kolom aksi tabel interaktif wajib menggunakan `text-center` dan `justify-center` dengan padding `px-6`.
+
+### [LRN-111] [Optimalisasi Detail Mahasiswa Portal Mentor: Lencana Status Kedinasan, Hierarki Alur Kerja & 0% Emoji]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/mentor/student-detail.blade.php`
+  - `app/Http/Controllers/Mentor/DashboardController.php`
+- **Problem / Symptom**:
+  1. Halaman detail bimbingan mahasiswa (`/mentor/students/{id}`) tidak menampilkan status magang mahasiswa (apakah menunggu mulai, aktif berjalan, atau selesai).
+  2. Ketika mahasiswa masih berstatus `ACCEPTED` (jadwal mulai belum tiba), tombol evaluasi bertuliskan "Lihat Nilai" dengan catatan kecil abu-abu "Penilaian baru dapat diisi setelah magang mahasiswa berjalan (status Aktif)", membingungkan mentor senior di dinas.
+  3. Kartu Penilaian diletakkan di atas Logbook, membalik alur kerja wajar mentor lapangan di instansi.
+  4. Ketiadaan kontak darurat langsung (WhatsApp) untuk koordinasi lapangan cepat saat mahasiswa belum hadir di kantor dinas.
+- **Root Cause**:
+  1. Ketiadaan badge status adaptif pada header dan kartu profil mentor view.
+  2. Penilaian belum memperhitungkan state `isUpcoming` (belum mulai) sehingga tetap merender anchor tombol ke form evaluasi kosong yang terkunci.
+  3. Kurangnya integrasi direct WhatsApp link dan info nomor telepon di kartu data magang.
+- **Fix Applied**:
+  1. **Pembersihan Header & Lencana Status Terpusat**:
+     - Lencana status di samping nama mahasiswa dihilangkan agar header bersih dan tidak redundan. Status resmi terpusat di sudut kanan atas kartu Data Magang.
+  2. **Harmonisasi UI Tombol WhatsApp**:
+     - Mengubah tombol WhatsApp dari warna solid hijau gelap yang kontras kasar menjadi gaya kartu putih bersih dengan border tipis emerald (`bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50`), persis serasi dengan tombol `Chat Mahasiswa` dan `Grup Bimbingan`.
+  3. **Penyempurnaan Kartu Data Magang & Penghapusan Sub-teks Redundan**:
+     - Menghapus subheadline teks panjang di bawah judul Data Magang.
+  4. **Panel Dinamis 'Tugas Mentor Saat Ini'**:
+     - Memanfaatkan area kosong di samping Kontak Mahasiswa (2 kolom) untuk menampilkan panduan tugas mentor berdasarkan status terkini mahasiswa (misal: saat `waiting_approval` atau `pending`, sistem menerangkan bahwa mentor belum perlu melakukan aksi bimbingan apapun karena proses pendaftaran/ACC atasan sedang berlangsung).
+  5. **Auto-Activation on-the-fly**: Menambahkan `$placement->autoActivateIfStarted()` di `Mentor\DashboardController::showStudent`.
+  6. **Strict Exit Code 0**: 49/49 Mentor tests passing, 3/3 ChatContextButtonsTest passing, visual validation via Playwright passed (Desktop & Mobile).
+- **Prevention Rule**:
+### [LRN-112] [Optimalisasi Luaran Magang: Multi-Screenshot, Dokumentasi Manfaat Masyarakat, Video Embed & Dedicated Page Architecture]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `database/migrations/2026_10_21_172000_add_media_and_documents_to_internship_projects_table.php`
+  - `app/Models/InternshipProject.php`
+  - `app/Http/Controllers/Student/InternshipProjectController.php`
+  - `app/Http/Controllers/ProjectDetailController.php`
+  - `resources/views/projects/show.blade.php`
+  - `resources/views/supervisor/reports/show.blade.php`
+  - `resources/views/components/supervision/report-review.blade.php`
+  - `resources/views/student/final_report.blade.php`
+  - `routes/web.php`
+- **Problem / Symptom**:
+  1. Sebelumnya, proyek magang hanya menampung 1 foto sampul tunggal tanpa kemampuan menyertakan multi-screenshot aplikasi, padahal proyek inovasi aplikasi membutuhkan banyak tangkapan layar antarmuka halaman web/mobile.
+  2. Klik "Lihat Detail" sebelumnya membuka modal dialog pop-up yang sempit, membatasi visualisasi komprehensif bagi evaluator, dosen, mentor, dan supervisor.
+  3. Ketiadaan tempat dokumentasi kegiatan mahasiswa saat presentasi di desa / masyarakat dan ketiadaan preview video (YouTube / Google Drive).
+  4. Dokumen panduan teknis (*manual book* / lampiran) belum dapat diunggah bersamaan dengan entitas proyek.
+- **Root Cause**:
+  1. Skema tabel `internship_projects` lama hanya memiliki kolom `photo_path` (string).
+  2. Belum ada route dan view dedicated `/projects/{id}` untuk eksplorasi penuh luaran inovasi.
+  3. Belum ada regex parser untuk URL YouTube embed responsif.
+- **Fix Applied**:
+  1. Menambahkan kolom JSON `screenshots`, `documents`, `community_photos`, dan `video_url` pada tabel `internship_projects`.
+  2. Implementasi accessor `screenshot_urls`, `community_photo_urls`, dan `youtube_embed_url` (ekstraksi 11 karakter ID video YouTube otomatis).
+  3. Menghapus pop-up modal detail proyek dan menggantinya dengan rute navigasi mandiri `Route::get('/projects/{id}', [ProjectDetailController::class, 'show'])->name('projects.show')` dengan *smart back navigation* lintas peran (Supervisor, Mentor, Dosen, Mahasiswa).
+  4. Merancang view mandiri `projects/show.blade.php` berselera Dinas: galeri visual interaktif dengan thumbnail strip, uraian dampak sosial, galeri foto dokumentasi presentasi lapangan, pemutar video YouTube responsif 16:9, dan kartu unduh buku panduan teknis.
+  5. Memperbarui form modal pengunggahan mahasiswa dengan multi-file upload & validasi ukuran berkas.
+  6. Strict Exit Code 0 pada automated test suite feature dan verifikasi visual Playwright Chrome.
+- **Prevention Rule**:
+  Untuk entitas karya ilmiah/proyek teknologi dengan luaran multimedia banyak, hindari penggunaan modal dialog pop-up sempit untuk inspeksi akhir. Selalu sediakan halaman dedicated `/resource/{id}` yang memiliki tombol kembali kontekstual, thumbnail strip interaktif, dan penanganan embed video responsif.
+
+### [LRN-113] [Portal Mahasiswa: Eliminasi Modal Proyek Menjadi Halaman Mandiri, Integrasi Media Riil & Proteksi Proporsi Gambar Besar]
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `routes/student.php`
+  - `app/Http/Controllers/Student/InternshipProjectController.php`
+  - `resources/views/student/final_report.blade.php`
+  - `resources/views/student/projects/create.blade.php`
+  - `resources/views/student/projects/edit.blade.php`
+  - `resources/views/projects/show.blade.php`
+  - `tests/Feature/InternshipProjectAndSupervisorReportTest.php`
+- **Problem / Symptom**:
+  1. Pengisian formulir multi-media proyek inovasi mahasiswa di `/student/final-report` sebelumnya menggunakan modal pop-up Alpine.js (`openModal`). Pop-up menjadi sangat panjang, sempit, dan rawan terpotong saat memuat input multi-file, preview multi-screenshot, dokumentasi foto masyarakat, dokumen PDF, dan URL video.
+  2. Pengguna meminta agar formulir proyek mahasiswa dipindahkan menjadi halaman baru (bukan pop-up).
+  3. Gambar proyek dummy perlu diganti dengan gambar yang diberikan oleh pengguna (screenshot sistem aplikasi dan foto dokumentasi presentasi mahasiswa di desa).
+  4. Foto beresolusi super besar (4K / ultra-wide) berisiko mendistorsi layout antarmuka atau meluber (*overflow*) jika dirender pada ukuran aslinya.
+- **Root Cause**:
+  1. Keterbatasan modal pop-up saat mengelola formulir multi-media kompleks (10+ field dan drag-and-drop file inputs).
+  2. Ketiadaan container guard dengan pembatasan tinggi maksimal (`max-h`) dan `object-contain` pada area pratinjau galeri gambar.
+- **Fix Applied**:
+  1. **Arsitektur Halaman Mandiri (/student/projects/create & /student/projects/{id}/edit)**:
+     - Mendaftarkan rute baru `student.projects.create` dan `student.projects.edit`.
+     - Mengimplementasikan method `create()` dan `edit($id)` di `InternshipProjectController`.
+     - Membangun view dedikasi `create.blade.php` dan `edit.blade.php` dengan tata letak profesional Style Dinas, breadcrumb/back link ke Laporan Akhir, panduan format berkas, indikator pratinjau interaktif, dan galeri berkas yang sudah terunggah.
+     - Menghapus 135+ baris kode modal pop-up dari `final_report.blade.php` dan mengubah tombol aksi menjadi tautan langsung (`<a>`).
+  2. **Integrasi Gambar Aktual Pengguna**:
+     - Menyimpan dan memetakan 5 foto dari pengguna: cover dashboard (`project_sample_cover.png`), 2 screenshot modul pendaftaran & kampus (`screenshot_1_jalur.png`, `screenshot_2_kampus.png`), serta 2 foto dokumentasi lapangan di desa (`community_doc_desa_1.png`, `community_doc_desa_2.png`).
+     - Menyematkan video YouTube riil yang diberikan pengguna (`https://youtu.be/jlKU3exv4Oc`).
+  3. **Proteksi Proporsi Ukuran Gambar Besar (Visual Container & Aspect Ratio Guard)**:
+     - Menerapkan pembatasan kontainer visual: `aspect-video max-h-72 w-full object-contain bg-slate-950/5` pada pratinjau form dan `max-h-[500px] object-contain bg-slate-950` pada viewport utama showcase proyek.
+     - Menyediakan tautan sekunder "Buka Resolusi Penuh ↗" bagi pengguna yang ingin menginspeksi file asli resolusi tinggi tanpa merusak estetika antarmuka.
+  4. **Strict Exit Code 0**: Seluruh automated test passing (3/3 tests, 39 assertions) dan verifikasi visual Playwright Google Chrome headless berhasil dengan bukti tangkapan layar.
+- **Prevention Rule**:
+  Hindari menampung input multi-media skala besar di dalam modal pop-up; gunakan dedicated page untuk formulir yang menampung multi-file upload. Pada seluruh render gambar pengguna/eksternal, wajib gunakan kontainer ber-aspect ratio terdefinisi dengan `object-contain` dan pembatas `max-h` untuk mencegah gambar super besar mendistorsi UI.
+
+---
+
+### [LRN-111] Desentralisasi Berkas Identitas Personal Mahasiswa & Penyederhanaan Formulir Pendaftaran Magang
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `database/migrations/2026_10_21_182606_add_documents_to_student_profiles_table.php`
+  - `app/Models/StudentProfile.php`
+  - `app/Http/Controllers/Student/ProfileController.php`
+  - `app/Http/Controllers/Student/ApplicationController.php`
+  - `app/Http/Controllers/PrivateFileController.php`
+  - `resources/views/student/profile/edit.blade.php`
+  - `resources/views/student/application/create.blade.php`
+  - `tests/Feature/InternshipGroupWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Pada arsitektur lama, formulir pendaftaran magang menuntut mahasiswa mengunggah seluruh berkas (Surat Pengantar, CV, Transkrip Nilai, KTM) sekaligus setiap kali mendaftar. Hal ini menyebabkan redundansi berkas, mempersulit alur kelompok jika ketua harus menggabungkan PDF CV seluruh anggota, serta menimbulkan kebingungan bagi pendaftar mandiri jika berkas harus diunggah berulang kali.
+  2. Pengguna meminta berkas personal (CV, Transkrip Nilai, KTM) diunggah satu kali saja di menu Profil Mahasiswa (Profil Saya) di bawah data diri, dan mewajibkan berkas tersebut sebelum mendaftar.
+  3. Mahasiswa jalur individu tidak boleh bekerja dua kali (mengunggah di profil lalu diminta unggah lagi di formulir pendaftaran).
+- **Root Cause**:
+  Pencampuran antara Master Data Identitas Personal Mahasiswa (CV, Transkrip, KTM yang bersifat statis melekat pada mahasiswa) dengan Data Transaksional Pengajuan Magang (Surat Pengantar dari kampus, pilihan unit kerja, rentang tanggal).
+- **Fix Applied**:
+  1. **Relokasi ke Master Profil Mahasiswa**:
+     - Menambahkan kolom `cv_path`, `transcript_path`, dan `id_card_path` pada tabel `student_profiles`.
+     - Membangun Section 5 (Dokumen Persyaratan Magang) pada view `student/profile/edit.blade.php` dengan badge status ketersediaan berkas dan tautan pratinjau aman melalui `PrivateFileController::studentDocument`.
+  2. **Penyederhanaan Formulir Pendaftaran Individu & Kelompok**:
+     - Formulir jalur individu disederhanakan: Mahasiswa hanya perlu mengunggah 1 berkas yaitu Surat Pengantar dari Perguruan Tinggi.
+     - Ditampilkan kartu ringkasan status berkas personal yang otomatis terhubung dari profil mahasiswa, lengkap dengan indikator ketersediaan dan tombol perbarui profil.
+     - Pada jalur kelompok, ketua tim hanya mengunggah 1 berkas bersama (Surat Pengantar/Proposal Kampus), sedangkan berkas CV, Transkrip, dan KTM tiap anggota tim otomatis tersinkronisasi dari profil masing-masing anggota.
+  3. **Mekanisme Snapshot Data**:
+     - Saat pengajuan dikirimkan, file path berkas personal dari profil mahasiswa disalin ke tabel `applications` dan dicatat ke `application_documents` sehingga arsip pengajuan magang di dinas tetap konsisten dan tidak berubah jika mahasiswa memperbarui CV profilnya di masa mendatang.
+  4. **Strict Exit Code 0 & Verifikasi Visual**:
+     - Memperbarui fixture test pada `InternshipGroupWorkflowTest` agar menyertakan berkas identitas profil.
+     - Seluruh 344 unit dan feature test di repositori berhasil lulus 100% dengan exit code 0.
+- **Prevention Rule**:
+  Pisahkan secara tegas data identitas personal mahasiswa yang berlaku jangka panjang dari data transaksional pendaftaran magang. Jangan pernah memaksa pengguna mengunggah ulang data statis yang sudah tersimpan di profil pengguna.
+
+---
+
+### [LRN-112] Multi-Kategori Inovasi Proyek Magang Non-IT, Pemisahan Bagian Akses Mandiri, dan Optimasi Grid Katalog 3-Kolom
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `database/migrations/2026_10_21_181000_add_repository_and_source_code_to_internship_projects_table.php`
+  - `database/migrations/2026_10_21_184300_add_category_to_internship_projects_table.php`
+  - `app/Models/InternshipProject.php`
+  - `app/Http/Controllers/Student/InternshipProjectController.php`
+  - `resources/views/student/projects/create.blade.php`
+  - `resources/views/student/projects/edit.blade.php`
+  - `resources/views/student/final_report.blade.php`
+  - `resources/views/projects/show.blade.php`
+  - `resources/views/components/supervision/report-review.blade.php`
+- **Problem / Symptom**:
+  1. Input proyek awalnya diasumsikan hanya untuk proyek berbasis software/coding (GitHub), sehingga proyek non-pemrograman (seperti penulisan buku literasi anak, mural/penataan ruang, preservasi fisik naskah kuno, SOP layanan, dan podcast) tidak memiliki tempat representatif.
+  2. Input Tautan Website, Repositori, dan File ZIP tercampur sempit di dalam Bagian 1, padahal merupakan pusat akses utama karya inovasi yang membutuhkan ruang visual lapang.
+  3. Kartu pratinjau proyek di `/student/final-report` berukuran terlalu besar karena memuat seluruh paragraf box "Manfaat untuk Masyarakat" dan deskripsi panjang, sehingga tampilan tidak simetris dan berantakan ketika mahasiswa memiliki banyak proyek (hingga 10 proyek).
+- **Root Cause**:
+  Ketiadaan kolom kategori klasifikasi inovasi pada basis data, penggabungan elemen input yang tidak proporsional di Bagian 1 form, serta ketiadaan pembatasan baris teks (*line clamp*) dan pemisahan informasi detail vs informasi kartu luar.
+- **Fix Applied**:
+  1. **Dukungan Kategori Multi-Disiplin Inovasi**:
+     - Menambahkan kolom `category` pada tabel `internship_projects` dengan konstanta `CATEGORIES` dan accessor pewarnaan badge otomatis (`category_label`, `category_badge_class`).
+     - Menyediakan dropdown kategori di formulir create/edit yang mencakup: Teknologi/Software, Buku/Literasi, Desain/Mural, Preservasi Kearsipan, Media Audio-Visual, Tata Kelola/SOP, dan Lainnya.
+     - Deteksi cerdas tautan repositori pada halaman detail publik (Google Drive, Behance, GitHub, atau storage awan lainnya).
+  2. **Pemisahan Bagian 2 (Pusat Akses Proyek) Secara Mandiri**:
+     - Memisahkan Bagian 2 menjadi kontainer tersendiri yang lapang dengan label inklusif untuk live demo/portofolio, repositori awan, dan unggah berkas ZIP master.
+  3. **Optimasi Grid Katalog 3-Kolom Responsif**:
+     - Menghapus box "Manfaat untuk Masyarakat" dari kartu pratinjau luar (tersedia lengkap saat "Lihat Detail" diklik).
+     - Mengunci deskripsi dengan `line-clamp-2 text-xs text-slate-500` dan judul `line-clamp-2 min-h-[2.5rem]`.
+     - Menyusun kartu dalam grid 3-kolom (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5`) dengan tinggi foto seragam (`h-44 object-cover`), badge kategori visual, dan chips fitur ringkas (*Akses Daring*, *Repo / Cloud*, *ZIP Berkas*, *N Lapangan*, *N Dokumen*).
+     - Berhasil diverifikasi dan terbukti sangat rapi pada akun Eka Putri Lestari dengan 10 variasi karya nyata.
+- **Prevention Rule**:
+  Katalog daftar kartu (card list) harus difokuskan pada ringkasan visual dan navigasi cepat (*high-level summary*), jangan menaruh teks narasi panjang atau box sekunder di kartu luar. Sediakan selalu pemisahan kategori eksplisit untuk mengakomodasi mahasiswa dari berbagai program studi non-IT.
+
+---
+
+### [LRN-113] Akses Berkas Proposal Kelompok dari Private Storage, Restrukturisasi Tombol Dokumen Persyaratan & Eliminasi Tombol Alih Jalur
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `routes/web.php`
+  - `app/Http/Controllers/DocumentController.php`
+  - `app/Http/Controllers/PrivateFileController.php`
+  - `resources/views/admin/applications/show.blade.php`
+  - `resources/views/supervisor/applications/show.blade.php`
+  - `resources/views/student/application/create.blade.php`
+  - `tests/Feature/InternshipGroupWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Tautan "Unduh Proposal Kelompok" di halaman admin aplikasi menghasilkan error 404 karena memanggil `asset('storage/' . $path)` ke disk public, padahal berkas tersimpan di disk privat oleh `PrivateDocumentStorage`.
+  2. Tombol "Lihat PDF" dan "Unduh" pada Dokumen Persyaratan di detail pengajuan admin tampil berantakan karena menjadi direct children dalam flex justify-between tanpa grouping div, menyebabkan posisi tombol melayang terpisah di tengah kartu.
+  3. Tombol "Pindah ke Jalur Individu" dan "Pindah ke Jalur Kelompok" di pojok kanan atas formulir pendaftaran dinilai mubazir dan membingungkan karena sudah ada tombol "Ganti Jalur Pendaftaran" di pojok kiri atas.
+- **Root Cause**:
+  1. Penggunaan URL statis publik `asset('storage/...')` untuk berkas yang disimpan pada storage driver privat (`storage/app/private/documents/applications`).
+  2. Ketiadaan kontainer pembungkus grup aksi (`flex items-center gap-2 shrink-0`) pada elemen tombol berkas.
+  3. Redundansi kontrol navigasi alih mode pada tampilan pendaftaran mahasiswa.
+- **Fix Applied**:
+  1. **Rute dan Handler Terotorisasi Proposal Kelompok**:
+     - Mendaftarkan rute `documents.group.proposal` dan `documents.group.proposal.download` pada `routes/web.php`.
+     - Mengimplementasikan `showGroupProposal($id)` dan `downloadGroupProposal($id)` di `DocumentController` dengan pengecekan otoritas admin, supervisor, mentor, kampus, dan mahasiswa anggota.
+  2. **Harmonisasi Tombol Dokumen Persyaratan**:
+     - Membungkus tombol `Lihat PDF` dan `Unduh` ke dalam div grup rapi dengan styling tinggi seragam, icon svg, dan rounded-xl.
+     - Menyinkronkan 87 berkas personal mahasiswa ke tabel `application_documents` sehingga seluruh berkas (Surat Pengantar, CV, Transkrip, KTM) tampil lengkap.
+  3. **Pembersihan Tombol Redundan**:
+     - Menghapus tombol "Pindah ke Jalur Kelompok" dan "Pindah ke Jalur Individu" dari header formulir pendaftaran, mengandalkan satu tombol navigasi utama "Ganti Jalur Pendaftaran".
+- **Prevention Rule**:
+  Seluruh dokumen sensitif yang diunggah oleh pemohon magang wajib diakses melalui route controller terotorisasi yang memanggil `PrivateDocumentStorage::locate()`. Jangan pernah menggunakan tautan langsung `asset('storage/...')` untuk dokumen yang berada di dalam folder privat.
+
+---
+
+### [LRN-114] Optimasi Tata Letak Laporan Akhir: Eliminasi Header Redundan, Banner Panduan 3-Poin, Toggle 3-Kartu Alpine.js & Ekspansi Dokumen Pendukung (10 Berkas)
+- **Tanggal**: 2026-10-21
+- **Komponen**:
+  - `resources/views/student/final_report.blade.php`
+  - `app/Http/Controllers/Student/InternshipProjectController.php`
+  - `resources/views/student/projects/create.blade.php`
+  - `resources/views/student/projects/edit.blade.php`
+  - `tests/Feature/InternshipProjectAndSupervisorReportTest.php`
+- **Problem / Symptom**:
+  1. Header halaman Laporan Akhir memuat kotak biru besar "Informasi Penempatan Magang" yang redundan karena informasi serupa sudah terpampang jelas di Dashboard dan Logbook, membuang ruang vertikal yang berharga pada layar pengguna.
+  2. Banner info awal pengunggahan laporan akhir terlalu singkat dan belum memuat edukasi penting mengenai alur pencicilan berkas, peran evaluasi mentor/dosen, serta syarat pembukaan tombol E-Sertifikat.
+  3. Mahasiswa dengan banyak proyek (misal 10 proyek) memenuhi seluruh layar laporan akhir secara masif sehingga pengguna harus menggulir jauh untuk mencapai formulir naskah laporan akhir (Bagian 2).
+  4. Kuota dokumen lampiran proyek dibatasi hanya 3 berkas, menyulitkan proyek skala besar yang membutuhkan banyak lampiran teknis (buku panduan, SOP, hasil riset lapangan, dsb).
+- **Root Cause**:
+  Ketiadaan mekanisme pagination/collapsible view pada grid kartu proyek di tampilan antarmuka, limit validasi hardcoded `max:3` pada dokumen proyek, serta penataan hierarki informasi halaman yang belum optimal.
+- **Fix Applied**:
+  1. **Eliminasi Header Redundan**: Menghapus kotak biru Informasi Penempatan Magang dari `final_report.blade.php`.
+  2. **Banner Panduan dan Ketentuan 3-Poin**: Mengganti banner sederhana dengan kontainer terstruktur yang menjelaskan: (1) Fleksibel & Bisa Dicicil, (2) Evaluasi 2 Pihak (Mentor & DPL), dan (3) Penerbitan E-Sertifikat resmi ber-QR Code, lengkap dengan catatan kewajiban logbook harian.
+  3. **Toggle Tampilan 3-Kartu via Alpine.js**:
+     - Menampilkan default 3 kartu teratas pada Bagian 1, menyembunyikan kartu ke-4 dan seterusnya dengan `x-show="showAllProjects" x-cloak`.
+     - Menyediakan tombol toggle modern `Tampilkan Semua (N Proyek)` yang dinamis bertransformasi menjadi `Tampilkan Lebih Sedikit (3 Proyek Teratas)` dengan rotasi ikon SVG mulus.
+  4. **Ekspansi Dokumen Pendukung hingga 10 Berkas**:
+     - Mengubah validasi Controller `store()` dan `update()` menjadi `'documents' => 'nullable|array|max:10'` dan membatasi akumulasi edit hingga 10 berkas via `array_slice`.
+     - Memperbarui panduan input pada formulir `create.blade.php` dan `edit.blade.php`.
+  5. **Verifikasi Strict Exit Code 0 & Visual E2E**: Seluruh pengujian fitur lulus 100% (61 assertions) dan diverifikasi visual melalui runner Playwright Chromium/Chrome sistem.
+- **Prevention Rule**:
+  Gunakan progressive disclosure (toggle/accordion/collapsible limit) saat menampilkan koleksi entitas yang dapat berjumlah banyak pada halaman multi-bagian, agar tidak menenggelamkan formulir utama di bawahnya. Hindari menduplikasi kotak status makro yang sudah ada di Dashboard jika halaman difokuskan pada aksi spesifik.
 
 ---
 
@@ -1805,8 +3041,6 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
-
-
 ```markdown
 ### [LRN-XXX] [Judul Singkat Masalah / Fitur]
 - **Tanggal**: YYYY-MM-DD
@@ -1816,4 +3050,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+
+
+
+
 

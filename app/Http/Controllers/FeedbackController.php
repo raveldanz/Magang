@@ -113,13 +113,18 @@ class FeedbackController extends Controller
             $attachmentPath = $file->storeAs(PrivateDocumentStorage::FEEDBACK_DIR, $fileName, PrivateDocumentStorage::DISK);
         }
 
+        $targetAgencyId = $request->target_agency_id;
+        if (($request->target_role ?? 'super_admin') === 'admin_dinas' && ! $targetAgencyId) {
+            $targetAgencyId = AgencyProfile::first()?->id ?? 1;
+        }
+
         $feedback = SystemFeedback::create([
             'user_id' => $user->id,
             'sender_name' => $user->name,
             'sender_email' => $user->email,
             'sender_role' => $user->role,
             'target_role' => $request->target_role ?? 'super_admin',
-            'target_agency_id' => $request->target_agency_id,
+            'target_agency_id' => $targetAgencyId,
             'target_university_id' => $request->target_university_id,
             'category' => $request->category,
             'subject' => $request->subject,

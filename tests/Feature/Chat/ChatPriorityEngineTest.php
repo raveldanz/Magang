@@ -105,7 +105,7 @@ class ChatPriorityEngineTest extends ChatTestCase
         $mentorBadge = $this->presenter->stageBadge($directConv, $this->mentorX);
         $this->assertNotNull($mentorBadge);
         $this->assertSame('staff', $mentorBadge['code']);
-        $this->assertSame('Mentor Lapangan', $mentorBadge['label']);
+        $this->assertSame('Pembimbing Lapangan', $mentorBadge['label']);
         $this->assertSame('mentor', $mentorBadge['role_group']);
         $this->assertFalse($mentorBadge['is_urgent']);
     }

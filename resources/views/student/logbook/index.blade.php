@@ -49,19 +49,25 @@
                     </div>
                 </div>
 
-            @elseif (in_array($lifecycle, ['PENDING', 'SUBMITTED', 'VERIFIED']))
-                <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl shadow-xs">
+            @elseif (in_array($lifecycle, ['PENDING', 'SUBMITTED', 'WAITING_APPROVAL']))
+                <div class="bg-amber-50 border-l-4 {{ $lifecycle === 'WAITING_APPROVAL' ? 'border-purple-500' : 'border-amber-400' }} p-6 rounded-2xl shadow-xs">
                     <div class="flex items-start justify-between flex-wrap gap-4">
                         <div class="flex items-start gap-3">
                             <div>
-                                <h4 class="font-bold text-amber-900 text-sm sm:text-base">Pengajuan Magang Sedang Diverifikasi</h4>
-                                <p class="text-xs sm:text-sm text-amber-700 mt-0.5">
-                                    Pengajuan magang Anda saat ini sedang dalam proses verifikasi dan seleksi oleh instansi <strong>{{ $application->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong>.
+                                <h4 class="font-bold {{ $lifecycle === 'WAITING_APPROVAL' ? 'text-purple-900' : 'text-amber-900' }} text-sm sm:text-base">
+                                    {{ $lifecycle === 'WAITING_APPROVAL' ? 'Pengajuan Menunggu Pengesahan (ACC) Atasan' : 'Pengajuan Magang Sedang Diverifikasi' }}
+                                </h4>
+                                <p class="text-xs sm:text-sm {{ $lifecycle === 'WAITING_APPROVAL' ? 'text-purple-700' : 'text-amber-700' }} mt-0.5">
+                                    @if ($lifecycle === 'WAITING_APPROVAL')
+                                        Berkas dan usulan mentor penempatan Anda telah diverifikasi oleh Admin. Saat ini pengajuan Anda sedang dalam tahap pengesahan akhir (ACC) oleh Atasan (Tim Kerja Umum &amp; Kepegawaian Dispusip Surabaya).
+                                    @else
+                                        Pengajuan magang Anda saat ini sedang dalam proses verifikasi dan seleksi oleh <strong>{{ $application->unit->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}</strong>.
+                                    @endif
                                 </p>
                             </div>
                         </div>
-                        <span class="px-3 py-1 bg-amber-200 text-amber-900 text-xs font-black rounded-full uppercase tracking-wider">
-                            Status: {{ $lifecycle }}
+                        <span class="px-3 py-1 {{ $lifecycle === 'WAITING_APPROVAL' ? 'bg-purple-100 text-purple-900 border border-purple-300' : 'bg-amber-200 text-amber-900' }} text-xs font-black rounded-full uppercase tracking-wider">
+                            Status: {{ $lifecycle === 'WAITING_APPROVAL' ? 'MENUNGGU ACC ATASAN' : $lifecycle }}
                         </span>
                     </div>
                 </div>
@@ -88,19 +94,21 @@
                             </div>
                             <p class="text-[11px] text-emerald-700">Formulir, CV, & Transkrip terkirim ke sistem.</p>
                         </div>
-                        <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-400 shadow-xs space-y-1">
+                        <div class="p-4 rounded-2xl {{ $lifecycle === 'WAITING_APPROVAL' ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border-2 border-amber-400 shadow-xs' }} space-y-1">
                             <div class="flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center animate-pulse">2</span>
-                                <h4 class="font-bold text-xs text-amber-900">Verifikasi Dinas</h4>
+                                <span class="w-6 h-6 rounded-full {{ $lifecycle === 'WAITING_APPROVAL' ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white animate-pulse' }} text-xs font-bold flex items-center justify-center">
+                                    {{ $lifecycle === 'WAITING_APPROVAL' ? '✓' : '2' }}
+                                </span>
+                                <h4 class="font-bold text-xs {{ $lifecycle === 'WAITING_APPROVAL' ? 'text-emerald-900' : 'text-amber-900' }}">Verifikasi Admin</h4>
                             </div>
-                            <p class="text-[11px] text-amber-700">Pemeriksaan berkas & kualifikasi oleh admin dinas.</p>
+                            <p class="text-[11px] {{ $lifecycle === 'WAITING_APPROVAL' ? 'text-emerald-700' : 'text-amber-700' }}">Pemeriksaan berkas & usulan mentor pembimbing.</p>
                         </div>
-                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
+                        <div class="p-4 rounded-2xl {{ $lifecycle === 'WAITING_APPROVAL' ? 'bg-purple-50 border-2 border-purple-400 shadow-xs' : 'bg-slate-50 border border-slate-200 opacity-60' }} space-y-1">
                             <div class="flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 text-xs font-bold flex items-center justify-center">3</span>
-                                <h4 class="font-bold text-xs text-slate-700">Penugasan Pembimbing</h4>
+                                <span class="w-6 h-6 rounded-full {{ $lifecycle === 'WAITING_APPROVAL' ? 'bg-purple-600 text-white animate-pulse' : 'bg-slate-300 text-slate-700' }} text-xs font-bold flex items-center justify-center">3</span>
+                                <h4 class="font-bold text-xs {{ $lifecycle === 'WAITING_APPROVAL' ? 'text-purple-900' : 'text-slate-700' }}">Pengesahan Atasan</h4>
                             </div>
-                            <p class="text-[11px] text-slate-500">Penetapan Mentor Dinas & Dosen Pembimbing Lapangan.</p>
+                            <p class="text-[11px] {{ $lifecycle === 'WAITING_APPROVAL' ? 'text-purple-700' : 'text-slate-500' }}">Persetujuan final / ACC Tim Kerja Dispusip.</p>
                         </div>
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60 space-y-1">
                             <div class="flex items-center gap-2">

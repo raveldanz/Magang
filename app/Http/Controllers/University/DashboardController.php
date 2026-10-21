@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
+use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class DashboardController extends Controller
         $placementsQuery = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'academicAdvisor',
@@ -49,6 +51,7 @@ class DashboardController extends Controller
         $applicationsQuery = Application::with([
             'user.studentProfile',
             'unit.agencyProfile',
+            'group',
             'placement.mentor',
             'placement.academicAdvisor',
             'placement.evaluation',
@@ -72,8 +75,14 @@ class DashboardController extends Controller
             });
         }
 
-        if ($request->filled('agency_id')) {
+        if ($request->filled('unit_id')) {
+            $applicationsQuery->where('unit_id', $request->unit_id);
+            $placementsQuery->whereHas('application', fn ($aq) => $aq->where('unit_id', $request->unit_id));
+        } elseif ($request->filled('agency_id')) {
             $applicationsQuery->whereHas('unit', function ($q) use ($request) {
+                $q->where('agency_profile_id', $request->agency_id);
+            });
+            $placementsQuery->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });
         }
@@ -86,10 +95,39 @@ class DashboardController extends Controller
         $totalActive = (clone $applicationsQuery)->where('status', 'active')->count();
         $totalAccepted = (clone $applicationsQuery)->whereIn('status', ['accepted', 'active', 'completed'])->count();
         $totalCompleted = (clone $applicationsQuery)->where('status', 'completed')->count();
-        $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'verified'])->count();
+        $totalPending = (clone $applicationsQuery)->whereIn('status', ['pending', 'waiting_approval'])->count();
         $totalResigned = (clone $applicationsQuery)->where('status', 'resigned')->count();
 
-        // Sebaran Dinas / Instansi Penempatan
+        // Sebaran Bidang / Divisi Penempatan di Dispusip Surabaya
+        $units = Unit::with('agencyProfile')->orderBy('name')->get();
+        $unitDistribution = [];
+
+        foreach ($units as $u) {
+            $count = $allApplications->filter(function ($app) use ($u) {
+                return (int) $app->unit_id === (int) $u->id;
+            })->count();
+
+            $unitDistribution[] = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'quota' => (int) $u->quota,
+                'count' => $count,
+                'percentage' => $totalStudents > 0 ? round(($count / $totalStudents) * 100, 1) : 0,
+            ];
+        }
+
+        usort($unitDistribution, function ($a, $b) {
+            if ($b['count'] === $a['count']) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+
+            return $b['count'] <=> $a['count'];
+        });
+
+        $totalUnitsCount = count($unitDistribution);
+        $activeUnitsCount = count(array_filter($unitDistribution, fn ($d) => $d['count'] > 0));
+
+        // Sebaran Dinas / Instansi Penempatan (Fallback kompatibilitas)
         $agencies = AgencyProfile::orderBy('agency_name')->get();
         $agencyDistribution = [];
 
@@ -147,6 +185,10 @@ class DashboardController extends Controller
             'university',
             'allApplications',
             'stats',
+            'unitDistribution',
+            'units',
+            'totalUnitsCount',
+            'activeUnitsCount',
             'agencyDistribution',
             'agencies',
             'availableDosens',
@@ -223,6 +265,7 @@ class DashboardController extends Controller
         // Query Semua Pengajuan Mahasiswa Asal Kampus Ini
         $applications = Application::with([
             'user.studentProfile',
+            'group',
             'unit.agencyProfile',
             'placement.mentor',
             'placement.academicAdvisor',
@@ -259,6 +302,8 @@ class DashboardController extends Controller
                 'No',
                 'NIM',
                 'Nama Mahasiswa',
+                'Tipe Pendaftaran',
+                'Kelompok Magang',
                 'Program Studi',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
@@ -293,10 +338,17 @@ class DashboardController extends Controller
                     ? date('d/m/Y', strtotime($app->start_date)).' s.d. '.date('d/m/Y', strtotime($app->end_date))
                     : '-';
 
+                $tipePendaftaran = $app->isGroup()
+                    ? ('Kelompok ('.($app->isGroupLeader() ? 'Ketua' : 'Anggota').')')
+                    : 'Individu';
+                $namaKelompok = $app->group?->name ?? '-';
+
                 fputcsv($handle, [
                     $no++,
                     $profile?->nim ?? '-',
                     $student?->name ?? '-',
+                    $tipePendaftaran,
+                    $namaKelompok,
                     $profile?->jurusan ?? '-',
                     $app->unit?->agencyProfile?->agency_name ?? '-',
                     $app->unit?->name ?? '-',
@@ -367,6 +419,7 @@ class DashboardController extends Controller
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'academicAdvisor',
@@ -374,6 +427,7 @@ class DashboardController extends Controller
                 $q->orderBy('date', 'desc');
             },
             'finalreport',
+            'internshipProjects',
             'evaluation',
         ])->find($id);
 
@@ -385,6 +439,7 @@ class DashboardController extends Controller
             $appCandidate = Application::with([
                 'user.studentProfile',
                 'unit.agencyProfile',
+                'group',
                 'placement.mentor',
                 'placement.pembimbing',
                 'placement.academicAdvisor',
@@ -392,6 +447,7 @@ class DashboardController extends Controller
                     $q->orderBy('date', 'desc');
                 },
                 'placement.finalreport',
+                'placement.internshipProjects',
                 'placement.evaluation',
             ])->find($id);
 

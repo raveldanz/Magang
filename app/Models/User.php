@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role', 'status', 'agency_profile_id', 'university', 'university_id', 'last_notification_read_at', 'phone'])]
+#[Fillable(['name', 'email', 'password', 'role', 'status', 'agency_profile_id', 'unit_id', 'university', 'university_id', 'last_notification_read_at', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -66,6 +66,63 @@ class User extends Authenticatable
             || ($this->role === 'admin' && is_null($this->agency_profile_id));
     }
 
+    /**
+     * Supervisor = Tim Kerja Umum dan Kepegawaian Dispusip.
+     */
+    public function isSupervisor(): bool
+    {
+        return $this->role === 'supervisor';
+    }
+
+    /**
+     * Memeriksa apakah user adalah Admin Bidang spesifik.
+     */
+    public function isBidangAdmin(): bool
+    {
+        return $this->role === 'admin' && ! is_null($this->unit_id);
+    }
+
+    /**
+     * Memeriksa apakah user memiliki akses dinas keseluruhan (Super Admin atau Admin Dinas tanpa unit khusus).
+     */
+    public function isAgencyWideAdmin(): bool
+    {
+        return $this->isSuperAdmin() || ($this->role === 'admin' && is_null($this->unit_id));
+    }
+
+    /**
+     * Standarisasi label role pengguna untuk seluruh antarmuka sistem.
+     */
+    public function roleLabel(): string
+    {
+        if ($this->isSuperAdmin()) {
+            return 'Super Admin';
+        }
+
+        if ($this->role === 'admin') {
+            if ($this->unit_id) {
+                $unit = $this->relationLoaded('unit') ? $this->unit : Unit::find($this->unit_id);
+                return $unit ? 'Admin ' . $unit->name : 'Admin Bidang';
+            }
+            return 'Admin Dispusip';
+        }
+
+        return match ($this->role) {
+            'super_admin' => 'Super Admin',
+            'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
+            'mentor', 'pembimbing' => 'Pembimbing Lapangan',
+            'lecturer', 'dosen', 'academic_advisor' => 'Dosen Pembimbing',
+            'university', 'universitas' => 'Admin Universitas',
+            'student', 'mahasiswa' => 'Mahasiswa Magang',
+            default => ucwords(str_replace('_', ' ', (string) $this->role)),
+        };
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return $this->roleLabel();
+    }
+
     public function studentProfile()
     {
         return $this->hasOne(StudentProfile::class);
@@ -74,6 +131,11 @@ class User extends Authenticatable
     public function agencyProfile()
     {
         return $this->belongsTo(AgencyProfile::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
     public function university()

@@ -18,7 +18,7 @@ class AgencyProfile extends Model
 
     /**
      * URL logo instansi yang benar-benar ada.
-     * Logo bisa tersimpan di public/ (mis. "images/logos/diskominfo.png") atau di disk public
+     * Logo bisa tersimpan di public/ (mis. "images/logos/dispusip.png") atau di disk public
      * (storage/app/public, diakses lewat /storage/...). Fallback ke logo default.
      */
     public function getLogoUrlAttribute(): string

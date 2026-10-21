@@ -6,7 +6,7 @@
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun seluruh role: Mahasiswa, Admin Dinas, Mentor Lapangan, DPL Kampus, & Universitas
+                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, DPL Kampus, & Universitas
                 </p>
             </div>
 
@@ -124,7 +124,8 @@
                     <select name="role" x-model="role" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Dinas / Super Admin</option>
+                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
+                        <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Atasan (Supervisor)</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
                         <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing</option>
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
@@ -179,20 +180,20 @@
                 <!-- 1. Tampilan Tabel Desktop & Tablet (>= 768px) -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
-                        <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
+                        <thead class="bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px] select-none">
                             <tr>
-                                <th class="py-3.5 px-3 w-10 text-center">
+                                <th class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap">
                                     <input type="checkbox" 
                                            :checked="isAllSelected" 
                                            @change="toggleSelectAll()" 
                                            title="Pilih / Batalkan Semua Pengguna di Halaman Ini"
                                            class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
                                 </th>
-                                <th class="py-3.5 px-4">Pengguna</th>
-                                <th class="py-3.5 px-4">Role Sistem</th>
-                                <th class="py-3.5 px-4">Afiliasi / Instansi / Kampus</th>
-                                <th class="py-3.5 px-4 text-center">Status</th>
-                                <th class="py-3.5 px-4 text-right">Aksi Manajemen</th>
+                                <th class="py-3.5 px-4 text-left">Pengguna</th>
+                                <th class="py-3.5 px-4 text-left">Role Sistem</th>
+                                <th class="py-3.5 px-4 text-left">Instansi</th>
+                                <th class="py-3.5 px-4 text-center whitespace-nowrap">Status</th>
+                                <th class="py-3.5 px-6 sm:px-8 text-center whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -203,8 +204,8 @@
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition" :class="isSelected({{ $u->id }}) ? 'bg-blue-50/40' : ''">
                                     
-                                    <!-- Checkbox Selection -->
-                                    <td class="py-4 px-3 text-center whitespace-nowrap">
+                                    <!-- Checkbox Selection (pl-8 sm:pl-10 lega di ujung kiri, tidak mepet border) -->
+                                    <td class="py-4 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap">
                                         @if($canSelect)
                                             <input type="checkbox" 
                                                    :checked="isSelected({{ $u->id }})" 
@@ -217,62 +218,90 @@
                                         @endif
                                     </td>
 
-                                    <!-- User Info -->
-                                    <td class="py-4 px-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-blue-50 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs">
-                                                {{ strtoupper(substr($u->name, 0, 2)) }}
-                                            </div>
-                                            <div>
-                                                <div class="font-bold text-gray-900 text-xs sm:text-sm">{{ $u->name }}</div>
-                                                <div class="text-[11px] text-gray-500 font-mono">{{ $u->email }}</div>
-                                                @if($u->studentProfile?->nim)
-                                                    <div class="text-[10px] text-blue-600 font-mono">NIM: {{ $u->studentProfile?->nim }}</div>
-                                                @endif
-                                            </div>
+                                    <!-- User Info (Nama Dikebawahkan Rapi, Tidak Makan Banyak Tempat & Email & NIM) -->
+                                    <td class="py-4 px-4 min-w-[220px] max-w-[240px]">
+                                        <div>
+                                            <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug break-words">{{ $u->name }}</div>
+                                            <div class="text-[11px] text-gray-500 font-mono mt-0.5 truncate" title="{{ $u->email }}">{{ $u->email }}</div>
+                                            @if($u->studentProfile?->nim)
+                                                <div class="text-[10px] text-blue-600 font-mono mt-0.5">NIM: {{ $u->studentProfile?->nim }}</div>
+                                            @endif
                                         </div>
                                     </td>
 
-                                    <!-- Role Badge -->
-                                    <td class="py-4 px-4 whitespace-nowrap">
+                                    <!-- Role Badge (Kompak & Elegan, tidak bertumpuk/bertabrakan) -->
+                                    <td class="py-4 px-4 max-w-[220px]">
                                         @if($isSuperAdminUser)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-blue-100 text-blue-900 border border-blue-300">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black bg-blue-100 text-blue-900 border border-blue-300 whitespace-nowrap">
                                                 Super Admin
                                             </span>
                                         @elseif($u->role === 'admin')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                Admin Dinas
+                                            @if($u->unit_id)
+                                                <div class="space-y-1">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap">
+                                                        Admin Bidang
+                                                    </span>
+                                                    <div class="text-[11px] text-slate-600 font-medium leading-snug break-words">
+                                                        {{ $u->unit->name ?? 'Bidang' }}
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap">
+                                                    Admin Dispusip
+                                                </span>
+                                            @endif
+                                        @elseif($u->role === 'supervisor')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200 whitespace-nowrap">
+                                                Atasan (Supervisor)
                                             </span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
-                                                Mentor Dinas
-                                            </span>
+                                            @if($u->unit_id)
+                                                <div class="space-y-1">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200 whitespace-nowrap">
+                                                        Mentor Bidang
+                                                    </span>
+                                                    <div class="text-[11px] text-slate-600 font-medium leading-snug break-words">
+                                                        {{ $u->unit->name ?? 'Bidang' }}
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200 whitespace-nowrap">
+                                                    Mentor Dinas
+                                                </span>
+                                            @endif
                                         @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                Dosen DPL
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
+                                                Dosen Pembimbing
                                             </span>
                                         @elseif($u->role === 'universitas')
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200 whitespace-nowrap">
                                                 Universitas
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
                                                 Mahasiswa
                                             </span>
                                         @endif
                                     </td>
 
-                                    <!-- Affiliation -->
-                                    <td class="py-4 px-4 text-xs text-slate-600">
-                                        @if($u->agencyProfile)
-                                            <div class="font-semibold text-gray-800">{{ $u->agencyProfile->agency_name ?? $u->agencyProfile->name ?? 'Dinas Terkait' }}</div>
-                                            <div class="text-[10px] text-gray-400">{{ $u->agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}</div>
+                                    <!-- Instansi (Ringkas & Proporsional, teks membungkus rapi) -->
+                                    <td class="py-4 px-4 text-xs text-slate-600 max-w-[220px]">
+                                        @if($u->agencyProfile || in_array($u->role, ['admin', 'supervisor', 'mentor', 'pembimbing']))
+                                            <div class="font-semibold text-gray-800 text-xs">Dispusip Surabaya</div>
+                                            <div class="text-[10px] text-gray-400">Pemerintah Kota Surabaya</div>
                                         @elseif($u->role === 'mahasiswa')
-                                            <div class="font-semibold text-gray-800">{{ $u->studentProfile?->university?->name ?? $u->studentProfile?->universitas ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}</div>
-                                            <div class="text-[10px] text-gray-400">NIM: {{ $u->studentProfile?->nim ?? '-' }}</div>
+                                            @php
+                                                $univName = $u->studentProfile?->universitas ?? $u->studentProfile?->university?->name ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-';
+                                            @endphp
+                                            <div class="font-semibold text-gray-800 text-xs leading-snug break-words" title="{{ $univName }}">{{ $univName }}</div>
+                                            @if($u->studentProfile?->jurusan)
+                                                <div class="text-[10px] text-gray-400 mt-0.5 leading-snug break-words" title="{{ $u->studentProfile->jurusan }}">{{ $u->studentProfile->jurusan }}</div>
+                                            @endif
                                         @elseif(in_array($u->role, ['dosen', 'academic_advisor', 'universitas']))
-                                            <div class="font-semibold text-gray-800">{{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}</div>
-                                            <div class="text-[10px] text-gray-400">Mitra Perguruan Tinggi</div>
+                                            @php
+                                                $univName = $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-';
+                                            @endphp
+                                            <div class="font-semibold text-gray-800 text-xs leading-snug break-words" title="{{ $univName }}">{{ $univName }}</div>
                                         @else
                                             <span class="text-xs text-gray-400">-</span>
                                         @endif
@@ -283,16 +312,16 @@
                                         <x-status-badge type="account" :status="$u->status ?? 'active'" />
                                     </td>
 
-                                    <!-- Action Buttons -->
-                                    <td class="py-4 px-4 text-right whitespace-nowrap">
-                                        <div class="inline-flex items-center justify-end gap-1.5 align-middle">
+                                    <!-- Action Buttons (px-6 sm:px-8 center-aligned and balanced) -->
+                                    <td class="py-4 px-6 sm:px-8 text-center whitespace-nowrap">
+                                        <div class="inline-flex items-center justify-center gap-1.5 align-middle">
 
                                             <!-- Tombol Impersonate / Login As -->
                                             @if($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser)
                                                 <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="inline-flex items-center m-0 p-0 align-middle">
                                                     @csrf
                                                     <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)"
-                                                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800">
+                                                            class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800 cursor-pointer">
                                                         Login As
                                                     </button>
                                                 </form>
@@ -311,9 +340,9 @@
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
                                                             name: '{{ addslashes($u->name) }}',
                                                             email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ strtoupper($u->role) }}'
+                                                            role: '{{ addslashes($u->roleLabel()) }}'
                                                         })" 
-                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white" 
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white cursor-pointer" 
                                                         title="Reset password ke default: password">
                                                     Reset
                                                 </button>
@@ -326,9 +355,9 @@
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
                                                             name: '{{ addslashes($u->name) }}',
-                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
+                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
-                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white" 
+                                                        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white cursor-pointer" 
                                                         title="Hapus Pengguna">
                                                     Hapus
                                                 </button>
@@ -350,10 +379,10 @@
                 </div>
 
                 <!-- 2. Tampilan Kartu Khusus Mobile (< 768px) -->
-                <div class="md:hidden">
+                <div class="md:hidden bg-slate-50/70 p-3 sm:p-4 space-y-3">
                     <!-- Mobile Select All Bar -->
-                    <div class="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100 text-xs text-slate-600">
-                        <label class="inline-flex items-center gap-2 font-bold cursor-pointer select-none">
+                    <div class="flex items-center justify-between px-3.5 py-2.5 bg-white rounded-xl border border-slate-200/80 shadow-2xs text-xs text-slate-700">
+                        <label class="inline-flex items-center gap-2.5 font-bold cursor-pointer select-none">
                             <input type="checkbox" 
                                    :checked="isAllSelected" 
                                    @change="toggleSelectAll()" 
@@ -365,16 +394,21 @@
                         </span>
                     </div>
 
-                    <!-- Mobile List Cards -->
-                    <div class="divide-y divide-gray-100">
+                    <!-- Mobile Individual User Cards -->
+                    <div class="space-y-3">
                         @forelse($users as $u)
                             @php
                                 $isSuperAdminUser = $u->isSuperAdmin();
                                 $canSelect = ($u->id !== $currentUser->id && !$isSuperAdminUser);
+                                $showLoginAs = ($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser);
+                                $showReset = (!$isSuperAdminUser || $u->id !== $currentUser->id);
+                                $showDelete = ($u->id !== $currentUser->id && !$isSuperAdminUser);
                             @endphp
-                            <div class="p-4 space-y-3 transition" :class="isSelected({{ $u->id }}) ? 'bg-blue-50/50' : 'hover:bg-slate-50/50'">
-                                <!-- Top: Checkbox, Avatar, Nama, Email, Status -->
-                                <div class="flex items-start justify-between gap-2.5">
+                            <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-2xs transition-all space-y-3"
+                                 :class="isSelected({{ $u->id }}) ? 'ring-2 ring-blue-500 bg-blue-50/20' : 'hover:border-slate-300'">
+                                
+                                <!-- 1. Identitas Atas & Status Badge -->
+                                <div class="flex items-start justify-between gap-3">
                                     <div class="flex items-start gap-2.5 min-w-0">
                                         <div class="pt-0.5 shrink-0">
                                             @if($canSelect)
@@ -389,17 +423,14 @@
                                             @endif
                                         </div>
 
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-blue-50 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0 shadow-2xs">
-                                                {{ strtoupper(substr($u->name, 0, 2)) }}
-                                            </div>
-                                            <div class="min-w-0">
-                                                <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug break-words">{{ $u->name }}</div>
-                                                <div class="text-[11px] text-gray-500 font-mono break-all">{{ $u->email }}</div>
-                                                @if($u->studentProfile?->nim)
-                                                    <div class="text-[10px] text-blue-600 font-mono font-semibold">NIM: {{ $u->studentProfile?->nim }}</div>
-                                                @endif
-                                            </div>
+                                        <div class="min-w-0">
+                                            <div class="font-bold text-slate-900 text-sm leading-snug break-words">{{ $u->name }}</div>
+                                            <div class="text-[11px] text-slate-500 font-mono mt-0.5 break-all">{{ $u->email }}</div>
+                                            @if($u->studentProfile?->nim)
+                                                <div class="inline-flex items-center mt-1 text-[10px] font-mono font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                                                    NIM: {{ $u->studentProfile?->nim }}
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -409,107 +440,178 @@
                                     </div>
                                 </div>
 
-                                <!-- Role & Affiliation Info Box -->
-                                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Role Sistem:</span>
-                                        <div>
-                                            @if($isSuperAdminUser)
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 border border-blue-300">
-                                                    Super Admin
+                                <!-- 2. Meta Strip: Role & Instansi -->
+                                <div class="pt-2 border-t border-slate-100/80 flex flex-col gap-1.5 text-xs">
+                                    <!-- Role Pill -->
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        @if($isSuperAdminUser)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black bg-blue-100 text-blue-900 border border-blue-300">
+                                                Super Admin
+                                            </span>
+                                        @elseif($u->role === 'admin')
+                                            @if($u->unit_id)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                                                    Admin Bidang
                                                 </span>
-                                            @elseif($u->role === 'admin')
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                                    Admin Dinas
-                                                </span>
-                                            @elseif(in_array($u->role, ['mentor', 'pembimbing']))
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
-                                                    Mentor Dinas
-                                                </span>
-                                            @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                    Dosen DPL
-                                                </span>
-                                            @elseif($u->role === 'universitas')
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                                                    Universitas
+                                                <span class="text-[11px] text-slate-600 font-medium truncate max-w-[200px]">
+                                                    {{ $u->unit->name ?? 'Bidang' }}
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                    Mahasiswa
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                                                    Admin Dispusip
                                                 </span>
                                             @endif
-                                        </div>
+                                        @elseif($u->role === 'supervisor')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                                Atasan (Supervisor)
+                                            </span>
+                                        @elseif(in_array($u->role, ['mentor', 'pembimbing']))
+                                            @if($u->unit_id)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
+                                                    Mentor Bidang
+                                                </span>
+                                                <span class="text-[11px] text-slate-600 font-medium truncate max-w-[200px]">
+                                                    {{ $u->unit->name ?? 'Bidang' }}
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
+                                                    Mentor Dinas
+                                                </span>
+                                            @endif
+                                        @elseif(in_array($u->role, ['dosen', 'academic_advisor']))
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                Dosen Pembimbing
+                                            </span>
+                                        @elseif($u->role === 'universitas')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                                                Universitas
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                Mahasiswa
+                                            </span>
+                                        @endif
                                     </div>
 
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 shrink-0">Afiliasi:</span>
-                                        <div class="text-right text-[11px] font-semibold text-slate-700 truncate">
-                                            @if($u->agencyProfile)
-                                                <span>{{ $u->agencyProfile->agency_name ?? $u->agencyProfile->name ?? 'Dinas Terkait' }}</span>
+                                    <!-- Instansi -->
+                                    <div class="flex items-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                        <span class="truncate">
+                                            @if($u->agencyProfile || in_array($u->role, ['admin', 'supervisor', 'mentor', 'pembimbing']))
+                                                Dispusip Surabaya <span class="text-slate-400 text-[10px] font-normal">&bull; Pemkot Surabaya</span>
                                             @elseif($u->role === 'mahasiswa')
-                                                <span>{{ $u->studentProfile?->university?->name ?? $u->studentProfile?->universitas ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}</span>
+                                                {{ $u->studentProfile?->universitas ?? $u->studentProfile?->university?->name ?? (is_string($u->university) ? $u->university : $u->university?->name) ?? '-' }}
                                             @elseif(in_array($u->role, ['dosen', 'academic_advisor', 'universitas']))
-                                                <span>{{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}</span>
+                                                {{ $u->university?->name ?? (is_string($u->university) ? $u->university : null) ?? '-' }}
                                             @else
                                                 <span class="text-slate-400 font-normal">-</span>
                                             @endif
-                                        </div>
+                                        </span>
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons in Mobile (Touch Friendly & Responsive) -->
-                                <div class="pt-2 border-t border-gray-100 flex flex-wrap items-center gap-2 justify-end">
-                                    @if($isSuperAdmin && $u->id !== $currentUser->id && !$isSuperAdminUser)
-                                        <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="inline-block m-0">
-                                            @csrf
-                                            <button type="submit" title="Masuk sebagai {{ $u->name }} (Login As)"
-                                                    class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 font-bold text-xs rounded-xl shadow-2xs transition active:scale-95 cursor-pointer">
-                                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                                                <span>Login As</span>
-                                            </button>
-                                        </form>
-                                    @endif
+                                <!-- 3. Action Buttons Mobile: Dedicated Symmetrical Grid Action Bar -->
+                                <div class="pt-2.5 border-t border-slate-100">
+                                    @if($showLoginAs)
+                                        <!-- Format 4 Tombol: 2x2 Grid Simetris Sempurna -->
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <!-- Login As -->
+                                            <form action="{{ route('admin.impersonate', $u->id) }}" method="POST" class="m-0">
+                                                @csrf
+                                                <button type="submit" 
+                                                        title="Masuk sebagai {{ $u->name }} (Login As)"
+                                                        class="w-full py-2 px-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                                                    <span>Login As</span>
+                                                </button>
+                                            </form>
 
-                                    <a href="{{ route('admin.users.edit', $u->id) }}" 
-                                       class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs rounded-xl transition active:scale-95">
-                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                        <span>Edit</span>
-                                    </a>
+                                            <!-- Edit -->
+                                            <a href="{{ route('admin.users.edit', $u->id) }}" 
+                                               class="w-full py-2 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 text-center">
+                                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                <span>Edit</span>
+                                            </a>
 
-                                    @if(!$isSuperAdminUser || $u->id !== $currentUser->id)
-                                        <button type="button" 
-                                                @click="$dispatch('open-reset-modal', {
-                                                    action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                    name: '{{ addslashes($u->name) }}',
-                                                    email: '{{ addslashes($u->email) }}',
-                                                    role: '{{ strtoupper($u->role) }}'
-                                                })" 
-                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer" 
-                                                title="Reset password ke default: password">
-                                            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                                            <span>Reset</span>
-                                        </button>
-                                    @endif
+                                            <!-- Reset -->
+                                            @if($showReset)
+                                                <button type="button" 
+                                                        @click="$dispatch('open-reset-modal', {
+                                                            action: '{{ route('admin.users.reset_password', $u->id) }}',
+                                                            name: '{{ addslashes($u->name) }}',
+                                                            email: '{{ addslashes($u->email) }}',
+                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                        })" 
+                                                        class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
+                                                        title="Reset password ke default: password">
+                                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                                    <span>Reset</span>
+                                                </button>
+                                            @endif
 
-                                    @if($u->id !== $currentUser->id && !$isSuperAdminUser)
-                                        <button type="button" 
-                                                @click="$dispatch('open-delete-modal', {
-                                                    action: '{{ route('admin.users.destroy', $u->id) }}',
-                                                    title: 'Hapus Akun Pengguna',
-                                                    name: '{{ addslashes($u->name) }}',
-                                                    desc: 'Email: {{ $u->email }} &bull; Role: {{ strtoupper($u->role) }}'
-                                                })" 
-                                                class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
-                                                title="Hapus Pengguna">
-                                            <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            <span>Hapus</span>
-                                        </button>
+                                            <!-- Hapus -->
+                                            @if($showDelete)
+                                                <button type="button" 
+                                                        @click="$dispatch('open-delete-modal', {
+                                                            action: '{{ route('admin.users.destroy', $u->id) }}',
+                                                            title: 'Hapus Akun Pengguna',
+                                                            name: '{{ addslashes($u->name) }}',
+                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
+                                                        })" 
+                                                        class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                                                        title="Hapus Pengguna">
+                                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <!-- Format Non-SuperAdmin: Grid Proporsional -->
+                                        <div class="grid {{ ($showReset && $showDelete) ? 'grid-cols-3' : (($showReset || $showDelete) ? 'grid-cols-2' : 'grid-cols-1') }} gap-2">
+                                            <!-- Edit -->
+                                            <a href="{{ route('admin.users.edit', $u->id) }}" 
+                                               class="w-full py-2 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 text-center">
+                                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                <span>Edit</span>
+                                            </a>
+
+                                            <!-- Reset -->
+                                            @if($showReset)
+                                                <button type="button" 
+                                                        @click="$dispatch('open-reset-modal', {
+                                                            action: '{{ route('admin.users.reset_password', $u->id) }}',
+                                                            name: '{{ addslashes($u->name) }}',
+                                                            email: '{{ addslashes($u->email) }}',
+                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                        })" 
+                                                        class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
+                                                        title="Reset password ke default: password">
+                                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                                    <span>Reset</span>
+                                                </button>
+                                            @endif
+
+                                            <!-- Hapus -->
+                                            @if($showDelete)
+                                                <button type="button" 
+                                                        @click="$dispatch('open-delete-modal', {
+                                                            action: '{{ route('admin.users.destroy', $u->id) }}',
+                                                            title: 'Hapus Akun Pengguna',
+                                                            name: '{{ addslashes($u->name) }}',
+                                                            desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
+                                                        })" 
+                                                        class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                                                        title="Hapus Pengguna">
+                                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            @endif
+                                        </div>
                                     @endif
                                 </div>
                             </div>
                         @empty
-                            <div class="py-12 text-center text-gray-400 text-xs">
+                            <div class="py-12 text-center text-gray-400 text-xs bg-white rounded-2xl border border-slate-200/80">
                                 Tidak ada data pengguna yang sesuai filter.
                             </div>
                         @endforelse

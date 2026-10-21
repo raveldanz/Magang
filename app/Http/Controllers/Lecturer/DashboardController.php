@@ -39,6 +39,19 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $lecturer = Auth::user();
+
+        // On-the-fly auto-activation bagi mahasiswa bimbingan yang sudah tiba tanggal mulainya
+        $startedApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::ACCEPTED)
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', now()->toDateString())
+            ->whereHas('placement', function ($q) use ($lecturer) {
+                $q->where('academic_advisor_id', $lecturer->id);
+            })
+            ->get();
+        foreach ($startedApps as $stApp) {
+            $stApp->autoActivateIfStarted();
+        }
+
         $query = $this->getLecturerPlacementsQuery();
 
         if ($request->filled('search')) {
@@ -54,7 +67,11 @@ class DashboardController extends Controller
             });
         }
 
-        if ($request->filled('agency_id')) {
+        if ($request->filled('unit_id')) {
+            $query->whereHas('application', function ($q) use ($request) {
+                $q->where('unit_id', $request->unit_id);
+            });
+        } elseif ($request->filled('agency_id')) {
             $query->whereHas('application.unit', function ($q) use ($request) {
                 $q->where('agency_profile_id', $request->agency_id);
             });
@@ -111,12 +128,14 @@ class DashboardController extends Controller
             $eval = $p->evaluation;
             $hasScore = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->dosenAspectScore('score_mastery') ?? 0) > 0);
             $app = $p->application;
-            if (!$app || $app->status === 'completed' || $app->status === 'rejected') return false;
+            if (!$app) return false;
+            $statusVal = $app->statusValue();
+            if (in_array($statusVal, ['completed', 'rejected', 'resigned'], true)) return false;
 
             $endDate = $app->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
             $isNearEnd = $endDate && $endDate->diffInDays(\Carbon\Carbon::now(), false) >= -14;
 
-            return !$hasScore && ($isNearEnd || $app->status === 'active');
+            return !$hasScore && ($isNearEnd || $statusVal === 'active');
         });
 
         $supervisedPlacementIds = $placements->pluck('id')->toArray();
@@ -131,8 +150,9 @@ class DashboardController extends Controller
         ];
 
         $agencies = AgencyProfile::all();
+        $units = \App\Models\Unit::orderBy('name')->get();
 
-        return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies', 'actionAlerts'));
+        return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies', 'units', 'actionAlerts'));
     }
 
     /**
@@ -146,19 +166,23 @@ class DashboardController extends Controller
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'logbooks',
             'finalreport',
+            'internshipProjects',
             'evaluation',
             'academicConsultations',
         ])->find($placementId) ?? Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'logbooks',
             'finalreport',
+            'internshipProjects',
             'evaluation',
             'academicConsultations',
         ])->where('application_id', $placementId)->firstOrFail();

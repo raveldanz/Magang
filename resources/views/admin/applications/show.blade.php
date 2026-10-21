@@ -61,6 +61,72 @@
                 </div>
             @endif
 
+            @if($application->group_id && $application->group)
+                <!-- Panel Terintegrasi Kelompok Magang -->
+                <div class="bg-gradient-to-r from-indigo-50/90 via-blue-50/50 to-white rounded-2xl border border-indigo-200 p-5 sm:p-6 shadow-2xs space-y-3.5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-full bg-indigo-600 text-white font-black text-[10px] uppercase tracking-wider">Pengajuan Kelompok</span>
+                                    <span class="text-xs font-mono font-bold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-md">Kode: {{ $application->group->code }}</span>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ $application->group->name }}</h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-600">Peran Pemohon:</span>
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold {{ $application->role_in_group === 'leader' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-blue-100 text-blue-900 border border-blue-200' }}">
+                                {{ $application->role_in_group === 'leader' ? '⭐ Ketua Kelompok' : 'Anggota Tim' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Anggota Tim -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs text-slate-700 font-bold">
+                            <span>Anggota Tim Terdaftar ({{ $application->group->applications->count() }} Mahasiswa):</span>
+                            @if($application->group->proposal_letter_path)
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('documents.group.proposal', $application->group->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span>Lihat Proposal</span>
+                                    </a>
+                                    <a href="{{ route('documents.group.proposal.download', $application->group->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer" title="Unduh Proposal Kelompok">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span>Unduh</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                            @foreach($application->group->applications as $grpMember)
+                                <a href="{{ route('admin.applications.show', $grpMember->id) }}"
+                                   class="p-3 rounded-xl border transition flex items-center justify-between {{ $grpMember->id === $application->id ? 'bg-indigo-100/80 border-indigo-300 font-bold text-indigo-950 ring-2 ring-indigo-400/30' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-800' }}">
+                                    <div class="min-w-0 pr-2">
+                                        <div class="text-xs truncate font-bold text-slate-900">{{ $grpMember->user?->name }}</div>
+                                        <div class="text-[11px] text-slate-500 font-mono">NIM: {{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase {{ $grpMember->role_in_group === 'leader' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600' }}">
+                                            {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
+                                        </span>
+                                        <div class="mt-0.5">
+                                            <span class="text-[10px] font-bold {{ $grpMember->statusValue() === 'accepted' ? 'text-emerald-700' : ($grpMember->statusValue() === 'rejected' ? 'text-rose-700' : 'text-slate-500') }}">
+                                                {{ ucfirst($grpMember->statusValue()) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- 1. Data Profil & Pengajuan Mahasiswa -->
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
                 <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100 mb-5">
@@ -120,7 +186,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @forelse ($application->documents as $doc)
                         <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-blue-200 transition">
-                            <div class="flex items-center gap-3 min-w-0">
+                            <div class="flex items-center gap-3 min-w-0 mr-3">
                                 <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
                                     PDF
                                 </div>
@@ -129,16 +195,19 @@
                                     <div class="text-[11px] text-slate-400 mt-0.5">Format dokumen terverifikasi</div>
                                 </div>
                             </div>
-                            <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                <span>Lihat PDF</span>
-                            </a>
-                            <a href="{{ route('documents.application.download', $doc->id) }}"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer"
-                               title="Unduh berkas">
-                                <span>Unduh</span>
-                            </a>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    <span>Lihat PDF</span>
+                                </a>
+                                <a href="{{ route('documents.application.download', $doc->id) }}"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer"
+                                   title="Unduh berkas">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>Unduh</span>
+                                </a>
+                            </div>
                         </div>
                     @empty
                         <div class="col-span-2 p-6 text-center text-xs text-slate-400">
@@ -280,25 +349,29 @@
                     @method('PUT')
 
                     @php
+                        $userAuth = auth()->user();
+                        $isSupervisorOrSuperAdmin = ($userAuth && ($userAuth->role === 'supervisor' || $userAuth->isSuperAdmin()));
                         $canComplete = $application->can_complete;
+                        $isAlreadyRejected = ($currentStatusVal === 'rejected');
+                        
+                        // Menentukan fase siklus: Tahap seleksi awal (belum diterima) vs Tahap magang aktif
+                        $isInitialStage = in_array($currentStatusVal, ['pending', 'waiting_approval', 'rejected'], true);
+                        
+                        // Kunci status ACCEPTED bagi staf biasa jika berada di waiting_approval
+                        $isWaitingApproval = ($currentStatusVal === 'waiting_approval');
+                        $isAcceptLockedForStaff = ($isWaitingApproval && !$isSupervisorOrSuperAdmin);
                     @endphp
 
                     <!-- Form Status Pipeline (Synchronized with visual cards) -->
                     <select id="status-select" name="status" x-model="status" class="hidden" aria-hidden="true">
                         <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::PENDING->label() }}</option>
-                        <option value="verified" {{ $currentStatus == 'verified' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::VERIFIED->label() }}</option>
+                        <option value="waiting_approval" {{ $currentStatus == 'waiting_approval' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</option>
                         <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</option>
                         <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</option>
                         <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</option>
                         <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</option>
                         <option value="resigned" {{ $currentStatus == 'resigned' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</option>
                     </select>
-
-                    @php
-                        $isAlreadyRejected = ($currentStatusVal === 'rejected');
-                        $isAcceptDisabled = !in_array($currentStatusVal, ['pending', 'verified', 'accepted'], true);
-                        $isRejectDisabled = !in_array($currentStatusVal, ['pending', 'verified', 'rejected'], true);
-                    @endphp
 
                     @if($isAlreadyRejected)
                         <div class="mb-5 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3">
@@ -312,194 +385,246 @@
                         </div>
                     @endif
 
-                    <!-- Interactive Status Selection Cards (7 Status Pipeline Baku) -->
+                    <!-- Interactive Status Selection Cards (Context-Aware Pipeline) -->
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                            Pilih Status Keputusan Pengajuan (Pipeline Terpadu)
+                            Pilih Status Keputusan Pengajuan
                         </label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
-                            
-                            <!-- 1. PENDING -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'pending'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                                    <span :class="status === 'pending' ? 'opacity-100 text-amber-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::PENDING->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::PENDING->description() }}</div>
-                                </div>
-                            </button>
 
-                            <!-- 2. VERIFIED -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'verified'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'verified' ? 'border-sky-400 bg-sky-50/70 ring-2 ring-sky-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-                                    <span :class="status === 'verified' ? 'opacity-100 text-sky-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::VERIFIED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::VERIFIED->description() }}</div>
-                                </div>
-                            </button>
-
-                            <!-- 3. ACCEPTED -->
-                            <button type="button" 
-                                    @if(!$isAcceptDisabled) @click="status = 'accepted'" @endif
-                                    {{ $isAcceptDisabled ? 'disabled title="Aksi persetujuan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
-                                    :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $isAcceptDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                                    <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                        {{ $isAcceptDisabled && $currentStatusVal !== 'accepted' ? 'Hanya dari PENDING atau VERIFIED' : \App\Enums\ApplicationStatus::ACCEPTED->description() }}
+                        @if($isInitialStage)
+                            {{-- FASE 1: SELEKSI AWAL (Hanya Tampilkan PENDING, WAITING_APPROVAL, ACCEPTED, REJECTED) --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                                
+                                <!-- 1. PENDING -->
+                                <button type="button" 
+                                        @if(!$isAlreadyRejected) @click="status = 'pending'" @endif
+                                        {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                        :class="status === 'pending' ? 'border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                        <span :class="status === 'pending' ? 'opacity-100 text-amber-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
                                     </div>
-                                </div>
-                            </button>
-
-                            <!-- 4. ACTIVE -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'active'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                    <span :class="status === 'active' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
-                                </div>
-                            </button>
-
-                            <!-- 5. COMPLETED -->
-                            @php
-                                $canComplete = $application->can_complete;
-                                $isCompleteDisabled = (!$canComplete && $currentStatusVal !== 'completed') || $isAlreadyRejected;
-
-                                $completedSubtitle = \App\Enums\ApplicationStatus::COMPLETED->description();
-                                if ($isAlreadyRejected) {
-                                    $completedSubtitle = 'Pengajuan Ditolak';
-                                } elseif ($isCompleteDisabled) {
-                                    $missingItems = [];
-                                    if (!$application->has_filled_logbook) {
-                                        $missingItems[] = 'Logbook';
-                                    }
-                                    if (!$application->has_approved_report) {
-                                        $missingItems[] = 'Laporan';
-                                    }
-                                    if (!$application->has_complete_evaluation) {
-                                        $missingItems[] = 'Nilai';
-                                    }
-
-                                    if (!empty($missingItems)) {
-                                        $completedSubtitle = implode(' & ', $missingItems) . ' Belum Lengkap';
-                                    } else {
-                                        $completedSubtitle = 'Syarat Belum Terpenuhi';
-                                    }
-                                }
-                            @endphp
-                            <button type="button" 
-                                    @if(!$isCompleteDisabled)
-                                        @click="status = 'completed'"
-                                    @endif
-                                    @if($isCompleteDisabled)
-                                        disabled
-                                        title="{{ $completedSubtitle }}"
-                                    @endif
-                                    :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                                    <span :class="status === 'completed' ? 'opacity-100 text-blue-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1">
-                                        <span>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
-                                        @if($isCompleteDisabled)
-                                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                        @endif
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::PENDING->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::PENDING->description() }}</div>
                                     </div>
-                                    <div class="text-[11px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
-                                        {{ $completedSubtitle }}
+                                </button>
+
+                                <!-- 2. WAITING_APPROVAL (Ajukan ACC ke Atasan) -->
+                                <button type="button" 
+                                        @if(!$isAlreadyRejected) @click="status = 'waiting_approval'" @endif
+                                        {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                        :class="status === 'waiting_approval' ? 'border-purple-500 bg-purple-50/70 ring-2 ring-purple-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-purple-200 hover:bg-purple-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block shrink-0" style="background-color: #a855f7;"></span>
+                                        <span :class="status === 'waiting_approval' ? 'opacity-100 text-purple-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
                                     </div>
-                                </div>
-                            </button>
-
-                            <!-- 6. REJECTED -->
-                            <button type="button" 
-                                    @if(!$isRejectDisabled) @click="status = 'rejected'" @endif
-                                    {{ $isRejectDisabled ? 'disabled title="Aksi penolakan hanya dapat dilakukan pada pengajuan berstatus PENDING atau VERIFIED"' : '' }}
-                                    :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : '{{ $isRejectDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                                    <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                                        {{ $isRejectDisabled && $currentStatusVal !== 'rejected' ? 'Hanya dari PENDING atau VERIFIED' : \App\Enums\ApplicationStatus::REJECTED->description() }}
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->description() }}</div>
                                     </div>
-                                </div>
-                            </button>
+                                </button>
 
-                            <!-- 7. RESIGNED -->
-                            <button type="button" 
-                                    @if(!$isAlreadyRejected) @click="status = 'resigned'" @endif
-                                    {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
-                                    :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer' }}'"
-                                    class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-                                    <span :class="status === 'resigned' ? 'opacity-100 text-slate-700' : 'opacity-0'" class="transition-opacity">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    </span>
-                                </div>
-                                <div>
-                                    <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</div>
-                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::RESIGNED->description() }}</div>
-                                </div>
-                            </button>
+                                <!-- 3. ACCEPTED (Hanya bisa aktif setelah di-ACC oleh Atasan) -->
+                                @php
+                                    $acceptButtonDisabled = $isAlreadyRejected || $isAcceptLockedForStaff;
+                                    $acceptButtonTooltip = $isAlreadyRejected ? 'Pengajuan telah ditolak' : ($isAcceptLockedForStaff ? 'Persetujuan akhir (ACC) hanya dapat disahkan oleh Atasan (Supervisor) atau Super Admin.' : '');
+                                @endphp
+                                <button type="button" 
+                                        @if(!$acceptButtonDisabled) @click="status = 'accepted'" @endif
+                                        @if($acceptButtonDisabled) disabled title="{{ $acceptButtonTooltip }}" @endif
+                                        :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : '{{ $acceptButtonDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                        <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1.5">
+                                            <span>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</span>
+                                            @if($isAcceptLockedForStaff)
+                                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Kunci ACC</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                            @if($isAcceptLockedForStaff)
+                                                Menunggu ACC Atasan Tim Kerja Umum
+                                            @elseif(!$isSupervisorOrSuperAdmin && $currentStatusVal === 'pending')
+                                                Usulkan pengesahan penerimaan ke Atasan
+                                            @else
+                                                {{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </button>
 
-                        </div>
+                                <!-- 4. REJECTED -->
+                                <button type="button" 
+                                        @if(!$isAlreadyRejected) @click="status = 'rejected'" @endif
+                                        {{ $isAlreadyRejected ? 'disabled title="Pengajuan telah ditolak"' : '' }}
+                                        :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : '{{ $isAlreadyRejected ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer' }}'"
+                                        class="p-3.5 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                        <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::REJECTED->description() }}</div>
+                                    </div>
+                                </button>
+
+                            </div>
+                        @else
+                            {{-- FASE 2: MASA MAGANG BERJALAN (Tampilkan ACCEPTED, ACTIVE, COMPLETED, RESIGNED, REJECTED) --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                                
+                                <!-- 1. ACCEPTED -->
+                                <button type="button" 
+                                        @click="status = 'accepted'"
+                                        :class="status === 'accepted' ? 'border-indigo-500 bg-indigo-50/70 ring-2 ring-indigo-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-indigo-50/20 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                        <span :class="status === 'accepted' ? 'opacity-100 text-indigo-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}</div>
+                                    </div>
+                                </button>
+
+                                <!-- 2. ACTIVE -->
+                                <button type="button" 
+                                        @click="status = 'active'"
+                                        :class="status === 'active' ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/20 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                        <span :class="status === 'active' ? 'opacity-100 text-emerald-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::ACTIVE->description() }}</div>
+                                    </div>
+                                </button>
+
+                                <!-- 3. COMPLETED -->
+                                @php
+                                    $isCompleteDisabled = (!$canComplete && $currentStatusVal !== 'completed');
+                                    $completedSubtitle = \App\Enums\ApplicationStatus::COMPLETED->description();
+                                    if ($isCompleteDisabled) {
+                                        $missingItems = [];
+                                        if (!$application->has_filled_logbook) {
+                                            $missingItems[] = 'Logbook';
+                                        }
+                                        if (!$application->has_approved_report) {
+                                            $missingItems[] = 'Laporan';
+                                        }
+                                        if (!$application->has_complete_evaluation) {
+                                            $missingItems[] = 'Nilai';
+                                        }
+
+                                        if (!empty($missingItems)) {
+                                            $completedSubtitle = implode(' & ', $missingItems) . ' Belum Lengkap';
+                                        } else {
+                                            $completedSubtitle = 'Syarat Belum Terpenuhi';
+                                        }
+                                    }
+                                @endphp
+                                <button type="button" 
+                                        @if(!$isCompleteDisabled) @click="status = 'completed'" @endif
+                                        @if($isCompleteDisabled) disabled title="{{ $completedSubtitle }}" @endif
+                                        :class="status === 'completed' ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-600/20 shadow-xs' : '{{ $isCompleteDisabled ? 'opacity-50 bg-slate-50 border-slate-200 cursor-not-allowed' : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/20 cursor-pointer' }}'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                                        <span :class="status === 'completed' ? 'opacity-100 text-blue-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight flex items-center gap-1">
+                                            <span>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</span>
+                                            @if($isCompleteDisabled)
+                                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            @endif
+                                        </div>
+                                        <div class="text-[11px] {{ $isCompleteDisabled ? 'text-amber-600 font-semibold' : 'text-slate-500' }} mt-0.5 leading-snug">
+                                            {{ $completedSubtitle }}
+                                        </div>
+                                    </div>
+                                </button>
+
+                                <!-- 4. RESIGNED -->
+                                <button type="button" 
+                                        @click="status = 'resigned'"
+                                        :class="status === 'resigned' ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-600/20 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                                        <span :class="status === 'resigned' ? 'opacity-100 text-slate-700' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::RESIGNED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::RESIGNED->description() }}</div>
+                                    </div>
+                                </button>
+
+                                <!-- 5. REJECTED -->
+                                <button type="button" 
+                                        @click="status = 'rejected'"
+                                        :class="status === 'rejected' ? 'border-rose-500 bg-rose-50/70 ring-2 ring-rose-500/20 shadow-xs' : 'border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/20 cursor-pointer'"
+                                        class="p-3 rounded-2xl border text-left transition-all duration-150 flex flex-col justify-between relative group">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                        <span :class="status === 'rejected' ? 'opacity-100 text-rose-600' : 'opacity-0'" class="transition-opacity">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-extrabold text-xs text-slate-900 tracking-tight">{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ \App\Enums\ApplicationStatus::REJECTED->description() }}</div>
+                                    </div>
+                                </button>
+
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Container Khusus Jika Status = ACCEPTED / ACTIVE / COMPLETED -->
+                    <!-- Container Khusus Jika Status = WAITING_APPROVAL / ACCEPTED / ACTIVE / COMPLETED -->
                     <div id="acceptance-box"
-                         x-show="status === 'accepted' || status === 'active' || status === 'completed'" 
+                         x-show="status === 'waiting_approval' || status === 'accepted' || status === 'active' || status === 'completed'" 
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
                          class="space-y-4 mb-5 p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 shadow-2xs">
-                        <div class="flex items-center gap-2 border-b border-emerald-200/60 pb-3">
-                            <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                            <h4 class="font-bold text-emerald-900 text-xs sm:text-sm">Data Balasan Penerimaan & Penempatan Magang</h4>
+                        <div id="penugasan-pembimbing" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                                    <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-emerald-950 text-xs sm:text-sm">Data Penempatan, Surat &amp; Penugasan Pembimbing</h4>
+                                    <p class="text-[11px] text-emerald-700 mt-0.5">Penugasan Pembimbing (Susulan / Ganti), penetapan mentor dinas, dosen pembimbing, dan surat balasan resmi.</p>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Surat Pengantar dari Kampus untuk Pengecekan Cepat Admin -->
@@ -531,12 +656,24 @@
                             $selectedMentorId = old('mentor_id', optional($application->placement)->mentor_id ?? optional($application->placement)->pembimbing_id ?? '');
                             $selectedDosenId = old('academic_advisor_id', optional($application->placement)->academic_advisor_id ?? '');
 
-                            $mentorItems = $pembimbings->map(function ($m) {
+                            // Filter mentor otomatis sesuai dengan bidang (unit_id) pengajuan mahasiswa
+                            $filteredPembimbings = $pembimbings;
+                            if ($application->unit_id) {
+                                $matchingMentors = $pembimbings->filter(function ($m) use ($application) {
+                                    return (int) $m->unit_id === (int) $application->unit_id;
+                                });
+                                if ($matchingMentors->isNotEmpty()) {
+                                    $filteredPembimbings = $matchingMentors;
+                                }
+                            }
+
+                            $mentorItems = $filteredPembimbings->map(function ($m) {
+                                $unitName = $m->unit?->name;
                                 return [
                                     'id' => $m->id,
                                     'name' => $m->name,
                                     'acronym' => 'Mentor',
-                                    'meta' => $m->email . ($m->phone ? ' • ' . $m->phone : ''),
+                                    'meta' => ($unitName ? $unitName . ' • ' : '') . $m->email . ($m->phone ? ' • ' . $m->phone : ''),
                                 ];
                             })->values()->all();
 
@@ -551,16 +688,55 @@
                             })->values()->all();
                         @endphp
 
+                        @php
+                            $currPlacement = $application->placement;
+                            $currMentor = $currPlacement?->mentor ?? $currPlacement?->pembimbing;
+                            $currAdvisor = $currPlacement?->academicAdvisor;
+                        @endphp
+
+                        @if ($currPlacement && in_array($currentStatusVal, ['accepted', 'active', 'completed'], true))
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mb-2">
+                                <div class="p-3.5 rounded-xl border bg-white/95 {{ $currMentor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mentor Dinas Saat Ini</div>
+                                    <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
+                                        <span>{{ $currMentor?->name ?? 'Belum Ditugaskan' }}</span>
+                                        @if($currMentor)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span> {{-- status-guard:ignore --}}
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu</span> {{-- status-guard:ignore --}}
+                                        @endif
+                                    </div>
+                                    @unless ($currMentor)
+                                        <div class="text-[11px] text-amber-700 mt-1">Logbook aktivitas sementara divalidasi langsung oleh Admin Bidang.</div>
+                                    @endunless
+                                </div>
+                                <div class="p-3.5 rounded-xl border bg-white/95 {{ $currAdvisor ? 'border-emerald-200 shadow-2xs' : 'border-amber-200 bg-amber-50/40' }}">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dosen Pembimbing Kampus Saat Ini</div>
+                                    <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
+                                        <span>{{ $currAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
+                                        @if($currAdvisor)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span> {{-- status-guard:ignore --}}
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu SK</span>
+                                        @endif
+                                    </div>
+                                    @unless ($currAdvisor)
+                                        <div class="text-[11px] text-amber-700 mt-1">Menunggu penetapan penugasan dosen dari perguruan tinggi.</div>
+                                    @endunless
+                                </div>
+                            </div>
+                        @endif
+
                         <!-- Dropdown Pembimbing Lapangan (Searchable Combobox) -->
                         <div>
                             <x-searchable-select
                                 name="mentor_id"
                                 :items="$mentorItems"
                                 :selected="$selectedMentorId"
-                                label="Plotting Pembimbing Lapangan (Mentor Dinas Terkait)"
+                                label="Penugasan Pembimbing Lapangan (Mentor Bidang)"
                                 placeholder="-- Cari atau Pilih Mentor Lapangan (Ketik nama / email) --"
                             />
-                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi yang terdaftar di {{ $application->unit->agencyProfile->agency_name ?? 'instansi ini' }}.</p>
+                            <p class="text-[11px] text-slate-500 mt-1 font-medium">Hanya menampilkan akun mentor resmi pada {{ $application->unit->name ?? 'bidang terkait' }}.</p>
                         </div>
 
                         <!-- Dropdown Dosen Pembimbing (Searchable Combobox) -->
@@ -580,12 +756,26 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nomor Surat Balasan Dinas</label>
                                 <input type="text" name="letter_number" value="{{ old('letter_number', $application->letter_number) }}" 
-                                    placeholder="Contoh: 500/123/APTIKA/2026"
+                                    placeholder="Contoh: 500.12.1/045/436.7.14/2026"
                                     class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Surat Balasan</label>
                                 <input type="date" name="letter_date" value="{{ old('letter_date', $application->letter_date ? \Carbon\Carbon::parse($application->letter_date)->format('Y-m-d') : date('Y-m-d')) }}" 
+                                    class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
+                            </div>
+                        </div>
+
+                        <!-- Grid Tanggal Pelaksanaan Magang -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Mulai Magang</label>
+                                <input type="date" name="start_date" value="{{ old('start_date', optional($application->placement)->start_date ? \Carbon\Carbon::parse($application->placement->start_date)->format('Y-m-d') : ($application->start_date ? \Carbon\Carbon::parse($application->start_date)->format('Y-m-d') : '')) }}" 
+                                    class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Tanggal Selesai Magang</label>
+                                <input type="date" name="end_date" value="{{ old('end_date', optional($application->placement)->end_date ? \Carbon\Carbon::parse($application->placement->end_date)->format('Y-m-d') : ($application->end_date ? \Carbon\Carbon::parse($application->end_date)->format('Y-m-d') : '')) }}" 
                                     class="w-full text-xs border-slate-200 rounded-xl shadow-2xs focus:ring-emerald-500 focus:border-emerald-500 bg-white py-2.5">
                             </div>
                         </div>
@@ -617,7 +807,7 @@
                             <button type="submit" 
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                <span>Simpan Perubahan Status</span>
+                                <span>Simpan Keputusan &amp; Penugasan</span>
                             </button>
                         @else
                             <button type="button" disabled
@@ -650,70 +840,6 @@
                     </div>
                 </form>
             </div>
-
-            {{-- 6. Penugasan Pembimbing Susulan (penempatan sudah berjalan: ACCEPTED / ACTIVE) --}}
-            @if ($application->placement && in_array($currentStatus, \App\Services\PlacementAssignmentService::ASSIGNABLE_STATUSES, true))
-                @php
-                    $asgPlacement = $application->placement;
-                    $asgMentor = $asgPlacement->mentor ?? $asgPlacement->pembimbing;
-                    $asgAdvisor = $asgPlacement->academicAdvisor;
-                @endphp
-                <div id="penugasan-pembimbing" class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
-                    <div class="pb-4 border-b border-slate-100 mb-5">
-                        <h3 class="text-base font-bold text-slate-900">Penugasan Pembimbing (Susulan / Ganti)</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Tetapkan atau ganti Mentor Dinas &amp; Dosen Pembimbing tanpa mengulang verifikasi. Histori logbook yang sudah divalidasi tetap tersimpan.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5 text-xs">
-                        <div class="p-3 rounded-xl border {{ $asgMentor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
-                            <div class="text-slate-500 font-semibold">Mentor Dinas saat ini</div>
-                            <div class="font-bold text-slate-900 mt-0.5">{{ $asgMentor?->name ?? 'Belum Ditugaskan' }}</div>
-                            @unless ($asgMentor)
-                                <div class="text-[11px] text-amber-700 mt-1">Sementara logbook divalidasi oleh Admin Dinas instansi.</div>
-                            @endunless
-                        </div>
-                        <div class="p-3 rounded-xl border {{ $asgAdvisor ? 'border-emerald-200 bg-emerald-50/50' : 'border-amber-200 bg-amber-50/60' }}">
-                            <div class="text-slate-500 font-semibold">Dosen Pembimbing Kampus saat ini</div>
-                            <div class="font-bold text-slate-900 mt-0.5">{{ $asgAdvisor?->name ?? 'Belum Ditugaskan' }}</div>
-                            @unless ($asgAdvisor)
-                                <div class="text-[11px] text-amber-700 mt-1">Menunggu SK / penugasan dari kampus.</div>
-                            @endunless
-                        </div>
-                    </div>
-
-                    <form action="{{ route('admin.applications.assignment', $application->id) }}" method="POST" class="space-y-4">
-                        @csrf
-                        @method('PATCH')
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="asg_mentor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Mentor Dinas</label>
-                                <select id="asg_mentor_id" name="mentor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
-                                    <option value="">-- Tidak diubah --</option>
-                                    @foreach ($pembimbings as $pembimbing)
-                                        <option value="{{ $pembimbing->id }}" @selected((int) ($asgMentor?->id ?? 0) === (int) $pembimbing->id)>{{ $pembimbing->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('mentor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label for="asg_advisor_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Dosen Pembimbing Kampus</label>
-                                <select id="asg_advisor_id" name="academic_advisor_id" class="w-full text-xs border-slate-200 rounded-xl bg-white py-2.5">
-                                    <option value="">-- Tidak diubah --</option>
-                                    @foreach ($dosens as $dosen)
-                                        <option value="{{ $dosen->id }}" @selected((int) ($asgAdvisor?->id ?? 0) === (int) $dosen->id)>{{ $dosen->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('academic_advisor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-                        @error('assignment') <p class="text-xs text-rose-600 font-semibold">{{ $message }}</p> @enderror
-                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
-                            Simpan Penugasan Pembimbing
-                        </button>
-                    </form>
-                </div>
-            @endif
-
         </div>
     </div>
 
@@ -729,7 +855,7 @@
                 if (val === 'rejected') {
                     rejectionBox.style.display = '';
                     acceptanceBox.style.display = 'none';
-                } else if (['accepted', 'active', 'completed'].includes(val)) {
+                } else if (['waiting_approval', 'accepted', 'active', 'completed'].includes(val)) {
                     acceptanceBox.style.display = '';
                     rejectionBox.style.display = 'none';
                 } else {

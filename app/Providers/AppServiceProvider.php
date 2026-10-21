@@ -9,7 +9,9 @@ use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -58,6 +60,23 @@ class AppServiceProvider extends ServiceProvider
             if ($feedback->isDirty('status')) {
                 FeedbackStatus::assertValid($feedback->status);
             }
+        });
+
+        // View Composer untuk Navigasi: Notifikasi lonceng & badge unread
+        View::composer('layouts.navigation', function ($view): void {
+            $user = Auth::user();
+            if (! $user) {
+                return;
+            }
+
+            $unreadCount = 0;
+            if ($user->isSupervisor()) {
+                $waitingApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
+                $waitingCerts = \App\Models\Certificate::where('approval_status', 'waiting_approval')->count();
+                $unreadCount = $waitingApps + $waitingCerts;
+            }
+
+            $view->with('unreadCount', $unreadCount);
         });
     }
 }

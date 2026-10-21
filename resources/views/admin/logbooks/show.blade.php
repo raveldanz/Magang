@@ -144,7 +144,7 @@
                 } elseif ($isLecturer) {
                     $reviewForm = ['route' => route('lecturer.logbooks.updateStatus', $logbook->id), 'feedback' => $logbook->lecturer_feedback, 'title' => 'Verifikasi Dosen Pembimbing'];
                 } elseif ($isAdminFallback) {
-                    $reviewForm = ['route' => route('admin.logbooks.review', $logbook->id), 'feedback' => $logbook->feedback, 'title' => 'Validasi Sementara oleh Admin Dinas'];
+                    $reviewForm = ['route' => route('admin.logbooks.review', $logbook->id), 'feedback' => $logbook->feedback, 'title' => Auth::user()->isBidangAdmin() ? 'Validasi Sementara oleh Admin Bidang' : 'Validasi Sementara oleh Admin Dinas'];
                 }
             @endphp
 

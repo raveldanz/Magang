@@ -21,13 +21,13 @@ class FinalReportController extends Controller
     public function index()
     {
         // 1. Ambil pengajuan magang yang aktif / terbaru
-        $application = Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+        $application = Application::with(['placement.finalreport', 'placement.internshipProjects', 'placement.evaluation', 'unit.agencyProfile'])
             ->where('user_id', Auth::id())
             ->whereNotIn('status', ['rejected', 'resigned'])
             ->whereHas('placement')
             ->latest()
             ->first()
-            ?? Application::with(['placement.finalreport', 'placement.evaluation', 'unit.agencyProfile'])
+            ?? Application::with(['placement.finalreport', 'placement.internshipProjects', 'placement.evaluation', 'unit.agencyProfile'])
                 ->where('user_id', Auth::id())
                 ->whereNotIn('status', ['rejected', 'resigned'])
                 ->latest()
@@ -43,6 +43,7 @@ class FinalReportController extends Controller
         $placement = $application->placement;
         $finalReport = null;
         $evaluation = null;
+        $projects = collect();
 
         // 3. Jika sudah diterima dan memiliki placement, baru cek DPL & ambil data laporan
         if ($placement) {
@@ -53,10 +54,11 @@ class FinalReportController extends Controller
 
             $finalReport = $placement->finalreport;
             $evaluation = $placement->evaluation;
+            $projects = $placement->internshipProjects;
         }
 
         // 4. Kirimkan $lifecycle ke view agar kartu alur/stepper muncul saat masih pending
-        return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation', 'lifecycle'));
+        return view('student.final_report', compact('application', 'placement', 'finalReport', 'evaluation', 'lifecycle', 'projects'));
     }
 
     /**

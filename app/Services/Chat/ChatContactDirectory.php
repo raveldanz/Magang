@@ -21,13 +21,38 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class ChatContactDirectory
 {
-    public const AGENCY_STAFF_ROLES = ['admin', 'mentor', 'pembimbing'];
+    public const AGENCY_STAFF_ROLES = ['admin', 'supervisor', 'mentor', 'pembimbing'];
 
     public const MENTOR_ROLES = ['mentor', 'pembimbing'];
 
     public const LECTURER_ROLES = ['dosen', 'academic_advisor'];
 
     public const CAMPUS_STAFF_ROLES = ['universitas', 'dosen', 'academic_advisor'];
+
+    /**
+     * SQL Order clause standar untuk hierarki role di kontak chat.
+     */
+    public static function roleOrderSql(): string
+    {
+        return "CASE 
+            WHEN role = 'super_admin' THEN 1 
+            WHEN role = 'supervisor' THEN 2 
+            WHEN role = 'admin' THEN 3 
+            WHEN role IN ('mentor', 'pembimbing') THEN 4 
+            WHEN role IN ('dosen', 'academic_advisor') THEN 5 
+            WHEN role IN ('universitas', 'university') THEN 6 
+            WHEN role IN ('mahasiswa', 'student') THEN 7 
+            ELSE 8 
+        END";
+    }
+
+    /**
+     * Mendapatkan daftar kontak yang diizinkan untuk pengguna tertentu.
+     */
+    public function allowedContacts(User $user, bool $strict = false): Builder
+    {
+        return $this->contactsQuery($user, $strict);
+    }
 
     /**
      * @param  bool  $strict  true = hanya hubungan kerja langsung (dipakai untuk data pribadi):
@@ -82,22 +107,35 @@ class ChatContactDirectory
     }
 
     /**
-     * Grup hanya dibuat oleh staf (Super Admin, admin dinas, mentor, DPL, admin kampus), bukan mahasiswa.
+     * Grup hanya dibuat oleh staf (Super Admin, supervisor, admin dinas, mentor, DPL, admin kampus), bukan mahasiswa.
      */
     public function canCreateGroups(User $user): bool
     {
-        return $user->role !== 'mahasiswa';
+        return $user->role !== 'mahasiswa' && $user->role !== 'student';
     }
 
     private function applyRoleContacts(Builder $q, User $user, bool $strict = false): void
     {
         $role = $user->role;
 
-        if ($role === 'mahasiswa') {
+        if ($role === 'supervisor') {
+            $agencyId = $user->agency_profile_id;
+            $this->orAgencyStaff($q, $agencyId);
+            $agencyApplications = Application::select('id')->whereIn('unit_id', Unit::select('id')->where('agency_profile_id', $agencyId));
+            $applicantIds = Application::select('user_id')->whereIn('unit_id', Unit::select('id')->where('agency_profile_id', $agencyId));
+            $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['mahasiswa', 'student'])->whereIn('id', $applicantIds));
+            $this->orPlacementColumns($q, ['academic_advisor_id'], fn ($p) => $p->whereIn('application_id', $agencyApplications));
+            $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['universitas', 'university'])->whereIn('university_id',
+                User::select('university_id')->whereNotNull('university_id')->whereIn('id', $applicantIds)));
+
+            return;
+        }
+
+        if ($role === 'mahasiswa' || $role === 'student') {
             // Mode ketat: dari pihak kampus hanya admin kampus; DPL ikut lewat data penempatan di bawah
             $this->orCampusStaff($q, $user->university_id, $strict ? ['universitas'] : self::CAMPUS_STAFF_ROLES);
             $applicationIds = Application::select('id')->where('user_id', $user->id);
-            $q->orWhere(fn (Builder $w) => $w->where('role', 'admin')->whereIn('agency_profile_id',
+            $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['admin', 'supervisor'])->whereIn('agency_profile_id',
                 Unit::select('agency_profile_id')->whereIn('id', Application::select('unit_id')->where('user_id', $user->id))));
             $this->orPlacementColumns($q, ['mentor_id', 'pembimbing_id', 'academic_advisor_id'],
                 fn ($p) => $p->whereIn('application_id', $applicationIds));
@@ -110,9 +148,9 @@ class ChatContactDirectory
             $this->orAgencyStaff($q, $agencyId);
             $agencyApplications = Application::select('id')->whereIn('unit_id', Unit::select('id')->where('agency_profile_id', $agencyId));
             $applicantIds = Application::select('user_id')->whereIn('unit_id', Unit::select('id')->where('agency_profile_id', $agencyId));
-            $q->orWhere(fn (Builder $w) => $w->where('role', 'mahasiswa')->whereIn('id', $applicantIds));
+            $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['mahasiswa', 'student'])->whereIn('id', $applicantIds));
             $this->orPlacementColumns($q, ['academic_advisor_id'], fn ($p) => $p->whereIn('application_id', $agencyApplications));
-            $q->orWhere(fn (Builder $w) => $w->where('role', 'universitas')->whereIn('university_id',
+            $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['universitas', 'university'])->whereIn('university_id',
                 User::select('university_id')->whereNotNull('university_id')->whereIn('id', $applicantIds)));
 
             return;
@@ -136,18 +174,18 @@ class ChatContactDirectory
             $advised = Placement::select('application_id')->where('academic_advisor_id', $user->id);
             $q->orWhereIn('id', Application::select('user_id')->whereIn('id', $advised));
             $this->orPlacementColumns($q, ['mentor_id', 'pembimbing_id'], fn ($p) => $p->where('academic_advisor_id', $user->id));
-            $q->orWhere(fn (Builder $w) => $w->where('role', 'admin')->whereIn('agency_profile_id',
+            $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['admin', 'supervisor'])->whereIn('agency_profile_id',
                 Unit::select('agency_profile_id')->whereIn('id', Application::select('unit_id')->whereIn('id', $advised))));
 
             return;
         }
 
-        if ($role === 'universitas') {
+        if ($role === 'universitas' || $role === 'university') {
             $this->orCampusStaff($q, $user->university_id);
             $this->orCampusStudents($q, $user->university_id);
             if ($user->university_id) {
-                $campusStudents = User::select('id')->where('role', 'mahasiswa')->where('university_id', $user->university_id);
-                $q->orWhere(fn (Builder $w) => $w->where('role', 'admin')->whereIn('agency_profile_id',
+                $campusStudents = User::select('id')->whereIn('role', ['mahasiswa', 'student'])->where('university_id', $user->university_id);
+                $q->orWhere(fn (Builder $w) => $w->whereIn('role', ['admin', 'supervisor'])->whereIn('agency_profile_id',
                     Unit::select('agency_profile_id')->whereIn('id', Application::select('unit_id')->whereIn('user_id', $campusStudents))));
             }
         }

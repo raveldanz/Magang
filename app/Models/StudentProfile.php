@@ -21,6 +21,26 @@ class StudentProfile extends Model
         return ! empty($this->attributes['photo'] ?? null) ? route('student.photo', $this->user_id) : null;
     }
 
+    public function getCvUrlAttribute(): ?string
+    {
+        return ! empty($this->cv_path) ? route('student.document', ['userId' => $this->user_id, 'type' => 'cv']) : null;
+    }
+
+    public function getTranscriptUrlAttribute(): ?string
+    {
+        return ! empty($this->transcript_path) ? route('student.document', ['userId' => $this->user_id, 'type' => 'transkrip']) : null;
+    }
+
+    public function getIdCardUrlAttribute(): ?string
+    {
+        return ! empty($this->id_card_path) ? route('student.document', ['userId' => $this->user_id, 'type' => 'id_card']) : null;
+    }
+
+    public function hasCompletePersonalDocuments(): bool
+    {
+        return ! empty($this->cv_path) && ! empty($this->transcript_path) && ! empty($this->id_card_path);
+    }
+
     public function university()
     {
         return $this->belongsTo(University::class);

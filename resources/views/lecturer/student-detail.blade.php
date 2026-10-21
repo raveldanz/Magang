@@ -167,6 +167,12 @@
                                 <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
                                     {{ $isMentorOnly ? 'Skema 100% Mentor' : 'Skema DPL + Mentor' }}
                                 </span>
+
+                                @if ($app?->group_id && $app?->group)
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                        Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Identitas Mahasiswa -->
@@ -327,7 +333,7 @@
                         <div class="p-5 bg-slate-50 rounded-2xl space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Nilai Dosen Pembimbing (DPL)
+                                    Nilai Dosen Pembimbing
                                 </span>
                                 @if (!$isMentorOnly && ($eval?->nilai_dosen_calculated ?? 0) > 0)
                                     <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-100 text-blue-800">
@@ -421,7 +427,7 @@
                 <div class="bg-white rounded-2xl p-6 shadow-xs space-y-3">
                     <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                         <div>
-                            <h4 class="font-bold text-sm text-slate-900">Catatan Pribadi Pembimbing (DPL)</h4>
+                            <h4 class="font-bold text-sm text-slate-900">Catatan Pribadi Dosen Pembimbing</h4>
                             <span class="text-[11px] text-slate-500">Catatan ini bersifat internal untuk arsip Anda dan tidak dapat dilihat oleh mahasiswa.</span>
                         </div>
                     </div>
@@ -469,6 +475,7 @@
             <div x-show="activeTab === 'laporan'" class="space-y-5">
                 <x-supervision.report-review
                     :finalReport="$finalReport"
+                    :placement="$placement"
                     :submitRoute="route('lecturer.final_report.updateStatus', $placement->id)"
                     method="POST"
                     role="lecturer"

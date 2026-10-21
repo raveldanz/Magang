@@ -30,7 +30,7 @@ class CheckRole
             return $next($request);
         }
 
-        if ($isSuperAdmin && (in_array('admin', $roles) || in_array('super_admin', $roles))) {
+        if ($isSuperAdmin && (in_array('admin', $roles) || in_array('super_admin', $roles) || in_array('supervisor', $roles))) {
             return $next($request);
         }
 
@@ -53,6 +53,7 @@ class CheckRole
         if ($request->session()->has('impersonator_id')) {
             $dest = match ($userRole) {
                 'admin' => route('admin.dashboard'),
+                'supervisor' => route('supervisor.dashboard'),
                 'mentor', 'pembimbing' => route('mentor.dashboard'),
                 'dosen', 'academic_advisor' => route('lecturer.dashboard'),
                 'universitas' => route('university.dashboard'),

@@ -316,8 +316,8 @@
         $agencyProfile = $application->unit->agencyProfile ?? $agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya';
         $agencyName = $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
-        $address = $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293';
-        $phone = $agencyProfile->phone ?? '(031) 8707682';
+        $address = $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293';
+        $phone = $agencyProfile->phone ?? '(031) 8704207';
         $email = $agencyProfile->email ?? 'dispusip@surabaya.go.id';
         $website = $agencyProfile->website ?? 'https://dispusip.surabaya.go.id';
         $cityName = $agencyProfile->city ?? 'Surabaya';
@@ -492,7 +492,7 @@
         <!-- 4. PARAGRAF PENGANTAR & TABEL IDENTITAS MAHASISWA -->
         <div class="content-body">
             <p>
-                Menindaklanjuti surat permohonan izin Praktik Kerja Magang dari Universitas Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima mahasiswa berikut:
+                Menindaklanjuti surat permohonan izin Praktik Kerja Magang dari Universitas Saudara, bersama ini disampaikan bahwa Pemerintah Kota Surabaya melalui {{ $agencyName }} menyetujui / menerima {{ $application->group_id ? 'kelompok mahasiswa' : 'mahasiswa' }} berikut:
             </p>
 
             <table class="student-table">
@@ -504,17 +504,43 @@
                         <th>Program Studi</th>
                         <th>Fakultas</th>
                         <th style="width: 80px;">Semester</th>
+                        @if($application->group_id)
+                            <th style="width: 80px;">Posisi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td style="font-weight: bold;">{{ $cleanStudentName }}</td>
-                        <td style="text-align: center;">{{ $nim }}</td>
-                        <td>{{ $jurusan }}</td>
-                        <td>{{ $fakultas }}</td>
-                        <td style="text-align: center;">{{ $semester }}</td>
-                    </tr>
+                    @if($application->group_id && $application->group)
+                        @foreach($application->group->applications()->with('user.studentProfile')->get() as $idx => $grpApp)
+                            @php
+                                $mStudent = $grpApp->user?->studentProfile;
+                                $mCleanName = preg_replace('/\s*\([^)]*\)/', '', $grpApp->user?->name ?? '-');
+                                $mNim = $mStudent?->nim ?? '-';
+                                $mJurusan = $mStudent?->jurusan ?? $mStudent?->major ?? '-';
+                                $mFakultas = $mStudent?->fakultas ?? $mStudent?->faculty ?? '-';
+                                $mSemester = $mStudent?->semester ? 'Semester ' . $mStudent->semester : '-';
+                                $mRole = $grpApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota';
+                            @endphp
+                            <tr>
+                                <td style="text-align: center;">{{ $idx + 1 }}</td>
+                                <td style="font-weight: bold;">{{ $mCleanName }}</td>
+                                <td style="text-align: center;">{{ $mNim }}</td>
+                                <td>{{ $mJurusan }}</td>
+                                <td>{{ $mFakultas }}</td>
+                                <td style="text-align: center;">{{ $mSemester }}</td>
+                                <td style="text-align: center; font-weight: bold; color: {{ $grpApp->role_in_group === 'leader' ? '#1d4ed8' : '#334155' }};">{{ $mRole }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td style="font-weight: bold;">{{ $cleanStudentName }}</td>
+                            <td style="text-align: center;">{{ $nim }}</td>
+                            <td>{{ $jurusan }}</td>
+                            <td>{{ $fakultas }}</td>
+                            <td style="text-align: center;">{{ $semester }}</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
 

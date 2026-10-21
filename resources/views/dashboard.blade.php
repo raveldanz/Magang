@@ -92,7 +92,7 @@
                                     Selamat Datang, {{ Auth::user()->name }}!
                                 </h1>
                                 <p class="text-xs sm:text-sm leading-relaxed text-blue-100/90 max-w-xl">
-                                    Portal Resmi Pelaksanaan Magang & Praktik Kerja Lapangan Dinas Perpustakaan dan Kearsipan Kota Surabaya
+                                    Portal Terpadu Pelaksanaan Magang & Praktik Kerja Lapangan Dinas Perpustakaan dan Kearsipan Kota Surabaya
                                 </p>
                             </div>
 
@@ -203,8 +203,8 @@
                                                 @elseif(in_array($rawSt, ['resigned', 'rejected'], true))
                                                     {{ $rawSt === 'rejected' ? 'Pengajuan magang Anda sebelumnya ditolak.' : 'Anda telah mengundurkan diri dari magang sebelumnya.' }}
                                                     Silakan buat permohonan magang baru untuk melanjutkan program magang.
-                                                @elseif($rawSt === 'verified')
-                                                    Berkas Anda sudah lolos verifikasi. Menunggu keputusan penerimaan dari instansi dinas terkait.
+                                                @elseif($rawSt === 'waiting_approval')
+                                                    Berkas dan usulan penempatan Anda telah diverifikasi oleh Admin. Saat ini pengajuan Anda sedang dalam tahap pengesahan akhir (ACC) oleh Atasan (Tim Kerja Umum &amp; Kepegawaian Dispusip).
                                                 @elseif(!in_array($rawSt, ['accepted', 'active', 'completed'], true))
                                                     Menunggu verifikasi dan persetujuan dari instansi dinas terkait.
                                                 @elseif($isPassed)
@@ -233,6 +233,10 @@
                                                     class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition inline-block">
                                                     Daftar Magang
                                                 </a>
+                                            @elseif($rawSt === 'waiting_approval')
+                                                <span class="px-3 py-1 rounded-lg bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 inline-block">
+                                                    Menunggu ACC Atasan
+                                                </span>
                                             @elseif(!in_array($rawSt, ['accepted', 'active', 'completed']))
                                                 <span class="px-3 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 inline-block">
                                                     Dalam Peninjauan
@@ -303,9 +307,15 @@
                                                 Buat Pengajuan Baru
                                             </a>
                                         @elseif($application)
-                                            <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
-                                                {{ $rawSt === 'verified' ? 'Menunggu Keputusan Dinas' : 'Menunggu Verifikasi Dinas' }}
-                                            </span>
+                                            @if($rawSt === 'waiting_approval')
+                                                <span class="px-2.5 py-1 rounded-md font-bold bg-purple-50 text-purple-700 border border-purple-200 inline-block">
+                                                    Menunggu ACC Atasan
+                                                </span>
+                                            @else
+                                                <span class="px-2.5 py-1 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-block">
+                                                    Menunggu Verifikasi Dinas
+                                                </span>
+                                            @endif
                                         @else
                                             <a href="{{ route('student.application.create') }}"
                                                 class="px-3 py-1.5 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition inline-block">
@@ -569,6 +579,8 @@
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
                                         <span>Daftar Magang Baru</span> &rarr;
                                     </a>
+                                @elseif ($rawAppSt === 'waiting_approval')
+                                    <span class="text-[11px] text-purple-700 font-semibold">Menunggu ACC Atasan</span>
                                 @else
                                     <span class="text-[11px] text-amber-600 font-semibold">Dalam proses verifikasi</span>
                                 @endif
@@ -735,6 +747,41 @@
                                         {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</strong>
                                 </p>
                             </div>
+
+                            @if($application->group_id && $application->group)
+                                <div class="mt-4 pt-3 border-t border-slate-100 p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 space-y-2">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-600 text-white">
+                                                Kelompok Magang
+                                            </span>
+                                            <span class="font-extrabold text-sm text-slate-900">{{ $application->group->name }}</span>
+                                            <span class="text-xs text-indigo-700 font-bold font-mono">({{ $application->group->code }})</span>
+                                        </div>
+                                        <span class="text-xs font-semibold text-slate-600">
+                                            Peran Anda: <strong class="text-indigo-800">{{ $application->role_in_group === 'leader' ? 'Ketua Kelompok' : 'Anggota Tim' }}</strong>
+                                        </span>
+                                    </div>
+                                    <div class="pt-2 border-t border-indigo-100 text-xs">
+                                        <span class="font-bold text-slate-700 block mb-1">Rekan Satu Tim ({{ $application->group->applications->count() }} Orang):</span>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                            @foreach($application->group->applications as $grpMember)
+                                                <div class="p-2 rounded-xl bg-white border border-indigo-100 flex items-center justify-between">
+                                                    <div class="min-w-0">
+                                                        <div class="text-xs font-bold text-slate-900 truncate {{ $grpMember->id === $application->id ? 'text-indigo-700' : '' }}">
+                                                            {{ $grpMember->user?->name }} {{ $grpMember->id === $application->id ? '(Anda)' : '' }}
+                                                        </div>
+                                                        <div class="text-[10px] text-slate-400 font-mono">{{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                                    </div>
+                                                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded shrink-0 {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
+                                                        {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
