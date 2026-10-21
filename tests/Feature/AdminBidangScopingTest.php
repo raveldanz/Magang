@@ -271,7 +271,7 @@ class AdminBidangScopingTest extends TestCase
         // Mentors index memuat nama bidang pada header
         $mentorResp = $this->actingAs($this->adminSekretariat)->get(route('admin.mentors.index'));
         $mentorResp->assertStatus(200);
-        $mentorResp->assertSee('Kelola Pembimbing Lapangan (Mentor) • Bidang Sekretariat');
+        $mentorResp->assertSee('Kelola Mentor • Bidang Sekretariat');
 
         // Logbooks index memuat nama bidang pada header
         $logbookResp = $this->actingAs($this->adminSekretariat)->get(route('admin.logbooks.index'));

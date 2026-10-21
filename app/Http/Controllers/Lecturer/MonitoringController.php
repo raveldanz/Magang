@@ -58,6 +58,7 @@ class MonitoringController extends Controller
         $query = (clone $baseQuery)->with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'logbooks',
@@ -120,6 +121,7 @@ class MonitoringController extends Controller
         $query = (clone $baseQuery)->with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'logbooks',
@@ -158,6 +160,8 @@ class MonitoringController extends Controller
                 'No',
                 'Nama Mahasiswa',
                 'NIM',
+                'Tipe Pendaftaran',
+                'Kelompok Magang',
                 'Instansi Mitra',
                 'Unit Kerja / Divisi',
                 'Mentor Lapangan',
@@ -178,6 +182,10 @@ class MonitoringController extends Controller
             foreach ($placements as $p) {
                 $student = $p->application?->user;
                 $profile = $student?->studentProfile;
+                $app = $p->application;
+                $group = $app?->group;
+                $tipePengajuan = $app?->group_id ? 'Kelompok (' . ($app->role_in_group === 'leader' ? 'Ketua' : 'Anggota') . ')' : 'Individu';
+                $groupName = $group?->name ?? '-';
                 $unit = $p->application?->unit;
                 $agency = $unit?->agencyProfile;
                 $mentor = $p->mentor ?? $p->pembimbing;
@@ -205,6 +213,8 @@ class MonitoringController extends Controller
                     $no++,
                     $student?->name ?? 'N/A',
                     $profile?->nim ?? 'N/A',
+                    $tipePengajuan,
+                    $groupName,
                     $agency?->agency_name ?? 'N/A',
                     $unit?->name ?? 'N/A',
                     $mentor?->name ?? 'Belum Ditugaskan',

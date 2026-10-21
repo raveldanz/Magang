@@ -8,6 +8,7 @@ enum ApplicationStatus: string
 {
     use DisplaysStatusCode;
 
+    case DRAFT = 'draft';
     case PENDING = 'pending';
     case WAITING_APPROVAL = 'waiting_approval';
     case ACCEPTED = 'accepted';
@@ -28,6 +29,7 @@ enum ApplicationStatus: string
         }
 
         return match ($this) {
+            self::DRAFT => 'Draf Kelompok (Belum Dikirim)',
             self::PENDING => 'Menunggu Verifikasi Berkas',
             self::WAITING_APPROVAL => 'Setujui, Serahkan ke Atasan',
             self::ACCEPTED => 'Diterima, Belum Mulai Magang',
@@ -52,6 +54,7 @@ enum ApplicationStatus: string
     public function badgeColor(): string
     {
         return match ($this) {
+            self::DRAFT => 'bg-slate-100 text-slate-700 border-slate-300',
             self::PENDING => 'bg-amber-50 text-amber-700 border-amber-300',
             self::WAITING_APPROVAL => 'bg-purple-50 text-purple-700 border-purple-200',
             self::ACCEPTED => 'bg-indigo-50 text-indigo-700 border-indigo-300',
@@ -68,6 +71,7 @@ enum ApplicationStatus: string
     public function dotColor(): string
     {
         return match ($this) {
+            self::DRAFT => 'bg-slate-400',
             self::PENDING => 'bg-amber-500',
             self::WAITING_APPROVAL => 'bg-purple-600',
             self::ACCEPTED => 'bg-indigo-500',

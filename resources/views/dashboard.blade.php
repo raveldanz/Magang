@@ -747,6 +747,41 @@
                                         {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}</strong>
                                 </p>
                             </div>
+
+                            @if($application->group_id && $application->group)
+                                <div class="mt-4 pt-3 border-t border-slate-100 p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 space-y-2">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-600 text-white">
+                                                Kelompok Magang
+                                            </span>
+                                            <span class="font-extrabold text-sm text-slate-900">{{ $application->group->name }}</span>
+                                            <span class="text-xs text-indigo-700 font-bold font-mono">({{ $application->group->code }})</span>
+                                        </div>
+                                        <span class="text-xs font-semibold text-slate-600">
+                                            Peran Anda: <strong class="text-indigo-800">{{ $application->role_in_group === 'leader' ? 'Ketua Kelompok' : 'Anggota Tim' }}</strong>
+                                        </span>
+                                    </div>
+                                    <div class="pt-2 border-t border-indigo-100 text-xs">
+                                        <span class="font-bold text-slate-700 block mb-1">Rekan Satu Tim ({{ $application->group->applications->count() }} Orang):</span>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                            @foreach($application->group->applications as $grpMember)
+                                                <div class="p-2 rounded-xl bg-white border border-indigo-100 flex items-center justify-between">
+                                                    <div class="min-w-0">
+                                                        <div class="text-xs font-bold text-slate-900 truncate {{ $grpMember->id === $application->id ? 'text-indigo-700' : '' }}">
+                                                            {{ $grpMember->user?->name }} {{ $grpMember->id === $application->id ? '(Anda)' : '' }}
+                                                        </div>
+                                                        <div class="text-[10px] text-slate-400 font-mono">{{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                                    </div>
+                                                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded shrink-0 {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
+                                                        {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

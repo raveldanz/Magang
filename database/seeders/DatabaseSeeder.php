@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             DemoE2ESeeder::class,
             AdminWorkflowSeeder::class,
             SupervisorDemoSeeder::class,
+            InternshipGroupDemoSeeder::class,
         ]);
     }
 }

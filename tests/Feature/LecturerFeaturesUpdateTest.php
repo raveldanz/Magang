@@ -199,7 +199,7 @@ class LecturerFeaturesUpdateTest extends TestCase
 
         $response->assertOk()
             ->assertSeeText('Bima Arya')
-            ->assertSeeText('Buka Naskah Laporan (Tab Baru ↗)')
+            ->assertSeeText('Buka Naskah Laporan')
             ->assertSee('target="_blank"', false)
             ->assertDontSeeText('Cetak Lembar Nilai / Berita Acara')
             ->assertDontSee('<iframe', false)

@@ -51,4 +51,30 @@ class PrivateFileController extends Controller
 
         return PrivateDocumentStorage::response($feedback->attachment, 'lampiran_tiket_'.$feedback->id);
     }
+
+    public function studentDocument(Request $request, int $userId, string $type)
+    {
+        $viewer = $request->user();
+        $profile = StudentProfile::with('user')->where('user_id', $userId)->firstOrFail();
+
+        // Akses dokumen personal: pemilik sendiri atau staf
+        $allowed = (int) $viewer->id === (int) $userId || $viewer->role !== 'mahasiswa';
+        abort_unless($allowed, 403, 'Anda tidak memiliki hak akses ke dokumen ini.');
+
+        $typeMap = [
+            'cv' => [$profile->cv_path, 'cv_'.Str::slug($profile->user?->name ?? 'mahasiswa', '_')],
+            'transkrip' => [$profile->transcript_path, 'transkrip_'.Str::slug($profile->user?->name ?? 'mahasiswa', '_')],
+            'transcript' => [$profile->transcript_path, 'transkrip_'.Str::slug($profile->user?->name ?? 'mahasiswa', '_')],
+            'id_card' => [$profile->id_card_path, 'ktm_'.Str::slug($profile->user?->name ?? 'mahasiswa', '_')],
+            'ktm' => [$profile->id_card_path, 'ktm_'.Str::slug($profile->user?->name ?? 'mahasiswa', '_')],
+        ];
+
+        abort_unless(isset($typeMap[$type]), 404, 'Jenis dokumen tidak valid.');
+        [$path, $name] = $typeMap[$type];
+        abort_unless($path, 404, 'Dokumen belum diunggah.');
+
+        $forceDownload = $request->boolean('download');
+
+        return PrivateDocumentStorage::response($path, $name, $forceDownload);
+    }
 }

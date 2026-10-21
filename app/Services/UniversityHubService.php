@@ -77,6 +77,7 @@ class UniversityHubService
                 'applications' => function ($q) {
                     $q->latest();
                 },
+                'applications.group',
                 'applications.unit.agencyProfile',
                 'applications.placement.mentor',
                 'applications.placement.pembimbing',

@@ -3,10 +3,7 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
                     {{ __('Manajemen Bidang Devisi & Kuota Magang') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1 flex items-center gap-2">
@@ -25,7 +22,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Divisi / Lowongan Baru
+                    Tambah Devisi
                 </a>
             @endif
         </div>
@@ -84,7 +81,7 @@
             @endif
 
             <!-- Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Divisi / Bidang</p>
                     <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_units'] }}</h3>
@@ -92,20 +89,8 @@
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Kuota Magang</p>
-                    <h3 class="text-2xl font-black text-blue-600 mt-1" id="stat-total-quota">{{ $stats['total_quota'] }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">Kapasitas maksimal</p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Kuota Terisi (Diterima)</p>
-                    <h3 class="text-2xl font-black text-emerald-600 mt-1">{{ $stats['total_filled'] }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">Mahasiswa aktif magang</p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sisa Kuota Tersedia</p>
-                    <h3 class="text-2xl font-black text-amber-600 mt-1" id="stat-total-remaining">{{ $stats['total_remaining'] }}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mt-1" id="stat-total-remaining">{{ $stats['total_remaining'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Slot mahasiswa baru</p>
                 </div>
             </div>
@@ -151,7 +136,6 @@
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200">
                 <div class="p-6 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-gray-900">Daftar Divisi & Penyesuaian Kuota</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Ketik angka kuota langsung atau klik tombol +/- untuk penyesuaian instan</p>
                 </div>
 
 {{-- Tampilan HP: kartu --}}
@@ -205,7 +189,7 @@
                                         <button type="button"
                                                 @click="$dispatch('open-delete-modal', {
                                                     action: '{{ route('admin.units.destroy', $unit->id) }}',
-                                                    title: 'Hapus Divisi / Lowongan Magang',
+                                                    title: 'Hapus Devisi',
                                                     name: '{{ addslashes($unit->name) }}',
                                                     desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                 })"
@@ -216,8 +200,8 @@
                         </div>
                     @empty
                         <div class="mempty">
-                            <p style="font-weight:700;color:#475569">Belum Ada Divisi / Lowongan Magang</p>
-                            <p style="margin-top:4px">Klik tombol "Tambah Divisi Baru" untuk membuka lowongan.</p>
+                            <p style="font-weight:700;color:#475569">Belum Ada Devisi</p>
+                            <p style="margin-top:4px">Klik tombol "Tambah Devisi" untuk menambahkan devisi baru.</p>
                         </div>
                     @endforelse
                 </div>
@@ -340,7 +324,7 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.units.destroy', $unit->id) }}',
-                                                            title: 'Hapus Divisi / Lowongan Magang',
+                                                            title: 'Hapus Devisi',
                                                             name: '{{ addslashes($unit->name) }}',
                                                             desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                         })" 
@@ -356,8 +340,8 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="py-12 text-center text-gray-400">
-                                        <p class="font-medium text-gray-600">Belum Ada Divisi / Lowongan Magang</p>
-                                        <p class="text-xs text-gray-400 mt-1">Silakan klik tombol "Tambah Divisi Baru" untuk membuka lowongan.</p>
+                                        <p class="font-medium text-gray-600">Belum Ada Devisi</p>
+                                        <p class="text-xs text-gray-400 mt-1">Silakan klik tombol "Tambah Devisi" untuk menambahkan devisi baru.</p>
                                     </td>
                                 </tr>
                             @endforelse

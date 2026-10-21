@@ -6,7 +6,6 @@
                 <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-slate-100">
     <div>
         <h3 class="text-sm font-black text-slate-900">Dosen Pembimbing Terdaftar</h3>
-        <p class="text-xs text-slate-500">Kelola akun dosen pembimbing akademik dari {{ $university->name }} yang memantau & menilai logbook mahasiswa</p>
     </div>
 
     <!-- Tombol Tambah Dosen (Mengarah ke form create & otomatis kembali ke sini) -->

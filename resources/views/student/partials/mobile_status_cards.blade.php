@@ -189,6 +189,21 @@
                                     </span>
                                 </div>
                             </div>
+
+                            @if($application->group_id && $application->group)
+                                <div class="mt-2 pt-2 border-t border-slate-100 p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200/80 space-y-1.5 text-xs">
+                                    <div class="flex items-center justify-between gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-indigo-600 text-white shrink-0">Kelompok</span>
+                                            <span class="font-extrabold text-slate-900 truncate">{{ $application->group->name }}</span>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-indigo-800 shrink-0">{{ $application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}</span>
+                                    </div>
+                                    <div class="pt-1.5 border-t border-indigo-100 text-[11px] text-slate-600">
+                                        Kode Gabung: <strong class="font-mono text-indigo-700 font-bold">{{ $application->group->code }}</strong> &bull; {{ $application->group->applications->count() }} Anggota Tim
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between gap-3">

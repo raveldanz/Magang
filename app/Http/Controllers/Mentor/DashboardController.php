@@ -150,16 +150,21 @@ class DashboardController extends Controller
     {
         $mentor = Auth::user();
 
-        $placement = Placement::with([
+        $placement = Placement::findOrFail($placementId);
+        $placement->autoActivateIfStarted();
+
+        $placement->load([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'logbooks' => function ($q) {
                 $q->orderBy('date', 'desc')->orderBy('id', 'desc');
             },
             'evaluation',
             'finalreport',
+            'internshipProjects',
             'academicAdvisor',
-        ])->findOrFail($placementId);
+        ]);
 
         // Mentor yang ditugaskan, atau Kepala Unit selama mentor belum ditunjuk (validasi sementara).
         abort_unless($placement->canFieldReviewLogbook($mentor), 403, 'Anda tidak memiliki hak akses ke data bimbingan mahasiswa ini.');

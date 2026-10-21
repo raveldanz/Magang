@@ -65,6 +65,31 @@ class Application extends Model
         return $this->hasOne(Placement::class);
     }
 
+    public function group()
+    {
+        return $this->belongsTo(InternshipGroup::class, 'group_id');
+    }
+
+    public function isGroup(): bool
+    {
+        return ! is_null($this->group_id);
+    }
+
+    public function isLeader(): bool
+    {
+        return $this->role_in_group === 'leader';
+    }
+
+    public function isGroupLeader(): bool
+    {
+        return $this->isLeader();
+    }
+
+    public function isMember(): bool
+    {
+        return $this->role_in_group === 'member';
+    }
+
     public function getAgencyProfileAttribute()
     {
         return $this->unit?->agencyProfile ?? AgencyProfile::first();

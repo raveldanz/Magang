@@ -34,6 +34,7 @@ class ApplicationController extends Controller
             'user.studentProfile',
             'user.universityRelation',
             'unit.agencyProfile',
+            'group',
             'documents',
             'placement.evaluation',
             'placement.finalreport',
@@ -102,6 +103,15 @@ class ApplicationController extends Controller
             });
         }
 
+        // 5. Filter Berdasarkan Tipe Pendaftaran (Individu vs Kelompok)
+        if ($request->filled('registration_type')) {
+            if ($request->registration_type === 'group') {
+                $query->whereNotNull('applications.group_id');
+            } elseif ($request->registration_type === 'individual') {
+                $query->whereNull('applications.group_id');
+            }
+        }
+
         // Query Unit untuk Filter Dropdown (Scoped per bidang untuk Admin Bidang, scoped per dinas untuk Admin Dinas, all untuk Superadmin)
         if (! $isSuperAdmin && $user->unit_id) {
             $units = Unit::where('id', $user->unit_id)->get();
@@ -145,12 +155,14 @@ class ApplicationController extends Controller
         $application = Application::with([
             'user.studentProfile',
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'documents',
             'placement.pembimbing',
             'placement.mentor',
             'placement.academicAdvisor',
             'placement.evaluation',
             'placement.finalreport',
+            'placement.internshipProjects',
         ])->findOrFail($id);
 
         // Pemicu Otomatis 3: jika mahasiswa sudah mencapai tanggal mulai (today >= start_date) dan belum berstatus active, sistem langsung memperbarui statusnya secara on-the-fly
@@ -407,6 +419,46 @@ class ApplicationController extends Controller
                 ));
             }
 
+            // Sinkronkan seluruh anggota kelompok jika ini adalah pengajuan kelompok
+            if ($application->group_id) {
+                $group = \App\Models\InternshipGroup::find($application->group_id);
+                if ($group) {
+                    $group->update([
+                        'status' => $newStatus,
+                        'letter_number' => $appUpdateData['letter_number'] ?? $group->letter_number,
+                        'letter_date' => $appUpdateData['letter_date'] ?? $group->letter_date,
+                        'letter_token' => $group->letter_token ?: $letterToken,
+                        'rejection_reason' => $appUpdateData['rejection_reason'] ?? null,
+                    ]);
+
+                    $siblingApps = Application::where('group_id', $group->id)
+                        ->where('id', '!=', $application->id)
+                        ->get();
+
+                    foreach ($siblingApps as $sibling) {
+                        $siblingUpdateData = $appUpdateData;
+                        $siblingUpdateData['letter_token'] = $sibling->letter_token ?: Str::random(32);
+                        $sibling->update($siblingUpdateData);
+
+                        if ($assignedMentorId || in_array($newStatus, $placementEligibleStatuses)) {
+                            $sibPlacement = Placement::where('application_id', $sibling->id)->first();
+                            $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                            $sibPlacementData = $placementData;
+                            if (in_array($newStatus, $placementEligibleStatuses)) {
+                                $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
+                                $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
+                            }
+                            if ($sibPlacement) {
+                                $sibPlacement->update($sibPlacementData);
+                            } else {
+                                $sibPlacementData['application_id'] = $sibling->id;
+                                Placement::create($sibPlacementData);
+                            }
+                        }
+                    }
+                }
+            }
+
             // Catat audit log khusus mutasi/pergantian pembimbing jika ada perubahan
             if (! empty($reassignChanges) && $existingPlacement) {
                 AuditLog::record('PLACEMENT_SUPERVISOR_REASSIGN', 'Placement', $existingPlacement->id, [
@@ -597,6 +649,50 @@ class ApplicationController extends Controller
                             $existingPlacement->update($placementData);
                         } else {
                             Placement::create(array_merge(['application_id' => $application->id], $placementData));
+                        }
+                    }
+                }
+
+                // Sinkronkan seluruh anggota kelompok jika pengajuan kelompok diproses massal
+                if ($application->group_id) {
+                    $group = \App\Models\InternshipGroup::find($application->group_id);
+                    if ($group) {
+                        $group->update([
+                            'status' => $effectiveAction,
+                            'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($group->letter_number ?: $autoLetterNumber) : null,
+                            'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($group->letter_date ?: date('Y-m-d')) : null,
+                            'letter_token' => $group->letter_token ?: $letterToken,
+                            'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                        ]);
+
+                        $siblingApps = Application::where('group_id', $group->id)
+                            ->where('id', '!=', $application->id)
+                            ->get();
+
+                        foreach ($siblingApps as $sibling) {
+                            $sibling->update([
+                                'status' => $effectiveAction,
+                                'rejection_note' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                                'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                                'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_number ?: $autoLetterNumber) : null,
+                                'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_date ?: date('Y-m-d')) : null,
+                                'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_token ?: Str::random(32)) : $sibling->letter_token,
+                            ]);
+
+                            if (in_array($effectiveAction, ['waiting_approval', 'accepted']) || $assignedMentorId) {
+                                $sibPlacement = Placement::where('application_id', $sibling->id)->first();
+                                $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                                $sibPlacementData = $placementData ?? [];
+                                if (in_array($effectiveAction, ['waiting_approval', 'accepted'])) {
+                                    $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
+                                    $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
+                                }
+                                if ($sibPlacement) {
+                                    $sibPlacement->update($sibPlacementData);
+                                } else {
+                                    Placement::create(array_merge(['application_id' => $sibling->id], $sibPlacementData));
+                                }
+                            }
                         }
                     }
                 }

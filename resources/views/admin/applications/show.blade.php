@@ -61,6 +61,72 @@
                 </div>
             @endif
 
+            @if($application->group_id && $application->group)
+                <!-- Panel Terintegrasi Kelompok Magang -->
+                <div class="bg-gradient-to-r from-indigo-50/90 via-blue-50/50 to-white rounded-2xl border border-indigo-200 p-5 sm:p-6 shadow-2xs space-y-3.5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-full bg-indigo-600 text-white font-black text-[10px] uppercase tracking-wider">Pengajuan Kelompok</span>
+                                    <span class="text-xs font-mono font-bold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-md">Kode: {{ $application->group->code }}</span>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ $application->group->name }}</h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-600">Peran Pemohon:</span>
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold {{ $application->role_in_group === 'leader' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-blue-100 text-blue-900 border border-blue-200' }}">
+                                {{ $application->role_in_group === 'leader' ? '⭐ Ketua Kelompok' : 'Anggota Tim' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Anggota Tim -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs text-slate-700 font-bold">
+                            <span>Anggota Tim Terdaftar ({{ $application->group->applications->count() }} Mahasiswa):</span>
+                            @if($application->group->proposal_letter_path)
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('documents.group.proposal', $application->group->id) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span>Lihat Proposal</span>
+                                    </a>
+                                    <a href="{{ route('documents.group.proposal.download', $application->group->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer" title="Unduh Proposal Kelompok">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span>Unduh</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                            @foreach($application->group->applications as $grpMember)
+                                <a href="{{ route('admin.applications.show', $grpMember->id) }}"
+                                   class="p-3 rounded-xl border transition flex items-center justify-between {{ $grpMember->id === $application->id ? 'bg-indigo-100/80 border-indigo-300 font-bold text-indigo-950 ring-2 ring-indigo-400/30' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-800' }}">
+                                    <div class="min-w-0 pr-2">
+                                        <div class="text-xs truncate font-bold text-slate-900">{{ $grpMember->user?->name }}</div>
+                                        <div class="text-[11px] text-slate-500 font-mono">NIM: {{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase {{ $grpMember->role_in_group === 'leader' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600' }}">
+                                            {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
+                                        </span>
+                                        <div class="mt-0.5">
+                                            <span class="text-[10px] font-bold {{ $grpMember->statusValue() === 'accepted' ? 'text-emerald-700' : ($grpMember->statusValue() === 'rejected' ? 'text-rose-700' : 'text-slate-500') }}">
+                                                {{ ucfirst($grpMember->statusValue()) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- 1. Data Profil & Pengajuan Mahasiswa -->
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs">
                 <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100 mb-5">
@@ -120,7 +186,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @forelse ($application->documents as $doc)
                         <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-blue-200 transition">
-                            <div class="flex items-center gap-3 min-w-0">
+                            <div class="flex items-center gap-3 min-w-0 mr-3">
                                 <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
                                     PDF
                                 </div>
@@ -129,16 +195,19 @@
                                     <div class="text-[11px] text-slate-400 mt-0.5">Format dokumen terverifikasi</div>
                                 </div>
                             </div>
-                            <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                <span>Lihat PDF</span>
-                            </a>
-                            <a href="{{ route('documents.application.download', $doc->id) }}"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold shadow-2xs transition active:scale-95 shrink-0 cursor-pointer"
-                               title="Unduh berkas">
-                                <span>Unduh</span>
-                            </a>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    <span>Lihat PDF</span>
+                                </a>
+                                <a href="{{ route('documents.application.download', $doc->id) }}"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer"
+                                   title="Unduh berkas">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>Unduh</span>
+                                </a>
+                            </div>
                         </div>
                     @empty
                         <div class="col-span-2 p-6 text-center text-xs text-slate-400">
@@ -632,9 +701,9 @@
                                     <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
                                         <span>{{ $currMentor?->name ?? 'Belum Ditugaskan' }}</span>
                                         @if($currMentor)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span> {{-- status-guard:ignore --}}
                                         @else
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu</span>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu</span> {{-- status-guard:ignore --}}
                                         @endif
                                     </div>
                                     @unless ($currMentor)
@@ -646,7 +715,7 @@
                                     <div class="font-bold text-slate-900 text-xs mt-1 flex items-center justify-between">
                                         <span>{{ $currAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
                                         @if($currAdvisor)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800">Aktif</span> {{-- status-guard:ignore --}}
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800">Menunggu SK</span>
                                         @endif

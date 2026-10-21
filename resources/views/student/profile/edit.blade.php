@@ -121,7 +121,8 @@
                             <li>Arahkan kursor & klik <strong>foto profil</strong> untuk meninjau gambar secara penuh.</li>
                             <li>Pastikan <strong>Foto Profil</strong> formal dan jelas dengan format JPG/PNG maksimal 2MB.</li>
                             <li>Pastikan <strong>NIM</strong> dan <strong>Universitas</strong> sesuai dengan data perguruan tinggi resmi.</li>
-                            <li>Nomor <strong>WhatsApp</strong> aktif wajib diisi untuk koordinasi dengan DPL & Mentor instansi.</li>
+                            <li>Nomor <strong>WhatsApp</strong> aktif wajib diisi untuk koordinasi dengan DPL dan Mentor instansi.</li>
+                            <li>Unggah berkas <strong>CV, Transkrip Nilai, dan KTM</strong> di bawah agar dapat digunakan langsung pada pengajuan magang.</li>
                         </ul>
                     </div>
                 </div>
@@ -281,18 +282,116 @@
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat / Hubungan*" class="text-xs font-bold uppercase tracking-wider" />
-                                        <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile?->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto (Ayah)" />
+                                        <x-input-label for="emergency_contact_name" value="Nama Kontak Darurat atau Hubungan Keluarga" class="text-xs font-bold uppercase tracking-wider" />
+                                        <x-text-input id="emergency_contact_name" name="emergency_contact_name" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_name', $profile?->emergency_contact_name ?? '')" placeholder="Contoh: Bpk. Haryanto - Ayah" />
                                         <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                                     </div>
 
                                     <div>
-                                        <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat*" class="text-xs font-bold uppercase tracking-wider" />
+                                        <x-input-label for="emergency_contact_phone" value="Nomor HP Kontak Darurat" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="emergency_contact_phone" name="emergency_contact_phone" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('emergency_contact_phone', $profile?->emergency_contact_phone ?? '')" placeholder="Contoh: 081298765432" />
                                         <x-input-error :messages="$errors->get('emergency_contact_phone')" class="mt-1" />
                                     </div>
                                 </div>
-                                <p class="text-xs text-slate-400 italic">*opsional</p>
+                                <p class="text-xs text-slate-400 italic">Kolom kontak darurat bersifat opsional.</p>
+                            </div>
+
+                            <!-- Section 5: Dokumen Berkas Personal Mahasiswa -->
+                            <div class="space-y-4 pt-2 border-t border-slate-100">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-xs font-black uppercase text-blue-700 tracking-wider flex items-center gap-2">
+                                        <span>Dokumen Persyaratan Magang</span>
+                                    </h4>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                                        Wajib untuk Pendaftaran
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    Unggah berkas identitas akademik Anda di sini satu kali saja. Berkas ini otomatis terhubung pada setiap pengajuan magang Anda, baik pendaftaran individu maupun tim kelompok.
+                                </p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                                    <!-- 1. Curriculum Vitae -->
+                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <label for="cv" class="block text-xs font-bold text-slate-800">
+                                                    1. Curriculum Vitae
+                                                </label>
+                                                @if($profile?->cv_path)
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800">Tersedia</span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-rose-100 text-rose-800">Belum Ada</span>
+                                                @endif
+                                            </div>
+                                            <input type="file" id="cv" name="cv" accept=".pdf" class="block w-full text-xs text-slate-500 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                                            <p class="text-[10px] text-slate-400">Format: PDF, Maks 2MB</p>
+                                            <x-input-error :messages="$errors->get('cv')" class="mt-1" />
+                                        </div>
+                                        @if($profile?->cv_path)
+                                            <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'cv']) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline text-[11px]">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    Lihat CV Saat Ini
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- 2. Transkrip Nilai Akademik -->
+                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <label for="transkrip" class="block text-xs font-bold text-slate-800">
+                                                    2. Transkrip Nilai
+                                                </label>
+                                                @if($profile?->transcript_path)
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800">Tersedia</span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-rose-100 text-rose-800">Belum Ada</span>
+                                                @endif
+                                            </div>
+                                            <input type="file" id="transkrip" name="transkrip" accept=".pdf" class="block w-full text-xs text-slate-500 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                                            <p class="text-[10px] text-slate-400">Format: PDF, Maks 2MB</p>
+                                            <x-input-error :messages="$errors->get('transkrip')" class="mt-1" />
+                                        </div>
+                                        @if($profile?->transcript_path)
+                                            <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'transkrip']) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline text-[11px]">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    Lihat Transkrip
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- 3. Kartu Tanda Mahasiswa (KTM) -->
+                                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <label for="id_card" class="block text-xs font-bold text-slate-800">
+                                                    3. KTM atau Kartu Identitas
+                                                </label>
+                                                @if($profile?->id_card_path)
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800">Tersedia</span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-rose-100 text-rose-800">Belum Ada</span>
+                                                @endif
+                                            </div>
+                                            <input type="file" id="id_card" name="id_card" accept=".pdf,image/png,image/jpeg,image/jpg" class="block w-full text-xs text-slate-500 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                                            <p class="text-[10px] text-slate-400">Format: PDF, JPG, PNG, Maks 2MB</p>
+                                            <x-input-error :messages="$errors->get('id_card')" class="mt-1" />
+                                        </div>
+                                        @if($profile?->id_card_path)
+                                            <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'id_card']) }}" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline text-[11px]">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    Lihat KTM Saat Ini
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Tombol Aksi Bawah -->

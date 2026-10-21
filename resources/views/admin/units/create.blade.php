@@ -12,7 +12,7 @@
             </a>
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    Tambah Divisi / Lowongan Magang Baru
+                    Tambah Devisi
                 </h2>
                 <p class="text-xs text-gray-500 mt-0.5">Buka divisi kerja baru dan tentukan kuota penerimaan mahasiswa
                 </p>

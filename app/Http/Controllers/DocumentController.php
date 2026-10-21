@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApplicationDocument;
+use App\Models\InternshipGroup;
 use App\Models\User;
 use App\Services\PrivateDocumentStorage;
 use Illuminate\Support\Facades\Auth;
@@ -55,6 +56,87 @@ class DocumentController extends Controller
         ]);
     }
 
+    /** Pratinjau inline proposal kelompok di tab browser. */
+    public function showGroupProposal($id)
+    {
+        [$group, $location, $downloadName] = $this->resolveAuthorizedGroupProposal($id);
+
+        $realPath = $location['disk'] ? Storage::disk($location['disk'])->path($location['path']) : $location['path'];
+        $ext = strtolower(pathinfo($realPath, PATHINFO_EXTENSION) ?: 'pdf');
+        $inline = in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'], true);
+
+        return response()->file($realPath, [
+            'Content-Type' => mime_content_type($realPath) ?: 'application/octet-stream',
+            'Content-Disposition' => ($inline ? 'inline' : 'attachment')."; filename=\"{$downloadName}\"",
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
+    /** Unduh proposal kelompok. */
+    public function downloadGroupProposal($id)
+    {
+        [$group, $location, $downloadName] = $this->resolveAuthorizedGroupProposal($id);
+
+        if (! $location['disk']) {
+            return response()->download($location['path'], $downloadName, ['X-Content-Type-Options' => 'nosniff']);
+        }
+
+        return Storage::disk($location['disk'])->download($location['path'], $downloadName, [
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
+    /**
+     * @return array{0: InternshipGroup, 1: array{disk: ?string, path: string}, 2: string}
+     */
+    private function resolveAuthorizedGroupProposal($id): array
+    {
+        $group = InternshipGroup::with(['applications.user.studentProfile', 'unit'])->findOrFail($id);
+
+        abort_unless(
+            $this->canAccessGroupProposal(Auth::user(), $group),
+            403,
+            'Anda tidak memiliki hak akses untuk membuka proposal kelompok ini.'
+        );
+
+        abort_unless($group->proposal_letter_path, 404, 'Berkas proposal kelompok belum diunggah.');
+
+        $location = PrivateDocumentStorage::locate($group->proposal_letter_path);
+        if (! $location && ($legacy = self::resolveStoredFile($group->proposal_letter_path))) {
+            $location = ['disk' => null, 'path' => $legacy];
+        }
+        abort_unless($location, 404, 'Berkas dokumen proposal tidak ditemukan di penyimpanan server.');
+
+        $ext = strtolower(pathinfo($location['path'], PATHINFO_EXTENSION) ?: 'pdf');
+        $downloadName = 'proposal_kelompok_'.Str::slug($group->name ?: 'tim', '_').'_'.$group->code.'.'.$ext;
+
+        return [$group, $location, $downloadName];
+    }
+
+    private function canAccessGroupProposal(?User $user, InternshipGroup $group): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($this->currentUserIsSuperAdmin($user)) {
+            return true;
+        }
+
+        return match ($user->role) {
+            'mahasiswa' => $group->applications()->where('user_id', $user->id)->exists(),
+            'admin', 'supervisor' => $user->agency_profile_id !== null
+                && (int) optional($group->unit)->agency_profile_id === (int) $user->agency_profile_id,
+            'mentor' => (int) optional($group->unit)->agency_profile_id === (int) $user->agency_profile_id,
+            'universitas' => $user->university_id !== null && $group->applications->contains(function ($app) use ($user) {
+                return (int) $app->user?->university_id === (int) $user->university_id;
+            }),
+            default => false,
+        };
+    }
+
     /**
      * @return array{0: ApplicationDocument, 1: array{disk: ?string, path: string}, 2: string}
      */
@@ -100,9 +182,11 @@ class DocumentController extends Controller
         return match ($user->role) {
             // Mahasiswa pemilik berkas
             'mahasiswa' => $application && (int) $application->user_id === (int) $user->id,
-            // Admin Dinas dari instansi yang dilamar
-            'admin' => $user->agency_profile_id !== null
+            // Admin Dinas atau Atasan Kepegawaian (Supervisor) dari instansi yang dilamar
+            'admin', 'supervisor' => $user->agency_profile_id !== null
                 && (int) optional($application?->unit)->agency_profile_id === (int) $user->agency_profile_id,
+            // Mentor yang bertugas di unit instansi tersebut
+            'mentor' => (int) optional($application?->unit)->agency_profile_id === (int) $user->agency_profile_id,
             // Admin Kampus asal mahasiswa
             'universitas' => $user->university_id !== null && in_array((int) $user->university_id, array_filter([
                 (int) $student?->university_id,

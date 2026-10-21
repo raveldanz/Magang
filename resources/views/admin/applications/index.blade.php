@@ -7,7 +7,7 @@
                 </h2>
                 @if(auth()->user()->isBidangAdmin())
                     <p class="text-xs text-blue-600 font-semibold mt-0.5">
-                        Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }} &bull; Verifikasi Berkas & Kelayakan Peserta
+                        Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}
                     </p>
                 @endif
             </div>
@@ -41,19 +41,46 @@
 
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-100">
                 
-                <!-- Form Filter & Search (Responsive Single-Row Flex Layout) -->
-                <form method="GET" action="{{ route('admin.applications.index') }}" class="mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <div class="flex flex-col lg:flex-row items-center gap-3">
-                        <!-- Input Search (flex-[1.5]) -->
-                        <div class="flex-[1.5] min-w-[200px] w-full">
-                            <x-text-input type="text" name="search" value="{{ request('search') }}" 
-                                placeholder="Cari nama mahasiswa, NIM, atau universitas..." class="w-full text-sm h-10" />
+                <!-- Form Filter & Search (Responsive 2-Row Grid Layout - No Squishing) -->
+                <form method="GET" action="{{ route('admin.applications.index') }}" class="mb-6 bg-slate-50/90 p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                    <!-- Baris 1: Search Mahasiswa & Action Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3 mb-3">
+                        <!-- Input Search Utama -->
+                        <div class="relative flex-1 w-full">
+                            <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}" 
+                                placeholder="Cari nama mahasiswa, NIM, atau universitas..." 
+                                class="w-full text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-gray-400 h-10"
+                                style="padding-left: 2.75rem !important; padding-right: 1rem !important;" />
                         </div>
 
-                        <!-- Filter Universitas (w-52) -->
+                        <!-- Tombol Terapkan Filter & Reset -->
+                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 h-10 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold rounded-xl shadow-xs transition duration-150 w-full sm:w-auto cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                <span>Terapkan Filter</span>
+                            </button>
+
+                            @if(request()->hasAny(['search', 'status', 'unit_id', 'university_id', 'agency_id', 'registration_type']))
+                                <a href="{{ route('admin.applications.index') }}" class="inline-flex items-center justify-center px-4 h-10 bg-white hover:bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold rounded-xl shadow-2xs transition duration-150">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Baris 2: 4 Dropdown Filter Proporsional (Grid 4 Kolom Lega) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- Filter Universitas -->
                         @if(isset($universities))
-                            <div class="w-full lg:w-52">
-                                <select name="university_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                            <div>
+                                <select name="university_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
                                     <option value="">-- Semua Kampus --</option>
                                     @foreach ($universities as $unv)
                                         <option value="{{ $unv->id }}" {{ request('university_id') == $unv->id ? 'selected' : '' }}>
@@ -64,15 +91,15 @@
                             </div>
                         @endif
 
-                        <!-- Filter Unit / Divisi (w-64) -->
-                        @if (auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
-                            <div class="w-full lg:w-64 flex items-center px-3.5 h-10 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-md shadow-2xs">
-                                <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
-                                <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
-                            </div>
-                        @else
-                            <div class="w-full lg:w-64">
-                                <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                        <!-- Filter Unit / Divisi -->
+                        <div>
+                            @if (auth()->user()->unit_id && ! auth()->user()->isSuperAdmin())
+                                <div class="w-full flex items-center px-3.5 h-10 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-xl shadow-2xs">
+                                    <span class="truncate">Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}</span>
+                                    <input type="hidden" name="unit_id" value="{{ auth()->user()->unit_id }}">
+                                </div>
+                            @else
+                                <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
                                     <option value="">-- Semua Unit/Divisi --</option>
                                     @if (isset($groupedUnits) && $groupedUnits !== null)
                                         @foreach ($groupedUnits as $agencyName => $agencyUnits)
@@ -96,12 +123,12 @@
                                         @endforeach
                                     @endif
                                 </select>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
 
-                        <!-- Filter Status (w-44) -->
-                        <div class="w-full lg:w-44">
-                            <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                        <!-- Filter Status -->
+                        <div>
+                            <select name="status" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
                                 <option value="">-- Semua Status --</option>
                                 <option value="action" {{ request('status') == 'action' ? 'selected' : '' }}>Perlu Tindakan</option>
                                 <optgroup label="Status Pengajuan">
@@ -112,20 +139,13 @@
                             </select>
                         </div>
 
-                        <!-- Action Buttons (Height 10 uniform) -->
-                        <div class="flex items-center gap-2 w-full lg:w-auto shrink-0">
-                            <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-4 h-10 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition w-full lg:w-auto cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                <span>Filter</span>
-                            </button>
-
-                            @if(request('search') || request('status') || request('unit_id') || request('university_id') || request('agency_id'))
-                                <a href="{{ route('admin.applications.index') }}" class="inline-flex items-center justify-center px-4 h-10 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-lg shadow-sm transition">
-                                    Reset
-                                </a>
-                            @endif
+                        <!-- Filter Tipe Pendaftaran (Individu / Kelompok) -->
+                        <div>
+                            <select name="registration_type" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
+                                <option value="">-- Semua Moda --</option>
+                                <option value="individual" {{ request('registration_type') == 'individual' ? 'selected' : '' }}>Individu Saja</option>
+                                <option value="group" {{ request('registration_type') == 'group' ? 'selected' : '' }}>Kelompok Saja</option>
+                            </select>
                         </div>
                     </div>
                 </form>
@@ -404,65 +424,91 @@
                     </div>
 
                 <!-- Tabel Data Pengajuan (Desktop & Tablet) -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b bg-gray-50 text-xs font-semibold text-gray-600 uppercase">
-                                <th class="p-3 w-10 text-center">
-                                    <input type="checkbox" x-model="selectAll" @change="toggleAll" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                <div class="hidden md:block overflow-x-auto rounded-2xl border border-gray-200/90 shadow-2xs overflow-hidden">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50/90 text-slate-500 font-bold uppercase tracking-wider text-[11px] whitespace-nowrap border-b border-slate-200/90">
+                            <tr>
+                                <th class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap">
+                                    <input type="checkbox" x-model="selectAll" @change="toggleAll" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                 </th>
-                                <th class="p-3">Tanggal Pengajuan</th>
-                                <th class="p-3">Nama Mahasiswa</th>
-                                <th class="p-3">Universitas / Jurusan</th>
-                                <th class="p-3">{{ auth()->user()->isBidangAdmin() ? 'Bidang & Pembimbing' : 'Instansi & Unit Tujuan' }}</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3 text-center">Aksi</th>
+                                <th class="py-3.5 pl-3 pr-3 text-left">Mahasiswa &amp; Perguruan Tinggi</th>
+                                <th class="py-3.5 px-3 text-left">{{ auth()->user()->isBidangAdmin() ? 'Bidang & Pembimbing' : 'Unit Kerja & Instansi' }}</th>
+                                <th class="py-3.5 px-3 text-left whitespace-nowrap">Tanggal Pengajuan</th>
+                                <th class="py-3.5 px-3 text-center whitespace-nowrap">Status</th>
+                                <th class="py-3.5 px-6 text-center whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm divide-y">
+                        <tbody class="text-sm divide-y divide-slate-100">
                             @forelse ($applications as $app)
-                                <tr class="border-b hover:bg-gray-50/50">
-                                    <td class="p-3 text-center">
+                                <tr class="hover:bg-slate-50/80 transition-colors duration-150" :class="selected.includes('{{ $app->id }}') ? 'bg-blue-50/40' : ''">
+                                    <td class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap">
                                         @if(in_array($app->statusValue(), ['pending', 'waiting_approval']))
-                                            <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                            <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                         @endif
                                     </td>
-                                    <td class="p-3 text-xs text-gray-500 font-mono">
-                                        {{ $app->created_at->format('d M Y, H:i') }}
+                                    <td class="py-3.5 pl-3 pr-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/70 text-blue-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                                                {{ strtoupper(substr($app->user?->name ?? 'M', 0, 1)) }}
+                                            </div>
+                                            <div class="min-w-0 max-w-[200px] sm:max-w-[240px]">
+                                                <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-blue-600 transition leading-tight truncate block" title="{{ $app->user?->name ?? 'Mahasiswa' }}">
+                                                    {{ $app->user?->name ?? 'Mahasiswa' }}
+                                                </a>
+                                                @if($app->group_id && $app->group)
+                                                    <div>
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mt-0.5">
+                                                            Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                        </span>
+                                                    </div>
+                                                @endif
+                                                <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate" title="{{ $app->user?->studentProfile?->universitas ?? '-' }}{{ $app->user?->studentProfile?->jurusan ? ' · ' . $app->user?->studentProfile?->jurusan : '' }}">
+                                                    <span class="font-medium text-slate-700">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
+                                                    @if($app->user?->studentProfile?->jurusan)
+                                                        <span class="text-slate-300">·</span>
+                                                        <span class="text-slate-500">{{ $app->user?->studentProfile?->jurusan }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="p-3 font-semibold text-gray-900">
-                                        <div class="leading-snug">{{ $app->user?->name ?? 'Mahasiswa' }}</div>
-                                    </td>
-                                    <td class="p-3 text-gray-600">{{ $app->user?->studentProfile?->universitas ?? '-' }} <br><span class="text-xs text-gray-400">({{ $app->user?->studentProfile?->jurusan ?? '-' }})</span></td>
-                                    <td class="p-3">
-                                        <div class="space-y-1">
-                                            <div class="font-bold text-gray-900 leading-snug">
+                                    <td class="py-3.5 px-3">
+                                        <div class="space-y-1 max-w-[200px] sm:max-w-[240px]">
+                                            <div class="font-bold text-slate-900 text-xs leading-snug truncate" title="{{ $app->unit->name ?? '-' }}">
                                                 {{ $app->unit->name ?? '-' }}
                                             </div>
                                             @if(auth()->user()->isBidangAdmin())
                                                 @if($app->placement?->mentor)
                                                     <div class="text-[11px] text-slate-600 flex items-center gap-1">
                                                         <span class="text-slate-400 font-medium">Mentor:</span>
-                                                        <span class="text-slate-900 font-semibold truncate max-w-[180px]">{{ $app->placement->mentor->name }}</span>
+                                                        <span class="text-slate-800 font-semibold truncate max-w-[160px]">{{ $app->placement->mentor->name }}</span>
                                                     </div>
                                                 @else
                                                     <span class="text-[11px] text-amber-600 font-semibold italic">Belum Ada Mentor</span>
                                                 @endif
                                             @elseif($app->unit?->agencyProfile)
-                                                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/90 border border-blue-200/80 rounded-md text-[11px] text-blue-800 font-semibold">
+                                                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 border border-slate-200/80 rounded-md text-[11px] text-slate-700 font-medium max-w-[200px]">
                                                     <svg class="w-3 h-3 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                                     </svg>
-                                                    <span class="truncate max-w-[220px]" title="{{ $app->unit->agencyProfile->agency_name }}">
+                                                    <span class="truncate" title="{{ $app->unit->agencyProfile->agency_name }}">
                                                         {{ $app->unit->agencyProfile->agency_name }}
                                                     </span>
                                                 </div>
                                             @else
-                                                <span class="text-[11px] text-gray-400">Pemerintah Kota Surabaya</span>
+                                                <span class="text-[11px] text-slate-400">Pemerintah Kota Surabaya</span>
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="p-3 whitespace-nowrap">
+                                    <td class="py-3.5 px-3 whitespace-nowrap">
+                                        <div class="text-xs font-semibold text-slate-800">
+                                            {{ $app->created_at->translatedFormat('d M Y') }}
+                                        </div>
+                                        <div class="text-[11px] text-slate-400 font-mono mt-0.5">
+                                            {{ $app->created_at->format('H:i') }} WIB
+                                        </div>
+                                    </td>
+                                    <td class="py-3.5 px-3 whitespace-nowrap text-center">
                                         @php
                                             $rawStatus = $app->statusValue();
                                             $isActive = $rawStatus === \App\Enums\ApplicationStatus::ACTIVE->value;
@@ -479,22 +525,22 @@
                                             <div class="mt-1.5 inline-flex px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold" title="Tanggal selesai {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}">Lewat masa magang {{ $app->daysPastEndDate() }} hari</div>
                                         @endif
                                         @if($isActive && $isReadyToComplete)
-                                            <div class="mt-1.5 text-xs text-emerald-600 font-medium">Siap diluluskan</div>
+                                            <div class="mt-1 text-[11px] text-emerald-600 font-medium">Siap diluluskan</div>
                                         @elseif($isActive && $app->isPastEndDate() && !$isReadyToComplete)
-                                            <div class="mt-1.5 text-xs font-semibold text-rose-600">Menunggu Evaluasi Mentor/Kelulusan</div>
+                                            <div class="mt-1 text-[11px] font-semibold text-rose-600">Menunggu Evaluasi Mentor/Kelulusan</div>
                                         @elseif($actionHint && $actionHint !== 'Siap diluluskan')
-                                            <div class="mt-1.5 text-xs font-semibold text-amber-700">{{ $actionHint }}</div>
+                                            <div class="mt-1 text-[11px] font-semibold text-amber-700">{{ $actionHint }}</div>
                                         @elseif($waitingLogbook)
-                                            <div class="mt-1.5 text-xs font-semibold text-rose-600">Logbook belum diisi</div>
+                                            <div class="mt-1 text-[11px] font-semibold text-rose-600">Logbook belum diisi</div>
                                         @elseif($waitingEvaluation)
-                                            <div class="mt-1.5 text-xs text-slate-500">Menunggu nilai evaluasi</div>
+                                            <div class="mt-1 text-[11px] text-slate-500">Menunggu nilai evaluasi</div>
                                         @elseif($rawStatus === \App\Enums\ApplicationStatus::ACCEPTED->value)
-                                            <div class="mt-1.5 text-xs text-indigo-600 font-medium">Pra-Magang</div>
+                                            <div class="mt-1 text-[11px] text-indigo-600 font-medium">Pra-Magang</div>
                                         @endif
                                     </td>
-                                    <td class="p-3 text-center whitespace-nowrap">
+                                    <td class="py-3.5 px-6 text-center whitespace-nowrap">
                                         <a href="{{ route('admin.applications.show', $app->id) }}" 
-                                            class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
+                                            class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
                                             <span>Detail</span>
                                             <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -504,7 +550,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="p-6 text-center text-gray-500">Tidak ada pengajuan magang yang sesuai kriteria pencarian.</td>
+                                    <td colspan="6" class="py-12 text-center text-gray-400">Tidak ada pengajuan magang yang sesuai kriteria pencarian.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -533,6 +579,13 @@
                             <div class="flex items-start justify-between gap-2">
                                 <div class="min-w-0 pr-2">
                                     <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
+                                    @if($app->group_id && $app->group)
+                                        <div class="mt-0.5">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                Kelompok ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                            </span>
+                                        </div>
+                                    @endif
                                     <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">({{ $app->user?->studentProfile?->jurusan ?? '-' }})</span></p>
                                 </div>
                                 <div class="text-right shrink-0 {{ in_array($rawStatus, ['pending', 'waiting_approval']) ? 'pr-8' : '' }}">

@@ -3,10 +3,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>Kelola Pembimbing Lapangan (Mentor) {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : ($currentAgency->agency_name ?? 'Dinas') }}</span>
+                    <span>Kelola Mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : ($currentAgency->agency_name ?? 'Dinas') }}</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun pembimbing lapangan {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? (auth()->user()->unit->name ?? 'bidang') : 'dinas' }} yang bertugas membimbing dan mengevaluasi mahasiswa magang
+                    Kelola akun mentor {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? (auth()->user()->unit->name ?? 'bidang') : 'dinas' }} yang bertugas membimbing dan mengevaluasi mahasiswa magang
                 </p>
             </div>
 

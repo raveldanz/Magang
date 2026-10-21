@@ -109,6 +109,13 @@
                                     </div>
                                     <div class="min-w-0">
                                         <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        @if($placement->application?->group_id && $placement->application?->group)
+                                            <div class="mt-0.5">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kelompok: {{ $placement->application->group->name }} ({{ $placement->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                </span>
+                                            </div>
+                                        @endif
                                         <p class="text-xs text-slate-500 mt-0.5 truncate">{{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</p>
                                     </div>
                                 </div>
@@ -212,6 +219,13 @@
                                 <tr class="hover:bg-slate-50/75 transition-colors">
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-slate-900 leading-snug">{{ $student->name ?? '-' }}</div>
+                                        @if($placement->application?->group_id && $placement->application?->group)
+                                            <div class="mt-0.5">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kelompok: {{ $placement->application->group->name }} ({{ $placement->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                </span>
+                                            </div>
+                                        @endif
                                         <div class="text-xs text-slate-500 mt-0.5">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</div>
                                     </td>
 

@@ -235,6 +235,13 @@
                                     </div>
                                     <div class="min-w-0">
                                         <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
+                                        @if($p->application?->group_id && $p->application?->group)
+                                            <div class="mt-0.5">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kelompok: {{ $p->application->group->name }} ({{ $p->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                </span>
+                                            </div>
+                                        @endif
                                         <p class="text-xs text-slate-500 mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}</p>
                                     </div>
                                 </div>
@@ -335,6 +342,13 @@
                                     <!-- Student Info -->
                                     <td class="py-4 px-4">
                                         <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
+                                        @if($p->application?->group_id && $p->application?->group)
+                                            <div class="mt-0.5">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kelompok: {{ $p->application->group->name }} ({{ $p->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                </span>
+                                            </div>
+                                        @endif
                                         <div class="text-[11px] text-slate-500 font-medium">NIM: {{ $profile?->nim ?? '-' }}</div>
                                         <div class="text-[11px] text-slate-600">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>

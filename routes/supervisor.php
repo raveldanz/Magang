@@ -26,4 +26,8 @@ Route::middleware(['auth', 'role:supervisor,super_admin'])->prefix('supervisor')
     Route::get('/certificates/{placementId}/preview', [CertificateApprovalController::class, 'show'])->name('certificates.show');
     Route::post('/certificates/{id}/approve', [CertificateApprovalController::class, 'approve'])->name('certificates.approve');
     Route::post('/certificates/{id}/revise', [CertificateApprovalController::class, 'revise'])->name('certificates.revise');
+
+    // 4. Laporan Mahasiswa (Pemantauan Kinerja Tanpa Menilai)
+    Route::get('/reports', [\App\Http\Controllers\Supervisor\StudentReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{placementId}', [\App\Http\Controllers\Supervisor\StudentReportController::class, 'show'])->name('reports.show');
 });

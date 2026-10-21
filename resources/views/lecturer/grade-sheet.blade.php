@@ -185,7 +185,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="py-1 font-semibold text-slate-700">Pembimbing Lapangan (Mentor)</td>
+                        <td class="py-1 font-semibold text-slate-700">Mentor Lapangan</td>
                         <td class="py-1">:</td>
                         <td class="py-1 text-slate-900">{{ $mentor->name ?? '-' }} (Instansi Kedinasan)</td>
                     </tr>
@@ -267,7 +267,7 @@
                             <span class="font-semibold text-slate-800">{{ $letterIndex }}. {{ $aspect['name'] }}</span>
                         </td>
                         @if ($idx === 0)
-                            <td class="border border-slate-300 py-1.5 text-center text-slate-700" rowspan="{{ $totalDosenAspects }}">Dosen Pembimbing (DPL)</td>
+                            <td class="border border-slate-300 py-1.5 text-center text-slate-700" rowspan="{{ $totalDosenAspects }}">Dosen Pembimbing</td>
                             <td class="border border-slate-300 py-1.5 text-center font-semibold" rowspan="{{ $totalDosenAspects }}">{{ $weightLecturer }}%</td>
                         @endif
                         <td class="border border-slate-300 py-1.5 text-center text-slate-800">{{ number_format((float)($aspect['score'] ?? 0), 1) }}</td>
@@ -381,7 +381,7 @@
                 <!-- Kolom 3 (Kanan): Dosen Pembimbing Lapangan (DPL) -->
                 <div>
                     <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-                    <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing Lapangan (DPL)</p>
+                    <p class="font-bold text-slate-800 text-xs mt-0.5">Dosen Pembimbing</p>
                     <p class="text-[10px] text-slate-500 truncate">{{ $univ->name ?? ($profile->universitas ?? 'Perguruan Tinggi') }}</p>
 
                     <div class="h-12 flex items-center justify-center my-0.5">

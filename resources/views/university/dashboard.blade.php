@@ -186,6 +186,13 @@
                     <p class="font-bold text-xs text-slate-800 truncate leading-snug">
                         {{ $student->name }}
                     </p>
+                    @if($app->group_id && $app->group)
+                        <div class="mt-0.5">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                            </span>
+                        </div>
+                    @endif
                     <p class="text-[11px] text-slate-400 font-mono mt-0.5">
                         NIM: {{ $student->studentProfile->nim ?? '-' }}
                     </p>
@@ -234,6 +241,13 @@
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="px-4 py-4">
                             <div class="font-bold text-slate-900">{{ $student->name }}</div>
+                            @if($app->group_id && $app->group)
+                                <div class="mt-0.5">
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                        Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                    </span>
+                                </div>
+                            @endif
                             <div class="text-xs text-slate-400 font-mono">{{ $student->email }}</div>
                         </td>
                         <td class="px-4 py-4">

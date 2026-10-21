@@ -33,14 +33,14 @@
                 <div class="lg:col-span-2 space-y-6">
 
                     {{-- 1. Kartu Data Mahasiswa --}}
-                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-200 pb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center font-black text-lg">
+                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center font-black text-lg shrink-0">
                                     {{ strtoupper(substr($application->user?->name ?? 'M', 0, 1)) }}
                                 </div>
-                                <div>
-                                    <h2 class="text-xl font-black text-slate-900">{{ $application->user?->name }}</h2>
+                                <div class="min-w-0">
+                                    <h2 class="text-lg sm:text-xl font-black text-slate-900 truncate">{{ $application->user?->name }}</h2>
                                     <p class="text-xs text-slate-500">NIM: <strong class="text-slate-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</strong></p>
                                 </div>
                             </div>
@@ -48,12 +48,54 @@
                                 $st = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status : \App\Enums\ApplicationStatus::tryFrom($application->status);
                             @endphp
                             @if($st)
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border {{ $st->badgeColor() }}">
-                                    <span class="w-2 h-2 rounded-full {{ $st->dotColor() }}"></span>
-                                    {{ $st->description('supervisor') }}
-                                </span>
+                                <div class="self-start sm:self-auto shrink-0">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border {{ $st->badgeColor() }}">
+                                        <span class="w-2 h-2 rounded-full {{ $st->dotColor() }}"></span>
+                                        {{ $st->description('supervisor') }}
+                                    </span>
+                                </div>
                             @endif
                         </div>
+
+                        @if($application->group_id && $application->group)
+                            <div class="p-4 bg-gradient-to-r from-indigo-50/90 via-blue-50/40 to-white border border-indigo-200 rounded-2xl space-y-2.5 mb-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-extrabold text-[10px] uppercase tracking-wider">Kelompok Magang</span>
+                                        <span class="font-extrabold text-sm text-slate-900">{{ $application->group->name }}</span>
+                                        <span class="text-xs text-indigo-700 font-bold font-mono">({{ $application->group->code }})</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold text-slate-700">
+                                            Posisi: <strong class="text-indigo-800">{{ $application->role_in_group === 'leader' ? 'Ketua Kelompok' : 'Anggota Tim' }}</strong>
+                                        </span>
+                                        @if($application->group->proposal_letter_path)
+                                            <a href="{{ route('documents.group.proposal', $application->group->id) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-2xs transition">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                <span>Lihat Proposal</span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t border-indigo-100 text-xs">
+                                    <span class="font-bold text-slate-700 block mb-1.5">Seluruh Anggota Kelompok Ini ({{ $application->group->applications->count() }} Orang):</span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                        @foreach($application->group->applications as $grpMember)
+                                            <a href="{{ route('supervisor.applications.show', $grpMember->id) }}" 
+                                               class="p-2.5 rounded-xl border transition flex items-center justify-between {{ $grpMember->id === $application->id ? 'bg-indigo-100/70 border-indigo-300 font-bold text-indigo-950 ring-2 ring-indigo-400/30' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-800' }}">
+                                                <div class="min-w-0">
+                                                    <div class="text-xs truncate max-w-[140px]">{{ $grpMember->user?->name }}</div>
+                                                    <div class="text-[10px] text-slate-400 font-mono">{{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                                </div>
+                                                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded shrink-0 {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
+                                                    {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
+                                                </span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
@@ -106,7 +148,7 @@
                             </div>
 
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Mentor Lapangan (Tim Kerja)</span>
+                                <span class="text-xs text-slate-500 font-bold uppercase block">Mentor Lapangan Bidang</span>
                                 <span class="font-black text-slate-900 text-sm mt-0.5 block">
                                     {{ $application->placement?->mentor?->name ?? $application->placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}
                                 </span>
@@ -126,7 +168,7 @@
                                         {{ $application->end_date ? \Carbon\Carbon::parse($application->end_date)->isoFormat('D MMMM Y') : '-' }}
                                     </strong>
                                 </div>
-                                <span class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-800 font-bold">
+                                <span class="self-start sm:self-auto px-2.5 py-1 rounded-lg bg-slate-200 text-slate-800 font-bold">
                                     Durasi: {{ $application->start_date && $application->end_date ? (int) round(\Carbon\Carbon::parse($application->start_date)->floatDiffInMonths(\Carbon\Carbon::parse($application->end_date))) . ' Bulan' : '-' }}
                                 </span>
                             </div>
@@ -134,26 +176,26 @@
                     </div>
 
                     {{-- 3. Berkas Pendukung Mahasiswa --}}
-                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-4">
+                    <div class="bg-white rounded-3xl border-2 border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
                         <h3 class="text-base font-black text-slate-900 border-b border-slate-200 pb-3">
                             Berkas Dokumen Pendukung Pengajuan
                         </h3>
 
                         <div class="space-y-3">
                             @forelse($application->documents ?? [] as $doc)
-                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
-                                    <div class="flex items-center gap-3">
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="flex items-center gap-3 min-w-0">
                                         <div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
                                              PDF
                                         </div>
-                                        <div>
-                                            <div class="text-sm font-bold text-slate-900">{{ $doc->name ?? $doc->type ?? 'Dokumen Pengajuan' }}</div>
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-slate-900 truncate">{{ $doc->name ?? $doc->type ?? 'Dokumen Pengajuan' }}</div>
                                             <div class="text-xs text-slate-500">{{ $doc->created_at ? $doc->created_at->diffForHumans() : '' }}</div>
                                         </div>
                                     </div>
                                     @if($doc->file_path)
                                         <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" 
-                                           class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-blue-700 font-bold text-xs border border-slate-300 shadow-2xs transition">
+                                           class="w-full sm:w-auto text-center px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-blue-700 font-bold text-xs border border-slate-300 shadow-2xs transition min-h-[38px] flex items-center justify-center">
                                             Buka Dokumen &rarr;
                                         </a>
                                     @endif

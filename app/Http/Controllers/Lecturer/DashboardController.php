@@ -166,19 +166,23 @@ class DashboardController extends Controller
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'logbooks',
             'finalreport',
+            'internshipProjects',
             'evaluation',
             'academicConsultations',
         ])->find($placementId) ?? Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'logbooks',
             'finalreport',
+            'internshipProjects',
             'evaluation',
             'academicConsultations',
         ])->where('application_id', $placementId)->firstOrFail();

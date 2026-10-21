@@ -189,29 +189,25 @@
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Sisa Kuota</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-blue-600">{{ $stats['total_remaining'] }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['total_remaining'] }}</span>
                         <span class="text-sm text-slate-500">dari {{ $stats['total_quota'] }} slot</span>
                     </div>
                 </div>
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Personel</div>
-                    <div class="mt-1.5 flex items-baseline gap-1.5">
+                    <div class="mt-1.5 flex flex-wrap items-baseline gap-1.5">
                         <span class="text-2xl font-bold text-slate-900">{{ $stats['total_admins'] + $stats['total_mentors'] }}</span>
                         <span class="text-sm text-slate-500">akun</span>
+                        <span class="text-xs text-slate-400">·</span>
+                        <span class="text-xs text-slate-500">{{ $stats['total_admins'] }} admin · {{ $stats['total_mentors'] }} mentor</span>
                     </div>
-                    <div class="mt-1 text-xs text-slate-500">{{ $stats['total_admins'] }} admin · {{ $stats['total_mentors'] }} mentor</div>
                 </div>
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-emerald-600">{{ $stats['active_students'] }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['active_students'] }}</span>
                         <span class="text-sm text-slate-500">mahasiswa</span>
                     </div>
-                    @if(($stats['needs_action'] ?? 0) > 0)
-                        <button type="button" @click="activeTab = 'applications'" class="mt-1 text-xs font-semibold text-amber-700 hover:underline cursor-pointer">
-                            {{ $stats['needs_action'] }} pengajuan perlu tindakan
-                        </button>
-                    @endif
                 </div>
             </div>
 
@@ -260,10 +256,9 @@
             <!-- TAB 1: AKUN PERSONEL KEDINASAN                                 -->
             <!-- ============================================================== -->
             <div x-show="activeTab === 'users'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
-                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-slate-100">
+                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
                     <div>
                         <h3 class="text-sm font-black text-slate-900">Daftar Akun Personel Kedinasan</h3>
-                        <p class="text-xs text-slate-500">Admin Dinas (PIC) dan Mentor Lapangan yang memiliki akses kelola magang di dinas ini</p>
                     </div>
                     <div class="cc-head-actions flex items-center gap-2">
                         <a href="{{ route('admin.users.create', ['agency_id' => $agency->id, 'role' => 'admin', 'return_to' => url()->current()]) }}"
@@ -435,10 +430,9 @@
             <!-- TAB 2: DIVISI & KUOTA MAGANG                                   -->
             <!-- ============================================================== -->
             <div x-show="activeTab === 'units'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
-                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-slate-100">
+                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
                     <div>
                         <h3 class="text-sm font-black text-slate-900">Divisi & Bidang Kerja Magang</h3>
-                        <p class="text-xs text-slate-500">Daftar bidang unit kerja beserta kuota penerimaan peserta magang</p>
                     </div>
                     <a href="{{ route('admin.units.create', ['agency_id' => $agency->id, 'return_to' => url()->current()]) }}"
                        class="cc-head-actions inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
@@ -538,10 +532,9 @@
             <!-- TAB 3: PENGAJUAN MAGANG MASUK                                  -->
             <!-- ============================================================== -->
             <div x-show="activeTab === 'applications'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
-                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-slate-100">
+                <div class="cc-panel-head flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
                     <div>
                         <h3 class="text-sm font-black text-slate-900">Daftar Pengajuan Magang Masuk</h3>
-                        <p class="text-xs text-slate-500">Semua berkas lamaran mahasiswa yang mendaftar ke divisi-divisi dinas ini</p>
                     </div>
                     <a href="{{ route('admin.applications.index', ['agency_id' => $agency->id]) }}" 
                        class="cc-head-actions inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
@@ -649,9 +642,8 @@
             <!-- TAB 4: MAHASISWA AKTIF MAGANG                                  -->
             <!-- ============================================================== -->
             <div x-show="activeTab === 'students'" class="cc-card bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden" style="display: none;">
-                <div class="cc-panel-head p-4 border-b border-slate-100">
+                <div class="cc-panel-head px-4 sm:px-6 pt-4 sm:pt-5 pb-6 sm:pb-7 border-b border-slate-100">
                     <h3 class="text-sm font-black text-slate-900">Mahasiswa Aktif Magang & Mentor Pembimbing</h3>
-                    <p class="text-xs text-slate-500">Peserta magang yang sedang aktif menjalani program di lingkungan dinas</p>
                 </div>
 
                     <div class="d-only overflow-x-auto rounded-2xl border border-slate-100">

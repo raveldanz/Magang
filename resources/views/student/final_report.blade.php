@@ -159,48 +159,244 @@
             {{-- KONDISI 2: JIKA SUDAH MEMILIKI PENEMPATAN AKTIF (BISA UNGGAH / LIHAT STATUS LAPORAN) --}}
             @else
 
-                {{-- Card 1: Informasi Penempatan Magang (Identik dengan Logbook) --}}
-                <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
-                    <div class="flex items-center justify-between mb-4 border-b border-blue-500 pb-3">
-                        <h3 class="text-base font-bold flex items-center gap-2">
-                            Informasi Penempatan Magang
-                        </h3>
-                        <span class="text-xs font-bold px-3 py-1 bg-white/20 text-white rounded-full">
-                            Status: {{ $lifecycle }}
-                        </span>
+                <!-- Informational Banner: Panduan & Ketentuan Laporan Akhir -->
+                <div class="p-4 sm:p-5 bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-blue-50/90 border border-blue-200/90 rounded-2xl shadow-2xs space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <h4 class="font-bold text-blue-950 text-sm sm:text-base">Panduan dan Ketentuan Laporan Akhir Magang</h4>
+                                <span class="text-[10px] font-bold px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full border border-blue-200">Tahap Akhir Magang</span>
+                            </div>
+                            <p class="text-xs text-blue-800 mt-0.5 leading-relaxed">
+                                Halaman ini digunakan untuk mengunggah naskah laporan ilmiah dan portofolio proyek inovasi sebagai syarat kelulusan magang.
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                        <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Instansi & Unit Kerja</p>
-                            <p class="font-bold text-sm text-white">{{ $application?->unit?->agencyProfile?->agency_name ?? '-' }}</p>
-                            <p class="text-blue-200 font-medium">{{ $application?->unit?->name ?? '-' }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 text-xs">
+                        <div class="p-3 bg-white/80 rounded-xl border border-blue-100/80 space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-blue-950 text-xs">
+                                <span class="w-5 h-5 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">1</span>
+                                <span>Fleksibel & Bisa Dicicil</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                                Draf naskah laporan dan karya proyek inovasi dapat diunggah atau diperbarui kapan saja selama masa magang tanpa menunggu hari terakhir.
+                            </p>
                         </div>
-                        <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Mentor Lapangan Dinas</p>
-                            <p class="font-bold text-sm text-white">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditentukan' }}</p>
+
+                        <div class="p-3 bg-white/80 rounded-xl border border-blue-100/80 space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-blue-950 text-xs">
+                                <span class="w-5 h-5 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">2</span>
+                                <span>Evaluasi 2 Pihak</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing (DPL)</strong> sebagai penentu nilai akhir.
+                            </p>
                         </div>
-                        <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Dosen Pembimbing</p>
-                            <p class="font-bold text-sm text-white">{{ $placement?->academicAdvisor?->name ?? 'Belum Ditentukan' }}</p>
+
+                        <div class="p-3 bg-white/80 rounded-xl border border-blue-100/80 space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-blue-950 text-xs">
+                                <span class="w-5 h-5 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">3</span>
+                                <span>Penerbitan E-Sertifikat</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-relaxed">
+                                E-Sertifikat resmi ber-QR Code Pemkot Surabaya akan otomatis aktif dapat diunduh setelah kedua pembimbing menyelesaikan penilaian.
+                            </p>
                         </div>
-                        <div class="p-3 bg-white/10 rounded-xl">
-                            <p class="text-blue-200 uppercase tracking-wider mb-0.5">Periode Magang</p>
-                            <p class="font-bold text-sm text-white">{{ $application?->start_date ? \Carbon\Carbon::parse($application->start_date)->format('d M Y') : '-' }} s/d {{ $application?->end_date ? \Carbon\Carbon::parse($application->end_date)->format('d M Y') : '-' }}</p>
-                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1 text-[11px] text-blue-900/90 font-medium border-t border-blue-100">
+                        <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span>Catatan: Pastikan logbook kegiatan harian tetap diisi secara teratur sampai periode magang berakhir.</span>
                     </div>
                 </div>
 
-                <!-- Informational Banner for Early & Parallel Upload -->
-                <div class="p-3.5 sm:p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl flex items-start gap-3 text-blue-900 text-xs sm:text-sm font-medium leading-relaxed shadow-2xs">
-                    <div class="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                <!-- ========================================================================= -->
+                <!-- BAGIAN 1: PROYEK INOVASI MAGANG (BISA DITAMBAHKAN LEBIH DARI 1) -->
+                <!-- ========================================================================= -->
+                <div class="space-y-4" x-data="{ showAllProjects: false }">
+
+                    <!-- Header Bagian Proyek -->
+                    <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block">Bagian 1</span>
+                            <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-0.5">
+                                Proyek Inovasi Magang
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                Dokumentasi karya, tangkapan layar, buku panduan, dan dokumentasi manfaat nyata kegiatan magang bagi masyarakat
+                            </p>
+                        </div>
+
+                        @if(!$finalReport || $finalReport->status !== 'approved')
+                            <a href="{{ route('student.projects.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <span>Tambah Proyek</span>
+                            </a>
+                        @endif
                     </div>
-                    <div class="space-y-0.5">
-                        <span class="font-bold block text-blue-950 text-xs sm:text-sm">Informasi Pengunggahan Laporan Akhir</span>
-                        <p class="text-[11px] sm:text-xs text-blue-900">Anda dapat mengunggah atau memperbarui draf naskah laporan ilmiah & repositori proyek magang Anda <strong>kapan saja</strong> selama periode magang berlangsung. Pastikan juga untuk tetap mengisi logbook kegiatan harian secara teratur.</p>
+
+                    <!-- Daftar Kartu Proyek -->
+                    @if($projects->isEmpty())
+                        <div class="bg-white rounded-2xl sm:rounded-3xl p-8 border border-slate-200/80 text-center space-y-3">
+                            <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-sm text-slate-800">Belum Ada Proyek Ditambahkan</h4>
+                                <p class="text-xs text-slate-500 max-w-md mx-auto">
+                                    Silakan tekan tombol Tambah Proyek untuk mengunggah dokumentasi proyek dan manfaat bagi masyarakat di halaman khusus. Anda dapat menambahkan lebih dari satu proyek.
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            @foreach($projects as $index => $project)
+                                @php
+                                    $ssCount = is_array($project->screenshots) ? count($project->screenshots) : 0;
+                                    $cpCount = is_array($project->community_photos) ? count($project->community_photos) : 0;
+                                    $docCount = is_array($project->documents) ? count($project->documents) : 0;
+                                @endphp
+                                <div @if($index >= 3) x-show="showAllProjects" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" @endif 
+                                     class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-blue-200 transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                                    <!-- Bagian Atas: Gambar & Informasi Utama -->
+                                    <div>
+                                        <!-- Foto Sampul Proyek (Proporsional & Anti-Pecah) -->
+                                        <div class="relative w-full h-44 overflow-hidden bg-slate-100 shrink-0">
+                                            <a href="{{ route('projects.show', $project->id) }}" class="block w-full h-full" title="Klik untuk melihat detail lengkap karya ini">
+                                                <img src="{{ $project->photo_url }}" alt="{{ $project->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                            </a>
+                                            
+                                            <!-- Floating Badge Media (Kanan Bawah) -->
+                                            <div class="absolute bottom-2.5 right-2.5 flex items-center gap-1">
+                                                @if($ssCount > 0)
+                                                    <span class="px-2 py-0.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold rounded-md shadow-xs">
+                                                        +{{ $ssCount }} Layar
+                                                    </span>
+                                                @endif
+                                                @if($project->video_url)
+                                                    <span class="px-2 py-0.5 bg-rose-600/90 backdrop-blur-xs text-white text-[10px] font-bold rounded-md flex items-center gap-1 shadow-xs">
+                                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                        Video
+                                                    </span>
+                                                @endif
+                                            </div>
+
+                                            <!-- Badge Nomor Indeks Proyek (Kiri Atas) -->
+                                            <div class="absolute top-2.5 left-2.5">
+                                                <span class="px-2 py-0.5 bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold rounded-md border border-slate-200/60 shadow-2xs">
+                                                    Proyek #{{ $index + 1 }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Konten Judul & Deskripsi Singkat -->
+                                        <div class="p-4 sm:p-5 space-y-2.5">
+                                            <div class="space-y-1.5">
+                                                <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $project->category_badge_class }}">
+                                                    {{ $project->category_label }}
+                                                </span>
+                                                <a href="{{ route('projects.show', $project->id) }}" class="block">
+                                                    <h4 class="font-bold text-sm sm:text-base text-slate-900 leading-snug line-clamp-2 hover:text-blue-600 transition min-h-[2.5rem]">
+                                                        {{ $project->title }}
+                                                    </h4>
+                                                </a>
+                                                <p class="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                                                    {{ $project->description }}
+                                                </p>
+                                            </div>
+
+                                            <!-- Indikator Berkas / Akses Cepat -->
+                                            <div class="flex flex-wrap items-center gap-1.5 text-[10px] pt-1">
+                                                @if($project->demo_url)
+                                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-semibold rounded-md border border-emerald-100 flex items-center gap-1">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                        Akses Daring
+                                                    </span>
+                                                @endif
+                                                @if($project->repository_url)
+                                                    <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-semibold rounded-md border border-indigo-100">
+                                                        Repo / Cloud
+                                                    </span>
+                                                @endif
+                                                @if($project->source_code_path)
+                                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-semibold rounded-md border border-amber-100">
+                                                        ZIP Berkas
+                                                    </span>
+                                                @endif
+                                                @if($cpCount > 0)
+                                                    <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-semibold rounded-md border border-teal-100">
+                                                        {{ $cpCount }} Lapangan
+                                                    </span>
+                                                @endif
+                                                @if($docCount > 0)
+                                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-700 font-semibold rounded-md border border-blue-100">
+                                                        {{ $docCount }} Dokumen
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bagian Bawah: Tombol Aksi -->
+                                    <div class="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 mt-auto">
+                                        <a href="{{ route('projects.show', $project->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition cursor-pointer">
+                                            <span>Lihat Detail</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+
+                                        @if(!$finalReport || $finalReport->status !== 'approved')
+                                            <div class="flex items-center gap-1.5">
+                                                <a href="{{ route('student.projects.edit', $project->id) }}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition cursor-pointer" title="Ubah data proyek">
+                                                    Ubah
+                                                </a>
+                                                <form action="{{ route('student.projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus proyek ini?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg transition cursor-pointer" title="Hapus proyek">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Tombol Tampilkan Semua / Tampilkan Lebih Sedikit jika > 3 proyek -->
+                        @if(count($projects) > 3)
+                            <div class="text-center pt-2">
+                                <button type="button" 
+                                        @click="showAllProjects = !showAllProjects" 
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition shadow-2xs hover:shadow-xs cursor-pointer">
+                                    <span x-text="showAllProjects ? 'Tampilkan Lebih Sedikit (3 Proyek Teratas)' : 'Tampilkan Semua ({{ count($projects) }} Proyek)'"></span>
+                                    <svg class="w-4 h-4 transition-transform duration-200 text-slate-500" :class="{ 'rotate-180': showAllProjects }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+
+                <!-- ========================================================================= -->
+                <!-- BAGIAN 2: NASKAH LAPORAN AKHIR -->
+                <!-- ========================================================================= -->
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-xs">
+                    <div>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block">Bagian 2</span>
+                        <h3 class="font-bold text-base sm:text-lg text-slate-900 mt-0.5">
+                            Naskah Laporan Akhir
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Pengunggahan berkas naskah laporan ilmiah Praktik Kerja Lapangan / Magang MBKM
+                        </p>
                     </div>
                 </div>
 
@@ -687,6 +883,35 @@
             } else {
                 box.classList.add('hidden');
                 box.classList.remove('flex');
+            }
+        }
+
+        function handleProjectPhotoPreview(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
+                    alert('Format foto harus berupa JPG, PNG, atau WebP.');
+                    input.value = '';
+                    return;
+                }
+                if (file.size > 3 * 1024 * 1024) {
+                    alert('Ukuran foto maksimal 3 MB.');
+                    input.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('projectPhotoPreview');
+                    const placeholder = document.getElementById('projectPhotoPlaceholder');
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                    if (placeholder) {
+                        placeholder.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
             }
         }
 

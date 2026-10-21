@@ -267,6 +267,16 @@ class Placement extends Model
         return $this->hasOne(FinalReport::class);
     }
 
+    public function internshipProjects()
+    {
+        return $this->hasMany(InternshipProject::class)->latest();
+    }
+
+    public function projects()
+    {
+        return $this->internshipProjects();
+    }
+
     public function evaluation()
     {
         return $this->hasOne(Evaluation::class);

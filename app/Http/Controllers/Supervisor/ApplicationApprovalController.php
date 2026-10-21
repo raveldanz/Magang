@@ -79,6 +79,7 @@ class ApplicationApprovalController extends Controller
         $application = Application::with([
             'user.studentProfile',
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'documents',
             'placement.mentor',
             'placement.pembimbing',
@@ -131,6 +132,44 @@ class ApplicationApprovalController extends Controller
                 $placementData
             );
 
+            // Jika pengajuan kelompok, sinkronkan seluruh anggota kelompok
+            if ($application->group_id) {
+                $group = \App\Models\InternshipGroup::find($application->group_id);
+                if ($group) {
+                    $group->update([
+                        'status' => $newStatus,
+                        'letter_number' => $autoLetterNumber,
+                        'letter_date' => $application->letter_date ?: date('Y-m-d'),
+                        'letter_token' => $letterToken,
+                    ]);
+
+                    $siblingApps = Application::where('group_id', $group->id)
+                        ->where('id', '!=', $application->id)
+                        ->get();
+
+                    foreach ($siblingApps as $sibling) {
+                        $sibling->update([
+                            'status' => $newStatus,
+                            'letter_number' => $autoLetterNumber,
+                            'letter_date' => $application->letter_date ?: date('Y-m-d'),
+                            'letter_token' => $sibling->letter_token ?: Str::random(32),
+                            'rejection_note' => null,
+                            'rejection_reason' => null,
+                        ]);
+
+                        $sibPlacement = Placement::where('application_id', $sibling->id)->first();
+                        $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                        Placement::updateOrCreate(
+                            ['application_id' => $sibling->id],
+                            [
+                                'certificate_hash' => $sibPlacement?->certificate_hash ?: Str::random(32),
+                                'certificate_number' => $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/DISPUSIP-SBY/{$year}",
+                            ]
+                        );
+                    }
+                }
+            }
+
             // Audit Trail
             AuditLog::record('SUPERVISOR_APPLICATION_APPROVED', 'Application', $application->id, [
                 'old_status' => $oldStatus,
@@ -163,11 +202,30 @@ class ApplicationApprovalController extends Controller
 
         $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) $application->status;
 
+        $rejectionText = "Catatan Penolakan Atasan: " . $request->notes;
+
         $application->update([
             'status' => ApplicationStatus::PENDING->value,
-            'rejection_note' => "Catatan Penolakan Atasan: " . $request->notes,
-            'rejection_reason' => "Catatan Penolakan Atasan: " . $request->notes,
+            'rejection_note' => $rejectionText,
+            'rejection_reason' => $rejectionText,
         ]);
+
+        if ($application->group_id) {
+            $group = \App\Models\InternshipGroup::find($application->group_id);
+            if ($group) {
+                $group->update([
+                    'status' => 'pending',
+                    'rejection_reason' => $rejectionText,
+                ]);
+                Application::where('group_id', $group->id)
+                    ->where('id', '!=', $application->id)
+                    ->update([
+                        'status' => ApplicationStatus::PENDING->value,
+                        'rejection_note' => $rejectionText,
+                        'rejection_reason' => $rejectionText,
+                    ]);
+            }
+        }
 
         AuditLog::record('SUPERVISOR_APPLICATION_REVISED', 'Application', $application->id, [
             'old_status' => $oldStatus,

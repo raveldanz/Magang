@@ -15,10 +15,7 @@
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-gray-800 leading-tight flex items-center gap-2">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
                     <span>Rekapitulasi Logbook Mahasiswa {{ auth()->user()->unit_id && !auth()->user()->isSuperAdmin() ? '• ' . (auth()->user()->unit->name ?? 'Bidang') : '' }}</span>
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">
@@ -73,27 +70,27 @@
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
+                        <span class="text-xs font-bold text-gray-500 uppercase">{{ \App\Enums\ReviewStatus::APPROVED->label() }}</span>
                         <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </span>
                     </div>
-                    <div class="text-2xl font-black text-emerald-700 mt-2">{{ $approvedLogs }}</div>
+                    <div class="text-2xl font-black text-gray-900 mt-2">{{ $approvedLogs }}</div>
                     <div class="text-[11px] text-gray-400 mt-0.5">Diverifikasi pembimbing</div>
                 </div>
 
                 <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-600 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
+                        <span class="text-xs font-bold text-gray-500 uppercase">{{ \App\Enums\ReviewStatus::PENDING->label() }}</span>
                         <span class="p-2 bg-amber-50 text-amber-600 rounded-xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </span>
                     </div>
-                    <div class="text-2xl font-black text-amber-700 mt-2">{{ $pendingLogs }}</div>
+                    <div class="text-2xl font-black text-gray-900 mt-2">{{ $pendingLogs }}</div>
                     <div class="text-[11px] text-gray-400 mt-0.5">Perlu approval mentor</div>
                 </div>
             </div>
@@ -279,7 +276,7 @@
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
                                 <th class="py-3.5 px-4">Mahasiswa</th>
                                 <th class="py-3.5 px-4">Unit & Pembimbing</th>
-                                <th class="py-3.5 px-4 text-center">Rekap Logbook</th>
+                                <th class="py-3.5 px-4 text-center">Pending Logbook</th>
                                 <th class="py-3.5 px-4 text-center">Progres Disetujui</th>
                                 <th class="py-3.5 px-4 text-center">Logbook Terakhir</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
@@ -327,27 +324,10 @@
                                         @endunless
                                     </td>
 
-                                    <td class="py-4 px-4 text-center" data-label="Rekap Logbook">
-                                        <div class="inline-flex flex-wrap items-center justify-center gap-1.5">
-                                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-md" title="Total Kegiatan">
-                                                 {{ $totalStudentLogs }} Total
-                                            </span>
-                                            @if ($approvedCount > 0)
-                                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-md" title="Approved">
-                                                     {{ $approvedCount }}
-                                                </span>
-                                            @endif
-                                            @if ($pendingCount > 0)
-                                                <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[11px] font-bold rounded-md" title="Pending">
-                                                     {{ $pendingCount }}
-                                                </span>
-                                            @endif
-                                            @if ($rejectedCount > 0)
-                                                <span class="px-2 py-0.5 bg-rose-50 text-rose-700 text-[11px] font-bold rounded-md" title="Rejected">
-                                                     {{ $rejectedCount }}
-                                                </span>
-                                            @endif
-                                        </div>
+                                    <td class="py-4 px-4 text-center" data-label="Pending Logbook">
+                                        <span class="inline-flex items-center justify-center px-2.5 py-0.5 bg-gray-100 text-gray-800 text-xs font-bold rounded-md">
+                                            {{ $pendingCount }}
+                                        </span>
                                     </td>
 
                                     <td class="py-4 px-4 text-center" data-label="Progres Disetujui">

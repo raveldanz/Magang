@@ -9,6 +9,7 @@ use App\Models\ApplicationDocument;
 use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
+use App\Models\InternshipProject;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\StudentProfile;
@@ -335,6 +336,15 @@ class SupervisorDemoSeeder extends Seeder
             ['placement_id' => $placementEka->id, 'date' => Carbon::now()->subDays(1)->toDateString()],
             ['activity' => 'Melakukan entri metadata buku digital pada modul otomasi perpustakaan Inlislite Dispusip Surabaya.', 'status' => 'approved', 'feedback' => 'Pekerjaan rapi dan teliti.']
         );
+        InternshipProject::updateOrCreate(
+            ['placement_id' => $placementEka->id, 'title' => 'Katalog Digital Koleksi Anak dan Remaja'],
+            [
+                'description' => 'Perancangan antarmuka pencarian buku anak interaktif pada perpustakaan umum.',
+                'community_benefit' => 'Mempermudah anak-anak dan orang tua dalam memilih bacaan yang mendidik dan sesuai umur.',
+                'photo_path' => 'images/logos/dispusip.png',
+                'demo_url' => 'https://dispusip.surabaya.go.id',
+            ]
+        );
 
         // [STATUS REVISION] Mahasiswa Fajar Nugraha -> Dikembalikan Atasan ke Admin untuk Penyesuaian
         $userFajar = User::updateOrCreate(
@@ -430,6 +440,23 @@ class SupervisorDemoSeeder extends Seeder
                 'feedback' => 'Laporan komprehensif dan memenuhi standar kedinasan.',
             ]
         );
+        InternshipProject::updateOrCreate(
+            ['placement_id' => $placementHana->id, 'title' => 'Portal Layanan Pojok Baca Digital Dispusip'],
+            [
+                'description' => 'Aplikasi web pencarian dan reservasi buku fisik serta e-book di seluruh taman bacaan Kota Surabaya.',
+                'community_benefit' => 'Meningkatkan literasi warga dan memangkas waktu pencarian koleksi bacaan dari 20 menit menjadi 3 menit.',
+                'photo_path' => 'images/logos/dispusip.png',
+                'demo_url' => 'https://dispusip.surabaya.go.id/pojok-baca',
+            ]
+        );
+        InternshipProject::updateOrCreate(
+            ['placement_id' => $placementHana->id, 'title' => 'Program Revitalisasi Pojok Baca Keliling'],
+            [
+                'description' => 'Dokumentasi program pendampingan membaca anak-anak di 5 titik taman kota Surabaya.',
+                'community_benefit' => 'Menjangkau lebih dari 300 anak sekolah dasar untuk aktif membaca buku setiap akhir pekan.',
+                'photo_path' => 'images/logos/surabaya.png',
+            ]
+        );
         Evaluation::updateOrCreate(
             ['placement_id' => $placementHana->id],
             [
@@ -510,6 +537,14 @@ class SupervisorDemoSeeder extends Seeder
                 'feedback' => 'Laporan telah divalidasi pembimbing lapangan.',
             ]
         );
+        InternshipProject::updateOrCreate(
+            ['placement_id' => $placementIrfan->id, 'title' => 'Sistem Monitoring Jaringan dan Infrastruktur IT Dispusip'],
+            [
+                'description' => 'Dashboard pemantauan ketersediaan server dan akses jaringan lokal antar-ruang kerja kedinasan.',
+                'community_benefit' => 'Menjamin kelancaran operasional layanan publik dan meminimalisir downtime sistem administrasi kearsipan.',
+                'photo_path' => 'images/logos/dispusip.png',
+            ]
+        );
         Evaluation::updateOrCreate(
             ['placement_id' => $placementIrfan->id],
             [
@@ -583,6 +618,14 @@ class SupervisorDemoSeeder extends Seeder
         FinalReport::updateOrCreate(
             ['placement_id' => $placementJoko->id],
             ['file_path' => $samplePdf, 'final_report_path' => $samplePdf, 'title' => 'Laporan Akhir: Tata Kelola Perpustakaan Terpadu', 'status' => 'approved', 'feedback' => 'Sangat baik.']
+        );
+        InternshipProject::updateOrCreate(
+            ['placement_id' => $placementJoko->id, 'title' => 'Alih Media dan Digitalisasi Naskah Kuno Surabaya'],
+            [
+                'description' => 'Preservasi naskah kuno era kolonial dan prasasti lokal Surabaya ke dalam format digital beresolusi tinggi.',
+                'community_benefit' => 'Menjaga warisan budaya Kota Surabaya agar dapat diakses oleh peneliti sejarah dan generasi penerus tanpa merusak fisik naskah asli.',
+                'photo_path' => 'images/logos/surabaya.png',
+            ]
         );
         Evaluation::updateOrCreate(
             ['placement_id' => $placementJoko->id],

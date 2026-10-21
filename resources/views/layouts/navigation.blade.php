@@ -172,6 +172,10 @@
                            class="transition py-1 {{ request()->routeIs('supervisor.certificates.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Pengesahan Sertifikat
                         </a>
+                        <a href="{{ route('supervisor.reports.index') }}" 
+                           class="transition py-1 {{ request()->routeIs('supervisor.reports.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Laporan
+                        </a>
 
                     @elseif ($isAdminDinas)
                         <a href="{{ route('admin.dashboard') }}" 
@@ -450,6 +454,9 @@
                             <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengesahan Sertifikat
                             </a>
+                            <a href="{{ route('supervisor.reports.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                                Laporan
+                            </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pengaturan Akun
                             </a>
@@ -694,6 +701,12 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/></svg>
                         </div>
                         <span>Pengesahan Sertifikat</span>
+                    </a>
+                    <a href="{{ route('supervisor.reports.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.reports.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.reports.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <span>Laporan</span>
                     </a>
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Pengaturan Akun</span>

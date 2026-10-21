@@ -80,6 +80,14 @@
                             <span class="text-slate-400">WhatsApp:</span>
                             <span class="font-mono text-slate-700">{{ $profile?->no_hp ?? '-' }}</span>
                         </div>
+                        @if($application->group_id && $application->group)
+                            <div class="flex justify-between items-center pt-1 border-t border-slate-100">
+                                <span class="text-slate-400">Kelompok:</span>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                    {{ $application->group->name }} ({{ $application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                </span>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -177,7 +185,46 @@
                 </div>
             </div>
 
-            <!-- 3. Laporan Akhir Magang -->
+            <!-- 3. Proyek Inovasi Magang (Jika Ada) -->
+            @if ($placement && $placement->internshipProjects && $placement->internshipProjects->isNotEmpty())
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base">Proyek Inovasi Magang</h4>
+                            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Karya inovasi dan manfaat bagi masyarakat yang dihasilkan mahasiswa</p>
+                        </div>
+                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+                            {{ $placement->internshipProjects->count() }} Proyek
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach ($placement->internshipProjects as $project)
+                            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                                <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                                    <img src="{{ $project->photo_url }}" alt="{{ $project->title }}" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-xs sm:text-sm text-slate-900 leading-snug">{{ $project->title }}</h5>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 mt-1 leading-relaxed">{{ $project->description }}</p>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200/80 rounded-lg space-y-0.5">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Manfaat untuk Masyarakat</span>
+                                    <p class="text-[11px] sm:text-xs text-slate-800 font-medium leading-relaxed">{{ $project->community_benefit }}</p>
+                                </div>
+                                @if ($project->demo_url)
+                                    <a href="{{ $project->demo_url }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-800 break-all">
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span>Tautan Proyek: {{ $project->demo_url }}</span>
+                                    </a>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <!-- 4. Laporan Akhir Magang -->
             <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs space-y-3">
                 <div class="border-b border-slate-100 pb-3">
                     <h4 class="font-bold text-slate-900 text-sm sm:text-base">Laporan Akhir Magang</h4>

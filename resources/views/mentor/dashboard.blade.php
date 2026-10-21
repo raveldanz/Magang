@@ -161,6 +161,7 @@
                                             <p class="font-bold text-xs sm:text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
                                             <x-status-badge :status="$appStatus" class="shrink-0" />
                                         </div>
+
                                         <p class="text-[11px] text-slate-500 font-mono mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}</p>
                                     </div>
                                 </div>
@@ -252,6 +253,7 @@
                                     <!-- Mahasiswa Info -->
                                     <td class="py-4 px-5">
                                         <div class="font-bold text-gray-900 text-xs sm:text-sm leading-snug">{{ $student->name ?? '-' }}</div>
+
                                         <div class="text-[11px] text-gray-500 font-mono mt-0.5">NIM: {{ $profile?->nim ?? '-' }}</div>
                                         <div class="text-[10px] text-blue-600 font-semibold mt-0.5">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>

@@ -58,6 +58,7 @@ class DashboardController extends Controller
         // Ambil pengajuan magang aktif mahasiswa (prioritaskan yang belum resigned/rejected)
         $application = Application::with([
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor.university',
@@ -71,6 +72,7 @@ class DashboardController extends Controller
             ->first()
         ?? Application::with([
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor.university',
@@ -83,6 +85,7 @@ class DashboardController extends Controller
             ->first()
         ?? Application::with([
             'unit.agencyProfile',
+            'group.applications.user.studentProfile',
             'placement.mentor',
             'placement.pembimbing',
             'placement.academicAdvisor.university',

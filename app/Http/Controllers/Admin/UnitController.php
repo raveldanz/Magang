@@ -404,6 +404,8 @@ class UnitController extends Controller
                 'message' => $msg,
                 'unit_id' => $unit->id,
                 'quota' => $unit->quota,
+                'occupied' => $occupied,
+                'remaining' => max(0, $unit->quota - $occupied),
             ]);
         }
 

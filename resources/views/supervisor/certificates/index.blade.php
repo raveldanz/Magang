@@ -28,9 +28,9 @@
             @endif
 
             {{-- TABS FILTER --}}
-            <div class="flex flex-wrap gap-2 border-b-2 border-slate-200 pb-3">
+            <div class="flex overflow-x-auto pb-2 scrollbar-none gap-2 border-b-2 border-slate-200">
                 <a href="{{ route('supervisor.certificates.index', ['status' => 'waiting_approval']) }}" 
-                   class="px-5 py-2.5 rounded-2xl text-sm font-black transition flex items-center gap-2.5 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'waiting_approval' ? 'bg-blue-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Menunggu Pengesahan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'waiting_approval' ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-800' }}">
                         {{ $waitingCount }}
@@ -38,7 +38,7 @@
                 </a>
 
                 <a href="{{ route('supervisor.certificates.index', ['status' => 'approved']) }}" 
-                   class="px-5 py-2.5 rounded-2xl text-sm font-black transition flex items-center gap-2.5 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'approved' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Telah Disahkan</span>
                     <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'approved' ? 'bg-white text-emerald-700' : 'bg-emerald-100 text-emerald-800' }}">
                         {{ $approvedCount }}
@@ -46,7 +46,7 @@
                 </a>
 
                 <a href="{{ route('supervisor.certificates.index', ['status' => 'revision']) }}" 
-                   class="px-5 py-2.5 rounded-2xl text-sm font-black transition flex items-center gap-2 {{ $statusFilter === 'revision' ? 'bg-amber-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
+                   class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'revision' ? 'bg-amber-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
                     <span>Perlu Ditinjau Ulang (Revisi)</span>
                 </a>
             </div>
@@ -61,21 +61,22 @@
                            class="w-full h-12 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0 text-sm font-medium text-slate-800">
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <button type="submit" class="px-6 h-12 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-sm shadow-sm transition">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="submit" class="w-full sm:w-auto px-6 h-12 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-sm shadow-sm transition cursor-pointer">
                         Cari
                     </button>
                     @if(request()->filled('search'))
-                        <a href="{{ route('supervisor.certificates.index', ['status' => $statusFilter]) }}" class="px-4 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center transition">
+                        <a href="{{ route('supervisor.certificates.index', ['status' => $statusFilter]) }}" class="w-full sm:w-auto px-4 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center transition">
                             Reset
                         </a>
                     @endif
                 </div>
             </form>
 
-            {{-- DAFTAR TABEL SERTIFIKAT --}}
+            {{-- DAFTAR SERTIFIKAT (DUAL-VIEW: TABEL DESKTOP + KARTU MOBILE ERGONOMIS) --}}
             <div class="bg-white rounded-3xl border-2 border-slate-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
+                {{-- 1. Tabel Desktop & Tablet (>= 768px) --}}
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b-2 border-slate-200 bg-slate-100/70 text-slate-700 text-xs font-bold uppercase tracking-wider">
@@ -212,7 +213,7 @@
                                                 {{-- Modal / Dropdown Revisi --}}
                                                 <div x-data="{ openRev: false }" class="relative">
                                                     <button @click="openRev = !openRev" type="button" 
-                                                            class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 transition">
+                                                            class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 transition cursor-pointer">
                                                         <span>Kembalikan</span>
                                                     </button>
 
@@ -223,7 +224,7 @@
                                                             <div class="text-xs font-bold text-slate-800 mb-1">Catatan Revisi Nilai/Data:</div>
                                                             <textarea name="notes" rows="2" required minlength="5" placeholder="Misal: nilai kriteria DPL belum masuk..."
                                                                       class="w-full text-xs p-2 rounded-lg border border-slate-300"></textarea>
-                                                            <button type="submit" class="mt-2 w-full py-1.5 px-3 rounded-lg bg-amber-600 text-white font-bold text-xs">
+                                                            <button type="submit" class="mt-2 w-full py-1.5 px-3 rounded-lg bg-amber-600 text-white font-bold text-xs cursor-pointer">
                                                                 Kirim Revisi
                                                             </button>
                                                         </form>
@@ -242,6 +243,177 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                {{-- 2. Tampilan Kartu Khusus Mobile (< 768px) --}}
+                <div class="md:hidden p-3.5 sm:p-4 space-y-3.5">
+                    @forelse($certificates as $cert)
+                        @php
+                            $student = $cert->placement?->application?->user;
+                            $profile = $student?->studentProfile;
+                            $unit = $cert->placement?->application?->unit;
+                            $eval = $cert->placement?->evaluation;
+                            $finalScore = $eval ? $eval->final_score : ($cert->placement?->final_score ?? '-');
+                        @endphp
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3 hover:border-blue-300 transition"
+                             x-data="{ showApproveCertModalMobile: false, showReviseModalMobile: false }">
+                            
+                            {{-- Header Kartu: Status ACC & Nilai --}}
+                            <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+                                <div>
+                                    @if($cert->approval_status === 'approved')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-300">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                            Telah Disahkan
+                                        </span>
+                                    @elseif($cert->approval_status === 'revision')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-800 border border-amber-300">
+                                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                            Perlu Revisi
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-800 border border-blue-300">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                            Menunggu ACC
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase">Nilai:</span>
+                                    @if(is_numeric($finalScore))
+                                        <span class="px-2.5 py-0.5 rounded-lg font-black text-sm {{ $finalScore >= 80 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-blue-50 text-blue-800 border border-blue-200' }}">
+                                            {{ number_format($finalScore, 1) }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-slate-400 font-semibold">{{ $finalScore }}</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- Nama Mahasiswa, NIM & Kampus --}}
+                            <div>
+                                <h3 class="font-extrabold text-sm sm:text-base text-slate-900 leading-snug">
+                                    {{ $student?->name }}
+                                </h3>
+                                <div class="text-xs text-slate-500 mt-0.5">
+                                    NIM: <span class="font-mono font-bold text-slate-700">{{ $profile?->nim ?? '-' }}</span> &bull; <span class="text-blue-700 font-semibold">{{ $profile?->universitas ?? $student?->university ?? '-' }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Box Bidang & Nomor Sertifikat --}}
+                            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
+                                <div class="flex items-start justify-between gap-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Bidang:</span>
+                                    <span class="font-bold text-slate-800 text-right text-[11px]">{{ $unit?->name ?? 'Dispusip Surabaya' }}</span>
+                                </div>
+                                <div class="flex items-start justify-between gap-2 pt-1 border-t border-slate-200/50">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">No. Sertifikat:</span>
+                                    <span class="font-mono font-medium text-slate-600 text-right text-[11px]">{{ $cert->certificate_number ?? $cert->placement?->certificate_number ?? 'Nomor otomatis' }}</span>
+                                </div>
+                            </div>
+
+                            @if($cert->approval_status === 'revision' && $cert->notes)
+                                <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-0.5">
+                                    <span class="font-bold text-[10px] uppercase tracking-wider text-amber-700">Catatan Revisi:</span>
+                                    <p class="italic text-[11px] text-amber-800 leading-relaxed">{{ $cert->notes }}</p>
+                                </div>
+                            @endif
+
+                            {{-- Tombol Aksi Mobile --}}
+                            <div class="pt-1 flex flex-col gap-2">
+                                <a href="{{ route('supervisor.certificates.show', $cert->placement_id) }}" target="_blank"
+                                   class="w-full min-h-[40px] inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs border border-slate-300 shadow-2xs transition">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span>Pratinjau Draft Sertifikat</span>
+                                </a>
+
+                                @if($cert->approval_status === 'waiting_approval')
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button type="button" 
+                                                @click="showApproveCertModalMobile = true"
+                                                class="w-full min-h-[44px] inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition cursor-pointer active:scale-95">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Sahkan (ACC)</span>
+                                        </button>
+
+                                        <button type="button" 
+                                                @click="showReviseModalMobile = true"
+                                                class="w-full min-h-[44px] inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 transition cursor-pointer active:scale-95">
+                                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            <span>Kembalikan</span>
+                                        </button>
+                                    </div>
+
+                                    {{-- Modal Konfirmasi Sahkan (Mobile) --}}
+                                    <div x-show="showApproveCertModalMobile" 
+                                         x-cloak 
+                                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs text-left"
+                                         @keydown.escape.window="showApproveCertModalMobile = false">
+                                        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4"
+                                             @click.outside="showApproveCertModalMobile = false">
+                                            <div class="flex items-start gap-3 pb-3 border-b border-slate-100">
+                                                <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-sm font-extrabold text-slate-900">Pengesahan E-Sertifikat</h3>
+                                                    <p class="text-xs text-slate-500 mt-0.5">Sahkan sertifikat resmi mahasiswa</p>
+                                                </div>
+                                            </div>
+                                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                                                <div class="text-slate-500">Nama Mahasiswa:</div>
+                                                <div class="font-bold text-slate-900 text-sm">{{ $student?->name }}</div>
+                                                <div class="text-[11px] text-slate-500">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
+                                            </div>
+                                            <form method="POST" action="{{ route('supervisor.certificates.approve', $cert->id) }}" class="space-y-3">
+                                                @csrf
+                                                <p class="text-xs text-slate-600 leading-relaxed">
+                                                    Setelah disahkan, mahasiswa dapat mengunduh E-Sertifikat resmi Dispusip.
+                                                </p>
+                                                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                                    <button type="button" @click="showApproveCertModalMobile = false" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">
+                                                        Batal
+                                                    </button>
+                                                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">
+                                                        Ya, Sahkan
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    {{-- Modal Revisi (Mobile) --}}
+                                    <div x-show="showReviseModalMobile" 
+                                         x-cloak 
+                                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs text-left"
+                                         @keydown.escape.window="showReviseModalMobile = false">
+                                        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4"
+                                             @click.outside="showReviseModalMobile = false">
+                                            <h3 class="text-sm font-extrabold text-slate-900">Catatan Revisi Nilai/Data</h3>
+                                            <form method="POST" action="{{ route('supervisor.certificates.revise', $cert->id) }}" class="space-y-3">
+                                                @csrf
+                                                <textarea name="notes" rows="3" required minlength="5" placeholder="Tuliskan catatan perbaikan untuk admin/mentor..."
+                                                          class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:border-amber-500 focus:ring-0"></textarea>
+                                                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                                    <button type="button" @click="showReviseModalMobile = false" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">
+                                                        Batal
+                                                    </button>
+                                                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md">
+                                                        Kirim Revisi
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-10 text-center text-slate-400 font-medium text-xs">
+                            Tidak ada berkas sertifikat yang sesuai dengan filter ini.
+                        </div>
+                    @endforelse
                 </div>
 
                 @if($certificates->hasPages())

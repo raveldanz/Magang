@@ -183,7 +183,7 @@
                                         <div class="flex items-center justify-between">
                                             <div>
                                                 <label class="block text-xs font-black text-indigo-900 uppercase tracking-wider">
-                                                    Nilai Dosen Pembimbing Lapangan (DPL)
+                                                    Nilai Dosen Pembimbing
                                                 </label>
                                                 <p class="text-[11px] text-indigo-700 mt-0.5">Bobot Kampus: {{ $weightLecturer }}% (Bobot Dinas: {{ $weightMentor }}%)</p>
                                             </div>

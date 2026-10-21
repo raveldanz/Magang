@@ -213,11 +213,6 @@
                         <span class="text-2xl font-bold text-slate-900">{{ $stats['total_students'] }}</span>
                         <span class="text-sm text-slate-500">orang</span>
                     </div>
-                    @if(($stats['needs_action'] ?? 0) > 0)
-                        <button type="button" @click="activeTab = 'mahasiswa'" class="mt-1 text-xs font-semibold text-amber-700 hover:underline cursor-pointer">
-                            {{ $stats['needs_action'] }} perlu tindakan
-                        </button>
-                    @endif
                 </div>
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Dosen Pembimbing</div>
@@ -229,14 +224,14 @@
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-blue-600">{{ $stats['active_interns'] }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['active_interns'] }}</span>
                         <span class="text-sm text-slate-500">di dinas</span>
                     </div>
                 </div>
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-emerald-600">{{ $stats['completed_interns'] }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['completed_interns'] }}</span>
                         <span class="text-sm text-slate-500">alumni</span>
                     </div>
                 </div>

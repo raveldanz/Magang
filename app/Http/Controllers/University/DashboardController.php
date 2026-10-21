@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Placement;
+use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class DashboardController extends Controller
         $placementsQuery = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'academicAdvisor',
@@ -49,6 +51,7 @@ class DashboardController extends Controller
         $applicationsQuery = Application::with([
             'user.studentProfile',
             'unit.agencyProfile',
+            'group',
             'placement.mentor',
             'placement.academicAdvisor',
             'placement.evaluation',
@@ -262,6 +265,7 @@ class DashboardController extends Controller
         // Query Semua Pengajuan Mahasiswa Asal Kampus Ini
         $applications = Application::with([
             'user.studentProfile',
+            'group',
             'unit.agencyProfile',
             'placement.mentor',
             'placement.academicAdvisor',
@@ -298,6 +302,8 @@ class DashboardController extends Controller
                 'No',
                 'NIM',
                 'Nama Mahasiswa',
+                'Tipe Pendaftaran',
+                'Kelompok Magang',
                 'Program Studi',
                 'Instansi Magang',
                 'Unit / Bidang Kerja',
@@ -332,10 +338,17 @@ class DashboardController extends Controller
                     ? date('d/m/Y', strtotime($app->start_date)).' s.d. '.date('d/m/Y', strtotime($app->end_date))
                     : '-';
 
+                $tipePendaftaran = $app->isGroup()
+                    ? ('Kelompok ('.($app->isGroupLeader() ? 'Ketua' : 'Anggota').')')
+                    : 'Individu';
+                $namaKelompok = $app->group?->name ?? '-';
+
                 fputcsv($handle, [
                     $no++,
                     $profile?->nim ?? '-',
                     $student?->name ?? '-',
+                    $tipePendaftaran,
+                    $namaKelompok,
                     $profile?->jurusan ?? '-',
                     $app->unit?->agencyProfile?->agency_name ?? '-',
                     $app->unit?->name ?? '-',
@@ -406,6 +419,7 @@ class DashboardController extends Controller
         $placement = Placement::with([
             'application.user.studentProfile',
             'application.unit.agencyProfile',
+            'application.group',
             'mentor',
             'pembimbing',
             'academicAdvisor',
@@ -413,6 +427,7 @@ class DashboardController extends Controller
                 $q->orderBy('date', 'desc');
             },
             'finalreport',
+            'internshipProjects',
             'evaluation',
         ])->find($id);
 
@@ -424,6 +439,7 @@ class DashboardController extends Controller
             $appCandidate = Application::with([
                 'user.studentProfile',
                 'unit.agencyProfile',
+                'group',
                 'placement.mentor',
                 'placement.pembimbing',
                 'placement.academicAdvisor',
@@ -431,6 +447,7 @@ class DashboardController extends Controller
                     $q->orderBy('date', 'desc');
                 },
                 'placement.finalreport',
+                'placement.internshipProjects',
                 'placement.evaluation',
             ])->find($id);
 
