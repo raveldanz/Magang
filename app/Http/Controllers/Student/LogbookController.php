@@ -21,7 +21,7 @@ class LogbookController extends Controller
      */
     protected function getActiveInternship($userId)
     {
-        return Application::where('user_id', $userId)
+        $app = Application::where('user_id', $userId)
             ->whereNotIn('status', ['rejected', 'resigned'])
             ->whereHas('placement')
             ->latest()
@@ -31,6 +31,12 @@ class LogbookController extends Controller
                 ->latest()
                 ->first()
             ?? Application::where('user_id', $userId)->latest()->first();
+
+        if ($app) {
+            $app->checkAndSyncActiveStatus();
+        }
+
+        return $app;
     }
 
     public function index()

@@ -96,9 +96,9 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
-        // Pemicu Otomatis 1: Otomatisasi transisi status dari ACCEPTED ke ACTIVE secara on-the-fly jika tanggal mulai magang telah tiba
         if ($application) {
             $application->autoActivateIfStarted();
+            $application->checkAndSyncActiveStatus();
         }
 
         $university = $user->university_id ? University::find($user->university_id) : null;
