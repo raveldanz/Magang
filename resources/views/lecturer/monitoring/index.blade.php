@@ -105,7 +105,9 @@
                                     }
                                 }
                             }
-                            $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                            $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+                            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+                            $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
                             $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
                             $nilaiDpl = $eval ? ($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0)) : 0;
                         @endphp
@@ -220,7 +222,9 @@
                                             }
                                         }
                                     }
-                                    $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                                    $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+                                    $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+                                    $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
                                     $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
                                     $nilaiDpl = $eval ? ($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0)) : 0;
                                 @endphp

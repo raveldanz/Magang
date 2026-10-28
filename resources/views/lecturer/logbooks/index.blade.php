@@ -97,6 +97,40 @@
                 </div>
             </div>
 
+            <!-- One-Click Quick Approval Banner (Jika ada logbook yang telah di-ACC Mentor Lapangan) -->
+            @if (($mentorApprovedPendingCount ?? 0) > 0)
+                <div class="bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-emerald-50/90 border border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-2xs">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h4 class="text-xs sm:text-sm font-bold text-emerald-950">Validasi Sekali Klik (One-Click Approval)</h4>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200/80 text-emerald-900">
+                                    {{ $mentorApprovedPendingCount }} Logbook Telah Di-ACC Mentor
+                                </span>
+                            </div>
+                            <p class="text-xs text-emerald-800/90 mt-1">
+                                Seluruh entri ini telah diverifikasi oleh Mentor Instansi terkait dan menunggu validasi DPL kampus. Anda dapat menyetujui seluruhnya secara instan.
+                            </p>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('lecturer.logbooks.approve_all_mentor_reviewed') }}"
+                          onsubmit="return confirm('Apakah Anda yakin ingin menyetujui seluruh {{ $mentorApprovedPendingCount }} logbook yang telah di-ACC mentor ini sekaligus?');">
+                        @csrf
+                        @if (request()->filled('placement_id'))
+                            <input type="hidden" name="placement_id" value="{{ request('placement_id') }}">
+                        @endif
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span>Setujui Semua yang Di-ACC Mentor ({{ $mentorApprovedPendingCount }})</span>
+                        </button>
+                    </form>
+                </div>
+            @endif
+
             <!-- Daftar Paket Mingguan (Borderless, Thoughtful Review UX) -->
             <x-supervision.logbook-weekly
                 :bundles="$weeklyBundles"

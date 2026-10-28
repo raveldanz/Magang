@@ -21,6 +21,8 @@ Route::middleware(['auth', 'role:dosen,academic_advisor'])->group(function () {
     Route::get('/lecturer/logbooks/{id}', [LecturerLogbookController::class, 'show'])->name('lecturer.logbooks.show');
     Route::put('/lecturer/logbooks/{id}', [LecturerLogbookController::class, 'updateStatus'])->name('lecturer.logbooks.updateStatus');
     Route::post('/lecturer/logbooks/bulk-approve', [LecturerLogbookController::class, 'bulkApprove'])->name('lecturer.logbooks.bulk_approve');
+    Route::post('/lecturer/students/{placementId}/logbooks/approve-mentor-reviewed', [LecturerLogbookController::class, 'approveMentorReviewedForPlacement'])->name('lecturer.students.logbooks.approve_mentor_reviewed');
+    Route::post('/lecturer/logbooks/approve-all-mentor-reviewed', [LecturerLogbookController::class, 'approveAllMentorReviewed'])->name('lecturer.logbooks.approve_all_mentor_reviewed');
     Route::get('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'create'])->name('lecturer.evaluations.create');
     Route::post('/lecturer/students/{placementId}/evaluation', [LecturerEvaluationController::class, 'store'])->name('lecturer.evaluations.store');
     Route::post('/lecturer/students/{placementId}/evaluate', [LecturerEvaluationController::class, 'store'])->name('lecturer.students.evaluate');

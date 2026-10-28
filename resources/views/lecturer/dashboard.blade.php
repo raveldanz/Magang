@@ -71,20 +71,20 @@
                                 <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
                                     <span>Evaluasi Akhir</span>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['urgent_ending']->count() > 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-600' }}">
-                                        {{ $actionAlerts['urgent_ending']->count() }} Belum Dinilai
+                                        {{ $actionAlerts['urgent_ending']->count() }} Belum Lengkap
                                     </span>
                                 </div>
                                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
                                     @if ($actionAlerts['urgent_ending']->count() > 0)
-                                        Mahasiswa mendekati akhir magang. Nilai DPL diperlukan untuk penerbitan sertifikat.
+                                        Mahasiswa mendekati akhir magang namun lembar evaluasi belum lengkap untuk penerbitan sertifikat.
                                     @else
-                                        Semua mahasiswa aktif yang mendekati akhir magang sudah dinilai.
+                                        Semua mahasiswa aktif yang mendekati akhir magang telah dievaluasi.
                                     @endif
                                 </p>
                             </div>
                             @if ($actionAlerts['urgent_ending']->count() > 0)
-                                <a href="{{ route('lecturer.evaluations.create', $actionAlerts['urgent_ending']->first()->id) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition text-center">
-                                    Input Nilai ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Mahasiswa' }})
+                                <a href="{{ route('lecturer.students.show', $actionAlerts['urgent_ending']->first()->id) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition text-center">
+                                    Tinjau Progres ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Mahasiswa' }})
                                 </a>
                             @endif
                         </div>

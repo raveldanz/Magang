@@ -45,6 +45,7 @@ class LogbookController extends Controller
         $pendingCount = $stats['pending'];
         $approvedCount = $stats['approved'];
         $rejectedCount = $stats['rejected'];
+        $mentorApprovedPendingCount = $allSupervisedLogs->where('status', 'approved')->where('lecturer_status', 'pending')->count();
 
         // 3. Terapkan filter pencarian & mahasiswa jika dipilih
         $filteredQuery = clone $baseLogbooksQuery;
@@ -87,7 +88,8 @@ class LogbookController extends Controller
             'supervisedPlacements',
             'pendingCount',
             'approvedCount',
-            'rejectedCount'
+            'rejectedCount',
+            'mentorApprovedPendingCount'
         ));
     }
 
@@ -229,5 +231,75 @@ class LogbookController extends Controller
         $statusMsg = $action === 'approved' ? 'disetujui (ACC)' : 'diminta revisi';
 
         return redirect()->back()->with('success', "Sebanyak {$count} logbook mahasiswa bimbingan berhasil {$statusMsg} sekaligus!");
+    }
+
+    /**
+     * One-Click Approval: Setujui semua logbook mahasiswa pada penempatan ini
+     * yang telah di-ACC oleh Mentor Lapangan namun masih pending di sisi DPL.
+     */
+    public function approveMentorReviewedForPlacement($placementId)
+    {
+        $user = Auth::user();
+
+        $placement = Placement::with(['application.user'])->find($placementId)
+            ?? Placement::with(['application.user'])->where('application_id', $placementId)->firstOrFail();
+
+        $isAssignedAdvisor = ($placement->academic_advisor_id === $user->id);
+        $isSuperAdmin = $user->isSuperAdmin();
+
+        if (! $isAssignedAdvisor && ! $isSuperAdmin) {
+            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing Lapangan yang ditugaskan untuk mahasiswa ini.');
+        }
+
+        $now = Carbon::now();
+        $updatedCount = Logbook::where('placement_id', $placement->id)
+            ->where('status', 'approved')
+            ->where('lecturer_status', 'pending')
+            ->update([
+                'lecturer_status' => 'approved',
+                'lecturer_verified_at' => $now,
+            ]);
+
+        // Cek sinkronisasi status kelulusan jika seluruh prasyarat magang sudah selesai
+        $placement->syncCompletionStatus();
+
+        if ($updatedCount > 0) {
+            return redirect()->back()->with('success', "Berhasil menyetujui {$updatedCount} logbook yang telah di-ACC mentor dalam satu klik!");
+        }
+
+        return redirect()->back()->with('info', 'Tidak ada logbook menunggu yang telah di-ACC oleh mentor.');
+    }
+
+    /**
+     * One-Click Approval Global: Setujui seluruh logbook bimbingan DPL
+     * yang telah di-ACC oleh Mentor Lapangan.
+     */
+    public function approveAllMentorReviewed(Request $request)
+    {
+        $user = Auth::user();
+
+        $supervisedPlacementIds = Placement::where('academic_advisor_id', $user->id)
+            ->pluck('id')
+            ->toArray();
+
+        $query = Logbook::whereIn('placement_id', $supervisedPlacementIds)
+            ->where('status', 'approved')
+            ->where('lecturer_status', 'pending');
+
+        if ($request->filled('placement_id')) {
+            $query->where('placement_id', $request->placement_id);
+        }
+
+        $now = Carbon::now();
+        $count = $query->update([
+            'lecturer_status' => 'approved',
+            'lecturer_verified_at' => $now,
+        ]);
+
+        if ($count > 0) {
+            return redirect()->back()->with('success', "Sebanyak {$count} logbook mahasiswa yang telah disetujui mentor berhasil di-ACC sekaligus!");
+        }
+
+        return redirect()->back()->with('info', 'Tidak ada logbook menunggu yang telah di-ACC oleh mentor.');
     }
 }
