@@ -282,4 +282,79 @@ class InternshipProjectAndSupervisorReportTest extends TestCase
         $response = $this->actingAs($student)->get(route('supervisor.reports.index'));
         $response->assertStatus(403);
     }
+
+    public function test_guest_and_authenticated_user_navigation_and_public_project_access()
+    {
+        $student = User::factory()->create(['role' => 'mahasiswa', 'name' => 'Eka Putri']);
+        $agency = AgencyProfile::create([
+            'agency_name' => 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
+            'email' => 'dispusip@surabaya.go.id',
+            'phone' => '031-1234567',
+            'address' => 'Jl. Rungkut Asri Timur No. 1 Surabaya',
+        ]);
+        $unit = Unit::create([
+            'agency_profile_id' => $agency->id,
+            'name' => 'Bidang Layanan Kearsipan',
+            'quota' => 10,
+        ]);
+        $application = Application::create([
+            'user_id' => $student->id,
+            'unit_id' => $unit->id,
+            'status' => 'active',
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+        ]);
+        $advisor = User::factory()->create(['role' => 'dosen']);
+        $placement = Placement::create([
+            'application_id' => $application->id,
+            'academic_advisor_id' => $advisor->id,
+            'status' => 'active',
+        ]);
+        $project = InternshipProject::create([
+            'placement_id' => $placement->id,
+            'title' => 'Portal Layanan Literasi Digital',
+            'description' => 'Platform literasi membaca daring untuk anak-anak kota Surabaya.',
+            'community_benefit' => 'Meningkatkan minat baca dan literasi digital generasi muda.',
+            'category' => 'pendidikan',
+            'photo_path' => 'internship_projects/sample.jpg',
+        ]);
+
+        // 1. Guest visits Welcome page ('/'): Should see login & register, and NOT see Pindah ke Dashboard
+        $responseGuestWelcome = $this->get('/');
+        $responseGuestWelcome->assertStatus(200);
+        $responseGuestWelcome->assertSee(route('login'));
+        $responseGuestWelcome->assertSee(route('register'));
+        $responseGuestWelcome->assertDontSee('Pindah ke Dashboard');
+
+        // 2. Authenticated user visits Welcome page ('/'): Should see Pindah ke Dashboard, and NOT see login or register
+        $responseAuthWelcome = $this->actingAs($student)->get('/');
+        $responseAuthWelcome->assertStatus(200);
+        $responseAuthWelcome->assertSee('Pindah ke Dashboard');
+        $responseAuthWelcome->assertDontSee(route('login'));
+        $responseAuthWelcome->assertDontSee(route('register'));
+        $responseAuthWelcome->assertDontSee('Masuk ke Akun');
+        $responseAuthWelcome->assertDontSee('Daftar Magang Sekarang');
+
+        // 3. Authenticated user views Navigation (e.g. final report index):
+        // Navbar logo must point to url('/') and profile dropdown must include "Home"
+        $responseAuthNav = $this->actingAs($student)->get(route('student.final_report.index'));
+        $responseAuthNav->assertStatus(200);
+        // Logo points to root url ('/')
+        $responseAuthNav->assertSee('<a href="' . url('/') . '" class="flex items-center gap-2.5 sm:gap-3 group py-1.5 shrink-0"', false);
+        // Menu Home is present in dropdown
+        $responseAuthNav->assertSee('Home');
+
+        // 4. Guest can view project detail page directly without login!
+        $responseGuestProject = $this->get(route('projects.show', $project->id));
+        $responseGuestProject->assertStatus(200);
+        $responseGuestProject->assertSee('Portal Layanan Literasi Digital');
+        $responseGuestProject->assertSee('Karya Inovasi Magang');
+        $responseGuestProject->assertSee(url('/'));
+
+        // 5. Authenticated user can also view project detail page
+        $responseAuthProject = $this->actingAs($student)->get(route('projects.show', $project->id));
+        $responseAuthProject->assertStatus(200);
+        $responseAuthProject->assertSee('Portal Layanan Literasi Digital');
+    }
 }
+

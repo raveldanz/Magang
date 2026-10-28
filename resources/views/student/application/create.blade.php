@@ -181,7 +181,7 @@
                             <div class="flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                                     <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                    <span>Anggota Kelompok ({{ $memberCount }} / 5 Mahasiswa)</span>
+                                    <span>Daftar Anggota Kelompok: {{ $memberCount }} dari maksimal {{ $maxGroupMembers ?? 20 }} Mahasiswa</span>
                                 </h4>
                                 @if($memberCount < 2)
                                     <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
@@ -209,7 +209,7 @@
                                                 <td class="py-3.5 px-4 font-bold text-slate-900">
                                                     {{ $grpApp->user?->name }}
                                                     @if($grpApp->user_id === Auth::id())
-                                                        <span class="ml-1 text-[10px] text-blue-600 font-semibold">(Anda)</span>
+                                                        <span class="ml-1 text-[10px] text-blue-600 font-bold tracking-wide">Anda</span>
                                                     @endif
                                                 </td>
                                                 <td class="py-3.5 px-4 font-mono text-slate-600">{{ $grpApp->user?->studentProfile?->nim ?? '-' }}</td>
@@ -263,7 +263,7 @@
                                             </label>
                                             <input type="file" name="surat_pengantar" accept=".pdf" required 
                                                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition bg-white border border-slate-200 rounded-xl p-1.5" />
-                                            <p class="text-[11px] text-slate-400">Format: Dokumen PDF resmi bertandatangan Dekan/Kaprodi memuat seluruh nama anggota (Maks. 2MB).</p>
+                                            <p class="text-[11px] text-slate-400">Format: Dokumen PDF resmi bertandatangan Dekan atau Kaprodi memuat seluruh nama anggota dengan ukuran maksimal 2MB.</p>
                                         </div>
 
                                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
@@ -287,7 +287,7 @@
                                 @else
                                     <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
                                         <p class="font-bold">Menunggu Anggota Tambahan:</p>
-                                        <p>Kelompok magang minimal memiliki 2 anggota (Ketua + 1 Anggota). Berikan Kode Gabung <strong class="font-mono text-indigo-700 bg-white px-2 py-0.5 rounded border border-amber-200">{{ $draftGroup->code }}</strong> kepada rekan Anda agar mereka dapat bergabung.</p>
+                                        <p>Kelompok magang minimal memiliki 2 anggota, yaitu Ketua dan minimal 1 Anggota. Berikan Kode Gabung <strong class="font-mono text-indigo-700 bg-white px-2 py-0.5 rounded border border-amber-200">{{ $draftGroup->code }}</strong> kepada rekan Anda agar mereka dapat bergabung.</p>
                                     </div>
                                     <div class="pt-2">
                                         <form action="{{ route('student.group.cancel') }}" method="POST" onsubmit="return confirm('Batalkan dan hapus kelompok ini?');">
@@ -304,7 +304,7 @@
                                 <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <div>
                                     <p class="font-bold">Anda Terdaftar Sebagai Anggota</p>
-                                    <p class="text-blue-800 mt-0.5">Mohon tunggu Ketua Kelompok (<strong>{{ $draftGroup->leader->name }}</strong>) mengunggah Surat Pengantar Kampus dan mengirimkan berkas pengajuan ini ke Admin Dinas.</p>
+                                    <p class="text-blue-800 mt-0.5">Mohon tunggu Ketua Kelompok yaitu <strong>{{ $draftGroup->leader->name }}</strong> mengunggah Surat Pengantar Kampus dan mengirimkan berkas pengajuan ini ke Admin Dinas.</p>
                                 </div>
                             </div>
                         @endif
@@ -835,7 +835,12 @@
                                         Sebagai Ketua Tim, Anda akan memilih Bidang Dispusip, menentukan rentang tanggal magang, dan mendapatkan <strong>Kode Undangan</strong> untuk dibagikan ke rekan satu kampus Anda.
                                     </p>
 
-                                    <form action="{{ route('student.group.create') }}" method="POST" class="space-y-4 pt-2">
+                                    <form action="{{ route('student.group.create') }}" method="POST" class="space-y-4 pt-2"
+                                          x-data="{
+                                              selectedUnit: '',
+                                              unitsData: @js($units->mapWithKeys(fn($u) => [$u->id => ['name' => $u->name, 'quota' => $u->quota, 'remaining' => $u->remaining_quota]])),
+                                              get currentUnit() { return this.unitsData[this.selectedUnit] || null; }
+                                          }">
                                         @csrf
                                         <div>
                                             <x-input-label for="group_name" value="Nama Kelompok - Opsional" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
@@ -846,7 +851,7 @@
                                             <label for="group_unit_select" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                                                 Pilihan Bidang Dispusip <span class="text-red-500">*</span>
                                             </label>
-                                            <select id="group_unit_select" name="unit_id" required class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white p-2.5 focus:ring-2 focus:ring-blue-400">
+                                            <select id="group_unit_select" name="unit_id" required x-model="selectedUnit" class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white p-2.5 focus:ring-2 focus:ring-blue-400">
                                                 <option value="">-- Pilih Bidang Dispusip Surabaya --</option>
                                                 @foreach($units as $u)
                                                     @php $rem = $u->remaining_quota; @endphp
@@ -855,6 +860,16 @@
                                                     </option>
                                                 @endforeach
                                             </select>
+                                            <!-- Interactive Quota & Capacity Banner -->
+                                            <div x-show="currentUnit" x-cloak class="mt-2.5 p-3 rounded-xl bg-blue-50/80 border border-blue-200 text-xs text-blue-900 space-y-1">
+                                                <div class="font-bold flex items-center justify-between">
+                                                    <span x-text="currentUnit ? currentUnit.name : ''"></span>
+                                                    <span class="px-2 py-0.5 rounded-md text-[11px] font-bold" :class="currentUnit && currentUnit.remaining > 0 ? 'bg-blue-100 text-blue-800' : 'bg-rose-100 text-rose-800'" x-text="currentUnit ? 'Sisa Kuota: ' + currentUnit.remaining + ' Slot' : ''"></span>
+                                                </div>
+                                                <p class="text-[11px] text-blue-700 leading-relaxed">
+                                                    Kelompok Anda dapat beranggotakan hingga kapasitas sisa kuota bidang tersebut dengan batas maksimal sistem 100 orang.
+                                                </p>
+                                            </div>
                                         </div>
 
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -908,6 +923,7 @@
                                             <p class="font-bold">Ketentuan Bergabung:</p>
                                             <p>&bull; Anda harus berasal dari perguruan tinggi yang sama dengan Ketua.</p>
                                             <p>&bull; Anda belum memiliki pengajuan aktif lain yang sedang berjalan.</p>
+                                            <p>&bull; Kapasitas kelompok dibatasi oleh sisa kuota bidang dengan batas maksimal sistem 100 orang.</p>
                                         </div>
 
                                         <button type="submit" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">

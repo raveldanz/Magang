@@ -125,7 +125,7 @@
                         <option value="">Semua Role Pengguna</option>
                         <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Bidang / Dispusip</option>
-                        <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Atasan (Supervisor)</option>
+                        <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
                         <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen Pembimbing</option>
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
@@ -252,7 +252,7 @@
                                             @endif
                                         @elseif($u->role === 'supervisor')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200 whitespace-nowrap">
-                                                Atasan (Supervisor)
+                                                Supervisor
                                             </span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                             @if($u->unit_id)
@@ -463,7 +463,7 @@
                                             @endif
                                         @elseif($u->role === 'supervisor')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
-                                                Atasan (Supervisor)
+                                                Supervisor
                                             </span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                             @if($u->unit_id)

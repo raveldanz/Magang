@@ -682,4 +682,218 @@ class InternshipGroupWorkflowTest extends TestCase
         $this->assertStringContainsString('Kelompok Magang', $lecturerContent);
         $this->assertStringContainsString('Tim Ekspor Mahasiswa', $lecturerContent);
     }
+
+    public function test_admin_applications_index_displays_group_as_single_row_with_members_accordion(): void
+    {
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Kolaborasi Surabaya',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(10)->toDateString(),
+            'end_date' => now()->addDays(70)->toDateString(),
+            'status' => 'pending',
+            'letter_token' => 'GRPVIEWTOKEN',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'pending',
+        ]);
+
+        $memberApp = Application::create([
+            'user_id' => $this->member->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.applications.index'));
+
+        $response->assertOk();
+        $response->assertSee('Jalur Kelompok');
+        $response->assertSee('Tim Kolaborasi Surabaya');
+        $response->assertSee($group->code);
+        $response->assertSee('Daftar Mahasiswa Anggota: Tim Kolaborasi Surabaya');
+        $response->assertSee($this->leader->name);
+        $response->assertSee($this->member->name);
+
+        // Aksi Kelompok sekarang dipusatkan di halaman Detail sesuai permintaan user
+        $detailResponse = $this->actingAs($this->admin)->get(route('admin.applications.show', $leaderApp->id));
+        $detailResponse->assertOk();
+        $detailResponse->assertSee('Aksi Serentak Kelompok');
+    }
+
+    public function test_admin_can_update_entire_group_status_serentak(): void
+    {
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Terpadu',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(10)->toDateString(),
+            'end_date' => now()->addDays(70)->toDateString(),
+            'status' => 'pending',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'pending',
+        ]);
+
+        $memberApp = Application::create([
+            'user_id' => $this->member->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->admin)->put(route('admin.groups.update_status', $group->id), [
+            'status' => 'accepted',
+            'mentor_id' => $this->mentor->id,
+        ]);
+
+        $response->assertRedirect();
+        $group->refresh();
+        $leaderApp->refresh();
+        $memberApp->refresh();
+
+        $this->assertEquals('waiting_approval', $group->status);
+        $this->assertEquals('waiting_approval', $leaderApp->statusValue());
+        $this->assertEquals('waiting_approval', $memberApp->statusValue());
+    }
+
+    public function test_admin_can_update_individual_member_status_independently(): void
+    {
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Parsial',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(10)->toDateString(),
+            'end_date' => now()->addDays(70)->toDateString(),
+            'status' => 'pending',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'pending',
+        ]);
+
+        $memberApp = Application::create([
+            'user_id' => $this->member->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'pending',
+        ]);
+
+        // Tolak hanya memberApp dengan sync_group = 0
+        $response = $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $memberApp->id), [
+            'status' => 'rejected',
+            'rejection_note' => 'Dokumen transkrip tidak valid',
+            'sync_group' => '0',
+        ]);
+
+        $response->assertRedirect();
+        $leaderApp->refresh();
+        $memberApp->refresh();
+
+        $this->assertEquals('rejected', $memberApp->statusValue());
+        // Ketua tetap pending, tidak ikut ditolak
+        $this->assertEquals('pending', $leaderApp->statusValue());
+    }
+
+    public function test_group_member_limit_enforces_safe_maximum_of_100(): void
+    {
+        $this->assertEquals(100, Unit::MAX_GROUP_MEMBERS);
+    }
+
+    public function test_supervisor_approve_from_member_application_approves_all_group_members_together(): void
+    {
+        $supervisor = User::factory()->create([
+            'role' => 'supervisor',
+            'agency_profile_id' => $this->unit->agency_profile_id,
+        ]);
+
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Riset Naskah Kuno',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(5)->toDateString(),
+            'end_date' => now()->addMonths(3)->toDateString(),
+            'status' => 'waiting_approval',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'waiting_approval',
+        ]);
+
+        $memberApp = Application::create([
+            'user_id' => $this->member->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'waiting_approval',
+        ]);
+
+        // Supervisor approves directly through memberApp (not leader)
+        $response = $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $memberApp->id));
+        $response->assertRedirect(route('supervisor.applications.index'));
+        $response->assertSessionHas('success');
+
+        $group->refresh();
+        $leaderApp->refresh();
+        $memberApp->refresh();
+
+        // Both members and group are now approved
+        $this->assertEquals('accepted', $group->status);
+        $this->assertEquals('accepted', $leaderApp->statusValue());
+        $this->assertEquals('accepted', $memberApp->statusValue());
+
+        // Both have placements created
+        $this->assertDatabaseHas('placements', ['application_id' => $leaderApp->id]);
+        $this->assertDatabaseHas('placements', ['application_id' => $memberApp->id]);
+
+        // Check menu names in navbar
+        $dashboardResponse = $this->actingAs($supervisor)->get(route('supervisor.dashboard'));
+        $dashboardResponse->assertOk();
+        $dashboardResponse->assertSee('Pengajuan');
+        $dashboardResponse->assertSee('Sertifikat');
+        $dashboardResponse->assertDontSee('Persetujuan Pengajuan');
+        $dashboardResponse->assertDontSee('Pengesahan Sertifikat');
+    }
 }
+
