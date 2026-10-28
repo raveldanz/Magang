@@ -170,7 +170,7 @@
                                     </span>
                                 </div>
                                 <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                                    <span class="text-slate-500 font-medium">Nilai Dosen:</span>
+                                    <span class="text-slate-500 font-medium">Evaluasi Nilai:</span>
                                     @if ($isMentorOnly)
                                         <span class="text-slate-500 text-[11px]">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
                                     @else
@@ -208,13 +208,13 @@
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3.5 px-4 w-[22%]">Mahasiswa</th>
-                                <th class="py-3.5 px-4 w-[21%]">Instansi & Unit</th>
-                                <th class="py-3.5 px-3 w-[11%] text-center">Status</th>
-                                <th class="py-3.5 px-3 w-[8%] text-center">Logbook</th>
+                                <th class="py-3.5 px-4 w-[24%]">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-[22%]">Instansi & Unit</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Status</th>
+                                <th class="py-3.5 px-3 w-[11%] text-center">Logbook</th>
                                 <th class="py-3.5 px-3 w-[11%] text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-3 w-[10%] text-center">Nilai Dosen</th>
-                                <th class="py-3.5 px-4 w-[17%] text-right">Aksi</th>
+                                <th class="py-3.5 px-3 w-[12%] text-center">Evaluasi Nilai</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
@@ -331,10 +331,10 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-right">
-                                        <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                    <td class="py-4 px-3 text-center">
+                                        <div class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                               class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
+                                               class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
                                                 Detail
                                             </a>
                                             @if (!$isMentorOnly)

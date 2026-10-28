@@ -153,7 +153,7 @@
                         <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Sudah Dinilai</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_evaluated'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-400 mt-2 block">Nilai DPL tersimpan</span>
+                    <span class="text-xs text-slate-400 mt-2 block">Evaluasi tersimpan</span>
                 </div>
 
                 <!-- Laporan Akhir Masuk / Pending -->
@@ -171,7 +171,7 @@
                         <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Belum Dinilai</span>
                         <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">{{ $stats['total_pending_eval'] }}</div>
                     </div>
-                    <span class="text-xs text-slate-400 mt-2 block">Menunggu penilaian DPL</span>
+                    <span class="text-xs text-slate-400 mt-2 block">Menunggu evaluasi</span>
                 </div>
 
             </div>
@@ -241,10 +241,26 @@
                             $agency = $unit?->agencyProfile;
                             $mentor = $p->mentor ?? $p->pembimbing;
                             $eval = $p->evaluation;
-                            $hasEval = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0);
                             $finalReport = $p->finalreport;
                             $logbooksCount = $p->logbooks->count();
+
+                            $univ = $eval?->getUniversity();
+                            if (!$univ && $student) {
+                                if ($student->university_id) {
+                                    $univ = \App\Models\University::find($student->university_id);
+                                } else {
+                                    $name = $student->university ?? ($profile?->universitas ?? null);
+                                    if ($name) {
+                                        $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
+                                    }
+                                }
+                            }
+                            $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+                            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+                            $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
+
                             $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
+                            $hasEval = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0);
                         @endphp
                         <div class="p-4 space-y-3 hover:bg-slate-50/60 transition">
                             <div class="flex items-start justify-between gap-3">
@@ -279,9 +295,6 @@
                                 <div class="text-slate-600">
                                     <span class="text-slate-500 font-medium">Mentor:</span> 
                                     <span class="font-semibold text-slate-800">{{ $mentor->name ?? 'Belum Ditugaskan' }}</span>
-                                    @if($nilaiDinas > 0)
-                                        <span class="text-emerald-700 font-semibold ml-1">&bull; Dinas: {{ number_format($nilaiDinas, 1) }}</span>
-                                    @endif
                                 </div>
                                 <div class="flex items-center justify-between pt-2 border-t border-slate-200/60 text-xs">
                                     <span class="text-slate-500">Laporan: 
@@ -292,10 +305,18 @@
                                         @endif
                                     </span>
                                     <span>
-                                        @if($hasEval)
-                                            <span class="text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-md">Nilai DPL: {{ number_format($eval->nilai_dosen_calculated, 1) }}</span>
+                                        @if($isMentorOnly)
+                                            @if($nilaiDinas > 0)
+                                                <span class="text-emerald-800 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-md">Dinas: {{ number_format($nilaiDinas, 1) }}</span>
+                                            @else
+                                                <span class="text-amber-700 font-semibold bg-amber-50 px-2.5 py-0.5 rounded-md">Menunggu Dinas</span>
+                                            @endif
                                         @else
-                                            <span class="text-amber-700 font-semibold bg-amber-50 px-2.5 py-0.5 rounded-md">Belum Dinilai</span>
+                                            @if($hasEval)
+                                                <span class="text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-md">Nilai DPL: {{ number_format($eval->nilai_dosen_calculated, 1) }}</span>
+                                            @else
+                                                <span class="text-amber-700 font-semibold bg-amber-50 px-2.5 py-0.5 rounded-md">Belum Dinilai</span>
+                                            @endif
                                         @endif
                                     </span>
                                 </div>
@@ -304,7 +325,7 @@
                             <div>
                                 <a href="{{ route('lecturer.students.show', $p->id) }}" 
                                    class="inline-flex items-center justify-center w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs text-center min-h-[38px]">
-                                    Detail & Nilai
+                                    {{ $isMentorOnly ? 'Detail Mahasiswa' : 'Detail & Nilai' }}
                                 </a>
                             </div>
                         </div>
@@ -353,7 +374,9 @@
                                             }
                                         }
                                     }
-                                    $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                                    $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+                                    $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+                                    $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
                                     $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
