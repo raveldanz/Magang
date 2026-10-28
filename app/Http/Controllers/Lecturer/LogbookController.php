@@ -67,10 +67,15 @@ class LogbookController extends Controller
             });
         }
 
-        $logsForBundling = $filteredQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->get();
-
         // Status filter: terima 'status' maupun 'lecturer_status'
         $statusFilter = $request->input('status', $request->input('lecturer_status'));
+
+        if ($statusFilter === 'mentor_approved') {
+            $filteredQuery->where('status', 'approved')->where('lecturer_status', 'pending');
+            $statusFilter = null;
+        }
+
+        $logsForBundling = $filteredQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->get();
 
         // 4. Kelompokkan menjadi paket mingguan (10 paket per halaman)
         $weeklyBundles = $bundler->bundle(

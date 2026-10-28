@@ -47,6 +47,14 @@
                             <span class="hidden sm:inline">{{ \App\Enums\ReviewStatus::REVISION->description() }}</span>
                             <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ $currStatus === 'rejected' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $rejectedCount }}</span>
                         </a>
+                        @if ($mentorApprovedPendingCount > 0 || $currStatus === 'mentor_approved')
+                            <a href="{{ route('lecturer.logbooks.index', array_merge(request()->except('status'), ['status' => 'mentor_approved'])) }}"
+                               class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ $currStatus === 'mentor_approved' ? 'border-emerald-600 text-emerald-700 font-bold' : 'border-transparent text-emerald-600 hover:text-emerald-700 hover:border-emerald-300 font-semibold' }}">
+                                <span class="sm:hidden">Siap ACC</span>
+                                <span class="hidden sm:inline">Siap ACC DPL</span>
+                                <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ $currStatus === 'mentor_approved' ? 'bg-emerald-200 text-emerald-800' : 'bg-emerald-100 text-emerald-700' }}">{{ $mentorApprovedPendingCount }}</span>
+                            </a>
+                        @endif
                     </nav>
                 </div>
 

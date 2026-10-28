@@ -295,4 +295,70 @@ class LecturerFeaturesUpdateTest extends TestCase
             ->assertSeeText('100% Mentor Dinas')
             ->assertSeeText('ACC Semua yang Di-ACC Mentor (1)');
     }
+
+    public function test_lecturer_dashboard_displays_refined_action_center_and_balanced_cards()
+    {
+        $data = $this->createLecturerScenario();
+
+        // Update naskah laporan menjadi pending agar Action Center muncul
+        $data['placement1']->finalreport->update([
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($data['lecturer'])->get(route('lecturer.dashboard'));
+
+        $response->assertOk()
+            ->assertSeeText('Perlu Tindakan Dosen')
+            ->assertSeeText('Review Laporan')
+            ->assertSeeText('Semua evaluasi tuntas')
+            ->assertDontSeeText('bg-rose-600');
+    }
+
+    public function test_lecturer_can_filter_logbooks_by_mentor_approved_status()
+    {
+        $data = $this->createLecturerScenario();
+
+        // Logbook 1: status=approved (mentor), lecturer_status=pending (dpl) -> harus muncul
+        // Buat logbook 2: status=pending, lecturer_status=pending -> tidak boleh muncul di filter mentor_approved
+        \App\Models\Logbook::create([
+            'placement_id' => $data['placement1']->id,
+            'date' => now()->subDays(2)->toDateString(),
+            'activity' => 'Aktivitas yang belum di-ACC mentor dinas',
+            'status' => 'pending',
+            'lecturer_status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($data['lecturer'])->get(
+            route('lecturer.logbooks.index', ['status' => 'mentor_approved'])
+        );
+
+        $response->assertOk()
+            ->assertSeeText('Melakukan testing REST API layanan e-Gov')
+            ->assertDontSeeText('Aktivitas yang belum di-ACC mentor dinas');
+    }
+
+    public function test_lecturer_monitoring_displays_student_activity_status()
+    {
+        $data = $this->createLecturerScenario();
+
+        $response = $this->actingAs($data['lecturer'])->get(route('lecturer.monitoring.index'));
+
+        $response->assertOk()
+            ->assertSeeText('2 hari lalu');
+
+        // Buat logbook hari ini
+        \App\Models\Logbook::create([
+            'placement_id' => $data['placement1']->id,
+            'date' => now()->toDateString(),
+            'activity' => 'Melakukan testing hari ini',
+            'status' => 'pending',
+            'lecturer_status' => 'pending',
+        ]);
+
+        $responseToday = $this->actingAs($data['lecturer'])->get(route('lecturer.monitoring.index'));
+        $responseToday->assertOk()
+            ->assertSeeText('Aktif hari ini');
+    }
 }
+
+

@@ -35,7 +35,7 @@
                 <div class="bg-white rounded-2xl p-5 shadow-xs space-y-4">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2">
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-bold text-slate-900">Smart Action Center</h3>
+                            <h3 class="text-sm font-bold text-slate-900">Perlu Tindakan Dosen <span class="sr-only">Smart Action Center</span></h3>
                             <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">Prioritas</span>
                         </div>
                     </div>
@@ -51,17 +51,24 @@
                                     </span>
                                 </div>
                                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                                    @if ($actionAlerts['pending_reports']->count() > 0)
-                                        Naskah laporan akhir menunggu persetujuan dari Anda.
+                                    @if ($actionAlerts['pending_reports']->count() === 1)
+                                        Naskah laporan akhir dari {{ $actionAlerts['pending_reports']->first()->application->user->name ?? 'Mahasiswa' }} menunggu persetujuan Anda.
+                                    @elseif ($actionAlerts['pending_reports']->count() > 1)
+                                        {{ $actionAlerts['pending_reports']->count() }} naskah laporan akhir mahasiswa menunggu persetujuan Anda.
                                     @else
                                         Semua naskah laporan sudah selesai diperiksa.
                                     @endif
                                 </p>
                             </div>
                             @if ($actionAlerts['pending_reports']->count() > 0)
-                                <a href="{{ route('lecturer.students.show', $actionAlerts['pending_reports']->first()->id) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition text-center">
-                                    Review Laporan ({{ $actionAlerts['pending_reports']->first()->application->user->name ?? 'Mahasiswa' }})
+                                <a href="{{ route('lecturer.students.show', $actionAlerts['pending_reports']->first()->id) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
+                                    {{ $actionAlerts['pending_reports']->count() === 1 ? 'Review Laporan' : 'Review ' . $actionAlerts['pending_reports']->count() . ' Laporan' }}
                                 </a>
+                            @else
+                                <div class="mt-auto pt-4 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                    <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Semua naskah tuntas</span>
+                                </div>
                             @endif
                         </div>
 
@@ -70,22 +77,29 @@
                             <div>
                                 <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
                                     <span>Evaluasi Akhir</span>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['urgent_ending']->count() > 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-600' }}">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $actionAlerts['urgent_ending']->count() > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600' }}">
                                         {{ $actionAlerts['urgent_ending']->count() }} Belum Lengkap
                                     </span>
                                 </div>
                                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">
-                                    @if ($actionAlerts['urgent_ending']->count() > 0)
-                                        Mahasiswa mendekati akhir magang namun lembar evaluasi belum lengkap untuk penerbitan sertifikat.
+                                    @if ($actionAlerts['urgent_ending']->count() === 1)
+                                        Mahasiswa mendekati akhir magang ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Mahasiswa' }}), lembar evaluasi belum lengkap untuk penerbitan sertifikat.
+                                    @elseif ($actionAlerts['urgent_ending']->count() > 1)
+                                        {{ $actionAlerts['urgent_ending']->count() }} mahasiswa mendekati akhir magang, lembar evaluasi belum lengkap untuk penerbitan sertifikat.
                                     @else
                                         Semua mahasiswa aktif yang mendekati akhir magang telah dievaluasi.
                                     @endif
                                 </p>
                             </div>
                             @if ($actionAlerts['urgent_ending']->count() > 0)
-                                <a href="{{ route('lecturer.students.show', $actionAlerts['urgent_ending']->first()->id) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition text-center">
-                                    Tinjau Progres ({{ $actionAlerts['urgent_ending']->first()->application->user->name ?? 'Mahasiswa' }})
+                                <a href="{{ $actionAlerts['urgent_ending']->count() === 1 ? route('lecturer.students.show', $actionAlerts['urgent_ending']->first()->id) : route('lecturer.monitoring.index', ['tab' => 'active']) }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
+                                    {{ $actionAlerts['urgent_ending']->count() === 1 ? 'Tinjau Progres' : 'Tinjau ' . $actionAlerts['urgent_ending']->count() . ' Mahasiswa' }}
                                 </a>
+                            @else
+                                <div class="mt-auto pt-4 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                    <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Semua evaluasi tuntas</span>
+                                </div>
                             @endif
                         </div>
 
@@ -107,9 +121,14 @@
                                 </p>
                             </div>
                             @if ($actionAlerts['pending_logbooks_count'] > 0)
-                                <a href="{{ route('lecturer.logbooks.index') }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center">
+                                <a href="{{ route('lecturer.logbooks.index') }}" class="mt-4 inline-flex items-center justify-center py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition text-center shadow-xs">
                                     Tinjau Logbook
                                 </a>
+                            @else
+                                <div class="mt-auto pt-4 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                    <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Seluruh logbook tuntas</span>
+                                </div>
                             @endif
                         </div>
                     </div>
