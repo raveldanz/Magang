@@ -81,6 +81,7 @@ class InternshipProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
+            'is_public' => 'nullable|boolean',
             'description' => 'required|string',
             'community_benefit' => 'required|string',
             'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
@@ -176,6 +177,7 @@ class InternshipProjectController extends Controller
             'placement_id' => $placement->id,
             'title' => $validated['title'],
             'category' => $validated['category'] ?? null,
+            'is_public' => $request->boolean('is_public', true),
             'description' => $validated['description'],
             'community_benefit' => $validated['community_benefit'],
             'photo_path' => $photoPath,
@@ -221,6 +223,7 @@ class InternshipProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
+            'is_public' => 'nullable|boolean',
             'description' => 'required|string',
             'community_benefit' => 'required|string',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
@@ -336,6 +339,7 @@ class InternshipProjectController extends Controller
         $project->update([
             'title' => $validated['title'],
             'category' => $validated['category'] ?? $project->category,
+            'is_public' => $request->has('is_public') ? $request->boolean('is_public') : $project->is_public,
             'description' => $validated['description'],
             'community_benefit' => $validated['community_benefit'],
             'photo_path' => $photoPath,

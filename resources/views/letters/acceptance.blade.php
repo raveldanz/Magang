@@ -511,7 +511,7 @@
                 </thead>
                 <tbody>
                     @if($application->group_id && $application->group)
-                        @foreach($application->group->applications()->with('user.studentProfile')->get() as $idx => $grpApp)
+                        @foreach($application->group->applications()->whereIn('status', ['accepted', 'active', 'completed', 'waiting_approval'])->with('user.studentProfile')->get() as $idx => $grpApp)
                             @php
                                 $mStudent = $grpApp->user?->studentProfile;
                                 $mCleanName = preg_replace('/\s*\([^)]*\)/', '', $grpApp->user?->name ?? '-');

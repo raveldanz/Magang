@@ -27,12 +27,106 @@
             </div>
 
             <div class="flex items-center gap-2">
-                @if($project->demo_url)
-                    <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        <span>Akses Tautan / Aplikasi Proyek</span>
-                    </a>
+                @php
+                    $isManagerRole = Auth::check() && (Auth::user()->isSuperAdmin() || in_array(Auth::user()->role, ['super_admin', 'superadmin', 'supervisor']));
+                @endphp
+
+                @if($isManagerRole)
+                    {{-- KHUSUS SUPER ADMIN & SUPERVISOR: Tombol 'Kelola Proyek' Elegan dengan Dropdown Lengkap --}}
+                    <div x-data="{ menuOpen: false }" class="relative" @click.outside="menuOpen = false">
+                        <button @click="menuOpen = !menuOpen" 
+                                type="button" 
+                                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer active:scale-95"
+                                title="Kelola dan Moderasi Proyek Inovasi">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Kelola Proyek</span>
+                            <svg class="w-3.5 h-3.5 text-blue-200 transition-transform duration-200" :class="{ 'rotate-180': menuOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+
+                        <div x-show="menuOpen" 
+                             x-cloak 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs divide-y divide-slate-100">
+                            
+                            {{-- 1. Pilihan Akses Tautan / Aplikasi Proyek (Jika Tersedia) --}}
+                            @if($project->demo_url)
+                                <div class="py-1">
+                                    <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer" 
+                                       class="w-full text-left px-4 py-2.5 hover:bg-blue-50 flex items-center gap-2.5 text-blue-700 font-bold transition">
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span class="truncate">Akses Tautan / Aplikasi Proyek</span>
+                                    </a>
+                                </div>
+                            @endif
+
+                            {{-- 2. Sembunyikan / Publikasikan Proyek --}}
+                            <div class="py-1">
+                                <form action="{{ route('projects.toggle_visibility', $project->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
+                                        @if($project->is_public)
+                                            <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                                            <div>
+                                                <div class="font-bold text-slate-800">Sembunyikan Proyek</div>
+                                                <div class="text-[10px] text-slate-400">Jadikan privat (hanya pengelola)</div>
+                                            </div>
+                                        @else
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <div>
+                                                <div class="font-bold text-slate-800">Tampilkan ke Publik</div>
+                                                <div class="text-[10px] text-slate-400">Dapat dilihat semua pengunjung</div>
+                                            </div>
+                                        @endif
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- 3. Salin Tautan --}}
+                            <div class="py-1">
+                                <button type="button" 
+                                        @click="navigator.clipboard.writeText(window.location.href); menuOpen = false; alert('Tautan proyek berhasil disalin!')" 
+                                        class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
+                                    <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    <div>
+                                        <div class="font-bold text-slate-800">Salin Tautan Proyek</div>
+                                        <div class="text-[10px] text-slate-400">Salin link halaman ini</div>
+                                    </div>
+                                </button>
+                            </div>
+
+                            @if(Auth::user()->isSuperAdmin() || in_array(Auth::user()->role, ['super_admin', 'superadmin']))
+                                {{-- 4. Hapus Proyek (Khusus Super Admin) --}}
+                                <div class="py-1">
+                                    <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus proyek inovasi ini secara permanen?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-full text-left px-4 py-2.5 hover:bg-rose-50 flex items-center gap-2.5 text-rose-600 font-semibold cursor-pointer transition">
+                                            <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            <div>
+                                                <div class="font-bold text-rose-600">Hapus Proyek</div>
+                                                <div class="text-[10px] text-rose-400">Hapus karya ini permanen</div>
+                                            </div>
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+
+                        </div>
+                    </div>
+                @else
+                    {{-- UNTUK USER LAIN (Mahasiswa, Dosen, Tamu / Publik): Tampilkan tombol Akses Tautan biasa jika tersedia demo_url --}}
+                    @if($project->demo_url)
+                        <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            <span>Akses Tautan / Aplikasi Proyek</span>
+                        </a>
+                    @endif
                 @endif
             </div>
         </div>
@@ -58,7 +152,94 @@
 
     <div class="py-8" x-data="{
         activePhoto: @js($allScreenshots[0]['url'] ?? null),
-        activeTitle: @js($allScreenshots[0]['title'] ?? 'Dokumentasi Proyek')
+        activeTitle: @js($allScreenshots[0]['title'] ?? 'Dokumentasi Proyek'),
+        isLiked: @js($isLikedByMe),
+        likesCount: {{ (int) $project->likes_count }},
+        commentsCount: {{ (int) $project->comments_count }},
+        likeLoading: false,
+        shareToast: false,
+        profanityAlert: '',
+        commentInput: '',
+        authorNameInput: '',
+
+        async toggleProjectLike() {
+            if (this.likeLoading) return;
+            this.likeLoading = true;
+            try {
+                const resp = await fetch('{{ route('projects.like', $project->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.isLiked = data.liked;
+                    this.likesCount = data.likes_count;
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.likeLoading = false;
+            }
+        },
+
+        copyShareLink() {
+            navigator.clipboard.writeText(window.location.href);
+            this.shareToast = true;
+            setTimeout(() => this.shareToast = false, 3000);
+        },
+
+        checkProfanity(text) {
+            const badWords = [
+                // Kata Kasar Jawa (Surabaya / Jatim & Jateng)
+                'jancok','jancuk','jancik','dancok','dancuk','damput','jancukan',
+                'ancok','ancuk','cok','cuk','coeg','taek','telek','tai','taik','silit',
+                'matamu','ndasmu','cocotmu','lambemu','modar','peli','gathel','gapleki','tempik','peler',
+                'kenthu','kirik',
+                // Organ intim & seksual eksplisit
+                'kontol','kntl','memek','mmk','jembut','jmbt','ngentot','ngewe','ewe','pantek',
+                'puki','pukimak','pepek','itil','tetek','titit','bocong','dildo','masturbasi',
+                'porno','bokep','vagina','penis','seks',
+                // Umpatan kasar / peyoratif Indonesia
+                'anjing','anjir','anjrit','babi','bangsat','bajingan','brengsek','kampret','asu',
+                'lonte','perek','jablay','goblok','goblog','tolol','idiot','bego','dungu','pekok','geblek',
+                // Slang & English profanity
+                'fuck','fucking','fucked','fucker','motherfucker','mf',
+                'shit','bullshit','bitch','bitches','bastard','asshole','cunt',
+                'dick','dicks','cock','pussy','whore','slut','prick','retard','nigger','fag','faggot'
+            ];
+            const lower = text.toLowerCase();
+            
+            // 1. Cek batas kata utuh
+            for (const w of badWords) {
+                const regex = new RegExp('\\b' + w + '\\b', 'i');
+                if (regex.test(lower)) {
+                    return w;
+                }
+            }
+
+            // 2. Cek stripped evasion (contoh: "j.a.n.c.o.k", "a_s_u")
+            const stripped = lower.replace(/[^a-z0-9]/g, '');
+            for (const w of ['jancok','jancuk','dancok','kontol','memek','ngentot','fuck','bitch','asu']) {
+                if (stripped.includes(w)) {
+                    return w;
+                }
+            }
+
+            return '';
+        },
+
+        validateCommentLive() {
+            const detected = this.checkProfanity(this.commentInput + ' ' + this.authorNameInput);
+            if (detected) {
+                this.profanityAlert = 'Terdeteksi kata tidak pantas (\x22' + detected + '\x22). Mohon gunakan bahasa yang sopan dan santun.';
+            } else {
+                this.profanityAlert = '';
+            }
+        }
     }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
@@ -450,6 +631,252 @@
                 @endif
             </div>
 
+            {{-- 4. INTERAKSI PROYEK: LIKE & SHARE RESMI --}}
+            <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    {{-- Tombol Suka (Like) --}}
+                    <button type="button" 
+                            @click="toggleProjectLike()" 
+                            :disabled="likeLoading"
+                            class="inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition-all duration-200 cursor-pointer shadow-2xs active:scale-95 border"
+                            :class="isLiked ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'">
+                        <svg class="w-5 h-5 transition-transform" :class="isLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-400 group-hover:text-rose-500'" viewBox="0 0 24 24">
+                            <path :fill="isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span x-text="isLiked ? 'Disukai' : 'Suka Proyek Ini'"></span>
+                        <span class="px-2 py-0.5 rounded-full text-xs" :class="isLiked ? 'bg-rose-100 text-rose-700' : 'bg-white text-slate-600 border border-slate-200'" x-text="likesCount"></span>
+                    </button>
+
+                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+                    {{-- Indikator Jumlah Diskusi --}}
+                    <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span>{{ $project->comments->count() }} Komentar Masukan</span>
+                    </div>
+                </div>
+
+                {{-- Opsi Bagikan (Share) --}}
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end relative" x-data="{ shareDropdown: false }">
+                    <button type="button" 
+                            @click="shareDropdown = !shareDropdown"
+                            class="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-700 transition cursor-pointer shadow-2xs">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                        <span>Bagikan</span>
+                    </button>
+
+                    {{-- Dropdown Pilihan Media Share --}}
+                    <div x-show="shareDropdown" 
+                         @click.outside="shareDropdown = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-cloak
+                         class="absolute right-0 bottom-full mb-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 space-y-1 z-30">
+                        <button type="button" 
+                                @click="copyShareLink(); shareDropdown = false;" 
+                                class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition text-left cursor-pointer">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <span>Salin Tautan</span>
+                        </button>
+                        <a href="https://api.whatsapp.com/send?text={{ urlencode('Simak karya inovasi magang: ' . $project->title . ' - ' . url()->current()) }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition text-left">
+                            <span class="w-4 h-4 text-emerald-500 font-bold text-center">W</span>
+                            <span>WhatsApp</span>
+                        </a>
+                        <a href="https://t.me/share/url?url={{ urlencode(url()->current()) }}&text={{ urlencode($project->title) }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-600 rounded-xl transition text-left">
+                            <span class="w-4 h-4 text-sky-500 font-bold text-center">T</span>
+                            <span>Telegram</span>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode('Karya Inovasi Magang Dispusip: ' . $project->title) }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition text-left">
+                            <span class="w-4 h-4 text-slate-900 font-bold text-center">X</span>
+                            <span>Twitter / X</span>
+                        </a>
+                    </div>
+
+                    {{-- Toast Notifikasi Salin Tautan --}}
+                    <div x-show="shareToast" 
+                         x-transition 
+                         x-cloak 
+                         class="absolute right-0 -top-10 px-3 py-1.5 bg-slate-900 text-white text-[11px] font-bold rounded-lg shadow-md whitespace-nowrap">
+                        Tautan berhasil disalin ke papan klip!
+                    </div>
+                </div>
+            </div>
+
+            {{-- 5. RUANG DISKUSI & ULASAN KOMENTAR --}}
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                            <span>Ulasan & Diskusi Karya</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800" x-text="commentsCount"></span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Sampaikan apresiasi, pertanyaan, atau masukan membangun untuk penyempurnaan karya mahasiswa ini.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Formulir Kirim Komentar --}}
+                <form method="POST" action="{{ route('projects.comments.store', $project->id) }}" class="space-y-4">
+                    @csrf
+                    
+                    @guest
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Anda <span class="text-rose-500">*</span></label>
+                                <input type="text" 
+                                       name="author_name" 
+                                       x-model="authorNameInput"
+                                       @input="validateCommentLive()"
+                                       placeholder="Contoh: Budi Santoso (Masyarakat / Praktisi)" 
+                                       required
+                                       class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                            </div>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </span>
+                            <span class="font-bold text-slate-800">{{ Auth::user()->name }}</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700">
+                                {{ Auth::user()->roleLabel() }}
+                            </span>
+                        </div>
+                    @endguest
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Isi Komentar / Masukan <span class="text-rose-500">*</span></label>
+                        <textarea name="comment" 
+                                  rows="3" 
+                                  x-model="commentInput"
+                                  @input="validateCommentLive()"
+                                  required 
+                                  placeholder="Tuliskan ulasan positif, pertanyaan, atau saran konstruktif Anda di sini..."
+                                  class="w-full p-3.5 rounded-2xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition leading-relaxed"></textarea>
+                    </div>
+
+                    {{-- Peringatan Sensor Kata Kasar Real-Time --}}
+                    <div x-show="profanityAlert" x-cloak class="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-700 text-xs font-semibold">
+                        <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span x-text="profanityAlert"></span>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[11px] text-slate-400">
+                            Sistem menerapkan filter otomatis untuk menjaga ruang diskusi tetap sopan dan edukatif.
+                        </span>
+                        <button type="submit" 
+                                :disabled="Boolean(profanityAlert) || commentInput.trim().length < 2"
+                                class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition active:scale-95 cursor-pointer">
+                            Kirim Komentar
+                        </button>
+                    </div>
+                </form>
+
+                {{-- Daftar Komentar yang Telah Diterbitkan --}}
+                <div class="space-y-3.5 pt-4 border-t border-slate-100">
+                    @forelse($project->comments as $comment)
+                        <div x-data="{
+                            commentLiked: {{ $comment->isLikedBy($user, $guestId) ? 'true' : 'false' }},
+                            commentLikesCount: {{ (int) $comment->likes_count }},
+                            commentLikeLoading: false,
+                            async toggleCommentLike() {
+                                if (this.commentLikeLoading) return;
+                                this.commentLikeLoading = true;
+                                try {
+                                    const resp = await fetch('{{ route('projects.comments.like', $comment->id) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Accept': 'application/json'
+                                        }
+                                    });
+                                    const data = await resp.json();
+                                    if (data.success) {
+                                        this.commentLiked = data.liked;
+                                        this.commentLikesCount = data.likes_count;
+                                    }
+                                } catch(e) {
+                                    console.error(e);
+                                } finally {
+                                    this.commentLikeLoading = false;
+                                }
+                            }
+                        }" class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition space-y-2.5">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
+                                        {{ strtoupper(substr($comment->author_name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="font-extrabold text-xs sm:text-sm text-slate-900">{{ $comment->author_name }}</span>
+                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold {{ $comment->is_guest ? 'bg-slate-200 text-slate-700' : 'bg-blue-100 text-blue-800' }}">
+                                                {{ $comment->author_role ?: 'Pengunjung' }}
+                                            </span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 mt-0.5">
+                                            {{ $comment->created_at ? $comment->created_at->diffForHumans() : 'Baru saja' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Aksi Hapus Komentar (Khusus Super Admin & Admin Dinas) --}}
+                                @if($canModerate || (Auth::check() && Auth::id() === $comment->user_id))
+                                    <form method="POST" action="{{ route('projects.comments.destroy', $comment->id) }}" 
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus komentar ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                title="Hapus Komentar (Moderasi)" 
+                                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed pl-10 whitespace-pre-line">
+                                {{ $comment->comment }}
+                            </p>
+
+                            {{-- Tombol Suka Komentar --}}
+                            <div class="flex items-center justify-between pl-10 pt-1">
+                                <button type="button" 
+                                        @click="toggleCommentLike()" 
+                                        :disabled="commentLikeLoading"
+                                        title="Suka komentar ini"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-95"
+                                        :class="commentLiked ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-white text-slate-500 hover:text-rose-600 border border-slate-200'">
+                                    <svg class="w-3.5 h-3.5 transition-transform" :class="commentLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-slate-400'" viewBox="0 0 24 24">
+                                        <path :fill="commentLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                    <span x-text="commentLikesCount > 0 ? commentLikesCount : 'Suka'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs">
+                            Belum ada ulasan atau diskusi untuk proyek ini. Jadilah yang pertama memberikan masukan!
+                        </div>
+                    @endforelse
+                </div>
+
+            </div>
+
             <!-- Footer Navigasi Bawah -->
             <div class="flex items-center justify-between pt-2">
                 <a href="{{ $backUrl }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
@@ -469,3 +896,4 @@
         </div>
     </div>
 </x-app-layout>
+

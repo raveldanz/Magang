@@ -82,7 +82,7 @@
                     $instansiNavUrl = $dispusipAgency ? route('admin.agencies.show', $dispusipAgency->id) : route('admin.agencies.index');
                 @endphp
 
-                <a href="{{ $dashboardRoute }}" class="flex items-center gap-2.5 sm:gap-3 group py-1.5 shrink-0" title="Portal Magang Dinas Perpustakaan dan Kearsipan Kota Surabaya">
+                <a href="{{ url('/') }}" class="flex items-center gap-2.5 sm:gap-3 group py-1.5 shrink-0" title="Portal Magang Dinas Perpustakaan dan Kearsipan Kota Surabaya">
                     <img src="{{ asset('images/logos/surabaya.png') }}" 
                          alt="Pemerintah Kota Surabaya" 
                          class="h-9 sm:h-10 w-auto object-contain shrink-0 transition-transform group-hover:scale-105"
@@ -114,6 +114,11 @@
                         <a href="{{ route('admin.universities.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.universities.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Universitas
+                        </a>
+
+                        <a href="{{ route('public.projects.index') }}" 
+                           class="transition py-1 {{ request()->routeIs('public.projects.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Proyek Dinas
                         </a>
 
                         <div x-data="{ open: false }" class="relative" @click.outside="open = false">
@@ -166,15 +171,19 @@
                         </a>
                         <a href="{{ route('supervisor.applications.index') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.applications.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Persetujuan Pengajuan
+                            Pengajuan
                         </a>
                         <a href="{{ route('supervisor.certificates.index') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.certificates.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Pengesahan Sertifikat
+                            Sertifikat
                         </a>
                         <a href="{{ route('supervisor.reports.index') }}" 
                            class="transition py-1 {{ request()->routeIs('supervisor.reports.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
                             Laporan
+                        </a>
+                        <a href="{{ route('public.projects.index') }}" 
+                           class="transition py-1 {{ request()->routeIs('public.projects.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
+                            Proyek Dinas
                         </a>
 
                     @elseif ($isAdminDinas)
@@ -280,11 +289,11 @@
                             Profil Kampus
                         </a>
                     @endif
-
                 </div>
             </div>
 
             {{-- 3. RIGHT SECTION: NOTIFICATION & USER PROFILE (DESKTOP) --}}
+            @auth
             <div class="hidden md:flex items-center gap-3">
 
                 @php
@@ -428,6 +437,15 @@
                             </span>
                         </div>
 
+                        <a href="{{ url('/') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
+                            Home
+                        </a>
+                        @if ($isSuperAdmin || $isSupervisor || !Auth::check())
+                            <a href="{{ route('public.projects.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition {{ request()->routeIs('public.projects.*') ? 'bg-blue-50 text-blue-600 font-bold' : '' }}">
+                                Proyek Dinas
+                            </a>
+                        @endif
+
                         @if ($isSuperAdmin)
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Dashboard
@@ -449,10 +467,10 @@
                                 Dashboard
                             </a>
                             <a href="{{ route('supervisor.applications.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Persetujuan Pengajuan
+                                Pengajuan
                             </a>
                             <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Pengesahan Sertifikat
+                                Sertifikat
                             </a>
                             <a href="{{ route('supervisor.reports.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Laporan
@@ -560,15 +578,30 @@
                     </div>
                 </div>
             </div>
+            @else
+            <div class="hidden md:flex items-center gap-2.5">
+                <a href="{{ url('/') }}" class="text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 transition px-3 py-2">
+                    Home
+                </a>
+                <a href="{{ route('login') }}" class="text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 transition px-3 py-2">
+                    Masuk
+                </a>
+                <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition">
+                    Daftar
+                </a>
+            </div>
+            @endauth
 
             {{-- 4. MOBILE MENU TOGGLE BUTTON --}}
             <div class="flex items-center gap-1 md:hidden">
+                @auth
                 <a href="{{ route('chat.index') }}" class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition" aria-label="Pesan">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                     <span x-show="$store.chat.unread > 0" x-text="$store.chat.label" data-chat-badge
                           class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold leading-[18px] text-center ring-2 ring-white"
                           @if(($chatUnread ?? 0) < 1) style="display: none;" @endif>{{ ($chatUnread ?? 0) > 99 ? '99+' : ($chatUnread ?? 0) }}</span>
                 </a>
+                @endauth
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                         type="button" 
                         class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none transition cursor-pointer"
@@ -620,6 +653,7 @@
              x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
              class="fixed inset-x-3 sm:inset-x-4 top-14 max-h-[calc(100vh-4.5rem)] overflow-y-auto bg-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-3 overscroll-contain">
 
+            @auth
             {{-- Profil Mahasiswa / User Header --}}
             <div class="p-3 rounded-2xl border border-slate-100 flex items-center justify-between bg-slate-50">
                 <div class="flex items-center gap-2.5">
@@ -642,6 +676,20 @@
 
             {{-- Daftar Navigasi Menu Mobile --}}
             <div class="space-y-1">
+                <a href="{{ url('/') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->is('/') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->is('/') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    </div>
+                    <span>Home</span>
+                </a>
+                @if ($isSuperAdmin || $isSupervisor)
+                    <a href="{{ route('public.projects.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('public.projects.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('public.projects.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        </div>
+                        <span>Proyek Dinas</span>
+                    </a>
+                @endif
                 @if ($isSuperAdmin)
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
@@ -682,13 +730,13 @@
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.applications.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
-                        <span>Persetujuan Pengajuan</span>
+                        <span>Pengajuan</span>
                     </a>
                     <a href="{{ route('supervisor.certificates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.certificates.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/></svg>
                         </div>
-                        <span>Pengesahan Sertifikat</span>
+                        <span>Sertifikat</span>
                     </a>
                     <a href="{{ route('supervisor.reports.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('supervisor.reports.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 {{ request()->routeIs('supervisor.reports.*') ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500' }}">
@@ -868,6 +916,26 @@
                     </button>
                 </form>
             </div>
+            @else
+            <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50 space-y-3">
+                <div class="flex items-center gap-2.5">
+                    <img src="{{ asset('images/logos/surabaya.png') }}" alt="Surabaya" class="h-8 w-auto">
+                    <span class="text-xs font-bold text-slate-800">SIM Magang Surabaya</span>
+                </div>
+                <p class="text-xs text-slate-600 leading-relaxed">Silakan masuk ke akun Anda atau daftar untuk mengakses portal magang Pemerintah Kota Surabaya.</p>
+                <div class="flex flex-col gap-2 pt-1">
+                    <a href="{{ url('/') }}" class="flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">
+                        Home
+                    </a>
+                    <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                        Masuk ke Akun
+                    </a>
+                    <a href="{{ route('register') }}" class="flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition">
+                        Daftar Magang Baru
+                    </a>
+                </div>
+            </div>
+            @endauth
         </div>
     </div>
 </nav>

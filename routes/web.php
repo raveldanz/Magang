@@ -75,6 +75,22 @@ Route::get('/verify-certificate/{token}', function ($token) {
     return view('verify_certificate', compact('placement'));
 })->middleware('throttle:verify-qr')->name('verify.certificate');
 
+// Halaman Detail Penuh Proyek Inovasi Magang (Dapat diakses publik tanpa login maupun oleh pengguna terautentikasi)
+Route::get('/projects/{id}', [\App\Http\Controllers\ProjectDetailController::class, 'show'])->name('projects.show');
+
+// Galeri & Histori Proyek Dinas (Katalog Terbuka Perjalanan Inovasi Mahasiswa)
+Route::get('/proyek-dinas', [\App\Http\Controllers\PublicProjectController::class, 'index'])->name('public.projects.index');
+
+// Interaksi Publik & Pengguna pada Proyek Inovasi (Like, Komen, Moderasi)
+Route::post('/projects/{id}/like', [\App\Http\Controllers\ProjectInteractionController::class, 'toggleLike'])->name('projects.like');
+Route::post('/projects/{id}/comments', [\App\Http\Controllers\ProjectInteractionController::class, 'storeComment'])->name('projects.comments.store');
+Route::post('/projects/comments/{commentId}/like', [\App\Http\Controllers\ProjectInteractionController::class, 'toggleCommentLike'])->name('projects.comments.like');
+Route::delete('/projects/comments/{commentId}', [\App\Http\Controllers\ProjectInteractionController::class, 'deleteComment'])->name('projects.comments.destroy');
+Route::post('/projects/{id}/toggle-visibility', [\App\Http\Controllers\ProjectInteractionController::class, 'toggleVisibility'])
+    ->middleware('auth')->name('projects.toggle_visibility');
+Route::delete('/projects/{id}', [\App\Http\Controllers\ProjectInteractionController::class, 'destroyProject'])
+    ->middleware('auth')->name('projects.destroy');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Shared Routes
@@ -149,9 +165,6 @@ Route::middleware('auth')->group(function () {
 
     // Naskah Laporan Akhir (Akses Terpusat & Unduhan Multi-Role dengan Format Nama Baku)
     Route::get('/final-reports/{id}/file', [StudentFinalReportController::class, 'showFile'])->name('final_reports.show');
-
-    // Halaman Detail Penuh Proyek Inovasi Magang (Dapat diakses oleh Mahasiswa, Mentor, Dosen, Supervisor, Admin)
-    Route::get('/projects/{id}', [\App\Http\Controllers\ProjectDetailController::class, 'show'])->name('projects.show');
 
     // Dokumen Persyaratan Pengajuan (CV, Transkrip, KTM, Surat Pengantar) — akses terotorisasi, bukan URL publik
     Route::get('/documents/applications/{id}', [DocumentController::class, 'showApplicationDocument'])->name('documents.application');

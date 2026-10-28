@@ -27,9 +27,9 @@ async function run() {
     const page = await context.newPage();
 
     // 1. Login sebagai Supervisor
-    console.log('[Visual Test] Login sebagai atasan.dispusip@surabaya.go.id...');
+    console.log('[Visual Test] Login sebagai supervisor@dispusip.surabaya.go.id...');
     await page.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
-    await page.fill('input[name="email"]', 'atasan.dispusip@surabaya.go.id');
+    await page.fill('input[name="email"]', 'supervisor@dispusip.surabaya.go.id');
     await page.fill('input[name="password"]', 'password');
     await page.click('button[type="submit"]');
     await page.waitForTimeout(2000);

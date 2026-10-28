@@ -62,7 +62,7 @@ class User extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin'
+        return in_array($this->role, ['super_admin', 'superadmin'])
             || ($this->role === 'admin' && is_null($this->agency_profile_id));
     }
 
@@ -109,8 +109,8 @@ class User extends Authenticatable
 
         return match ($this->role) {
             'super_admin' => 'Super Admin',
-            'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
-            'mentor', 'pembimbing' => 'Pembimbing Lapangan',
+            'supervisor' => 'Supervisor',
+            'mentor', 'pembimbing' => 'Mentor Lapangan',
             'lecturer', 'dosen', 'academic_advisor' => 'Dosen Pembimbing',
             'university', 'universitas' => 'Admin Universitas',
             'student', 'mahasiswa' => 'Mahasiswa Magang',

@@ -13,7 +13,7 @@ class SurabayaAgenciesSeeder extends Seeder
 {
     /**
      * Seeder Master Data Resmi Dinas Perpustakaan dan Kearsipan (Dispusip) Kota Surabaya (Single-Agency).
-     * Terintegrasi dengan 4 Bidang resmi, akun Admin Dispusip, Atasan (Supervisor), dan Tim Kerja Pembimbing (Mentor).
+     * Terintegrasi dengan 4 Bidang resmi, akun Admin Dispusip, Supervisor, dan Tim Kerja Pembimbing (Mentor).
      */
     public function run(): void
     {
@@ -163,24 +163,11 @@ class SurabayaAgenciesSeeder extends Seeder
             }
         }
 
-        // 5. Akun Atasan / Supervisor (Tim Kerja Umum dan Kepegawaian Dispusip) — Double ACC
-        User::updateOrCreate(
-            ['email' => 'atasan.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Bambang Supriyadi, S.Sos., M.AP',
-                'password' => $defaultPassword,
-                'role' => 'supervisor',
-                'agency_profile_id' => $dispusip->id,
-                'unit_id' => $createdUnits['Bidang Sekretariat']->id,
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-
+        // 5. Akun Supervisor Dispusip (Bambang Supriyadi, S.Sos., M.AP) — Double ACC
         User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
-                'name' => 'Tim Kerja Umum dan Kepegawaian',
+                'name' => 'Bambang Supriyadi, S.Sos., M.AP',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,

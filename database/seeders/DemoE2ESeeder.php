@@ -161,24 +161,11 @@ class DemoE2ESeeder extends Seeder
             ]
         );
 
-        // [ROLE 3] SUPERVISOR / ATASAN DISPUSIP (TIM KERJA UMUM & KEPEGAWAIAN) — DOUBLE ACC
+        // [ROLE 3] SUPERVISOR DISPUSIP (BAMBANG SUPRIYADI, S.SOS., M.AP) — DOUBLE ACC
         $supervisorDispusip = User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
                 'name' => 'Bambang Supriyadi, S.Sos., M.AP',
-                'password' => $defaultPassword,
-                'role' => 'supervisor',
-                'agency_profile_id' => $dispusip->id,
-                'unit_id' => $unitSekretariat->id,
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'atasan.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Tim Kerja Umum dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,
