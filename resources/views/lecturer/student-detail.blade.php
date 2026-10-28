@@ -36,6 +36,7 @@
         $isReportApproved = ($rawFinalSt === 'approved');
 
         $hasMentorScore = $eval && (($eval->nilai_disiplin ?? 0) > 0 || ($eval->nilai_kinerja ?? 0) > 0 || ($eval->nilai_laporan ?? 0) > 0);
+        $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
         $finalScore = $eval?->final_score > 0 ? $eval->final_score : ($eval?->nilai_akhir > 0 ? $eval->nilai_akhir : null);
 
         // Durasi Hari Kerja
@@ -97,6 +98,18 @@
         $readyMentorScore = $hasMentorScore;
         $readyCount = ($readyLogbook ? 1 : 0) + ($readyReport ? 1 : 0) + ($readyLecturerScore ? 1 : 0) + ($readyMentorScore ? 1 : 0);
         $readinessPercent = round(($readyCount / 4) * 100);
+
+        // Status Izin Chat & Grup Komunikasi
+        $chatViewer = auth()->user();
+        $canChatStudent = $chatViewer && $student && (int) $chatViewer->id !== (int) $student->id
+            && app(\App\Services\Chat\ChatContactDirectory::class)->canContact($chatViewer, $student);
+        $canChatMentor = $chatViewer && $mentor && (int) $chatViewer->id !== (int) $mentor->id
+            && app(\App\Services\Chat\ChatContactDirectory::class)->canContact($chatViewer, $mentor);
+
+        $groupMembers = $placement
+            ? array_map('intval', array_filter([$placement->application?->user_id, $placement->mentor_id, $placement->pembimbing_id, $placement->academic_advisor_id]))
+            : [];
+        $showGroup = $chatViewer && count(array_unique($groupMembers)) >= 2 && in_array((int) $chatViewer->id, $groupMembers, true);
     @endphp
 
     <div class="py-6 sm:py-8" x-data="{ activeTab: 'evaluasi' }">
@@ -114,196 +127,351 @@
                 </div>
             @endif
 
-            <!-- 1. HERO PROFILE CARD (Clean, Professional, Human-Crafted) -->
-            <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-xs">
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                    <div class="flex items-start gap-4 sm:gap-5">
-                        <!-- Initials Avatar -->
-                        <div class="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-blue-50 text-blue-700 font-black text-xl sm:text-2xl flex items-center justify-center shrink-0">
-                            {{ $studentInitial }}
-                        </div>
-
-                        <div class="space-y-2">
-                            <!-- Status & Keaktifan Badges -->
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-800">
-                                    Status: {{ $statusLabel }}
-                                </span>
-
-                                @if ($isFinished)
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                                        Magang Selesai
-                                    </span>
-                                @elseif ($daysRemaining !== null)
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ $daysRemaining <= 7 ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800' }}">
-                                        Sisa {{ $daysRemaining }} Hari
-                                    </span>
-                                @endif
-
-                                @if ($latestLogbook)
-                                    @if ($daysSinceLastLogbook === 0)
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800">
-                                            Logbook: Hari ini
-                                        </span>
-                                    @elseif ($daysSinceLastLogbook === 1)
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800">
-                                            Logbook: Kemarin
-                                        </span>
-                                    @elseif ($daysSinceLastLogbook <= 4)
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700">
-                                            Logbook: {{ $daysSinceLastLogbook }} hari lalu
-                                        </span>
-                                    @else
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800" title="Mahasiswa belum mengisi logbook baru dalam {{ $daysSinceLastLogbook }} hari">
-                                            Perlu Diingatkan ({{ $daysSinceLastLogbook }} hari belum isi)
-                                        </span>
-                                    @endif
-                                @else
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-800">
-                                        Belum Ada Logbook
-                                    </span>
-                                @endif
-
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                                    {{ $isMentorOnly ? 'Skema 100% Mentor' : 'Skema DPL + Mentor' }}
-                                </span>
-
-                                @if ($app?->group_id && $app?->group)
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                        Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
-                                    </span>
-                                @endif
+            <!-- 1. HERO PROFILE CARD (Executive, Clean, Human-Crafted) -->
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    
+                    <!-- Left: Avatar & Identity -->
+                    <div class="flex items-start sm:items-center gap-3.5 min-w-0 w-full lg:w-auto">
+                        @if (!empty($profile?->photo_url))
+                            <img src="{{ $profile->photo_url }}" alt="{{ $student->name }}" 
+                                 class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-slate-200/80 shadow-2xs shrink-0">
+                        @else
+                            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-2xs">
+                                {{ $studentInitial }}
                             </div>
+                        @endif
 
-                            <!-- Identitas Mahasiswa -->
-                            <div>
-                                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 leading-tight">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-tight">
                                     {{ $student->name }}
                                 </h1>
-                                <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                                    NIM {{ $profile->nim ?? '-' }} &bull; {{ $profile->jurusan ?? '-' }} &bull; {{ $profile->universitas ?? ($univ->name ?? '-') }}
-                                </p>
+                                <div class="inline-flex items-center gap-1.5 shrink-0 flex-wrap">
+                                    <x-status-badge :status="$appStatusVal" />
+
+                                    @if ($app?->group_id && $app?->group)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-2xs">
+                                            Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                        </span>
+                                    @endif
+
+                                    @if ($isFinished)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200/80">
+                                            <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            Masa Magang Berakhir {{-- status-guard:ignore --}}
+                                        </span>
+                                    @elseif ($daysRemaining !== null)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold {{ $daysRemaining <= 7 ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-blue-50 text-blue-700 border border-blue-200/60' }}">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            Sisa {{ $daysRemaining }} Hari
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
-                            <!-- Meta Penempatan -->
-                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 pt-0.5">
-                                <span>Instansi: <strong class="text-slate-800 font-semibold">{{ $agency->agency_name ?? '-' }} ({{ $unit->name ?? '-' }})</strong></span>
-                                <span>&bull;</span>
-                                <span>Mentor: <strong class="text-slate-800 font-semibold">{{ $mentor->name ?? '-' }}</strong></span>
-                                <span>&bull;</span>
-                                <span>Periode: <strong class="text-slate-800 font-semibold">{{ $app?->start_date ? \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M Y') : '-' }} &ndash; {{ $app?->end_date ? \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') : '-' }}</strong></span>
-                            </div>
+                            <p class="text-xs text-slate-500 font-medium mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                <span>NIM {{ $profile->nim ?? '-' }}</span>
+                                <span class="text-slate-300">&bull;</span>
+                                <span>{{ $profile->jurusan ?? '-' }}</span>
+                                <span class="text-slate-300">&bull;</span>
+                                <span>{{ $profile->universitas ?? ($univ->name ?? '-') }}</span>
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Tombol Aksi Komunikasi & WhatsApp -->
-                    <div class="w-full lg:w-auto flex flex-wrap items-center gap-2 pt-2 lg:pt-0">
+                    <!-- Right: Cohesive Communication Toolbar -->
+                    <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full lg:w-auto shrink-0 pt-1 lg:pt-0">
+                        @if ($showGroup)
+                            <a href="{{ route('chat.placement', $placement->id) }}" 
+                               title="Buka Forum Diskusi Bersama"
+                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition active:scale-95 text-center cursor-pointer">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span>Grup Bimbingan</span>
+                            </a>
+                        @endif
+
                         @if ($cleanStudentPhone)
                             <a href="https://wa.me/{{ $cleanStudentPhone }}?text={{ $waMessage }}" target="_blank"
-                               class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl transition cursor-pointer"
-                               title="Kirim pesan WhatsApp langsung ke {{ $student->name }}">
+                               title="Hubungi via WhatsApp ({{ $studentPhone }})"
+                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                <svg class="w-4 h-4 text-emerald-600 fill-current shrink-0" viewBox="0 0 24 24">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
+                                </svg>
                                 <span>WhatsApp</span>
                             </a>
                         @endif
 
-                        <x-chat-button :user="$student" label="Chat" />
-                        @if ($placement->mentor ?? $placement->pembimbing)
-                            <x-chat-button :user="$placement->mentor ?? $placement->pembimbing" label="Chat Mentor" />
+                        @if ($canChatStudent)
+                            <form method="POST" action="{{ route('chat.start') }}" class="m-0 {{ !$mentor || !$canChatMentor ? 'col-span-2 sm:col-span-1' : '' }}">
+                                @csrf
+                                <input type="hidden" name="user_id" value="{{ $student->id }}">
+                                <button type="submit" 
+                                        title="Kirim pesan langsung ke {{ $student->name }}"
+                                        class="inline-flex items-center justify-center gap-1.5 w-full px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                    <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                    <span>Chat Mhs</span>
+                                </button>
+                            </form>
                         @endif
-                        <x-chat-group-button :placement="$placement" />
+
+                        @if ($mentor && $canChatMentor)
+                            <form method="POST" action="{{ route('chat.start') }}" class="m-0">
+                                @csrf
+                                <input type="hidden" name="user_id" value="{{ $mentor->id }}">
+                                <button type="submit" 
+                                        title="Kirim pesan ke Mentor Lapangan"
+                                        class="inline-flex items-center justify-center gap-1.5 w-full px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-semibold rounded-xl shadow-2xs transition active:scale-95 text-center cursor-pointer">
+                                    <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    <span>Chat Mentor</span>
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+
+                </div>
+
+                <!-- Structured Placement Details (Clean, Unified, Minimalist) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3.5 border-t border-slate-100 text-xs">
+                    <!-- 1. Instansi & Bidang -->
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Instansi & Bidang</span>
+                        <div class="font-bold text-slate-900 truncate mt-1" title="{{ $agency->agency_name ?? '-' }}">{{ $agency->agency_name ?? '-' }}</div>
+                        <div class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
+                    </div>
+
+                    <!-- 2. Pembimbing Dinas (Mentor) -->
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pembimbing Dinas</span>
+                        <div class="font-bold text-slate-900 truncate mt-1" title="{{ $mentor->name ?? 'Belum Ditugaskan' }}">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
+                        <div class="text-[11px] text-slate-500 truncate mt-0.5">
+                            @if($nilaiDinas > 0)
+                                <span class="text-slate-700 font-semibold">Nilai Dinas: {{ number_format($nilaiDinas, 1) }}</span>
+                            @else
+                                <span>Pendamping Lapangan</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- 3. Periode Waktu -->
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Periode Magang</span>
+                        <div class="font-bold text-slate-900 truncate mt-1">
+                            {{ $app?->start_date ? \Carbon\Carbon::parse($app->start_date)->translatedFormat('d M') : '-' }} &ndash; {{ $app?->end_date ? \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') : '-' }}
+                        </div>
+                        <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ $targetDays }} hari kerja</div>
+                    </div>
+
+                    <!-- 4. Skema Evaluasi Kampus -->
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 min-w-0">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Skema Penilaian</span>
+                        <div class="font-bold text-slate-900 truncate mt-1">{{ $isMentorOnly ? '100% Mentor Dinas' : 'DPL + Mentor Dinas' }}</div>
+                        <div class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $univ->name ?? '-' }}">{{ $univ->name ?? 'Kampus Mitra' }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. TABBED NAVIGATION (Responsive Grid on Mobile: No Horizontal Scrollbar) -->
-            <div class="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1.5 bg-slate-100 rounded-2xl">
-                <button type="button" @click="activeTab = 'evaluasi'"
-                        :class="activeTab === 'evaluasi' 
-                            ? 'bg-white text-blue-700 shadow-xs font-bold' 
-                            : 'text-slate-600 hover:text-slate-900 font-medium'"
-                        class="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer text-center">
-                    Evaluasi & Nilai
-                </button>
-
-                <button type="button" @click="activeTab = 'logbook'"
-                        :class="activeTab === 'logbook' 
-                            ? 'bg-white text-blue-700 shadow-xs font-bold' 
-                            : 'text-slate-600 hover:text-slate-900 font-medium'"
-                        class="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer text-center">
-                    Logbook ({{ $logbookTotal }})
-                </button>
-
-                <button type="button" @click="activeTab = 'laporan'"
-                        :class="activeTab === 'laporan' 
-                            ? 'bg-white text-blue-700 shadow-xs font-bold' 
-                            : 'text-slate-600 hover:text-slate-900 font-medium'"
-                        class="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer text-center">
-                    Laporan Akhir
-                    @if($isReportApproved)
-                        <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800">ACC</span>
-                    @elseif($finalReport)
-                        <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800">Review</span>
+            <!-- 2. ACTIONABLE INACTIVITY ALERT (Muncul hanya jika telat isi logbook) -->
+            @if ($latestLogbook && $daysSinceLastLogbook > 4 && !$isFinished)
+                <div class="bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-amber-50/90 border border-amber-200/90 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 shadow-2xs">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h4 class="text-xs sm:text-sm font-bold text-amber-950">Peringatan Keaktifan Mahasiswa</h4>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/80 text-amber-900">
+                                    {{ $daysSinceLastLogbook }} Hari Belum Mengisi Logbook
+                                </span>
+                            </div>
+                            <p class="text-xs text-amber-800/90 mt-1">
+                                Mahasiswa belum menginput entri logbook baru dalam {{ $daysSinceLastLogbook }} hari terakhir. Mohon hubungi mahasiswa untuk memastikan keteraturan pencatatan magang.
+                            </p>
+                        </div>
+                    </div>
+                    @if ($cleanStudentPhone)
+                        <a href="https://wa.me/{{ $cleanStudentPhone }}?text={{ $waMessage }}" target="_blank"
+                           class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                            <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
+                            </svg>
+                            <span>Ingatkan via WhatsApp</span>
+                        </a>
                     @endif
-                </button>
+                </div>
+            @endif
 
-                <button type="button" @click="activeTab = 'bimbingan'"
-                        :class="activeTab === 'bimbingan' 
-                            ? 'bg-white text-blue-700 shadow-xs font-bold' 
-                            : 'text-slate-600 hover:text-slate-900 font-medium'"
-                        class="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer text-center">
-                    Bimbingan ({{ $consultations->count() }})
-                </button>
+            <!-- 3. READINESS STEPPER: KESIAPAN EVALUASI AKHIR (Modern Executive Strip) -->
+            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-900 leading-tight">Kesiapan Penilaian Akhir Magang</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Pantau kelengkapan berkas dan aktivitas sebelum penerbitan nilai akademik</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 self-end sm:self-center">
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-slate-900">{{ $readyCount }} dari 4 Syarat</span>
+                            <div class="w-24 bg-slate-100 rounded-full h-1.5 mt-1 overflow-hidden">
+                                <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-500" style="width: {{ $readinessPercent }}%"></div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $readinessPercent === 100 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-700' }}">
+                            {{ $readinessPercent }}%
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 4 Interactive Micro-Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
+                    <!-- 1. Logbook -->
+                    <button type="button" @click="activeTab = 'logbook'"
+                            class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLogbook ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50' }}">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">1. Logbook Harian</span>
+                            @if($readyLogbook)
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            @else
+                                <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></span>
+                            @endif
+                        </div>
+                        <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
+                            {{ $logbookTotal > 0 ? $logbookTotal.' Entri Terisi' : 'Belum Ada Entri' }}
+                        </div>
+                    </button>
+
+                    <!-- 2. Laporan Akhir -->
+                    <button type="button" @click="activeTab = 'laporan'"
+                            class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyReport ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : ($finalReport ? 'bg-amber-50/50 border-amber-200/80 hover:bg-amber-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50') }}">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">2. Laporan Akhir</span>
+                            @if($readyReport)
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            @elseif($finalReport)
+                                <svg class="w-4 h-4 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+                            @else
+                                <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></span>
+                            @endif
+                        </div>
+                        <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
+                            @if($readyReport)
+                                Disetujui DPL {{-- status-guard:ignore --}}
+                            @elseif($finalReport)
+                                Menunggu Review {{-- status-guard:ignore --}}
+                            @else
+                                Belum Unggah
+                            @endif
+                        </div>
+                    </button>
+
+                    <!-- 3. Nilai Mentor -->
+                    <div class="p-3 sm:p-3.5 rounded-xl border text-left {{ $readyMentorScore ? 'bg-emerald-50/50 border-emerald-200/80' : 'bg-slate-50/70 border-slate-200/70' }}">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[11px] font-semibold text-slate-500">3. Nilai Dinas (Mentor)</span>
+                            @if($readyMentorScore)
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            @else
+                                <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></span>
+                            @endif
+                        </div>
+                        <div class="font-bold mt-1 text-slate-900">
+                            {{ $readyMentorScore ? 'Skor: '.number_format($eval->nilai_pembimbing ?? 0, 1) : 'Menunggu Dinas' }}
+                        </div>
+                    </div>
+
+                    <!-- 4. Nilai DPL -->
+                    <button type="button" @click="activeTab = 'evaluasi'"
+                            class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLecturerScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-blue-50/40 border-blue-200/80 hover:bg-blue-50/70' }}">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">4. Nilai DPL</span>
+                            @if($readyLecturerScore)
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            @else
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Input</span>
+                            @endif
+                        </div>
+                        <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
+                            @if($isMentorOnly)
+                                Skema 100% Mentor
+                            @elseif($hasEval)
+                                Skor: {{ number_format($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0), 1) }}
+                            @else
+                                Siap Diinput DPL
+                            @endif
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. TABBED NAVIGATION (Clean Responsive Tabs - No Scrollbar) -->
+            <div class="border-b border-slate-200">
+                <nav class="flex items-center w-full sm:space-x-8 sm:w-auto" aria-label="Tabs">
+                    <button type="button" @click="activeTab = 'evaluasi'"
+                            :class="activeTab === 'evaluasi' 
+                                ? 'border-blue-600 text-blue-600 font-bold' 
+                                : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
+                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                        <span class="sm:hidden">Nilai</span>
+                        <span class="hidden sm:inline">Evaluasi & Nilai</span>
+                    </button>
+
+                    <button type="button" @click="activeTab = 'logbook'"
+                            :class="activeTab === 'logbook' 
+                                ? 'border-blue-600 text-blue-600 font-bold' 
+                                : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
+                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                        <span>Logbook</span>
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold"
+                              :class="activeTab === 'logbook' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'">
+                            {{ $logbookTotal }}
+                        </span>
+                    </button>
+
+                    <button type="button" @click="activeTab = 'laporan'"
+                            :class="activeTab === 'laporan' 
+                                ? 'border-blue-600 text-blue-600 font-bold' 
+                                : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
+                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                        <span>Laporan</span>
+                        @if($isReportApproved)
+                            <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-emerald-100 text-emerald-800">ACC</span>
+                        @elseif($finalReport)
+                            <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-amber-100 text-amber-800">Review</span>
+                        @endif
+                    </button>
+
+                    <button type="button" @click="activeTab = 'bimbingan'"
+                            :class="activeTab === 'bimbingan' 
+                                ? 'border-blue-600 text-blue-600 font-bold' 
+                                : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'"
+                            class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center transition cursor-pointer flex items-center justify-center gap-1 sm:gap-2">
+                        <span>Bimbingan</span>
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold"
+                              :class="activeTab === 'bimbingan' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'">
+                            {{ $consultations->count() }}
+                        </span>
+                    </button>
+                </nav>
             </div>
 
             <!-- ========================================================================= -->
             <!-- TAB 1: EVALUASI & PENILAIAN -->
             <!-- ========================================================================= -->
             <div x-show="activeTab === 'evaluasi'" class="space-y-6">
-                <!-- Status Kelengkapan Berkas Magang (Clean & Non-Robotic) -->
-                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-xs space-y-3">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                        <h3 class="font-bold text-slate-900 text-sm">
-                            Status Kelengkapan Berkas
-                        </h3>
-                        <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-                            {{ $readyCount }} dari 4 Syarat Terpenuhi
-                        </span>
-                    </div>
-
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
-                        <div class="p-3.5 sm:p-4 rounded-xl {{ $readyLogbook ? 'bg-emerald-50/70 text-emerald-950' : 'bg-slate-50 text-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-900">Logbook Harian</span>
-                                <span class="font-bold {{ $readyLogbook ? 'text-emerald-700' : 'text-slate-400' }}">{{ $readyLogbook ? 'Terisi' : 'Kosong' }}</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500 mt-1 block">{{ $logbookTotal }} hari kerja</span>
-                        </div>
-
-                        <div class="p-3.5 sm:p-4 rounded-xl {{ $readyReport ? 'bg-emerald-50/70 text-emerald-950' : 'bg-slate-50 text-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-900">Laporan Akhir</span>
-                                <span class="font-bold {{ $readyReport ? 'text-emerald-700' : 'text-slate-400' }}">{{ $readyReport ? 'Disetujui' : ($finalReport ? 'Proses' : 'Belum') }}</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500 mt-1 block">{{ $readyReport ? 'Sudah ACC' : ($finalReport ? 'Menunggu review' : 'Belum unggah') }}</span>
-                        </div>
-
-                        <div class="p-3.5 sm:p-4 rounded-xl {{ $readyLecturerScore ? 'bg-emerald-50/70 text-emerald-950' : 'bg-slate-50 text-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-900">Nilai DPL</span>
-                                <span class="font-bold {{ $readyLecturerScore ? 'text-emerald-700' : 'text-amber-700' }}">{{ $readyLecturerScore ? 'Lengkap' : 'Belum' }}</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500 mt-1 block">{{ $isMentorOnly ? '100% Mentor' : ($hasEval ? "Nilai: {$eval->nilai_dosen_calculated}" : 'Belum diinput') }}</span>
-                        </div>
-
-                        <div class="p-3.5 sm:p-4 rounded-xl {{ $readyMentorScore ? 'bg-emerald-50/70 text-emerald-950' : 'bg-slate-50 text-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-900">Nilai Mentor</span>
-                                <span class="font-bold {{ $readyMentorScore ? 'text-emerald-700' : 'text-amber-700' }}">{{ $readyMentorScore ? 'Lengkap' : 'Belum' }}</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500 mt-1 block">{{ $readyMentorScore ? "Nilai: {$eval->nilai_pembimbing}" : 'Menunggu mentor' }}</span>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Lembar Evaluasi (Clean Surface, Soft Containers) -->
                 <div class="bg-white rounded-2xl p-6 shadow-xs space-y-6">

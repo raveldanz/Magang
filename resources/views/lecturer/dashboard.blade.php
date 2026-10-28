@@ -167,11 +167,11 @@
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa, NIM, atau program studi..." 
-                               class="w-full text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl pl-9 pr-3.5 py-2.5 transition">
+                               class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-                        <select name="report_status" class="py-2.5 px-3.5 text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-auto transition">
+                        <select name="report_status" class="py-2.5 px-3.5 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-48 sm:max-w-xs truncate transition shadow-2xs">
                             <option value="">Semua Status Laporan</option>
                             <option value="pending" {{ request('report_status') == 'pending' ? 'selected' : '' }}>Menunggu Review (Pending)</option>
                             <option value="revision" {{ request('report_status') == 'revision' ? 'selected' : '' }}>Perlu Revisi</option>
@@ -179,7 +179,7 @@
                             <option value="none" {{ request('report_status') == 'none' ? 'selected' : '' }}>Belum Unggah Laporan</option>
                         </select>
 
-                        <select name="unit_id" class="py-2.5 px-3.5 text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-auto transition">
+                        <select name="unit_id" class="py-2.5 px-3.5 text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl font-medium w-full sm:w-48 sm:max-w-xs truncate transition shadow-2xs">
                             <option value="">Semua Bidang / Divisi</option>
                             @foreach($units ?? [] as $u)
                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>
@@ -188,13 +188,13 @@
                             @endforeach
                         </select>
 
-                        <div class="flex items-center gap-2 col-span-1 sm:col-span-2 sm:flex-initial">
-                            <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
+                        <div class="flex items-center gap-2 col-span-1 sm:col-span-2 sm:flex-initial shrink-0">
+                            <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer shrink-0">
                                 Filter
                             </button>
 
                             @if(request()->hasAny(['search', 'unit_id', 'agency_id', 'report_status']))
-                                <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center">
+                                <a href="{{ route('lecturer.dashboard') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">
                                     Reset
                                 </a>
                             @endif
@@ -212,8 +212,8 @@
                     <span class="text-xs text-slate-600 font-semibold bg-slate-100 px-3 py-1 rounded-full">{{ $placements->count() }} Mahasiswa</span>
                 </div>
 
-                <!-- 1. TAMPILAN MOBILE (< 640px) -->
-                <div class="block sm:hidden divide-y divide-slate-100">
+                <!-- 1. TAMPILAN MOBILE & TABLET (< 1024px) -->
+                <div class="block lg:hidden divide-y divide-slate-100">
                     @forelse($placements as $p)
                         @php
                             $student = $p->application?->user;
@@ -296,18 +296,18 @@
                     @endforelse
                 </div>
 
-                <!-- 2. TAMPILAN DESKTOP (Tabel Bersih & Minimalis) -->
-                <div class="hidden sm:block overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-100 text-left text-xs">
+                <!-- 2. TAMPILAN DESKTOP (Tabel Presisi Tanpa Scrollbar Horizontal) -->
+                <div class="hidden lg:block w-full">
+                    <table class="w-full table-fixed divide-y divide-slate-100 text-left text-xs">
                         <thead class="bg-slate-50/75 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                             <tr>
-                                <th class="py-3.5 px-4">Mahasiswa</th>
-                                <th class="py-3.5 px-4">Instansi & Unit Kerja</th>
-                                <th class="py-3.5 px-4">Pembimbing Dinas</th>
-                                <th class="py-3.5 px-4 text-center">Logbook</th>
-                                <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Evaluasi Nilai</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-4 w-[23%]">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-[21%]">Instansi & Unit Kerja</th>
+                                <th class="py-3.5 px-4 w-[18%]">Pembimbing Dinas</th>
+                                <th class="py-3.5 px-3 w-[9%] text-center">Logbook</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Laporan Akhir</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Evaluasi Nilai</th>
+                                <th class="py-3.5 px-4 w-[9%] text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -341,27 +341,27 @@
                                     
                                     <!-- Student Info -->
                                     <td class="py-4 px-4">
-                                        <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $student->name ?? '-' }}</div>
+                                        <div class="font-bold text-slate-900 text-xs sm:text-sm truncate" title="{{ $student->name ?? '-' }}">{{ $student->name ?? '-' }}</div>
                                         @if($p->application?->group_id && $p->application?->group)
-                                            <div class="mt-0.5">
+                                            <div class="mt-0.5 truncate">
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                     Kelompok: {{ $p->application->group->name }} ({{ $p->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
                                                 </span>
                                             </div>
                                         @endif
-                                        <div class="text-[11px] text-slate-500 font-medium">NIM: {{ $profile?->nim ?? '-' }}</div>
-                                        <div class="text-[11px] text-slate-600">{{ $profile?->jurusan ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-500 font-medium truncate">NIM: {{ $profile?->nim ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-600 truncate">{{ $profile?->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <!-- Placement Location -->
                                     <td class="py-4 px-4">
-                                        <div class="font-semibold text-slate-800 text-xs">{{ $agency->agency_name ?? '-' }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
+                                        <div class="font-semibold text-slate-800 text-xs truncate" title="{{ $agency->agency_name ?? '-' }}">{{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 truncate" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <!-- Mentor Info -->
                                     <td class="py-4 px-4">
-                                        <div class="font-medium text-slate-800 text-xs">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
+                                        <div class="font-medium text-slate-800 text-xs truncate" title="{{ $mentor->name ?? 'Belum Ditugaskan' }}">{{ $mentor->name ?? 'Belum Ditugaskan' }}</div>
                                         <div class="text-[11px] text-slate-500 mt-0.5">
                                             @if($nilaiDinas > 0)
                                                 <span class="text-emerald-700 font-semibold">Dinas: {{ number_format($nilaiDinas, 1) }}</span>
@@ -372,14 +372,14 @@
                                     </td>
 
                                     <!-- Logbook Counter -->
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
                                             {{ $logbooksCount }} Entri
                                         </span>
                                     </td>
 
                                     <!-- Final Report Status -->
-                                    <td class="py-4 px-4 text-center whitespace-nowrap">
+                                    <td class="py-4 px-3 text-center">
                                         @if(!$finalReport)
                                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500">
                                                 Belum Unggah
@@ -390,7 +390,7 @@
                                     </td>
 
                                     <!-- Dual-Status Nilai (Dinas & DPL) & Kumulatif -->
-                                    <td class="py-3 px-4 text-center whitespace-nowrap">
+                                    <td class="py-3 px-3 text-center">
                                         <div class="flex flex-col items-center gap-1">
                                             @if($isMentorOnly)
                                                 @if($nilaiDinas > 0)
