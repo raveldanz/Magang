@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-control-center-style />
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
@@ -10,69 +11,76 @@
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
 
+            <!-- Tab Switcher Navigation (Clean, Responsive, No Scrollbar) -->
+            <div class="border-b border-slate-200">
+                <nav class="flex items-center w-full sm:space-x-6 sm:w-auto" aria-label="Tabs">
+                    <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'active'])) }}" 
+                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? 'active') === 'active' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        <span class="sm:hidden">Aktif</span> {{-- status-guard:ignore --}}
+                        <span class="hidden sm:inline">Mahasiswa Aktif</span> {{-- status-guard:ignore --}}
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? 'active') === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['active'] }}</span>
+                    </a>
+                    <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'completed'])) }}" 
+                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'completed' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        <span class="sm:hidden">Selesai</span>
+                        <span class="hidden sm:inline">Arsip Selesai</span>
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? '') === 'completed' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['completed'] }}</span>
+                    </a>
+                    <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'upcoming'])) }}" 
+                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'upcoming' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        <span class="sm:hidden">Calon</span>
+                        <span class="hidden sm:inline">Calon Peserta</span>
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['upcoming'] }}</span>
+                    </a>
+                    <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'all'])) }}" 
+                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'all' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        <span>Semua</span>
+                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? '') === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['total'] }}</span>
+                    </a>
+                </nav>
+            </div>
+
             <!-- Filter & Search Bar (Clean Minimalist Form) -->
-            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs">
+            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200/80">
                 <form method="GET" action="{{ route('lecturer.monitoring.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                     <input type="hidden" name="tab" value="{{ $tab ?? 'active' }}">
 
                     <div class="relative flex-1 min-w-0">
                         <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau NIM..."
-                               class="w-full text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl pl-9 pr-3.5 py-2.5 transition">
+                               class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
                     </div>
 
-                    <select name="unit_id" onchange="this.form.submit()"
-                            class="text-xs sm:text-sm bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium w-full sm:w-64 transition">
-                        <option value="">Semua Bidang / Divisi</option>
-                        @foreach ($units ?? [] as $u)
-                            <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="w-full sm:w-64 sm:max-w-xs shrink-0">
+                        <select name="unit_id" onchange="this.form.submit()"
+                                class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium transition shadow-2xs truncate">
+                            <option value="">Semua Bidang / Divisi</option>
+                            @foreach ($units ?? [] as $u)
+                                <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                    <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer shrink-0">
                             Cari
                         </button>
                         @if (request()->filled('search') || request()->filled('unit_id') || request()->filled('agency_id'))
-                            <a href="{{ route('lecturer.monitoring.index', ['tab' => $tab ?? 'active']) }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center">Reset</a>
+                            <a href="{{ route('lecturer.monitoring.index', ['tab' => $tab ?? 'active']) }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">Reset</a>
                         @endif
                     </div>
                 </form>
             </div>
 
-            <!-- Tab Switcher Navigation (Responsive Grid on Mobile: No Horizontal Scrollbar) -->
-            <div class="grid grid-cols-2 sm:flex sm:items-center gap-2">
-                <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'active'])) }}" 
-                    class="px-3.5 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-between sm:justify-start gap-1.5 {{ ($tab ?? 'active') === 'active' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-50 shadow-2xs' }}">
-                    <span>Mahasiswa Aktif</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? 'active') === 'active' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600' }}">{{ $stats['active'] }}</span>
-                </a>
-                <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'completed'])) }}" 
-                    class="px-3.5 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-between sm:justify-start gap-1.5 {{ ($tab ?? '') === 'completed' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-50 shadow-2xs' }}">
-                    <span>Arsip Selesai</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'completed' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600' }}">{{ $stats['completed'] }}</span>
-                </a>
-                <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'upcoming'])) }}" 
-                    class="px-3.5 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-between sm:justify-start gap-1.5 {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-50 shadow-2xs' }}">
-                    <span>Calon Peserta</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600' }}">{{ $stats['upcoming'] }}</span>
-                </a>
-                <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'all'])) }}" 
-                    class="px-3.5 py-2.5 text-xs font-bold rounded-xl transition flex items-center justify-between sm:justify-start gap-1.5 {{ ($tab ?? '') === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-50 shadow-2xs' }}">
-                    <span>Semua</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] {{ ($tab ?? '') === 'all' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600' }}">{{ $stats['total'] }}</span>
-                </a>
-            </div>
-
             <!-- Daftar Mahasiswa Monitoring (Clean Surface) -->
             <div class="bg-white rounded-2xl shadow-xs overflow-hidden">
                 
-                <!-- 1. TAMPILAN MOBILE (< 640px) -->
-                <div class="block sm:hidden divide-y divide-slate-100">
+                <!-- 1. TAMPILAN MOBILE & TABLET (< 1024px) -->
+                <div class="block lg:hidden divide-y divide-slate-100">
                     @forelse ($placements as $placement)
                         @php
                             $student = $placement->application?->user;
@@ -173,18 +181,18 @@
                     @endforelse
                 </div>
 
-                <!-- 2. TAMPILAN DESKTOP (Tabel Bersih & Minimalis) -->
-                <div class="hidden sm:block overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <!-- 2. TAMPILAN DESKTOP (Tabel Presisi Tanpa Scrollbar Horizontal) -->
+                <div class="hidden lg:block w-full">
+                    <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3.5 px-4">Mahasiswa</th>
-                                <th class="py-3.5 px-4">Instansi & Unit</th>
-                                <th class="py-3.5 px-4 text-center">Status</th>
-                                <th class="py-3.5 px-4 text-center">Logbook</th>
-                                <th class="py-3.5 px-4 text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-4 text-center">Nilai Dosen</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-4 w-[22%]">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-[21%]">Instansi & Unit</th>
+                                <th class="py-3.5 px-3 w-[11%] text-center">Status</th>
+                                <th class="py-3.5 px-3 w-[8%] text-center">Logbook</th>
+                                <th class="py-3.5 px-3 w-[11%] text-center">Laporan Akhir</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Nilai Dosen</th>
+                                <th class="py-3.5 px-4 w-[17%] text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
@@ -218,33 +226,33 @@
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors">
                                     <td class="py-4 px-4">
-                                        <div class="font-bold text-slate-900 leading-snug">{{ $student->name ?? '-' }}</div>
+                                        <div class="font-bold text-slate-900 leading-snug truncate" title="{{ $student->name ?? '-' }}">{{ $student->name ?? '-' }}</div>
                                         @if($placement->application?->group_id && $placement->application?->group)
-                                            <div class="mt-0.5">
+                                            <div class="mt-0.5 truncate">
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                     Kelompok: {{ $placement->application->group->name }} ({{ $placement->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
                                                 </span>
                                             </div>
                                         @endif
-                                        <div class="text-xs text-slate-500 mt-0.5">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</div>
+                                        <div class="text-xs text-slate-500 mt-0.5 truncate">NIM: {{ $profile->nim ?? '-' }} &bull; {{ $profile->major ?? $profile->jurusan ?? '-' }}</div>
                                     </td>
 
                                     <td class="py-4 px-4">
-                                        <div class="text-xs font-semibold text-slate-800">{{ $agency->agency_name ?? '-' }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5">{{ $unit->name ?? '-' }}</div>
+                                        <div class="text-xs font-semibold text-slate-800 truncate" title="{{ $agency->agency_name ?? '-' }}">{{ $agency->agency_name ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 truncate" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center">
                                         <x-status-badge :status="$appStatus" />
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center">
                                         <span class="inline-flex items-center px-2.5 py-0.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
                                             {{ $approvedLog }} / {{ $totalLog }}
                                         </span>
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center">
                                         @if ($finalReport)
                                             <x-status-badge type="review" :status="$finalReport->status" />
                                         @else
@@ -252,18 +260,18 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-center">
+                                    <td class="py-4 px-3 text-center">
                                         @if ($isMentorOnly)
                                             @if ($nilaiDinas > 0)
                                                 <div class="inline-flex flex-col items-center">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-md">
+                                                    <span class="inline-flex items-center px-2 py-0.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-md">
                                                         Dinas: {{ $nilaiDinas }}
                                                     </span>
                                                     <span class="text-[10px] text-slate-400 mt-0.5">100% Nilai Dinas</span>
                                                 </div>
                                             @else
                                                 <div class="inline-flex flex-col items-center">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded-md">
+                                                    <span class="inline-flex items-center px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded-md">
                                                         Menunggu Dinas
                                                     </span>
                                                 </div>
@@ -281,15 +289,15 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-right whitespace-nowrap">
+                                    <td class="py-4 px-4 text-right">
                                         <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                               class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition">
+                                               class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
                                                 Detail
                                             </a>
                                             @if (!$isMentorOnly)
                                                 <a href="{{ route('lecturer.evaluations.create', $placement->id) }}" 
-                                                   class="px-3 py-1.5 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white text-xs font-bold rounded-lg transition">
+                                                   class="px-2.5 py-1.5 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white text-xs font-bold rounded-lg transition shrink-0">
                                                     {{ $hasEval ? 'Ubah Nilai' : 'Input Nilai' }}
                                                 </a>
                                             @endif

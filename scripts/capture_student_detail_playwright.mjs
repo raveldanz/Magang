@@ -30,15 +30,16 @@ async function run() {
         });
         const pageDesktop = await contextDesktop.newPage();
 
-        await pageDesktop.goto('http://127.0.0.1:8000/login', { waitUntil: 'load' });
+        await pageDesktop.goto('http://127.0.0.1:8000/login', { waitUntil: 'domcontentloaded' });
+        await pageDesktop.waitForSelector('input[name="email"]');
         await pageDesktop.fill('input[name="email"]', 'dosen.unesa@unesa.ac.id');
         await pageDesktop.fill('input[name="password"]', 'password');
         await pageDesktop.click('button[type="submit"]');
         await pageDesktop.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
 
-        console.log('[*] Navigating to /lecturer/students/1...');
-        await pageDesktop.goto('http://127.0.0.1:8000/lecturer/students/1', { waitUntil: 'networkidle' });
-        await pageDesktop.waitForTimeout(500);
+        console.log('[*] Navigating to /lecturer/students/3...');
+        await pageDesktop.goto('http://127.0.0.1:8000/lecturer/students/3', { waitUntil: 'domcontentloaded' });
+        await pageDesktop.waitForTimeout(1000);
 
         const desktopPath = path.join(publicDir, 'student_detail_desktop.png');
         await pageDesktop.screenshot({ path: desktopPath, fullPage: true });
@@ -55,14 +56,15 @@ async function run() {
         });
         const pageMobile = await contextMobile.newPage();
 
-        await pageMobile.goto('http://127.0.0.1:8000/login', { waitUntil: 'load' });
+        await pageMobile.goto('http://127.0.0.1:8000/login', { waitUntil: 'domcontentloaded' });
+        await pageMobile.waitForSelector('input[name="email"]');
         await pageMobile.fill('input[name="email"]', 'dosen.unesa@unesa.ac.id');
         await pageMobile.fill('input[name="password"]', 'password');
         await pageMobile.click('button[type="submit"]');
         await pageMobile.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
 
-        await pageMobile.goto('http://127.0.0.1:8000/lecturer/students/1', { waitUntil: 'networkidle' });
-        await pageMobile.waitForTimeout(500);
+        await pageMobile.goto('http://127.0.0.1:8000/lecturer/students/3', { waitUntil: 'domcontentloaded' });
+        await pageMobile.waitForTimeout(1000);
 
         const mobilePath = path.join(publicDir, 'student_detail_mobile.png');
         await pageMobile.screenshot({ path: mobilePath, fullPage: true });

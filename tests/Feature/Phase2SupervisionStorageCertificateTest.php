@@ -175,7 +175,10 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
         $this->actingAs($this->adminA)->get($url)->assertOk();
         $this->actingAs($univAdmin)->get($url)->assertOk();
         $this->actingAs($otherUnivAdmin)->get($url)->assertForbidden();
-        $this->actingAs($this->assignedMentor)->get($url)->assertForbidden();
+        $foreignAgency = AgencyProfile::create(['agency_name' => 'Dinas Asing']);
+        $foreignMentor = User::factory()->create(['role' => 'mentor', 'agency_profile_id' => $foreignAgency->id]);
+        $this->actingAs($this->assignedMentor)->get($url)->assertOk();
+        $this->actingAs($foreignMentor)->get($url)->assertForbidden();
         $this->actingAs($dosen)->get($url)->assertForbidden();
     }
 
