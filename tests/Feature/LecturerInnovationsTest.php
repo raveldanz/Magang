@@ -92,6 +92,12 @@ class LecturerInnovationsTest extends TestCase
 
     public function test_dpl_can_view_dual_status_badges_on_dashboard(): void
     {
+        University::find($this->dosen->university_id)->update([
+            'evaluation_scheme' => 'dual_evaluation',
+            'weight_mentor' => 40,
+            'weight_lecturer' => 60,
+        ]);
+
         Evaluation::create([
             'placement_id' => $this->placement->id,
             'nilai_disiplin' => 88,

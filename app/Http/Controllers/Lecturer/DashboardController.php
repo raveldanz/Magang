@@ -97,11 +97,16 @@ class DashboardController extends Controller
                 return false;
             }
             $univ = $eval->getUniversity();
-            if ($univ && $univ->evaluation_scheme === 'mentor_only') {
+            if (! $univ && $p->application?->user) {
+                $univ = app(\App\Services\UniversityResolver::class)->forUser($p->application->user);
+            }
+            $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+            if ($scheme === 'mentor_only' || $weightLecturer === 0) {
                 return ($eval->nilai_pembimbing ?? 0) > 0;
             }
 
-            return $eval->nilai_akademik > 0 || $eval->nilai_dosen > 0;
+            return ($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0;
         })->count();
         $totalPendingEval = max(0, $totalStudents - $totalEvaluated);
         $totalReportsApproved = $placements->filter(function ($p) {
@@ -125,17 +130,30 @@ class DashboardController extends Controller
         });
 
         $urgentEndingPlacements = $placements->filter(function ($p) {
-            $eval = $p->evaluation;
-            $hasScore = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->dosenAspectScore('score_mastery') ?? 0) > 0);
             $app = $p->application;
-            if (!$app) return false;
+            if (! $app) return false;
             $statusVal = $app->statusValue();
             if (in_array($statusVal, ['completed', 'rejected', 'resigned'], true)) return false;
+
+            $eval = $p->evaluation;
+            $univ = $eval?->getUniversity();
+            if (! $univ && $app->user) {
+                $univ = app(\App\Services\UniversityResolver::class)->forUser($app->user);
+            }
+            $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+            $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
+
+            if ($isMentorOnly) {
+                $hasScore = $eval && (($eval->nilai_pembimbing ?? 0) > 0);
+            } else {
+                $hasScore = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->dosenAspectScore('score_mastery') ?? 0) > 0);
+            }
 
             $endDate = $app->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
             $isNearEnd = $endDate && $endDate->diffInDays(\Carbon\Carbon::now(), false) >= -14;
 
-            return !$hasScore && ($isNearEnd || $statusVal === 'active');
+            return ! $hasScore && ($isNearEnd || $statusVal === 'active');
         });
 
         $supervisedPlacementIds = $placements->pluck('id')->toArray();

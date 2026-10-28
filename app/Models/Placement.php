@@ -318,12 +318,14 @@ class Placement extends Model
      * Evaluasi dan perbarui status kelulusan magang (COMPLETED) secara otomatis.
      * Syarat: Naskah laporan akhir disetujui (ACC), lembar evaluasi lengkap sesuai skema kampus,
      * DAN mahasiswa wajib telah mengisi logbook aktivitas magang.
+     * Mencegah kelulusan otomatis jika tanggal berakhir magang masih di masa depan,
+     * kecuali jika diizinkan kelulusan dini ($allowEarlyCompletion = true).
      */
-    public function syncCompletionStatus(): bool
+    public function syncCompletionStatus(bool $allowEarlyCompletion = false): bool
     {
-        $app = $this->application;
-        $finalReport = $this->finalreport;
-        $eval = $this->evaluation;
+        $app = $this->application?->fresh() ?? $this->application;
+        $finalReport = $this->finalreport?->fresh() ?? $this->finalreport;
+        $eval = $this->evaluation?->fresh() ?? $this->evaluation;
 
         if (! $app || ! $finalReport || strtolower($finalReport->status ?? '') !== 'approved') {
             return false;
@@ -334,6 +336,11 @@ class Placement extends Model
             return false;
         }
 
+        // Mencegah auto-completed prematur jika masa magang belum selesai
+        if (! $allowEarlyCompletion && $app->end_date && \Carbon\Carbon::parse($app->end_date)->startOfDay()->isFuture()) {
+            return false;
+        }
+
         if ($eval && $eval->is_complete) {
             $rawStatus = $app->status instanceof ApplicationStatus ? $app->status->value : strtolower((string) $app->status);
             if ($rawStatus !== 'completed' && ! in_array($rawStatus, ['resigned', 'rejected'])) {
@@ -341,7 +348,7 @@ class Placement extends Model
 
                 AuditLog::record('AUTO_COMPLETE_INTERNSHIP', 'Application', $app->id, [
                     'student_name' => $app->user?->name,
-                    'reason' => 'Laporan akhir disetujui, nilai evaluasi lengkap, dan logbook terisi.',
+                    'reason' => 'Laporan akhir disetujui, nilai evaluasi lengkap, logbook terisi, dan masa magang selesai.',
                 ]);
             }
 

@@ -105,9 +105,14 @@
                                     }
                                 }
                             }
-                            $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                            $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+                            $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+                            $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
                             $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
                             $nilaiDpl = $eval ? ($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0)) : 0;
+
+                            $latestLog = $placement->logbooks->sortByDesc('date')->first();
+                            $daysAgo = $latestLog ? \Carbon\Carbon::parse($latestLog->date)->startOfDay()->diffInDays(now()->startOfDay(), false) : null;
                         @endphp
                         <div class="p-4 space-y-3 hover:bg-slate-50/60 transition">
                             <div class="flex items-start justify-between gap-3">
@@ -138,7 +143,24 @@
                                     <span class="font-semibold text-slate-800">{{ $agency->agency_name ?? '-' }} ({{ $unit->name ?? '-' }})</span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs">
-                                    <span class="text-slate-500">Logbook: <strong class="text-slate-800">{{ $approvedLog }} / {{ $totalLog }} ACC</strong></span>
+                                    <div>
+                                        <span class="text-slate-500">Logbook: <strong class="text-slate-800">{{ $approvedLog }} / {{ $totalLog }} ACC</strong></span>
+                                        <div class="text-[10px] mt-0.5">
+                                            @if ($latestLog)
+                                                @if ($daysAgo <= 0)
+                                                    <span class="text-emerald-700 font-medium">● Aktif hari ini</span>
+                                                @elseif ($daysAgo === 1)
+                                                    <span class="text-slate-500">● Aktif kemarin</span>
+                                                @elseif ($daysAgo <= 4)
+                                                    <span class="text-slate-500">● Aktif {{ $daysAgo }} hari lalu</span>
+                                                @else
+                                                    <span class="text-amber-700 font-semibold">● {{ $daysAgo }} hari belum isi</span>
+                                                @endif
+                                            @else
+                                                <span class="text-slate-400 italic">● Belum ada log</span>
+                                            @endif
+                                        </div>
+                                    </div>
                                     <span class="text-slate-500">Laporan: 
                                         @if ($finalReport)
                                             <x-status-badge type="review" :status="$finalReport->status" />
@@ -148,7 +170,7 @@
                                     </span>
                                 </div>
                                 <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                                    <span class="text-slate-500 font-medium">Nilai Dosen:</span>
+                                    <span class="text-slate-500 font-medium">Evaluasi Nilai:</span>
                                     @if ($isMentorOnly)
                                         <span class="text-slate-500 text-[11px]">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
                                     @else
@@ -186,13 +208,13 @@
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3.5 px-4 w-[22%]">Mahasiswa</th>
-                                <th class="py-3.5 px-4 w-[21%]">Instansi & Unit</th>
-                                <th class="py-3.5 px-3 w-[11%] text-center">Status</th>
-                                <th class="py-3.5 px-3 w-[8%] text-center">Logbook</th>
+                                <th class="py-3.5 px-4 w-[24%]">Mahasiswa</th>
+                                <th class="py-3.5 px-4 w-[22%]">Instansi & Unit</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Status</th>
+                                <th class="py-3.5 px-3 w-[11%] text-center">Logbook</th>
                                 <th class="py-3.5 px-3 w-[11%] text-center">Laporan Akhir</th>
-                                <th class="py-3.5 px-3 w-[10%] text-center">Nilai Dosen</th>
-                                <th class="py-3.5 px-4 w-[17%] text-right">Aksi</th>
+                                <th class="py-3.5 px-3 w-[12%] text-center">Evaluasi Nilai</th>
+                                <th class="py-3.5 px-3 w-[10%] text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
@@ -220,9 +242,14 @@
                                             }
                                         }
                                     }
-                                    $isMentorOnly = $univ && $univ->evaluation_scheme === 'mentor_only';
+                                    $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+                                    $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+                                    $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
                                     $nilaiDinas = $eval ? ($eval->nilai_pembimbing ?? 0) : 0;
                                     $nilaiDpl = $eval ? ($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0)) : 0;
+
+                                    $latestLogDesktop = $placement->logbooks->sortByDesc('date')->first();
+                                    $daysAgoDesktop = $latestLogDesktop ? \Carbon\Carbon::parse($latestLogDesktop->date)->startOfDay()->diffInDays(now()->startOfDay(), false) : null;
                                 @endphp
                                 <tr class="hover:bg-slate-50/75 transition-colors">
                                     <td class="py-4 px-4">
@@ -250,6 +277,21 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
                                             {{ $approvedLog }} / {{ $totalLog }}
                                         </span>
+                                        <div class="text-[10px] mt-1">
+                                            @if ($latestLogDesktop)
+                                                @if ($daysAgoDesktop <= 0)
+                                                    <span class="text-emerald-700 font-medium whitespace-nowrap">Aktif hari ini</span>
+                                                @elseif ($daysAgoDesktop === 1)
+                                                    <span class="text-slate-500 whitespace-nowrap">Aktif kemarin</span>
+                                                @elseif ($daysAgoDesktop <= 4)
+                                                    <span class="text-slate-500 whitespace-nowrap">{{ $daysAgoDesktop }} hari lalu</span>
+                                                @else
+                                                    <span class="text-amber-700 font-semibold whitespace-nowrap">{{ $daysAgoDesktop }} hari belum isi</span>
+                                                @endif
+                                            @else
+                                                <span class="text-slate-400 italic whitespace-nowrap">Belum ada log</span>
+                                            @endif
+                                        </div>
                                     </td>
 
                                     <td class="py-4 px-3 text-center">
@@ -289,10 +331,10 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-right">
-                                        <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                    <td class="py-4 px-3 text-center">
+                                        <div class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
                                             <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                               class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
+                                               class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-lg transition shrink-0">
                                                 Detail
                                             </a>
                                             @if (!$isMentorOnly)
