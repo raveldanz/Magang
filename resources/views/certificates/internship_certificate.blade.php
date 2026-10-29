@@ -186,7 +186,7 @@
                         {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                     </h2>
                     <p class="text-[9.5px] text-slate-500 mt-0.5 leading-tight">
-                        {{ $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293' }} &bull; Website: {{ $agencyProfile->website ?? 'https://dispusip.surabaya.go.id' }}
+                        {{ $agencyProfile->address ?? 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275' }} &bull; Website: {{ $agencyProfile->website ?? 'https://dispusip.surabaya.go.id' }}
                     </p>
                 </div>
 

@@ -58,7 +58,7 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                             Alamat Kantor Dinas Lengkap <span class="text-rose-500">*</span>
                         </label>
-                        <textarea name="address" rows="3" required placeholder="Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('address') }}</textarea>
+                        <textarea name="address" rows="3" required placeholder="Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">{{ old('address') }}</textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">

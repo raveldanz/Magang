@@ -133,6 +133,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-101** | 2026-10-29 | Pencegahan Crash Alpine.js Akibat Kutip Ganda di Atribut HTML x-data | Pemecahan 90+ baris fat inline x-data menjadi fungsi terdedikasi di tag script demi mencegah crash parser HTML & evaluasi ekspresi Alpine | RESOLVED |
 | **LRN-102** | 2026-10-29 | Audit Sistem Menyeluruh, Node.js 24 Undici Body Drain, Null-Safety Detail Proyek & Back-Link Multi-Role | Resolusi unconsumed stream pada Hermes test di Node 24, null-safety placement detail proyek, sinkronisasi otorisasi Admin & visual feedback salin tautan | RESOLVED |
 | **LRN-103** | 2026-10-29 | Audit Visual UI Antarmuka, Restorasi Alamat Rungkut Asri & Hardening Mobile Detail Proyek | Restorasi alamat Dispusip Rungkut Asri & (031) 8707682 di landing page, eliminasi rogue bullet wrapping & indikator ulasan mobile pada detail proyek | RESOLVED |
+| **LRN-104** | 2026-10-29 | Pembersihan Menu Navigasi Mobile Drawer & Standardisasi Alamat Resmi Kantor Dispusip (Gedung Siola Lt. 4) | Penghapusan teks alamat di drawer mobile menu agar bersih & pembaruan alamat resmi kantor Dispusip Surabaya ke Gedung Siola Lantai 4 & (031) 8707329 di seluruh sistem | RESOLVED |
 
 ---
 
@@ -3419,6 +3420,27 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**: 
   1. Selalu lakukan audit visual multimodal vision pada breakpoint mobile (< 400px) untuk memastikan elemen tanda baca / bullet (`•`, `-`) tidak terisolasi sendirian di baris baru.
   2. Pertahankan keakuratan data identitas kantor institusi pemerintah sesuai ketetapan profil resmi di seluruh tampilan publik.
+
+---
+
+### [LRN-104] Pembersihan Menu Navigasi Mobile Drawer & Standardisasi Alamat Resmi Kantor Dispusip (Gedung Siola Lt. 4)
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/letters/acceptance.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/student/application/create.blade.php`, `database/seeders/`
+- **Problem / Symptom**: 
+  1. Menu dropdown navigasi mobile (saat tombol hamburger diklik) memuat teks alamat dan telepon di bagian bawah kartu menu, sehingga terkesan sesak dan redundan dengan konten halaman utama.
+  2. Alamat `Jl. Rungkut Asri Tengah No. 5-7, Surabaya` dan `(031) 8707682` ternyata merupakan lokasi perpustakaan cabang, bukan kantor pusat dinas. Sesuai data direktori resmi Pemkot Surabaya dan Google Maps, kantor pusat Dinas Perpustakaan dan Kearsipan Kota Surabaya berada di **Gedung Siola Lantai 4 (Jl. Tunjungan No. 1-3, Surabaya)** dengan telepon **(031) 8707329**.
+- **Root Cause**: 
+  1. Penempatan placeholder informasi kontak footer di dalam wadah `<div x-show="mobileMenuOpen">`.
+  2. Rancangan awal database menggunakan alamat Rungkut Asri yang semestinya dikhususkan pada unit pelayanan perpustakaan cabang Rungkut, bukan kantor pusat Dispusip.
+- **Fix Applied**: 
+  1. Menghapus blok informasi kontak dari dalam drawer menu mobile pada `resources/views/welcome.blade.php` sehingga menu drawer bersih dan fokus pada tautan navigasi dan tombol autentikasi.
+  2. Memperbarui seluruh referensi alamat kantor pusat Dispusip pada `welcome.blade.php` (tampilan desktop dan mobile di bawah kartu bidang), `acceptance.blade.php` (surat penerimaan), `internship_certificate.blade.php` (e-sertifikat kelulusan), formulir pendaftaran mahasiswa (`student/application/create.blade.php`), seeder, dan tabel `agency_profiles` ke:
+     - Alamat: `Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya`
+     - Telepon: `(031) 8707329`
+  3. Memvalidasi visual rendering Playwright Chrome (`scripts/verify_siola_and_clean_mobile_menu.mjs`) untuk viewport mobile (400x700) dan desktop (1366x768).
+- **Prevention Rule**: 
+  1. Panel mobile navigation drawer harus tetap terisolasi hanya untuk item navigasi dan aksi pengguna, tanpa menjejalkan blok kontak/footer.
+  2. Seluruh identitas resmi dinas pada surat resmi, sertifikat, dan landing page wajib merujuk ke kantor dinas utama (Gedung Siola Lt. 4).
 
 ---
 

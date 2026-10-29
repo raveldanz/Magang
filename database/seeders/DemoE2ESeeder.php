@@ -72,8 +72,8 @@ class DemoE2ESeeder extends Seeder
             [
                 'government_name' => 'Pemerintah Kota Surabaya',
                 'acronym' => 'Dispusip',
-                'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293',
-                'phone' => '(031) 8704207',
+                'address' => 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275',
+                'phone' => '(031) 8707329',
                 'email' => 'dispusip@surabaya.go.id',
                 'website' => 'https://dispusip.surabaya.go.id',
                 'logo' => 'images/logos/dispusip.png',

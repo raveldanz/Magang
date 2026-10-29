@@ -316,8 +316,8 @@
         $agencyProfile = $application->unit->agencyProfile ?? $agencyProfile ?? \App\Models\AgencyProfile::first();
         $govName = $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya';
         $agencyName = $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
-        $address = $agencyProfile->address ?? 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293';
-        $phone = $agencyProfile->phone ?? '(031) 8704207';
+        $address = $agencyProfile->address ?? 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275';
+        $phone = $agencyProfile->phone ?? '(031) 8707329';
         $email = $agencyProfile->email ?? 'dispusip@surabaya.go.id';
         $website = $agencyProfile->website ?? 'https://dispusip.surabaya.go.id';
         $cityName = $agencyProfile->city ?? 'Surabaya';
