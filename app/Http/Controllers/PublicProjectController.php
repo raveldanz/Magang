@@ -87,8 +87,12 @@ class PublicProjectController extends Controller
             ? "strftime('%Y', created_at) as project_year" 
             : 'EXTRACT(YEAR FROM created_at) as project_year';
 
-        $availableYears = InternshipProject::selectRaw($yearExpression)
-            ->distinct()
+        $yearQuery = InternshipProject::selectRaw($yearExpression);
+        if (! $isPrivileged) {
+            $yearQuery->where('is_public', true);
+        }
+
+        $availableYears = $yearQuery->distinct()
             ->orderBy('project_year', 'desc')
             ->pluck('project_year')
             ->filter()
@@ -101,9 +105,9 @@ class PublicProjectController extends Controller
 
         // Metrik Statistik Ringkas Galeri
         $stats = [
-            'total_projects' => InternshipProject::where('is_public', true)->count(),
-            'total_likes' => (int) InternshipProject::where('is_public', true)->sum('likes_count'),
-            'total_comments' => (int) InternshipProject::where('is_public', true)->sum('comments_count'),
+            'total_projects' => InternshipProject::when(! $isPrivileged, fn ($q) => $q->where('is_public', true))->count(),
+            'total_likes' => (int) InternshipProject::when(! $isPrivileged, fn ($q) => $q->where('is_public', true))->sum('likes_count'),
+            'total_comments' => (int) InternshipProject::when(! $isPrivileged, fn ($q) => $q->where('is_public', true))->sum('comments_count'),
             'total_categories' => count(InternshipProject::CATEGORIES),
         ];
 

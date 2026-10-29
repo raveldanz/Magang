@@ -129,6 +129,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-097** | 2026-10-28 | Integritas Penyimpanan Dokumen: Resolusi Error 404 Berkas Proposal/Profil Mahasiswa & Penanganan Bug 500 PushController | Error 404 berkas fisik proposal kelompok/mahasiswa hilang di disk lokal, ketiadaan fallback graceful di DocumentController, dan BadMethodCallException 500 di PushController::validate | RESOLVED |
 | **LRN-098** | 2026-10-28 | Desain Ornamen Pembatas Transisi Tahun Katalog Proyek Berstandar Identitas Kedinasan | Border polos diubah menjadi ornamen inline SVG Ultra-HD dengan gradien royal blue & garis pembatas lateral | RESOLVED |
 | **LRN-099** | 2026-10-28 | Perbaikan Bulk Action (Eliminasi Nested Forms), Pemindahan Aksi Kelompok ke Detail, dan Streamlining Kolom Bidang | Error HTTP 404 bulk update akibat nested forms, pembersihan teks instansi redundan di kolom Bidang, unbold ketua & kampus tanpa jurusan, serta sentralisasi aksi kelompok ke halaman detail | RESOLVED |
+| **LRN-100** | 2026-10-28 | Optimasi Komponen Section Divider SVG Gelombang, Micro-Interactions, Dark Mode & Anti-Knot Symmetry | Resolusi bug koordinat simetri gelombang SVG (knot overlap), efek transisi hover halus (aura glow & gyroscopic spin), responsivitas mobile-first, dan CSS variables dark mode adaptif | RESOLVED |
+| **LRN-101** | 2026-10-29 | Pencegahan Crash Alpine.js Akibat Kutip Ganda di Atribut HTML x-data | Pemecahan 90+ baris fat inline x-data menjadi fungsi terdedikasi di tag script demi mencegah crash parser HTML & evaluasi ekspresi Alpine | RESOLVED |
+| **LRN-102** | 2026-10-29 | Audit Sistem Menyeluruh, Node.js 24 Undici Body Drain, Null-Safety Detail Proyek & Back-Link Multi-Role | Resolusi unconsumed stream pada Hermes test di Node 24, null-safety placement detail proyek, sinkronisasi otorisasi Admin & visual feedback salin tautan | RESOLVED |
+| **LRN-103** | 2026-10-29 | Audit Visual UI Antarmuka, Restorasi Alamat Rungkut Asri & Hardening Mobile Detail Proyek | Restorasi alamat Dispusip Rungkut Asri & (031) 8707682 di landing page, eliminasi rogue bullet wrapping & indikator ulasan mobile pada detail proyek | RESOLVED |
 
 ---
 
@@ -3322,6 +3326,99 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**: 
   1. Dilarang keras menempatkan tag `<form>` di dalam elemen `<form>` lain (*no nested forms in HTML/Blade*). Aksi interaktif pada baris tabel wajib diarahkan ke halaman detail atau menggunakan handler JavaScript/Alpine yang memanipulasi hidden input tanpa merusak form wrapper.
   2. Pada pemrosesan bulk action yang mencakup entitas relasional kelompok, wajib melakukan pelacakan ID kelompok (`$processedGroupIds`) untuk mencegah duplikasi pembaruan status dan kesalahan penghitungan kuota.
+
+### [LRN-100] Optimasi Komponen Section Divider SVG Gelombang, Micro-Interactions, Dark Mode & Anti-Knot Symmetry
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/components/section-divider.blade.php`, `resources/views/projects/index.blade.php`, `scripts/verify_wave_divider_visual.mjs`
+- **Problem / Symptom**: 
+  1. Komponen pembatas halaman (divider) berbasis SVG gelombang memiliki simetri patah / kusut (knot overlap) pada gelombang sisi kanan akibat kekeliruan urutan koordinat bezier `Q` pada template awal.
+  2. Gerakan transisi hover terasa kaku dan artifisial akibat perputaran 90° mendadak pada diamond dan satelit.
+  3. Ruang kosong vertikal dan horizontal terlalu luas (terdapat void kosong >140px akibat akumulasi margin `space-y-16`, `pt-6 sm:pt-10`, dan `my-6 sm:my-8`), serta gelombang mengambang terisolasi di tengah kontainer 1280px.
+  4. Tabrakan ID gradien SVG (`customWaveL` / `customWaveR`) bila komponen dipanggil berulang kali di halaman yang sama (misalnya loop antar-tahun pada katalog proyek dinas).
+- **Root Cause**: 
+  1. Jalur gelombang kanan sebelumnya melompat mundur-maju (`264 -> 220 -> 264` dan `176 -> 220 -> 264 -> 308`), alih-alih membentuk cerminan matematis mulus dari gelombang kiri (`440 -> 352 -> 264 -> 176 -> 88 -> 0`).
+  2. Rotasi 90° (`rotate-[135deg]`) menghasilkan patahan visual abrupt; animasi natural membutuhkan fisika pegas (*spring physics*) dengan kemiringan dinamis halus (+10°) dan pembesaran vertikal gelombang (`scale-y-115`).
+  3. Ketiadaan garis aksen penghubung lateral menyebabkan gelombang hanya mengisi 800px di tengah kontainer grid 1280px, dan akumulasi padding/margin antar-elemen memicu ruang kosong yang berlebihan.
+- **Fix Applied**: 
+  1. Mengoreksi titik kontrol kuadratik kurva SVG sisi kanan secara presisi matematis sehingga 100% simetris terhadap gelombang kiri.
+  2. Menambahkan garis aksen gradien lateral kiri dan kanan (`flex-1 h-px bg-gradient-to-r/l`) yang menghubungkan ujung gelombang hingga ke tepi batas kontainer, mengisi ruang kosong horizontal secara elegan dan seimbang.
+  3. Menstandarisasi ritme vertikal yang padat dan harmonis: mereduksi jarak antar-tahun di `projects/index.blade.php` (`space-y-10 sm:space-y-12`, wrapper `py-2 sm:py-3`, dan divider `my-2 sm:my-3`).
+  4. Mengganti animasi kaku dengan fisika pegas lembut Apple iOS (*cubic-bezier(0.34, 1.56, 0.64, 1)*): kemiringan dinamis halus +10° (`rotate-[55deg]`), pembesaran lembut bintang 4-titik, dan pendaran aura kabut lembut (*soft bloom* `blur-xl`).
+  5. Memberikan efek riak pada gelombang SVG saat hover: membesar secara vertikal (`scale-y-115`) dengan pendaran neon halus, mencerminkan gelombang air alami.
+  6. Mengompilasi aset via Vite (`npm run build`) dan memvalidasi tampilan visual secara E2E di Chrome (Normal Desktop, Page Context, Hover State, Mobile 390px, dan Dark Mode) dengan Strict Exit Code 0.
+- **Prevention Rule**: 
+  1. Hindari rotasi 90° mendadak pada micro-interactions ikon/diamond; gunakan kemiringan lembut (+5° hingga +15°) dengan kurva akselerasi pegas (*spring cubic-bezier*) untuk sensasi alami dan hidup.
+  2. Pada section divider halaman berlebar kontainer luas (max-w-7xl), selalu sertakan garis aksen lateral `flex-1 h-px` agar pembatas membentang menyatu dengan tepi grid dan tidak tampak seperti pulau kecil yang terisolasi.
+  3. Hindari penumpukan margin/padding bertingkat antara kontainer induk (`space-y`), pembungkus loop (`py`), dan komponen divider (`my`).
+
+---
+
+### [LRN-101] Pencegahan Crash Alpine.js Akibat Kutip Ganda di Atribut HTML x-data
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/projects/show.blade.php`, `resources/views/projects/index.blade.php`
+- **Problem / Symptom**: 
+  1. Halaman detail proyek (`/projects/{id}`) memicu 19 error console secara beruntun di browser: `Alpine Expression Error: Unexpected token ')'` diikuti dengan `activePhoto is not defined`, `isLiked is not defined`, `likesCount is not defined`, `shareToast is not defined`, `authorNameInput is not defined`, `commentInput is not defined`, dll.
+  2. Seluruh fungsionalitas interaktif Alpine (preview galeri tangkapan layar, tombol suka proyek & komentar, toast salin tautan, validasi profanity filter komentar langsung) lumpuh total bagi pengunjung dan pengguna.
+- **Root Cause**: 
+  1. Logika JavaScript yang kompleks dan panjang (>90 baris) ditulis secara *inline* di dalam atribut HTML ganda `x-data="{ ... }"`.
+  2. Di dalam fungsi `checkProfanity`, terdapat komentar teks baris ganda: `// 2. Cek stripped evasion (contoh: "j.a.n.c.o.k", "a_s_u")`. Karakter kutip ganda (`"`) pada komentar tersebut diinterpretasikan oleh HTML parser browser sebagai penutup awal atribut `x-data="..."`, memotong ekspresi JavaScript tepat di tengah-tengah dan mengoper string sintaks yang cacat ke Alpine.js.
+- **Fix Applied**: 
+  1. Mengekstrak deklarasi komponen JavaScript keluar dari atribut HTML menjadi fungsi terisolasi `function projectDetail(config)` dan `function commentItem(config)` di dalam tag `<script>`.
+  2. Mendaftarkan komponen secara formal ke dalam `window` dan Alpine component registry via `window.Alpine.data(...)` (dengan fallback event `alpine:init`).
+  3. Menyederhanakan elemen HTML menjadi pemanggilan konfigurasi bersih: `x-data="projectDetail({ ... })"` dan `x-data="commentItem({ ... })"`.
+  4. Menjalankan audit browser Playwright headless (`scripts/verify_detail_interaction.mjs`) untuk mengonfirmasi 0 error console dan menjalankan seluruh unit test (`php artisan test`) yang lolos 100% (368 passed, Exit Code 0).
+- **Prevention Rule**: 
+  1. **Larangan Fat Inline `x-data`**: Dilarang keras menempatkan fungsi JavaScript panjang (>15 baris), ekspresi regex kompleks, array kata kasar, atau komentar dengan kutip ganda di dalam atribut tag HTML `x-data="..."`.
+  2. Ekstrak selalu logika komponen Alpine yang memiliki banyak method ke dalam fungsi terdedikasi `function componentName(config)` di `<script>` atau via `Alpine.data('name', ...)`.
+  3. Lakukan audit runtime console browser secara berkala menggunakan runner Playwright untuk mendeteksi silent evaluation error pada komponen frontend.
+
+---
+
+### [LRN-102] Audit Sistem Menyeluruh: Node.js 24 Undici Body Drain Hermes Runner, Null-Safety Detail Proyek & Standarisasi Back-Link Multi-Role
+- **Tanggal**: 2026-10-29
+- **Komponen**: `scripts/hermes_all_roles_test.mjs`, `app/Http/Controllers/ProjectDetailController.php`, `app/Http/Controllers/PublicProjectController.php`, `app/Http/Controllers/ProjectInteractionController.php`, `resources/views/projects/show.blade.php`, `resources/views/projects/index.blade.php`
+- **Problem / Symptom**: 
+  1. `npm run test:hermes` gagal di Node.js 24 dengan `AssertionError [ERR_ASSERTION]: assert(!this.paused)` saat socket HTTP ditutup tanpa mengonsumsi body response stream.
+  2. Di `ProjectDetailController.php`, tombol kembali kontekstual (`$backUrl`) memanggil `$placement->id` tanpa null-safe operator dan mem-fallback peran non-supervisor (seperti Admin Dinas) ke rute `supervisor.reports.index` yang memicu HTTP 403 Forbidden.
+  3. Di `PublicProjectController.php`, filter `availableYears` dan metrik ringkas masih memuat tahun dan data proyek berstatus privat bagi pengunjung umum (tamu non-login).
+  4. Di `ProjectInteractionController.php`, otorisasi `toggleVisibility` tidak menyertakan peran `admin` (Admin Dinas), sementara `PublicProjectController` dan `ProjectDetailController` mengizinkan Admin Dinas memoderasi proyek.
+  5. Di `resources/views/projects/index.blade.php`, aksi salin tautan masih menggunakan browser `alert()` yang dapat terblokir oleh browser modern.
+- **Root Cause**: 
+  1. Node.js 24 engine (Undici v6+) mewajibkan pembacaan stream body response (`await res.text()` atau `await res.body.cancel()`) pada setiap pemanggilan `fetch()` agar status parser tidak tertinggal dalam keadaan paused saat socket ditutup.
+  2. Ketiadaan null-safety `$placement?->id` dan pemetaan fallback rute yang kurang granular untuk berbagai peran pengguna sistem.
+  3. Pemfilteran `where('is_public', true)` belum diterapkan pada query distinct years dan agregasi statistik katalog.
+  4. Inkonsistensi pengecekan hak moderasi antara controller interaksi dan controller detail/publik.
+- **Fix Applied**: 
+  1. Merefaktor `HermesSession::request` dan pemanggilan `fetch()` di `scripts/hermes_all_roles_test.mjs` untuk selalu mengonsumsi body (`await res.text()`), menghasilkan pengujian 56/56 PASS (100% HIJAU) pada Node.js 24.
+  2. Menyempurnakan pemetaan `$backUrl` pada `ProjectDetailController.php` dengan operator null-safe `$placement?->id` dan perutean kontekstual berbasis peran (Super Admin $\rightarrow$ `admin.dashboard`, Admin Dinas $\rightarrow$ `admin.applications.index`, Kampus $\rightarrow$ `university.dashboard`, Publik $\rightarrow$ `public.projects.index`).
+  3. Membatasi `availableYears` dan agregasi metrik di `PublicProjectController.php` dengan filter `is_public = true` untuk pengguna non-privileged.
+  4. Menyelaraskan otorisasi `toggleVisibility` di `ProjectInteractionController.php` agar mencakup peran `admin` (Admin Dinas).
+  5. Mengganti `alert()` native pada salin tautan di katalog proyek dengan visual feedback interaktif berbasis Alpine.js (`Tautan Tersalin! ✓`).
+  6. Menjalankan verifikasi penuh: 368 unit/feature test passed (Strict Exit Code 0), Tier 3 Visual Playwright passed (Strict Exit Code 0), dan Hermes Multi-Role passed (56/56, Strict Exit Code 0).
+- **Prevention Rule**: 
+  1. Pada runner JavaScript berbasis `fetch()`, wajib konsumsi body response stream (`await res.text()`) untuk menjamin kompatibilitas penuh dengan Node.js 24+ Undici engine.
+  2. Jangan pernah mengakses relasi model Eloquent tanpa operator null-safe (`?->`) pada view publik atau rute fallback.
+  3. Pastikan definisi hak akses peran (*authorization role matrix*) konsisten di seluruh controller terkait dalam domain fitur yang sama.
+
+---
+
+### [LRN-103] Audit Visual UI Antarmuka, Restorasi Alamat Rungkut Asri & Hardening Mobile Detail Proyek
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/projects/show.blade.php`, `scripts/audit_ui_comprehensive.mjs`
+- **Problem / Symptom**: 
+  1. Pada halaman landing page (`welcome.blade.php`), informasi alamat kantor kedinasan Dispusip di bagian desktop dan mobile secara keliru menampilkan teks Siola (`Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4`) dan telepon `(031) 8707329`, menyimpang dari aturan resmi LRN-094.
+  2. Pada halaman detail proyek (`projects/show.blade.php`) di layar smartphone (< 400px), pemisah bullet `•` pada tag header melipat sendirian ke baris baru (*awkward rogue wrapping*), dan bilah interaksi menyembunyikan total ulasan/komentar sehingga menyisakan ruang kosong di samping tombol like.
+- **Root Cause**: 
+  1. Adanya residu placeholder alamat Siola lama yang belum ter-update saat rekonsiliasi layout grid 2-kolom.
+  2. Pembungkusan flex `flex-wrap` tanpa penyembunyian bullet pada layar sempit (`hidden sm:inline`), serta kelas `hidden sm:flex` pada indikator diskusi interaksi bar.
+- **Fix Applied**: 
+  1. Memperbarui `resources/views/welcome.blade.php` pada section desktop dan mobile ke alamat kantor resmi Dispusip: `Jl. Rungkut Asri Tengah No. 5-7, Surabaya` dan telepon `(031) 8707682`.
+  2. Menyempurnakan header detail proyek dengan `hidden sm:inline` untuk bullet dan ukuran teks yang proporsional di layar seluler.
+  3. Mengaktifkan indikator ulasan pada mobile (`hidden min-[380px]:flex`) dengan label ringkas `💬 X Ulasan` sehingga bilah interaksi terlihat padat, informatif, dan seimbang.
+  4. Menjalankan audit visual Playwright (`scripts/audit_ui_comprehensive.mjs`) di channel Google Chrome pada resolusi Desktop (1440x900) dan Mobile (390x844) dengan hasil 0 console error dan 0 horizontal overflow.
+- **Prevention Rule**: 
+  1. Selalu lakukan audit visual multimodal vision pada breakpoint mobile (< 400px) untuk memastikan elemen tanda baca / bullet (`•`, `-`) tidak terisolasi sendirian di baris baru.
+  2. Pertahankan keakuratan data identitas kantor institusi pemerintah sesuai ketetapan profil resmi di seluruh tampilan publik.
 
 ---
 

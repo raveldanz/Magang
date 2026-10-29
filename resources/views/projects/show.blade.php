@@ -8,16 +8,16 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </a>
                 <div>
-                    <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                         <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
                             Karya Inovasi Magang
                         </span>
                         <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold border {{ $project->category_badge_class }}">
                             {{ $project->category_label }}
                         </span>
-                        <span class="text-xs text-slate-400">&bull;</span>
-                        <span class="text-xs text-slate-500 font-medium">
-                            {{ $placement->application?->unit?->name ?? 'Dinas Perpustakaan dan Kearsipan' }}
+                        <span class="hidden sm:inline text-xs text-slate-400">&bull;</span>
+                        <span class="text-[11px] sm:text-xs text-slate-500 font-medium">
+                            {{ $placement?->application?->unit?->name ?? 'Dinas Perpustakaan dan Kearsipan' }}
                         </span>
                     </div>
                     <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight mt-1">
@@ -89,7 +89,7 @@
                             {{-- 3. Salin Tautan --}}
                             <div class="py-1">
                                 <button type="button" 
-                                        @click="navigator.clipboard.writeText(window.location.href); menuOpen = false; alert('Tautan proyek berhasil disalin!')" 
+                                        @click="navigator.clipboard.writeText(window.location.href); menuOpen = false; if (typeof copyShareLink === 'function') { copyShareLink(); } else { shareToast = true; setTimeout(() => shareToast = false, 3000); }" 
                                         class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
                                     <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <div>
@@ -150,97 +150,159 @@
         $documents = is_array($project->documents) ? $project->documents : [];
     @endphp
 
-    <div class="py-8" x-data="{
+    <script>
+        function projectDetail(config) {
+            return {
+                activePhoto: config.activePhoto,
+                activeTitle: config.activeTitle,
+                isLiked: Boolean(config.isLiked),
+                likesCount: Number(config.likesCount) || 0,
+                commentsCount: Number(config.commentsCount) || 0,
+                likeLoading: false,
+                shareToast: false,
+                profanityAlert: '',
+                commentInput: '',
+                authorNameInput: '',
+                likeUrl: config.likeUrl,
+                csrfToken: config.csrfToken,
+
+                async toggleProjectLike() {
+                    if (this.likeLoading) return;
+                    this.likeLoading = true;
+                    try {
+                        const resp = await fetch(this.likeUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': this.csrfToken,
+                                'Accept': 'application/json'
+                            }
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                            this.isLiked = data.liked;
+                            this.likesCount = data.likes_count;
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    } finally {
+                        this.likeLoading = false;
+                    }
+                },
+
+                copyShareLink() {
+                    navigator.clipboard.writeText(window.location.href);
+                    this.shareToast = true;
+                    setTimeout(() => this.shareToast = false, 3000);
+                },
+
+                checkProfanity(text) {
+                    const badWords = [
+                        // Kata Kasar Jawa (Surabaya / Jatim & Jateng)
+                        'jancok','jancuk','jancik','dancok','dancuk','damput','jancukan',
+                        'ancok','ancuk','cok','cuk','coeg','taek','telek','tai','taik','silit',
+                        'matamu','ndasmu','cocotmu','lambemu','modar','peli','gathel','gapleki','tempik','peler',
+                        'kenthu','kirik',
+                        // Organ intim & seksual eksplisit
+                        'kontol','kntl','memek','mmk','jembut','jmbt','ngentot','ngewe','ewe','pantek',
+                        'puki','pukimak','pepek','itil','tetek','titit','bocong','dildo','masturbasi',
+                        'porno','bokep','vagina','penis','seks',
+                        // Umpatan kasar / peyoratif Indonesia
+                        'anjing','anjir','anjrit','babi','bangsat','bajingan','brengsek','kampret','asu',
+                        'lonte','perek','jablay','goblok','goblog','tolol','idiot','bego','dungu','pekok','geblek',
+                        // Slang & English profanity
+                        'fuck','fucking','fucked','fucker','motherfucker','mf',
+                        'shit','bullshit','bitch','bitches','bastard','asshole','cunt',
+                        'dick','dicks','cock','pussy','whore','slut','prick','retard','nigger','fag','faggot'
+                    ];
+                    const lower = (text || '').toLowerCase();
+                    
+                    // 1. Cek batas kata utuh
+                    for (const w of badWords) {
+                        const regex = new RegExp('\\b' + w + '\\b', 'i');
+                        if (regex.test(lower)) {
+                            return w;
+                        }
+                    }
+
+                    // 2. Cek stripped evasion (contoh: j.a.n.c.o.k, a_s_u)
+                    const stripped = lower.replace(/[^a-z0-9]/g, '');
+                    for (const w of ['jancok','jancuk','dancok','kontol','memek','ngentot','fuck','bitch','asu']) {
+                        if (stripped.includes(w)) {
+                            return w;
+                        }
+                    }
+
+                    return '';
+                },
+
+                validateCommentLive() {
+                    const detected = this.checkProfanity(this.commentInput + ' ' + this.authorNameInput);
+                    if (detected) {
+                        this.profanityAlert = 'Terdeteksi kata tidak pantas ("' + detected + '"). Mohon gunakan bahasa yang sopan dan santun.';
+                    } else {
+                        this.profanityAlert = '';
+                    }
+                }
+            };
+        }
+
+        function commentItem(config) {
+            return {
+                commentLiked: Boolean(config.liked),
+                commentLikesCount: Number(config.likesCount) || 0,
+                commentLikeLoading: false,
+                likeUrl: config.likeUrl,
+                csrfToken: config.csrfToken,
+                async toggleCommentLike() {
+                    if (this.commentLikeLoading) return;
+                    this.commentLikeLoading = true;
+                    try {
+                        const resp = await fetch(this.likeUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': this.csrfToken,
+                                'Accept': 'application/json'
+                            }
+                        });
+                        const data = await resp.json();
+                        if (data.success) {
+                            this.commentLiked = data.liked;
+                            this.commentLikesCount = data.likes_count;
+                        }
+                    } catch(e) {
+                        console.error(e);
+                    } finally {
+                        this.commentLikeLoading = false;
+                    }
+                }
+            };
+        }
+
+        window.projectDetail = projectDetail;
+        window.commentItem = commentItem;
+
+        if (window.Alpine) {
+            window.Alpine.data('projectDetail', projectDetail);
+            window.Alpine.data('commentItem', commentItem);
+        } else {
+            document.addEventListener('alpine:init', () => {
+                window.Alpine.data('projectDetail', projectDetail);
+                window.Alpine.data('commentItem', commentItem);
+            });
+        }
+    </script>
+
+    <div class="py-8" x-data="projectDetail({
         activePhoto: @js($allScreenshots[0]['url'] ?? null),
         activeTitle: @js($allScreenshots[0]['title'] ?? 'Dokumentasi Proyek'),
         isLiked: @js($isLikedByMe),
         likesCount: {{ (int) $project->likes_count }},
         commentsCount: {{ (int) $project->comments_count }},
-        likeLoading: false,
-        shareToast: false,
-        profanityAlert: '',
-        commentInput: '',
-        authorNameInput: '',
-
-        async toggleProjectLike() {
-            if (this.likeLoading) return;
-            this.likeLoading = true;
-            try {
-                const resp = await fetch('{{ route('projects.like', $project->id) }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await resp.json();
-                if (data.success) {
-                    this.isLiked = data.liked;
-                    this.likesCount = data.likes_count;
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.likeLoading = false;
-            }
-        },
-
-        copyShareLink() {
-            navigator.clipboard.writeText(window.location.href);
-            this.shareToast = true;
-            setTimeout(() => this.shareToast = false, 3000);
-        },
-
-        checkProfanity(text) {
-            const badWords = [
-                // Kata Kasar Jawa (Surabaya / Jatim & Jateng)
-                'jancok','jancuk','jancik','dancok','dancuk','damput','jancukan',
-                'ancok','ancuk','cok','cuk','coeg','taek','telek','tai','taik','silit',
-                'matamu','ndasmu','cocotmu','lambemu','modar','peli','gathel','gapleki','tempik','peler',
-                'kenthu','kirik',
-                // Organ intim & seksual eksplisit
-                'kontol','kntl','memek','mmk','jembut','jmbt','ngentot','ngewe','ewe','pantek',
-                'puki','pukimak','pepek','itil','tetek','titit','bocong','dildo','masturbasi',
-                'porno','bokep','vagina','penis','seks',
-                // Umpatan kasar / peyoratif Indonesia
-                'anjing','anjir','anjrit','babi','bangsat','bajingan','brengsek','kampret','asu',
-                'lonte','perek','jablay','goblok','goblog','tolol','idiot','bego','dungu','pekok','geblek',
-                // Slang & English profanity
-                'fuck','fucking','fucked','fucker','motherfucker','mf',
-                'shit','bullshit','bitch','bitches','bastard','asshole','cunt',
-                'dick','dicks','cock','pussy','whore','slut','prick','retard','nigger','fag','faggot'
-            ];
-            const lower = text.toLowerCase();
-            
-            // 1. Cek batas kata utuh
-            for (const w of badWords) {
-                const regex = new RegExp('\\b' + w + '\\b', 'i');
-                if (regex.test(lower)) {
-                    return w;
-                }
-            }
-
-            // 2. Cek stripped evasion (contoh: "j.a.n.c.o.k", "a_s_u")
-            const stripped = lower.replace(/[^a-z0-9]/g, '');
-            for (const w of ['jancok','jancuk','dancok','kontol','memek','ngentot','fuck','bitch','asu']) {
-                if (stripped.includes(w)) {
-                    return w;
-                }
-            }
-
-            return '';
-        },
-
-        validateCommentLive() {
-            const detected = this.checkProfanity(this.commentInput + ' ' + this.authorNameInput);
-            if (detected) {
-                this.profanityAlert = 'Terdeteksi kata tidak pantas (\x22' + detected + '\x22). Mohon gunakan bahasa yang sopan dan santun.';
-            } else {
-                this.profanityAlert = '';
-            }
-        }
-    }">
+        likeUrl: @js(route('projects.like', $project->id)),
+        csrfToken: @js(csrf_token()),
+    })">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
             <!-- 1. Banner Ringkasan Identitas Mahasiswa & Penugasan -->
@@ -260,14 +322,14 @@
 
                     <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                         <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Penempatan Unit Kerja Dinas</span>
-                        <span class="font-bold text-slate-800 text-sm block">{{ $placement->application?->unit?->agencyProfile?->agency_name ?? 'Dispusip Surabaya' }}</span>
-                        <span class="text-slate-500 text-[11px] block mt-0.5">{{ $placement->application?->unit?->name ?? 'Bidang Kerja' }}</span>
+                        <span class="font-bold text-slate-800 text-sm block">{{ $placement?->application?->unit?->agencyProfile?->agency_name ?? 'Dispusip Surabaya' }}</span>
+                        <span class="text-slate-500 text-[11px] block mt-0.5">{{ $placement?->application?->unit?->name ?? 'Bidang Kerja' }}</span>
                     </div>
 
                     <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                         <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mentor Lapangan (Dinas)</span>
-                        <span class="font-bold text-slate-800 text-sm block">{{ $placement->mentor?->name ?? $placement->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
-                        <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement->academicAdvisor?->name ?? '-' }}</span>
+                        <span class="font-bold text-slate-800 text-sm block">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
+                        <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -647,12 +709,12 @@
                         <span class="px-2 py-0.5 rounded-full text-xs" :class="isLiked ? 'bg-rose-100 text-rose-700' : 'bg-white text-slate-600 border border-slate-200'" x-text="likesCount"></span>
                     </button>
 
-                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                    <div class="h-6 w-px bg-slate-200 hidden min-[380px]:block"></div>
 
                     {{-- Indikator Jumlah Diskusi --}}
-                    <div class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                        <span>{{ $project->comments->count() }} Komentar Masukan</span>
+                    <div class="hidden min-[380px]:flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-500">
+                        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        <span><span x-text="commentsCount">{{ $project->comments->count() }}</span> <span class="hidden sm:inline">Komentar Masukan</span><span class="sm:hidden">Ulasan</span></span>
                     </div>
                 </div>
 
@@ -711,6 +773,11 @@
                         Tautan berhasil disalin ke papan klip!
                     </div>
                 </div>
+            </div>
+
+            {{-- Pembatas Ornamen Gelombang Elegan Kustom --}}
+            <div class="py-2">
+                <x-section-divider />
             </div>
 
             {{-- 5. RUANG DISKUSI & ULASAN KOMENTAR --}}
@@ -788,34 +855,12 @@
                 {{-- Daftar Komentar yang Telah Diterbitkan --}}
                 <div class="space-y-3.5 pt-4 border-t border-slate-100">
                     @forelse($project->comments as $comment)
-                        <div x-data="{
-                            commentLiked: {{ $comment->isLikedBy($user, $guestId) ? 'true' : 'false' }},
-                            commentLikesCount: {{ (int) $comment->likes_count }},
-                            commentLikeLoading: false,
-                            async toggleCommentLike() {
-                                if (this.commentLikeLoading) return;
-                                this.commentLikeLoading = true;
-                                try {
-                                    const resp = await fetch('{{ route('projects.comments.like', $comment->id) }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Accept': 'application/json'
-                                        }
-                                    });
-                                    const data = await resp.json();
-                                    if (data.success) {
-                                        this.commentLiked = data.liked;
-                                        this.commentLikesCount = data.likes_count;
-                                    }
-                                } catch(e) {
-                                    console.error(e);
-                                } finally {
-                                    this.commentLikeLoading = false;
-                                }
-                            }
-                        }" class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition space-y-2.5">
+                        <div x-data="commentItem({
+                            liked: @js($comment->isLikedBy($user, $guestId)),
+                            likesCount: {{ (int) $comment->likes_count }},
+                            likeUrl: @js(route('projects.comments.like', $comment->id)),
+                            csrfToken: @js(csrf_token()),
+                        })" class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition space-y-2.5">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
