@@ -134,6 +134,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-102** | 2026-10-29 | Audit Sistem Menyeluruh, Node.js 24 Undici Body Drain, Null-Safety Detail Proyek & Back-Link Multi-Role | Resolusi unconsumed stream pada Hermes test di Node 24, null-safety placement detail proyek, sinkronisasi otorisasi Admin & visual feedback salin tautan | RESOLVED |
 | **LRN-103** | 2026-10-29 | Audit Visual UI Antarmuka, Restorasi Alamat Rungkut Asri & Hardening Mobile Detail Proyek | Restorasi alamat Dispusip Rungkut Asri & (031) 8707682 di landing page, eliminasi rogue bullet wrapping & indikator ulasan mobile pada detail proyek | RESOLVED |
 | **LRN-104** | 2026-10-29 | Pembersihan Menu Navigasi Mobile Drawer & Standardisasi Alamat Resmi Kantor Dispusip (Gedung Siola Lt. 4) | Penghapusan teks alamat di drawer mobile menu agar bersih & pembaruan alamat resmi kantor Dispusip Surabaya ke Gedung Siola Lantai 4 & (031) 8707329 di seluruh sistem | RESOLVED |
+| **LRN-105** | 2026-10-29 | Standarisasi Tinggi Baris Tabel Pengajuan Desktop (/admin/applications), Eliminasi Visual Clutter & Accordion Pill | Menyelaraskan tinggi baris Individu & Kelompok menjadi maksimal 2 baris konsisten, pill button anggota [👥 X Anggota ⌄], eliminasi duplikasi badge & penataan murni vertikal status badge | RESOLVED |
+| **LRN-106** | 2026-10-29 | Penataan Teks Subtitle Header Mobile Dispusip Saat Menu Dibuka (Multi-Line Spacing) | Mengubah teks panjang 'Dinas Perpustakaan dan Kearsipan Kota Surabaya' di header mobile saat menu drawer dibuka agar terbagi menjadi 2 baris ('Kota Surabaya' di bawah) sehingga tidak terpotong oleh tombol close (X) | RESOLVED |
 
 ---
 
@@ -3441,6 +3443,53 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**: 
   1. Panel mobile navigation drawer harus tetap terisolasi hanya untuk item navigasi dan aksi pengguna, tanpa menjejalkan blok kontak/footer.
   2. Seluruh identitas resmi dinas pada surat resmi, sertifikat, dan landing page wajib merujuk ke kantor dinas utama (Gedung Siola Lt. 4).
+
+---
+
+### [LRN-105] Standarisasi Tinggi Baris Tabel Pengajuan Desktop (/admin/applications), Eliminasi Visual Clutter & Accordion Pill
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `scripts/verify_desktop_applications_table.mjs`
+- **Problem / Symptom**: 
+  1. Tampilan tabel daftar pengajuan magang di `/admin/applications` pada layar desktop tampak padat dan berantakan (*visual clutter*) karena tinggi baris antara pengajuan Individu (67px) dan Kelompok (150-180px) sangat tidak seimbang.
+  2. Baris Kelompok memuat badge teks "JALUR KELOMPOK", kode grup panjang `#GRP-...`, serta tombol besar "Buka Daftar X Anggota v" yang memakan ruang vertikal 5 baris.
+  3. Terjadi redundansi data di Kolom 2 (memuat badge `X Anggota Terdaftar`) dan Kolom 4 (memuat teks peringatan duplikat `Mentor belum ditetapkan` di bawah badge status ACCEPTED).
+- **Root Cause**: 
+  1. Struktur sel kolom pertama kelompok belum mengadopsi pola ringkas (*compact inline pill*) dan menumpuk metadata secara vertikal.
+  2. Adanya residu badge jumlah anggota di kolom bidang serta teks `$actionHint` yang merender ulang status mentor di bawah badge status.
+- **Fix Applied**: 
+  1. **Kolom 1 (Pemohon / Tim)**: Menyeragamkan tinggi baris menjadi maksimal 2 baris konsisten:
+     - Individu: Baris 1: Nama Pemohon (bold); Baris 2: Universitas • Jurusan (teks abu-abu).
+     - Kelompok: Baris 1: Nama Tim (bold) berdampingan inline flex dengan pill button interaktif `[👥 X Anggota ⌄]`; Baris 2: `Ketua: [Nama Ketua] • [Nama Universitas]`.
+     - Kode grup `#GRP-...` dialihkan ke atribut tooltip `title` pada ikon grup ungu.
+     - Badge tebal "JALUR KELOMPOK" dan tombol besar di bawah dihapus.
+  2. **Kolom 2 (Bidang & Mentor)**: Menghapus badge `X Anggota Terdaftar` dan menata kolom murni menjadi 2 baris konsisten: Baris 1: Nama Bidang (`truncate`); Baris 2: `Mentor: [Nama Mentor]` atau `Mentor belum ditetapkan` (amber-600).
+  3. **Kolom 4 (Status)**: Menghapus teks redundan di bawah badge status; kolom berpusat pada satu elemen badge status `<x-status-badge>` rata tengah secara vertikal (`align-middle`).
+  4. **Accordion & Sub-Tabel**: Fungsi toggle daftar mahasiswa kelompok tetap responsif dan halus via Alpine.js tanpa mengubah tampilan kartu mobile (`md:hidden`).
+  5. Pengujian Playwright E2E visual (`scripts/verify_desktop_applications_table.mjs`) dan test suite backend PHPUnit (`Phase3SecurityDataIntegrityTest`, `InternshipGroupWorkflowTest`) 100% PASS (Exit Code 0).
+- **Prevention Rule**: 
+  1. Pada tabel data desktop tabular, pertahankan konsistensi ketinggian baris (*row height parity*) antar varian entitas (Individu vs Kelompok) dengan membatasi konten sel primer ke maksimal 2 baris fungsional.
+  2. Tempatkan aksi sekunder seperti ekspansi daftar anggota dalam bentuk pill badge inline `[👥 X Anggota ⌄]` agar tidak menambah tinggi baris.
+
+---
+
+### [LRN-106] Penataan Teks Subtitle Header Mobile Dispusip Saat Menu Dibuka (Multi-Line Spacing)
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/welcome.blade.php`, `scripts/verify_siola_and_clean_mobile_menu.mjs`
+- **Problem / Symptom**: 
+  Pada tampilan smartphone (lebar layar < 450px), saat pengguna menekan tombol hamburger menu navigasi, subtitle instansi yang panjang (`Dinas Perpustakaan dan Kearsipan Kota Surabaya`) terpotong (*truncated ellipsis*) tepat di samping tombol close (X), sehingga tulisan tampak terpotong menjadi `DINAS PERPUSTAKAAN DAN KEARSIPAN KOTA S...`.
+- **Root Cause**: 
+  Teks instansi pada header bersifat *single line nowrap truncate*. Ketika tombol close (X) aktif, ruang horizontal tersisa untuk teks merek berkurang, menyebabkan nama dinas yang berjumlah 48 karakter terpotong otomatis oleh CSS `truncate`.
+- **Fix Applied**: 
+  1. Pada `welcome.blade.php`, menambahkan kontrol visibilitas responsif Alpine.js pada header brand:
+     - **Desktop (`md:inline`)**: Tetap 1 baris utuh proporsional.
+     - **Mobile Saat Menu Tertutup (`x-show="!mobileMenuOpen"`)**: 1 baris standar.
+     - **Mobile Saat Menu Terbuka (`x-show="mobileMenuOpen"`)**: Di-spasi ke bawah menjadi 2 baris terstruktur:
+       - Baris 1: `DINAS PERPUSTAKAAN DAN KEARSIPAN`
+       - Baris 2: `KOTA SURABAYA` (teks biru tebal proporsional di bawahnya)
+  2. Memberikan `shrink-0 ml-2` pada tombol hamburger/close button dan `flex-1` pada logo wrapper agar ruang horizontal terdistribusi maksimal.
+  3. Memvalidasi visual dengan Playwright Chrome headless (`scripts/verify_siola_and_clean_mobile_menu.mjs`), terbukti teks tidak lagi terpotong dan tombol close memiliki *whitespace* yang lega.
+- **Prevention Rule**: 
+  Gunakan layout dua baris adaptif (*two-line split*) pada sub-brand instansi pemerintahan di viewport mobile ketika menu drawer terbuka agar keterbacaan identitas dinas tetap utuh 100%.
 
 ---
 

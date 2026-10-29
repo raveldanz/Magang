@@ -13,12 +13,22 @@ async function verify() {
         const mobilePage = await mobileContext.newPage();
         await mobilePage.goto('http://127.0.0.1:8000/', { waitUntil: 'networkidle' });
 
-        // Click the hamburger menu button
+        // Before clicking menu: check closed state text
+        const closedText = mobilePage.locator('header a span[x-show="!mobileMenuOpen"]');
+        console.log('Closed mobile text visible:', await closedText.isVisible());
+
+        // Click the hamburger menu button to open
         const hamburgerBtn = mobilePage.locator('button[aria-label="Toggle navigasi menu"]');
         await hamburgerBtn.click();
         await mobilePage.waitForTimeout(500);
 
-        // Check if address is present in mobile menu
+        // Check if the split text is visible when open
+        const line1 = mobilePage.locator('header a div[x-show="mobileMenuOpen"] span').first();
+        const line2 = mobilePage.locator('header a div[x-show="mobileMenuOpen"] span').nth(1);
+        console.log('Line 1 ("Dinas Perpustakaan dan Kearsipan") visible when open:', await line1.isVisible(), await line1.textContent());
+        console.log('Line 2 ("Kota Surabaya") visible when open:', await line2.isVisible(), await line2.textContent());
+
+        // Check if address is present in mobile menu drawer
         const mobileMenu = mobilePage.locator('header div[x-show="mobileMenuOpen"]');
         const menuAddressCheck = await mobileMenu.getByText('Siola').count();
         console.log('Mobile Menu Siola text count (should be 0):', menuAddressCheck);
@@ -29,8 +39,8 @@ async function verify() {
         }
 
         // Take screenshot of mobile menu open
-        await mobilePage.screenshot({ path: 'public/test-artifacts/mobile_menu_clean.png' });
-        console.log('✅ Screenshot mobile menu saved to public/test-artifacts/mobile_menu_clean.png');
+        await mobilePage.screenshot({ path: 'public/test-artifacts/mobile_menu_open_header_multiline.png' });
+        console.log('✅ Screenshot mobile menu saved to public/test-artifacts/mobile_menu_open_header_multiline.png');
 
         // Close menu to inspect page content
         await hamburgerBtn.click();
