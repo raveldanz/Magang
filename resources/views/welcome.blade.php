@@ -52,7 +52,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                 
                 <!-- Logo & Brand Dispusip Surabaya -->
-                <a href="{{ url('/') }}" class="flex items-center gap-2.5 sm:gap-4 min-w-0 group" title="Portal Magang Dispusip Kota Surabaya">
+                <a href="{{ url('/') }}" class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1 sm:flex-initial group" title="Portal Magang Dispusip Kota Surabaya">
                     <img src="{{ asset('images/logoPemkotSBY.png') }}" alt="Logo Pemkot Surabaya" 
                          class="h-8 sm:h-10 w-auto object-contain shrink-0"
                          style="aspect-ratio: 960/1234; height: 36px; width: auto; object-fit: contain;">
@@ -62,7 +62,25 @@
                          style="height: 36px; width: auto; object-fit: contain;">
                     <div class="flex flex-col min-w-0">
                         <span class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 leading-tight truncate">Portal Magang Dispusip</span>
-                        <span class="text-[10px] sm:text-xs font-bold text-blue-700 tracking-tight sm:tracking-normal uppercase truncate">Dinas Perpustakaan dan Kearsipan Kota Surabaya</span>
+                        
+                        <!-- Tampilan Desktop (md ke atas): Satu baris penuh proporsional -->
+                        <span class="hidden md:inline text-xs font-bold text-blue-700 tracking-normal uppercase truncate">
+                            Dinas Perpustakaan dan Kearsipan Kota Surabaya
+                        </span>
+
+                        <!-- Tampilan Mobile (< md): Adaptif saat menu ditutup vs dibuka -->
+                        <div class="md:hidden">
+                            <!-- Saat menu DITUTUP: Teks 1 baris standar truncate -->
+                            <span x-show="!mobileMenuOpen" class="text-[10px] font-bold text-blue-700 tracking-tight uppercase truncate block">
+                                Dinas Perpustakaan dan Kearsipan Kota Surabaya
+                            </span>
+
+                            <!-- Saat menu DIBUKA (Sesuai Permintaan Pengguna): Di-spasi ke bawah dengan 'Kota Surabaya' di baris kedua -->
+                            <div x-show="mobileMenuOpen" x-cloak class="flex flex-col leading-tight">
+                                <span class="text-[9.5px] font-bold text-blue-700 tracking-tight uppercase">Dinas Perpustakaan dan Kearsipan</span>
+                                <span class="text-[9px] font-extrabold text-blue-600 tracking-tight uppercase">Kota Surabaya</span>
+                            </div>
+                        </div>
                     </div>
                 </a>
 
@@ -94,7 +112,7 @@
                 </div>
 
                 <!-- Mobile Hamburger Button (Hanya Tampil di Layar Kecil < md) -->
-                <div class="flex items-center md:hidden">
+                <div class="flex items-center md:hidden shrink-0 ml-2">
                     <button type="button" 
                             @click="mobileMenuOpen = !mobileMenuOpen" 
                             class="inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all border border-slate-200/80 shadow-2xs"
@@ -160,11 +178,6 @@
                             Masuk ke Akun
                         </a>
                     @endauth
-                </div>
-
-                <!-- Informasi Kontak Singkat di Bawah Dropdown -->
-                <div class="pt-2 text-center text-[11px] text-slate-400 font-medium">
-                    📍 Gedung Siola Lt. 4, Surabaya &bull; 📞 (031) 8707329
                 </div>
             </div>
         </header>

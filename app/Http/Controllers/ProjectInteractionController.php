@@ -238,7 +238,7 @@ class ProjectInteractionController extends Controller
     public function toggleVisibility(Request $request, $id)
     {
         $user = Auth::user();
-        if (! $user || (! $user->isSuperAdmin() && ! in_array($user->role, ['super_admin', 'superadmin', 'supervisor']))) {
+        if (! $user || (! $user->isSuperAdmin() && ! in_array($user->role, ['super_admin', 'superadmin', 'admin', 'supervisor']))) {
             abort(403, 'Akses terbatas untuk Administrator dan Supervisor.');
         }
 

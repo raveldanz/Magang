@@ -46,16 +46,20 @@ class ProjectDetailController extends Controller
         // Tentukan tautan kembali (Back Link) yang kontekstual dan aman
         $backUrl = url()->previous();
         if (! $backUrl || $backUrl === url()->current()) {
-            if ($user?->role === 'supervisor') {
+            if ($user?->role === 'supervisor' && $placement) {
                 $backUrl = route('supervisor.reports.show', $placement->id);
-            } elseif (in_array($user?->role, ['mentor', 'pembimbing'])) {
+            } elseif (in_array($user?->role, ['mentor', 'pembimbing']) && $placement) {
                 $backUrl = route('mentor.students.show', $placement->id);
-            } elseif (in_array($user?->role, ['dosen', 'academic_advisor'])) {
+            } elseif (in_array($user?->role, ['dosen', 'academic_advisor']) && $placement) {
                 $backUrl = route('lecturer.students.show', $placement->id);
             } elseif ($user?->role === 'mahasiswa') {
                 $backUrl = route('student.final_report.index');
-            } elseif ($user) {
-                $backUrl = route('supervisor.reports.index');
+            } elseif ($user?->isSuperAdmin()) {
+                $backUrl = route('admin.dashboard');
+            } elseif ($user?->role === 'admin') {
+                $backUrl = route('admin.applications.index');
+            } elseif (in_array($user?->role, ['university', 'admin_univ'])) {
+                $backUrl = route('university.dashboard');
             } else {
                 $backUrl = route('public.projects.index');
             }

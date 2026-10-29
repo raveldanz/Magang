@@ -444,8 +444,8 @@
                                 <th class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap">
                                     <input type="checkbox" x-model="selectAll" @change="toggleAll" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                 </th>
-                                <th class="py-3.5 pl-3 pr-3 text-left">Mahasiswa &amp; Perguruan Tinggi</th>
-                                <th class="py-3.5 px-3 text-left">Bidang</th>
+                                <th class="py-3.5 pl-3 pr-3 text-left">Pemohon / Tim</th>
+                                <th class="py-3.5 px-3 text-left">Bidang &amp; Mentor</th>
                                 <th class="py-3.5 px-3 text-left whitespace-nowrap">Tanggal Pengajuan</th>
                                 <th class="py-3.5 px-3 text-center whitespace-nowrap">Status</th>
                                 <th class="py-3.5 px-6 text-center whitespace-nowrap">Aksi</th>
@@ -476,65 +476,69 @@
                                 <tbody class="text-sm divide-y divide-slate-100 border-b border-slate-200/80" 
                                        x-data="{ expanded: false }">
                                     <tr class="hover:bg-indigo-50/30 transition-colors duration-150" :class="selected.includes('{{ $app->id }}') ? 'bg-indigo-50/50' : 'bg-slate-50/20'">
-                                        <td class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap align-top pt-4">
+                                        <td class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap align-middle">
                                             @if($groupPendingOrWaiting)
                                                 <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                             @endif
                                         </td>
-                                        <td class="py-3.5 pl-3 pr-3">
-                                            <div class="flex items-start gap-3">
-                                                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <td class="py-3.5 pl-3 pr-3 align-middle">
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-2xs cursor-help" title="Jalur Kelompok #{{ $app->group->code }}">
+                                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                                     </svg>
                                                 </div>
-                                                <div class="min-w-0 max-w-[220px] sm:max-w-[260px]">
-                                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200 uppercase tracking-wider">
-                                                            Jalur Kelompok
-                                                        </span>
-                                                        <span class="font-mono text-[11px] font-bold text-slate-500">#{{ $app->group->code }}</span>
-                                                    </div>
-                                                    <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-indigo-600 transition leading-tight truncate block mt-1" title="{{ $app->group->name }}">
-                                                        {{ $app->group->name }}
-                                                    </a>
-                                                    <div class="text-[11px] text-slate-600 mt-0.5 leading-tight truncate font-normal">
-                                                        Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}
-                                                    </div>
-                                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate font-medium text-slate-700">
-                                                        {{ $app->user?->studentProfile?->universitas ?? '-' }}
+                                                <div class="min-w-0 max-w-[240px] sm:max-w-[280px]">
+                                                    <!-- Baris 1: Nama Tim + Pill Button [👥 X Anggota ⌄] -->
+                                                    <div class="flex items-center gap-1.5 min-w-0">
+                                                        <a href="{{ route('admin.applications.show', $app->id) }}" 
+                                                           class="font-bold text-slate-900 text-xs sm:text-sm hover:text-indigo-600 transition leading-tight truncate" 
+                                                           title="{{ $app->group->name }}">
+                                                            {{ $app->group->name }}
+                                                        </a>
+                                                        <button type="button" 
+                                                                @click="expanded = !expanded" 
+                                                                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/90 transition cursor-pointer shrink-0"
+                                                                :class="expanded ? 'bg-indigo-100 ring-1 ring-indigo-300' : ''"
+                                                                :title="expanded ? 'Tutup daftar anggota' : 'Buka daftar anggota'">
+                                                            <svg class="w-3 h-3 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                            </svg>
+                                                            <span>{{ $groupMemberCount }} Anggota</span>
+                                                            <svg class="w-3 h-3 transition-transform duration-200 shrink-0" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </button>
                                                     </div>
 
-                                                    <!-- Tombol Buka / Tutup Daftar Mahasiswa -->
-                                                    <button type="button" 
-                                                            @click="expanded = !expanded" 
-                                                            class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition cursor-pointer">
-                                                        <span x-text="expanded ? 'Tutup Daftar Anggota' : 'Buka Daftar ' + {{ $groupMemberCount }} + ' Anggota'"></span>
-                                                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                                        </svg>
-                                                    </button>
+                                                    <!-- Baris 2: Ketua: [Nama Ketua] • [Nama Universitas] -->
+                                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate font-normal" 
+                                                         title="Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }} • {{ $app->user?->studentProfile?->universitas ?? '-' }}">
+                                                        <span class="text-slate-600">Ketua: <span class="font-medium text-slate-700">{{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</span></span>
+                                                        <span class="text-slate-300 mx-1">•</span>
+                                                        <span class="text-slate-500">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-3 align-top pt-4">
-                                            <div class="space-y-1 max-w-[200px] sm:max-w-[240px]">
-                                                <div class="font-bold text-slate-900 text-xs leading-snug truncate" title="{{ $app->unit->name ?? '-' }}">
+                                        <td class="py-3.5 px-3 align-middle">
+                                            <div class="space-y-0.5 max-w-[200px] sm:max-w-[240px]">
+                                                <div class="font-bold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="{{ $app->unit->name ?? '-' }}">
                                                     {{ $app->unit->name ?? '-' }}
                                                 </div>
-                                                <div class="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50/80 border border-indigo-100 rounded-md text-[11px] text-indigo-700 font-semibold">
-                                                    <svg class="w-3 h-3 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                                                    <span>{{ $groupMemberCount }} Anggota Terdaftar</span>
-                                                </div>
                                                 @if($app->placement?->mentor)
-                                                    <div class="text-[11px] text-slate-600 flex items-center gap-1">
+                                                    <div class="text-[11px] text-slate-600 leading-tight truncate flex items-center gap-1" title="Mentor: {{ $app->placement->mentor->name }}">
                                                         <span class="text-slate-400 font-medium">Mentor:</span>
-                                                        <span class="text-slate-800 font-semibold truncate max-w-[160px]">{{ $app->placement->mentor->name }}</span>
+                                                        <span class="text-slate-800 font-semibold truncate">{{ $app->placement->mentor->name }}</span>
+                                                    </div>
+                                                @else
+                                                    <div class="text-[11px] text-amber-600 font-semibold italic leading-tight truncate">
+                                                        Mentor belum ditetapkan
                                                     </div>
                                                 @endif
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-3 whitespace-nowrap align-top pt-4">
+                                        <td class="py-3.5 px-3 whitespace-nowrap align-middle">
                                             <div class="text-xs font-semibold text-slate-800">
                                                 {{ $app->group->created_at ? $app->group->created_at->translatedFormat('d M Y') : $app->created_at->translatedFormat('d M Y') }}
                                             </div>
@@ -542,19 +546,24 @@
                                                 {{ $app->group->created_at ? $app->group->created_at->format('H:i') : $app->created_at->format('H:i') }} WIB
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-3 whitespace-nowrap text-center align-top pt-4">
+                                        <td class="py-3.5 px-3 whitespace-nowrap text-center align-middle">
+                                            @php
+                                                $groupTooltip = null;
+                                                if ($app->isPastEndDate()) {
+                                                    $groupTooltip = 'Lewat masa magang ' . $app->daysPastEndDate() . ' hari';
+                                                } elseif (! $isUniformGroupStatus) {
+                                                    $groupTooltip = 'Status Anggota Beragam';
+                                                } elseif ($rawStatus === 'rejected' && $app->rejection_note) {
+                                                    $groupTooltip = 'Alasan: ' . $app->rejection_note;
+                                                }
+                                            @endphp
                                             <x-status-badge :status="$app->group->status ?? $app->status"
-                                                :tooltip="$rawStatus === 'rejected' && $app->rejection_note ? 'Alasan: ' . $app->rejection_note : null" />
-                                            @if(! $isUniformGroupStatus)
-                                                <div class="mt-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 inline-block">
-                                                    Status Anggota Beragam
-                                                </div>
-                                            @endif
+                                                :tooltip="$groupTooltip" />
                                         </td>
-                                        <td class="py-3.5 px-6 text-center whitespace-nowrap align-top pt-4">
+                                        <td class="py-3.5 px-6 text-center whitespace-nowrap align-middle">
                                             <div class="flex items-center justify-center">
                                                 <a href="{{ route('admin.applications.show', $app->id) }}" 
-                                                    class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
+                                                    class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
                                                     <span>Detail</span>
                                                     <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -645,46 +654,48 @@
                                 <!-- Jalur Individu Standar -->
                                 <tbody class="text-sm divide-y divide-slate-100 border-b border-slate-100">
                                     <tr class="hover:bg-slate-50/80 transition-colors duration-150" :class="selected.includes('{{ $app->id }}') ? 'bg-blue-50/40' : ''">
-                                        <td class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap">
+                                        <td class="py-3.5 pl-8 sm:pl-10 pr-3 w-12 text-center whitespace-nowrap align-middle">
                                             @if(in_array($rawStatus, ['pending', 'waiting_approval']))
                                                 <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                             @endif
                                         </td>
-                                        <td class="py-3.5 pl-3 pr-3">
+                                        <td class="py-3.5 pl-3 pr-3 align-middle">
                                             <div class="flex items-center gap-2.5">
                                                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/70 text-blue-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
                                                     {{ strtoupper(substr($app->user?->name ?? 'M', 0, 1)) }}
                                                 </div>
-                                                <div class="min-w-0 max-w-[200px] sm:max-w-[240px]">
+                                                <div class="min-w-0 max-w-[240px] sm:max-w-[280px]">
                                                     <a href="{{ route('admin.applications.show', $app->id) }}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-blue-600 transition leading-tight truncate block" title="{{ $app->user?->name ?? 'Mahasiswa' }}">
                                                         {{ $app->user?->name ?? 'Mahasiswa' }}
                                                     </a>
-                                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate" title="{{ $app->user?->studentProfile?->universitas ?? '-' }}{{ $app->user?->studentProfile?->jurusan ? ' · ' . $app->user?->studentProfile?->jurusan : '' }}">
+                                                    <div class="text-[11px] text-slate-500 mt-0.5 leading-tight truncate" title="{{ $app->user?->studentProfile?->universitas ?? '-' }}{{ $app->user?->studentProfile?->jurusan ? ' • ' . $app->user?->studentProfile?->jurusan : '' }}">
                                                         <span class="font-medium text-slate-700">{{ $app->user?->studentProfile?->universitas ?? '-' }}</span>
                                                         @if($app->user?->studentProfile?->jurusan)
-                                                            <span class="text-slate-300">·</span>
+                                                            <span class="text-slate-300 mx-1">•</span>
                                                             <span class="text-slate-500">{{ $app->user?->studentProfile?->jurusan }}</span>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-3">
-                                            <div class="space-y-1 max-w-[200px] sm:max-w-[240px]">
-                                                <div class="font-bold text-slate-900 text-xs leading-snug truncate" title="{{ $app->unit->name ?? '-' }}">
+                                        <td class="py-3.5 px-3 align-middle">
+                                            <div class="space-y-0.5 max-w-[200px] sm:max-w-[240px]">
+                                                <div class="font-bold text-slate-900 text-xs sm:text-sm leading-tight truncate" title="{{ $app->unit->name ?? '-' }}">
                                                     {{ $app->unit->name ?? '-' }}
                                                 </div>
                                                 @if($app->placement?->mentor)
-                                                    <div class="text-[11px] text-slate-600 flex items-center gap-1">
+                                                    <div class="text-[11px] text-slate-600 leading-tight truncate flex items-center gap-1" title="Mentor: {{ $app->placement->mentor->name }}">
                                                         <span class="text-slate-400 font-medium">Mentor:</span>
-                                                        <span class="text-slate-800 font-semibold truncate max-w-[160px]">{{ $app->placement->mentor->name }}</span>
+                                                        <span class="text-slate-800 font-semibold truncate">{{ $app->placement->mentor->name }}</span>
                                                     </div>
-                                                @elseif($rawStatus === 'accepted' || $rawStatus === 'active')
-                                                    <span class="text-[11px] text-amber-600 font-semibold italic">Mentor belum ditetapkan</span>
+                                                @else
+                                                    <div class="text-[11px] text-amber-600 font-semibold italic leading-tight truncate">
+                                                        Mentor belum ditetapkan
+                                                    </div>
                                                 @endif
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-3 whitespace-nowrap">
+                                        <td class="py-3.5 px-3 whitespace-nowrap align-middle">
                                             <div class="text-xs font-semibold text-slate-800">
                                                 {{ $app->created_at->translatedFormat('d M Y') }}
                                             </div>
@@ -692,34 +703,28 @@
                                                 {{ $app->created_at->format('H:i') }} WIB
                                             </div>
                                         </td>
-                                        <td class="py-3.5 px-3 whitespace-nowrap text-center">
+                                        <td class="py-3.5 px-3 whitespace-nowrap text-center align-middle">
+                                            @php
+                                                $appTooltip = null;
+                                                if ($app->isPastEndDate()) {
+                                                    $appTooltip = 'Lewat masa magang ' . $app->daysPastEndDate() . ' hari';
+                                                } elseif ($rawStatus === 'rejected' && $app->rejection_note) {
+                                                    $appTooltip = 'Alasan: ' . $app->rejection_note;
+                                                }
+                                            @endphp
                                             <x-status-badge :status="$app->status"
-                                                :tooltip="$rawStatus === 'rejected' && $app->rejection_note ? 'Alasan: ' . $app->rejection_note : null" />
-                                            @if($app->isPastEndDate())
-                                                <div class="mt-1.5 inline-flex px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold" title="Tanggal selesai {{ \Carbon\Carbon::parse($app->end_date)->translatedFormat('d M Y') }}">Lewat masa magang {{ $app->daysPastEndDate() }} hari</div>
-                                            @endif
-                                            @if($isActive && $isReadyToComplete)
-                                                <div class="mt-1 text-[11px] text-emerald-600 font-medium">Siap diluluskan</div>
-                                            @elseif($isActive && $app->isPastEndDate() && !$isReadyToComplete)
-                                                <div class="mt-1 text-[11px] font-semibold text-rose-600">Menunggu Evaluasi Mentor/Kelulusan</div>
-                                            @elseif($actionHint && $actionHint !== 'Siap diluluskan')
-                                                <div class="mt-1 text-[11px] font-semibold text-amber-700">{{ $actionHint }}</div>
-                                            @elseif($waitingLogbook)
-                                                <div class="mt-1 text-[11px] font-semibold text-rose-600">Logbook belum diisi</div>
-                                            @elseif($waitingEvaluation)
-                                                <div class="mt-1 text-[11px] text-slate-500">Menunggu nilai evaluasi</div>
-                                            @elseif($rawStatus === \App\Enums\ApplicationStatus::ACCEPTED->value)
-                                                <div class="mt-1 text-[11px] text-indigo-600 font-medium">Pra-Magang</div>
-                                            @endif
+                                                :tooltip="$appTooltip" />
                                         </td>
-                                        <td class="py-3.5 px-6 text-center whitespace-nowrap">
-                                            <a href="{{ route('admin.applications.show', $app->id) }}" 
-                                                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
-                                                <span>Detail</span>
-                                                <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </a>
+                                        <td class="py-3.5 px-6 text-center whitespace-nowrap align-middle">
+                                            <div class="flex items-center justify-center">
+                                                <a href="{{ route('admin.applications.show', $app->id) }}" 
+                                                    class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl border border-blue-200/80 transition duration-150 shadow-2xs cursor-pointer group">
+                                                    <span>Detail</span>
+                                                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                    </svg>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>

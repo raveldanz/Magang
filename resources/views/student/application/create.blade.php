@@ -534,7 +534,7 @@
                                         Dinas Perpustakaan dan Kearsipan Kota Surabaya
                                     </h4>
                                     <p class="text-[11px] text-slate-500 truncate mt-0.5">
-                                        Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293
+                                        Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275
                                     </p>
                                 </div>
                             </div>

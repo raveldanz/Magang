@@ -27,11 +27,11 @@ async function run() {
         await guestPage.goto('http://127.0.0.1:8000/', { waitUntil: 'networkidle' });
         
         // Assertions for Guest
-        const rungkutText = await guestPage.locator('text=Jl. Rungkut Asri Tengah No. 5-7, Surabaya').first();
-        if (await rungkutText.isVisible()) {
-            console.log('PASS: Rungkut Asri address is visible on Welcome page.');
+        const siolaText = await guestPage.locator('text=Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya').first();
+        if (await siolaText.isVisible()) {
+            console.log('PASS: Siola address is visible on Welcome page.');
         } else {
-            console.error('FAIL: Rungkut Asri address not found!');
+            console.error('FAIL: Siola address not found!');
         }
 
         const proyekDinasNav = await guestPage.locator('header a:has-text("Proyek Dinas")').first();

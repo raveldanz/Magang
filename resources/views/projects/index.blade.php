@@ -139,76 +139,12 @@
                     </div>
                 </div>
             @else
-                <div class="space-y-16 sm:space-y-20">
+                <div class="space-y-10 sm:space-y-12">
                     @foreach($groupedProjects as $yr => $projectList)
                         @if(!$loop->first)
-                            {{-- Pembatas Ornamen Transisi Tahun Khas Dinas (Gaya Ornamen No. 2 Vektor HD Proporsional) --}}
-                            <div class="pt-8 sm:pt-12 pb-2 flex items-center justify-center w-full">
-                                <div class="w-full flex items-center justify-center">
-                                    <!-- Garis Aksen Kiri Menghubungkan Sisi Luar -->
-                                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-blue-300/80"></div>
-
-                                    <!-- Ornamen Pembatas Nomor 2 Vektor HD Khas Dinas -->
-                                    <div class="shrink-0 px-2 sm:px-5 flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-130 -18 260 36" class="w-56 sm:w-72 md:w-80 h-auto select-none pointer-events-none drop-shadow-2xs" fill="none">
-                                            <defs>
-                                                <!-- Kelopak Pusat Berbentuk Tetesan Ramping -->
-                                                <path id="hd-cp" d="M 0,-1 C -2.2,-3.5 -4.5,-7.5 -3.5,-11 C -2.5,-14 2.5,-14 3.5,-11 C 4.5,-7.5 2.2,-3.5 0,-1 Z" fill="#1d4ed8" />
-                                                
-                                                <!-- Kelopak Samping Anggun -->
-                                                <path id="hd-sp" d="M -1,0 C -3,-1.5 -6,-3 -8.5,-2.5 C -11,-1.5 -11,1.5 -8.5,2.5 C -6,3 -3,1.5 -1,0 Z" fill="#1d4ed8" />
-
-                                                <!-- Gradien Ujung Tombak -->
-                                                <linearGradient id="hd-spear-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                    <stop offset="0%" stop-color="#0284c7" stop-opacity="1" />
-                                                    <stop offset="60%" stop-color="#0284c7" stop-opacity="0.9" />
-                                                    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.8" />
-                                                </linearGradient>
-
-                                                <!-- Sayap Ornamen (Lengkungan, Titik, 3 Kelopak, Tombak Meruncing) -->
-                                                <g id="hd-wing">
-                                                    <!-- Lengkungan Flourish Atas -->
-                                                    <path d="M 12,-2.5 Q 26,-5.5 38,-13.5 Q 28,-7.5 18,-3.5 Z" fill="#0284c7" />
-                                                    <!-- Lengkungan Flourish Bawah -->
-                                                    <path d="M 12,2.5 Q 26,5.5 38,13.5 Q 28,7.5 18,3.5 Z" fill="#0284c7" />
-                                                    
-                                                    <!-- Titik Aksen -->
-                                                    <circle cx="30" cy="0" r="2.2" fill="#0284c7" />
-
-                                                    <!-- 3 Kelopak Samping (Menghadap Keluar) -->
-                                                    <use href="#hd-sp" transform="translate(48, 0) scale(-1, 1)" />
-                                                    <use href="#hd-sp" transform="translate(45, 0) scale(-1, 1) rotate(40)" />
-                                                    <use href="#hd-sp" transform="translate(45, 0) scale(-1, 1) rotate(-40)" />
-
-                                                    <!-- Garis Tombak Meruncing -->
-                                                    <polygon points="53,-1.75 53,1.75 126,0.3 126,-0.3" fill="url(#hd-spear-grad)" />
-                                                </g>
-                                            </defs>
-
-                                            <!-- Sayap Kiri (Mirror) -->
-                                            <use href="#hd-wing" transform="scale(-1, 1)" />
-
-                                            <!-- Sayap Kanan -->
-                                            <use href="#hd-wing" />
-
-                                            <!-- Bunga Pusat (6 Kelopak Simetris) -->
-                                            <g>
-                                                <use href="#hd-cp" transform="rotate(25)" />
-                                                <use href="#hd-cp" transform="rotate(335)" />
-                                                <use href="#hd-cp" transform="rotate(90)" />
-                                                <use href="#hd-cp" transform="rotate(270)" />
-                                                <use href="#hd-cp" transform="rotate(155)" />
-                                                <use href="#hd-cp" transform="rotate(205)" />
-
-                                                <!-- Titik Poros Tengah -->
-                                                <circle cx="0" cy="0" r="2.6" fill="#0284c7" />
-                                            </g>
-                                        </svg>
-                                    </div>
-
-                                    <!-- Garis Aksen Kanan Menghubungkan Sisi Luar -->
-                                    <div class="flex-1 h-px bg-gradient-to-l from-transparent via-slate-200 to-blue-300/80"></div>
-                                </div>
+                            {{-- Pembatas Gelombang Elegan Kustom Transisi Antar-Tahun --}}
+                            <div class="py-2 sm:py-3 w-full">
+                                <x-section-divider />
                             </div>
                         @endif
 
@@ -287,7 +223,7 @@
                                             {{-- Menu Opsi 3-Titik Khusus Admin & Supervisor --}}
                                             @auth
                                                 @if(Auth::user()->isSuperAdmin() || in_array(Auth::user()->role, ['super_admin', 'superadmin', 'supervisor']))
-                                                    <div x-data="{ menuOpen: false }" class="absolute top-3 right-3 z-20" @click.outside="menuOpen = false">
+                                                    <div x-data="{ menuOpen: false, copied: false }" class="absolute top-3 right-3 z-20" @click.outside="menuOpen = false">
                                                         <button @click.prevent.stop="menuOpen = !menuOpen" 
                                                                 type="button" 
                                                                 class="w-7 h-7 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-white flex items-center justify-center transition backdrop-blur-xs cursor-pointer shadow-sm"
@@ -320,10 +256,10 @@
 
                                                             {{-- 2. Salin Tautan --}}
                                                             <button type="button" 
-                                                                    @click.prevent.stop="navigator.clipboard.writeText('{{ route('projects.show', $project->id) }}'); menuOpen = false; alert('Tautan proyek berhasil disalin!')" 
+                                                                    @click.prevent.stop="navigator.clipboard.writeText('{{ route('projects.show', $project->id) }}'); copied = true; setTimeout(() => { copied = false; menuOpen = false; }, 1800);" 
                                                                     class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-semibold cursor-pointer">
                                                                 <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                                                <span>Salin Tautan</span>
+                                                                <span x-text="copied ? 'Tautan Tersalin! ✓' : 'Salin Tautan'">Salin Tautan</span>
                                                             </button>
 
                                                             @if(Auth::user()->isSuperAdmin() || in_array(Auth::user()->role, ['super_admin', 'superadmin']))
