@@ -44,7 +44,13 @@ class HermesSession {
 
         const res = await fetch(fullUrl, { ...options, headers, redirect: 'manual' });
         this.parseCookies(res);
-        return res;
+        const bodyText = await res.text();
+        return {
+            status: res.status,
+            headers: res.headers,
+            text: async () => bodyText,
+            bodyText
+        };
     }
 
     async getWithRedirects(url, maxRedirects = 5) {
@@ -117,6 +123,7 @@ async function runFullHermesTest() {
     try {
         const t0 = performance.now();
         const home = await fetch(`${BASE_URL}/`);
+        await home.text();
         const ms = Math.round(performance.now() - t0);
         record('Public', 'Landing Page (/)' , home.status === 200 ? 'PASS' : 'FAIL', `${ms}ms`);
     } catch (e) {
@@ -126,6 +133,7 @@ async function runFullHermesTest() {
     try {
         const t0 = performance.now();
         const loginPg = await fetch(`${BASE_URL}/login`);
+        await loginPg.text();
         const ms = Math.round(performance.now() - t0);
         record('Public', 'Auth Login Page (/login)', loginPg.status === 200 ? 'PASS' : 'FAIL', `${ms}ms`);
     } catch (e) {
@@ -134,6 +142,7 @@ async function runFullHermesTest() {
 
     try {
         const regPg = await fetch(`${BASE_URL}/register`);
+        await regPg.text();
         record('Public', 'Registration Page (/register)', regPg.status === 200 ? 'PASS' : 'FAIL');
     } catch (e) {
         record('Public', 'Registration Page (/register)', 'FAIL', e.message);
@@ -399,10 +408,12 @@ async function runFullHermesTest() {
         const vTokenMatch = vLetterPage.html.match(/\/verify-letter\/([a-zA-Z0-9_-]+)/);
         const letterToken = vTokenMatch ? vTokenMatch[1] : '8jWF5lkveqJNb97rfKgcrBjibOB2HDno';
         const vLetter = await fetch(`${BASE_URL}/verify-letter/${letterToken}`);
+        await vLetter.text();
         record('Security & Public', 'Verifikasi QR Code Surat Balasan (Anti-IDOR)', vLetter.status === 200 ? 'PASS' : 'FAIL', `/verify-letter/${letterToken}`);
 
         // Public QR Verification for Certificate & Transcript
         const vCert = await fetch(`${BASE_URL}/verify-certificate/${certHash}`);
+        await vCert.text();
         record('Security & Public', 'Verifikasi QR Code E-Sertifikat & Nilai (Anti-IDOR)', vCert.status === 200 ? 'PASS' : 'FAIL', `/verify-certificate/${certHash}`);
 
         // Multi-role Centralized File Download for Final Report

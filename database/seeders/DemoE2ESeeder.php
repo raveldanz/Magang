@@ -72,8 +72,8 @@ class DemoE2ESeeder extends Seeder
             [
                 'government_name' => 'Pemerintah Kota Surabaya',
                 'acronym' => 'Dispusip',
-                'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293',
-                'phone' => '(031) 8704207',
+                'address' => 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275',
+                'phone' => '(031) 8707329',
                 'email' => 'dispusip@surabaya.go.id',
                 'website' => 'https://dispusip.surabaya.go.id',
                 'logo' => 'images/logos/dispusip.png',
@@ -161,24 +161,11 @@ class DemoE2ESeeder extends Seeder
             ]
         );
 
-        // [ROLE 3] SUPERVISOR / ATASAN DISPUSIP (TIM KERJA UMUM & KEPEGAWAIAN) — DOUBLE ACC
+        // [ROLE 3] SUPERVISOR DISPUSIP (BAMBANG SUPRIYADI, S.SOS., M.AP) — DOUBLE ACC
         $supervisorDispusip = User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
                 'name' => 'Bambang Supriyadi, S.Sos., M.AP',
-                'password' => $defaultPassword,
-                'role' => 'supervisor',
-                'agency_profile_id' => $dispusip->id,
-                'unit_id' => $unitSekretariat->id,
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'atasan.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Tim Kerja Umum dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,

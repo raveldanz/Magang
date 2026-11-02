@@ -221,4 +221,144 @@ class LecturerFeaturesUpdateTest extends TestCase
         $this->assertEquals('Logbook diverifikasi dan disetujui oleh DPL.', $data['logbook1']->fresh()->lecturer_feedback);
         $this->assertNotNull($data['logbook1']->fresh()->lecturer_verified_at);
     }
+
+    public function test_lecturer_can_one_click_approve_mentor_reviewed_logbooks_for_placement()
+    {
+        $data = $this->createLecturerScenario();
+
+        // Buat logbook kedua yang juga sudah di-ACC mentor tapi pending di DPL
+        $logbook2 = Logbook::create([
+            'placement_id' => $data['placement1']->id,
+            'date' => now()->subDay()->toDateString(),
+            'activity' => 'Deployment aplikasi ke server staging',
+            'status' => 'approved',
+            'lecturer_status' => 'pending',
+        ]);
+
+        // Buat logbook ketiga yang belum di-ACC mentor (status masih pending)
+        $logbook3 = Logbook::create([
+            'placement_id' => $data['placement1']->id,
+            'date' => now()->toDateString(),
+            'activity' => 'Menulis dokumentasi teknis API',
+            'status' => 'pending',
+            'lecturer_status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($data['lecturer'])->post(
+            route('lecturer.students.logbooks.approve_mentor_reviewed', $data['placement1']->id)
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        // Logbook 1 dan 2 (yang sudah di-ACC mentor) harus ter-ACC oleh DPL
+        $this->assertEquals('approved', $data['logbook1']->fresh()->lecturer_status);
+        $this->assertEquals('approved', $logbook2->fresh()->lecturer_status);
+        $this->assertNotNull($data['logbook1']->fresh()->lecturer_verified_at);
+
+        // Logbook 3 (yang belum di-ACC mentor) harus tetap pending
+        $this->assertEquals('pending', $logbook3->fresh()->lecturer_status);
+    }
+
+    public function test_lecturer_can_one_click_approve_all_mentor_reviewed_logbooks_globally()
+    {
+        $data = $this->createLecturerScenario();
+
+        $response = $this->actingAs($data['lecturer'])->post(
+            route('lecturer.logbooks.approve_all_mentor_reviewed')
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertEquals('approved', $data['logbook1']->fresh()->lecturer_status);
+    }
+
+    public function test_student_detail_renders_adaptive_stepper_for_default_mentor_only_scheme()
+    {
+        $data = $this->createLecturerScenario();
+
+        // Update universitas mahasiswa ke skema default 100% mentor dinas
+        $univ = University::find($data['student1']->university_id ?? $data['lecturer']->university_id);
+        $univ->update([
+            'evaluation_scheme' => 'mentor_only',
+            'weight_mentor' => 100,
+            'weight_lecturer' => 0,
+        ]);
+
+        $response = $this->actingAs($data['lecturer'])->get(
+            route('lecturer.students.show', $data['placement1']->id)
+        );
+
+        $response->assertOk()
+            ->assertSeeText('3 Syarat')
+            ->assertDontSeeText('4 Syarat')
+            ->assertSeeText('100% Mentor Dinas')
+            ->assertSeeText('ACC Semua yang Di-ACC Mentor (1)');
+    }
+
+    public function test_lecturer_dashboard_displays_refined_action_center_and_balanced_cards()
+    {
+        $data = $this->createLecturerScenario();
+
+        // Update naskah laporan menjadi pending agar Action Center muncul
+        $data['placement1']->finalreport->update([
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($data['lecturer'])->get(route('lecturer.dashboard'));
+
+        $response->assertOk()
+            ->assertSeeText('Perlu Tindakan Dosen')
+            ->assertSeeText('Review Laporan')
+            ->assertSeeText('Semua evaluasi tuntas')
+            ->assertDontSeeText('bg-rose-600');
+    }
+
+    public function test_lecturer_can_filter_logbooks_by_mentor_approved_status()
+    {
+        $data = $this->createLecturerScenario();
+
+        // Logbook 1: status=approved (mentor), lecturer_status=pending (dpl) -> harus muncul
+        // Buat logbook 2: status=pending, lecturer_status=pending -> tidak boleh muncul di filter mentor_approved
+        \App\Models\Logbook::create([
+            'placement_id' => $data['placement1']->id,
+            'date' => now()->subDays(2)->toDateString(),
+            'activity' => 'Aktivitas yang belum di-ACC mentor dinas',
+            'status' => 'pending',
+            'lecturer_status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($data['lecturer'])->get(
+            route('lecturer.logbooks.index', ['status' => 'mentor_approved'])
+        );
+
+        $response->assertOk()
+            ->assertSeeText('Melakukan testing REST API layanan e-Gov')
+            ->assertDontSeeText('Aktivitas yang belum di-ACC mentor dinas');
+    }
+
+    public function test_lecturer_monitoring_displays_student_activity_status()
+    {
+        $data = $this->createLecturerScenario();
+
+        $response = $this->actingAs($data['lecturer'])->get(route('lecturer.monitoring.index'));
+
+        $response->assertOk()
+            ->assertSeeText('2 hari lalu');
+
+        // Buat logbook hari ini
+        \App\Models\Logbook::create([
+            'placement_id' => $data['placement1']->id,
+            'date' => now()->toDateString(),
+            'activity' => 'Melakukan testing hari ini',
+            'status' => 'pending',
+            'lecturer_status' => 'pending',
+        ]);
+
+        $responseToday = $this->actingAs($data['lecturer'])->get(route('lecturer.monitoring.index'));
+        $responseToday->assertOk()
+            ->assertSeeText('Aktif hari ini');
+    }
 }
+
+

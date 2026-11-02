@@ -63,7 +63,8 @@
 
             @if($application->group_id && $application->group)
                 <!-- Panel Terintegrasi Kelompok Magang -->
-                <div class="bg-gradient-to-r from-indigo-50/90 via-blue-50/50 to-white rounded-2xl border border-indigo-200 p-5 sm:p-6 shadow-2xs space-y-3.5">
+                <div class="bg-gradient-to-r from-indigo-50/90 via-blue-50/50 to-white rounded-2xl border border-indigo-200 p-5 sm:p-6 shadow-2xs space-y-3.5"
+                     x-data="{ showGroupModal: false, groupAction: 'accepted', groupMentorId: '', groupRejectNote: '' }">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -77,11 +78,113 @@
                                 <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ $application->group->name }}</h3>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-slate-600">Peran Pemohon:</span>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            @if(in_array($application->group->status, ['pending', 'waiting_approval']) || in_array($application->statusValue(), ['pending', 'waiting_approval']))
+                                <button type="button" 
+                                        @click="showGroupModal = true"
+                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                    <span>Aksi Serentak Kelompok</span>
+                                </button>
+                            @endif
                             <span class="px-2.5 py-1 rounded-lg text-xs font-bold {{ $application->role_in_group === 'leader' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-blue-100 text-blue-900 border border-blue-200' }}">
                                 {{ $application->role_in_group === 'leader' ? '⭐ Ketua Kelompok' : 'Anggota Tim' }}
                             </span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Aksi Serentak Kelompok -->
+                    <div x-show="showGroupModal" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         @keydown.escape.window="showGroupModal = false"
+                         class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4" 
+                         x-cloak style="display: none;">
+                        <div x-show="showGroupModal"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+                             @click.outside="showGroupModal = false" 
+                             class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg p-6 sm:p-7 space-y-4 text-left">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-base font-black text-slate-900">Aksi Serentak Kelompok Magang</h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        Tindakan ini berlaku untuk seluruh {{ $application->group->applications->count() }} anggota tim <strong>{{ $application->group->name }}</strong>.
+                                    </p>
+                                </div>
+                                <button type="button" @click="showGroupModal = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+
+                            <form method="POST" action="{{ route('admin.groups.update_status', $application->group->id) }}" class="space-y-4">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" 
+                                            @click="groupAction = 'accepted'"
+                                            class="p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                            :class="groupAction === 'accepted' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 ring-2 ring-emerald-500/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'">
+                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>Terima Sekelompok</span>
+                                    </button>
+                                    <button type="button" 
+                                            @click="groupAction = 'rejected'"
+                                            class="p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                                            :class="groupAction === 'rejected' ? 'bg-rose-50 border-rose-500 text-rose-700 ring-2 ring-rose-500/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'">
+                                        <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>Tolak Sekelompok</span>
+                                    </button>
+                                </div>
+
+                                <input type="hidden" name="status" :value="groupAction">
+
+                                <div x-show="groupAction === 'accepted'" class="space-y-2">
+                                    <label class="block text-xs font-bold text-slate-700">
+                                        Tetapkan Pembimbing atau Mentor Bersama:
+                                    </label>
+                                    <select name="mentor_id" class="w-full h-10 text-xs border-slate-300 rounded-xl focus:border-indigo-500 focus:ring-indigo-500">
+                                        <option value="">-- Tetapkan Nanti atau Tetap Saat Ini --</option>
+                                        @if(isset($pembimbings))
+                                            @foreach($pembimbings as $pmb)
+                                                <option value="{{ $pmb->id }}">{{ $pmb->name }} - {{ $pmb->unit->name ?? 'Bidang Kerja' }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <p class="text-[11px] text-slate-500">Mentor yang dipilih akan otomatis ditetapkan ke seluruh anggota tim ini.</p>
+                                </div>
+
+                                <div x-show="groupAction === 'rejected'" class="space-y-2">
+                                    <label class="block text-xs font-bold text-rose-800">
+                                        Alasan Penolakan Kelompok:
+                                    </label>
+                                    <textarea name="rejection_note" x-model="groupRejectNote" rows="3" class="w-full text-xs rounded-xl border-slate-300 focus:border-rose-500 focus:ring-rose-500" placeholder="Tuliskan alasan penolakan kelompok..."></textarea>
+                                </div>
+
+                                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                    <button type="button" @click="showGroupModal = false" class="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold cursor-pointer">Batal</button>
+                                    <button type="submit" 
+                                            class="px-5 py-2 text-white text-xs font-bold rounded-xl transition cursor-pointer"
+                                            :class="groupAction === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
+                                            :disabled="groupAction === 'rejected' && !groupRejectNote.trim()">
+                                        Simpan Keputusan Kelompok
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -159,9 +262,6 @@
                     <div class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1 md:col-span-2 lg:col-span-1">
                         <span class="text-blue-600 font-semibold uppercase text-[10px] tracking-wider block">Tujuan Magang</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->unit->name ?? '-' }}</div>
-                        <div class="text-xs font-semibold text-blue-800">
-                            {{ $application->unit->agencyProfile->agency_name ?? $application->unit->agencyProfile->name ?? 'Pemerintah Kota Surabaya' }}
-                        </div>
                         <div class="text-slate-500 mt-1 font-mono text-[11px]">
                             {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} &mdash; {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}
                         </div>
@@ -385,6 +485,21 @@
                         </div>
                     @endif
 
+                    @if($application->group_id && $application->group)
+                        <div class="mb-5 p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200 flex items-start gap-3 shadow-2xs">
+                            <input type="checkbox" id="sync_group" name="sync_group" value="1" checked
+                                   class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            <div class="flex-1">
+                                <label for="sync_group" class="text-xs font-bold text-indigo-950 cursor-pointer select-none">
+                                    Terapkan keputusan ini ke seluruh anggota kelompok ({{ $application->group->name }})
+                                </label>
+                                <p class="text-[11px] text-indigo-700 mt-0.5 leading-relaxed">
+                                    Centang opsi ini agar keputusan status, surat balasan, tanggal pelaksanaan, dan penugasan mentor diterapkan ke {{ $application->group->applications->count() }} anggota tim sekaligus. <strong>Hilangkan centang</strong> jika ingin memproses mahasiswa ini secara mandiri (khusus individu).
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Interactive Status Selection Cards (Context-Aware Pipeline) -->
                     <div class="mb-6">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
@@ -434,7 +549,7 @@
                                 <!-- 3. ACCEPTED (Hanya bisa aktif setelah di-ACC oleh Atasan) -->
                                 @php
                                     $acceptButtonDisabled = $isAlreadyRejected || $isAcceptLockedForStaff;
-                                    $acceptButtonTooltip = $isAlreadyRejected ? 'Pengajuan telah ditolak' : ($isAcceptLockedForStaff ? 'Persetujuan akhir (ACC) hanya dapat disahkan oleh Atasan (Supervisor) atau Super Admin.' : '');
+                                    $acceptButtonTooltip = $isAlreadyRejected ? 'Pengajuan telah ditolak' : ($isAcceptLockedForStaff ? 'Persetujuan akhir (ACC) hanya dapat disahkan oleh Supervisor atau Super Admin.' : '');
                                 @endphp
                                 <button type="button" 
                                         @if(!$acceptButtonDisabled) @click="status = 'accepted'" @endif

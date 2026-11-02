@@ -13,7 +13,7 @@ class SurabayaAgenciesSeeder extends Seeder
 {
     /**
      * Seeder Master Data Resmi Dinas Perpustakaan dan Kearsipan (Dispusip) Kota Surabaya (Single-Agency).
-     * Terintegrasi dengan 4 Bidang resmi, akun Admin Dispusip, Atasan (Supervisor), dan Tim Kerja Pembimbing (Mentor).
+     * Terintegrasi dengan 4 Bidang resmi, akun Admin Dispusip, Supervisor, dan Tim Kerja Pembimbing (Mentor).
      */
     public function run(): void
     {
@@ -30,8 +30,8 @@ class SurabayaAgenciesSeeder extends Seeder
             'government_name' => 'Pemerintah Kota Surabaya',
             'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
             'acronym' => 'Dispusip',
-            'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293',
-            'phone' => '(031) 8707682',
+            'address' => 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Genteng, Kota Surabaya, Jawa Timur 60275',
+            'phone' => '(031) 8707329',
             'email' => 'dispusip@surabaya.go.id',
             'website' => 'https://dispusip.surabaya.go.id',
             'logo' => 'images/logos/dispusip.png',
@@ -163,24 +163,11 @@ class SurabayaAgenciesSeeder extends Seeder
             }
         }
 
-        // 5. Akun Atasan / Supervisor (Tim Kerja Umum dan Kepegawaian Dispusip) — Double ACC
-        User::updateOrCreate(
-            ['email' => 'atasan.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Bambang Supriyadi, S.Sos., M.AP',
-                'password' => $defaultPassword,
-                'role' => 'supervisor',
-                'agency_profile_id' => $dispusip->id,
-                'unit_id' => $createdUnits['Bidang Sekretariat']->id,
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-
+        // 5. Akun Supervisor Dispusip (Bambang Supriyadi, S.Sos., M.AP) — Double ACC
         User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
-                'name' => 'Tim Kerja Umum dan Kepegawaian',
+                'name' => 'Bambang Supriyadi, S.Sos., M.AP',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,

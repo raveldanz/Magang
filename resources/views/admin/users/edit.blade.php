@@ -56,6 +56,7 @@
                             <select name="role" x-model="selectedRole" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
                                 <option value="mahasiswa">Mahasiswa Pendaftar</option>
                                 <option value="admin">Admin Instansi Dinas / Superadmin</option>
+                                <option value="supervisor">Supervisor</option>
                                 <option value="mentor">Mentor Lapangan Dinas</option>
                                 <option value="dosen">Dosen Pembimbing</option>
                                 <option value="universitas">Admin Universitas</option>
@@ -75,8 +76,8 @@
                         </div>
                     </div>
 
-                    <!-- Input Instansi Dinas jika Role Admin / Mentor -->
-                    <div x-show="selectedRole === 'admin' || selectedRole === 'mentor'" x-cloak class="p-4 rounded-xl bg-blue-50/60 border border-blue-100 space-y-2">
+                    <!-- Input Instansi Dinas jika Role Admin / Mentor / Supervisor -->
+                    <div x-show="selectedRole === 'admin' || selectedRole === 'mentor' || selectedRole === 'supervisor'" x-cloak class="p-4 rounded-xl bg-blue-50/60 border border-blue-100 space-y-2">
                         <label class="block text-xs font-bold text-blue-900 uppercase tracking-wider">
                             Pilih Instansi Dinas Terkait
                         </label>

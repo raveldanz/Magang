@@ -119,6 +119,23 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-077** | 2026-10-15 | Redireksi Kontekstual Sesi Penyamaran (Impersonasi) | Sesi impersonasi kembali ke referer asal bukan hardcode users index | RESOLVED |
 | **LRN-078** | 2026-10-15 | Eliminasi Redundan Filter Instansi Dinas di Seluruh Modul Admin | Pembersihan filter instansi tunggal pada halaman admin | RESOLVED |
 | **LRN-079** | 2026-10-19 | Audit Sistem, Migrasi Pending & Integritas Rute Modular | Pemulihan rute staged monolitik ke modular, eksekusi migrasi pending PostgreSQL & pembetulan import Kernel CLI scripts | RESOLVED |
+| **LRN-090** | 2026-10-28 | Navigasi Hibrida Publik & Terautentikasi: Logo Root URL, Menu Home di Profil Dropdown/Drawer Samping, dan Akses Publik Proyek Inovasi | Pengguna login tidak bisa kembali ke SIM Magang Surabaya (/), landing page menampilkan login/daftar saat login, ketiadaan Home di dropdown samping, & akses publik proyek 403 | RESOLVED |
+| **LRN-091** | 2026-10-28 | Katalog Perjalanan Inovasi "Proyek Dinas" Tahunan, Interaksi Like & Komen Tamu/Login, Filter Sensor Kata Kotor Akurat (Anti-Scunthorpe) & Moderasi Admin | Ketiadaan histori terpusat karya inovasi dinas tahunan, fitur like, komen & share publik/tamu, pencegahan Scunthorpe false positive, dan opsi visibilitas privat data sensitif | RESOLVED |
+| **LRN-092** | 2026-10-28 | Standarisasi Role Sistem di Admin: Eliminasi Label Ganda 'Atasan (Supervisor)' & Konsolidasi Akun Tunggal | Penamaan ganda role kurung penjelas di panel admin back-office, duplikasi 2 akun supervisor di seeder, dan ketiadaan role supervisor di form create/edit admin | RESOLVED |
+| **LRN-093** | 2026-10-28 | Rekonstruksi Estetika Single Centered Card Landing Page Home & Harmonisasi Navigasi Publik/Auth | Layout 2-kolom memadati viewport, ketiadaan tombol 'Pindah ke Dashboard' untuk user login, integrasi menu Proyek Dinas & Alur Magang | RESOLVED |
+| **LRN-094** | 2026-10-28 | Nomenklatur Menu Supervisor (Pengajuan & Sertifikat), Eliminasi Dobel Konfirmasi Modal & Sinkronisasi ACC Kelompok | Simplifikasi menu 'Pengesahan Sertifikat' -> 'Sertifikat' dan 'Persetujuan Pengajuan' -> 'Pengajuan', eliminasi modal dobel konfirmasi kata kunci 'SETUJUI' menjadi 1-klik ACC, serta sinkronisasi otomatis seluruh anggota kelompok | RESOLVED |
+| **LRN-095** | 2026-10-28 | Responsive Mobile Navigation Hardening: Integrasi Burger Menu & Dropdown Drawer di Landing Page | Eliminasi tata letak header mobile yang sesak dan berantakan; isolasi link desktop (`hidden md:flex`) dan penyediaan tombol hamburger menu interaktif dengan panel dropdown drawer transisi halus di mobile | RESOLVED |
+| **LRN-096** | 2026-10-28 | Penataan Menu Header Detail Proyek 'Kelola Proyek' & Eliminasi Overflow Clipping | Tombol opsi 3-titik terpotong overflow-hidden, pemindahan tautan proyek ke menu dropdown primer 'Kelola Proyek ▾' | RESOLVED |
+| **LRN-097** | 2026-10-28 | Integritas Penyimpanan Dokumen: Resolusi Error 404 Berkas Proposal/Profil Mahasiswa & Penanganan Bug 500 PushController | Error 404 berkas fisik proposal kelompok/mahasiswa hilang di disk lokal, ketiadaan fallback graceful di DocumentController, dan BadMethodCallException 500 di PushController::validate | RESOLVED |
+| **LRN-098** | 2026-10-28 | Desain Ornamen Pembatas Transisi Tahun Katalog Proyek Berstandar Identitas Kedinasan | Border polos diubah menjadi ornamen inline SVG Ultra-HD dengan gradien royal blue & garis pembatas lateral | RESOLVED |
+| **LRN-099** | 2026-10-28 | Perbaikan Bulk Action (Eliminasi Nested Forms), Pemindahan Aksi Kelompok ke Detail, dan Streamlining Kolom Bidang | Error HTTP 404 bulk update akibat nested forms, pembersihan teks instansi redundan di kolom Bidang, unbold ketua & kampus tanpa jurusan, serta sentralisasi aksi kelompok ke halaman detail | RESOLVED |
+| **LRN-100** | 2026-10-28 | Optimasi Komponen Section Divider SVG Gelombang, Micro-Interactions, Dark Mode & Anti-Knot Symmetry | Resolusi bug koordinat simetri gelombang SVG (knot overlap), efek transisi hover halus (aura glow & gyroscopic spin), responsivitas mobile-first, dan CSS variables dark mode adaptif | RESOLVED |
+| **LRN-101** | 2026-10-29 | Pencegahan Crash Alpine.js Akibat Kutip Ganda di Atribut HTML x-data | Pemecahan 90+ baris fat inline x-data menjadi fungsi terdedikasi di tag script demi mencegah crash parser HTML & evaluasi ekspresi Alpine | RESOLVED |
+| **LRN-102** | 2026-10-29 | Audit Sistem Menyeluruh, Node.js 24 Undici Body Drain, Null-Safety Detail Proyek & Back-Link Multi-Role | Resolusi unconsumed stream pada Hermes test di Node 24, null-safety placement detail proyek, sinkronisasi otorisasi Admin & visual feedback salin tautan | RESOLVED |
+| **LRN-103** | 2026-10-29 | Audit Visual UI Antarmuka, Restorasi Alamat Rungkut Asri & Hardening Mobile Detail Proyek | Restorasi alamat Dispusip Rungkut Asri & (031) 8707682 di landing page, eliminasi rogue bullet wrapping & indikator ulasan mobile pada detail proyek | RESOLVED |
+| **LRN-104** | 2026-10-29 | Pembersihan Menu Navigasi Mobile Drawer & Standardisasi Alamat Resmi Kantor Dispusip (Gedung Siola Lt. 4) | Penghapusan teks alamat di drawer mobile menu agar bersih & pembaruan alamat resmi kantor Dispusip Surabaya ke Gedung Siola Lantai 4 & (031) 8707329 di seluruh sistem | RESOLVED |
+| **LRN-105** | 2026-10-29 | Standarisasi Tinggi Baris Tabel Pengajuan Desktop (/admin/applications), Eliminasi Visual Clutter & Accordion Pill | Menyelaraskan tinggi baris Individu & Kelompok menjadi maksimal 2 baris konsisten, pill button anggota [👥 X Anggota ⌄], eliminasi duplikasi badge & penataan murni vertikal status badge | RESOLVED |
+| **LRN-106** | 2026-10-29 | Penataan Teks Subtitle Header Mobile Dispusip Saat Menu Dibuka (Multi-Line Spacing) | Mengubah teks panjang 'Dinas Perpustakaan dan Kearsipan Kota Surabaya' di header mobile saat menu drawer dibuka agar terbagi menjadi 2 baris ('Kota Surabaya' di bawah) sehingga tidak terpotong oleh tombol close (X) | RESOLVED |
 
 ---
 
@@ -3017,25 +3034,462 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-079] Audit Menyeluruh Sistem: Penanganan Staged Monolithic Route, Migrasi Pending PostgreSQL, & Hardening Runner Testing
-- **Tanggal**: 2026-10-19
-- **Komponen**: `routes/web.php`, `database/migrations/`, `scripts/health_check.php`, `scripts/audit_verifier.php`, `scripts/tier3_playwright_audit.mjs`, `scripts/browser-runner.mjs`
+### [LRN-089] Rekayasa Hierarki Hibrida Pengajuan Magang: Representasi Baris Tunggal Kelompok dengan Akordion Anggota & Kapasitas Dinamis 20 Orang
+- **Tanggal**: 2026-10-28
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Admin/AgencyProfileController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/agency_profile/edit.blade.php`, `database/migrations/2026_10_28_130000_add_max_group_members_to_agency_profiles_table.php`
 - **Problem / Symptom**:
-  1. Berkas `routes/web.php` ter-stage dengan modifikasi yang mengganti rute modular dengan versi monolitik lama, menyebabkan 33 pengujian otomatis gagal akibat `Route [chat.start] not defined` dan hilangnya file route modular (`student.php`, `admin.php`, dll.).
-  2. Terdapat 2 migrasi tertunda (*Pending*) pada PostgreSQL: `create_academic_consultations_table` dan `add_advisor_notes_to_placements_table`.
-  3. Skrip verifikasi mandiri (`health_check.php`, `audit_verifier.php`, `dev_credentials.php`) melempar `ReflectionException: Target class [Kernel] does not exist` karena deklarasi `use Kernel;` terletak setelah instansiasi.
-  4. Pengujian visual Playwright gagal login karena menembak akun dummy `admin.qa@test.local` yang tidak terdaftar di database.
+  1. Pengajuan magang jalur kelompok sebelumnya terpecah menjadi baris-baris terpisah di tabel seleksi admin, mengacaukan paginasi serta menyulitkan pemantauan utuh satu tim kerja.
+  2. Batas maksimal anggota kelompok terkunci kaku pada angka 5 orang dan tidak dapat disesuaikan oleh Admin Dinas melalui profil instansi.
+  3. Ketiadaan kapabilitas aksi status ganda: admin membutuhkan fleksibilitas menerima atau menolak satu kelompok serentak maupun mengelola status mahasiswa anggota secara mandiri per individu.
 - **Root Cause**:
-  1. Penulisan ulang manual tanpa menyertakan modul rute modern.
-  2. Migrasi baru ditambahkan di codebase namun belum dieksekusi di database PostgreSQL lokal.
-  3. Kesalahan urutan deklarasi namespace `use` sebelum pemanggilan `$app->make(Kernel::class)` pada skrip CLI mandiri.
-  4. Kredensial hardcoded tidak selaras dengan akun admin resmi hasil seeding (`admin@surabaya.go.id`).
+  Ketiadaan pemfilteran baris induk kelompok pada query index admin, hardcoded validasi max 5 pada controller mahasiswa, ketiadaan kolom kapasitas kelompok pada tabel profil dinas, dan ketiadaan flag pemisah sinkronisasi massal pada method updateStatus.
 - **Fix Applied**:
-  1. Memulihkan `routes/web.php` ke versi modular HEAD terpisah, memvalidasi test suite hingga 281/281 test (1.914 assertions) berstatus 100% PASS (Exit Code 0).
-  2. Menjalankan `php artisan migrate` untuk mengaktifkan tabel konsultasi dan kolom catatan dosen.
-  3. Memperbaiki urutan `use` import pada seluruh skrip audit mandiri.
-  4. Mengupdate kredensial audit visual ke `admin@surabaya.go.id`, menginstal devDependencies `playwright`, dan memverifikasi pengujian visual E2E Chrome channel (100% PASS).
-- **Prevention Rule**: Selalu pastikan `routes/web.php` mempertahankan impor modular terpisah; selalu jalankan `php artisan migrate:status` sebelum pengujian; dan pastikan skrip pengujian visual selalu menggunakan kredensial master dari seeder resmi.
+  1. Menambahkan migrasi database kolom `max_group_members` integer default 20 pada tabel `agency_profiles`.
+  2. Memperbarui formulir profil dinas dengan kartu kebijakan batas anggota kelompok magang berbasis dinamis.
+  3. Menyesuaikan validasi pendaftaran dan gabung kelompok mahasiswa agar mengacu pada pengaturan dinamis profil instansi dengan batas standar 20 orang.
+  4. Merombak query seleksi admin agar membatasi pendaftaran kelompok hanya pada baris representasi kelompok, dengan eager loading relasi mahasiswa dan dokumen secara lengkap.
+  5. Mendesain ulang antarmuka desktop dan mobile seleksi admin: kelompok tampil sebagai 1 baris induk elegan dengan badge Jalur Kelompok, kode tim, ketua tim, dan tombol akordion dropdown untuk membuka daftar mahasiswa anggota di bawahnya.
+  6. Menyediakan dua kanal aksi status: kanal aksi serentak sekelompok via `admin.groups.update_status` dan kanal aksi mandiri per individu via `admin.applications.updateStatus` dengan parameter `sync_group = 0`.
+- **Prevention Rule**:
+  Terapkan pola baris representasi master dengan progressive disclosure akordion untuk entitas grup di tabel data admin. Sediakan selalu parameter flag sinkronisasi saat sebuah entitas mendukung pembaruan status massal sekaligus pembaruan status granular per individu.
+
+---
+
+### [LRN-090] Navigasi Hibrida Publik & Terautentikasi: Logo Root URL, Menu Home di Profil Dropdown/Drawer Samping, dan Akses Publik Proyek Inovasi
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `resources/views/welcome.blade.php`, `app/Http/Controllers/ProjectDetailController.php`, `routes/web.php`, `tests/Feature/InternshipProjectAndSupervisorReportTest.php`
+- **Problem / Symptom**:
+  1. Pengguna yang sudah login di dalam panel sistem tidak memiliki jalan pintas atau menu navigasi untuk kembali ke halaman utama portal publik SIM Magang Surabaya (`http://127.0.0.1:8000/`), karena logo navbar di dalam sistem selalu mengarah kembali ke dashboard internal masing-masing role.
+  2. Ketika pengguna yang sudah login membuka halaman utama portal (`/`), halaman masih menyajikan tombol "Masuk ke Akun" dan "Daftar Magang Sekarang" alih-alih opsi pindah ke dashboard.
+  3. Halaman detail proyek inovasi mahasiswa (`/projects/{id}`) terkunci di dalam middleware `auth`, sehingga tidak dapat dilihat atau dibagikan kepada publik/orang luar yang belum login.
+- **Root Cause**:
+  1. Atribut `href` logo pada `navigation.blade.php` mengarah ke `$dashboardRoute` dinamis, bukan ke URL beranda portal `url('/')`.
+  2. Dropdown profil pengguna di pojok kanan atas serta laci menu navigasi samping mobile belum memuat item menu "Home".
+  3. Header dan hero CTA di `welcome.blade.php` belum sepenuhnya responsif terhadap state `@auth` dengan tombol eksplisit "Pindah ke Dashboard".
+  4. Rute `/projects/{id}` berada di dalam grup `Route::middleware(['auth'])` dan `ProjectDetailController` memanggil properti `$user->role` tanpa perlindungan null-safety jika `$user` bernilai null (tamu).
+- **Fix Applied**:
+  1. Mengarahkan tautan logo navbar Pemkot Surabaya & Dispusip di `navigation.blade.php` ke `url('/')` (`http://127.0.0.1:8000/`).
+  2. Menambahkan menu item **"Home"** di urutan teratas dropdown profil pengguna pojok kanan atas (di atas Dashboard) dan pada drawer navigasi mobile.
+  3. Memperbarui `welcome.blade.php`:
+     - Pada status `@auth`: Tombol header dan hero section secara dinamis menampilkan *"Pindah ke Dashboard"* dengan ikon panah SVG, dan tombol login/register disembunyikan total.
+     - Pada status `@guest`: Tombol *"Masuk"* dan *"Daftar"* ditampilkan dengan rapi di header dan hero section.
+  4. Memindahkan rute `projects.show` ke rute publik di `routes/web.php` dan memperbarui `ProjectDetailController` dengan safe navigation `$user?->role` serta fallback tautan kembali ke `url('/')`.
+  5. Menambahkan fallback guest yang aman pada navbar `<x-app-layout>` sehingga tamu yang mengakses detail proyek disajikan navigasi publik yang bersih tanpa runtime exception `roleLabel() on null`.
+  6. Menambahkan automated feature test (80 assertions passing, Exit Code 0) dan verifikasi visual multimodal vision Playwright (Exit Code 0).
+- **Prevention Rule**:
+  Tautan logo instansi utama pada navbar aplikasi wajib selalu mengarah ke halaman beranda publik portal (`url('/')`) untuk memudahkan orientasi navigasi bolak-balik antara portal publik dan dashboard internal. Sediakan selalu menu "Home" pada dropdown profil pengguna. Halaman publik landing page wajib mendeteksi status `@auth` untuk mengganti CTA login/daftar menjadi navigasi langsung ke dashboard.
+
+---
+
+### [LRN-091] Katalog Perjalanan Inovasi "Proyek Dinas" Tahunan, Interaksi Like & Komen Tamu/Login, Filter Sensor Kata Kotor Akurat (Anti-Scunthorpe) & Moderasi Admin
+- **Tanggal**: 2026-10-28
+- **Komponen**: `app/Http/Controllers/PublicProjectController.php`, `app/Http/Controllers/ProjectInteractionController.php`, `app/Services/ContentModeration/ProfanityFilterService.php`, `app/Models/InternshipProject.php`, `app/Models/ProjectComment.php`, `resources/views/projects/index.blade.php`, `resources/views/projects/show.blade.php`, `database/migrations/2026_10_28_150000_create_project_interactions_and_comments_table.php`, `tests/Feature/ProjectInteractionsAndCatalogTest.php`
+- **Problem / Symptom**:
+  1. Ketiadaan katalog histori terpusat karya inovasi dinas yang dapat diakses publik tanpa login untuk melihat jejak inovasi mahasiswa dari tahun ke tahun.
+  2. Ketiadaan opsi visibilitas privasi karya: seluruh proyek sebelumnya dianggap publik tanpa proteksi untuk karya yang memuat arsip internal atau data sensitif kedinasan.
+  3. Ketiadaan fitur interaksi modern (Like pada proyek dan komentar, Ulasan Komentar masyarakat, dan Share ke media sosial).
+  4. Tantangan filter sensor kata kotor: jika menggunakan pencarian substring mentah, terjadi *Scunthorpe Problem* di mana kata-kata umum dan kedinasan yang aman (misalnya: "pantai", "partai", "asuransi", "menghimpun", "surabaya", "pembimbing") terblokir salah (*false positive*).
+  5. Pengunjung non-login (tamu) tidak dapat memberikan like atau mengirim ulasan komentar.
+- **Root Cause**:
+  1. Belum ada entitas database untuk interaksi ulasan (`project_likes`, `project_comments`, `project_comment_likes`) dan kolom `is_public` pada `internship_projects`.
+  2. Algoritma filter kata kotor sederhana tanpa regex word boundary (`\b`) dan tanpa daftar *whitelist* kata kedinasan memicu false positive.
+  3. Query `EXTRACT(YEAR FROM created_at)` pada PostgreSQL memicu syntax error pada pengujian in-memory SQLite (`select distinct EXTRACT...`).
+- **Fix Applied**:
+  1. Membuat migrasi database `2026_10_28_150000_create_project_interactions_and_comments_table.php` dengan kolom `is_public`, `likes_count`, `comments_count`, dan `views_count`, serta tabel relasi yang mendukung session-based identifier untuk tamu (`guest_identifier`).
+  2. Membangun `ProfanityFilterService` dengan kamus kata kotor ID & EN, normalisasi leetspeak, pencocokan boundary kata utuh (`\b`), deduplikasi karakter, dan daftar whitelist kata aman ("pantai", "partai", "asuransi", "menghimpun", "surabaya", dll.) sehingga 100% bebas dari *Scunthorpe Problem*.
+  3. Membangun `PublicProjectController` dengan dynamic driver abstraction (SQLite `strftime('%Y')` vs PostgreSQL `EXTRACT(YEAR)`) serta pencarian teks `ilike`/`like`, grouping perjalanan tahunan, dan metrik statistik.
+  4. Merancang tampilan antarmuka katalog `/proyek-dinas` modern dan estetik: pemisah tahunan timeline per tahun perjalanan, filter pencarian multi-dimensi, card responsive anti-pecah, dan drawer navigasi.
+  5. Merancang antarmuka Like AJAX persisten, dropdown Bagikan (Salin tautan, WhatsApp, Telegram, X), formulir komentar dengan live sensor warning banner, tombol hapus moderasi khusus Super Admin & Admin Dinas, dan like pada ulasan komentar.
+  6. Menyediakan opsi radio button Visibilitas Proyek (Publik vs Privat/Data Sensitif) pada formulir tambah & edit mahasiswa.
+  7. Menulis feature test suite komprehensif (`ProjectInteractionsAndCatalogTest`, 8 tests, 41 assertions passed, Exit Code 0) dan verifikasi visual Playwright Chrome E2E (Exit Code 0).
+- **Prevention Rule**:
+  1. Seluruh pemfilteran konten teks pengguna wajib mengimplementasikan word boundary matching (`\b`) dan whitelist kata aman kedinasan untuk mencegah Scunthorpe Problem.
+  2. Query ekstraksi tahun database wajib mendeteksi driver koneksi (`\DB::connection()->getDriverName()`) guna menjamin kompatibilitas ganda antara SQLite in-memory runner dan PostgreSQL production server.
+  3. Fitur interaksi publik (like & komentar tamu) wajib memanfaatkan session-based identifier yang stabil agar tidak dapat dimanipulasi dengan reload sederhana.
+
+### [LRN-092] Standarisasi Role Sistem di Admin: Eliminasi Penamaan Ganda 'Atasan (Supervisor)' Menjadi 'Supervisor' & Konsolidasi Akun Tunggal
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/admin/users/index.blade.php`, `resources/views/admin/users/create.blade.php`, `resources/views/admin/users/edit.blade.php`, `app/Models/User.php`, `app/Http/Controllers/Admin/UserController.php`, `resources/views/admin/applications/show.blade.php`, Seeders (`SurabayaAgenciesSeeder`, `SupervisorDemoSeeder`, `DemoE2ESeeder`)
+- **Problem / Symptom**:
+  1. Pada halaman Master Pengguna Admin (`/admin/users`), label role ditulis merangkap ganda sebagai `Atasan (Supervisor)` baik di dropdown filter role maupun badge tabel dan mobile card.
+  2. Saat filter role `supervisor` dipilih, muncul 2 akun sekaligus: `Bambang Supriyadi, S.Sos., M.AP` (`supervisor@dispusip.surabaya.go.id`) dan `Tim Kerja Umum dan Kepegawaian` (`atasan.dispusip@surabaya.go.id`), menimbulkan kebingungan operasional bagi Super Admin.
+  3. Form create/edit user admin belum memiliki opsi role `supervisor` sehingga akun supervisor tidak dapat didaftarkan atau diperbarui dari modul pengguna.
+- **Root Cause**:
+  1. Penamaan ganda `Atasan (Supervisor)` sebelumnya dibuat untuk menyesuaikan preferensi bahasa pejabat non-teknis, namun tercampur ke dalam modul back-office Administrator yang memerlukan standarisasi teknis yang ringkas dan profesional.
+  2. Duplikasi akun terjadi karena seeder sebelumnya membuat dua variasi akun (satu dengan email `atasan.dispusip...` dan nama tim, satu lagi dengan email `supervisor@dispusip...` dan nama pejabat personil).
+- **Fix Applied**:
+  1. Menstandarisasi penamaan role di seluruh antarmuka Admin pengguna menjadi **`Supervisor`** murni (filter dropdown, badge tabel desktop, badge kartu mobile, dan tooltip ACC pengajuan).
+  2. Mengubah pemetaan `User::roleLabel()` untuk role `supervisor` dari `'Tim Kerja Umum dan Kepegawaian'` menjadi **`'Supervisor'`**.
+  3. Menambahkan opsi role **`Supervisor`** pada form `admin/users/create.blade.php` dan `admin/users/edit.blade.php`, serta memperbarui validasi `in:` dan `AGENCY_SCOPED_ROLES` di `UserController.php`.
+  4. Menghapus akun duplikat redundan (`atasan.dispusip@surabaya.go.id`) dan menetapkan akun tunggal resmi Supervisor: **Bambang Supriyadi, S.Sos., M.AP** (`supervisor@dispusip.surabaya.go.id`).
+  5. Memperbarui seluruh seeder dan script visual test ke akun resmi tunggal tersebut.
+- **Prevention Rule**:
+  Antarmuka Administrator (`/admin/*`) adalah panel kendali teknis yang wajib menerapkan standarisasi nama role yang murni dan baku (Super Admin, Admin Dispusip, Admin Bidang, Supervisor, Mentor Lapangan, Dosen Pembimbing, Admin Universitas, Mahasiswa). Hindari perangkapan istilah kurung penjelas seperti "Atasan (Supervisor)" pada panel back-office admin. Setiap role sistem dalam seeder hanya boleh memiliki 1 akun acuan kanonikal tanpa menduplikasi variasi akun dengan nama instansi/tim.
+
+### [LRN-093] Rekonstruksi Estetika Single Centered Card Landing Page Home & Harmonisasi Navigasi Publik/Auth
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/welcome.blade.php`, `scripts/verify_home_restored.mjs`
+- **Problem / Symptom**:
+  1. Perombakan sebelumnya mengubah landing page (`welcome.blade.php`) menjadi 2 kolom grid dengan kartu bidang magang di sisi kanan desktop, yang membuat tampilan terasa terlalu padat dan menghilangkan kesederhanaan fokus kartu tunggal terpusat (*single centered card*) yang disukai pengguna.
+  2. Saat pengguna sudah login (`@auth`), tombol di landing page masih menyajikan tautan registrasi/login atau belum terintegrasi harmonis dengan menu baru "Proyek Dinas".
+  3. Header navbar di layar mobile (< 640px) mengalami potensi text clipping jika seluruh tautan publik dipaksakan tampil di baris atas.
+- **Root Cause**:
+  1. Penggunaan grid 12 kolom (`lg:grid-cols-12`) memecah fokus pandangan mata antara teks aksi dan kartu bidang statis di desktop.
+  2. Logika kondisional `@auth` dan `@guest` belum terintegrasi optimal pada tombol aksi utama kartu tengah dan navbar.
+- **Fix Applied**:
+  1. Mengembalikan layout hero menjadi **Single Centered Card** (`max-w-2xl bg-white rounded-3xl p-6 sm:p-8 lg:p-9 shadow-lg border border-slate-200/80`) yang terpusat secara elegan di tengah layar desktop maupun mobile.
+  2. Mempertahankan tombol banner hijau kuota beranimasi ping (`Sisa Kuota: XX Kursi Tersedia | Klik untuk rincian 4 bidang magang`) yang memicu modal pop-up interaktif 4 bidang unit kerja.
+  3. Menyesuaikan tombol aksi utama:
+     - Jika `@auth`: Tombol utama berwarna biru menjadi **"Pindah ke Dashboard"** (dan tombol sekunder **"Galeri Proyek Dinas"**). Di header, tombol Masuk/Daftar disembunyikan dan digantikan tombol tunggal "Dashboard".
+     - Jika `@guest`: Tombol aksi menyajikan **"DAFTAR MAGANG SEKARANG"** (biru) dan **"MASUK KE AKUN"** (outline), serta tautan halus ke galeri karya mahasiswa. Di header menyajikan teks "Masuk" dan tombol biru rounded "Daftar".
+  4. Menambahkan menu baru **"Proyek Dinas"** di header desktop/tablet dan kartu aksi, serta modal interaktif **"Alur Magang"** (4 tahapan: Registrasi Akun, Pilih Bidang/Kuota, Unggah Berkas Resmi, Verifikasi & Kelulusan).
+  5. Mengoptimalkan responsivitas mobile: menyembunyikan subjudul panjang dan memindahkan akses proyek dinas ke dalam kartu pada layar sempit sehingga header mobile bebas dari clipping.
+  6. Memvalidasi secara visual (Playwright Chrome E2E: `welcome_restored_guest.png`, `welcome_restored_auth.png`, `welcome_restored_mobile.png`, `welcome_restored_quota_modal.png`) dengan Exit Code 0.
+### [LRN-094] Restorasi Penuh Landing Page Desain Asli (Alamat Rungkut Asri & Layout 2-Kolom Kuota 4 Bidang) dengan Menu Proyek Dinas & Tombol Dashboard Adaptif
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/welcome.blade.php`, `scripts/verify_welcome_restored_exact.mjs`
+- **Problem / Symptom**:
+  1. Pengguna meminta pengembalian tampilan `http://127.0.0.1:8000/` ke versi asli awal sebelum adanya perintah pengubahan logo ke home dan penambahan menu home. Pada versi yang diubah sebelumnya, alamat keliru diganti menjadi Siola, layout 2-kolom hilang dan diganti single centered card dengan modal pop-up.
+  2. Pengguna meminta alamat kantor tetap `Jl. Rungkut Asri Tengah No. 5-7, Surabaya` dan `(031) 8707682`.
+  3. Menu baru **"Proyek Dinas"** harus ditambahkan di header atas navigasi.
+  4. Jika pengguna sudah login (`@auth`), tombol "Daftar" dan "Masuk" (baik di header maupun di hero) berubah menjadi **"Dashboard"** / **"Pindah ke Dashboard"**, namun style dan susunan tata letaknya harus tetap sama persis seperti di awal.
+- **Root Cause**:
+  Asumsi sebelumnya keliru memaksakan konversi landing page menjadi model satu kotak terpusat dan modal pop-up, padahal preferensi desain asli yang disetujui adalah layout grid 2-kolom (sisi kiri: judul besar hero, badges, deskripsi, tombol aksi, kontak Rungkut Asri; sisi kanan: kartu 4 bidang pilihan magang dengan kuota tersisa live real-time).
+- **Fix Applied**:
+  1. Mengembalikan file `resources/views/welcome.blade.php` ke struktur dan style 2-kolom grid aslinya (komit sebelum revisi welcome `03bd110~1`).
+  2. Menjaga alamat kantor resmi tetap: `Jl. Rungkut Asri Tengah No. 5-7, Surabaya` dan telepon `(031) 8707682`.
+  3. Menampilkan langsung 4 bidang kerja magang Dispusip beserta sisa kuota dinamisnya di kolom kanan desktop tanpa pop-up.
+  4. Menambahkan tautan menu **"Proyek Dinas"** (`route('public.projects.index')`) di header kanan.
+  5. Menerapkan logika status autentikasi:
+     - `@guest`: Menampilkan tombol "Masuk" dan "Daftar" (header) serta "Daftar Magang Sekarang" dan "Masuk ke Akun" (hero) dengan styling awal.
+     - `@auth`: Tombol daftar dan masuk bertransformasi menjadi tombol "Dashboard" (header) dan "Pindah ke Dashboard" (hero) dengan style biru rounded yang konsisten.
+  6. Mengoptimalkan responsivitas mobile agar logo dan menu Proyek Dinas tidak mengalami pemotongan teks.
+  7. Memvalidasi secara visual (Playwright E2E: `welcome_exact_guest_desktop.png`, `welcome_exact_auth_desktop.png`, `welcome_exact_mobile_perfect.png`) dan pengujian PHPUnit (`php artisan test`) Exit Code 0.
+- **Prevention Rule**:
+  Jangan pernah merombak radikal layout utama landing page (seperti mengubah grid 2-kolom menjadi modal pop-up atau mengubah alamat kantor instansi) kecuali atas instruksi eksplisit pengguna. Jika pengguna meminta penambahan menu atau penyesuaian tombol autentikasi, terapkan secara bedah (*surgical patch*) pada struktur yang sudah ada dengan mempertahankan susunan tata letak aslinya.
+
+### [LRN-095] Visualisasi Timeline Inovasi Multi-Tahun (2020-2026), Penguatan Filter Profanity Jawa-Inggris, Menu Titik 3 Moderasi, dan Isolasi Navbar Proyek Dinas
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/projects/index.blade.php`, `resources/views/projects/show.blade.php`, `resources/views/layouts/navigation.blade.php`, `app/Services/ContentModeration/ProfanityFilterService.php`, `app/Http/Controllers/ProjectInteractionController.php`, `scripts/distribute_projects_2020_2026.php`, `tests/Feature/ProjectInteractionsAndCatalogTest.php`
+- **Problem / Symptom**:
+  1. Seluruh data proyek awal hanya berada di tahun 2026 sehingga pengelompokan timeline tahunan tidak terlihat gayanya.
+  2. Saat foto thumbnail dan judul proyek pada kartu ditekan, pengguna mengeluhkan tidak langsung membuka halaman detail.
+  3. Umpatan bahasa Jawa Suroboyoan (`jancok`, `asu`) dan Inggris (`fuck`) lolos filter komentar, serta leetspeak tanda seru `!` di akhir kalimat (`asu!`) keliru diubah menjadi `i` (`asui`) sehingga meloloskan kata kotor.
+  4. Kartu statistik atas di katalog memuat warna teks mencolok dan emoji, serta overlay ikon love pada kartu berwarna hitam legam.
+  5. Menu navigasi dashboard Super Admin belum menempatkan "Pengguna" di paling ujung kanan, dan role lain (mahasiswa, dosen, dll.) memiliki menu Proyek Dinas berlebih padahal sudah ada di Beranda/Home.
+  6. Super Admin & Supervisor belum memiliki menu cepat titik 3 (`...`) untuk menyembunyikan/mempublikasikan proyek langsung dari katalog dan halaman detail.
+- **Root Cause**:
+  1. Timestamp `created_at` proyek di database seragam di tahun 2026.
+  2. Thumbnail dan judul card sebelumnya memerlukan pembungkus tag tautan yang memiliki pointer-events aktif dan z-index yang tidak terhalang floating overlay.
+  3. Kamus `ProfanityFilterService` belum memuat ragam kata umpatan Jawa Timur, dan substitusi `'!' => 'i'` di `normalizeText()` diterapkan secara global tanpa memeriksa apakah tanda seru adalah tanda baca kalimat (`asui`).
+  4. SVG like sebelumnya menggunakan `fill-white text-white` atau emoji yang ter-render solid oleh sistem operasi.
+  5. Urutan tautan blade layout navigation belum diposisikan `Proyek Dinas` sebelum dropdown `Pengguna`.
+- **Fix Applied**:
+  1. Membuat dan menjalankan `scripts/distribute_projects_2020_2026.php` yang mendistribusikan karya inovasi Dispusip nyata per tahun dari 2020 hingga 2026.
+  2. Membungkus thumbnail foto dan judul dengan tag `<a href="{{ route('projects.show', $id) }}">` yang bersih dan teruji langsung berpindah ke halaman detail saat diklik.
+  3. Memperkaya kamus kata kotor Jawa Timuran & Inggris di backend (`ProfanityFilterService`) dan frontend Alpine.js, serta memperbaiki normalisasi leetspeak agar tanda seru `!` hanya diubah menjadi `i` bila diapit huruf (`an!ing`), bukan di akhir kata (`asu!`).
+  4. Menjadikan metrik atas netral `text-slate-900` tanpa emoji, dan mengubah ikon love overlay menjadi outline putih `stroke-2 fill-none text-white` serasi dengan ikon komentar.
+  5. Menata urutan navigasi Super Admin menjadi `Dashboard` -> `Pengajuan` -> `Instansi` -> `Universitas` -> `Proyek Dinas` -> `Pengguna` (paling ujung), serta membatasi menu Proyek Dinas hanya muncul di dashboard Super Admin dan Supervisor.
+  6. Menambahkan menu dropdown 3-titik (`...`) di pojok kanan kartu katalog dan header halaman detail proyek (opsi: Sembunyikan/Tampilkan ke Publik, Salin Tautan, dan Hapus Proyek khusus Super Admin).
+  7. Menjalankan automated test suite `ProjectInteractionsAndCatalogTest` (11 test, 59 assertions, Exit Code 0) dan audit visual Playwright Chrome channel dengan bukti tangkapan layar.
+- **Prevention Rule**:
+  1. Leetspeak replacements tidak boleh memodifikasi tanda baca di akhir kalimat tanpa batas kata utuh.
+  2. Filter profanity wajib mencakup kamus lokal bahasa daerah tempat instansi beroperasi (Jawa Timur / Surabaya).
+  3. Card list wajib selalu menyediakan tautan langsung pada thumbnail dan judul menuju entitas detailnya.
+
+---
+
+### [LRN-094] Nomenklatur Menu Supervisor (Pengajuan & Sertifikat), Eliminasi Dobel Konfirmasi Modal & Sinkronisasi ACC Kelompok
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `resources/views/supervisor/dashboard.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`
+- **Problem / Symptom**: 
+  1. Penulisan nama menu di navbar & dashboard supervisor terlalu panjang ('Persetujuan Pengajuan' dan 'Pengesahan Sertifikat').
+  2. Alur persetujuan pengajuan magang di tingkat atasan memiliki modal dobel konfirmasi (checkbox pernyataan + mengetik kata kunci 'SETUJUI') yang memperlambat proses ACC.
+  3. Pada pengajuan magang kelompok, jika atasan menyetujui pengajuan salah satu anggota, anggota lain berpotensi tertinggal bila statusnya tidak tersinkronisasi serentak.
+- **Root Cause**:
+  1. Penamaan menu supervisor belum disederhanakan selaras dengan menu Admin Dinas ('Pengajuan').
+  2. Implementasi modal konfirmasi 2 lapis di Blade view memblokir aksi submit langsung.
+  3. Method `approve` sebelumnya hanya mengambil sibling yang berstatus selain 'rejected' tanpa menyinkronkan penempatan/mentor template ke seluruh anggota kelompok secara serentak.
+- **Fix Applied**:
+  1. Memperbarui seluruh label navigasi (desktop, profil dropdown, dan drawer mobile) dan tombol kartu dashboard supervisor menjadi:
+     - 'Persetujuan Pengajuan' $\rightarrow$ 'Pengajuan'
+     - 'Pengesahan Sertifikat' $\rightarrow$ 'Sertifikat'
+  2. Menghapus modal dialog dobel konfirmasi pada halaman detail pengajuan supervisor (`supervisor/applications/show.blade.php`) sehingga tombol 'Setujui & Terbitkan Surat' langsung mengeksekusi form secara instan (1-klik selesai) dan menampilkan panel status resmi jika berkas sudah disetujui.
+  3. Memperbarui `ApplicationApprovalController@approve` agar memproses seluruh anggota kelompok (`Application::where('group_id', $group->id)->get()`) secara serempak, memastikan nomor surat, tanggal surat, token verifikasi, unit, dan placement mentor teralokasikan lengkap ke semua anggota.
+  4. Menambahkan automated feature test `test_supervisor_approve_from_member_application_approves_all_group_members_together` serta validasi Playwright E2E berstandar channel Chrome lokal.
+- **Prevention Rule**:
+  1. Penamaan menu navigasi wajib ringkas dan proporsional (1-2 kata).
+  2. Alur pengesahan eksekutif yang telah melalui tinjauan data sebelumnya sebaiknya menyediakan eksekusi langsung tanpa modal ketik kata kunci yang berulang kecuali untuk aksi destruktif (DELETE permanen).
+  3. Setiap pembaruan status kelompok wajib mengiterasi seluruh record anak dalam relasi `group_id` secara atomik di dalam database transaction.
+
+### [LRN-095] Responsive Mobile Navigation Hardening: Integrasi Burger Menu & Dropdown Drawer di Landing Page
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/welcome.blade.php`, `scripts/verify_mobile_burger_menu.mjs`
+- **Problem / Symptom**: Tampilan header landing page di layar mobile berantakan dan sesak karena menu 'Proyek Dinas' dan tombol autentikasi ('Daftar' / 'Masuk') dijejalkan ke baris yang sama dengan dua logo instansi dan teks nama dinas, menyebabkan teks instansi terhimpit dan tata letak tidak ergonomis.
+- **Root Cause**: Navbar landing page sebelumnya tidak menerapkan pola hamburger menu responsif (`hidden md:flex` dan `md:hidden`), sehingga elemen navigasi desktop dipaksakan tampil horizontal pada viewport kecil (< 768px).
+- **Fix Applied**:
+  1. Menambahkan state reaktif Alpine.js `x-data="{ mobileMenuOpen: false }"` pada `<header>`.
+  2. Mengisolasi menu navigasi dan tombol autentikasi desktop ke dalam container `hidden md:flex`.
+  3. Mengimplementasikan tombol hamburger responsif di layar mobile (`md:hidden`) dengan animasi toggle SVG antara ikon 3-garis (burger) dan ikon silang (close).
+  4. Merancang panel dropdown drawer mobile (`x-show="mobileMenuOpen"`) dengan transisi halus (`opacity`, `translate-y`, `scale`) yang memuat tautan Beranda Utama, Proyek Dinas (dengan badge 'Katalog'), tombol aksi full-width Daftar/Masuk (atau Dashboard jika `@auth`), serta ringkasan kontak Gedung Siola.
+  5. Menambahkan style `[x-cloak] { display: none !important; }` guna mencegah flicker saat halaman pertama kali dirender.
+  6. Menguji dan memvalidasi secara visual menggunakan Playwright test runner (`channel: 'chrome'`) pada resolusi mobile 375x812 (keadaan tertutup & terbuka) dan desktop 1280x800 dengan Strict Exit Code 0.
+- **Prevention Rule**: Setiap header navigasi publik wajib menyediakan burger menu responsif pada breakpoint seluler (`md:hidden`) dan mengisolasi link horizontal ke desktop (`hidden md:flex`). Dilarang keras menjejalkan teks menu navigasi multi-tombol di baris utama header mobile.
+
+### [LRN-096] Penataan Menu Header Detail Proyek 'Kelola Proyek' & Eliminasi Overflow Clipping
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/layouts/app.blade.php`, `resources/views/projects/show.blade.php`, `resources/views/projects/index.blade.php`, `scripts/verify_kelola_proyek_button.mjs`
+- **Problem / Symptom**:
+  1. Ikon kalender pembatas tahun di katalog `/proyek-dinas` warnanya pudar dan menyatu dengan background putih.
+  2. Tombol opsi 3-titik di header detail proyek (`/projects/{id}`) terpotong/ketutup saat dropdown dibuka.
+  3. Terdapat tombol redundant 'Akses Tautan / Aplikasi Proyek' yang tampil berdampingan dengan menu manajemen di header pengelola.
+- **Root Cause**:
+  1. Background gradien kalender pembatas tahun belum terinjeksi penuh dalam kompilasi CSS statis, sehingga membutuhkan inline CSS eksplisit bernilai solid (`background: #2563eb !important`).
+  2. Komponen `<header>` dan wrapper `$header` di `resources/views/layouts/app.blade.php` menerapkan kelas `overflow-hidden`, memotong semua elemen absolut anak (`dropdown menu`) yang melewati batas bawah header.
+- **Fix Applied**:
+  1. Mengubah tombol titik 3 menjadi tombol primer berlabel **`Kelola Proyek ▾`** khusus role pengelola (Super Admin & Supervisor).
+  2. Memindahkan tombol 'Akses Tautan / Aplikasi Proyek' ke dalam menu dropdown `Kelola Proyek` bersama opsi Sembunyikan/Publikasikan Proyek, Salin Tautan, dan Hapus Proyek (Super Admin).
+  3. Mempertahankan tombol akses tautan standar tunggal untuk role umum (Mahasiswa, Dosen, Tamu / Publik) tanpa tombol Kelola Proyek.
+  4. Menghapus kelas `overflow-hidden` pada wrapper `$header` di `layouts/app.blade.php` dan menetapkan `relative z-30` sehingga dropdown melayang bebas di atas konten.
+  5. Memberikan inline style fallback `#2563eb` dengan ikon SVG stroke putih tegas pada pembatas tahun.
+  6. Menguji secara visual menggunakan Playwright (`scripts/verify_kelola_proyek_button.mjs`) untuk Admin dan Tamu, serta menjalankan test suite feature (Exit Code 0).
+- **Prevention Rule**:
+  1. Jangan letakkan kelas `overflow-hidden` pada container slot `$header` utama di layout induk jika di dalamnya dapat memuat menu dropdown atau tooltips yang membutuhkan overflow melayang (*floating popovers*).
+  2. Bedakan kontrol aksi manajemen dengan aksi konsumsi publik berdasarkan otorisasi peran (`$isManagerRole`).
+
+---
+
+### [LRN-097] Integritas Penyimpanan Dokumen: Resolusi Error 404 Berkas Proposal/Profil Mahasiswa & Penanganan Bug 500 PushController
+- **Tanggal**: 2026-10-28
+- **Komponen**: `app/Http/Controllers/DocumentController.php`, `app/Services/PrivateDocumentStorage.php`, `app/Http/Controllers/PushController.php`, `storage/app/private/`, `storage/app/public/`
+- **Problem / Symptom**:
+  1. Pengguna menemui error `404 | Not Found` saat menekan tombol "Lihat Proposal" pada kelompok magang #3 (`http://127.0.0.1:8000/documents/groups/3/proposal`) dan kelompok seeder lainnya.
+  2. Audit menunjukkan 87 berkas dokumen pendukung aplikasi mahasiswa (`ApplicationDocument`) dan profil mahasiswa (`StudentProfile`: CV, Transkrip Nilai, KTM) berstatus missing secara fisik di filesystem server.
+  3. Log server `storage/logs/laravel.log` berulang kali mencatat exception `local.ERROR: Method App\Http\Controllers\PushController::validate does not exist.` setiap kali browser klien memicu sinkronisasi push notification subscription.
+- **Root Cause**:
+  1. Seeder (`InternshipGroupDemoSeeder`, `AdminWorkflowSeeder`, `StudentProfileSeeder`) mengisi path berkas contoh (mis. `documents/applications/sample_proposal_kelompok.pdf`, `documents/student-profiles/cv_sample.pdf`, dll.) di database, tetapi file fisik PDF tersebut tidak dibuat ke disk storage `storage/app/private/` maupun `storage/app/public/`.
+  2. `DocumentController` dan `PrivateDocumentStorage` tidak memiliki mekanisme fallback resilient: jika berkas fisik tidak ditemukan di disk server, controller langsung memanggil `abort(404)` mentah tanpa penanganan berkas acuan/template standar.
+  3. `PushController` memperluas `Illuminate\Routing\Controller` dan memanggil method `$this->validate()` yang telah dihilangkan pada arsitektur bawaan Laravel 11 (harus menggunakan `$request->validate()`).
+- **Fix Applied**:
+  1. Memperbaiki `PushController.php` baris 12 agar menggunakan `$request->validate([...])`, melenyapkan seluruh runtime exception 500 BadMethodCallException secara tuntas.
+  2. Mengenerate seluruh naskah PDF resmi berstandar kedinasan Dispusip Kota Surabaya via DomPDF untuk semua path seeder yang hilang:
+     - `documents/applications/sample_proposal_kelompok.pdf`
+     - `documents/applications/sample_proposal.pdf`
+     - `documents/applications/sample_cv.pdf`
+     - `documents/applications/sample_transcript.pdf`
+     - `documents/applications/sample_ktp.pdf`
+     - `documents/student-profiles/cv_sample.pdf`
+     - `documents/student-profiles/cv_calon_magang.pdf`
+     - `documents/student-profiles/transkrip_sample.pdf`
+     - `documents/student-profiles/transkrip_calon_magang.pdf`
+     - `documents/student-profiles/ktm_sample.pdf`
+     - `documents/student-profiles/ktm_calon_magang.pdf`
+     - `documents/applications/default_proposal.pdf`
+     dan menempatkannya secara serentak di `storage/app/private/`, `storage/app/public/`, dan `public/storage/`.
+  3. Menambahkan resilient fallback handling di `DocumentController` (`resolveAuthorizedGroupProposal` dan `resolveAuthorizedDocument`) serta `PrivateDocumentStorage::response()` agar bila ada berkas fisik yang hilang atau belum terunggah, sistem secara mulus menyajikan berkas template acuan resmi alih-alih melempar error 404 mentah.
+  4. Melakukan audit komprehensif seluruh tabel database (`ApplicationDocument`, `InternshipGroup`, `StudentProfile`, `Placement`, `Logbook`) yang menghasilkan 0 missing files (100% OK).
+  5. Memvalidasi visual dan fungsional melalui Playwright Chrome runner: status HTTP 200 OK pada `/documents/groups/3/proposal`, `/documents/groups/2/proposal`, `/documents/applications/8`, dan detail pengajuan kelompok supervisor.
+- **Prevention Rule**:
+  1. Setiap file path yang didefinisikan dalam seeder wajib dipastikan eksistensi berkas fisiknya di storage privat maupun publik.
+  2. Controller penyaji dokumen wajib memiliki resilience fallback ke template default berstandar dinas sebelum melempar HTTP 404.
+  3. Seluruh controller Laravel 11 wajib menggunakan `$request->validate()` untuk validasi HTTP request.
+
+### [LRN-098] Desain Ornamen Pembatas Transisi Tahun Katalog Proyek Berstandar Identitas Kedinasan
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/projects/index.blade.php`, `public/images/pembatas_dinas_hd.svg`, `scripts/verify_pembatas_dinas.mjs`, `scripts/verify_pembatas_mobile.mjs`
+- **Problem / Symptom**: 
+  1. Garis batas pemisah antar tahun di katalog proyek dinas (`/proyek-dinas`) tampak polos (hanya border abu-abu `border-slate-200`) dan dinilai kurang elegan serta kurang mencerminkan identitas resmi kedinasan Dispusip Kota Surabaya.
+  2. Implementasi raster PNG sebelumnya berukuran terlalu tebal/besar saat diregangkan (`max-w-2xl`), tampak kurang tajam (tidak HD) pada layar DPI tinggi, dan menyisakan ruang kosong yang terlalu luas di sisi kanan dan kirinya.
+- **Root Cause**: Penggunaan raster PNG dengan scaling lebar berbasis wrapper tanpa menghubungkan kontur batas horizontal halaman dan ketiadaan batas vektor murni.
+- **Fix Applied**:
+  1. Merancang ulang ornamen gaya nomor 2 menjadi **Inline Vector SVG Ultra-HD** murni:
+     - 6 kelopak pusat ramping simetris beraksen Royal Blue Dinas (`#1d4ed8`).
+     - Lengkungan flourish anggun, titik aksen, dan 3 kelopak samping bergradien Cerulean Dispusip (`#0284c7` & `#38bdf8`).
+     - Ukuran tinggi proporsional, ramping, dan estetis (`w-56 sm:w-72 md:w-80 h-auto`, tinggi pusat hanya ~28-34px).
+  2. Menambahkan **garis aksen gradien horizontal penuh** di sisi kiri (`bg-gradient-to-r from-transparent via-slate-200 to-blue-300/80`) dan kanan (`bg-gradient-to-l from-transparent via-slate-200 to-blue-300/80`), membentang mengisi seluruh lebar layout tanpa meninggalkan ruang kosong yang canggung.
+  3. Memvalidasi responsivitas tata letak di desktop (1440px) dan mobile (375px) menggunakan Playwright channel Chrome lokal (Exit Code 0).
+### [LRN-099] Perbaikan Bulk Action (Eliminasi Nested Forms), Pemindahan Aksi Kelompok ke Detail, dan Streamlining Kolom Bidang
+- **Tanggal**: 2026-10-28
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `resources/views/admin/applications/index.blade.php`, `resources/views/admin/applications/show.blade.php`, `scripts/verify_group_and_bulk_visual.mjs`
+- **Problem / Symptom**: 
+  1. Fitur bulk action (pilih banyak pengajuan lalu "Terima" / "Tolak") pada halaman `/admin/applications` mengalami error HTTP 404 setelah penambahan fitur pendaftaran magang kelompok.
+  2. Redundansi teks lokasi instansi: Kolom Bidang (baik individu maupun kelompok) memuat teks berulang "Dinas Perpustakaan dan Kearsipan" yang tidak diperlukan karena sistem bersifat single-agency (Dispusip Surabaya).
+  3. Format kelompok di tabel: Nama ketua bercetak tebal ("Ketua: Andi Pratama Wijaya") dan nama universitas memuat jurusan ("· S1 Sistem Informasi") sehingga membuat baris tabel padat.
+  4. Tombol aksi kelompok ("Aksi Kelompok") di baris tabel utama dan aksi mandiri ("Setujui" / "Tolak") di dalam dropdown akordeon anggota kelompok membingungkan alur verifikasi berkas dan memicu nested forms.
+- **Root Cause**: 
+  1. Tag `<form id="bulk-action-form">` membungkus seluruh tabel data di `index.blade.php`. Masuknya fitur kelompok menambahkan tag `<form method="POST">` dengan `@method('PUT')` di dalam baris tabel dan sub-tabel modal akordeon. Menurut spesifikasi HTML5 parser, penulisan formulir bersarang (*nested `<form>` tags*) adalah ilegal dan menyebabkan browser membocorkan input tersembunyi `_method="PUT"`, sehingga request bulk action dikirim sebagai `PUT /admin/applications/bulk-update` yang secara keliru dicocokkan Laravel ke rute `PUT /admin/applications/{id}` (error HTTP 404 Not Found).
+  2. Logika `ApplicationController@bulkUpdateStatus` belum memiliki pelacakan `$processedGroupIds`, sehingga jika beberapa anggota kelompok yang sama terpilih sekaligus, terjadi penyesuaian kuota ganda atau kegagalan inkonsisten.
+- **Fix Applied**: 
+  1. Mengeliminasi seluruh nested forms dari `index.blade.php`. Memindahkan semua aksi persetujuan dan penolakan kelompok maupun anggota ke dalam halaman detail (`admin/applications/show.blade.php`).
+  2. Sub-tabel akordeon kelompok di tabel index kini bersih dan ergonomis, hanya menampilkan daftar nama anggota dengan tombol "Detail".
+  3. Memformat ulang identitas kelompok di tabel desktop dan mobile: nama kelompok tetap bold, ketua menggunakan font normal/unbolded (`Ketua: [Nama]`), dan perguruan tinggi hanya menampilkan nama universitas tanpa jurusan.
+  4. Menghapus teks "Dinas Perpustakaan dan Kearsipan" dari kolom Bidang di tabel desktop, kartu mobile, dan kartu Tujuan Magang halaman detail, sehingga hanya menampilkan nama bidang dan mentor terkait.
+  5. Memperbaiki `ApplicationController@bulkUpdateStatus`: deduplikasi `application_ids`, pelacakan `$processedGroupIds` agar satu kelompok hanya diproses sekali dengan kuota penuh kelompok (`$groupSize`), dan sanitasi input.
+  6. Memvalidasi secara visual dan fungsional via Playwright Chrome headless E2E (Exit Code 0), mencakup pengujian bulk toolbar, akordeon kelompok, kartu mobile, dan halaman detail terintegrasi.
+- **Prevention Rule**: 
+  1. Dilarang keras menempatkan tag `<form>` di dalam elemen `<form>` lain (*no nested forms in HTML/Blade*). Aksi interaktif pada baris tabel wajib diarahkan ke halaman detail atau menggunakan handler JavaScript/Alpine yang memanipulasi hidden input tanpa merusak form wrapper.
+  2. Pada pemrosesan bulk action yang mencakup entitas relasional kelompok, wajib melakukan pelacakan ID kelompok (`$processedGroupIds`) untuk mencegah duplikasi pembaruan status dan kesalahan penghitungan kuota.
+
+### [LRN-100] Optimasi Komponen Section Divider SVG Gelombang, Micro-Interactions, Dark Mode & Anti-Knot Symmetry
+- **Tanggal**: 2026-10-28
+- **Komponen**: `resources/views/components/section-divider.blade.php`, `resources/views/projects/index.blade.php`, `scripts/verify_wave_divider_visual.mjs`
+- **Problem / Symptom**: 
+  1. Komponen pembatas halaman (divider) berbasis SVG gelombang memiliki simetri patah / kusut (knot overlap) pada gelombang sisi kanan akibat kekeliruan urutan koordinat bezier `Q` pada template awal.
+  2. Gerakan transisi hover terasa kaku dan artifisial akibat perputaran 90° mendadak pada diamond dan satelit.
+  3. Ruang kosong vertikal dan horizontal terlalu luas (terdapat void kosong >140px akibat akumulasi margin `space-y-16`, `pt-6 sm:pt-10`, dan `my-6 sm:my-8`), serta gelombang mengambang terisolasi di tengah kontainer 1280px.
+  4. Tabrakan ID gradien SVG (`customWaveL` / `customWaveR`) bila komponen dipanggil berulang kali di halaman yang sama (misalnya loop antar-tahun pada katalog proyek dinas).
+- **Root Cause**: 
+  1. Jalur gelombang kanan sebelumnya melompat mundur-maju (`264 -> 220 -> 264` dan `176 -> 220 -> 264 -> 308`), alih-alih membentuk cerminan matematis mulus dari gelombang kiri (`440 -> 352 -> 264 -> 176 -> 88 -> 0`).
+  2. Rotasi 90° (`rotate-[135deg]`) menghasilkan patahan visual abrupt; animasi natural membutuhkan fisika pegas (*spring physics*) dengan kemiringan dinamis halus (+10°) dan pembesaran vertikal gelombang (`scale-y-115`).
+  3. Ketiadaan garis aksen penghubung lateral menyebabkan gelombang hanya mengisi 800px di tengah kontainer grid 1280px, dan akumulasi padding/margin antar-elemen memicu ruang kosong yang berlebihan.
+- **Fix Applied**: 
+  1. Mengoreksi titik kontrol kuadratik kurva SVG sisi kanan secara presisi matematis sehingga 100% simetris terhadap gelombang kiri.
+  2. Menambahkan garis aksen gradien lateral kiri dan kanan (`flex-1 h-px bg-gradient-to-r/l`) yang menghubungkan ujung gelombang hingga ke tepi batas kontainer, mengisi ruang kosong horizontal secara elegan dan seimbang.
+  3. Menstandarisasi ritme vertikal yang padat dan harmonis: mereduksi jarak antar-tahun di `projects/index.blade.php` (`space-y-10 sm:space-y-12`, wrapper `py-2 sm:py-3`, dan divider `my-2 sm:my-3`).
+  4. Mengganti animasi kaku dengan fisika pegas lembut Apple iOS (*cubic-bezier(0.34, 1.56, 0.64, 1)*): kemiringan dinamis halus +10° (`rotate-[55deg]`), pembesaran lembut bintang 4-titik, dan pendaran aura kabut lembut (*soft bloom* `blur-xl`).
+  5. Memberikan efek riak pada gelombang SVG saat hover: membesar secara vertikal (`scale-y-115`) dengan pendaran neon halus, mencerminkan gelombang air alami.
+  6. Mengompilasi aset via Vite (`npm run build`) dan memvalidasi tampilan visual secara E2E di Chrome (Normal Desktop, Page Context, Hover State, Mobile 390px, dan Dark Mode) dengan Strict Exit Code 0.
+- **Prevention Rule**: 
+  1. Hindari rotasi 90° mendadak pada micro-interactions ikon/diamond; gunakan kemiringan lembut (+5° hingga +15°) dengan kurva akselerasi pegas (*spring cubic-bezier*) untuk sensasi alami dan hidup.
+  2. Pada section divider halaman berlebar kontainer luas (max-w-7xl), selalu sertakan garis aksen lateral `flex-1 h-px` agar pembatas membentang menyatu dengan tepi grid dan tidak tampak seperti pulau kecil yang terisolasi.
+  3. Hindari penumpukan margin/padding bertingkat antara kontainer induk (`space-y`), pembungkus loop (`py`), dan komponen divider (`my`).
+
+---
+
+### [LRN-101] Pencegahan Crash Alpine.js Akibat Kutip Ganda di Atribut HTML x-data
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/projects/show.blade.php`, `resources/views/projects/index.blade.php`
+- **Problem / Symptom**: 
+  1. Halaman detail proyek (`/projects/{id}`) memicu 19 error console secara beruntun di browser: `Alpine Expression Error: Unexpected token ')'` diikuti dengan `activePhoto is not defined`, `isLiked is not defined`, `likesCount is not defined`, `shareToast is not defined`, `authorNameInput is not defined`, `commentInput is not defined`, dll.
+  2. Seluruh fungsionalitas interaktif Alpine (preview galeri tangkapan layar, tombol suka proyek & komentar, toast salin tautan, validasi profanity filter komentar langsung) lumpuh total bagi pengunjung dan pengguna.
+- **Root Cause**: 
+  1. Logika JavaScript yang kompleks dan panjang (>90 baris) ditulis secara *inline* di dalam atribut HTML ganda `x-data="{ ... }"`.
+  2. Di dalam fungsi `checkProfanity`, terdapat komentar teks baris ganda: `// 2. Cek stripped evasion (contoh: "j.a.n.c.o.k", "a_s_u")`. Karakter kutip ganda (`"`) pada komentar tersebut diinterpretasikan oleh HTML parser browser sebagai penutup awal atribut `x-data="..."`, memotong ekspresi JavaScript tepat di tengah-tengah dan mengoper string sintaks yang cacat ke Alpine.js.
+- **Fix Applied**: 
+  1. Mengekstrak deklarasi komponen JavaScript keluar dari atribut HTML menjadi fungsi terisolasi `function projectDetail(config)` dan `function commentItem(config)` di dalam tag `<script>`.
+  2. Mendaftarkan komponen secara formal ke dalam `window` dan Alpine component registry via `window.Alpine.data(...)` (dengan fallback event `alpine:init`).
+  3. Menyederhanakan elemen HTML menjadi pemanggilan konfigurasi bersih: `x-data="projectDetail({ ... })"` dan `x-data="commentItem({ ... })"`.
+  4. Menjalankan audit browser Playwright headless (`scripts/verify_detail_interaction.mjs`) untuk mengonfirmasi 0 error console dan menjalankan seluruh unit test (`php artisan test`) yang lolos 100% (368 passed, Exit Code 0).
+- **Prevention Rule**: 
+  1. **Larangan Fat Inline `x-data`**: Dilarang keras menempatkan fungsi JavaScript panjang (>15 baris), ekspresi regex kompleks, array kata kasar, atau komentar dengan kutip ganda di dalam atribut tag HTML `x-data="..."`.
+  2. Ekstrak selalu logika komponen Alpine yang memiliki banyak method ke dalam fungsi terdedikasi `function componentName(config)` di `<script>` atau via `Alpine.data('name', ...)`.
+  3. Lakukan audit runtime console browser secara berkala menggunakan runner Playwright untuk mendeteksi silent evaluation error pada komponen frontend.
+
+---
+
+### [LRN-102] Audit Sistem Menyeluruh: Node.js 24 Undici Body Drain Hermes Runner, Null-Safety Detail Proyek & Standarisasi Back-Link Multi-Role
+- **Tanggal**: 2026-10-29
+- **Komponen**: `scripts/hermes_all_roles_test.mjs`, `app/Http/Controllers/ProjectDetailController.php`, `app/Http/Controllers/PublicProjectController.php`, `app/Http/Controllers/ProjectInteractionController.php`, `resources/views/projects/show.blade.php`, `resources/views/projects/index.blade.php`
+- **Problem / Symptom**: 
+  1. `npm run test:hermes` gagal di Node.js 24 dengan `AssertionError [ERR_ASSERTION]: assert(!this.paused)` saat socket HTTP ditutup tanpa mengonsumsi body response stream.
+  2. Di `ProjectDetailController.php`, tombol kembali kontekstual (`$backUrl`) memanggil `$placement->id` tanpa null-safe operator dan mem-fallback peran non-supervisor (seperti Admin Dinas) ke rute `supervisor.reports.index` yang memicu HTTP 403 Forbidden.
+  3. Di `PublicProjectController.php`, filter `availableYears` dan metrik ringkas masih memuat tahun dan data proyek berstatus privat bagi pengunjung umum (tamu non-login).
+  4. Di `ProjectInteractionController.php`, otorisasi `toggleVisibility` tidak menyertakan peran `admin` (Admin Dinas), sementara `PublicProjectController` dan `ProjectDetailController` mengizinkan Admin Dinas memoderasi proyek.
+  5. Di `resources/views/projects/index.blade.php`, aksi salin tautan masih menggunakan browser `alert()` yang dapat terblokir oleh browser modern.
+- **Root Cause**: 
+  1. Node.js 24 engine (Undici v6+) mewajibkan pembacaan stream body response (`await res.text()` atau `await res.body.cancel()`) pada setiap pemanggilan `fetch()` agar status parser tidak tertinggal dalam keadaan paused saat socket ditutup.
+  2. Ketiadaan null-safety `$placement?->id` dan pemetaan fallback rute yang kurang granular untuk berbagai peran pengguna sistem.
+  3. Pemfilteran `where('is_public', true)` belum diterapkan pada query distinct years dan agregasi statistik katalog.
+  4. Inkonsistensi pengecekan hak moderasi antara controller interaksi dan controller detail/publik.
+- **Fix Applied**: 
+  1. Merefaktor `HermesSession::request` dan pemanggilan `fetch()` di `scripts/hermes_all_roles_test.mjs` untuk selalu mengonsumsi body (`await res.text()`), menghasilkan pengujian 56/56 PASS (100% HIJAU) pada Node.js 24.
+  2. Menyempurnakan pemetaan `$backUrl` pada `ProjectDetailController.php` dengan operator null-safe `$placement?->id` dan perutean kontekstual berbasis peran (Super Admin $\rightarrow$ `admin.dashboard`, Admin Dinas $\rightarrow$ `admin.applications.index`, Kampus $\rightarrow$ `university.dashboard`, Publik $\rightarrow$ `public.projects.index`).
+  3. Membatasi `availableYears` dan agregasi metrik di `PublicProjectController.php` dengan filter `is_public = true` untuk pengguna non-privileged.
+  4. Menyelaraskan otorisasi `toggleVisibility` di `ProjectInteractionController.php` agar mencakup peran `admin` (Admin Dinas).
+  5. Mengganti `alert()` native pada salin tautan di katalog proyek dengan visual feedback interaktif berbasis Alpine.js (`Tautan Tersalin! ✓`).
+  6. Menjalankan verifikasi penuh: 368 unit/feature test passed (Strict Exit Code 0), Tier 3 Visual Playwright passed (Strict Exit Code 0), dan Hermes Multi-Role passed (56/56, Strict Exit Code 0).
+- **Prevention Rule**: 
+  1. Pada runner JavaScript berbasis `fetch()`, wajib konsumsi body response stream (`await res.text()`) untuk menjamin kompatibilitas penuh dengan Node.js 24+ Undici engine.
+  2. Jangan pernah mengakses relasi model Eloquent tanpa operator null-safe (`?->`) pada view publik atau rute fallback.
+  3. Pastikan definisi hak akses peran (*authorization role matrix*) konsisten di seluruh controller terkait dalam domain fitur yang sama.
+
+---
+
+### [LRN-103] Audit Visual UI Antarmuka, Restorasi Alamat Rungkut Asri & Hardening Mobile Detail Proyek
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/projects/show.blade.php`, `scripts/audit_ui_comprehensive.mjs`
+- **Problem / Symptom**: 
+  1. Pada halaman landing page (`welcome.blade.php`), informasi alamat kantor kedinasan Dispusip di bagian desktop dan mobile secara keliru menampilkan teks Siola (`Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4`) dan telepon `(031) 8707329`, menyimpang dari aturan resmi LRN-094.
+  2. Pada halaman detail proyek (`projects/show.blade.php`) di layar smartphone (< 400px), pemisah bullet `•` pada tag header melipat sendirian ke baris baru (*awkward rogue wrapping*), dan bilah interaksi menyembunyikan total ulasan/komentar sehingga menyisakan ruang kosong di samping tombol like.
+- **Root Cause**: 
+  1. Adanya residu placeholder alamat Siola lama yang belum ter-update saat rekonsiliasi layout grid 2-kolom.
+  2. Pembungkusan flex `flex-wrap` tanpa penyembunyian bullet pada layar sempit (`hidden sm:inline`), serta kelas `hidden sm:flex` pada indikator diskusi interaksi bar.
+- **Fix Applied**: 
+  1. Memperbarui `resources/views/welcome.blade.php` pada section desktop dan mobile ke alamat kantor resmi Dispusip: `Jl. Rungkut Asri Tengah No. 5-7, Surabaya` dan telepon `(031) 8707682`.
+  2. Menyempurnakan header detail proyek dengan `hidden sm:inline` untuk bullet dan ukuran teks yang proporsional di layar seluler.
+  3. Mengaktifkan indikator ulasan pada mobile (`hidden min-[380px]:flex`) dengan label ringkas `💬 X Ulasan` sehingga bilah interaksi terlihat padat, informatif, dan seimbang.
+  4. Menjalankan audit visual Playwright (`scripts/audit_ui_comprehensive.mjs`) di channel Google Chrome pada resolusi Desktop (1440x900) dan Mobile (390x844) dengan hasil 0 console error dan 0 horizontal overflow.
+- **Prevention Rule**: 
+  1. Selalu lakukan audit visual multimodal vision pada breakpoint mobile (< 400px) untuk memastikan elemen tanda baca / bullet (`•`, `-`) tidak terisolasi sendirian di baris baru.
+  2. Pertahankan keakuratan data identitas kantor institusi pemerintah sesuai ketetapan profil resmi di seluruh tampilan publik.
+
+---
+
+### [LRN-104] Pembersihan Menu Navigasi Mobile Drawer & Standardisasi Alamat Resmi Kantor Dispusip (Gedung Siola Lt. 4)
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/welcome.blade.php`, `resources/views/letters/acceptance.blade.php`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/student/application/create.blade.php`, `database/seeders/`
+- **Problem / Symptom**: 
+  1. Menu dropdown navigasi mobile (saat tombol hamburger diklik) memuat teks alamat dan telepon di bagian bawah kartu menu, sehingga terkesan sesak dan redundan dengan konten halaman utama.
+  2. Alamat `Jl. Rungkut Asri Tengah No. 5-7, Surabaya` dan `(031) 8707682` ternyata merupakan lokasi perpustakaan cabang, bukan kantor pusat dinas. Sesuai data direktori resmi Pemkot Surabaya dan Google Maps, kantor pusat Dinas Perpustakaan dan Kearsipan Kota Surabaya berada di **Gedung Siola Lantai 4 (Jl. Tunjungan No. 1-3, Surabaya)** dengan telepon **(031) 8707329**.
+- **Root Cause**: 
+  1. Penempatan placeholder informasi kontak footer di dalam wadah `<div x-show="mobileMenuOpen">`.
+  2. Rancangan awal database menggunakan alamat Rungkut Asri yang semestinya dikhususkan pada unit pelayanan perpustakaan cabang Rungkut, bukan kantor pusat Dispusip.
+- **Fix Applied**: 
+  1. Menghapus blok informasi kontak dari dalam drawer menu mobile pada `resources/views/welcome.blade.php` sehingga menu drawer bersih dan fokus pada tautan navigasi dan tombol autentikasi.
+  2. Memperbarui seluruh referensi alamat kantor pusat Dispusip pada `welcome.blade.php` (tampilan desktop dan mobile di bawah kartu bidang), `acceptance.blade.php` (surat penerimaan), `internship_certificate.blade.php` (e-sertifikat kelulusan), formulir pendaftaran mahasiswa (`student/application/create.blade.php`), seeder, dan tabel `agency_profiles` ke:
+     - Alamat: `Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya`
+     - Telepon: `(031) 8707329`
+  3. Memvalidasi visual rendering Playwright Chrome (`scripts/verify_siola_and_clean_mobile_menu.mjs`) untuk viewport mobile (400x700) dan desktop (1366x768).
+- **Prevention Rule**: 
+  1. Panel mobile navigation drawer harus tetap terisolasi hanya untuk item navigasi dan aksi pengguna, tanpa menjejalkan blok kontak/footer.
+  2. Seluruh identitas resmi dinas pada surat resmi, sertifikat, dan landing page wajib merujuk ke kantor dinas utama (Gedung Siola Lt. 4).
+
+---
+
+### [LRN-105] Standarisasi Tinggi Baris Tabel Pengajuan Desktop (/admin/applications), Eliminasi Visual Clutter & Accordion Pill
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/admin/applications/index.blade.php`, `scripts/verify_desktop_applications_table.mjs`
+- **Problem / Symptom**: 
+  1. Tampilan tabel daftar pengajuan magang di `/admin/applications` pada layar desktop tampak padat dan berantakan (*visual clutter*) karena tinggi baris antara pengajuan Individu (67px) dan Kelompok (150-180px) sangat tidak seimbang.
+  2. Baris Kelompok memuat badge teks "JALUR KELOMPOK", kode grup panjang `#GRP-...`, serta tombol besar "Buka Daftar X Anggota v" yang memakan ruang vertikal 5 baris.
+  3. Terjadi redundansi data di Kolom 2 (memuat badge `X Anggota Terdaftar`) dan Kolom 4 (memuat teks peringatan duplikat `Mentor belum ditetapkan` di bawah badge status ACCEPTED).
+- **Root Cause**: 
+  1. Struktur sel kolom pertama kelompok belum mengadopsi pola ringkas (*compact inline pill*) dan menumpuk metadata secara vertikal.
+  2. Adanya residu badge jumlah anggota di kolom bidang serta teks `$actionHint` yang merender ulang status mentor di bawah badge status.
+- **Fix Applied**: 
+  1. **Kolom 1 (Pemohon / Tim)**: Menyeragamkan tinggi baris menjadi maksimal 2 baris konsisten:
+     - Individu: Baris 1: Nama Pemohon (bold); Baris 2: Universitas • Jurusan (teks abu-abu).
+     - Kelompok: Baris 1: Nama Tim (bold) berdampingan inline flex dengan pill button interaktif `[👥 X Anggota ⌄]`; Baris 2: `Ketua: [Nama Ketua] • [Nama Universitas]`.
+     - Kode grup `#GRP-...` dialihkan ke atribut tooltip `title` pada ikon grup ungu.
+     - Badge tebal "JALUR KELOMPOK" dan tombol besar di bawah dihapus.
+  2. **Kolom 2 (Bidang & Mentor)**: Menghapus badge `X Anggota Terdaftar` dan menata kolom murni menjadi 2 baris konsisten: Baris 1: Nama Bidang (`truncate`); Baris 2: `Mentor: [Nama Mentor]` atau `Mentor belum ditetapkan` (amber-600).
+  3. **Kolom 4 (Status)**: Menghapus teks redundan di bawah badge status; kolom berpusat pada satu elemen badge status `<x-status-badge>` rata tengah secara vertikal (`align-middle`).
+  4. **Accordion & Sub-Tabel**: Fungsi toggle daftar mahasiswa kelompok tetap responsif dan halus via Alpine.js tanpa mengubah tampilan kartu mobile (`md:hidden`).
+  5. Pengujian Playwright E2E visual (`scripts/verify_desktop_applications_table.mjs`) dan test suite backend PHPUnit (`Phase3SecurityDataIntegrityTest`, `InternshipGroupWorkflowTest`) 100% PASS (Exit Code 0).
+- **Prevention Rule**: 
+  1. Pada tabel data desktop tabular, pertahankan konsistensi ketinggian baris (*row height parity*) antar varian entitas (Individu vs Kelompok) dengan membatasi konten sel primer ke maksimal 2 baris fungsional.
+  2. Tempatkan aksi sekunder seperti ekspansi daftar anggota dalam bentuk pill badge inline `[👥 X Anggota ⌄]` agar tidak menambah tinggi baris.
+
+---
+
+### [LRN-106] Penataan Teks Subtitle Header Mobile Dispusip Saat Menu Dibuka (Multi-Line Spacing)
+- **Tanggal**: 2026-10-29
+- **Komponen**: `resources/views/welcome.blade.php`, `scripts/verify_siola_and_clean_mobile_menu.mjs`
+- **Problem / Symptom**: 
+  Pada tampilan smartphone (lebar layar < 450px), saat pengguna menekan tombol hamburger menu navigasi, subtitle instansi yang panjang (`Dinas Perpustakaan dan Kearsipan Kota Surabaya`) terpotong (*truncated ellipsis*) tepat di samping tombol close (X), sehingga tulisan tampak terpotong menjadi `DINAS PERPUSTAKAAN DAN KEARSIPAN KOTA S...`.
+- **Root Cause**: 
+  Teks instansi pada header bersifat *single line nowrap truncate*. Ketika tombol close (X) aktif, ruang horizontal tersisa untuk teks merek berkurang, menyebabkan nama dinas yang berjumlah 48 karakter terpotong otomatis oleh CSS `truncate`.
+- **Fix Applied**: 
+  1. Pada `welcome.blade.php`, menambahkan kontrol visibilitas responsif Alpine.js pada header brand:
+     - **Desktop (`md:inline`)**: Tetap 1 baris utuh proporsional.
+     - **Mobile Saat Menu Tertutup (`x-show="!mobileMenuOpen"`)**: 1 baris standar.
+     - **Mobile Saat Menu Terbuka (`x-show="mobileMenuOpen"`)**: Di-spasi ke bawah menjadi 2 baris terstruktur:
+       - Baris 1: `DINAS PERPUSTAKAAN DAN KEARSIPAN`
+       - Baris 2: `KOTA SURABAYA` (teks biru tebal proporsional di bawahnya)
+  2. Memberikan `shrink-0 ml-2` pada tombol hamburger/close button dan `flex-1` pada logo wrapper agar ruang horizontal terdistribusi maksimal.
+  3. Memvalidasi visual dengan Playwright Chrome headless (`scripts/verify_siola_and_clean_mobile_menu.mjs`), terbukti teks tidak lagi terpotong dan tombol close memiliki *whitespace* yang lega.
+- **Prevention Rule**: 
+  Gunakan layout dua baris adaptif (*two-line split*) pada sub-brand instansi pemerintahan di viewport mobile ketika menu drawer terbuka agar keterbacaan identitas dinas tetap utuh 100%.
 
 ---
 
@@ -3050,6 +3504,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
 - **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
 ```
+
 
 
 

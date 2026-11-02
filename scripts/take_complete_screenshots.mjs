@@ -22,9 +22,9 @@ async function run() {
         const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
         const page = await context.newPage();
 
-        console.log('[Runner] Login Supervisor atasan.dispusip@surabaya.go.id...');
+        console.log('[Runner] Login Supervisor supervisor@dispusip.surabaya.go.id...');
         await page.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
-        await page.fill('input[name="email"]', 'atasan.dispusip@surabaya.go.id');
+        await page.fill('input[name="email"]', 'supervisor@dispusip.surabaya.go.id');
         await page.fill('input[name="password"]', 'password');
         await page.click('button[type="submit"]');
         await page.waitForTimeout(2000);

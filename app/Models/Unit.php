@@ -60,9 +60,24 @@ class Unit extends Model
         return $this->occupied_count;
     }
 
+    const MAX_GROUP_MEMBERS = 100;
+
+    protected $casts = [
+        'quota' => 'integer',
+    ];
+
     // Accessor untuk menghitung sisa kuota dinamis: $unit->remaining_quota
     public function getRemainingQuotaAttribute()
     {
         return max(0, $this->quota - $this->occupied_count);
+    }
+
+    /**
+     * Menghitung batas maksimal anggota kelompok yang efektif berlaku untuk bidang ini.
+     * Menggunakan standar aman 100 orang dan dibatasi oleh sisa kuota yang masih tersedia.
+     */
+    public function getEffectiveMaxGroupMembersAttribute(): int
+    {
+        return min(self::MAX_GROUP_MEMBERS, $this->remaining_quota);
     }
 }

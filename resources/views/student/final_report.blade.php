@@ -310,36 +310,6 @@
                                                     {{ $project->description }}
                                                 </p>
                                             </div>
-
-                                            <!-- Indikator Berkas / Akses Cepat -->
-                                            <div class="flex flex-wrap items-center gap-1.5 text-[10px] pt-1">
-                                                @if($project->demo_url)
-                                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-semibold rounded-md border border-emerald-100 flex items-center gap-1">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                        Akses Daring
-                                                    </span>
-                                                @endif
-                                                @if($project->repository_url)
-                                                    <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-semibold rounded-md border border-indigo-100">
-                                                        Repo / Cloud
-                                                    </span>
-                                                @endif
-                                                @if($project->source_code_path)
-                                                    <span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-semibold rounded-md border border-amber-100">
-                                                        ZIP Berkas
-                                                    </span>
-                                                @endif
-                                                @if($cpCount > 0)
-                                                    <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-semibold rounded-md border border-teal-100">
-                                                        {{ $cpCount }} Lapangan
-                                                    </span>
-                                                @endif
-                                                @if($docCount > 0)
-                                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-700 font-semibold rounded-md border border-blue-100">
-                                                        {{ $docCount }} Dokumen
-                                                    </span>
-                                                @endif
-                                            </div>
                                         </div>
                                     </div>
 

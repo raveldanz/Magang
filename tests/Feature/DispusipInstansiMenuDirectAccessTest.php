@@ -22,7 +22,7 @@ class DispusipInstansiMenuDirectAccessTest extends TestCase
                 'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
                 'acronym' => 'Dispusip',
                 'email' => 'admin.dispusip@surabaya.go.id',
-                'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Surabaya',
+                'address' => 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275',
             ]);
         }
 

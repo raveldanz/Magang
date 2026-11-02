@@ -20,7 +20,7 @@ class UserController extends Controller
      * Role yang terikat ke instansi (agency_profile_id). Admin Dinas hanya boleh
      * mengelola akun dengan role ini jika berada di instansinya sendiri.
      */
-    private const AGENCY_SCOPED_ROLES = ['admin', 'mentor', 'pembimbing'];
+    private const AGENCY_SCOPED_ROLES = ['admin', 'supervisor', 'mentor', 'pembimbing'];
 
     /**
      * Role pihak kampus. Hanya Super Admin yang boleh membuat/mengubah/mereset akun ini
@@ -178,7 +178,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'role' => 'required|in:'.($this->currentUserIsSuperAdmin() ? 'admin,mentor,dosen,universitas,mahasiswa' : 'admin,mentor,mahasiswa'),
+            'role' => 'required|in:'.($this->currentUserIsSuperAdmin() ? 'admin,supervisor,mentor,dosen,universitas,mahasiswa' : 'admin,mentor,mahasiswa'),
             'password' => 'nullable|string|min:6',
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
@@ -186,10 +186,10 @@ class UserController extends Controller
             'return_to' => 'nullable|string',
         ]);
 
-        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
+        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor/Supervisor ke instansi lain
         // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
-        $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
-        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+        $agencyProfileId = in_array($request->role, ['admin', 'supervisor', 'mentor']) ? $request->agency_profile_id : null;
+        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'supervisor', 'mentor'])) {
             $agencyProfileId = Auth::user()->agency_profile_id;
         }
 
@@ -270,7 +270,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
-            'role' => 'required|in:'.($isSuperAdmin ? 'admin,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
+            'role' => 'required|in:'.($isSuperAdmin ? 'admin,supervisor,mentor,dosen,universitas,mahasiswa,super_admin' : 'admin,mentor,mahasiswa'),
             'agency_profile_id' => 'nullable|exists:agency_profiles,id',
             'university_id' => 'nullable|exists:universities,id',
             'status' => ['nullable', 'string', Rule::in(AccountStatus::values())],
@@ -278,10 +278,10 @@ class UserController extends Controller
             'return_to' => 'nullable|string',
         ]);
 
-        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor ke instansi lain
+        // Admin Dinas tidak boleh membuat/memindahkan akun Admin/Mentor/Supervisor ke instansi lain
         // (dan tidak boleh membuat Admin tanpa instansi = Admin Sistem / Super Admin).
-        $agencyProfileId = in_array($request->role, ['admin', 'mentor']) ? $request->agency_profile_id : null;
-        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'mentor'])) {
+        $agencyProfileId = in_array($request->role, ['admin', 'supervisor', 'mentor']) ? $request->agency_profile_id : null;
+        if (! $this->currentUserIsSuperAdmin() && in_array($request->role, ['admin', 'supervisor', 'mentor'])) {
             $agencyProfileId = Auth::user()->agency_profile_id;
         }
 

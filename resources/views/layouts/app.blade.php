@@ -93,8 +93,8 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow-xs w-full overflow-hidden border-b border-slate-100">
-                    <div class="max-w-7xl mx-auto py-4 px-3 sm:px-6 lg:px-8 w-full overflow-hidden">
+                <header class="bg-white shadow-xs w-full border-b border-slate-100 relative z-30">
+                    <div class="max-w-7xl mx-auto py-4 px-3 sm:px-6 lg:px-8 w-full">
                         {{ $header }}
                     </div>
                 </header>

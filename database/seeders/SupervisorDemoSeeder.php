@@ -83,19 +83,6 @@ class SupervisorDemoSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
-            ['email' => 'atasan.dispusip@surabaya.go.id'],
-            [
-                'name' => 'Tim Kerja Umum dan Kepegawaian',
-                'password' => $defaultPassword,
-                'role' => 'supervisor',
-                'agency_profile_id' => $dispusip->id,
-                'unit_id' => $unitSekretariat->id,
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-
         // 4. Akun Mentor Tim Kerja (Masing-masing Bidang)
         $mentorPerpus = User::updateOrCreate(
             ['email' => 'mentor.perpus@dispusip.surabaya.go.id'],

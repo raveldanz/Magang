@@ -56,7 +56,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('student.projects.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form action="{{ route('student.projects.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{ visibility: '{{ old('is_public', '1') == '1' ? 'public' : 'private' }}' }">
                 @csrf
 
                 <!-- BAGIAN 1: IDENTITAS & DESKRIPSI KARYA -->
@@ -90,6 +90,42 @@
                                 <option value="tata_kelola" {{ old('category') === 'tata_kelola' ? 'selected' : '' }}>Tata Kelola & SOP Layanan (Pedoman/Kebijakan Administrasi)</option>
                                 <option value="lainnya" {{ old('category') === 'lainnya' ? 'selected' : '' }}>Karya Inovasi Lainnya</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Status Visibilitas & Privasi Proyek -->
+                    <div class="pt-2 border-t border-slate-100">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            Status Visibilitas Karya di Galeri Publik Dinas
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="relative flex items-start gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition"
+                                   :class="visibility === 'public' ? 'border-blue-600 bg-blue-50/40 ring-1 ring-blue-500/20' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'">
+                                <input type="radio" name="is_public" value="1" x-model="visibility" class="mt-0.5 text-blue-600 focus:ring-blue-500" {{ old('is_public', '1') == '1' ? 'checked' : '' }}>
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span>Publik (Galeri Karya Proyek Dinas)</span>
+                                    </div>
+                                    <p class="text-slate-500 mt-1 leading-relaxed">
+                                        Karya dapat dinikmati publik umum, menerima ulasan diskusi, serta apresiasi suka (like).
+                                    </p>
+                                </div>
+                            </label>
+
+                            <label class="relative flex items-start gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition"
+                                   :class="visibility === 'private' ? 'border-amber-500 bg-amber-50/40 ring-1 ring-amber-500/20' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'">
+                                <input type="radio" name="is_public" value="0" x-model="visibility" class="mt-0.5 text-amber-600 focus:ring-amber-500" {{ old('is_public') === '0' ? 'checked' : '' }}>
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                        <span>Privat / Data Sensitif Kedinasan</span>
+                                    </div>
+                                    <p class="text-slate-500 mt-1 leading-relaxed">
+                                        Disembunyikan dari galeri publik jika memuat dokumen rahasia instansi atau arsip terbatas dinas.
+                                    </p>
+                                </div>
+                            </label>
                         </div>
                     </div>
 

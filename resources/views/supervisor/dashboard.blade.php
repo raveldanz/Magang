@@ -21,12 +21,12 @@
                     <div class="mt-4 pt-3 border-t border-slate-100">
                         <a href="{{ route('supervisor.applications.index') }}" 
                            class="w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
-                            Persetujuan Pengajuan
+                            Pengajuan
                         </a>
                     </div>
                 </div>
 
-                <!-- Card 2: Pengesahan Sertifikat -->
+                {{-- Card 2: Sertifikat --}}
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Sertifikat Menunggu ACC</span>
@@ -36,7 +36,7 @@
                     <div class="mt-4 pt-3 border-t border-slate-100">
                         <a href="{{ route('supervisor.certificates.index') }}" 
                            class="w-full inline-flex items-center justify-center py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition">
-                            Pengesahan Sertifikat
+                            Sertifikat
                         </a>
                     </div>
                 </div>

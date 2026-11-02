@@ -34,7 +34,10 @@ class ApplicationController extends Controller
             'user.studentProfile',
             'user.universityRelation',
             'unit.agencyProfile',
-            'group',
+            'group.applications.user.studentProfile',
+            'group.applications.documents',
+            'group.applications.placement.mentor',
+            'group.leader.studentProfile',
             'documents',
             'placement.evaluation',
             'placement.finalreport',
@@ -48,6 +51,13 @@ class ApplicationController extends Controller
         // Sama persis dengan pusat kendali dinas & kampus.
         $query->orderByActionPriority();
 
+        // Tampilkan 1 baris per pengajuan: pengajuan mandiri tampil mandiri, pengajuan kelompok diwakili ketua/baris utama kelompok
+        $query->where(function ($q) {
+            $q->whereNull('applications.group_id')
+              ->orWhere('applications.role_in_group', 'leader')
+              ->orWhereRaw('applications.id = (SELECT MIN(a2.id) FROM applications a2 WHERE a2.group_id = applications.group_id)');
+        });
+
         // Isolasi Bidang & Multi-Tenant:
         // Jika user adalah Admin Bidang, otomatis kunci hanya melihat pengajuan pada bidangnya sendiri
         if (! $isSuperAdmin && $user->unit_id) {
@@ -59,24 +69,44 @@ class ApplicationController extends Controller
             });
         }
 
-        // 1. Pencarian berdasarkan Nama Mahasiswa, NIM, atau Universitas
+        // 1. Pencarian komprehensif berdasarkan Nama Mahasiswa, NIM, Universitas, atau Nama/Kode Kelompok
         if ($request->filled('search')) {
             $search = strtolower($request->search);
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
-            $query->whereHas('user', function ($q) use ($search, $like) {
-                $q->where('name', $like, "%{$search}%")
-                    ->orWhereHas('studentProfile', function ($spQuery) use ($search, $like) {
-                        $spQuery->where('universitas', $like, "%{$search}%")
-                            ->orWhere('nim', $like, "%{$search}%");
-                    });
+            $query->where(function ($sq) use ($search, $like) {
+                $sq->whereHas('user', function ($q) use ($search, $like) {
+                    $q->where('name', $like, "%{$search}%")
+                        ->orWhereHas('studentProfile', function ($spQuery) use ($search, $like) {
+                            $spQuery->where('universitas', $like, "%{$search}%")
+                                ->orWhere('nim', $like, "%{$search}%");
+                        });
+                })->orWhereHas('group', function ($gq) use ($search, $like) {
+                    $gq->where('code', $like, "%{$search}%")
+                        ->orWhere('name', $like, "%{$search}%")
+                        ->orWhereHas('applications.user', function ($uq) use ($search, $like) {
+                            $uq->where('name', $like, "%{$search}%")
+                                ->orWhereHas('studentProfile', function ($spQuery) use ($search, $like) {
+                                    $spQuery->where('universitas', $like, "%{$search}%")
+                                        ->orWhere('nim', $like, "%{$search}%");
+                                });
+                        });
+                });
             });
         }
 
         // 2. Filter Berdasarkan Status Pengajuan ('action' = semua yang butuh tindakan admin, tingkat 1–3)
         if ($request->filled('status')) {
-            $request->status === 'action'
-                ? $query->requiringAction()
-                : $query->where('status', strtolower($request->status));
+            $statusVal = strtolower($request->status);
+            if ($statusVal === 'action') {
+                $query->requiringAction();
+            } else {
+                $query->where(function ($q) use ($statusVal) {
+                    $q->where('applications.status', $statusVal)
+                      ->orWhereHas('group.applications', function ($gq) use ($statusVal) {
+                          $gq->where('status', $statusVal);
+                      });
+                });
+            }
         }
 
         // 3. Filter Berdasarkan Unit / Divisi Kerja (Hanya jika Super Admin atau Admin Dinas Keseluruhan)
@@ -129,6 +159,16 @@ class ApplicationController extends Controller
         $agencies = AgencyProfile::all();
         $universities = University::orderBy('name')->get();
 
+        // Query Pembimbing Lapangan untuk modal aksi
+        $pembimbingQuery = User::whereIn('role', ['mentor', 'pembimbing'])->with('unit');
+        if ($agencyId !== null) {
+            $pembimbingQuery->where('agency_profile_id', $agencyId);
+        }
+        if (! $isSuperAdmin && $user->unit_id) {
+            $pembimbingQuery->where('unit_id', $user->unit_id);
+        }
+        $pembimbings = $pembimbingQuery->orderBy('name')->get();
+
         // Paginasi 10 Data Per Halaman
         $applications = $query->paginate(10)->withQueryString();
 
@@ -139,6 +179,7 @@ class ApplicationController extends Controller
             'agencies',
             'universities',
             'selectedUniversity',
+            'pembimbings',
             'isSuperAdmin',
             'agencyId'
         ));
@@ -423,37 +464,51 @@ class ApplicationController extends Controller
             if ($application->group_id) {
                 $group = \App\Models\InternshipGroup::find($application->group_id);
                 if ($group) {
-                    $group->update([
-                        'status' => $newStatus,
-                        'letter_number' => $appUpdateData['letter_number'] ?? $group->letter_number,
-                        'letter_date' => $appUpdateData['letter_date'] ?? $group->letter_date,
-                        'letter_token' => $group->letter_token ?: $letterToken,
-                        'rejection_reason' => $appUpdateData['rejection_reason'] ?? null,
-                    ]);
+                    $shouldSyncSiblings = $request->boolean('sync_group', true);
 
-                    $siblingApps = Application::where('group_id', $group->id)
-                        ->where('id', '!=', $application->id)
-                        ->get();
+                    if ($shouldSyncSiblings) {
+                        $group->update([
+                            'status' => $newStatus,
+                            'letter_number' => $appUpdateData['letter_number'] ?? $group->letter_number,
+                            'letter_date' => $appUpdateData['letter_date'] ?? $group->letter_date,
+                            'letter_token' => $group->letter_token ?: $letterToken,
+                            'rejection_reason' => $appUpdateData['rejection_reason'] ?? null,
+                        ]);
 
-                    foreach ($siblingApps as $sibling) {
-                        $siblingUpdateData = $appUpdateData;
-                        $siblingUpdateData['letter_token'] = $sibling->letter_token ?: Str::random(32);
-                        $sibling->update($siblingUpdateData);
+                        $siblingApps = Application::where('group_id', $group->id)
+                            ->where('id', '!=', $application->id)
+                            ->get();
 
-                        if ($assignedMentorId || in_array($newStatus, $placementEligibleStatuses)) {
-                            $sibPlacement = Placement::where('application_id', $sibling->id)->first();
-                            $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
-                            $sibPlacementData = $placementData;
-                            if (in_array($newStatus, $placementEligibleStatuses)) {
-                                $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
-                                $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
+                        foreach ($siblingApps as $sibling) {
+                            $siblingUpdateData = $appUpdateData;
+                            $siblingUpdateData['letter_token'] = $sibling->letter_token ?: Str::random(32);
+                            $sibling->update($siblingUpdateData);
+
+                            if ($assignedMentorId || in_array($newStatus, $placementEligibleStatuses)) {
+                                $sibPlacement = Placement::where('application_id', $sibling->id)->first();
+                                $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                                $sibPlacementData = $placementData;
+                                if (in_array($newStatus, $placementEligibleStatuses)) {
+                                    $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
+                                    $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
+                                }
+                                if ($sibPlacement) {
+                                    $sibPlacement->update($sibPlacementData);
+                                } else {
+                                    $sibPlacementData['application_id'] = $sibling->id;
+                                    Placement::create($sibPlacementData);
+                                }
                             }
-                            if ($sibPlacement) {
-                                $sibPlacement->update($sibPlacementData);
-                            } else {
-                                $sibPlacementData['application_id'] = $sibling->id;
-                                Placement::create($sibPlacementData);
-                            }
+                        }
+                    } else {
+                        // Pembaruan individu: perbarui status agregat kelompok tanpa merusak anggota lain
+                        $groupStatuses = Application::where('group_id', $group->id)->pluck('status')->map(fn ($s) => $s instanceof \App\Enums\ApplicationStatus ? $s->value : (string) $s)->unique();
+                        if ($groupStatuses->count() === 1) {
+                            $group->update(['status' => $groupStatuses->first()]);
+                        } elseif ($groupStatuses->contains('accepted') || $groupStatuses->contains('active')) {
+                            $group->update(['status' => 'accepted']);
+                        } elseif ($groupStatuses->contains('waiting_approval')) {
+                            $group->update(['status' => 'waiting_approval']);
                         }
                     }
                 }
@@ -519,11 +574,114 @@ class ApplicationController extends Controller
             }
         });
 
+        // Sinkronkan status kelompok jika pengajuan memiliki grup
+        if ($application->group_id) {
+            $group = \App\Models\InternshipGroup::with('applications')->find($application->group_id);
+            if ($group) {
+                $statuses = $group->applications->map(fn ($a) => $a->statusValue())->unique();
+                if ($statuses->count() === 1) {
+                    $group->update(['status' => $statuses->first()]);
+                } elseif ($statuses->contains('accepted') || $statuses->contains('active')) {
+                    $group->update(['status' => 'accepted']);
+                }
+            }
+        }
+
         if ($request->filled('return_to')) {
             return redirect()->to($request->input('return_to'))->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
         }
 
         return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
+    }
+
+    /**
+     * Update status kelompok magang secara serentak (Aksi Langsung Sekelompok)
+     */
+    public function updateGroupStatus(Request $request, $id)
+    {
+        $user = Auth::user();
+        $isSuperAdmin = $user->isSuperAdmin();
+        $group = \App\Models\InternshipGroup::with(['applications.user', 'unit'])->findOrFail($id);
+
+        if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($group->unit)->agency_profile_id !== $user->agency_profile_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
+        }
+
+        if (! $isSuperAdmin && $user->unit_id && $group->unit_id !== $user->unit_id) {
+            abort(403, 'Anda tidak memiliki hak akses ke data pengajuan bidang lain.');
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,waiting_approval,accepted,active,completed,rejected',
+            'rejection_note' => 'nullable|string',
+            'mentor_id' => 'nullable|exists:users,id',
+        ]);
+
+        if ($request->status === 'rejected' && empty($request->rejection_note)) {
+            return redirect()->back()->with('error', 'Alasan penolakan wajib diisi jika menolak pengajuan kelompok.');
+        }
+
+        $newStatus = $request->status;
+        if ($newStatus === 'accepted' && ! $isSuperAdmin && ! ($user->role === 'supervisor')) {
+            $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
+        }
+
+        $year = date('Y');
+        $letterDate = date('Y-m-d');
+        $letterToken = $group->letter_token ?: Str::random(32);
+
+        DB::transaction(function () use ($group, $newStatus, $request, $year, $letterDate, $letterToken) {
+            $group->update([
+                'status' => $newStatus,
+                'rejection_reason' => $newStatus === 'rejected' ? $request->rejection_note : null,
+                'letter_date' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($group->letter_date ?: $letterDate) : null,
+                'letter_token' => in_array($newStatus, ['waiting_approval', 'accepted']) ? $letterToken : $group->letter_token,
+            ]);
+
+            foreach ($group->applications as $app) {
+                $paddedId = str_pad($app->id, 3, '0', STR_PAD_LEFT);
+                $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
+
+                $app->update([
+                    'status' => $newStatus,
+                    'rejection_note' => $newStatus === 'rejected' ? $request->rejection_note : null,
+                    'rejection_reason' => $newStatus === 'rejected' ? $request->rejection_note : null,
+                    'letter_number' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($app->letter_number ?: $autoLetterNumber) : null,
+                    'letter_date' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($app->letter_date ?: $letterDate) : null,
+                    'letter_token' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($app->letter_token ?: Str::random(32)) : $app->letter_token,
+                ]);
+
+                if (in_array($newStatus, ['waiting_approval', 'accepted'])) {
+                    $existingPlacement = Placement::where('application_id', $app->id)->first();
+                    $placementData = [
+                        'certificate_hash' => $existingPlacement?->certificate_hash ?: Str::random(32),
+                        'certificate_number' => $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}",
+                    ];
+                    if ($request->filled('mentor_id')) {
+                        $placementData['mentor_id'] = $request->mentor_id;
+                        $placementData['pembimbing_id'] = $request->mentor_id;
+                    }
+                    if ($existingPlacement) {
+                        $existingPlacement->update($placementData);
+                    } else {
+                        Placement::create(array_merge(['application_id' => $app->id], $placementData));
+                    }
+                }
+
+                AuditLog::record('GROUP_APPLICATION_STATUS_UPDATE', 'Application', $app->id, [
+                    'group_id' => $group->id,
+                    'group_name' => $group->name,
+                    'new_status' => $newStatus,
+                    'student_name' => $app->user?->name,
+                ]);
+
+                if ($newStatus === ApplicationStatus::WAITING_APPROVAL->value) {
+                    NotificationService::notifySupervisorForApplication($app);
+                }
+            }
+        });
+
+        return redirect()->back()->with('success', 'Status kelompok dan seluruh anggotanya berhasil diperbarui!');
     }
 
     /**
@@ -546,14 +704,20 @@ class ApplicationController extends Controller
         ]);
 
         $action = $request->bulk_action;
-        $applicationIds = $request->application_ids;
+        $applicationIds = array_values(array_unique((array) $request->application_ids));
         $successCount = 0;
         $failCount = 0;
         $year = date('Y');
+        $processedGroupIds = [];
 
-        $applications = Application::with(['unit', 'placement', 'user'])->whereIn('id', $applicationIds)->get();
+        $applications = Application::with(['unit', 'placement', 'user', 'group.applications'])->whereIn('id', $applicationIds)->get();
 
         foreach ($applications as $application) {
+            // Jika grup sudah diproses dalam batch yang sama, lewati tanpa menghitung gagal
+            if ($application->group_id && in_array($application->group_id, $processedGroupIds, true)) {
+                continue;
+            }
+
             // Multi-Tenant Check
             if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($application->unit)->agency_profile_id !== $user->agency_profile_id) {
                 $failCount++;
@@ -582,15 +746,16 @@ class ApplicationController extends Controller
             // Kuota Check jika accepted
             if ($action === 'accepted') {
                 if ($unit) {
+                    $groupSize = $application->group ? $application->group->applications()->count() : 1;
                     $overlappingInterns = $unit->applications()
                         ->whereIn('status', ['accepted', 'active'])
                         ->where('id', '!=', $application->id)
-                        ->where(function ($query) use ($application) {
+                        ->when($application->start_date && $application->end_date, function ($query) use ($application) {
                             $query->where('start_date', '<=', $application->end_date)
                                 ->where('end_date', '>=', $application->start_date);
                         })->count();
 
-                    if ($overlappingInterns >= $unit->quota) {
+                    if (($overlappingInterns + $groupSize) > $unit->quota) {
                         $failCount++;
 
                         continue;
@@ -708,6 +873,10 @@ class ApplicationController extends Controller
                     NotificationService::notifySupervisorForApplication($application);
                 }
             });
+
+            if ($application->group_id) {
+                $processedGroupIds[] = $application->group_id;
+            }
 
             $successCount++;
         }

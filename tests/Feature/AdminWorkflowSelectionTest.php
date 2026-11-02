@@ -309,7 +309,7 @@ class AdminWorkflowSelectionTest extends TestCase
         // Cek halaman dashboard supervisor
         $responseDashboard = $this->get(route('supervisor.dashboard'));
         $responseDashboard->assertOk();
-        $responseDashboard->assertSee('Pengesahan Sertifikat');
+        $responseDashboard->assertSee('Sertifikat');
         $responseDashboard->assertSee('Dashboard');
         $responseDashboard->assertDontSee('Dashboard &amp; Tim Kerja');
         $responseDashboard->assertDontSee('Dashboard & Tim Kerja');

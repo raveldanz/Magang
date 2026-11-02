@@ -94,7 +94,7 @@ class ApplicationApprovalController extends Controller
      */
     public function approve(Request $request, $id)
     {
-        $application = Application::with(['unit', 'placement', 'user'])->findOrFail($id);
+        $application = Application::with(['unit', 'placement', 'user', 'group.applications'])->findOrFail($id);
         $user = Auth::user();
 
         // Status baru: jika sudah melewati start_date, langsung 'active'; jika belum, 'accepted'
@@ -107,67 +107,91 @@ class ApplicationApprovalController extends Controller
         $paddedId = str_pad($application->id, 3, '0', STR_PAD_LEFT);
         $autoLetterNumber = $application->letter_number ?: "500.12.1/{$paddedId}/436.7.14/{$year}";
         $letterToken = $application->letter_token ?: Str::random(32);
+        $letterDate = $application->letter_date ?: date('Y-m-d');
 
-        DB::transaction(function () use ($application, $newStatus, $autoLetterNumber, $letterToken, $paddedId, $year, $user) {
+        DB::transaction(function () use ($application, $newStatus, $autoLetterNumber, $letterToken, $letterDate, $paddedId, $year, $user) {
             $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) $application->status;
 
-            $application->update([
-                'status' => $newStatus,
-                'letter_number' => $autoLetterNumber,
-                'letter_date' => $application->letter_date ?: date('Y-m-d'),
-                'letter_token' => $letterToken,
-                'rejection_note' => null,
-                'rejection_reason' => null,
-            ]);
-
-            // Pastikan Placement aktif dan memiliki nomor sertifikat & token verifikasi
-            $existingPlacement = Placement::where('application_id', $application->id)->first();
-            $placementData = [
-                'certificate_hash' => $existingPlacement?->certificate_hash ?: Str::random(32),
-                'certificate_number' => $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/DISPUSIP-SBY/{$year}",
-            ];
-
-            Placement::updateOrCreate(
-                ['application_id' => $application->id],
-                $placementData
-            );
-
-            // Jika pengajuan kelompok, sinkronkan seluruh anggota kelompok
+            // Jika pengajuan kelompok, sinkronkan seluruh anggota kelompok bersama-sama
             if ($application->group_id) {
                 $group = \App\Models\InternshipGroup::find($application->group_id);
                 if ($group) {
                     $group->update([
                         'status' => $newStatus,
                         'letter_number' => $autoLetterNumber,
-                        'letter_date' => $application->letter_date ?: date('Y-m-d'),
-                        'letter_token' => $letterToken,
+                        'letter_date' => $letterDate,
+                        'letter_token' => $group->letter_token ?: $letterToken,
                     ]);
 
-                    $siblingApps = Application::where('group_id', $group->id)
-                        ->where('id', '!=', $application->id)
-                        ->get();
+                    // Ambil penempatan existing sebagai template mentor/dosen bila ada
+                    $leadPlacement = Placement::where('application_id', $application->id)->first();
+                    if (! $leadPlacement && $group->leader_user_id) {
+                        $leaderApp = Application::where('group_id', $group->id)->where('role_in_group', 'leader')->first();
+                        if ($leaderApp) {
+                            $leadPlacement = Placement::where('application_id', $leaderApp->id)->first();
+                        }
+                    }
 
-                    foreach ($siblingApps as $sibling) {
-                        $sibling->update([
+                    $allGroupApps = Application::where('group_id', $group->id)->get();
+                    foreach ($allGroupApps as $memberApp) {
+                        $memberPaddedId = str_pad($memberApp->id, 3, '0', STR_PAD_LEFT);
+                        $memberApp->update([
                             'status' => $newStatus,
                             'letter_number' => $autoLetterNumber,
-                            'letter_date' => $application->letter_date ?: date('Y-m-d'),
-                            'letter_token' => $sibling->letter_token ?: Str::random(32),
+                            'letter_date' => $letterDate,
+                            'letter_token' => $memberApp->letter_token ?: Str::random(32),
+                            'unit_id' => $memberApp->unit_id ?: $application->unit_id,
+                            'start_date' => $memberApp->start_date ?: $application->start_date,
+                            'end_date' => $memberApp->end_date ?: $application->end_date,
                             'rejection_note' => null,
                             'rejection_reason' => null,
                         ]);
 
-                        $sibPlacement = Placement::where('application_id', $sibling->id)->first();
-                        $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
+                        $memberPlacement = Placement::where('application_id', $memberApp->id)->first();
+                        $memberPlacementData = [
+                            'certificate_hash' => $memberPlacement?->certificate_hash ?: Str::random(32),
+                            'certificate_number' => $memberPlacement?->certificate_number ?: "SERT/{$memberPaddedId}/DISPUSIP-SBY/{$year}",
+                        ];
+
+                        $mentorId = $memberPlacement?->mentor_id ?: $leadPlacement?->mentor_id;
+                        if ($mentorId) {
+                            $memberPlacementData['mentor_id'] = $mentorId;
+                            $memberPlacementData['pembimbing_id'] = $mentorId;
+                        }
+
+                        $advisorId = $memberPlacement?->academic_advisor_id ?: $leadPlacement?->academic_advisor_id;
+                        if ($advisorId) {
+                            $memberPlacementData['academic_advisor_id'] = $advisorId;
+                        }
+
                         Placement::updateOrCreate(
-                            ['application_id' => $sibling->id],
-                            [
-                                'certificate_hash' => $sibPlacement?->certificate_hash ?: Str::random(32),
-                                'certificate_number' => $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/DISPUSIP-SBY/{$year}",
-                            ]
+                            ['application_id' => $memberApp->id],
+                            $memberPlacementData
                         );
                     }
                 }
+            } else {
+                // Pengajuan Individu
+                $application->update([
+                    'status' => $newStatus,
+                    'letter_number' => $autoLetterNumber,
+                    'letter_date' => $letterDate,
+                    'letter_token' => $letterToken,
+                    'rejection_note' => null,
+                    'rejection_reason' => null,
+                ]);
+
+                // Pastikan Placement aktif dan memiliki nomor sertifikat & token verifikasi
+                $existingPlacement = Placement::where('application_id', $application->id)->first();
+                $placementData = [
+                    'certificate_hash' => $existingPlacement?->certificate_hash ?: Str::random(32),
+                    'certificate_number' => $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/DISPUSIP-SBY/{$year}",
+                ];
+
+                Placement::updateOrCreate(
+                    ['application_id' => $application->id],
+                    $placementData
+                );
             }
 
             // Audit Trail
@@ -176,13 +200,20 @@ class ApplicationApprovalController extends Controller
                 'new_status' => $newStatus,
                 'student_name' => $application->user?->name,
                 'unit_name' => $application->unit?->name,
+                'is_group' => (bool) $application->group_id,
+                'group_id' => $application->group_id,
                 'approved_by' => $user->name,
                 'approved_by_id' => $user->id,
             ]);
         });
 
+        $group = $application->group_id ? \App\Models\InternshipGroup::find($application->group_id) : null;
+        $successMsg = $group
+            ? "Pengajuan magang kelompok '{$group->name}' ({$group->applications()->count()} anggota) berhasil disetujui (ACC) dan Surat Balasan resmi telah diterbitkan!"
+            : "Pengajuan magang atas nama {$application->user?->name} berhasil disetujui (ACC) dan Surat Balasan resmi telah diterbitkan!";
+
         return redirect()->route('supervisor.applications.index')
-            ->with('success', "Pengajuan magang atas nama {$application->user?->name} berhasil disetujui (ACC) dan Surat Balasan resmi telah diterbitkan!");
+            ->with('success', $successMsg);
     }
 
     /**
@@ -219,6 +250,7 @@ class ApplicationApprovalController extends Controller
                 ]);
                 Application::where('group_id', $group->id)
                     ->where('id', '!=', $application->id)
+                    ->where('status', '!=', 'rejected')
                     ->update([
                         'status' => ApplicationStatus::PENDING->value,
                         'rejection_note' => $rejectionText,

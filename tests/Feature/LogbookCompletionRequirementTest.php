@@ -93,7 +93,7 @@ class LogbookCompletionRequirementTest extends TestCase
             'unit_id' => $this->unit->id,
             'status' => ApplicationStatus::ACTIVE,
             'start_date' => Carbon::now()->subMonths(2)->toDateString(),
-            'end_date' => Carbon::now()->addMonth()->toDateString(),
+            'end_date' => Carbon::now()->subDays(1)->toDateString(),
         ]);
 
         $this->placement = Placement::create([
@@ -234,5 +234,33 @@ class LogbookCompletionRequirementTest extends TestCase
 
         $this->application->refresh();
         $this->assertEquals(ApplicationStatus::COMPLETED, $this->application->status);
+    }
+
+    /**
+     * 7. Flaw A: syncCompletionStatus menolak menyelesaikan magang sebelum masa magang berakhir (end_date in future)
+     */
+    public function test_student_cannot_graduate_prematurely_while_internship_is_still_ongoing(): void
+    {
+        // Set end_date 2 minggu ke depan
+        $this->application->update([
+            'end_date' => Carbon::now()->addWeeks(2)->toDateString(),
+            'status' => ApplicationStatus::ACTIVE,
+        ]);
+
+        // Mahasiswa mengisi logbook
+        Logbook::create([
+            'placement_id' => $this->placement->id,
+            'date' => Carbon::now()->toDateString(),
+            'activity' => 'Mengerjakan tugas harian magang',
+            'status' => 'approved',
+        ]);
+
+        // syncCompletionStatus otomatis harus menolak kelulusan dini (return false)
+        $this->assertFalse($this->placement->syncCompletionStatus());
+        $this->assertEquals(ApplicationStatus::ACTIVE, $this->application->fresh()->status);
+
+        // Jika secara eksplisit diizinkan kelulusan dini ($allowEarlyCompletion = true)
+        $this->assertTrue($this->placement->syncCompletionStatus(allowEarlyCompletion: true));
+        $this->assertEquals(ApplicationStatus::COMPLETED, $this->application->fresh()->status);
     }
 }

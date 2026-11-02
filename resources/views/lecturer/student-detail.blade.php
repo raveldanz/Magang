@@ -22,8 +22,9 @@
         if (!$univ && $student) {
             $univ = app(\App\Services\UniversityResolver::class)->forUser($student);
         }
-        $scheme = $univ->evaluation_scheme ?? 'dual_evaluation';
-        $isMentorOnly = ($scheme === 'mentor_only');
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+        $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
 
         $app = $placement->application;
         $appStatusVal = $app ? ($app->status instanceof \BackedEnum ? $app->status->value : $app->status) : 'active';
@@ -91,13 +92,15 @@
 
         $studentInitial = strtoupper(substr($student->name ?? 'M', 0, 1));
 
-        // 4 Indikator Kelengkapan Magang
+        // Indikator Kelengkapan Magang Dinamis (3 Syarat jika 100% Dinas, 4 Syarat jika Skema Ganda)
         $readyLogbook = ($logbookTotal > 0);
         $readyReport = $isReportApproved;
-        $readyLecturerScore = $isMentorOnly || $hasEval;
         $readyMentorScore = $hasMentorScore;
-        $readyCount = ($readyLogbook ? 1 : 0) + ($readyReport ? 1 : 0) + ($readyLecturerScore ? 1 : 0) + ($readyMentorScore ? 1 : 0);
-        $readinessPercent = round(($readyCount / 4) * 100);
+        $readyLecturerScore = $hasEval;
+
+        $totalRequirements = $isMentorOnly ? 3 : 4;
+        $readyCount = ($readyLogbook ? 1 : 0) + ($readyReport ? 1 : 0) + ($readyMentorScore ? 1 : 0) + (! $isMentorOnly && $readyLecturerScore ? 1 : 0);
+        $readinessPercent = round(($readyCount / $totalRequirements) * 100);
 
         // Status Izin Chat & Grup Komunikasi
         $chatViewer = auth()->user();
@@ -325,7 +328,7 @@
                     
                     <div class="flex items-center gap-3 self-end sm:self-center">
                         <div class="text-right">
-                            <span class="text-xs font-bold text-slate-900">{{ $readyCount }} dari 4 Syarat</span>
+                            <span class="text-xs font-bold text-slate-900">{{ $readyCount }} dari {{ $totalRequirements }} Syarat</span>
                             <div class="w-24 bg-slate-100 rounded-full h-1.5 mt-1 overflow-hidden">
                                 <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-500" style="width: {{ $readinessPercent }}%"></div>
                             </div>
@@ -336,8 +339,8 @@
                     </div>
                 </div>
 
-                <!-- 4 Interactive Micro-Cards -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
+                <!-- Interactive Micro-Cards (3 Syarat jika 100% Dinas, 4 Syarat jika Skema Ganda) -->
+                <div class="grid grid-cols-1 sm:grid-cols-{{ $isMentorOnly ? '3' : '2 lg:grid-cols-4' }} gap-2.5 sm:gap-3 text-xs">
                     <!-- 1. Logbook -->
                     <button type="button" @click="activeTab = 'logbook'"
                             class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLogbook ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50' }}">
@@ -358,7 +361,7 @@
                     <button type="button" @click="activeTab = 'laporan'"
                             class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyReport ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : ($finalReport ? 'bg-amber-50/50 border-amber-200/80 hover:bg-amber-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50') }}">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">2. Laporan Akhir</span>
+                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">2. Laporan Akhir (ACC DPL)</span>
                             @if($readyReport)
                                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             @elseif($finalReport)
@@ -378,42 +381,43 @@
                         </div>
                     </button>
 
-                    <!-- 3. Nilai Mentor -->
-                    <div class="p-3 sm:p-3.5 rounded-xl border text-left {{ $readyMentorScore ? 'bg-emerald-50/50 border-emerald-200/80' : 'bg-slate-50/70 border-slate-200/70' }}">
+                    <!-- 3. Nilai Dinas / Mentor -->
+                    <button type="button" @click="activeTab = 'evaluasi'"
+                            class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyMentorScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-slate-50/70 border-slate-200/70 hover:bg-slate-50' }}">
                         <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] font-semibold text-slate-500">3. Nilai Dinas (Mentor)</span>
+                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">3. Nilai Dinas ({{ $isMentorOnly ? '100%' : ($univ->weight_mentor ?? 60).'%' }})</span>
                             @if($readyMentorScore)
                                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                             @else
                                 <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></span>
                             @endif
                         </div>
-                        <div class="font-bold mt-1 text-slate-900">
+                        <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
                             {{ $readyMentorScore ? 'Skor: '.number_format($eval->nilai_pembimbing ?? 0, 1) : 'Menunggu Dinas' }}
                         </div>
-                    </div>
-
-                    <!-- 4. Nilai DPL -->
-                    <button type="button" @click="activeTab = 'evaluasi'"
-                            class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLecturerScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-blue-50/40 border-blue-200/80 hover:bg-blue-50/70' }}">
-                        <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">4. Nilai DPL</span>
-                            @if($readyLecturerScore)
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                            @else
-                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Input</span>
-                            @endif
-                        </div>
-                        <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
-                            @if($isMentorOnly)
-                                Skema 100% Mentor
-                            @elseif($hasEval)
-                                Skor: {{ number_format($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0), 1) }}
-                            @else
-                                Siap Diinput DPL
-                            @endif
-                        </div>
                     </button>
+
+                    @if (!$isMentorOnly)
+                        <!-- 4. Nilai DPL (Hanya untuk skema evaluasi ganda) -->
+                        <button type="button" @click="activeTab = 'evaluasi'"
+                                class="p-3 sm:p-3.5 rounded-xl border transition text-left cursor-pointer group {{ $readyLecturerScore ? 'bg-emerald-50/50 border-emerald-200/80 hover:bg-emerald-50' : 'bg-blue-50/40 border-blue-200/80 hover:bg-blue-50/70' }}">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[11px] font-semibold text-slate-500 group-hover:text-slate-800 transition">4. Nilai DPL</span>
+                                @if($readyLecturerScore)
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                @else
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Input</span>
+                                @endif
+                            </div>
+                            <div class="font-bold mt-1 text-slate-900 group-hover:text-blue-600 transition">
+                                @if($hasEval)
+                                    Skor: {{ number_format($eval->nilai_dosen_calculated ?? ($eval->nilai_akademik ?? 0), 1) }}
+                                @else
+                                    Siap Diinput DPL
+                                @endif
+                            </div>
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -489,7 +493,7 @@
                             @else
                                 <a href="{{ route('lecturer.evaluations.create', $placement->id) }}"
                                    class="inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
-                                    {{ $hasEval ? 'Ubah Nilai Evaluasi' : 'Isi Nilai Evaluasi' }}
+                                    {{ $isMentorOnly ? ($eval?->feedback_dosen ? 'Ubah Catatan Bimbingan' : 'Beri Catatan Bimbingan') : ($hasEval ? 'Ubah Nilai Evaluasi' : 'Isi Nilai Evaluasi') }}
                                 </a>
                             @endif
                         </div>
@@ -511,9 +515,12 @@
                             </div>
 
                             @if ($isMentorOnly)
-                                <p class="text-xs text-slate-500 italic p-2">
-                                    Kebijakan kampus menerapkan 100% penilaian dari Mentor Lapangan.
-                                </p>
+                                <div class="p-3 bg-white rounded-xl shadow-2xs space-y-1">
+                                    <p class="text-xs font-semibold text-slate-700">Kebijakan Kampus: 100% Penilaian Mentor Dinas</p>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                                        Perguruan tinggi menetapkan bahwa seluruh nilai angka (100%) diberikan oleh Mentor Lapangan di instansi. DPL mendampingi mahasiswa, menyetujui logbook, mereview laporan akhir, dan memberikan catatan evaluasi akhir.
+                                    </p>
+                                </div>
                             @else
                                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
                                     @forelse ($eval?->dosen_aspects_list ?? [] as $dAspect)
@@ -616,16 +623,63 @@
             <!-- ========================================================================= -->
             <!-- TAB 2: LOGBOOK AKTIVITAS MINGGUAN -->
             <!-- ========================================================================= -->
+            @php
+                $mentorApprovedPendingCount = $logbooks->where('status', 'approved')->where('lecturer_status', 'pending')->count();
+            @endphp
             <div x-show="activeTab === 'logbook'" class="space-y-5">
                 <div class="bg-white rounded-2xl p-6 shadow-xs space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h3 class="font-bold text-base text-slate-900">
-                            Logbook Aktivitas Mahasiswa
-                        </h3>
-                        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full">
-                            Verifikasi DPL
-                        </span>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-base text-slate-900 leading-tight">
+                                Logbook Aktivitas Mahasiswa
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                Pantau dan validasi jurnal aktivitas harian bimbingan magang
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
+                                {{ $logbookTotal }} Entri
+                            </span>
+                            @if ($mentorApprovedPendingCount > 0)
+                                <form method="POST" action="{{ route('lecturer.students.logbooks.approve_mentor_reviewed', $placement->id) }}"
+                                      onsubmit="return confirm('Setujui sekaligus seluruh {{ $mentorApprovedPendingCount }} logbook yang telah disetujui Mentor Lapangan?');">
+                                    @csrf
+                                    <button type="submit"
+                                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer active:scale-95">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <span>ACC Semua yang Di-ACC Mentor ({{ $mentorApprovedPendingCount }})</span>
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
+
+                    @if ($mentorApprovedPendingCount > 0)
+                        <div class="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-emerald-950">
+                                        {{ $mentorApprovedPendingCount }} Logbook Siap ACC Satu Klik
+                                    </p>
+                                    <p class="text-[11px] text-emerald-800/90 mt-0.5">
+                                        Mentor Lapangan telah memeriksa dan menyetujui logbook ini. Anda dapat menyetujui seluruhnya secara instan.
+                                    </p>
+                                </div>
+                            </div>
+                            <form method="POST" action="{{ route('lecturer.students.logbooks.approve_mentor_reviewed', $placement->id) }}">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs shrink-0 cursor-pointer active:scale-95">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Setujui {{ $mentorApprovedPendingCount }} Sekaligus</span>
+                                </button>
+                            </form>
+                        </div>
+                    @endif
 
                     <x-supervision.logbook-weekly
                         :bundles="$weeklyBundles"
