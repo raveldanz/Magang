@@ -61,61 +61,83 @@
                 </div>
             </div>
 
-            {{-- 2. BAR PENCARIAN & FILTER MULTI-DIMENSI --}}
-            <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm">
-                <form method="GET" action="{{ route('public.projects.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
+            {{-- 2. BAR PENCARIAN & FILTER MULTI-DIMENSI (Layout 2-Baris Lega & Anti-Squish) --}}
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-3.5">
+                <form method="GET" action="{{ route('public.projects.index') }}" class="space-y-3.5">
                     
-                    {{-- Pencarian Kata Kunci --}}
-                    <div class="lg:col-span-4 relative flex items-center">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    {{-- Baris 1: Pencarian Utama (Lega) & Tombol Aksi --}}
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ $search }}" 
+                                   placeholder="Cari judul proyek, nama mahasiswa, kampus, atau topik inovasi..." 
+                                   class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs font-medium placeholder:text-slate-400 h-11 transition"
+                                   style="padding-left: 2.75rem !important; padding-right: 1rem !important;">
                         </div>
-                        <input type="text" 
-                               name="search" 
-                               value="{{ $search }}" 
-                               placeholder="Cari judul proyek, nama mahasiswa, kampus..." 
-                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 px-5 h-11 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition duration-150 cursor-pointer w-full sm:w-auto">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                </svg>
+                                <span>Filter</span>
+                            </button>
+
+                            @if(!empty($search) || (!empty($category) && $category !== 'all') || (!empty($year) && $year !== 'all') || (!empty($sort) && $sort !== 'latest'))
+                                <a href="{{ route('public.projects.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs sm:text-sm font-semibold rounded-xl shadow-2xs transition duration-150 shrink-0">
+                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span>Reset</span>
+                                </a>
+                            @endif
+                        </div>
                     </div>
 
-                    {{-- Filter Kategori --}}
-                    <div class="lg:col-span-3">
-                        <select name="category" class="w-full py-2.5 px-3 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition bg-white cursor-pointer">
-                            <option value="all">Semua Kategori Karya</option>
-                            @foreach(\App\Models\InternshipProject::CATEGORIES as $catKey => $catData)
-                                <option value="{{ $catKey }}" {{ $category === $catKey ? 'selected' : '' }}>
-                                    {{ $catData['label'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    {{-- Baris 2: Dropdown Filter Proporsional (Grid 3 Kolom Lega & Anti-Squish) --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-0.5">
+                        {{-- Filter Kategori --}}
+                        <div class="relative">
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kategori Bidang</label>
+                            <select name="category" onchange="this.form.submit()" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition cursor-pointer shadow-2xs">
+                                <option value="all">Semua Kategori Karya</option>
+                                @foreach(\App\Models\InternshipProject::CATEGORIES as $catKey => $catData)
+                                    <option value="{{ $catKey }}" {{ $category === $catKey ? 'selected' : '' }}>
+                                        {{ $catData['label'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    {{-- Filter Tahun Perjalanan --}}
-                    <div class="lg:col-span-2">
-                        <select name="year" class="w-full py-2.5 px-3 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition bg-white cursor-pointer">
-                            <option value="all">Semua Tahun</option>
-                            @foreach($availableYears as $yr)
-                                <option value="{{ $yr }}" {{ (string)$year === (string)$yr ? 'selected' : '' }}>
-                                    Tahun {{ $yr }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                        {{-- Filter Tahun Perjalanan --}}
+                        <div class="relative">
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tahun Proyek</label>
+                            <select name="year" onchange="this.form.submit()" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition cursor-pointer shadow-2xs">
+                                <option value="all">Semua Tahun</option>
+                                @foreach($availableYears as $yr)
+                                    <option value="{{ $yr }}" {{ (string)$year === (string)$yr ? 'selected' : '' }}>
+                                        Tahun {{ $yr }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    {{-- Pengurutan --}}
-                    <div class="lg:col-span-2">
-                        <select name="sort" class="w-full py-2.5 px-3 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition bg-white cursor-pointer">
-                            <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Terbaru</option>
-                            <option value="popular" {{ $sort === 'popular' ? 'selected' : '' }}>Paling Banyak Disukai</option>
-                            <option value="discussed" {{ $sort === 'discussed' ? 'selected' : '' }}>Paling Banyak Didiskusikan</option>
-                            <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Terlama</option>
-                        </select>
-                    </div>
-
-                    {{-- Tombol Terapkan --}}
-                    <div class="lg:col-span-1 flex gap-2">
-                        <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs rounded-xl transition cursor-pointer shadow-sm flex items-center justify-center">
-                            Filter
-                        </button>
+                        {{-- Pengurutan --}}
+                        <div class="relative">
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Urutan Tampil</label>
+                            <select name="sort" onchange="this.form.submit()" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition cursor-pointer shadow-2xs">
+                                <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="popular" {{ $sort === 'popular' ? 'selected' : '' }}>Paling Banyak Disukai</option>
+                                <option value="discussed" {{ $sort === 'discussed' ? 'selected' : '' }}>Paling Banyak Didiskusikan</option>
+                                <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Terlama</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
