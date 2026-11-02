@@ -12,9 +12,9 @@
             </a>
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    Tambah Devisi
+                    Tambah Unit Bidang
                 </h2>
-                <p class="text-xs text-gray-500 mt-0.5">Buka divisi kerja baru dan tentukan kuota penerimaan mahasiswa
+                <p class="text-xs text-gray-500 mt-0.5">Buka unit bidang baru dan tentukan kuota penerimaan mahasiswa
                 </p>
             </div>
         </div>

@@ -11,6 +11,7 @@ export default {
         './resources/js/**/*.js',
         // Warna badge status didefinisikan di enum (badgeColor/dotColor)
         './app/Enums/**/*.php',
+        './app/Models/**/*.php',
     ],
 
     theme: {

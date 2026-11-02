@@ -56,8 +56,12 @@
                 $rawFinalSt = strtolower($finalReportStatusVal ?? '');
 
                 // Certificate Gate (Application::certificateBlockers): evaluasi mentor lengkap + laporan ACC
-                // + logbook terisi + status COMPLETED. Tombol unduh hanya aktif bila daftar blocker kosong.
+                // + logbook terisi + status COMPLETED + ACC Atasan. Tombol unduh hanya aktif bila daftar blocker kosong.
                 $certificateBlockers = $application ? $application->certificateBlockers() : ['Belum ada pengajuan magang.'];
+                $certRecord = $placement?->certificate;
+                if ($certRecord && $certRecord->approval_status !== 'approved') {
+                    $certificateBlockers[] = 'Sertifikat magang telah diajukan dan sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+                }
                 $isPassed = $application && $certificateBlockers === [];
 
                 // Nama status untuk banner: kode sistem standar (sama di semua role)

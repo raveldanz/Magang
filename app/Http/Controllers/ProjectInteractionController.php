@@ -9,6 +9,7 @@ use App\Models\ProjectLike;
 use App\Services\ContentModeration\ProfanityFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProjectInteractionController extends Controller
@@ -273,6 +274,37 @@ class ProjectInteractionController extends Controller
 
         $project = InternshipProject::findOrFail($id);
         $title = $project->title;
+
+        // Bersihkan berkas fisik proyek dari storage lokal
+        if ($project->photo_path && Storage::disk('public')->exists($project->photo_path)) {
+            Storage::disk('public')->delete($project->photo_path);
+        }
+        if ($project->source_code_path && Storage::disk('public')->exists($project->source_code_path)) {
+            Storage::disk('public')->delete($project->source_code_path);
+        }
+        if (is_array($project->screenshots)) {
+            foreach ($project->screenshots as $ss) {
+                if (Storage::disk('public')->exists($ss)) {
+                    Storage::disk('public')->delete($ss);
+                }
+            }
+        }
+        if (is_array($project->community_photos)) {
+            foreach ($project->community_photos as $cp) {
+                if (Storage::disk('public')->exists($cp)) {
+                    Storage::disk('public')->delete($cp);
+                }
+            }
+        }
+        if (is_array($project->documents)) {
+            foreach ($project->documents as $doc) {
+                $docPath = is_array($doc) ? ($doc['path'] ?? null) : $doc;
+                if ($docPath && Storage::disk('public')->exists($docPath)) {
+                    Storage::disk('public')->delete($docPath);
+                }
+            }
+        }
+
         $project->delete();
 
         if ($request->expectsJson() || $request->wantsJson()) {

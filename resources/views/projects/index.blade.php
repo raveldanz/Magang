@@ -208,9 +208,10 @@
                                                 @endif
                                             </a>
 
-                                            {{-- Badge Kategori Floating --}}
+                                            {{-- Badge Kategori Floating (Solid Non-Transparent) --}}
                                             <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
-                                                <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold shadow-sm backdrop-blur-md {{ $project->category_badge_class }}">
+                                                <span class="px-2.5 py-1 rounded-xl text-[10px] font-extrabold shadow-sm border {{ $project->category_badge_class }}"
+                                                      style="background-color: {{ $project->category_bg_color }} !important; color: {{ $project->category_text_color }} !important; border-color: {{ $project->category_border_color }} !important; opacity: 1 !important;">
                                                     {{ $project->category_label }}
                                                 </span>
                                                 @if(! $project->is_public)

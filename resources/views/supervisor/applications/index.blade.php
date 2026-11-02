@@ -109,7 +109,7 @@
                                         @if($app->group_id && $app->group)
                                             <div class="mt-0.5">
                                                 <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                                    Kelompok ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                                    Kelompok &bull; {{ $app->role_in_group === 'leader' ? 'Ketua Tim' : 'Anggota' }}
                                                 </span>
                                             </div>
                                         @endif
@@ -209,7 +209,7 @@
                                 @if($app->group_id && $app->group)
                                     <div class="mt-0.5">
                                         <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                            Kelompok: {{ $app->group->name }} ({{ $app->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
+                                            Kelompok: {{ $app->group->name }} &bull; {{ $app->role_in_group === 'leader' ? 'Ketua Tim' : 'Anggota' }}
                                         </span>
                                     </div>
                                 @endif

@@ -320,19 +320,30 @@
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                         </a>
 
+                                        @php
+                                            $canManageProject = ($placement && $project->placement_id === $placement->id) 
+                                                || ($placement && $project->members->where('is_leader', true)->contains('placement_id', $placement->id));
+                                        @endphp
+
                                         @if(!$finalReport || $finalReport->status !== 'approved')
-                                            <div class="flex items-center gap-1.5">
-                                                <a href="{{ route('student.projects.edit', $project->id) }}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition cursor-pointer" title="Ubah data proyek">
-                                                    Ubah
-                                                </a>
-                                                <form action="{{ route('student.projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus proyek ini?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg transition cursor-pointer" title="Hapus proyek">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            @if($canManageProject)
+                                                <div class="flex items-center gap-1.5">
+                                                    <a href="{{ route('student.projects.edit', $project->id) }}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition cursor-pointer" title="Ubah data proyek">
+                                                        Ubah
+                                                    </a>
+                                                    <form action="{{ route('student.projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus proyek ini?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg transition cursor-pointer" title="Hapus proyek">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @else
+                                                <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-semibold border border-slate-200">
+                                                    Anggota Tim
+                                                </span>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
@@ -634,7 +645,17 @@
                                     </div>
                                 @endif
 
-                                @php $certBlockers = $application ? $application->certificateBlockers() : ['Belum ada pengajuan magang.']; @endphp
+                                @php
+                                    $certBlockers = $application ? $application->certificateBlockers() : ['Belum ada pengajuan magang.'];
+                                    $certRecord = $placement?->certificate;
+                                    if ($certRecord && $certRecord->approval_status !== 'approved') {
+                                        if ($certRecord->approval_status === 'revision') {
+                                            $certBlockers[] = 'Sertifikat magang Anda sedang dalam proses revisi atau perbaikan data oleh Admin Dinas.';
+                                        } else {
+                                            $certBlockers[] = 'Sertifikat magang Anda telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan oleh Atasan Tim Kerja Umum dan Kepegawaian Dispusip.';
+                                        }
+                                    }
+                                @endphp
                                 @if ($certBlockers === [])
                                 <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-2.5 sm:gap-3">
                                     <a href="{{ route('student.certificate.show', $placement->id) }}" target="_blank"

@@ -272,6 +272,26 @@ class Placement extends Model
         return $this->hasMany(InternshipProject::class)->latest();
     }
 
+    public function projectMemberships()
+    {
+        return $this->hasMany(InternshipProjectMember::class, 'placement_id');
+    }
+
+    public function collaborativeProjects()
+    {
+        return $this->belongsToMany(InternshipProject::class, 'internship_project_members')
+            ->withPivot(['role_in_project', 'is_leader'])
+            ->withTimestamps();
+    }
+
+    public function allProjects()
+    {
+        return InternshipProject::where(function ($q) {
+            $q->where('placement_id', $this->id)
+                ->orWhereHas('members', fn ($m) => $m->where('placement_id', $this->id));
+        })->latest()->get();
+    }
+
     public function projects()
     {
         return $this->internshipProjects();

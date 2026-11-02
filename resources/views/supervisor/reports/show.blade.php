@@ -10,7 +10,7 @@
                         {{ $student?->name ?? 'Mahasiswa' }}
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                        NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }} ({{ $profile?->jurusan ?? '-' }})
+                        NIM: {{ $profile?->nim ?? '-' }} &bull; {{ $profile?->universitas ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}
                     </p>
                 </div>
             </div>
@@ -185,7 +185,7 @@
                             <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Nilai Akhir</span>
                             <span class="text-lg font-bold text-slate-900 mt-1 block">
                                 {{ number_format((float) $evaluation->nilai_akhir, 1) }}
-                                <span class="text-xs font-semibold text-slate-500 font-mono">({{ $evaluation->grade_calculated ?? '-' }})</span>
+                                <span class="text-xs font-semibold text-slate-500 font-mono">&bull; Grade {{ $evaluation->grade_calculated ?? '-' }}</span>
                             </span>
                         </div>
                     </div>

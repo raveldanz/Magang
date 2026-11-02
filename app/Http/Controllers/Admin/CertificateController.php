@@ -63,10 +63,34 @@ class CertificateController extends Controller
             });
         }
 
-        // Certificate Gate: hanya tampilkan yang benar-benar memenuhi seluruh syarat penerbitan
-        $applications = $query->get()->filter(fn (Application $app) => $app->isCertificateEligible())->values();
+        // Pencarian Cepat Nama Mahasiswa / Kampus / NIM
+        $search = request('search');
+        if (! empty($search)) {
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->whereHas('user', function ($uq) use ($search, $like) {
+                $uq->where('name', $like, "%{$search}%")
+                    ->orWhereHas('studentProfile', fn ($sp) => $sp->where('universitas', $like, "%{$search}%")->orWhere('nim', $like, "%{$search}%"));
+            });
+        }
 
-        return view('admin.certificates.index', compact('applications'));
+        // Certificate Gate: hanya tampilkan yang benar-benar memenuhi seluruh syarat penerbitan
+        $eligibleApps = $query->latest('id')->get()->filter(fn (Application $app) => $app->isCertificateEligible())->values();
+
+        // Pagination 10 mahasiswa per halaman agar tampilan tetap ringan & rapi saat data berjumlah banyak
+        $perPage = 10;
+        $page = (int) request()->get('page', 1);
+        $applications = new \Illuminate\Pagination\LengthAwarePaginator(
+            $eligibleApps->forPage($page, $perPage)->values(),
+            $eligibleApps->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        $activeTheme = \App\Models\CertificateTheme::getActive();
+        $allThemes = \App\Models\CertificateTheme::orderByDesc('year')->get();
+
+        return view('admin.certificates.index', compact('applications', 'activeTheme', 'allThemes', 'eligibleApps'));
     }
 
     // Pratinjau & Cetak E-Sertifikat Lengkap (Format Resmi Mahasiswa & Transkrip 2 Halaman)
@@ -99,8 +123,12 @@ class CertificateController extends Controller
         }
 
         $year = date('Y');
-        $paddedId = str_pad($placement->id, 3, '0', STR_PAD_LEFT);
-        $certNumber = $placement->certificate_number ?: "SERT/{$paddedId}/DISPUSIP-SBY/{$year}";
+        if ($placement->application && $placement->application->end_date) {
+            $year = date('Y', strtotime($placement->application->end_date));
+        }
+        $theme = \App\Models\CertificateTheme::getActive((int) $year);
+        $paddedId = str_pad($placement->id, 4, '0', STR_PAD_LEFT);
+        $certNumber = $placement->certificate_number ?: $theme->formatNumber($paddedId, (int) $year);
 
         if (empty($placement->certificate_number) || empty($placement->certificate_hash)) {
             $placement->certificate_number = $certNumber;
@@ -352,5 +380,88 @@ class CertificateController extends Controller
 
         return redirect()->back()
             ->with('success', "Draf perbaikan berhasil disimpan. Anda dapat memeriksa pratinjau atau mengajukan ulang ke Atasan kapan saja.");
+    }
+
+    /**
+     * Simpan / Perbarui Pengaturan Tema Warna & Pejabat TTE Sertifikat Tahunan
+     */
+    public function updateTheme(Request $request)
+    {
+        $user = Auth::user();
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            abort(403, 'Hanya Admin Utama atau Super Admin yang dapat mengubah tema sertifikat dinas.');
+        }
+
+        $validated = $request->validate([
+            'year' => 'required|integer|min:2020|max:2099',
+            'theme_name' => 'required|string|max:255',
+            'primary_color' => 'required|string|max:20',
+            'secondary_color' => 'required|string|max:20',
+            'accent_color' => 'required|string|max:20',
+            'number_format_pattern' => 'required|string|max:255',
+            'signee_name' => 'required|string|max:255',
+            'signee_position' => 'required|string|max:255',
+            'signee_rank' => 'nullable|string|max:255',
+            'signee_nip' => 'nullable|string|max:50',
+            'mandate_text' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
+            'is_active' => 'nullable',
+        ]);
+
+        $theme = \App\Models\CertificateTheme::updateOrCreate(
+            ['year' => (int) $validated['year']],
+            [
+                'theme_name' => $validated['theme_name'],
+                'primary_color' => $validated['primary_color'],
+                'secondary_color' => $validated['secondary_color'],
+                'accent_color' => $validated['accent_color'],
+                'number_format_pattern' => $validated['number_format_pattern'],
+                'signee_name' => $validated['signee_name'],
+                'signee_position' => $validated['signee_position'],
+                'signee_rank' => $validated['signee_rank'] ?? 'PEMBINA TK I',
+                'signee_nip' => $validated['signee_nip'] ?? '',
+                'mandate_text' => $validated['mandate_text'] ?: 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya',
+                'city' => $validated['city'] ?: 'Surabaya',
+                'is_active' => true,
+            ]
+        );
+
+        if ($request->boolean('is_active', true)) {
+            \App\Models\CertificateTheme::where('id', '!=', $theme->id)->update(['is_active' => false]);
+            $theme->update(['is_active' => true]);
+        }
+
+        AuditLog::record('CERTIFICATE_THEME_UPDATED', 'CertificateTheme', $theme->id, [
+            'year' => $theme->year,
+            'theme_name' => $theme->theme_name,
+            'updated_by' => $user->name,
+        ]);
+
+        return redirect()->route('admin.certificates.index', ['tab' => 'settings'])
+            ->with('success', "Tema Desain & Data TTE Sertifikat Tahun {$theme->year} ({$theme->theme_name}) berhasil disimpan!");
+    }
+
+    /**
+     * Aktifkan salah satu tema tahunan sebagai tema aktif
+     */
+    public function activateTheme($id)
+    {
+        $user = Auth::user();
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            abort(403, 'Hanya Admin Utama atau Super Admin yang dapat mengubah tema sertifikat dinas.');
+        }
+
+        $theme = \App\Models\CertificateTheme::findOrFail($id);
+        \App\Models\CertificateTheme::where('id', '!=', $theme->id)->update(['is_active' => false]);
+        $theme->update(['is_active' => true]);
+
+        AuditLog::record('CERTIFICATE_THEME_ACTIVATED', 'CertificateTheme', $theme->id, [
+            'year' => $theme->year,
+            'theme_name' => $theme->theme_name,
+            'activated_by' => $user->name,
+        ]);
+
+        return redirect()->route('admin.certificates.index', ['tab' => 'settings'])
+            ->with('success', "Tema Tahun {$theme->year} ({$theme->theme_name}) sekarang menjadi tema sertifikat aktif!");
     }
 }

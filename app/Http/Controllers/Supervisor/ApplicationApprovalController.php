@@ -209,8 +209,8 @@ class ApplicationApprovalController extends Controller
 
         $group = $application->group_id ? \App\Models\InternshipGroup::find($application->group_id) : null;
         $successMsg = $group
-            ? "Pengajuan magang kelompok '{$group->name}' ({$group->applications()->count()} anggota) berhasil disetujui (ACC) dan Surat Balasan resmi telah diterbitkan!"
-            : "Pengajuan magang atas nama {$application->user?->name} berhasil disetujui (ACC) dan Surat Balasan resmi telah diterbitkan!";
+            ? "Pengajuan magang kelompok '{$group->name}' sejumlah {$group->applications()->count()} anggota berhasil disetujui dan Surat Balasan resmi telah diterbitkan!"
+            : "Pengajuan magang atas nama {$application->user?->name} berhasil disetujui dan Surat Balasan resmi telah diterbitkan!";
 
         return redirect()->route('supervisor.applications.index')
             ->with('success', $successMsg);

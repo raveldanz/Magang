@@ -161,8 +161,8 @@ class InternshipProjectAndSupervisorReportTest extends TestCase
         $responseEdit = $this->actingAs($student)->get(route('student.projects.edit', $project1->id));
         $responseEdit->assertStatus(200);
         $responseEdit->assertSee('Ubah Proyek Inovasi');
-        $responseEdit->assertSee('Lihat Halaman Proyek');
-        $responseEdit->assertDontSee('Lihat Halaman Proyek ↗');
+        $responseEdit->assertSee('Preview Proyek');
+        $responseEdit->assertDontSee('Preview Proyek ↗');
         $responseEdit->assertSee('arsip_v1.zip');
         $responseEdit->assertSee('Maksimal 10 berkas');
 

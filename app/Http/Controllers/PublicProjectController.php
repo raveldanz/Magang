@@ -51,6 +51,14 @@ class PublicProjectController extends Controller
                                     ->orWhere('jurusan', $like, "%{$search}%");
                             });
                     })
+                    ->orWhereHas('members.placement.application.user', function ($uq) use ($search, $like) {
+                        $uq->where('name', $like, "%{$search}%")
+                            ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {
+                                $sq->where('universitas', $like, "%{$search}%")
+                                    ->orWhere('nim', $like, "%{$search}%")
+                                    ->orWhere('jurusan', $like, "%{$search}%");
+                            });
+                    })
                     ->orWhereHas('placement.application.unit', function ($unitQ) use ($search, $like) {
                         $unitQ->where('name', $like, "%{$search}%");
                     });

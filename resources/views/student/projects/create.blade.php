@@ -56,7 +56,72 @@
                 </div>
             @endif
 
-            <form action="{{ route('student.projects.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{ visibility: '{{ old('is_public', '1') == '1' ? 'public' : 'private' }}' }">
+            <form action="{{ route('student.projects.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" 
+                  x-data="{ 
+                      visibility: '{{ old('is_public', '1') == '1' ? 'public' : 'private' }}',
+                      category: '{{ old('category', '') }}',
+                      customCategory: '{{ old('custom_category', '') }}',
+                      projectType: '{{ old('project_type', 'individual') }}',
+                      roleRecommendations: @js($roleRecommendations),
+                      categoryKeywords: @js($categoryKeywords),
+                      categoryLabels: {
+                          'teknologi': 'Sistem Digital',
+                          'buku': 'Karya Literasi',
+                          'media': 'Media Kreatif',
+                          'preservasi': 'Preservasi Kearsipan',
+                          'tata_kelola': 'Tata Kelola Layanan'
+                      },
+                      get detectedCategory() {
+                          if (this.category !== 'lainnya' || !this.customCategory) return null;
+                          const text = this.customCategory.toLowerCase().trim();
+                          if (!text) return null;
+
+                          let bestCat = null;
+                          let bestScore = 0;
+
+                          for (const [catKey, keywords] of Object.entries(this.categoryKeywords)) {
+                              let score = 0;
+                              for (const kw of keywords) {
+                                  const lowerKw = kw.toLowerCase().trim();
+                                  if (!lowerKw) continue;
+
+                                  if (lowerKw.length < 4) {
+                                      const regex = new RegExp('(?:^|[^a-z0-9])' + lowerKw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:[^a-z0-9]|$)', 'i');
+                                      if (regex.test(text)) {
+                                          score += lowerKw.length * 3;
+                                      }
+                                  } else {
+                                      if (text.includes(lowerKw)) {
+                                          score += lowerKw.length;
+                                      }
+                                  }
+                              }
+                              if (score > bestScore) {
+                                  bestScore = score;
+                                  bestCat = catKey;
+                              }
+                          }
+                          return bestScore > 0 ? bestCat : null;
+                      },
+                      applyDetectedCategory(catKey) {
+                          this.category = catKey;
+                          this.customCategory = '';
+                      },
+                      get currentRoleChips() {
+                          return this.roleRecommendations[this.category] || this.roleRecommendations['lainnya'] || [];
+                      },
+                      setOrAppendRole(elId, chipRole) {
+                          const input = document.getElementById(elId);
+                          if (!input) return;
+                          const val = input.value.trim();
+                          if (!val) {
+                              input.value = chipRole;
+                          } else if (!val.includes(chipRole)) {
+                              input.value = val + ' & ' + chipRole;
+                          }
+                          input.dispatchEvent(new Event('input'));
+                      }
+                  }">
                 @csrf
 
                 <!-- BAGIAN 1: IDENTITAS & DESKRIPSI KARYA -->
@@ -80,17 +145,38 @@
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                                 Bidang / Kategori Inovasi <span class="text-rose-500">*</span>
                             </label>
-                            <select name="category" required class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <select name="category" x-model="category" required class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
                                 <option value="" disabled {{ old('category') ? '' : 'selected' }}>Pilih Kategori Karya...</option>
-                                <option value="teknologi" {{ old('category') === 'teknologi' ? 'selected' : '' }}>Teknologi & Perangkat Lunak (Aplikasi Web/Mobile/Sistem)</option>
-                                <option value="buku" {{ old('category') === 'buku' ? 'selected' : '' }}>Buku & Karya Tulis Literasi (Buku Cerita/Antologi/Kamus)</option>
-                                <option value="desain" {{ old('category') === 'desain' ? 'selected' : '' }}>Desain Grafis & Penataan Ruang (Mural/Pojok Baca/Interior)</option>
-                                <option value="preservasi" {{ old('category') === 'preservasi' ? 'selected' : '' }}>Preservasi & Konservasi (Restorasi Naskah Kuno/Arsip Fisik)</option>
-                                <option value="media" {{ old('category') === 'media' ? 'selected' : '' }}>Media Kreatif & Audio-Visual (Video/Podcast/Audiobook)</option>
-                                <option value="tata_kelola" {{ old('category') === 'tata_kelola' ? 'selected' : '' }}>Tata Kelola & SOP Layanan (Pedoman/Kebijakan Administrasi)</option>
-                                <option value="lainnya" {{ old('category') === 'lainnya' ? 'selected' : '' }}>Karya Inovasi Lainnya</option>
+                                <option value="teknologi">Sistem Digital</option>
+                                <option value="buku">Karya Literasi</option>
+                                <option value="media">Media Kreatif</option>
+                                <option value="preservasi">Preservasi Kearsipan</option>
+                                <option value="tata_kelola">Tata Kelola Layanan</option>
+                                <option value="lainnya">Inovasi Lainnya</option>
                             </select>
                         </div>
+                    </div>
+
+                    {{-- Form Tambahan Kategori Lainnya dengan Rekomendasi Cerdas --}}
+                    <div x-show="category === 'lainnya'" x-cloak class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Nama Bidang Proyek <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="custom_category" x-model="customCategory" 
+                               placeholder="Tuliskan nama bidang proyek Anda..." 
+                               class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        
+                        {{-- Rekomendasi Pintar Jika Cocok dengan Kategori Standar --}}
+                        <template x-if="detectedCategory">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 mt-2">
+                                <div>
+                                    <span class="font-bold text-blue-950">Rekomendasi:</span> Bidang ini cocok dengan kategori <span class="font-bold underline" x-text="categoryLabels[detectedCategory]"></span>.
+                                </div>
+                                <button type="button" @click="applyDetectedCategory(detectedCategory)" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md text-[11px] shrink-0 transition cursor-pointer">
+                                    Pilih Kategori Ini
+                                </button>
+                            </div>
+                        </template>
                     </div>
 
                     <!-- Status Visibilitas & Privasi Proyek -->
@@ -137,14 +223,157 @@
                                   placeholder="Jelaskan ruang lingkup inovasi, masalah yang diatasi, metodologi/teknologi/media yang digunakan, serta kontribusi mahasiswa selama masa magang..." 
                                   class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 leading-relaxed">{{ old('description') }}</textarea>
                     </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Manfaat untuk Masyarakat & Layanan Dinas <span class="text-rose-500">*</span>
+                        </label>
+                        <textarea name="community_benefit" rows="3" required 
+                                  placeholder="Jelaskan dampak nyata inovasi terhadap pelayanan dinas, pemustaka, arsip daerah, atau masyarakat umum..." 
+                                  class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 leading-relaxed">{{ old('community_benefit') }}</textarea>
+                    </div>
                 </div>
 
-                <!-- BAGIAN 2: PUSAT AKSES & TAUTAN PROYEK -->
+                <!-- BAGIAN 2: PENGERJAAN PROYEK & ANGGOTA TIM -->
+                <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
+                    <div class="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bagian 2</span>
+                            <h3 class="font-bold text-base text-slate-900 mt-0.5">Pengerjaan Proyek & Anggota Tim</h3>
+                        </div>
+                        <span class="text-[11px] text-slate-500">
+                            Tentukan apakah karya dikerjakan individu atau kelompok
+                        </span>
+                    </div>
+
+                    <!-- Pilihan Mode: Individu vs Kelompok -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="relative flex items-start gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition"
+                               :class="projectType === 'individual' ? 'border-blue-600 bg-blue-50/40 ring-1 ring-blue-500/20' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'">
+                            <input type="radio" name="project_type" value="individual" x-model="projectType" class="mt-0.5 text-blue-600 focus:ring-blue-500">
+                            <div class="text-xs">
+                                <div class="font-bold text-slate-900">Proyek Individu</div>
+                                <p class="text-slate-500 mt-0.5">Karya dikerjakan mandiri oleh Anda sendiri.</p>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-start gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition"
+                               :class="projectType === 'group' ? 'border-blue-600 bg-blue-50/40 ring-1 ring-blue-500/20' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'">
+                            <input type="radio" name="project_type" value="group" x-model="projectType" class="mt-0.5 text-blue-600 focus:ring-blue-500">
+                            <div class="text-xs">
+                                <div class="font-bold text-slate-900">Proyek Kelompok (Tim)</div>
+                                <p class="text-slate-500 mt-0.5">Karya kolaboratif bersama rekan magang di bidang Anda.</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Peran Pembuat / Pengunggah Utama -->
+                    <div class="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs font-bold text-slate-800">
+                                Peran Anda: <span class="text-blue-600 font-semibold">{{ $user->name }}</span> (Pengunggah Utama)
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Ketua / Penanggung Jawab</span>
+                        </div>
+                        <div>
+                            <input type="text" name="creator_role" id="creator_role_input"
+                                   value="{{ old('creator_role', 'Koordinator Proyek') }}" 
+                                   placeholder="Contoh: Koordinator Proyek & Desain Grafis"
+                                   class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-slate-500">
+                            <span class="font-medium text-slate-600 shrink-0">Rekomendasi:</span>
+                            <template x-for="rChip in currentRoleChips" :key="rChip">
+                                <button type="button" @click="setOrAppendRole('creator_role_input', rChip)"
+                                        class="px-2 py-0.5 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 border border-slate-200 rounded-md text-[11px] font-medium text-slate-700 transition cursor-pointer">
+                                    <span x-text="rChip"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Anggota Tim (Hanya Tampil Jika Mode Kelompok) -->
+                    <div x-show="projectType === 'group'" x-cloak class="space-y-3 pt-2 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-xs sm:text-sm text-slate-900">Pilih Rekan Anggota Tim</h4>
+                                <p class="text-[11px] text-slate-500">Centang rekan yang terlibat dan tentukan peran tugasnya.</p>
+                            </div>
+                            <span class="text-[11px] text-slate-400">{{ count($peers) }} rekan magang terdeteksi</span>
+                        </div>
+
+                        @if(count($peers) === 0)
+                            <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 leading-relaxed">
+                                Tidak ada rekan magang lain yang terdaftar di unit kerja ini. Anda tetap dapat menyimpan proyek ini sebagai karya kelompok atau beralih ke mode individu.
+                            </div>
+                        @else
+                            <div class="space-y-3">
+                                @foreach($peers as $pIdx => $peer)
+                                    @php
+                                        $peerUser = $peer->application?->user;
+                                        $peerProfile = $peerUser?->studentProfile;
+                                    @endphp
+                                    <div x-data="{ checked: {{ old('members.'.$pIdx.'.placement_id') == $peer->id ? 'true' : 'false' }} }"
+                                         class="p-4 rounded-2xl border transition"
+                                         :class="checked ? 'border-blue-300 bg-blue-50/20 shadow-2xs' : 'border-slate-200 bg-white hover:bg-slate-50/60'">
+                                        <div class="flex items-start gap-3">
+                                            <input type="checkbox" 
+                                                   id="peer_check_{{ $peer->id }}" 
+                                                   x-model="checked"
+                                                   class="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+                                            
+                                            <div class="flex-1">
+                                                <label for="peer_check_{{ $peer->id }}" class="cursor-pointer block">
+                                                    <div class="font-bold text-xs sm:text-sm text-slate-900">{{ $peerUser?->name ?? 'Mahasiswa' }}</div>
+                                                    <div class="text-[11px] text-slate-500 mt-0.5">
+                                                        NIM: {{ $peerProfile?->nim ?? '-' }} &bull; {{ $peerProfile?->universitas ?? $peerUser?->university ?? '-' }} ({{ $peerProfile?->jurusan ?? '-' }})
+                                                    </div>
+                                                </label>
+
+                                                <!-- Form Input Peran Anggota (Tampil Jika Dicentang) -->
+                                                <div x-show="checked" x-cloak class="mt-3 pt-3 border-t border-slate-100 space-y-2">
+                                                    <input type="hidden" name="members[{{ $pIdx }}][placement_id]" value="{{ $peer->id }}" :disabled="!checked">
+                                                    
+                                                    <div>
+                                                        <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                                                            Peran:
+                                                        </label>
+                                                        <input type="text" 
+                                                               id="peer_role_input_{{ $peer->id }}"
+                                                               name="members[{{ $pIdx }}][role]" 
+                                                               value="{{ old('members.'.$pIdx.'.role', 'Anggota Tim') }}" 
+                                                               placeholder="Misal: Desain Grafis & Konten" 
+                                                               :disabled="!checked"
+                                                               class="w-full text-xs border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                                    </div>
+
+                                                    <div class="flex items-center gap-1.5 flex-wrap text-[11px] text-slate-500">
+                                                        <span class="font-medium text-slate-600 shrink-0">Rekomendasi:</span>
+                                                        <template x-for="rChip in currentRoleChips" :key="rChip">
+                                                            <button type="button" 
+                                                                    @click="setOrAppendRole('peer_role_input_{{ $peer->id }}', rChip)"
+                                                                    class="px-2 py-0.5 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 border border-slate-200 rounded-md text-[11px] font-medium text-slate-700 transition cursor-pointer">
+                                                                <span x-text="rChip"></span>
+                                                            </button>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                </div>
+
+                <!-- BAGIAN 3: PUSAT AKSES & TAUTAN PROYEK -->
                 <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
                     <div class="pb-3 border-b border-slate-100">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wider">
-                                Bagian 2
+                                Bagian 3
                             </span>
                             <h3 class="font-bold text-base text-slate-900">Pusat Akses Proyek</h3>
                         </div>
@@ -203,10 +432,10 @@
                     </div>
                 </div>
 
-                <!-- BAGIAN 3: MEDIA VISUAL & SAMPUL PROYEK -->
+                <!-- BAGIAN 4: MEDIA VISUAL & SAMPUL PROYEK -->
                 <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
                     <div class="pb-3 border-b border-slate-100">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bagian 3</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bagian 4</span>
                         <h3 class="font-bold text-base text-slate-900 mt-0.5">Dokumentasi Visual & Tangkapan Layar</h3>
                     </div>
 

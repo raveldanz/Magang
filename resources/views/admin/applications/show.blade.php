@@ -82,18 +82,15 @@
                             @if(in_array($application->group->status, ['pending', 'waiting_approval']) || in_array($application->statusValue(), ['pending', 'waiting_approval']))
                                 <button type="button" 
                                         @click="showGroupModal = true"
-                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                                    <span>Aksi Serentak Kelompok</span>
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-xs hover:shadow transition active:scale-95 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                    <span>Proses Pengajuan Tim</span>
                                 </button>
                             @endif
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold {{ $application->role_in_group === 'leader' ? 'bg-amber-100 text-amber-900 border border-amber-200' : 'bg-blue-100 text-blue-900 border border-blue-200' }}">
-                                {{ $application->role_in_group === 'leader' ? '⭐ Ketua Kelompok' : 'Anggota Tim' }}
-                            </span>
                         </div>
                     </div>
 
-                    <!-- Modal Aksi Serentak Kelompok -->
+                    <!-- Modal Proses Pengajuan Tim -->
                     <div x-show="showGroupModal" 
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0"
@@ -120,7 +117,7 @@
                                     </svg>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="text-base font-black text-slate-900">Aksi Serentak Kelompok Magang</h3>
+                                    <h3 class="text-base font-black text-slate-900">Proses Pengajuan Tim</h3>
                                     <p class="text-xs text-slate-500 mt-0.5">
                                         Tindakan ini berlaku untuk seluruh {{ $application->group->applications->count() }} anggota tim <strong>{{ $application->group->name }}</strong>.
                                     </p>
@@ -140,16 +137,19 @@
                                             class="p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                             :class="groupAction === 'accepted' ? 'bg-emerald-50 border-emerald-500 text-emerald-700 ring-2 ring-emerald-500/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'">
                                         <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <span>Terima Sekelompok</span>
+                                        <span>{{ (auth()->user()?->isSuperAdmin() || auth()->user()?->role === 'supervisor') ? 'Terima Kelompok' : 'Setujui & Ajukan ke Atasan' }}</span>
                                     </button>
                                     <button type="button" 
                                             @click="groupAction = 'rejected'"
                                             class="p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                                             :class="groupAction === 'rejected' ? 'bg-rose-50 border-rose-500 text-rose-700 ring-2 ring-rose-500/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'">
                                         <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <span>Tolak Sekelompok</span>
+                                        <span>Tolak Kelompok</span>
                                     </button>
                                 </div>
+                                @if(!auth()->user()?->isSuperAdmin() && auth()->user()?->role !== 'supervisor')
+                                    <p class="text-[11px] text-slate-500">Persetujuan tim ini akan diteruskan ke Atasan (Tim Kerja Umum &amp; Kepegawaian) untuk pengesahan akhir.</p>
+                                @endif
 
                                 <input type="hidden" name="status" :value="groupAction">
 
@@ -181,7 +181,7 @@
                                             class="px-5 py-2 text-white text-xs font-bold rounded-xl transition cursor-pointer"
                                             :class="groupAction === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
                                             :disabled="groupAction === 'rejected' && !groupRejectNote.trim()">
-                                        Simpan Keputusan Kelompok
+                                        Simpan Keputusan
                                     </button>
                                 </div>
                             </form>
@@ -457,16 +457,16 @@
                         // Menentukan fase siklus: Tahap seleksi awal (belum diterima) vs Tahap magang aktif
                         $isInitialStage = in_array($currentStatusVal, ['pending', 'waiting_approval', 'rejected'], true);
                         
-                        // Kunci status ACCEPTED bagi staf biasa jika berada di waiting_approval
+                        // Kunci status ACCEPTED bagi staf biasa pada tahap seleksi awal (pending maupun waiting_approval)
                         $isWaitingApproval = ($currentStatusVal === 'waiting_approval');
-                        $isAcceptLockedForStaff = ($isWaitingApproval && !$isSupervisorOrSuperAdmin);
+                        $isAcceptLockedForStaff = ($isInitialStage && ! $isSupervisorOrSuperAdmin);
                     @endphp
 
                     <!-- Form Status Pipeline (Synchronized with visual cards) -->
                     <select id="status-select" name="status" x-model="status" class="hidden" aria-hidden="true">
                         <option value="pending" {{ $currentStatus == 'pending' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::PENDING->label() }}</option>
                         <option value="waiting_approval" {{ $currentStatus == 'waiting_approval' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::WAITING_APPROVAL->label() }}</option>
-                        <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</option>
+                        <option value="accepted" {{ $currentStatus == 'accepted' ? 'selected' : '' }} {{ $isAcceptLockedForStaff ? 'disabled' : '' }}>{{ \App\Enums\ApplicationStatus::ACCEPTED->label() }}</option>
                         <option value="active" {{ $currentStatus == 'active' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::ACTIVE->label() }}</option>
                         <option value="completed" {{ $currentStatus == 'completed' ? 'selected' : '' }} {{ !$canComplete && $currentStatus != 'completed' ? 'disabled' : '' }}>{{ \App\Enums\ApplicationStatus::COMPLETED->label() }}</option>
                         <option value="rejected" {{ $currentStatus == 'rejected' ? 'selected' : '' }}>{{ \App\Enums\ApplicationStatus::REJECTED->label() }}</option>
@@ -549,7 +549,11 @@
                                 <!-- 3. ACCEPTED (Hanya bisa aktif setelah di-ACC oleh Atasan) -->
                                 @php
                                     $acceptButtonDisabled = $isAlreadyRejected || $isAcceptLockedForStaff;
-                                    $acceptButtonTooltip = $isAlreadyRejected ? 'Pengajuan telah ditolak' : ($isAcceptLockedForStaff ? 'Persetujuan akhir (ACC) hanya dapat disahkan oleh Supervisor atau Super Admin.' : '');
+                                    $acceptButtonTooltip = $isAlreadyRejected 
+                                        ? 'Pengajuan telah ditolak' 
+                                        : ($isAcceptLockedForStaff 
+                                            ? 'Persetujuan akhir (ACC) hanya dapat disahkan oleh Atasan (Supervisor) atau Super Admin.' 
+                                            : '');
                                 @endphp
                                 <button type="button" 
                                         @if(!$acceptButtonDisabled) @click="status = 'accepted'" @endif
@@ -571,9 +575,7 @@
                                         </div>
                                         <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
                                             @if($isAcceptLockedForStaff)
-                                                Menunggu ACC Atasan Tim Kerja Umum
-                                            @elseif(!$isSupervisorOrSuperAdmin && $currentStatusVal === 'pending')
-                                                Usulkan pengesahan penerimaan ke Atasan
+                                                {{ $currentStatusVal === 'waiting_approval' ? 'Menunggu ACC Atasan Tim Kerja Umum' : 'Persetujuan akhir disahkan oleh Atasan (Supervisor)' }}
                                             @else
                                                 {{ \App\Enums\ApplicationStatus::ACCEPTED->description() }}
                                             @endif

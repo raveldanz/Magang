@@ -47,7 +47,10 @@
 
                 <a href="{{ route('supervisor.certificates.index', ['status' => 'revision']) }}" 
                    class="whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shrink-0 {{ $statusFilter === 'revision' ? 'bg-amber-600 text-white shadow-md' : 'bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-200' }}">
-                    <span>Perlu Ditinjau Ulang (Revisi)</span>
+                    <span>Perlu Revisi</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs {{ $statusFilter === 'revision' ? 'bg-white text-amber-700' : 'bg-amber-100 text-amber-800' }}">
+                        {{ $revisionCount ?? 0 }}
+                    </span>
                 </a>
             </div>
 
@@ -210,26 +213,12 @@
                                                     </div>
                                                 </div>
 
-                                                {{-- Modal / Dropdown Revisi --}}
-                                                <div x-data="{ openRev: false }" class="relative">
-                                                    <button @click="openRev = !openRev" type="button" 
-                                                            class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 transition cursor-pointer">
-                                                        <span>Kembalikan</span>
-                                                    </button>
-
-                                                    <div x-show="openRev" @click.outside="openRev = false" x-cloak 
-                                                         class="absolute right-0 bottom-full mb-2 w-72 bg-white rounded-2xl p-4 shadow-xl border border-slate-200 z-50 text-left">
-                                                        <form method="POST" action="{{ route('supervisor.certificates.revise', $cert->id) }}">
-                                                            @csrf
-                                                            <div class="text-xs font-bold text-slate-800 mb-1">Catatan Revisi Nilai/Data:</div>
-                                                            <textarea name="notes" rows="2" required minlength="5" placeholder="Misal: nilai kriteria DPL belum masuk..."
-                                                                      class="w-full text-xs p-2 rounded-lg border border-slate-300"></textarea>
-                                                            <button type="submit" class="mt-2 w-full py-1.5 px-3 rounded-lg bg-amber-600 text-white font-bold text-xs cursor-pointer">
-                                                                Kirim Revisi
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
+                                                {{-- Tombol Revisi (Pindah ke Halaman Pemilihan Aspek & Catatan Revisi) --}}
+                                                <a href="{{ route('supervisor.certificates.revision', $cert->placement_id) }}" 
+                                                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 shadow-2xs transition">
+                                                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    <span>Minta Revisi</span>
+                                                </a>
                                             @endif
                                         </div>
                                     </td>
@@ -256,7 +245,7 @@
                             $finalScore = $eval ? $eval->final_score : ($cert->placement?->final_score ?? '-');
                         @endphp
                         <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3 hover:border-blue-300 transition"
-                             x-data="{ showApproveCertModalMobile: false, showReviseModalMobile: false }">
+                             x-data="{ showApproveCertModalMobile: false }">
                             
                             {{-- Header Kartu: Status ACC & Nilai --}}
                             <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
@@ -334,15 +323,14 @@
                                                 @click="showApproveCertModalMobile = true"
                                                 class="w-full min-h-[44px] inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm transition cursor-pointer active:scale-95">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Sahkan (ACC)</span>
+                                            <span>Sahkan</span>
                                         </button>
 
-                                        <button type="button" 
-                                                @click="showReviseModalMobile = true"
-                                                class="w-full min-h-[44px] inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 transition cursor-pointer active:scale-95">
+                                        <a href="{{ route('supervisor.certificates.revision', $cert->placement_id) }}" 
+                                           class="w-full min-h-[44px] inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300 transition cursor-pointer active:scale-95">
                                             <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                            <span>Kembalikan</span>
-                                        </button>
+                                            <span>Minta Revisi</span>
+                                        </a>
                                     </div>
 
                                     {{-- Modal Konfirmasi Sahkan (Mobile) --}}
@@ -377,30 +365,6 @@
                                                     </button>
                                                     <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">
                                                         Ya, Sahkan
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    {{-- Modal Revisi (Mobile) --}}
-                                    <div x-show="showReviseModalMobile" 
-                                         x-cloak 
-                                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs text-left"
-                                         @keydown.escape.window="showReviseModalMobile = false">
-                                        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4"
-                                             @click.outside="showReviseModalMobile = false">
-                                            <h3 class="text-sm font-extrabold text-slate-900">Catatan Revisi Nilai/Data</h3>
-                                            <form method="POST" action="{{ route('supervisor.certificates.revise', $cert->id) }}" class="space-y-3">
-                                                @csrf
-                                                <textarea name="notes" rows="3" required minlength="5" placeholder="Tuliskan catatan perbaikan untuk admin/mentor..."
-                                                          class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:border-amber-500 focus:ring-0"></textarea>
-                                                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                                                    <button type="button" @click="showReviseModalMobile = false" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">
-                                                        Batal
-                                                    </button>
-                                                    <button type="submit" class="px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-xl shadow-md">
-                                                        Kirim Revisi
                                                     </button>
                                                 </div>
                                             </form>
