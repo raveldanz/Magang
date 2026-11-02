@@ -151,38 +151,48 @@
                 </div>
 
                 {{-- Tampilan Mobile / Tablet --}}
-                <div class="md:hidden p-4 space-y-3">
+                <div class="md:hidden p-4 space-y-3 bg-slate-50/50">
                     @foreach($units as $unit)
                         @php
                             $unitActiveCount = $unit->applications->whereIn('status', ['accepted', 'active'])->count();
                             $unitWaitingCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $unitCompletedCount = $unit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $remainingQuota = max(0, $unit->quota - $unitActiveCount);
+                            $uPercent = $unit->quota > 0 ? min(100, round(($unitActiveCount / $unit->quota) * 100)) : 0;
                         @endphp
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                            <div class="flex items-start justify-between gap-3">
-                                <h3 class="font-bold text-slate-900 text-sm">{{ $unit->name }}</h3>
-                                <span class="px-2 py-0.5 rounded-md text-xs font-bold {{ $remainingQuota > 0 ? 'text-blue-700 bg-blue-50 border border-blue-200' : 'text-slate-500 bg-slate-200' }}">
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
+                            <div class="flex items-start justify-between gap-2.5">
+                                <h3 class="font-bold text-slate-900 text-sm leading-snug flex-1 pr-2">{{ $unit->name }}</h3>
+                                <span class="px-2.5 py-1 rounded-xl text-xs font-bold shrink-0 {{ $remainingQuota > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                                     Sisa: {{ $remainingQuota }}
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-4 gap-2 text-center text-xs py-2 border-t border-slate-200">
-                                <div>
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold">Kuota</div>
-                                    <div class="font-bold text-slate-800">{{ $unit->quota }}</div>
+                            {{-- Progress Bar Mini Kuota Terisi --}}
+                            <div class="space-y-1">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-1.5 rounded-full {{ $uPercent >= 100 ? 'bg-rose-500' : ($uPercent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}"
+                                         style="width: {{ $uPercent }}%"></div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold">Mhs Aktif</div>
-                                    <div class="font-bold text-slate-900">{{ $unitActiveCount }}</div>
+                            </div>
+
+                            {{-- 4 Kotak Metrik Horizontal --}}
+                            <div class="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;">
+                                <div class="bg-slate-50/80 rounded-xl p-2 text-center border border-slate-200/60">
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Kuota</div>
+                                    <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $unit->quota }}</div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold">ACC</div>
-                                    <div class="font-bold text-blue-700">{{ $unitWaitingCount }}</div>
+                                <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
+                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $unitActiveCount }}</div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold">Mhs Lulus</div>
-                                    <div class="font-bold text-slate-700">{{ $unitCompletedCount }}</div>
+                                <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
+                                    <div class="text-[10px] {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-400' }} uppercase font-bold tracking-wider">ACC</div>
+                                    <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $unitWaitingCount }}</div>
+                                </div>
+                                <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
+                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $unitCompletedCount }}</div>
                                 </div>
                             </div>
                         </div>

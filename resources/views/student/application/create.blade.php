@@ -255,9 +255,10 @@
                                 </h4>
 
                                 @if($memberCount >= 2)
-                                    <form action="{{ route('student.group.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                    <form action="{{ route('student.group.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-4"
+                                          x-data="{ groupFileName: '', groupFileUrl: null }">
                                         @csrf
-                                        <div class="space-y-1.5">
+                                        <div class="space-y-2">
                                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                                                 Surat Pengantar / Proposal Kelompok dari Universitas <span class="text-red-500">*</span>
                                             </label>
@@ -484,51 +485,65 @@
                             <form action="{{ route('student.application.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                                 @csrf
 
-                        <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
-                        @php
-                            $selectedUnitId = old('unit_id', '');
-                            $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
-                            $defaultAgency = $agencies->first();
-                            $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? ($defaultAgency?->id ?? ''));
+                                <!-- Bagian A: Pilihan Instansi & Unit Kerja / Divisi Magang Dispusip -->
+                                @php
+                                    $selectedUnitId = old('unit_id', '');
+                                    $selectedUnit = $units->firstWhere('id', (int) $selectedUnitId);
+                                    $defaultAgency = $agencies->first();
+                                    $selectedAgencyId = old('agency_profile_id', $selectedUnit?->agency_profile_id ?? ($defaultAgency?->id ?? ''));
 
-                            $agencyItems = $agencies->map(function ($a) {
-                                return [
-                                    'id' => $a->id,
-                                    'name' => $a->agency_name,
-                                    'acronym' => $a->acronym,
-                                    'meta' => $a->address ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
-                                ];
-                            })->values()->all();
+                                    $agencyItems = $agencies->map(function ($a) {
+                                        return [
+                                            'id' => $a->id,
+                                            'name' => $a->agency_name,
+                                            'acronym' => $a->acronym,
+                                            'meta' => $a->address ?? 'Dinas Perpustakaan dan Kearsipan Kota Surabaya',
+                                        ];
+                                    })->values()->all();
 
-                            $unitItems = $units->map(function ($u) {
-                                $agencyName = $u->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
-                                $rem = $u->remaining_quota;
-                                return [
-                                    'id' => $u->id,
-                                    'agency_profile_id' => $u->agency_profile_id,
-                                    'name' => $u->name,
-                                    'acronym' => $u->agencyProfile?->acronym,
-                                    'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " • {$agencyName}",
-                                    'remaining_quota' => $rem,
-                                    'disabled' => $rem <= 0,
-                                ];
-                            })->values()->all();
-                        @endphp
+                                    $unitItems = $units->map(function ($u) {
+                                        $agencyName = $u->agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan';
+                                        $rem = $u->remaining_quota;
+                                        return [
+                                            'id' => $u->id,
+                                            'agency_profile_id' => $u->agency_profile_id,
+                                            'name' => $u->name,
+                                            'acronym' => $u->agencyProfile?->acronym,
+                                            'meta' => ($rem > 0 ? "Sisa Kuota: {$rem} orang" : "Kuota Penuh") . " • {$agencyName}",
+                                            'remaining_quota' => $rem,
+                                            'disabled' => $rem <= 0,
+                                        ];
+                                    })->values()->all();
+                                @endphp
 
-                        <!-- 1. Instansi Penempatan Tunggal Resmi: Dinas Perpustakaan dan Kearsipan Kota Surabaya -->
-                        <input type="hidden" name="agency_profile_id" value="{{ $selectedAgencyId }}">
-                        
-                        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white border border-blue-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="flex items-center gap-3.5 min-w-0">
-                                <div class="w-12 h-12 rounded-xl bg-white border border-blue-100 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
-                                    <img src="{{ asset('images/logos/dispusip.png') }}" alt="Dispusip Surabaya" class="max-h-full max-w-full object-contain">
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-600 text-white uppercase tracking-wider">
-                                            Instansi Tunggal Resmi
-                                        </span>
-                                        <span class="text-xs text-slate-500 font-medium hidden sm:inline">&bull; Pemkot Surabaya</span>
+                                <!-- 1. Instansi Penempatan Tunggal Resmi -->
+                                <input type="hidden" name="agency_profile_id" value="{{ $selectedAgencyId }}">
+                                
+                                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-white border border-blue-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-12 h-12 rounded-xl bg-white border border-blue-100 p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                                            <img src="{{ asset('images/logos/dispusip.png') }}" alt="Dispusip Surabaya" class="max-h-full max-w-full object-contain">
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-600 text-white uppercase tracking-wider">
+                                                    Instansi Tunggal Resmi
+                                                </span>
+                                                <span class="text-xs text-slate-500 font-medium hidden sm:inline">&bull; Pemkot Surabaya</span>
+                                            </div>
+                                            <h4 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight mt-0.5 truncate">
+                                                Dinas Perpustakaan dan Kearsipan Kota Surabaya
+                                            </h4>
+                                            <p class="text-[11px] text-slate-500 truncate mt-0.5">
+                                                Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Surabaya 60293
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="shrink-0 flex items-center gap-1.5 self-start sm:self-auto px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold">
+                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Mitra Resmi Terpilih</span>
                                     </div>
                                     <h4 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight mt-0.5 truncate">
                                         Dinas Perpustakaan dan Kearsipan Kota Surabaya
@@ -537,303 +552,286 @@
                                         Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275
                                     </p>
                                 </div>
-                            </div>
-                            <div class="shrink-0 flex items-center gap-1.5 self-start sm:self-auto px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold">
-                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span>Mitra Resmi Terpilih</span>
-                            </div>
-                        </div>
 
-                        <!-- 2. Pemilihan Bidang Resmi Dispusip -->
-                        <div>
-                            <x-searchable-select
-                                name="unit_id"
-                                :items="$unitItems"
-                                :selected="$selectedUnitId"
-                                label="Pilihan Bidang / Divisi Resmi Dispusip Surabaya"
-                                placeholder="-- Cari atau Pilih Bidang Resmi Dispusip Surabaya --"
-                                :required="true"
-                                :show-asterisk="true"
-                            />
-                            @error('unit_id')
-                                <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
-                            @enderror
-                            <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1 font-medium">
-                                <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Tersedia 4 Bidang resmi: Sekretariat, Pengelolaan Perpustakaan, Layanan Kearsipan, dan Perlindungan/Preservasi Arsip.</span>
-                            </p>
-                        </div>
-
-                        <!-- Bagian B: Periode Magang -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" 
-                             x-data="{ 
-                                 startDate: '{{ old('start_date', '') }}',
-                                 endDate: '{{ old('end_date', '') }}',
-                                 today: '{{ date('Y-m-d') }}'
-                             }">
-                            
-                            <!-- Tanggal Mulai -->
-                            <div class="space-y-1.5">
-                                <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                <x-text-input id="start_date" 
-                                              name="start_date" 
-                                              type="date" 
-                                              x-model="startDate"
-                                              class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
-                                              :value="old('start_date')"
-                                              required />
-                                <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
-                            </div>
-
-                            <!-- Tanggal Selesai -->
-                            <div class="space-y-1.5">
-                                <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                <x-text-input id="end_date" 
-                                              name="end_date" 
-                                              type="date" 
-                                              x-bind:min="startDate"
-                                              x-model="endDate"
-                                              class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
-                                              :value="old('end_date')"
-                                              required />
-                                <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
-                            </div>
-                        </div>
-
-                        <hr class="border-slate-100">
-
-                        <!-- Upload Dokumen Persyaratan Magang -->
-                        <div class="space-y-5">
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900">Dokumen Persyaratan Magang</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Unggah Surat Pengantar resmi dari perguruan tinggi Anda. Dokumen personal CV, Transkrip, dan KTM Anda otomatis terhubung dari profil.</p>
-                            </div>
-
-                            <!-- 1. Surat Pengantar / Proposal Kampus -->
-                            <div x-data="{ 
-                                    fileName: '', 
-                                    fileUrl: null, 
-                                    handleFile(e) {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            this.fileName = file.name;
-                                            this.fileUrl = URL.createObjectURL(file);
-                                        } else {
-                                            this.fileName = '';
-                                            this.fileUrl = null;
-                                        }
-                                    } 
-                                 }" 
-                                 class="p-5 rounded-2xl border-2 border-blue-200/80 bg-blue-50/20 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <label for="surat_pengantar" class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
-                                        Surat Pengantar dari Perguruan Tinggi <span class="text-red-500">*</span>
-                                    </label>
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800">
-                                        Wajib Diunggah
-                                    </span>
-                                </div>
-                                
-                                <div class="flex items-center gap-2">
-                                    <input type="file" 
-                                           id="surat_pengantar" 
-                                           name="surat_pengantar" 
-                                           accept=".pdf" 
-                                           required 
-                                           @change="handleFile($event)" 
-                                           class="block w-full text-xs text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer transition shadow-xs" />
+                                <!-- 2. Pemilihan Bidang Resmi Dispusip -->
+                                <div>
+                                    <x-searchable-select
+                                        name="unit_id"
+                                        :items="$unitItems"
+                                        :selected="$selectedUnitId"
+                                        label="Pilihan Bidang / Divisi Resmi Dispusip Surabaya"
+                                        placeholder="-- Cari atau Pilih Bidang Resmi Dispusip Surabaya --"
+                                        :required="true"
+                                        :show-asterisk="true"
+                                    />
+                                    @error('unit_id')
+                                        <p class="text-xs text-red-600 font-semibold mt-1">{{ $message }}</p>
+                                    @enderror
+                                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1 font-medium">
+                                        <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span>Tersedia 4 Bidang resmi: Sekretariat, Pengelolaan Perpustakaan, Layanan Kearsipan, dan Perlindungan/Preservasi Arsip.</span>
+                                    </p>
                                 </div>
 
-                                <div x-show="fileUrl" x-cloak class="flex items-center justify-between pt-2 border-t border-blue-100 text-xs">
-                                    <a :href="fileUrl" target="_blank" class="inline-flex items-center gap-1 font-bold text-blue-700 hover:text-blue-900 hover:underline">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        Lihat Berkas Terpilih
+                                <!-- Bagian B: Periode Magang -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" 
+                                     x-data="{ 
+                                         startDate: '{{ old('start_date', '') }}',
+                                         endDate: '{{ old('end_date', '') }}',
+                                         today: '{{ date('Y-m-d') }}'
+                                     }">
+                                    
+                                    <!-- Tanggal Mulai -->
+                                    <div class="space-y-1.5">
+                                        <x-input-label for="start_date" value="Tanggal Mulai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                        <x-text-input id="start_date" 
+                                                      name="start_date" 
+                                                      type="date" 
+                                                      x-model="startDate"
+                                                      class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                                      :value="old('start_date')"
+                                                      required />
+                                        <x-input-error :messages="$errors->get('start_date')" class="mt-1" />
+                                    </div>
+
+                                    <!-- Tanggal Selesai -->
+                                    <div class="space-y-1.5">
+                                        <x-input-label for="end_date" value="Tanggal Selesai Magang" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                        <x-text-input id="end_date" 
+                                                      name="end_date" 
+                                                      type="date" 
+                                                      x-bind:min="startDate"
+                                                      x-model="endDate"
+                                                      class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400/40 focus:border-blue-500 p-2.5"
+                                                      :value="old('end_date')"
+                                                      required />
+                                        <x-input-error :messages="$errors->get('end_date')" class="mt-1" />
+                                    </div>
+                                </div>
+
+                                <hr class="border-slate-100">
+
+                                <!-- Upload Dokumen Persyaratan Magang -->
+                                <div class="space-y-5">
+                                    <div>
+                                        <h3 class="text-sm font-bold text-slate-900">Dokumen Persyaratan Magang</h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">Unggah Surat Pengantar resmi dari perguruan tinggi Anda. Dokumen personal CV, Transkrip, dan KTM Anda otomatis terhubung dari profil.</p>
+                                    </div>
+
+                                    <!-- 1. Surat Pengantar / Proposal Kampus (Konsisten dengan Form Profil) -->
+                                    <div class="p-5 rounded-2xl border-2 border-blue-200/80 bg-blue-50/20 space-y-2.5"
+                                         x-data="{ chosenName: '', previewUrl: null }">
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                                                Surat Pengantar dari Perguruan Tinggi <span class="text-red-500">*</span>
+                                            </label>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800">
+                                                Wajib Diunggah
+                                            </span>
+                                        </div>
+
+                                        <div class="flex items-center gap-2 w-full pt-1">
+                                            <input type="file" 
+                                                   id="surat_pengantar" 
+                                                   name="surat_pengantar" 
+                                                   accept=".pdf" 
+                                                   required 
+                                                   class="hidden"
+                                                   @change="if($event.target.files.length) { 
+                                                       chosenName = $event.target.files[0].name; 
+                                                       previewUrl = URL.createObjectURL($event.target.files[0]); 
+                                                   }" />
+
+                                            <button type="button" 
+                                                    @click="document.getElementById('surat_pengantar').click()"
+                                                    class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                                Choose File
+                                            </button>
+
+                                            <div class="min-w-0 flex-1 truncate text-xs">
+                                                <template x-if="chosenName">
+                                                    <a :href="previewUrl" target="_blank" class="text-blue-700 hover:text-blue-900 hover:underline font-bold truncate block cursor-pointer" :title="chosenName" x-text="chosenName"></a>
+                                                </template>
+                                                <template x-if="!chosenName">
+                                                    <span class="text-slate-400">No file chosen</span>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-[10px] text-slate-400">Format: Dokumen PDF resmi, Maks 2MB</p>
+                                        <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
+                                    </div>
+
+                                    <!-- Panel Dokumen Personal Otomatis dari Profil (Gaya Bersih Seragam Profil) -->
+@php
+    $studentProfile = Auth::user()->studentProfile;
+    $hasCv = !empty($studentProfile?->cv_path);
+    $hasTranscript = !empty($studentProfile?->transcript_path);
+    $hasIdCard = !empty($studentProfile?->id_card_path);
+    $allComplete = $hasCv && $hasTranscript && $hasIdCard;
+
+    $cvDisplayName = $hasCv ? ('CV_' . ($studentProfile?->nim ?? 'Mahasiswa') . '.pdf') : '';
+    $transcriptDisplayName = $hasTranscript ? ('Transkrip_' . ($studentProfile?->nim ?? 'Mahasiswa') . '.pdf') : '';
+    $idCardExt = $hasIdCard ? pathinfo($studentProfile->id_card_path, PATHINFO_EXTENSION) : 'pdf';
+    $idCardDisplayName = $hasIdCard ? ('KTM_' . ($studentProfile?->nim ?? 'Mahasiswa') . '.' . $idCardExt) : '';
+@endphp
+
+<div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full {{ $allComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }} flex items-center justify-center font-bold text-xs">
+                @if($allComplete)
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                @else
+                    !
+                @endif
+            </div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900">
+                Dokumen Personal Terhubung Otomatis dari Profil
+            </h4>
+        </div>
+
+        <a href="{{ route('student.profile.edit') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 self-start sm:self-auto">
+            <span>Perbarui di Profil Saya</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+    </div>
+
+    <p class="text-[11px] text-slate-500">
+        Anda tidak perlu mengunggah ulang berkas identitas pribadi. Dokumen di bawah ini ditarik langsung dari profil mahasiswa Anda:
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <!-- 1. CV -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+            <span class="block text-xs font-bold text-slate-800">1. Curriculum Vitae</span>
+            <div class="min-w-0">
+                @if($hasCv)
+                    <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'cv']) }}" 
+                       target="_blank" 
+                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold text-xs truncate block cursor-pointer" 
+                       title="Buka CV">
+                        {{ $cvDisplayName }}
+                    </a>
+                @else
+                    <span class="text-xs text-rose-500 italic block">Belum diunggah di profil</span>
+                @endif
+            </div>
+        </div>
+
+        <!-- 2. Transkrip -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+            <span class="block text-xs font-bold text-slate-800">2. Transkrip Nilai</span>
+            <div class="min-w-0">
+                @if($hasTranscript)
+                    <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'transkrip']) }}" 
+                       target="_blank" 
+                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold text-xs truncate block cursor-pointer" 
+                       title="Buka Transkrip">
+                        {{ $transcriptDisplayName }}
+                    </a>
+                @else
+                    <span class="text-xs text-rose-500 italic block">Belum diunggah di profil</span>
+                @endif
+            </div>
+        </div>
+
+        <!-- 3. KTM -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+            <span class="block text-xs font-bold text-slate-800">3. KTM atau Kartu Identitas</span>
+            <div class="min-w-0">
+                @if($hasIdCard)
+                    <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}" 
+                       target="_blank" 
+                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold text-xs truncate block cursor-pointer" 
+                       title="Buka KTM">
+                        {{ $idCardDisplayName }}
+                    </a>
+                @else
+                    <span class="text-xs text-rose-500 italic block">Belum diunggah di profil</span>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    @if(!$allComplete)
+        <div class="p-3 rounded-xl bg-amber-100/70 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-2 mt-2">
+            <span>Berkas personal Anda belum lengkap. Silakan lengkapi pada menu Profil Saya sebelum mengirim pengajuan.</span>
+            <a href="{{ route('student.profile.edit') }}" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-[11px] shrink-0 transition">
+                Lengkapi Profil
+            </a>
+        </div>
+    @endif
+</div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-5 border-t border-slate-100">
+                                    <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-150 text-center flex items-center justify-center">
+                                        {{ __('Kembali ke dashboard') }}
                                     </a>
-                                </div>
-                                <p x-show="!fileUrl" class="text-[11px] text-slate-500">Format: Dokumen PDF, Ukuran Maksimal 2MB</p>
-                                <x-input-error :messages="$errors->get('surat_pengantar')" class="mt-1" />
-                            </div>
-
-                            <!-- Panel Dokumen Personal Otomatis dari Profil -->
-                            @php
-                                $studentProfile = Auth::user()->studentProfile;
-                                $hasCv = !empty($studentProfile?->cv_path);
-                                $hasTranscript = !empty($studentProfile?->transcript_path);
-                                $hasIdCard = !empty($studentProfile?->id_card_path);
-                                $allComplete = $hasCv && $hasTranscript && $hasIdCard;
-                            @endphp
-
-                            <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full {{ $allComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }} flex items-center justify-center font-bold text-xs">
-                                            @if($allComplete)
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                            @else
-                                                !
-                                            @endif
-                                        </div>
-                                        <h4 class="text-xs sm:text-sm font-bold text-slate-900">
-                                            Dokumen Personal Terhubung Otomatis dari Profil
-                                        </h4>
-                                    </div>
-
-                                    <a href="{{ route('student.profile.edit') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 self-start sm:self-auto">
-                                        <span>Perbarui di Profil Saya</span>
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    </a>
-                                </div>
-
-                                <p class="text-[11px] text-slate-500">
-                                    Anda tidak perlu mengunggah ulang berkas identitas pribadi. Dokumen di bawah ini ditarik langsung dari profil mahasiswa Anda:
-                                </p>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                                    <!-- CV Status -->
-                                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 flex items-center justify-between">
-                                        <div class="min-w-0">
-                                            <span class="block text-[11px] font-bold text-slate-800 truncate">Curriculum Vitae</span>
-                                            <span class="text-[10px] {{ $hasCv ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold' }}">
-                                                {{ $hasCv ? 'Tersedia di Profil' : 'Belum Diunggah' }}
-                                            </span>
-                                        </div>
-                                        @if($hasCv)
-                                            <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'cv']) }}" target="_blank" class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50" title="Lihat Berkas">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </a>
-                                        @endif
-                                    </div>
-
-                                    <!-- Transkrip Status -->
-                                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 flex items-center justify-between">
-                                        <div class="min-w-0">
-                                            <span class="block text-[11px] font-bold text-slate-800 truncate">Transkrip Nilai</span>
-                                            <span class="text-[10px] {{ $hasTranscript ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold' }}">
-                                                {{ $hasTranscript ? 'Tersedia di Profil' : 'Belum Diunggah' }}
-                                            </span>
-                                        </div>
-                                        @if($hasTranscript)
-                                            <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'transkrip']) }}" target="_blank" class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50" title="Lihat Berkas">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </a>
-                                        @endif
-                                    </div>
-
-                                    <!-- KTM Status -->
-                                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 flex items-center justify-between">
-                                        <div class="min-w-0">
-                                            <span class="block text-[11px] font-bold text-slate-800 truncate">KTM atau Identitas</span>
-                                            <span class="text-[10px] {{ $hasIdCard ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold' }}">
-                                                {{ $hasIdCard ? 'Tersedia di Profil' : 'Belum Diunggah' }}
-                                            </span>
-                                        </div>
-                                        @if($hasIdCard)
-                                            <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}" target="_blank" class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50" title="Lihat Berkas">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                @if(!$allComplete)
-                                    <div class="p-3 rounded-xl bg-amber-100/70 border border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-2 mt-2">
-                                        <span>Berkas personal Anda belum lengkap. Silakan lengkapi pada menu Profil Saya sebelum mengirim pengajuan.</span>
-                                        <a href="{{ route('student.profile.edit') }}" class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-[11px] shrink-0 transition">
-                                            Lengkapi Profil
-                                        </a>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-5 border-t border-slate-100">
-                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-150 text-center flex items-center justify-center">
-                                {{ __('Kembali ke dashboard') }}
-                            </a>
-                            <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer flex items-center justify-center">
-                                {{ __('Kirim Pengajuan Magang') }}
-                            </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Moda 2: Pendaftaran Kelompok -->
-                    <div x-show="regMode === 'group'" x-cloak class="space-y-6">
-                        <!-- Navigasi Kembali ke Pilihan Jalur -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2">
-                                    <button type="button" 
-                                            @click="regMode = ''" 
-                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                                        <span>Ganti Jalur Pendaftaran</span>
+                                    <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all duration-150 cursor-pointer flex items-center justify-center">
+                                        {{ __('Kirim Pengajuan Magang') }}
                                     </button>
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                        Pendaftaran Kelompok
-                                    </span>
                                 </div>
-                                <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-2">Pendaftaran Magang Bersama Tim</h3>
-                                <p class="text-xs text-slate-500">Buat kelompok baru sebagai ketua tim atau bergabung ke kelompok rekan kampus menggunakan kode undangan.</p>
-                            </div>
+                            </form>
                         </div>
 
-                        <!-- Petunjuk Peran Ketua dan Anggota -->
-                        <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-950 space-y-3">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-900 border border-amber-300">
-                                    Petunjuk Penting
-                                </span>
-                                <h4 class="text-xs sm:text-sm font-black text-amber-950">
-                                    Panduan Peran Pendaftaran Kelompok
-                                </h4>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
-                                <div class="p-3.5 rounded-xl bg-white/80 border border-amber-200/70 space-y-1">
-                                    <div class="font-extrabold text-blue-900 flex items-center gap-1.5">
-                                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                                        <span>Untuk Ketua Kelompok:</span>
-                                    </div>
-                                    <p class="text-slate-700">
-                                        Pilih bagian <strong>Buat Kelompok Baru</strong>. Anda yang menentukan unit dinas, memilih periode magang, mengunggah surat pengantar resmi bersama, dan membagikan kode undangan kepada rekan tim.
-                                    </p>
-                                </div>
-                                <div class="p-3.5 rounded-xl bg-white/80 border border-amber-200/70 space-y-1">
-                                    <div class="font-extrabold text-indigo-900 flex items-center gap-1.5">
-                                        <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
-                                        <span>Untuk Anggota Tim:</span>
-                                    </div>
-                                    <p class="text-slate-700">
-                                        <strong>Jangan membuat kelompok baru.</strong> Mintalah ketua kelompok Anda untuk membuat kelompok terlebih dahulu di bagian sebelah kiri. Setelah ketua selesai membuat kelompok, minta <strong>Kode Undangan Kelompok</strong> dari ketua lalu masukkan ke bagian <strong>Gabung ke Kelompok Rekan</strong>.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Card A: Buat Kelompok Baru -->
-                            <div class="p-6 rounded-2xl bg-gradient-to-b from-blue-50/60 to-white border border-blue-200/80 shadow-xs flex flex-col justify-between space-y-5">
-                                <div class="space-y-3">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                                        </div>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
-                                            Khusus Ketua Tim
+                        <!-- Moda 2: Pendaftaran Kelompok -->
+                        <div x-show="regMode === 'group'" x-cloak class="space-y-6">
+                            <!-- Navigasi Kembali ke Pilihan Jalur -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" 
+                                                @click="regMode = ''" 
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                            <span>Ganti Jalur Pendaftaran</span>
+                                        </button>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                            Pendaftaran Kelompok
                                         </span>
                                     </div>
-                                    <h4 class="text-base font-extrabold text-slate-900">Buat Kelompok Baru</h4>
-                                    <div class="p-2.5 rounded-xl bg-blue-100/60 border border-blue-200 text-[11px] text-blue-900 font-medium">
-                                        Formulir ini khusus untuk Ketua Kelompok yang menginisiasi pendaftaran. Jika Anda adalah anggota, jangan isi formulir ini.
+                                    <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-2">Pendaftaran Magang Bersama Tim</h3>
+                                    <p class="text-xs text-slate-500">Buat kelompok baru sebagai ketua tim atau bergabung ke kelompok rekan kampus menggunakan kode undangan.</p>
+                                </div>
+                            </div>
+
+                            <!-- Petunjuk Peran Ketua dan Anggota -->
+                            <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-950 space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-900 border border-amber-300">
+                                        Petunjuk Penting
+                                    </span>
+                                    <h4 class="text-xs sm:text-sm font-black text-amber-950">
+                                        Panduan Peran Pendaftaran Kelompok
+                                    </h4>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
+                                    <div class="p-3.5 rounded-xl bg-white/80 border border-amber-200/70 space-y-1">
+                                        <div class="font-extrabold text-blue-900 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                                            <span>Untuk Ketua Kelompok:</span>
+                                        </div>
+                                        <p class="text-slate-700">
+                                            Pilih bagian <strong>Buat Kelompok Baru</strong>. Anda yang menentukan unit dinas, memilih periode magang, mengunggah surat pengantar resmi bersama, dan membagikan kode undangan kepada rekan tim.
+                                        </p>
                                     </div>
-                                    <p class="text-xs text-slate-600 leading-relaxed">
-                                        Sebagai Ketua Tim, Anda akan memilih Bidang Dispusip, menentukan rentang tanggal magang, dan mendapatkan <strong>Kode Undangan</strong> untuk dibagikan ke rekan satu kampus Anda.
-                                    </p>
+                                    <div class="p-3.5 rounded-xl bg-white/80 border border-amber-200/70 space-y-1">
+                                        <div class="font-extrabold text-indigo-900 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                                            <span>Untuk Anggota Tim:</span>
+                                        </div>
+                                        <p class="text-slate-700">
+                                            <strong>Jangan membuat kelompok baru.</strong> Mintalah ketua kelompok Anda untuk membuat kelompok terlebih dahulu di bagian sebelah kiri. Setelah ketua selesai membuat kelompok, minta <strong>Kode Undangan Kelompok</strong> dari ketua lalu masukkan ke bagian <strong>Gabung ke Kelompok Rekan</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
                                     <form action="{{ route('student.group.create') }}" method="POST" class="space-y-4 pt-2"
                                           x-data="{
@@ -871,52 +869,61 @@
                                                 </p>
                                             </div>
                                         </div>
+                                        <p class="text-xs text-slate-600 leading-relaxed">
+                                            Sebagai Ketua Tim, Anda akan memilih Bidang Dispusip, menentukan rentang tanggal magang, dan mendapatkan <strong>Kode Undangan</strong> untuk dibagikan ke rekan satu kampus Anda.
+                                        </p>
 
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <form action="{{ route('student.group.create') }}" method="POST" class="space-y-4 pt-2">
+                                            @csrf
                                             <div>
-                                                <x-input-label for="group_start_date" value="Tanggal Mulai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                <x-text-input id="group_start_date" name="start_date" type="date" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                <x-input-label for="group_name" value="Nama Kelompok - Opsional" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                <x-text-input id="group_name" name="name" type="text" placeholder="Contoh: Tim Riset Kearsipan MBKM" class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
                                             </div>
-                                            <div>
-                                                <x-input-label for="group_end_date" value="Tanggal Selesai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                                <x-text-input id="group_end_date" name="end_date" type="date" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
-                                            </div>
-                                        </div>
 
-                                        <button type="submit" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
-                                            <span>Buat Kelompok & Dapatkan Kode</span>
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                        </button>
-                                    </form>
+                                            <div>
+                                                <label for="group_unit_select" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                                                    Pilihan Bidang Dispusip <span class="text-red-500">*</span>
+                                                </label>
+                                                <select id="group_unit_select" name="unit_id" required class="block w-full text-xs sm:text-sm rounded-xl border-slate-200 bg-white p-2.5 focus:ring-2 focus:ring-blue-400">
+                                                    <option value="">-- Pilih Bidang Dispusip Surabaya --</option>
+                                                    @foreach($units as $u)
+                                                        @php $rem = $u->remaining_quota; @endphp
+                                                        <option value="{{ $u->id }}" {{ $rem <= 0 ? 'disabled' : '' }}>
+                                                            {{ $u->name }} - Sisa Kuota: {{ $rem }} orang
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <x-input-label for="group_start_date" value="Tanggal Mulai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                    <x-text-input id="group_start_date" name="start_date" type="date" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                </div>
+                                                <div>
+                                                    <x-input-label for="group_end_date" value="Tanggal Selesai" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                    <x-text-input id="group_end_date" name="end_date" type="date" required class="block w-full text-xs rounded-xl border-slate-200 bg-white mt-1 p-2" />
+                                                </div>
+                                            </div>
+
+                                            <button type="submit" class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
+                                                <span>Buat Kelompok & Dapatkan Kode</span>
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Card B: Gabung Kelompok Rekan -->
-                            <div class="p-6 rounded-2xl bg-gradient-to-b from-indigo-50/60 to-white border border-indigo-200/80 shadow-xs flex flex-col justify-between space-y-5">
-                                <div class="space-y-3">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-xs">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-                                        </div>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">
-                                            Khusus Anggota Tim
-                                        </span>
-                                    </div>
-                                    <h4 class="text-base font-extrabold text-slate-900">Gabung ke Kelompok Rekan</h4>
-                                    <div class="p-2.5 rounded-xl bg-indigo-100/60 border border-indigo-200 text-[11px] text-indigo-900 font-medium">
-                                        Formulir ini khusus untuk Anggota Tim. Pastikan Ketua Kelompok Anda sudah membuat tim terlebih dahulu agar Anda dapat meminta kode undangannya.
-                                    </div>
-                                    <p class="text-xs text-slate-600 leading-relaxed">
-                                        Sudah ada rekan satu kampus Anda yang membuat kelompok magang? Minta <strong>Kode Undangan Kelompok</strong> dari ketua tim Anda dan masukkan di bawah ini.
-                                    </p>
-
-                                    <form action="{{ route('student.group.join') }}" method="POST" class="space-y-4 pt-2">
-                                        @csrf
-                                        <div>
-                                            <x-input-label for="group_code" value="Kode Undangan Kelompok" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
-                                            <x-text-input id="group_code" name="group_code" type="text" placeholder="Contoh: GRP-8K2A1P" required 
-                                                          class="block w-full text-sm font-mono uppercase tracking-widest text-center font-bold rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
-                                            <p class="text-[11px] text-slate-400 mt-1">Kode terdiri dari 6-10 karakter yang diberikan oleh Ketua Kelompok Anda.</p>
+                                <!-- Card B: Gabung Kelompok Rekan -->
+                                <div class="p-6 rounded-2xl bg-gradient-to-b from-indigo-50/60 to-white border border-indigo-200/80 shadow-xs flex flex-col justify-between space-y-5">
+                                    <div class="space-y-3">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-xs">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                                            </div>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                                Khusus Anggota Tim
+                                            </span>
                                         </div>
 
                                         <div class="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl text-[11px] text-amber-800 space-y-1">
@@ -925,18 +932,36 @@
                                             <p>&bull; Anda belum memiliki pengajuan aktif lain yang sedang berjalan.</p>
                                             <p>&bull; Kapasitas kelompok dibatasi oleh sisa kuota bidang dengan batas maksimal sistem 100 orang.</p>
                                         </div>
+                                        <p class="text-xs text-slate-600 leading-relaxed">
+                                            Sudah ada rekan satu kampus Anda yang membuat kelompok magang? Minta <strong>Kode Undangan Kelompok</strong> dari ketua tim Anda dan masukkan di bawah ini.
+                                        </p>
 
-                                        <button type="submit" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
-                                            <span>Gabung ke Kelompok Tim</span>
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" /></svg>
-                                        </button>
-                                    </form>
+                                        <form action="{{ route('student.group.join') }}" method="POST" class="space-y-4 pt-2">
+                                            @csrf
+                                            <div>
+                                                <x-input-label for="group_code" value="Kode Undangan Kelompok" class="text-xs font-bold uppercase tracking-wider text-slate-700" />
+                                                <x-text-input id="group_code" name="group_code" type="text" placeholder="Contoh: GRP-8K2A1P" required 
+                                                              class="block w-full text-sm font-mono uppercase tracking-widest text-center font-bold rounded-xl border-slate-200 bg-white mt-1 p-2.5" />
+                                                <p class="text-[11px] text-slate-400 mt-1">Kode terdiri dari 6-10 karakter yang diberikan oleh Ketua Kelompok Anda.</p>
+                                            </div>
+
+                                            <div class="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl text-[11px] text-amber-800 space-y-1">
+                                                <p class="font-bold">Ketentuan Bergabung:</p>
+                                                <p>&bull; Anda harus berasal dari perguruan tinggi yang sama dengan Ketua.</p>
+                                                <p>&bull; Anda belum memiliki pengajuan aktif lain yang sedang berjalan.</p>
+                                            </div>
+
+                                            <button type="submit" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
+                                                <span>Gabung ke Kelompok Tim</span>
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" /></svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endif
             </div>
 
             <!-- 2. TABEL RIWAYAT PENGAJUAN MAGANG -->
@@ -945,7 +970,7 @@
                     <h3 class="text-base font-bold text-slate-900">Riwayat Pengajuan Magang Anda</h3>
                 </div>
 
-                <!-- Desktop View (Tabel Pas Presisi Tanpa Scrollbar Horizontal) -->
+                <!-- Desktop View -->
                 <div class="hidden md:block w-full">
                     <table class="w-full table-fixed text-left border-collapse">
                         <thead>

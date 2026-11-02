@@ -150,9 +150,12 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-118** | 2026-11-02 | Pengamanan Double-ACC Sertifikat Multi-Role, Kepatuhan StatusViewGuard & Eliminasi N+1 Dashboard DPL | Proteksi unduh sertifikat berstatus waiting_approval/revision pada Mahasiswa, DPL, dan Universitas, penyesuaian tombol 'Minta Revisi' bebas regex guard, optimasi eager-loading universityRelation & eliminasi duplikasi notifikasi Supervisor | RESOLVED |
 | **LRN-119** | 2026-11-02 | Standardisasi Nomenklatur 'Kelola Bidang' (Admin Bidang) & 'Unit Bidang' (Admin Dinas / Supervisor) | Penggantian menu 'Bidang Saya' menjadi 'Kelola Bidang' pada admin formasi bidang, dan standardisasi istilah 'Bidang Devisi'/'Devisi' menjadi 'Unit Bidang' di seluruh navbar, header, tombol aksi, metrik, tabel, serta filter | RESOLVED |
 | **LRN-120** | 2026-11-02 | Tombol 'Preview Proyek', Ekspansi Kata Kunci Cerdas Kategori Inovasi & Algoritma Pembobotan Skor Cerdas | Perubahan tombol 'Lihat Halaman Proyek' -> 'Preview Proyek', penambahan 150+ kosakata kategori inovasi (videografi, fotografi, kaligrafi, lukisan, karya seni, arsip sejarah, pemrograman, dll), proteksi regex word-boundary kata pendek, dan rekomendasi berbasis skor tertinggi | RESOLVED |
-| **LRN-121** | 2026-11-02 | Standardisasi Favicon Resmi Dispusip Surabaya, Eliminasi Margin Kosong (Padding) & Cache-Busting Versioning | Penggantian 9 varian favicon dengan format tight-crop beresolusi tajam tanpa padding kosong berlebih, dan cache-busting `?v=4` di layout Blade | RESOLVED |
-| **LRN-122** | 2026-11-02 | Template Sertifikat Resmi Dispusip, 5 Logo Kop Horizontal, Kotak TTE Presisi Ber-QR Logo Surabaya, & Theme Engine Tahunan Terintegrasi | Format baru Halaman 1 sesuai prototipe resmi Dispusip Pemkot Surabaya, jajaran 5 logo resmi, kotak TTE presisi BSrE dengan QR lambang Surabaya di tengah, Certificate Theme Engine dinamis, harmonisasi Halaman 2, serta navigasi 2-Tab terkunci di atas dengan pagination | RESOLVED |
-
+| **LRN-121** | 2026-11-02 | Standardisasi Favicon Resmi Dispusip Surabaya, Eliminasi Margin Kosong (Padding) & Cache-Busting Versioning | Penggantian 9 varian favicon dengan format tight-crop beresolusi tajam tanpa padding kosong berlebih, dan cache-busting ?v=4 di layout Blade | RESOLVED |
+| **LRN-122** | 2026-11-02 | Inovasi Template Sertifikat Resmi Dispusip, 5 Logo Kop Horizontal, Kotak TTE Presisi Ber-QR Logo Surabaya, & Certificate Theme Engine Tahunan Terintegrasi | Format baru Halaman 1 sesuai prototipe resmi Dispusip Pemkot Surabaya, jajaran 5 logo resmi, kotak TTE presisi BSrE dengan QR lambang Surabaya di tengah, Certificate Theme Engine dinamis, harmonisasi Halaman 2, serta navigasi 2-Tab terkunci di atas dengan pagination | RESOLVED |
+| **LRN-123** | 2026-11-02 | Migrasi Database PostgreSQL & Galeri Proyek Dinas | Error 500 column likes_count does not exist di /proyek-dinas akibat migrasi batch interaksi proyek pending | RESOLVED |
+| **LRN-124** | 2026-11-02 | Form Filter Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow | Elemen input & dropdown filter menyempit (squished), teks menabrak icon chevron & tombol reset absen | RESOLVED |
+| **LRN-125** | 2026-11-02 | Mobile Kartu 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar | Metrik kuota & mhs aktif runtuh vertikal 1-kolom di HP akibat CSS bundle lama & ketiadaan inline fallback | RESOLVED |
+| **LRN-126** | 2026-11-02 | Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping | Penyeragaman item tautan menu drawer navigasi mobile menjadi teks bersih konsisten tanpa box ikon sporadis demi estetika antarmuka ringkas | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -3852,6 +3855,76 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule**:
   Desain dokumen resmi berbobot hukum (sertifikat, transkrip) tidak boleh meng-*hardcode* warna atau nama pejabat di Blade view. Selalu sediakan *Dynamic Theme & Signee Token Engine* yang dapat dikelola admin dari UI web secara backward-compatible. Kode QR yang ditumpangi logo tengah WAJIB menggunakan *Error Correction Level H* agar tetap 100% terbaca saat dipindai.
 
+---
 
-### [LRN-122] Inovasi Template Sertifikat Resmi Dispusip, 5 Logo Kop Horizontal, Kotak TTE Presisi Be
-... [truncated for diff preview]
+### [LRN-123] Migrasi Skema Interaksi Proyek & Galeri Proyek Dinas
+- **Tanggal**: 2026-11-02
+- **Komponen**: `database/migrations/2026_10_28_150000_create_project_interactions_and_comments_table.php`, `app/Http/Controllers/PublicProjectController.php`, PostgreSQL `internship_projects`
+- **Problem / Symptom**: `Illuminate\Database\QueryException: SQLSTATE[42703]: Undefined column: 7 ERROR: column "likes_count" does not exist` saat mengakses rute `/proyek-dinas`.
+- **Root Cause**: Migrasi `2026_10_28_150000_create_project_interactions_and_comments_table.php` yang menambahkan kolom `is_public`, `likes_count`, `comments_count`, dan `views_count` ke tabel `internship_projects` masih berstatus pending pada basis data PostgreSQL lokal.
+- **Fix Applied**: 
+  1. Menjalankan perintah migrasi `php artisan migrate --force` untuk memperbarui skema tabel PostgreSQL.
+  2. Melakukan verifikasi HTTP status 200 pada rute `/proyek-dinas`.
+  3. Memvalidasi visual responsivitas antarmuka menggunakan runner Playwright Chrome sistem (`scripts/browser-runner.mjs --url /proyek-dinas --screenshot`) baik desktop (1920x1080) maupun mobile (375x812).
+  4. Menjalankan suite pengujian `php artisan test` dengan hasil 368/368 Passed (Exit Code 0).
+  5. Membersihkan cache aplikasi dengan `php artisan optimize:clear`.
+- **Prevention Rule**: Jika terjadi runtime exception `column does not exist` atau `relation does not exist`, lakukan audit status migrasi database via `php artisan migrate:status` sebelum mengubah struktur query pada Controller.
+
+---
+
+### [LRN-124] Standardisasi Tata Letak Filter Bar Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/projects/index.blade.php`, Tailwind CSS Grid & Forms
+- **Problem / Symptom**: Filter bar di katalog Proyek Dinas (`/proyek-dinas`) tampak menyempit (*squished*): ikon pencarian bertabrakan dengan teks placeholder, teks opsi dropdown (seperti "Teknologi & Perangkat Lunak") terhimpit menabrak ikon panah dropdown (*chevron*), dan ketiadaan tombol reset cepat.
+- **Root Cause**: Seluruh 5 kontrol (search input, kategori, tahun, pengurutan, tombol filter) dipaksakan berada dalam 1 baris grid 12-kolom (`lg:col-span-12`) di mana kolom tombol hanya mendapat 1/12 lebar dan dropdown terkompresi hingga ~240px dengan `px-3` yang meng-override padding kanan bawaan Tailwind Forms (`pr-10`).
+- **Fix Applied**: 
+  1. Menerapkan pola layout 2-baris lapang (*anti-squish layout*):
+     - **Baris 1**: Input pencarian lega (`flex-1`, `h-11`) dengan padding kiri aman (`pl-11` / `2.75rem`) dan tombol aksi **Filter** (dengan ikon funnel) serta tombol **Reset Filter** otomatis saat filter aktif.
+     - **Baris 2**: Grid 3 kolom proporsional (`grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4`) untuk Kategori Bidang, Tahun Proyek, dan Urutan Tampil dengan label formal di atasnya.
+  2. Memberikan `pl-3.5 pr-10` pada setiap elemen `<select>` sehingga chevron panah dropdown memiliki gutter terlindung 2.5rem dan tidak pernah menabrak teks opsi.
+  3. Menambahkan trigger instan `onchange="this.form.submit()"` pada seluruh dropdown filter untuk kenyamanan pengguna.
+  4. Memvalidasi visual rendering pada desktop (1920x1080) dan smartphone mobile (375x812) via browser runner Chrome.
+---
+
+### [LRN-125] Perapian Kartu Mobile 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/admin/dashboard.blade.php`, `resources/views/supervisor/dashboard.blade.php`
+- **Problem / Symptom**: Di viewport smartphone (<768px), metrik angka pada kartu 4 Bidang Dispusip (Kuota, Mhs Aktif, ACC, Mhs Lulus) runtuh secara vertikal dalam 1 kolom ke bawah yang sangat memanjang dan canggung.
+- **Root Cause**: Kelas Tailwind `grid-cols-4` belum terkompilasi dalam berkas bundle CSS produksi lama (`app-BLPP0X1b.css`), sehingga browser fallback ke `display: grid` default dengan 1 kolom auto-flow baris. Selain itu, ketiadaan styling kotak kartu sel individual menyebabkan teks angka dan label mengambang polos di tengah.
+- **Fix Applied**: 
+  1. Menata ulang komponen kartu mobile 4 bidang:
+     - Header: Nama bidang tebal dengan panah link interaktif dan badge sisa kuota rounded.
+     - Progress Bar: Indikator visual utilisasi kuota terisi (emerald/amber/rose).
+     - 4 Kotak Metrik Horizontal: Masing-masing angka (Kuota, Mhs Aktif, ACC, Mhs Lulus) dibungkus dalam sel kartu ber-border halus dengan background tint lembut (`bg-slate-50`, `bg-emerald-50`, `bg-purple-50`, `bg-blue-50`).
+  2. Menambahkan inline CSS `style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;"` sebagai jaminan anti-runtuh mutlak di semua browser HP.
+  3. Menjalankan `npm run build` untuk meng-update bundle CSS produksi (dari 98 kB ke 124 kB).
+  4. Memvalidasi kepatuhan aturan `StatusViewGuardTest` (2/2 PASS) dan menguji rendering visual Playwright Chrome mobile (375x812).
+- **Prevention Rule**: Selalu sertakan inline style cadangan (`grid-template-columns: repeat(N, minmax(0, 1fr))`) pada grid metrik kompak di tampilan mobile untuk mencegah regresi tata letak jika terjadi jeda update bundle aset Vite.
+
+### [LRN-126] Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `scripts/browser-runner.mjs`
+- **Problem / Symptom**: Pada drawer navigasi mobile (<768px), beberapa item menu utama teratas (`Home`, `Proyek Dinas`, `Dashboard`, `Pengajuan`) menampilkan ikon SVG dalam kotak rounded (`w-7 h-7 rounded-lg bg-slate-100`), sedangkan item-item menu di bawahnya (Instansi Dinas, Perguruan Tinggi, Semua Pengguna, Mentor, Pengaturan Akun, dll.) berwujud teks bersih tanpa ikon, menciptakan inkonsistensi visual dan kepadatan yang tidak perlu.
+- **Root Cause**: Inkonsistensi implementasi markup antara menu umum/super-admin/supervisor dengan menu peran lainnya di dalam drawer navigasi mobile `resources/views/layouts/navigation.blade.php`.
+- **Fix Applied**: 
+  1. Menghapus blok kontainer ikon `<div class="w-7 h-7 rounded-lg ..."><svg ...></svg></div>` dari seluruh tautan menu mobile di `resources/views/layouts/navigation.blade.php` (Home, Proyek Dinas, Dashboard, Pengajuan, Bidang Saya, Mentor, Logbook, Profil Dinas).
+  2. Menyeragamkan semua item tautan menjadi format teks bersih berjarak seimbang (`flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px]`) dengan status aktif konsisten (`bg-blue-50 text-blue-600 font-bold`).
+  3. Memperbarui `scripts/browser-runner.mjs` dengan automasi klik tombol burger drawer `button[aria-label="Buka Menu"]` dan penangkapan tangkapan layar otomatis `yolo_${cleanName}_mobile_drawer.png`.
+  4. Menjalankan `php artisan view:clear; php artisan optimize:clear` dan verifikasi full test suite `php artisan test` (368 passed, Exit Code 0).
+- **Prevention Rule**: Seluruh item menu di dalam drawer navigasi mobile wajib menjaga keseragaman format list: jika teks polos digunakan untuk daftar entitas sekunder, maka menu utama juga wajib menggunakan teks polos yang konsisten tanpa menambahkan box ikon sporadis.
+
+---
+
+---
+
+## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
+
+```markdown
+### [LRN-XXX] Judul Singkat & Padat Masalah
+- **Tanggal**: YYYY-MM-DD
+- **Komponen**: File / Modul yang terdampak
+- **Problem / Symptom**: Gejala yang terlihat di pengguna/console/terminal
+- **Root Cause**: Akar penyebab teknis masalah
+- **Fix Applied**: Langkah-langkah penyelesaian konkret yang telah diterapkan
+- **Prevention Rule**: Aturan permanen untuk mencegah bug terulang
+```

@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // 0. Sinkronisasi sequence PostgreSQL agar ID tidak bentrok
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("SELECT setval('agency_profiles_id_seq', COALESCE((SELECT MAX(id) FROM agency_profiles), 1))");
+        }
+
         // 1. Kolom unit_id pada tabel users untuk akun mentor & tim kerja
         Schema::table('users', function (Blueprint $table) {
             if (! Schema::hasColumn('users', 'unit_id')) {
@@ -52,21 +57,30 @@ return new class extends Migration
         });
 
         // 5. Standarisasi 4 Bidang Resmi Dispusip Kota Surabaya
-        $dispusip = \App\Models\AgencyProfile::firstOrCreate(
-            ['agency_name' => 'Dinas Perpustakaan dan Kearsipan'],
-            [
-                'government_name' => 'Pemerintah Kota Surabaya',
-                'address' => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293',
-                'phone' => '(031) 8707682',
-                'email' => 'dispusip@surabaya.go.id',
-                'website' => 'https://dispusip.surabaya.go.id',
-                'logo' => 'images/logos/dispusip.png',
-                'signee_name' => 'Ir. Mia Santi Dewi, M.Si',
-                'signee_nip' => '19680812 199403 2 007',
-                'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
-                'city' => 'Surabaya',
-            ]
-        );
+        $dispusipData = [
+            'agency_name'     => 'Dinas Perpustakaan dan Kearsipan',
+            'government_name' => 'Pemerintah Kota Surabaya',
+            'address'         => 'Jl. Rungkut Asri Tengah No. 5-7, Rungkut Kidul, Kec. Rungkut, Kota Surabaya, Jawa Timur 60293',
+            'phone'           => '(031) 8707682',
+            'email'           => 'dispusip@surabaya.go.id',
+            'website'         => 'https://dispusip.surabaya.go.id',
+            'logo'            => 'images/logos/dispusip.png',
+            'signee_name'     => 'Ir. Mia Santi Dewi, M.Si',
+            'signee_nip'      => '19680812 199403 2 007',
+            'signee_position' => 'Kepala Dinas Perpustakaan dan Kearsipan',
+            'city'            => 'Surabaya',
+            'updated_at'      => now(),
+        ];
+
+        // Cari record yang ada menggunakan Query Builder mentah agar tidak mentrigger insert
+        $existingAgency = DB::table('agency_profiles')->orderBy('id', 'asc')->first();
+
+        if ($existingAgency) {
+            DB::table('agency_profiles')->where('id', $existingAgency->id)->update($dispusipData);
+            $agencyId = $existingAgency->id;
+        } else {
+            $agencyId = DB::table('agency_profiles')->insertGetId(array_merge($dispusipData, ['created_at' => now()]));
+        }
 
         $officialUnits = [
             [
@@ -92,14 +106,15 @@ return new class extends Migration
         ];
 
         foreach ($officialUnits as $unitData) {
-            \App\Models\Unit::updateOrCreate(
+            DB::table('units')->updateOrInsert(
                 [
-                    'agency_profile_id' => $dispusip->id,
+                    'agency_profile_id' => $agencyId,
                     'name' => $unitData['name'],
                 ],
                 [
                     'description' => $unitData['description'],
                     'quota' => $unitData['quota'],
+                    'updated_at' => now(),
                 ]
             );
         }
