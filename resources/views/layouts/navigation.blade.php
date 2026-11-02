@@ -198,7 +198,7 @@
                         @if ($isBidangAdmin)
                             <a href="{{ route('admin.units.show', Auth::user()->unit_id) }}" 
                                class="transition py-1 {{ request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                                Bidang Saya
+                                Kelola Bidang
                             </a>
                             <a href="{{ route('admin.mentors.index') }}" 
                                class="transition py-1 {{ request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -207,7 +207,7 @@
                         @else
                             <a href="{{ route('admin.units.index') }}" 
                                class="transition py-1 {{ request()->routeIs('admin.units.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                                Bidang Devisi
+                                Unit Bidang
                             </a>
                             <a href="{{ route('admin.mentors.index') }}" 
                                class="transition py-1 {{ request()->routeIs('admin.mentors.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -486,7 +486,7 @@
                                 Pengajuan
                             </a>
                             <a href="{{ route('admin.units.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Bidang Devisi
+                                Unit Bidang
                             </a>
                             <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Mentor Lapangan
@@ -733,14 +733,14 @@
                     </a>
                     @if ($isBidangAdmin)
                         <a href="{{ route('admin.units.show', Auth::user()->unit_id) }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.units.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                            <span>Bidang Saya</span>
+                            <span>Kelola Bidang</span>
                         </a>
                         <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                             <span>Mentor Bidang</span>
                         </a>
                     @else
                         <a href="{{ route('admin.units.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.units.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                            <span>Bidang Devisi</span>
+                            <span>Unit Bidang</span>
                         </a>
                         <a href="{{ route('admin.mentors.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.mentors.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                             <span>Mentor Lapangan</span>

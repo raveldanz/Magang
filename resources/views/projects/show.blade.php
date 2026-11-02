@@ -12,7 +12,8 @@
                         <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">
                             Karya Inovasi Magang
                         </span>
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold border {{ $project->category_badge_class }}">
+                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold border {{ $project->category_badge_class }}"
+                              style="background-color: {{ $project->category_bg_color }} !important; color: {{ $project->category_text_color }} !important; border-color: {{ $project->category_border_color }} !important; opacity: 1 !important;">
                             {{ $project->category_label }}
                         </span>
                         <span class="hidden sm:inline text-xs text-slate-400">&bull;</span>
@@ -29,11 +30,12 @@
             <div class="flex items-center gap-2">
                 @php
                     $isManagerRole = Auth::check() && (Auth::user()->isSuperAdmin() || in_array(Auth::user()->role, ['super_admin', 'superadmin', 'supervisor']));
+                    $isOwner = $isOwner ?? (Auth::check() && $student && Auth::id() === $student->id);
                 @endphp
 
                 @if($isManagerRole)
                     {{-- KHUSUS SUPER ADMIN & SUPERVISOR: Tombol 'Kelola Proyek' Elegan dengan Dropdown Lengkap --}}
-                    <div x-data="{ menuOpen: false }" class="relative" @click.outside="menuOpen = false">
+                    <div x-data="{ menuOpen: false, copied: false }" class="relative" @click.outside="menuOpen = false">
                         <button @click="menuOpen = !menuOpen" 
                                 type="button" 
                                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer active:scale-95"
@@ -89,12 +91,12 @@
                             {{-- 3. Salin Tautan --}}
                             <div class="py-1">
                                 <button type="button" 
-                                        @click="navigator.clipboard.writeText(window.location.href); menuOpen = false; if (typeof copyShareLink === 'function') { copyShareLink(); } else { shareToast = true; setTimeout(() => shareToast = false, 3000); }" 
+                                        @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2500);" 
                                         class="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-semibold cursor-pointer transition">
                                     <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <div>
-                                        <div class="font-bold text-slate-800">Salin Tautan Proyek</div>
-                                        <div class="text-[10px] text-slate-400">Salin link halaman ini</div>
+                                        <div class="font-bold text-slate-800" x-text="copied ? 'Tautan Berhasil Disalin!' : 'Salin Tautan Proyek'"></div>
+                                        <div class="text-[10px]" :class="copied ? 'text-emerald-600 font-semibold' : 'text-slate-400'" x-text="copied ? 'Tersalin ke papan klip' : 'Salin link halaman ini'"></div>
                                     </div>
                                 </button>
                             </div>
@@ -119,6 +121,15 @@
                         </div>
                     </div>
                 @else
+                    {{-- UNTUK PEMILIK / KETUA TIM: Tombol Ubah Proyek --}}
+                    @if(Auth::check() && ($isOwner || $project->members->where('is_leader', true)->contains(fn($m) => $m->placement?->application?->user_id === Auth::id())))
+                        <a href="{{ route('student.projects.edit', $project->id) }}" 
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            <span>Ubah Proyek</span>
+                        </a>
+                    @endif
+
                     {{-- UNTUK USER LAIN (Mahasiswa, Dosen, Tamu / Publik): Tampilkan tombol Akses Tautan biasa jika tersedia demo_url --}}
                     @if($project->demo_url)
                         <a href="{{ $project->demo_url }}" target="_blank" rel="noopener noreferrer"
@@ -305,34 +316,101 @@
     })">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-            <!-- 1. Banner Ringkasan Identitas Mahasiswa & Penugasan -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mahasiswa Pengembang</span>
-                        <span class="font-bold text-slate-900 text-sm block">{{ $student->name ?? '-' }}</span>
-                        <span class="text-slate-500 text-[11px] font-mono block mt-0.5">NIM: {{ $student->studentProfile?->nim ?? '-' }}</span>
+            <!-- 1. Banner Ringkasan Identitas & Penugasan -->
+            @php
+                $projectMembers = $project->members;
+                $isGroupWork = $projectMembers->count() > 1;
+            @endphp
+
+            @if($isGroupWork)
+                {{-- TAMPILAN TIM PROYEK KOLABORATIF (MULTI-MAHASISWA) --}}
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Penempatan Unit Kerja Dinas</span>
+                            <span class="font-bold text-slate-800 text-sm block">{{ $placement?->application?->unit?->agencyProfile?->agency_name ?? 'Dispusip Surabaya' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">{{ $placement?->application?->unit?->name ?? 'Bidang Kerja' }}</span>
+                        </div>
+
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Pembimbing Magang</span>
+                            <span class="font-bold text-slate-800 text-sm block">Mentor: {{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
+                        </div>
                     </div>
 
-                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Asal Perguruan Tinggi</span>
-                        <span class="font-bold text-slate-800 text-sm block">{{ $student->studentProfile?->universitas ?? $student->university ?? '-' }}</span>
-                        <span class="text-slate-500 text-[11px] block mt-0.5">{{ $student->studentProfile?->jurusan ?? '-' }}</span>
-                    </div>
+                    {{-- Daftar Anggota Tim Pengembang --}}
+                    <div class="pt-3 border-t border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider block">Tim Pengembang Proyek ({{ $projectMembers->count() }} Anggota)</span>
+                            <span class="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-md border border-blue-200">Karya Kolaboratif Tim</span>
+                        </div>
 
-                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Penempatan Unit Kerja Dinas</span>
-                        <span class="font-bold text-slate-800 text-sm block">{{ $placement?->application?->unit?->agencyProfile?->agency_name ?? 'Dispusip Surabaya' }}</span>
-                        <span class="text-slate-500 text-[11px] block mt-0.5">{{ $placement?->application?->unit?->name ?? 'Bidang Kerja' }}</span>
-                    </div>
-
-                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mentor Lapangan (Dinas)</span>
-                        <span class="font-bold text-slate-800 text-sm block">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
-                        <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                            @foreach($projectMembers as $mem)
+                                @php
+                                    $mStudent = $mem->placement?->application?->user;
+                                    $mProfile = $mStudent?->studentProfile;
+                                @endphp
+                                <div class="p-3.5 rounded-xl border {{ $mem->is_leader ? 'border-blue-200 bg-blue-50/20' : 'border-slate-100 bg-slate-50' }} space-y-2">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $mStudent?->name ?? '-' }}</div>
+                                            <div class="text-[11px] font-mono text-slate-500">NIM: {{ $mProfile?->nim ?? '-' }}</div>
+                                        </div>
+                                        @if($mem->is_leader)
+                                            <span class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded shadow-2xs shrink-0">Ketua Tim</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-[11px] text-slate-600 truncate">
+                                        {{ $mProfile?->universitas ?? $mStudent?->university ?? '-' }} &bull; {{ $mProfile?->jurusan ?? '-' }}
+                                    </div>
+                                    <div class="pt-2 border-t border-slate-200/60 flex items-center gap-1.5 text-[11px]">
+                                        <span class="text-slate-500 font-medium">Peran:</span>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white border border-slate-200 text-slate-800 shadow-2xs">
+                                            {{ $mem->role_in_project ?: 'Anggota Tim' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
-            </div>
+            @else
+                {{-- TAMPILAN PROYEK INDIVIDU --}}
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mahasiswa Pengembang</span>
+                            <span class="font-bold text-slate-900 text-sm block">{{ $student->name ?? '-' }}</span>
+                            <span class="text-slate-500 text-[11px] font-mono block mt-0.5">NIM: {{ $student->studentProfile?->nim ?? '-' }}</span>
+                            @if($project->members->first())
+                                <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                    Peran: {{ $project->members->first()->role_in_project ?: 'Pengembang Utama' }}
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Asal Perguruan Tinggi</span>
+                            <span class="font-bold text-slate-800 text-sm block">{{ $student->studentProfile?->universitas ?? $student->university ?? '-' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">{{ $student->studentProfile?->jurusan ?? '-' }}</span>
+                        </div>
+
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Penempatan Unit Kerja Dinas</span>
+                            <span class="font-bold text-slate-800 text-sm block">{{ $placement?->application?->unit?->agencyProfile?->agency_name ?? 'Dispusip Surabaya' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">{{ $placement?->application?->unit?->name ?? 'Bidang Kerja' }}</span>
+                        </div>
+
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Mentor Lapangan (Dinas)</span>
+                            <span class="font-bold text-slate-800 text-sm block">{{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}</span>
+                            <span class="text-slate-500 text-[11px] block mt-0.5">Dosen: {{ $placement?->academicAdvisor?->name ?? '-' }}</span>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- 2. Galeri Tangkapan Layar & Mockup Proyek (Multi-Screenshot Showcase) -->
             <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-5">
@@ -345,27 +423,42 @@
                             Koleksi antarmuka aplikasi, alur kerja sistem, dan hasil visual yang dirancang mahasiswa
                         </p>
                     </div>
-                    @if(count($allScreenshots) > 1)
-                        <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200">
-                            {{ count($allScreenshots) }} Gambar Tersedia
-                        </span>
-                    @endif
+                    <div class="flex items-center gap-2">
+                        @if(count($allScreenshots) > 1)
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl border border-blue-200">
+                                {{ count($allScreenshots) }} Gambar Tersedia
+                            </span>
+                        @endif
+                        <a :href="activePhoto" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            <span>Buka Resolusi Penuh</span>
+                        </a>
+                    </div>
                 </div>
 
                 @if(!empty($allScreenshots))
                     <!-- Display Layar Utama (Viewport Penuh, Anti-Pecah & Proporsional) -->
                     <div class="space-y-3">
-                        <div class="w-full rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative p-3 sm:p-4 min-h-[280px] max-h-[560px]">
-                            <img :src="activePhoto" :alt="activeTitle" class="max-h-[520px] w-auto max-w-full object-contain rounded-xl shadow-lg transition-all duration-300">
+                        <div class="w-full rounded-2xl border border-slate-700 overflow-hidden flex items-center justify-center relative p-3 sm:p-4 min-h-[300px] max-h-[580px] shadow-inner"
+                             style="background-color: #0f172a;">
+                            <img :src="activePhoto" :alt="activeTitle" 
+                                 class="max-h-[540px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300"
+                                 x-on:error="$el.src = '{{ asset('images/logo.png') }}'">
                             
-                            <!-- Overlay Tombol Buka Tab Baru -->
+                            <!-- Overlay Tombol Buka Tab Baru (Vibrant Blue, Jelas & Mudah Dilihat) -->
                             <a :href="activePhoto" target="_blank" rel="noopener noreferrer" 
-                               class="absolute bottom-4 right-4 px-3.5 py-2 bg-slate-900/80 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl backdrop-blur-md transition shadow-md flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                               class="absolute bottom-4 right-4 px-4 py-2.5 text-white text-xs font-bold rounded-xl shadow-xl flex items-center gap-2 border border-blue-400/40 hover:brightness-110 active:scale-95 transition cursor-pointer z-20"
+                               style="background-color: #2563eb; color: #ffffff;"
+                               title="Buka foto / tangkapan layar dalam resolusi asli di tab baru">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 <span>Buka Resolusi Penuh</span>
                             </a>
 
-                            <div class="absolute top-4 left-4 px-3 py-1 bg-black/60 text-white text-[11px] font-bold rounded-lg backdrop-blur-xs" x-text="activeTitle"></div>
+                            <div x-show="activeTitle && activeTitle.trim() !== ''"
+                                 class="absolute top-4 left-4 px-3 py-1.5 text-white text-[11px] font-bold rounded-lg shadow-md border border-slate-700/80 pointer-events-none z-10" 
+                                 style="background-color: rgba(15, 23, 42, 0.85);"
+                                 x-text="activeTitle"></div>
                         </div>
 
                         <!-- Thumbnail Strip (Bila Terdapat Lebih Dari 1 Gambar) -->
@@ -522,7 +615,7 @@
                         </div>
 
                         @if($project->source_code_path)
-                            <a href="{{ asset('storage/' . $project->source_code_path) }}" download 
+                            <a href="{{ $project->source_code_url }}" download 
                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition">
                                 <span>Unduh Berkas ZIP Proyek</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -678,7 +771,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <a href="{{ asset('storage/' . $docPath) }}" target="_blank" download="{{ $docName }}"
+                                <a href="{{ $project->normalizeMediaUrl($docPath) }}" target="_blank" download="{{ $docName }}"
                                    class="p-2 rounded-lg bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 transition shrink-0 shadow-2xs"
                                    title="Unduh Berkas">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>

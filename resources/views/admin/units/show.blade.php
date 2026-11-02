@@ -7,9 +7,9 @@
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
                     <span class="text-slate-400">/</span>
                     @if(Auth::user()->isBidangAdmin())
-                        <span class="text-slate-800 font-semibold truncate">Bidang Saya</span>
+                        <span class="text-slate-800 font-semibold truncate">Kelola Bidang</span>
                     @else
-                        <a href="{{ route('admin.units.index') }}" class="hover:text-blue-600 transition">Bidang Devisi</a>
+                        <a href="{{ route('admin.units.index') }}" class="hover:text-blue-600 transition">Unit Bidang</a>
                         <span class="text-slate-400">/</span>
                         <span class="text-slate-800 font-semibold truncate">{{ $unit->name }}</span>
                     @endif
@@ -414,25 +414,27 @@
                     </a>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-4">
-                    @forelse($mentors as $mentor)
-                        <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200 flex items-start justify-between gap-3">
-                            <div>
-                                <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $mentor->name }}</div>
-                                <div class="text-[11px] text-slate-500 mt-0.5">{{ $mentor->email }}</div>
-                                @if($mentor->nip)
-                                    <div class="text-[10px] text-slate-400 font-mono mt-0.5">NIP: {{ $mentor->nip }}</div>
-                                @endif
+                <div class="max-h-[380px] overflow-y-auto pr-1.5 scrollbar-thin" style="max-height: 380px; overflow-y: auto; scrollbar-width: thin;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-4">
+                        @forelse($mentors as $mentor)
+                            <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200 flex items-start justify-between gap-3">
+                                <div>
+                                    <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $mentor->name }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5">{{ $mentor->email }}</div>
+                                    @if($mentor->nip)
+                                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">NIP: {{ $mentor->nip }}</div>
+                                    @endif
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-100 text-blue-800 shrink-0">
+                                    {{ $mentor->active_students_count ?? 0 }} Mhs Aktif
+                                </span>
                             </div>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-100 text-blue-800 shrink-0">
-                                {{ $mentor->active_students_count ?? 0 }} Mhs Aktif
-                            </span>
-                        </div>
-                    @empty
-                        <div class="col-span-full py-6 text-center text-xs text-slate-400 italic">
-                            Belum ada mentor khusus yang ditugaskan pada bidang ini.
-                        </div>
-                    @endforelse
+                        @empty
+                            <div class="col-span-full py-6 text-center text-xs text-slate-400 italic">
+                                Belum ada mentor khusus yang ditugaskan pada bidang ini.
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 

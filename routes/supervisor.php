@@ -24,6 +24,8 @@ Route::middleware(['auth', 'role:supervisor,super_admin'])->prefix('supervisor')
     // 3. Pengesahan Sertifikat Kelulusan (Double ACC)
     Route::get('/certificates', [CertificateApprovalController::class, 'index'])->name('certificates.index');
     Route::get('/certificates/{placementId}/preview', [CertificateApprovalController::class, 'show'])->name('certificates.show');
+    Route::get('/certificates/{placementId}/revision', [CertificateApprovalController::class, 'revision'])->name('certificates.revision');
+    Route::post('/certificates/{placementId}/revision', [CertificateApprovalController::class, 'submitRevision'])->name('certificates.submitRevision');
     Route::post('/certificates/{id}/approve', [CertificateApprovalController::class, 'approve'])->name('certificates.approve');
     Route::post('/certificates/{id}/revise', [CertificateApprovalController::class, 'revise'])->name('certificates.revise');
 

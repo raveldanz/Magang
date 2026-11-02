@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\InternshipProject;
+use App\Models\InternshipProjectMember;
+use App\Models\Placement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -29,9 +31,15 @@ class InternshipProjectController extends Controller
             return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir telah disetujui, proyek tidak dapat ditambah.');
         }
 
+        $peers = $this->getEligiblePeers($placement);
+
         return view('student.projects.create', [
             'placement' => $placement,
             'user' => $user,
+            'peers' => $peers,
+            'categories' => InternshipProject::CATEGORIES,
+            'roleRecommendations' => InternshipProject::ROLE_RECOMMENDATIONS,
+            'categoryKeywords' => InternshipProject::CATEGORY_KEYWORDS,
         ]);
     }
 
@@ -47,18 +55,28 @@ class InternshipProjectController extends Controller
             return redirect()->route('student.final_report.index')->with('error', 'Akses ditolak.');
         }
 
-        $project = InternshipProject::where('id', $id)
-            ->where('placement_id', $placement->id)
+        $project = InternshipProject::with(['members.placement.application.user.studentProfile'])
+            ->where('id', $id)
+            ->where(function ($q) use ($placement) {
+                $q->where('placement_id', $placement->id)
+                    ->orWhereHas('members', fn ($m) => $m->where('placement_id', $placement->id)->where('is_leader', true));
+            })
             ->firstOrFail();
 
         if ($placement->finalreport && $placement->finalreport->status === 'approved') {
             return redirect()->route('student.final_report.index')->with('error', 'Laporan akhir telah disetujui, proyek tidak dapat diubah.');
         }
 
+        $peers = $this->getEligiblePeers($placement);
+
         return view('student.projects.edit', [
             'placement' => $placement,
             'project' => $project,
             'user' => $user,
+            'peers' => $peers,
+            'categories' => InternshipProject::CATEGORIES,
+            'roleRecommendations' => InternshipProject::ROLE_RECOMMENDATIONS,
+            'categoryKeywords' => InternshipProject::CATEGORY_KEYWORDS,
         ]);
     }
 
@@ -81,6 +99,12 @@ class InternshipProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
+            'custom_category' => 'nullable|string|max:150',
+            'project_type' => 'nullable|in:individual,group',
+            'creator_role' => 'nullable|string|max:150',
+            'members' => 'nullable|array',
+            'members.*.placement_id' => 'required_with:members|exists:placements,id',
+            'members.*.role' => 'nullable|string|max:150',
             'is_public' => 'nullable|boolean',
             'description' => 'required|string',
             'community_benefit' => 'required|string',
@@ -109,6 +133,13 @@ class InternshipProjectController extends Controller
             'documents.max' => 'Jumlah berkas dokumen pendukung maksimal 10 berkas.',
             'documents.*.max' => 'Ukuran berkas dokumen maksimal 10 MB.',
         ]);
+
+        $category = ! empty($validated['category']) ? $validated['category'] : 'teknologi';
+        $projectType = $request->input('project_type', 'individual');
+
+        if ($category === 'lainnya' && ! $request->filled('custom_category')) {
+            return back()->withInput()->withErrors(['custom_category' => 'Nama bidang spesifik wajib diisi jika memilih Inovasi Lainnya.']);
+        }
 
         // 1. Simpan Foto Sampul Utama
         $photoFile = $request->file('photo');
@@ -176,7 +207,8 @@ class InternshipProjectController extends Controller
         $project = InternshipProject::create([
             'placement_id' => $placement->id,
             'title' => $validated['title'],
-            'category' => $validated['category'] ?? null,
+            'category' => $category,
+            'custom_category' => $category === 'lainnya' ? trim((string) $request->input('custom_category')) : null,
             'is_public' => $request->boolean('is_public', true),
             'description' => $validated['description'],
             'community_benefit' => $validated['community_benefit'],
@@ -191,6 +223,34 @@ class InternshipProjectController extends Controller
             'community_photos' => !empty($communityPhotos) ? $communityPhotos : null,
             'documents' => !empty($documents) ? $documents : null,
         ]);
+
+        // Simpan Anggota Tim Proyek
+        $creatorRole = trim((string) $request->input('creator_role'));
+        if (empty($creatorRole)) {
+            $creatorRole = $projectType === 'group' ? 'Koordinator Proyek' : 'Pengembang Utama';
+        }
+
+        InternshipProjectMember::create([
+            'internship_project_id' => $project->id,
+            'placement_id' => $placement->id,
+            'role_in_project' => $creatorRole,
+            'is_leader' => true,
+        ]);
+
+        if ($projectType === 'group' && $request->has('members') && is_array($request->input('members'))) {
+            foreach ($request->input('members') as $memData) {
+                $mPlacementId = (int) ($memData['placement_id'] ?? 0);
+                if ($mPlacementId && $mPlacementId !== $placement->id) {
+                    $mRole = trim((string) ($memData['role'] ?? 'Anggota Tim'));
+                    InternshipProjectMember::create([
+                        'internship_project_id' => $project->id,
+                        'placement_id' => $mPlacementId,
+                        'role_in_project' => ! empty($mRole) ? $mRole : 'Anggota Tim',
+                        'is_leader' => false,
+                    ]);
+                }
+            }
+        }
 
         AuditLog::record('STUDENT_PROJECT_CREATE', 'InternshipProject', $project->id, [
             'student_name' => $user->name,
@@ -213,7 +273,10 @@ class InternshipProjectController extends Controller
         }
 
         $project = InternshipProject::where('id', $id)
-            ->where('placement_id', $placement->id)
+            ->where(function ($q) use ($placement) {
+                $q->where('placement_id', $placement->id)
+                    ->orWhereHas('members', fn ($m) => $m->where('placement_id', $placement->id)->where('is_leader', true));
+            })
             ->firstOrFail();
 
         if ($placement->finalreport && $placement->finalreport->status === 'approved') {
@@ -223,6 +286,12 @@ class InternshipProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
+            'custom_category' => 'nullable|string|max:150',
+            'project_type' => 'nullable|in:individual,group',
+            'creator_role' => 'nullable|string|max:150',
+            'members' => 'nullable|array',
+            'members.*.placement_id' => 'required_with:members|exists:placements,id',
+            'members.*.role' => 'nullable|string|max:150',
             'is_public' => 'nullable|boolean',
             'description' => 'required|string',
             'community_benefit' => 'required|string',
@@ -251,6 +320,13 @@ class InternshipProjectController extends Controller
             'documents.max' => 'Jumlah berkas dokumen pendukung maksimal 10 berkas.',
             'documents.*.max' => 'Ukuran berkas dokumen maksimal 10 MB.',
         ]);
+
+        $category = ! empty($validated['category']) ? $validated['category'] : ($project->category ?? 'teknologi');
+        $projectType = $request->input('project_type', ($project->members()->where('is_leader', false)->exists() ? 'group' : 'individual'));
+
+        if ($category === 'lainnya' && ! $request->filled('custom_category')) {
+            return back()->withInput()->withErrors(['custom_category' => 'Nama bidang spesifik wajib diisi jika memilih Inovasi Lainnya.']);
+        }
 
         // 1. Perbarui Foto Sampul Utama jika diunggah baru
         $photoPath = $project->photo_path;
@@ -338,7 +414,8 @@ class InternshipProjectController extends Controller
 
         $project->update([
             'title' => $validated['title'],
-            'category' => $validated['category'] ?? $project->category,
+            'category' => $category,
+            'custom_category' => $category === 'lainnya' ? trim((string) $request->input('custom_category')) : null,
             'is_public' => $request->has('is_public') ? $request->boolean('is_public') : $project->is_public,
             'description' => $validated['description'],
             'community_benefit' => $validated['community_benefit'],
@@ -353,6 +430,36 @@ class InternshipProjectController extends Controller
             'community_photos' => !empty($communityPhotos) ? array_values($communityPhotos) : null,
             'documents' => !empty($documents) ? array_values($documents) : null,
         ]);
+
+        // Sinkronisasi Anggota Tim Proyek
+        $project->members()->delete();
+
+        $creatorRole = trim((string) $request->input('creator_role'));
+        if (empty($creatorRole)) {
+            $creatorRole = $projectType === 'group' ? 'Koordinator Proyek' : 'Pengembang Utama';
+        }
+
+        InternshipProjectMember::create([
+            'internship_project_id' => $project->id,
+            'placement_id' => $project->placement_id,
+            'role_in_project' => $creatorRole,
+            'is_leader' => true,
+        ]);
+
+        if ($projectType === 'group' && $request->has('members') && is_array($request->input('members'))) {
+            foreach ($request->input('members') as $memData) {
+                $mPlacementId = (int) ($memData['placement_id'] ?? 0);
+                if ($mPlacementId && $mPlacementId !== $project->placement_id) {
+                    $mRole = trim((string) ($memData['role'] ?? 'Anggota Tim'));
+                    InternshipProjectMember::create([
+                        'internship_project_id' => $project->id,
+                        'placement_id' => $mPlacementId,
+                        'role_in_project' => ! empty($mRole) ? $mRole : 'Anggota Tim',
+                        'is_leader' => false,
+                    ]);
+                }
+            }
+        }
 
         AuditLog::record('STUDENT_PROJECT_UPDATE', 'InternshipProject', $project->id, [
             'student_name' => $user->name,
@@ -442,5 +549,38 @@ class InternshipProjectController extends Controller
             ->first();
 
         return $application?->placement;
+    }
+
+    /**
+     * Ambil rekan magang yang satu unit kerja atau satu kelompok pendaftaran
+     */
+    protected function getEligiblePeers(Placement $placement)
+    {
+        $unitId = $placement->application?->unit_id;
+        $peers = Placement::with(['application.user.studentProfile'])
+            ->where('id', '!=', $placement->id)
+            ->whereHas('application', function ($q) use ($unitId) {
+                $q->whereIn('status', ['accepted', 'active', 'completed']);
+                if ($unitId) {
+                    $q->where('unit_id', $unitId);
+                } else {
+                    $q->whereRaw('1 = 0');
+                }
+            })
+            ->get();
+
+        if ($placement->application?->group_id) {
+            $groupPeers = Placement::with(['application.user.studentProfile'])
+                ->where('id', '!=', $placement->id)
+                ->whereHas('application', function ($q) use ($placement) {
+                    $q->where('group_id', $placement->application->group_id)
+                        ->whereIn('status', ['accepted', 'active', 'completed']);
+                })
+                ->get();
+
+            $peers = $peers->merge($groupPeers)->unique('id')->values();
+        }
+
+        return $peers;
     }
 }

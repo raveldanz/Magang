@@ -105,6 +105,29 @@
                 </div>
             @endif
 
+            <!-- Active Unit / Bidang Filter Indicator Banner -->
+            @if(isset($selectedUnit) && $selectedUnit)
+                <div class="p-4 bg-teal-50/80 border border-teal-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-teal-900 shadow-2xs">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
+                        <div>
+                            <span class="font-medium text-teal-700">Filter Aktif Unit / Bidang Dinas:</span>
+                            <h4 class="font-black text-sm text-teal-950">{{ $selectedUnit->name }}</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-2 shrink-0">
+                        <a href="{{ route('admin.units.index') }}" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-xs transition">
+                            Kelola Unit / Bidang
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-xl transition">
+                            Reset Filter
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <!-- Search & Filter Card -->
             <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
                 <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: '{{ request('role', '') }}' }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
@@ -131,7 +154,7 @@
                         <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
                     </select>
 
-                    <!-- Filter Afiliasi / Instansi / Universitas Dinamis -->
+                    <!-- Filter Afiliasi / Bidang Dinas / Universitas Dinamis -->
                     <div>
                         <!-- Case 1: Universitas / Mahasiswa / Dosen -->
                         <div x-show="['universitas', 'dosen', 'mahasiswa'].includes(role)">
@@ -145,19 +168,19 @@
                             </select>
                         </div>
 
-                        <!-- Case 2: Admin Dinas / Mentor Lapangan / Default -->
-                        @if(isset($agencies) && count($agencies) > 1)
-                            <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
-                                <select name="agency_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                    <option value="">Semua Instansi Dinas</option>
-                                    @foreach($agencies as $ag)
-                                        <option value="{{ $ag->id }}" {{ request('agency_id') == $ag->id ? 'selected' : '' }}>
-                                            {{ $ag->agency_name }}
+                        <!-- Case 2: Admin Dinas / Mentor Lapangan / Supervisor / Default -->
+                        <div x-show="!['universitas', 'dosen', 'mahasiswa'].includes(role)">
+                            <select name="unit_id" :disabled="['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
+                                <option value="">Semua Bidang Dinas</option>
+                                @if(isset($units))
+                                    @foreach($units as $unit)
+                                        <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->name }}
                                         </option>
                                     @endforeach
-                                </select>
-                            </div>
-                        @endif
+                                @endif
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Submit & Reset -->
@@ -165,7 +188,7 @@
                         <button type="submit" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer text-center">
                             Terapkan Filter
                         </button>
-                        @if(request()->hasAny(['search', 'role', 'agency_id', 'university_id']))
+                        @if(request()->hasAny(['search', 'role', 'agency_id', 'university_id', 'unit_id']))
                             <a href="{{ route('admin.users.index') }}" class="px-3.5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-xl transition text-center">
                                 Reset
                             </a>

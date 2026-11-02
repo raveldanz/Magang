@@ -21,6 +21,7 @@ class DashboardController extends Controller
 
         return Placement::with([
             'application.user.studentProfile',
+            'application.user.universityRelation',
             'application.unit.agencyProfile',
             'mentor',
             'pembimbing',
@@ -88,6 +89,11 @@ class DashboardController extends Controller
         }
 
         $placements = $query->latest()->get();
+        $placements->each(function ($p) {
+            if ($p->evaluation) {
+                $p->evaluation->setRelation('placement', $p);
+            }
+        });
 
         // Hitung metrik statistik bimbingan DPL
         $totalStudents = $placements->count();

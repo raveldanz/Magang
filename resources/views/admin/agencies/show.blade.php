@@ -59,18 +59,13 @@
                         </div>
 
                         <div class="space-y-2 min-w-0 flex-1">
-                            <div class="cc-badges flex flex-wrap items-center gap-2">
-                                @if(($stats['total_admins'] ?? 0) > 0)
-                                    <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                        Akun Terdaftar
-                                    </span>
-                                @else
+                            @if(($stats['total_admins'] ?? 0) === 0)
+                                <div class="cc-badges flex flex-wrap items-center gap-2">
                                     <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60">
                                         Belum Ada Akun Admin
                                     </span>
-                                @endif
-                            </div>
+                                </div>
+                            @endif
 
                             <h1 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
                                 {{ $agency->agency_name }}
@@ -98,29 +93,73 @@
                             </div>
 
                             <!-- Ringkasan Instansi & Akun Admin -->
-                            @php $firstAdmin = $adminUsers->first(); @endphp
+                            @php $firstAdmin = $adminUsers->firstWhere('unit_id', null) ?? $adminUsers->first(); @endphp
                             <dl class="cc-facts grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 mt-3 border-t border-slate-100">
-                                <div class="min-w-0">
-                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Induk Pemerintahan</dt>
-                                    <dd class="mt-1 text-sm font-semibold text-slate-800">
-                                        {{ $agency->government_name ?? 'Pemerintah Kota Surabaya' }}
-                                    </dd>
+                                <div class="min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Induk Pemerintahan</dt>
+                                        <dd class="mt-1 text-sm font-semibold text-slate-800">
+                                            {{ $agency->government_name ?? 'Pemerintah Kota Surabaya' }}
+                                        </dd>
+                                    </div>
+                                    <div class="mt-2.5">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100/80 text-slate-600 border border-slate-200/70">
+                                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                            <span>Pemerintah Daerah</span>
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="min-w-0">
-                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Akun Admin Dinas</dt>
-                                    <dd title="{{ $firstAdmin->email ?? '' }}" class="mt-1 text-sm font-semibold truncate {{ $firstAdmin ? 'text-slate-800 font-mono' : 'text-amber-600' }}">
-                                        {{ $firstAdmin->email ?? 'Belum dibuat' }}
-                                    </dd>
-                                </div>
-                                <div class="min-w-0">
-                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Situs Resmi</dt>
-                                    <dd class="mt-1 text-sm font-semibold truncate">
-                                        @if($agency->website)
-                                            <a href="{{ $agency->website }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700 hover:underline">{{ parse_url($agency->website, PHP_URL_HOST) ?? $agency->website }}</a>
+                                <div class="min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Akun Admin Dinas</dt>
+                                        <dd title="{{ $firstAdmin->email ?? '' }}" class="mt-1 text-sm font-semibold truncate {{ $firstAdmin ? 'text-slate-800 font-mono' : 'text-amber-600' }}">
+                                            {{ $firstAdmin->email ?? 'Belum dibuat' }}
+                                        </dd>
+                                    </div>
+                                    <div class="mt-2.5">
+                                        @if($isSuperAdmin && $firstAdmin)
+                                            <form action="{{ route('admin.impersonate', $firstAdmin->id) }}" method="POST" class="m-0">
+                                                @csrf
+                                                <input type="hidden" name="return_to" value="{{ url()->current() }}">
+                                                <button type="submit"
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 transition-all shadow-2xs cursor-pointer group"
+                                                        title="Masuk ke Akun {{ $firstAdmin->name }} (Admin Dispusip)">
+                                                    <svg class="w-3.5 h-3.5 text-blue-600 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                                                    <span>Masuk Sebagai Admin</span>
+                                                </button>
+                                            </form>
                                         @else
-                                            <span class="text-slate-400">Belum diatur</span>
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/70">
+                                                Belum Dibuat
+                                            </span>
                                         @endif
-                                    </dd>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Situs Resmi</dt>
+                                        <dd class="mt-1 text-sm font-semibold truncate">
+                                            @if($agency->website)
+                                                <a href="{{ $agency->website }}" target="_blank" rel="noopener" class="text-slate-800 hover:text-blue-600 font-mono text-xs hover:underline">{{ parse_url($agency->website, PHP_URL_HOST) ?? $agency->website }}</a>
+                                            @else
+                                                <span class="text-slate-400">Belum diatur</span>
+                                            @endif
+                                        </dd>
+                                    </div>
+                                    <div class="mt-2.5">
+                                        @if($agency->website)
+                                            <a href="{{ $agency->website }}" target="_blank" rel="noopener"
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 transition-all shadow-2xs group"
+                                               title="Buka portal web resmi dinas">
+                                                <span>Kunjungi Portal</span>
+                                                <svg class="w-3 h-3 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-400 border border-slate-200/70">
+                                                Belum Diatur
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                             </dl>
                         </div>
@@ -139,37 +178,29 @@
                             <div class="text-slate-600 text-xs font-mono">NIP. {{ $agency->signee_nip ?? '-' }}</div>
                         </div>
 
-                        <!-- Tombol Masuk Sebagai Admin Dinas (Login As) -->
-                        @if($isSuperAdmin && ($firstAdmin || ($stats['total_admins'] ?? 0) === 0))
+                        <!-- Tombol Masuk Sebagai Supervisor (Login As Atasan) -->
+                        @if($isSuperAdmin)
+                        @php
+                            $supervisorUser = ($supervisorUsers ?? collect())->first() 
+                                ?? \App\Models\User::where('role', 'supervisor')->where('agency_profile_id', $agency->id)->first() 
+                                ?? \App\Models\User::where('role', 'supervisor')->first();
+                        @endphp
                         <div class="pt-3 border-t border-slate-200/80">
-                            @if($firstAdmin)
-                                <form action="{{ route('admin.impersonate', $firstAdmin->id) }}" method="POST" class="m-0">
+                            @if($supervisorUser)
+                                <form action="{{ route('admin.impersonate', $supervisorUser->id) }}" method="POST" class="m-0">
                                     @csrf
                                     <input type="hidden" name="return_to" value="{{ url()->current() }}">
                                     <button type="submit"
-                                            class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer">
+                                            class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer"
+                                            title="Masuk ke Akun {{ $supervisorUser->name }} (Atasan / Pejabat Penandatangan)">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                                        <span>Masuk Sebagai Admin Dinas</span>
+                                        <span>Masuk Sebagai Supervisor</span>
                                     </button>
                                 </form>
                             @else
-                                <form method="POST" action="{{ route('admin.agencies.create_account', $agency->id) }}" class="m-0">
-                                    @csrf
-                                    <button type="button"
-                                            @click="$dispatch('open-confirm-modal', {
-                                                form: $el.form,
-                                                title: 'Buat Akun Admin Dinas',
-                                                message: 'Sistem akan membuat akun login untuk PIC dinas agar dapat mengelola divisi, kuota, dan pengajuan magang.',
-                                                label: 'Instansi:',
-                                                name: @js($agency->agency_name),
-                                                desc: 'Password awal: password',
-                                                confirmText: 'Ya, Buat Akun'
-                                            })"
-                                            class="w-full inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                        <span>Buat Akun Admin Dinas</span>
-                                    </button>
-                                </form>
+                                <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-center font-medium">
+                                    Akun Supervisor belum terdaftar
+                                </div>
                             @endif
                         </div>
                         @endif
@@ -196,10 +227,10 @@
                 <div class="bg-white p-4 sm:p-5">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Personel</div>
                     <div class="mt-1.5 flex flex-wrap items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-slate-900">{{ $stats['total_admins'] + $stats['total_mentors'] }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['total_admins'] + $stats['total_mentors'] + ($stats['total_supervisors'] ?? 0) }}</span>
                         <span class="text-sm text-slate-500">akun</span>
                         <span class="text-xs text-slate-400">·</span>
-                        <span class="text-xs text-slate-500">{{ $stats['total_admins'] }} admin · {{ $stats['total_mentors'] }} mentor</span>
+                        <span class="text-xs text-slate-500">{{ $stats['total_admins'] }} admin · {{ $stats['total_mentors'] }} mentor{{ ($stats['total_supervisors'] ?? 0) > 0 ? ' · ' . $stats['total_supervisors'] . ' supervisor' : '' }}</span>
                     </div>
                 </div>
                 <div class="bg-white p-4 sm:p-5">
@@ -303,6 +334,10 @@
                                                 <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                                                     Admin Dinas (PIC)
                                                 </span>
+                                            @elseif($u->role === 'supervisor')
+                                                <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Supervisor / Atasan
+                                                </span>
                                             @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                                 <span class="whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
                                                     Mentor Lapangan
@@ -383,6 +418,8 @@
                                     <div class="cc-pills">
                                         @if($isAdminRole)
                                             <span class="mpill mpill-blue">Admin Dinas (PIC)</span>
+                                        @elseif($u->role === 'supervisor')
+                                            <span class="mpill mpill-indigo">Supervisor / Atasan</span>
                                         @elseif(in_array($u->role, ['mentor', 'pembimbing']))
                                             <span class="mpill mpill-purple">Mentor Lapangan</span>
                                         @else

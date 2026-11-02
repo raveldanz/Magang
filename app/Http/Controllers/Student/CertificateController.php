@@ -154,10 +154,10 @@ class CertificateController extends Controller
         }
         $blockers = $application->certificateBlockers();
 
-        // Cek pengesahan Atasan (Double ACC): Mahasiswa hanya bisa mengunduh jika sudah disahkan oleh supervisor/super_admin
+        // Cek pengesahan Atasan (Double ACC): Mahasiswa, Dosen, dan Mitra Kampus hanya bisa mengunduh jika sudah disahkan oleh Atasan
         $certRecord = \App\Models\Certificate::where('placement_id', $placement?->id)->first();
-        if ($isOwner && $certRecord && $certRecord->approval_status !== 'approved') {
-            $blockers[] = 'Sertifikat magang Anda telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+        if (($isOwner || $isAdvisor || $isUnivAdmin) && $certRecord && $certRecord->approval_status !== 'approved') {
+            $blockers[] = 'Sertifikat magang telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
         }
 
         if (! $isSupervisor && ! $isSuperAdmin && ! $isAgencyAdmin && $blockers !== []) {
@@ -193,9 +193,14 @@ class CertificateController extends Controller
             $university = app(UniversityResolver::class)->forUser($student);
         }
 
-        // Nomor Registrasi Sertifikat & Hash Verifikasi Publik
+        // Nomor Registrasi Sertifikat, Tema Tahunan & Hash Verifikasi Publik
         $year = Carbon::now()->format('Y');
-        $paddedId = str_pad($placement ? $placement->id : $application->id, 3, '0', STR_PAD_LEFT);
+        if ($application && $application->end_date) {
+            $year = Carbon::parse($application->end_date)->format('Y');
+        }
+
+        $theme = \App\Models\CertificateTheme::getActive((int) $year);
+        $paddedId = str_pad($placement ? $placement->id : $application->id, 4, '0', STR_PAD_LEFT);
 
         if ($placement) {
             $dirty = false;
@@ -204,7 +209,7 @@ class CertificateController extends Controller
                 $dirty = true;
             }
             if (empty($placement->certificate_number)) {
-                $placement->certificate_number = "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+                $placement->certificate_number = $theme->formatNumber($paddedId, (int) $year);
                 $dirty = true;
             }
             if ($dirty) {
@@ -212,16 +217,16 @@ class CertificateController extends Controller
             }
         }
 
-        $regNumber = $placement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
+        $regNumber = $placement?->certificate_number ?: $theme->formatNumber($paddedId, (int) $year);
         $certificateHash = $placement?->certificate_hash;
         // QR selalu memakai hash acak (bukan ID angka) agar sertifikat lain tidak bisa ditebak
         $verifyCertificateUrl = $certificateHash ? route('verify.certificate', $certificateHash) : null;
 
-        // QR dibuat lokal (SVG) — URL verifikasi tidak dikirim ke layanan pihak ketiga
+        // QR dibuat lokal (SVG) — dengan error correction H (High) agar logo pemkot di tengah tetap terbaca akurat
         $qrSvg = null;
         if ($verifyCertificateUrl && class_exists(QrCode::class)) {
             try {
-                $qrSvg = (string) QrCode::size(64)->margin(0)->generate($verifyCertificateUrl);
+                $qrSvg = (string) QrCode::size(80)->errorCorrection('H')->margin(0)->generate($verifyCertificateUrl);
             } catch (\Throwable $e) {
                 $qrSvg = null;
             }
@@ -233,6 +238,7 @@ class CertificateController extends Controller
             'application',
             'placement',
             'agencyProfile',
+            'theme',
             'student',
             'profile',
             'mentor',

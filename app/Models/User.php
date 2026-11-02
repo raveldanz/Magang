@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 #[Fillable(['name', 'email', 'password', 'role', 'status', 'agency_profile_id', 'unit_id', 'university', 'university_id', 'last_notification_read_at', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
@@ -19,7 +20,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     // HasApiTokens wajib untuk API login Sanctum (createToken / tokens) di Api\AuthController
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions;
 
     /**
      * Get the attributes that should be cast.

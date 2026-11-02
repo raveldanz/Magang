@@ -57,6 +57,7 @@ class MonitoringController extends Controller
 
         $query = (clone $baseQuery)->with([
             'application.user.studentProfile',
+            'application.user.universityRelation',
             'application.unit.agencyProfile',
             'application.group',
             'mentor',
@@ -74,6 +75,11 @@ class MonitoringController extends Controller
         };
 
         $placements = $query->latest()->paginate(10)->withQueryString();
+        $placements->getCollection()->each(function ($p) {
+            if ($p->evaluation) {
+                $p->evaluation->setRelation('placement', $p);
+            }
+        });
 
         $agencies = AgencyProfile::all();
         $units = \App\Models\Unit::orderBy('name')->get();

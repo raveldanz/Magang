@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             AdminWorkflowSeeder::class,
             SupervisorDemoSeeder::class,
             InternshipGroupDemoSeeder::class,
+            YearlyProjectsFiveYearsSeeder::class,
         ]);
     }
 }

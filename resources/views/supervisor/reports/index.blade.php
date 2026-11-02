@@ -62,7 +62,7 @@
 
                 <div class="w-full md:w-56">
                     <select name="unit_id" class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600">
-                        <option value="">Semua Bidang Devisi</option>
+                        <option value="">Semua Unit Bidang</option>
                         @foreach ($units as $u)
                             <option value="{{ $u->id }}" {{ (string)$unitFilter === (string)$u->id ? 'selected' : '' }}>
                                 {{ $u->name }}
@@ -100,7 +100,7 @@
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-[11px] uppercase tracking-wider font-bold select-none">
                                 <th class="py-3.5 px-5 min-w-[220px]">Mahasiswa</th>
-                                <th class="py-3.5 px-5 min-w-[200px]">Bidang Devisi</th>
+                                <th class="py-3.5 px-5 min-w-[200px]">Unit Bidang</th>
                                 <th class="py-3.5 px-5 min-w-[180px]">Proyek Inovasi</th>
                                 <th class="py-3.5 px-5 whitespace-nowrap min-w-[150px]">Status Laporan</th>
                                 <th class="py-3.5 pl-4 pr-6 text-right whitespace-nowrap w-24">Aksi</th>

@@ -63,8 +63,8 @@
                     <div class="flex flex-col min-w-0">
                         <span class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 leading-tight truncate">Portal Magang Dispusip</span>
                         
-                        <!-- Tampilan Desktop (md ke atas): Satu baris penuh proporsional -->
-                        <span class="hidden md:inline text-xs font-bold text-blue-700 tracking-normal uppercase truncate">
+                        <!-- Tampilan Desktop & Tablet (md ke atas): Satu baris penuh proporsional -->
+                        <span class="hidden md:inline text-[10.5px] lg:text-xs font-bold text-blue-700 tracking-normal uppercase truncate">
                             Dinas Perpustakaan dan Kearsipan Kota Surabaya
                         </span>
 
@@ -85,7 +85,7 @@
                 </a>
 
                 <!-- Desktop Right Header Actions (Tampil Khusus Layar md ke Atas) -->
-                <div class="hidden md:flex items-center gap-2 sm:gap-3">
+                <div class="hidden md:flex items-center gap-1.5 lg:gap-3">
                     <!-- Menu Proyek Dinas -->
                     <a href="{{ route('public.projects.index') }}" 
                        class="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-blue-600 transition rounded-xl hover:bg-slate-50">
@@ -245,7 +245,6 @@
 
                         <!-- 4 Unit Divisi Dispusip -->
                         <div class="space-y-2.5">
-                            
                             <!-- Bidang 1: Bidang Sekretariat -->
                             <div class="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-blue-50/40 border border-slate-200/70 hover:border-blue-200 transition group">
                                 <div class="flex items-center justify-between gap-2">
@@ -293,7 +292,6 @@
                                 </div>
                                 <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">Restorasi naskah kuno bersejarah, alih media digital & preservasi arsip.</p>
                             </div>
-
                         </div>
 
                         <!-- Footer Catatan -->
@@ -307,7 +305,7 @@
             </div>
 
             <!-- Info Kedinasan Dispusip (Mobile: Tampil Paling Akhir di Bawah Kartu Bidang) -->
-            <div class="dispusip-address-mobile pt-6 mt-6 border-t border-slate-200/80 flex-col sm:flex-row items-center justify-center gap-2 sm:gap-x-4 text-xs text-slate-500 text-center sm:text-left">
+            <div class="dispusip-address-mobile py-6 mt-6 border-t border-slate-200/80 flex-col sm:flex-row items-center justify-center gap-2 sm:gap-x-4 text-xs text-slate-500 text-center sm:text-left">
                 <div class="flex items-center gap-1.5 font-medium">
                     <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span>Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya</span>
@@ -321,10 +319,25 @@
         </main>
 
         <!-- Footer -->
-        <footer class="w-full bg-white border-t border-slate-200/80 py-4 shrink-0">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-                <p>&copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.</p>
-                <p class="text-[11px] text-slate-400 font-medium">Sistem Informasi Penerimaan, Logbook, Evaluasi & Monitoring Magang Dispusip</p>
+        <footer class="w-full bg-white border-t border-slate-200/80 shrink-0">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Tampilan Desktop Normal: Kunci 100% Persis Sesuai Desain Asli (hidden lg:flex) -->
+                <div class="hidden lg:flex items-center justify-between gap-2 py-4 text-xs text-slate-500">
+                    <p>&copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.</p>
+                    <p class="text-[11px] text-slate-400 font-medium">Sistem Informasi Penerimaan, Logbook, Evaluasi & Monitoring Magang Dispusip</p>
+                </div>
+
+                <!-- Tampilan Mobile & Tablet (block lg:hidden): Rata Tengah, Estetis & Bersih ala Eagle High Plantations -->
+                <div class="block lg:hidden py-5 text-center">
+                    <div class="space-y-1">
+                        <p class="text-xs font-semibold text-slate-600 tracking-tight">
+                            &copy; {{ date('Y') }} Dispusip Kota Surabaya &bull; Hak Cipta Dilindungi
+                        </p>
+                        <p class="text-[11px] text-slate-400 font-medium">
+                            Sistem Informasi Magang Dispusip
+                        </p>
+                    </div>
+                </div>
             </div>
         </footer>
 

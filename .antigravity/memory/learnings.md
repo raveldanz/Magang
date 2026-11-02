@@ -136,10 +136,26 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-104** | 2026-10-29 | Pembersihan Menu Navigasi Mobile Drawer & Standardisasi Alamat Resmi Kantor Dispusip (Gedung Siola Lt. 4) | Penghapusan teks alamat di drawer mobile menu agar bersih & pembaruan alamat resmi kantor Dispusip Surabaya ke Gedung Siola Lantai 4 & (031) 8707329 di seluruh sistem | RESOLVED |
 | **LRN-105** | 2026-10-29 | Standarisasi Tinggi Baris Tabel Pengajuan Desktop (/admin/applications), Eliminasi Visual Clutter & Accordion Pill | Menyelaraskan tinggi baris Individu & Kelompok menjadi maksimal 2 baris konsisten, pill button anggota [👥 X Anggota ⌄], eliminasi duplikasi badge & penataan murni vertikal status badge | RESOLVED |
 | **LRN-106** | 2026-10-29 | Penataan Teks Subtitle Header Mobile Dispusip Saat Menu Dibuka (Multi-Line Spacing) | Mengubah teks panjang 'Dinas Perpustakaan dan Kearsipan Kota Surabaya' di header mobile saat menu drawer dibuka agar terbagi menjadi 2 baris ('Kota Surabaya' di bawah) sehingga tidak terpotong oleh tombol close (X) | RESOLVED |
-| **LRN-107** | 2026-11-02 | Migrasi Database PostgreSQL & Galeri Proyek Dinas | Error 500 column likes_count does not exist di /proyek-dinas akibat migrasi batch interaksi proyek pending | RESOLVED |
-| **LRN-108** | 2026-11-02 | Form Filter Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow | Elemen input & dropdown filter menyempit (squished), teks menabrak icon chevron & tombol reset absen | RESOLVED |
-| **LRN-109** | 2026-11-02 | Mobile Kartu 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar | Metrik kuota & mhs aktif runtuh vertikal 1-kolom di HP akibat CSS bundle lama & ketiadaan inline fallback | RESOLVED |
-
+| **LRN-107** | 2026-11-02 | Verifikasi Pengajuan Kelompok: Tombol Proses Tim, Eliminasi Role Badge Redundan & Simplifikasi Label Modal | Penghapusan badge role ketua/anggota redundan di header kelompok, pembesaran tombol 'Proses Pengajuan Tim', serta simplifikasi tombol Simpan Keputusan dan label Terima Kelompok / Tolak Kelompok | RESOLVED |
+| **LRN-108** | 2026-11-02 | Arsitektur Proyek Kolaboratif Kelompok, Peran Fleksibel, Kategori Non-& & Deteksi Cerdas | Pembedaan kelompok pendaftaran vs tim proyek lapangan, fleksibilitas peran teks bebas (rangkap tugas) dengan chip rekomendasi dinamis, label kategori bersih tanpa '&', dan smart-matcher inovasi lainnya berbasis scoring kata kunci | RESOLVED |
+| **LRN-109** | 2026-11-02 | Isolasi Desain Responsif Footer & Copyright Mobile ala Eagle High Plantations | Pemisahan container footer mobile (block md:hidden) dan desktop (hidden md:flex), centering teks copyright, eliminasi ragged text/orphan word, dan penataan padding simetris info kontak | RESOLVED |
+| **LRN-110** | 2026-11-02 | Penguncian Otorisasi Tombol ACCEPTED bagi Staf Admin pada Tahap Seleksi PENDING (Double ACC) | Penguncian tombol ACCEPTED (Kunci ACC) bagi Admin biasa sejak status PENDING untuk mencegah ilusi bypass Atasan, penyesuaian label modal kelompok 'Setujui & Ajukan ke Atasan', penambahan test suite otomatis, dan verifikasi visual Playwright | RESOLVED |
+| **LRN-111** | 2026-11-02 | Distribusi Proyek Inovasi 5 Tahun (2022-2026), Integrasi Foto Nyata Dispusip & Resolusi Konflik Directive Blade @error | Integrasi 5 foto autentik perpustakaan & kearsipan Dispusip, linimasa katalog 5 tahun (12 karya tematik), eliminasi layar/placeholder hitam, resolusi bentrok sintaks Alpine @error vs Blade directive @error via x-on:error | RESOLVED |
+| **LRN-112** | 2026-11-02 | Penyelarasan Responsif Tablet (768px - 1023px) & Preservasi Desain Asli Desktop Normal (1024px+) | Penyelarasan breakpoint footer ke lg: (1024px+) agar tablet menikmati footer rapi rata tengah tanpa tabrakan teks, preservasi layout kartu bidang 1 kolom asli desktop, dan optimasi elipsis sub-brand header tablet | RESOLVED |
+| **LRN-113** | 2026-11-02 | Penyelarasan Tombol Masuk Sebagai Supervisor pada Profil Dinas, Kategori Solid Non-Transparan, & Visibilitas Buka Resolusi Penuh | Penggantian tombol login instansi ke Supervisor Atasan, pewarnaan solid 100% pada badge kategori floating proyek dinas, framing studio #0f172a dan penambahan tombol ganda 'Buka Resolusi Penuh' | RESOLVED |
+| **LRN-114** | 2026-11-02 | Filter Dinamis Bidang / Unit Dinas pada Master Pengguna Sistem (Admin & Mentor) | Slot ke-3 filter pengguna menampilkan dropdown Unit/Bidang Dinas bagi Admin & Mentor, filter eager loading relasi langsung & pengajuan, serta Alpine :disabled binding | RESOLVED |
+| **LRN-115** | 2026-11-02 | Penyelarasan Tata Letak & Scrollable Roster Mentor Bidang pada Dashboard Admin Bidang | Pembatasan tinggi kontainer mentor (max-height: 205px) dengan scroll vertikal rapi, penyetaraan proporsi tinggi kolom kiri-kanan, eliminasi error redeclaration Placement::finalreport, dan verifikasi visual Playwright | RESOLVED |
+| **LRN-116** | 2026-11-02 | WebPush Trait Safety, Otorisasi Aksi Tim Proyek, Scope Alpine Salin Tautan & Pembersihan Orphan Storage | Penambahan trait HasPushSubscriptions pada User, proteksi tombol ubah/hapus proyek hanya bagi ketua tim di final report, isolasi state copied Alpine header, penyelarasan back-link multi-role, dan pembersihan berkas fisik storage | RESOLVED |
+| **LRN-117** | 2026-11-02 | Halaman Khusus Pemilihan Aspek Revisi Sertifikat Supervisor, Eliminasi Popover Tumpang Tindih, Standardisasi Tombol 'Revisi' & Pembersihan Tanda Kurung () | Relokasi form revisi sertifikat supervisor ke halaman terdedikasi (/supervisor/certificates/{id}/revision) dengan 4 aspek interaktif (Nilai, Identitas, Logbook/Laporan, Lainnya), penggantian tombol 'Kembalikan' -> 'Revisi', eliminasi total teks kurung redundan seperti (Revisi) dan (ACC), serta verifikasi visual Playwright | RESOLVED |
+| **LRN-118** | 2026-11-02 | Pengamanan Double-ACC Sertifikat Multi-Role, Kepatuhan StatusViewGuard & Eliminasi N+1 Dashboard DPL | Proteksi unduh sertifikat berstatus waiting_approval/revision pada Mahasiswa, DPL, dan Universitas, penyesuaian tombol 'Minta Revisi' bebas regex guard, optimasi eager-loading universityRelation & eliminasi duplikasi notifikasi Supervisor | RESOLVED |
+| **LRN-119** | 2026-11-02 | Standardisasi Nomenklatur 'Kelola Bidang' (Admin Bidang) & 'Unit Bidang' (Admin Dinas / Supervisor) | Penggantian menu 'Bidang Saya' menjadi 'Kelola Bidang' pada admin formasi bidang, dan standardisasi istilah 'Bidang Devisi'/'Devisi' menjadi 'Unit Bidang' di seluruh navbar, header, tombol aksi, metrik, tabel, serta filter | RESOLVED |
+| **LRN-120** | 2026-11-02 | Tombol 'Preview Proyek', Ekspansi Kata Kunci Cerdas Kategori Inovasi & Algoritma Pembobotan Skor Cerdas | Perubahan tombol 'Lihat Halaman Proyek' -> 'Preview Proyek', penambahan 150+ kosakata kategori inovasi (videografi, fotografi, kaligrafi, lukisan, karya seni, arsip sejarah, pemrograman, dll), proteksi regex word-boundary kata pendek, dan rekomendasi berbasis skor tertinggi | RESOLVED |
+| **LRN-121** | 2026-11-02 | Standardisasi Favicon Resmi Dispusip Surabaya, Eliminasi Margin Kosong (Padding) & Cache-Busting Versioning | Penggantian 9 varian favicon dengan format tight-crop beresolusi tajam tanpa padding kosong berlebih, dan cache-busting ?v=4 di layout Blade | RESOLVED |
+| **LRN-122** | 2026-11-02 | Inovasi Template Sertifikat Resmi Dispusip, 5 Logo Kop Horizontal, Kotak TTE Presisi Ber-QR Logo Surabaya, & Certificate Theme Engine Tahunan Terintegrasi | Format baru Halaman 1 sesuai prototipe resmi Dispusip Pemkot Surabaya, jajaran 5 logo resmi, kotak TTE presisi BSrE dengan QR lambang Surabaya di tengah, Certificate Theme Engine dinamis, harmonisasi Halaman 2, serta navigasi 2-Tab terkunci di atas dengan pagination | RESOLVED |
+| **LRN-123** | 2026-11-02 | Migrasi Database PostgreSQL & Galeri Proyek Dinas | Error 500 column likes_count does not exist di /proyek-dinas akibat migrasi batch interaksi proyek pending | RESOLVED |
+| **LRN-124** | 2026-11-02 | Form Filter Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow | Elemen input & dropdown filter menyempit (squished), teks menabrak icon chevron & tombol reset absen | RESOLVED |
+| **LRN-125** | 2026-11-02 | Mobile Kartu 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar | Metrik kuota & mhs aktif runtuh vertikal 1-kolom di HP akibat CSS bundle lama & ketiadaan inline fallback | RESOLVED |
+| **LRN-126** | 2026-11-02 | Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping | Penyeragaman item tautan menu drawer navigasi mobile menjadi teks bersih konsisten tanpa box ikon sporadis demi estetika antarmuka ringkas | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -3496,7 +3512,352 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-107] Migrasi Skema Interaksi Proyek & Galeri Proyek Dinas
+### [LRN-107] Verifikasi Pengajuan Kelompok: Tombol Proses Tim, Eliminasi Role Badge Redundan & Simplifikasi Label Modal
+- **Tanggal**: 2026-11-02
+- **Komponen**: Blade View (`resources/views/admin/applications/show.blade.php`), Automated Tests (`tests/Feature/InternshipGroupWorkflowTest.php`)
+- **Problem / Symptom**:
+  1. Keberadaan badge peran `⭐ Ketua Kelompok` / `Anggota Tim` di samping kanan tombol aksi header kelompok terkesan redundan karena setiap kartu anggota di bawahnya sudah memuat penanda peran yang jelas.
+  2. Tombol aksi sebelumnya berukuran kecil (`px-3.5 py-1.5 text-xs`) dan berlabel "Aksi Serentak Kelompok" yang kurang merefleksikan alur pemrosesan tim magang secara tegas.
+  3. Label modal keputusan kelompok "Terima Sekelompok" / "Tolak Sekelompok" serta tombol submit "Simpan Keputusan Kelompok" terlalu panjang.
+- **Root Cause**: Desain awal modul kelompok menempatkan status kepemimpinan ganda di header dan label formulir menggunakan kata ganti kelompok yang panjang.
+- **Fix Applied**:
+  1. Menghapus badge role ketua/anggota di samping tombol aksi pada panel terintegrasi kelompok magang.
+  2. Mengubah tombol aksi menjadi **"Proses Pengajuan Tim"** dengan ukuran proporsional lebih besar khusus tombol ini (`px-5 py-2.5 text-sm font-bold shadow-xs hover:shadow`).
+  3. Mempersingkat tombol modal menjadi **"Simpan Keputusan"**.
+  4. Menyeragamkan label pilihan tindakan menjadi **"Terima Kelompok"** dan **"Tolak Kelompok"**.
+  5. Memperbarui assertion pada feature test dan memvalidasi tampilan antarmuka via Playwright Chrome headless.
+- **Prevention Rule**: Hindari meletakkan badge status peran individu di tingkat header kolektif kelompok jika daftar anggota di bawahnya sudah memuat badge peran masing-masing secara eksplisit.
+
+---
+
+### [LRN-108] Arsitektur Proyek Kolaboratif Kelompok, Peran Fleksibel, Kategori Non-& & Deteksi Cerdas Kategori
+- **Tanggal**: 2026-11-02
+- **Komponen**: Database Migration, Eloquent Models (`InternshipProject`, `InternshipProjectMember`, `Placement`), Controllers (`InternshipProjectController`, `ProjectDetailController`, `PublicProjectController`, `FinalReportController`), Blade Views (`student/projects/create.blade.php`, `student/projects/edit.blade.php`, `projects/show.blade.php`), Automated Tests (`CollaborativeProjectTeamTest.php`)
+- **Problem / Symptom**:
+  1. Kelompok pendaftaran (misal 10 orang) tidak dapat menyesuaikan pembagian proyek riil di lapangan (misal 5 orang Proyek A dan 5 orang Proyek B, atau proyek gabungan lintas kelompok).
+  2. Peran proyek sebelumnya kaku dan diasumsikan hanya untuk proyek pemrograman, padahal penugasan di Dispusip mencakup literasi buku, preservasi kearsipan kuno, media kreatif, dan SOP tata kelola layanan.
+  3. Mahasiswa sering kali merangkap tugas (misal "UI/UX & Frontend" atau "Penulis Naskah & Ilustrator").
+  4. Label kategori lama memuat karakter ampersand `&` yang terlalu panjang dan menyebabkan teks wrap patah di UI mobile/badge.
+  5. Saat memilih kategori "Lainnya", mahasiswa sering mengetikkan bidang yang sebenarnya sudah termasuk golongan kategori standar yang tersedia.
+- **Root Cause**:
+  Pencampuran antara konsep administratif pendaftaran (`internship_groups`) dengan pembagian operasional luaran proyek, ketiadaan tabel pivot keanggotaan proyek luaran, serta keterbatasan opsi kategori statis.
+- **Fix Applied**:
+  1. **Pemisahan Konsep**: Mempertahankan `internship_groups` untuk administrasi surat penerimaan, dan membuat tabel relasi pivot baru `internship_project_members` (`internship_project_id`, `placement_id`, `role_in_project`, `is_leader`) untuk tim proyek operasional.
+  2. **Peran Teks Bebas & Chip Rekomendasi Dinamis**: Menyediakan input teks bebas untuk peran anggota agar mendukung rangkap tugas, dilengkapi chip rekomendasi dinamis sesuai bidang kategori yang dipilih dengan format ringkas `Peran: ...` dan `Rekomendasi: ...` tanpa tanda kurung maupun emotikon berlebih.
+  3. **Standardisasi Label Kategori Non-&**: Menyeragamkan kategori ke sebutan bersih: *Sistem Digital*, *Karya Literasi*, *Media Kreatif*, *Preservasi Kearsipan*, *Tata Kelola Layanan*, dan *Inovasi Lainnya*.
+  4. **Pendeteksi Cerdas Kategori "Inovasi Lainnya"**: Mengembangkan algoritma pembobotan skor kata kunci (`InternshipProject::detectMatchingCategory`) yang otomatis memunculkan rekomendasi beralih ke kategori standar yang cocok dalam satu klik (Alpine.js & PHP).
+  5. **Portofolio Terintegrasi**: Proyek kelompok otomatis tampil di halaman Laporan Akhir seluruh anggota tim kolaborator, dan detail publik menampilkan kartu anggota tim lengkap dengan nama, NIM, kampus, serta peran masing-masing.
+  6. **Automated & Visual Verification**: Menjalankan test suite unit/feature baru (`CollaborativeProjectTeamTest.php`) dengan hasil 100% PASS dan verifikasi visual Playwright Chrome headless.
+- **Prevention Rule**:
+  Pisahkan selalu batas administratif (pendaftaran kelompok) dengan aktivitas luaran operasional riil (pengerjaan proyek lapangan) agar fleksibilitas alokasi anggota dan portofolio bersama tidak terbatasi. Format label antarmuka wajib ringkas tanpa karakter simbol seperti `&` untuk menjaga estetika responsif.
+
+---
+
+### [LRN-109] Isolasi Desain Responsif Footer & Copyright Mobile ala Eagle High Plantations
+- **Tanggal**: 2026-11-02
+- **Komponen**: Blade View (`resources/views/welcome.blade.php`), Visual E2E Script (`scripts/verify_welcome_footer_mobile.mjs`)
+- **Problem / Symptom**:
+  1. Pada viewport mobile smartphone (< 768px), teks copyright pada halaman depan (`welcome.blade.php`) tampil merapat ke kiri (*left-aligned*), sedangkan informasi kontak di atasnya rata tengah (*center-aligned*).
+  2. Kalimat copyright dan nama sistem terlalu panjang sehingga menghasilkan pemenggalan kata kaku (*ragged text / orphan word* seperti kata "Dilindungi." dan "Dispusip" yang jatuh sendirian di baris baru).
+  3. Jarak vertikal kontak instansi di mobile sebelumnya belum memiliki padding bawah (`pb-0`), sehingga menempel kaku ke garis pembatas footer.
+- **Root Cause**: Container footer lama mencampur styling mobile dan desktop dalam satu baris flex tanpa reset text-align (`text-left` default) dan menggunakan teks legal desktop yang panjang untuk viewport mobile yang sempit.
+- **Fix Applied**:
+  1. Menerapkan isolasi total struktur DOM menggunakan utility breakpoint Tailwind:
+     - **Desktop** (`hidden md:flex py-4`): Terkunci 100% persis seperti aslinya (`md:justify-between`, teks lengkap tanpa efek samping sama sekali).
+     - **Mobile** (`block md:hidden py-5 text-center`): Rata tengah dengan padding vertikal yang lega, pembatas garis lembut (`border-t`), dan teks ringkas proporsional:
+       - Baris 1: `&copy; {{ date('Y') }} Dispusip Kota Surabaya &bull; Hak Cipta Dilindungi`
+       - Baris 2: `Sistem Informasi Magang Dispusip`
+  2. Menyesuaikan padding vertikal info alamat dinas mobile menjadi `py-6 mt-6` untuk menjaga simetri jarak pembatas atas dan bawah.
+  3. Memverifikasi dengan visual audit Playwright pada viewport mobile (360px & 393px) dan desktop (1440px).
+- **Prevention Rule**:
+  Untuk elemen footer atau copyright dengan kalimat panjang, pisahkan DOM mobile dan desktop secara disiplin (`block md:hidden` dan `hidden md:flex`) agar penyusunan kalimat di layar kecil dapat diringkas tanpa mengorbankan kelengkapan teks legal di layar desktop.
+
+---
+
+### [LRN-110] Penguncian Otorisasi Tombol ACCEPTED bagi Staf Admin pada Tahap Seleksi PENDING (Double ACC)
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/admin/applications/show.blade.php`, `tests/Feature/AdminWorkflowSelectionTest.php`, `scripts/verify_application_locked_accepted.mjs`
+- **Problem / Symptom**:
+  1. Pada halaman detail verifikasi pengajuan admin (`/admin/applications/{id}`), saat status pengajuan masih `pending`, tombol kartu **ACCEPTED** berstatus aktif dan dapat ditekan oleh Admin staf biasa.
+  2. Subteks kartu saat itu bertuliskan "Usulkan pengesahan penerimaan ke Atasan", yang memicu kebingungan dan ilusi bahwa Admin staf dapat melompati persetujuan Atasan (Supervisor) secara langsung.
+  3. Namun saat status telah berpindah ke `waiting_approval`, tombol kartu **ACCEPTED** justru terkunci dengan badge "Kunci ACC", menciptakan inkonsistensi visual dan alur logika pengguna.
+- **Root Cause**:
+  Variabel `$isAcceptLockedForStaff` di `show.blade.php` sebelumnya hanya mengecek status `$currentStatusVal === 'waiting_approval'`. Akibatnya, pada status `pending`, tombol `ACCEPTED` tidak terkunci bagi Admin biasa meskipun wewenang pengesahan akhir (ACC) sesungguhnya hanya dimiliki oleh Atasan (Supervisor).
+- **Fix Applied**:
+  1. Menyesuaikan logika penguncian tombol pada `show.blade.php` sehingga `$isAcceptLockedForStaff = ($isInitialStage && ! $isSupervisorOrSuperAdmin)`.
+  2. Mengunci kartu **ACCEPTED** dengan atribut `disabled`, badge kuning **"Kunci ACC"**, `cursor-not-allowed`, serta keterangan subteks jelas: *"Persetujuan akhir disahkan oleh Atasan (Supervisor)"* sejak pengajuan masih berstatus `pending`.
+  3. Menambahkan atribut `disabled` pada elemen `<option value="accepted">` di `#status-select` tersembunyi bagi Admin staf pada tahap seleksi awal.
+  4. Menyelaraskan teks tombol aksi pada modal kelompok magang agar menampilkan *"Setujui & Ajukan ke Atasan"* bagi Admin staf.
+  5. Menambahkan automated unit test `test_admin_staff_sees_locked_accepted_button_on_pending_and_waiting_approval` di `AdminWorkflowSelectionTest.php` (12/12 PASS, 84 assertions, Strict Exit Code 0).
+  6. Memverifikasi antarmuka visual secara E2E menggunakan Playwright runner lokal Chrome (`channel: 'chrome'`) pada `public/test-artifacts/admin_application_pending_locked_accepted.png`.
+- **Prevention Rule**:
+  Pada sistem dengan alur persetujuan bertingkat (*Double ACC*), tombol aksi untuk status yang memerlukan wewenang atasan (seperti `ACCEPTED` pada tahap awal) wajib dikunci secara konsisten sejak status `pending` bagi pengguna tanpa hak prerogatif (staf biasa). Jangan memberikan ilusi tombol aktif jika aksi tersebut tidak dapat langsung disahkan oleh peran yang bersangkutan.
+
+---
+
+### [LRN-111] Distribusi Proyek Inovasi 5 Tahun (2022-2026), Integrasi Foto Nyata Dispusip & Resolusi Konflik Directive Blade @error
+- **Tanggal**: 2026-11-02
+- **Komponen**: `database/seeders/YearlyProjectsFiveYearsSeeder.php`, `database/seeders/DatabaseSeeder.php`, `resources/views/projects/show.blade.php`, `resources/views/projects/index.blade.php`, `scripts/capture_5_years_catalog_and_detail.mjs`
+- **Problem / Symptom**:
+  1. Sampul proyek sebelumnya menggunakan placeholder path fiktif (`projects/sample_preservasi.jpg` atau berkas yang tidak ada fisiknya) sehingga halaman detail dan thumbnail proyek menampilkan latar belakang hitam pekat atau broken image yang tidak sedap dipandang.
+  2. Ketiadaan data historis terstruktur yang mendistribusikan karya inovasi ke dalam rentang **5 tahun** (2022 - 2026) dengan ragam bidang (*Sistem Digital*, *Karya Literasi*, *Media Kreatif*, *Preservasi Kearsipan*, *Tata Kelola Layanan*, dan *Inovasi Lainnya*).
+  3. Terjadi runtime parsing exception pada Blade template `syntax error, unexpected end of file, expecting "elseif" or "else" or "endif"` saat view `projects/show.blade.php` dikompilasi.
+- **Root Cause**:
+  1. Aset dummy lama tidak memiliki file gambar fisik beresolusi tinggi di `storage/app/public/projects/` dan `public/storage/projects/`.
+  2. Penulisan atribut Alpine.js `@error="$el.src = ..."` pada tag `<img>` disalahartikan oleh Laravel Blade Compiler sebagai directive Blade form error `@error('field')`, sehingga compiler menyisipkan `if ($__bag->has($__errorArgs[0])) :` yang tidak memiliki pasangan `@enderror`.
+- **Fix Applied**:
+  1. Mengintegrasikan 5 foto nyata kiriman pengguna yang autentik bertema perpustakaan & kearsipan Dispusip:
+     - `anak_membaca_rak_melingkar.jpg`: Anak sekolah membaca di rak buku lingkaran kreatif (Karya Literasi / Pojok Baca).
+     - `koleksi_buku_rak_perpustakaan.jpg`: Koleksi buku sosiologi di rak perpustakaan tertata rapi (Preservasi Kearsipan / Modul).
+     - `ruang_baca_modern_interior.jpg`: Interior ruang baca modern berkonsep lounge dengan sofa santai (Media Kreatif / Revitalisasi Ruang).
+     - `meja_layanan_sirkulasi.jpg`: Meja sirkulasi kayu estetik dan resepsionis (Tata Kelola Layanan / SOP).
+     - `mahasiswi_membaca_koleksi.jpg`: Mahasiswi menelaah buku di depan rak tinggi (Sistem Digital / OPAC & SIM-Magang).
+  2. Membangun seeder terdedikasi `YearlyProjectsFiveYearsSeeder` yang menyemai 12 proyek inovasi tematik ke dalam 5 tahun (2022 s/d 2026), lengkap dengan pengerjaan tim kelompok, nama anggota, badge ketua tim, peran non-IT & IT, dokumen pendukung, dan interaksi suka/ulasan.
+  3. Mengganti atribut Alpine `@error` menjadi `x-on:error="$el.src = '{{ asset('images/logo.png') }}'"` pada `resources/views/projects/show.blade.php` untuk memisahkan sintaks Alpine event dari Blade directive secara aman.
+  4. Meredesain latar belakang showcase galeri utama dari `bg-slate-950` polos menjadi `bg-gradient-to-b from-slate-900 to-slate-950` dengan frame shadow dan ring lembut (`ring-1 ring-white/10`) sehingga foto tampil profesional layaknya kurasi pameran.
+  5. Memvalidasi 17 unit/feature test (100% PASS, Exit Code 0) dan penangkapan layar visual E2E dengan Playwright channel Chrome.
+- **Prevention Rule**:
+  Dilarang menggunakan shorthand `@error` Alpine.js di dalam berkas Blade template karena bertabrakan langsung dengan directive `@error` bawaan Laravel; gunakan selalu sintaks eksplisit `x-on:error`. Pastikan setiap seeding proyek selalu menyertakan berkas fisik gambar nyata di storage publik guna menghindari placeholder hitam.
+
+---
+
+### [LRN-112] Penyelarasan Responsif Tablet (768px - 1023px) & Preservasi Desain Asli Desktop Normal (1024px+)
+- **Tanggal**: 2026-11-02
+- **Komponen**: Blade View (`resources/views/welcome.blade.php`), E2E Script (`scripts/verify_tablet_landing.mjs`)
+- **Problem / Symptom**:
+  1. Pada resolusi tablet (768px - 1023px), container footer desktop sebelumnya aktif terlalu dini di `md:` (768px), memicu pemaksaan dua teks legal panjang bersanding horizontal yang mengakibatkan kata patah dan berhimpitan.
+  2. Sub-brand instansi pada header tablet terpotong elipsis (*"KOTA SU..."*).
+  3. Percobaan awal grid 2-kolom pada kartu bidang magang merambat ke viewport desktop (`1440px`), mengubah susunan asli kartu kanan menjadi 2 kolom pipih yang tidak diinginkan.
+- **Root Cause**:
+  Penggunaan breakpoint `md:` untuk beralih ke layout desktop horizontal tidak cocok untuk footer dengan kalimat legal panjang, dan manipulasi class grid pada kartu bidang mengaburkan hierarki layout desktop 2-kolom (`lg:grid-cols-12`).
+- **Fix Applied**:
+  1. Memindahkan breakpoint pemisah footer dari `md:` ke `lg:` (`hidden lg:flex` untuk desktop normal, `block lg:hidden` untuk mobile & tablet). Tablet kini menikmati footer rata tengah yang bersih, proporsional, dan bebas dari patah kata kaku.
+  2. Mengembalikan struktur 4 kartu bidang magang ke susunan 1 kolom vertikal asli (`space-y-2.5`), sehingga tampilan desktop normal (`1024px+`) kembali 100% utuh, natural, dan proporsional.
+  3. Menyesuaikan tipografi sub-brand header di breakpoint tablet (`text-[10.5px] lg:text-xs`) dan memperhalus jarak tombol (`gap-1.5 lg:gap-3`) agar identitas instansi tidak terpotong elipsis.
+  4. Memvalidasi secara visual ke-4 tingkatan perangkat secara serentak (iPad Mini 768px, iPad Air 820px, Mobile 393px, dan Desktop 1440px) via Playwright Chrome channel.
+- **Prevention Rule**:
+  Gunakan breakpoint `lg:` (1024px+) sebagai standar peralihan untuk layout horizontal yang memuat teks panjang berpasangan (seperti footer atau tabel lebar) agar resolusi tablet (768px - 1023px) tidak memaksakan rendering horizontal yang sempit.
+
+---
+
+### [LRN-113] Penyelarasan Tombol Masuk Sebagai Supervisor pada Profil Dinas, Kategori Solid Non-Transparan, & Visibilitas Buka Resolusi Penuh
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/admin/agencies/show.blade.php`, `app/Http/Controllers/Admin/AgencyController.php`, `app/Models/InternshipProject.php`, `resources/views/projects/index.blade.php`, `resources/views/projects/show.blade.php`, `tailwind.config.js`
+- **Problem / Symptom**:
+  1. Pada kartu "Pejabat Penandatangan Resmi" di Pusat Kendali Instansi (`/admin/agencies/{id}`), tombol cepat *Login As* bertuliskan *"Masuk Sebagai Admin Dinas"* dan mengarahkan ke akun staf admin, padahal pejabat penandatangan dokumen dinas adalah Atasan (Supervisor).
+  2. Pada katalog kartu proyek (`/proyek-dinas`), badge kategori seperti *"Klinik Literasi Inklusif"* menggunakan background transparan/kabur (`backdrop-blur-md`), sehingga saat menimpa latar foto gelap atau rambut murid, teks kategori menjadi redup dan sulit terbaca.
+  3. Pada detail proyek (`/projects/{id}`), tombol *"Buka Resolusi Penuh"* tidak menonjol dan kontainer galeri berisiko tampil putih/blank, serta tag judul memunculkan kotak hantu kosong saat teks kosong.
+- **Root Cause**:
+  1. Tombol cepat di panel penandatangan instansi mengambil akun `$firstAdmin` alih-alih akun Supervisor instansi.
+  2. Tailwind CSS mem-purge class `bg-teal-50` yang tidak tercantum di file template, menyebabkan rendering CSS fallback menjadi `transparent`.
+  3. Desain kontainer galeri foto belum terkunci dengan warna panggung studio gelap `#0f172a`, dan tombol resolusi penuh hanya bergantung pada overlay sudut bawah tanpa tombol pendamping di header.
+- **Fix Applied**:
+  1. Memperbarui tombol pada panel "Pejabat Penandatangan Resmi" menjadi **"Masuk Sebagai Supervisor"** yang mengimpersonasikan akun Supervisor Atasan instansi, menyelaraskan metrik personel dengan jumlah supervisor, serta menambahkan badge peran "Supervisor / Atasan" pada tabel personel.
+  2. Menstandarkan seluruh badge kategori floating (`projects/index.blade.php` dan `projects/show.blade.php`) dengan warna solid 100% (non-transparan) via accessor `category_bg_color`, `category_text_color`, dan `category_border_color`, mengeliminasi `backdrop-blur-md`, serta mendaftarkan path `./app/Models/**/*.php` ke `tailwind.config.js`.
+  3. Mengunci kontainer showcase galeri proyek dengan panggung studio gelap `#0f172a`, menonjolkan tombol **"Buka Resolusi Penuh"** berwarna biru kerajaan (`#2563eb`) beropasitas penuh dan bayangan tegas, menambahkan tombol pendamping pada header bagian atas galeri, serta mengondisikan tag judul hanya tampil jika judul terisi (`x-show="activeTitle"`).
+  4. Menjalankan *build* aset Vite (`npm run build`), membersihkan cache Laravel (`optimize:clear`), menguji PHPUnit (13/13 PASS), serta memvalidasi 3 hasil visual tangkapan layar Playwright Chrome (`channel: 'chrome'`).
+- **Prevention Rule**:
+  Elemen badge atau teks penting di atas media gambar dinamis WAJIB memiliki latar belakang solid/opak dengan tingkat kontras tinggi (WCAG AAA) dan DILARANG mengandalkan efek transparan/backdrop blur tipis yang rentan tersamar oleh warna foto di baliknya.
+
+
+
+
+---
+
+### [LRN-114] Filter Dinamis Bidang / Unit Dinas pada Master Pengguna Sistem (Admin & Mentor)
+- **Tanggal**: 2026-11-02
+- **Komponen**: `app/Http/Controllers/Admin/UserController.php`, `resources/views/admin/users/index.blade.php`, `scripts/verify_user_filter_bidang.mjs`
+- **Problem / Symptom**:
+  1. Pada halaman Master Pengguna Sistem (`/admin/users`), filter slot ke-3 di bilah pencarian hanya muncul jika role Mahasiswa, Dosen, atau Universitas dipilih (menampilkan dropdown filter "Semua Universitas / Kampus").
+  2. Saat pengguna memilih role Mentor Lapangan (`mentor`) atau Admin Bidang / Dispusip (`admin`), slot ke-3 kosong/hilang, padahal Admin Dinas dan Mentor Dinas di Dispusip terbagi ke dalam 4 bidang (Unit Kerja: Sekretariat, Perpustakaan, Layanan Kearsipan, dan Pengelolaan Kearsipan).
+- **Root Cause**:
+  Pada view Blade lama, slot ke-3 dibungkus oleh kondisi `@if(isset($agencies) && count($agencies) > 1)` untuk menampilkan dropdown instansi dinas. Karena di lingkungan Dispusip Surabaya jumlah profil instansinya tunggal (`count($agencies) == 1`), kondisi tersebut menghasilkan nilai `false` sehingga slot ke-3 tidak dirender sama sekali.
+- **Fix Applied**:
+  1. Pada Controller (`UserController.php`): Meng-eager load relasi `'unit'`, mengimplementasikan query filtering untuk `unit_id` baik pada relasi langsung (`users.unit_id`) maupun via relasi pengajuan magang (`applications.unit_id`), serta mengirim koleksi `$units` dan entitas `$selectedUnit` ke view.
+  2. Pada Blade View (`resources/views/admin/users/index.blade.php`):
+     - Memperbarui slot ke-3 menjadi filter dinamis ganda: jika role kampus/mahasiswa (`['universitas', 'dosen', 'mahasiswa']`) dipilih, tampilkan dropdown Universitas; jika selain itu (Admin, Mentor, Supervisor, atau default), tampilkan `<select name="unit_id">` ("Semua Bidang Dinas") dengan pilihan 4 Unit Kerja Dispusip.
+     - Menyematkan binding Alpine.js `:disabled` agar input yang tersembunyi tidak ikut terkirim dalam GET query.
+     - Menambahkan banner informatif *"Filter Aktif Unit / Bidang Dinas: [Nama Bidang]"* berbalut warna teal yang dilengkapi tombol navigasi *"Kelola Unit / Bidang"* dan *"Reset Filter"*.
+  3. Memvalidasi 83 PHPUnit tests (414 assertions passed) dan pengujian E2E Playwright dengan Google Chrome (`channel: 'chrome'`) mencakup 5 skenario role (`mentor`, `admin`, `admin&unit_id=1`, `mahasiswa`, serta pengujian transisi Alpine.js).
+- **Prevention Rule**:
+  Jangan pernah membatasi rendering filter instansi/divisi internal dengan asumsi jumlah instansi > 1. Untuk akun dinas (Admin, Mentor, Supervisor), selalu sediakan filter subdivisi / unit kerja (bidang dinas) di slot sekunder agar pengelolaan data pengguna multi-divisi tetap granular dan presisi.
+
+### [LRN-115] Penyelarasan Tata Letak & Scrollable Roster Mentor Bidang pada Dashboard Admin Bidang
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/admin/dashboard.blade.php`, `resources/views/admin/units/show.blade.php`, `app/Models/Placement.php`, `scripts/verify_mentor_scroll_visual.mjs`
+- **Problem / Symptom**:
+  1. Daftar pembimbing lapangan bidang di kartu "PANEL PROFIL BIDANG" (`/admin/dashboard`) menumpuk ke bawah secara vertikal tanpa batas seiring bertambahnya jumlah mentor (misal 9+ mentor terdaftar pada Bidang Perpustakaan). Hal ini merusak estetika dan keseimbangan layout karena kolom kanan menjadi sangat panjang dibandingkan kolom kiri (Lingkup Kerja Bidang, Koordinator Bidang, dan Utilisasi Kuota Bidang).
+  2. Deklarasi metode ganda di PHP (`finalreport()` dan `finalReport()`) pada `app/Models/Placement.php` menyebabkan fatal error redeclaration karena nama method pada PHP bersifat *case-insensitive*.
+- **Root Cause**:
+  1. Kontainer grid daftar kartu mentor di `resources/views/admin/dashboard.blade.php` belum dibungkus dengan batas tinggi maksimal (`max-height`) dan *overflow container* (`overflow-y-auto`).
+  2. Adanya method alias `finalReport()` yang dideklarasikan ulang di `Placement.php` bertentangan dengan prinsip PHP bahwa penamaan fungsi/metode tidak membedakan huruf besar/kecil.
+- **Fix Applied**:
+  1. Pada `resources/views/admin/dashboard.blade.php`: Membungkus grid kartu mentor dalam kontainer scrollable dengan `max-height: 205px` (`max-h-[205px] overflow-y-auto pr-1.5 scrollbar-thin`). Tinggi ini secara visual menampilkan 4 kartu mentor pertama (2 baris × 2 kolom pada desktop/tablet) dengan intipan halus baris ke-3 (*scroll affordance*), sehingga tinggi kolom kanan seimbang sempurna dengan kolom kiri (~260px).
+  2. Menambahkan badge jumlah personel di header (`{{ $mentorCount }} Personel`) dan baris indikator bawah dinamis saat mentor > 4: `"Total X mentor terdaftar"` dan `"Scroll untuk melihat seluruhnya ↓"`.
+  3. Menerapkan proteksi scroll serupa pada `resources/views/admin/units/show.blade.php` (`max-h-[380px] overflow-y-auto`) untuk mencegah regresi tampilan pada halaman detail unit.
+  4. Menghapus method ganda `finalReport()` di `app/Models/Placement.php` dan menjaga method tunggal `finalreport()` sesuai aturan LRN-080.
+  5. Menjalankan verifikasi visual browser headless Google Chrome (Playwright channel `chrome`) menghasilkan bukti fisik tangkapan layar `admin_dashboard_mentor_panel_card.png` (kondisi awal seimbang) dan `admin_dashboard_mentor_scrolled.png` (kondisi ter-scroll hingga mentor ke-9), serta memvalidasi 26 PHPUnit tests (143 assertions passed, Exit Code 0).
+- **Prevention Rule**:
+  Elemen daftar entitas dinamis (seperti anggota tim, mentor, peserta) yang diletakkan berdampingan dalam grid multi-kolom dashboard WAJIB dibungkus dalam kontainer berbatas tinggi (`max-height`) dan berkemampuan gulir vertikal (`overflow-y-auto`) dengan indikator scroll yang jelas, agar penambahan data tidak merusak proporsi tata letak antarmuka.
+
+---
+
+### [LRN-116] WebPush Trait Safety, Otorisasi Aksi Tim Proyek, Scope Alpine Salin Tautan & Pembersihan Orphan Storage
+- **Tanggal**: 2026-11-02
+- **Komponen**: `app/Models/User.php`, `resources/views/student/final_report.blade.php`, `resources/views/projects/show.blade.php`, `app/Http/Controllers/ProjectDetailController.php`, `app/Http/Controllers/ProjectInteractionController.php`, `app/Http/Controllers/Student/InternshipProjectController.php`, `tests/Feature/PushSubscriptionTest.php`
+- **Problem / Symptom**:
+  1. `laravel.log` berulang kali mencatat fatal error `BadMethodCallException: Call to undefined method App\Models\User::updatePushSubscription()` setiap kali peramban web mengirimkan subscription push notification ke endpoint `/push-subscriptions`.
+  2. Pada halaman Laporan Akhir Mahasiswa (`student/final_report.blade.php`), anggota tim biasa pada proyek kolaboratif (`is_leader = false`) disajikan tombol aksi "Ubah" dan "Hapus". Ketika ditekan, permintaan menghasilkan HTTP 404 `ModelNotFoundException` karena hanya pembuat/ketua tim yang memiliki wewenang memodifikasi/menghapus proyek.
+  3. Pada menu dropdown header detail proyek (`projects/show.blade.php`), tombol "Salin Tautan Proyek" memicu JavaScript `ReferenceError: shareToast is not defined` karena variabel `shareToast` berada di dalam konteks komponen Alpine `projectDetail` pada elemen `<main>`, terisolasi dari `<x-slot name="header">`.
+  4. Penanganan tautan kembali (`$backUrl`) pada `ProjectDetailController` mengabaikan role universitas database (`universitas`) dan menyebabkan pengguna instansi tanpa placement langsung terlempar ke katalog publik, bukan ke dasbor masing-masing.
+  5. Penghapusan proyek oleh Super Admin di `ProjectInteractionController::destroyProject` hanya menghapus baris tabel tanpa membersihkan aset fisik storage (`photo_path`, `source_code_path`, `screenshots`, `community_photos`, `documents`).
+- **Root Cause**:
+  1. Model `User` belum menyematkan trait `NotificationChannels\WebPush\HasPushSubscriptions` yang disediakan oleh package `laravel-notification-channels/webpush`.
+  2. Kondisi rendering tombol Ubah/Hapus pada `final_report.blade.php` hanya memeriksa status laporan akhir (`!$finalReport || $finalReport->status !== 'approved'`) tanpa memvalidasi kepemilikan/kepemimpinan proyek (`$canManageProject`).
+  3. Perbedaan hierarki DOM Blade slot `<x-slot name="header">` dan `<main>` memisahkan instance Alpine.js sehingga pemanggilan variabel lintas scope gagal secara runtime.
+  4. Inkonsistensi array pemeriksaan role `'university'` vs `'universitas'`.
+- **Fix Applied**:
+  1. Menyisipkan `use NotificationChannels\WebPush\HasPushSubscriptions;` pada `App\Models\User` dan memverifikasi fungsionalitas dengan Feature Test baru `PushSubscriptionTest` (100% PASS).
+  2. Menambahkan variabel otorisasi `$canManageProject` pada loop proyek di `final_report.blade.php`. Anggota tim biasa kini hanya melihat tombol *"Lihat Detail"* dan badge *"Anggota Tim"*, sedangkan tombol *"Ubah"* dan *"Hapus"* hanya tersedia bagi pembuat/ketua proyek.
+  3. Mengisolasi state Alpine pada dropdown header menjadi `{ menuOpen: false, copied: false }` dengan visual feedback mandiri *"Tautan Berhasil Disalin!"* tanpa bergantung pada event bus eksternal.
+  4. Memperluas pemetaan rute kembali pada `ProjectDetailController` untuk menyertakan role `universitas`, `student`, dan fallback ke dasbor masing-masing peran saat `placement` bernilai null.
+  5. Mengintegrasikan pembersihan file fisik dari `Storage::disk('public')` pada aksi `destroyProject` di `ProjectInteractionController`.
+  6. Memperbaiki pemanggilan `$project->source_code_url` dan `$project->normalizeMediaUrl($docPath)` di `projects/show.blade.php`.
+- **Prevention Rule**:
+  Setiap model yang berinteraksi dengan API notification push wajib memverifikasi ketersediaan trait `HasPushSubscriptions`. Seluruh tombol aksi destruktif atau mutasi data pada view kolaboratif WAJIB memvalidasi hak otorisasi peran spesifik (pemilik/ketua) sebelum dirender guna mencegah 403/404 exception. Hindari pemanggilan variabel Alpine lintas slot template Blade tanpa CustomEvent.
+
+---
+
+### [LRN-117] Halaman Khusus Pemilihan Aspek Revisi Sertifikat Supervisor, Eliminasi Popover Tumpang Tindih, Standardisasi Tombol 'Revisi' & Pembersihan Tanda Kurung ()
+- **Tanggal**: 2026-11-02
+- **Komponen**: `routes/supervisor.php`, `app/Http/Controllers/Supervisor/CertificateApprovalController.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`, `resources/views/supervisor/certificates/index.blade.php`, `resources/views/supervisor/certificates/revision.blade.php`, `resources/views/supervisor/applications/index.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `resources/views/supervisor/reports/show.blade.php`, `resources/views/admin/certificates/revision.blade.php`, `tests/Feature/SupervisorCertificateRevisionFlowTest.php`
+- **Problem / Symptom**:
+  1. Pada halaman `/supervisor/certificates`, popover pengembalian sertifikat bertumpuk (*overflow clip*) di dalam sel tabel desktop, terpotong batas kartu, dan hanya menyediakan 1 textarea pendek tanpa kejelasan aspek apa yang perlu direvisi.
+  2. Tombol aksi masih menggunakan label `Kembalikan`, yang kurang intuitif dan tidak mencerminkan proses revisi resmi.
+  3. Terdapat teks dalam tanda kurung `()` yang redundan di berbagai halaman supervisor seperti `Perlu Ditinjau Ulang (Revisi)`, `Sahkan (ACC)`, `(ACC)`, `(Kode)`, dan `(Jurusan)`.
+- **Root Cause**:
+  1. Penggunaan dropdown Alpine inline floating (`absolute right-0 bottom-full`) di dalam sel tabel dengan pembungkus `overflow-x-auto`.
+  2. Ketiadaan halaman terdedikasi bagi Atasan (Supervisor) untuk menelaah multi-aspek sertifikat sebelum memutuskan revisi.
+  3. Residu penamaan bertahap antarmuka yang masih mempertahankan tanda kurung penjelas.
+- **Fix Applied**:
+  1. Mengganti tombol `Kembalikan` menjadi tombol tautan bersih `Revisi` yang langsung mengarah ke halaman baru `supervisor.certificates.revision` (`GET & POST /supervisor/certificates/{placementId}/revision`).
+  2. Membangun halaman terdedikasi `resources/views/supervisor/certificates/revision.blade.php` dengan kartu konteks mahasiswa, pratinjau draft sertifikat resmi, dan 4 pilihan aspek interaktif (*Aspek 1: Nilai Evaluasi & Transkrip*, *Aspek 2: Data Mahasiswa & Magang*, *Aspek 3: Validasi Logbook & Laporan Akhir*, dan *Aspek 4: Aspek Lainnya/Persuratan*) lengkap dengan nilai aktual, input catatan spesifik, dan 5 tombol chip rekomendasi cepat.
+  3. Menyimpan struktur aspek terpilih dan instruksi komprehensif ke `Certificate->notes` dan mereset status pengesahan ke `revision`, sehingga Admin Dinas langsung melihat aspek revisi dan arahan Atasan pada `/admin/certificates/{placementId}/revision`.
+  4. Menghapus seluruh teks dalam tanda kurung `()` dan label redundan pada tab `Perlu Revisi` (dengan badge hitungan dinamis), tombol aksi, detail pengajuan, laporan mahasiswa, dan pesan flash.
+  5. Menambahkan suite pengujian feature `SupervisorCertificateRevisionFlowTest` (5 test, 65 assertions, Strict Exit Code 0) dan memvalidasi tampilan visual secara nyata menggunakan Playwright Chrome channel.
+- **Prevention Rule**:
+  Dilarang menggunakan formulir popover melayang di dalam tabel yang memiliki container `overflow-x-auto`. Untuk alur verifikasi multi-aspek, selalu sediakan halaman formulir terdedikasi (*dedicated revision page*). Bersihkan tanda kurung penjelas `()` dari teks antarmuka publik/kedinasan agar tampilan tetap profesional, ringkas, dan bebas redundansi.
+
+---
+
+### [LRN-118] Pengamanan Double-ACC Sertifikat Multi-Role, Kepatuhan StatusViewGuard & Eliminasi N+1 Dashboard DPL
+- **Tanggal**: 2026-11-02
+- **Komponen**: `app/Http/Controllers/Student/CertificateController.php`, `resources/views/student/final_report.blade.php`, `resources/views/dashboard.blade.php`, `resources/views/supervisor/certificates/index.blade.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `app/Http/Controllers/Lecturer/MonitoringController.php`, `app/Services/NotificationService.php`
+- **Problem / Symptom**:
+  1. Sertifikat berstatus draft yang baru diajukan Admin (status `waiting_approval` atau `revision`) hanya memblokir mahasiswa (`$isOwner`), namun tidak memproteksi akses DPL (`$isAdvisor`) atau Universitas (`$isUnivAdmin`).
+  2. Pada antarmuka Mahasiswa (`dashboard.blade.php` dan `student/final_report.blade.php`), tombol unduh tetap berwarna hijau aktif meskipun sertifikat sedang dalam proses telaah Atasan, sehingga memicu kebingungan saat mahasiswa mengeklik dan menemui halaman 403 `certificates.locked`.
+  3. `StatusViewGuardTest` mendeteksi pelanggaran hardcoded status name pada elemen `<span>Revisi</span>` di tombol aksi Supervisor sertifikat.
+  4. Terjadi query N+1 pada `Lecturer/DashboardController` dan `Lecturer/MonitoringController` saat resolving skema penilaian perguruan tinggi mahasiswa.
+  5. Blok notifikasi Supervisor di `NotificationService.php` terduplikasi di bagian 1.5 dan bagian 7, menyebabkan bagian 7 menjadi dead code.
+- **Root Cause**:
+  1. Pengecekan status pengesahan di `CertificateController::getCertificateData()` hanya mengecek `$isOwner`.
+  2. Komputasi `$isPassed` dan `$certBlockers` di view mahasiswa hanya membaca `$application->certificateBlockers()`, belum memperhitungkan relasi `$placement->certificate->approval_status`.
+  3. Regex guard mendeteksi teks status string literal yang berdiri sendiri di dalam tag `<span>`.
+  4. Pemanggilan `$eval->getUniversity()` menelusuri `$eval->placement` yang belum memiliki inverse relation binding di memori RAM Eloquent.
+- **Fix Applied**:
+  1. Memperluas proteksi gate di `CertificateController` mencakup `($isOwner || $isAdvisor || $isUnivAdmin)` saat `approval_status !== 'approved'`.
+  2. Menambahkan sinkronisasi pesan blocker ACC Atasan pada `$certificateBlockers` di `dashboard.blade.php` dan `final_report.blade.php`, menyajikan badge status informatif sebelum tombol unduh diaktifkan.
+  3. Mengubah label tombol aksi Supervisor menjadi `<span>Minta Revisi</span>` yang mematuhi StatusViewGuard.
+  4. Menambahkan eager-loading `'application.user.universityRelation'` dan `$p->evaluation->setRelation('placement', $p)` di `Lecturer/DashboardController` dan `MonitoringController`.
+  5. Mengonsolidasikan notifikasi Supervisor di `NotificationService.php` dan menghapus blok duplikat yang tidak terjangkau.
+- **Prevention Rule**:
+  Setiap gate otorisasi kelulusan/sertifikat yang menerapkan Double-ACC wajib memvalidasi status pengesahan di tingkat backend dan menyinkronkan status tersebut ke antarmuka pengguna tanpa menimbulkan aksi palsu (*misleading active CTA*). Selalu gunakan kata kerja aksi (misal: *Minta Revisi*, bukan kata benda kode status *Revisi*) pada tombol tindakan antarmuka agar mematuhi arsitektur enum status.
+
+---
+
+### [LRN-119] Standardisasi Nomenklatur 'Kelola Bidang' (Admin Bidang) & 'Unit Bidang' (Admin Dinas / Supervisor)
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/layouts/navigation.blade.php`, `resources/views/admin/units/show.blade.php`, `resources/views/admin/units/index.blade.php`, `resources/views/admin/units/create.blade.php`, `resources/views/admin/dashboard.blade.php`, `resources/views/supervisor/reports/index.blade.php`, `scripts/verify_kelola_bidang_and_unit_bidang.mjs`
+- **Problem / Symptom**:
+  1. Pada akun Admin Bidang (`$isBidangAdmin`), menu navigasi di bilah atas dan breadcrumb masih menggunakan frasa *"Bidang Saya"*, yang kurang mencerminkan fungsi kerja ruang manajemen operasional bidang magang.
+  2. Pada akun Admin Dinas / Super Admin, menu dan berbagai elemen antarmuka menggunakan istilah gabungan *"Bidang Devisi"* atau kata *"Devisi"*, yang rancu dan tidak baku dalam tata kelola administrasi Dispusip Kota Surabaya (seharusnya dibakukan menjadi *"Unit Bidang"*).
+- **Root Cause**: Residu penamaan bertahap dari iterasi fitur sebelumnya yang belum diselaraskan secara menyeluruh ke istilah baku kedinasan.
+- **Fix Applied**:
+  1. **Pengubahan "Bidang Saya" &rarr; "Kelola Bidang"**:
+     - Desktop navbar & mobile drawer navigation (`resources/views/layouts/navigation.blade.php`).
+     - Breadcrumb navigasi pada halaman ruang kerja unit (`resources/views/admin/units/show.blade.php`).
+     - Kartu pintasan dashboard admin bidang (`resources/views/admin/dashboard.blade.php`).
+  2. **Pengubahan "Bidang Devisi" / "Devisi" &rarr; "Unit Bidang"**:
+     - Menu desktop, profile dropdown drawer, dan drawer mobile menu Admin Dinas (`navigation.blade.php`).
+     - Judul header halaman (`Manajemen Unit Bidang & Kuota Magang`), tombol utama (`+ Tambah Unit Bidang`), judul modal (`Hapus Unit Bidang`), kartu ringkasan (`Total Unit Bidang`), placeholder cari (`Cari nama unit bidang...`), judul tabel (`Daftar Unit Bidang & Penyesuaian Kuota`), dan header kolom (`Nama Unit Bidang`) pada `resources/views/admin/units/index.blade.php`.
+     - Judul halaman dan sub-teks pada formulir pembuatan bidang (`resources/views/admin/units/create.blade.php`).
+     - Matriks tabel rekapitulasi pada dashboard admin dinas (`resources/views/admin/dashboard.blade.php`).
+     - Opsi dropdown dan kolom tabel laporan mahasiswa supervisor (`resources/views/supervisor/reports/index.blade.php`).
+  3. Memvalidasi visual secara otomatis menggunakan Playwright runner (Google Chrome channel) dengan tangkapan layar `admin_bidang_kelola_bidang.png` dan `admin_dispusip_unit_bidang.png`, serta memastikan test suite feature lulus 100% (26 tests, 143 assertions, Strict Exit Code 0).
+- **Prevention Rule**:
+  Gunakan istilah baku "Unit Bidang" untuk seluruh entitas subdivisi dinas Dispusip dan "Kelola Bidang" untuk ruang kerja personal admin bidang. Jangan menggunakan istilah tidak baku seperti "Devisi" pada teks antarmuka publik maupun kedinasan.
+
+---
+
+### [LRN-120] Tombol 'Preview Proyek', Ekspansi Kata Kunci Cerdas Kategori Inovasi & Algoritma Pembobotan Skor Cerdas
+- **Tanggal**: 2026-11-02
+- **Komponen**: `resources/views/student/projects/edit.blade.php`, `resources/views/student/projects/create.blade.php`, `app/Models/InternshipProject.php`, `tests/Feature/InternshipProjectAndSupervisorReportTest.php`, `scripts/verify_preview_proyek_and_smart_keywords.mjs`
+- **Problem / Symptom**:
+  1. Tombol pratinjau proyek pada form edit proyek mahasiswa masih berlabel teks panjang *"Lihat Halaman Proyek"*, yang kurang ringkas dibandingkan fungsinya sebagai aksi peninjauan tampilan publik.
+  2. Rekomendasi pintar kategori kustom pada opsi "Inovasi Lainnya" (`custom_category`) sangat terbatas dan sering kali hanya mendeteksi "IT" atau "UI" secara naif karena pencocokan substring tanpa batas kata (`\b`) pada kata pendek memicu *false-positive* (misal: kata `edit video` keliru mendeteksi `it` pada kata `edit` sehingga salah diarahkan ke Sistem Digital), sedangkan istilah riil mahasiswa magang seperti `karya seni`, `pemrograman`, `videografi`, `edit video`, `fotografi`, `kaligrafi`, `lukisan`, `arsip sejarah`, `presentasi sejarah` tidak dikenali sama sekali.
+- **Root Cause**:
+  1. Teks tombol lama pada `resources/views/student/projects/edit.blade.php` masih menggunakan `<span>Lihat Halaman Proyek</span>`.
+  2. Kamus kata kunci `CATEGORY_KEYWORDS` pada model `InternshipProject.php` hanya memuat kosakata terbatas dan belum mencakup bidang seni, videografi, fotografi, sejarah kearsipan, maupun varian kata kerja/benda pemrograman.
+  3. Algoritma deteksi JavaScript di template Blade menghentikan iterasi pada pencocokan pertama (*first match*) tanpa proteksi kata pendek dan tanpa sistem pembobotan skor (*scoring*).
+- **Fix Applied**:
+  1. Mengubah tombol header pada form edit proyek menjadi **"Preview Proyek"** ([`edit.blade.php`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/resources/views/student/projects/edit.blade.php#L29)) dan memperbarui assertion pada `InternshipProjectAndSupervisorReportTest.php`.
+  2. Mengembangkan kamus `CATEGORY_KEYWORDS` di [`app/Models/InternshipProject.php`](file:///c:/Users/TK%20ABA%20SBY%2069%20(3)/Documents/@Yasin/Semester%205/Magang-main/Magang/app/Models/InternshipProject.php#L238) dengan lebih dari 150+ kosakata komprehensif:
+     - `teknologi`: IT, pemrograman, coding, software, website, fullstack, database, artificial intelligence, IoT, bot, e-library, dll.
+     - `buku`: buku, karya literasi, novel, cerpen, antologi, puisi, komik, modul ajar, resensi, mendongeng, pojok baca, dll.
+     - `media`: videografi, edit video, fotografi, kaligrafi, lukisan, karya seni, seni rupa, podcast, animasi, mural, poster, infografis, penata display, dll.
+     - `preservasi`: preservasi kearsipan, arsip sejarah, presentasi sejarah, naskah kuno, manuskrip, cagar budaya, restorasi, fumigasi, alih media, dll.
+     - `tata_kelola`: SOP, standar pelayanan, tata kelola layanan, pedoman kerja, jadwal retensi arsip (JRA), survei IKM, dll.
+  3. Menyempurnakan logika `detectedCategory` di Alpine.js (`create.blade.php` & `edit.blade.php`) dan PHP (`detectMatchingCategory`) dengan proteksi regex *word-boundary* untuk kata pendek (< 4 karakter) serta seleksi kategori berbasis akumulasi bobot skor tertinggi (*highest scoring category*).
+  4. Menjalankan pengujian otomatis headless Google Chrome Playwright (`scripts/verify_preview_proyek_and_smart_keywords.mjs`) yang memvalidasi tombol "Preview Proyek" serta rekomendasi akurat untuk `karya seni` &rarr; Media Kreatif, `pemrograman` &rarr; Sistem Digital, `videografi` &rarr; Media Kreatif, dan `arsip sejarah` &rarr; Preservasi Kearsipan, serta memastikan seluruh test suite feature lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**:
+  Setiap sistem pengenalan kata kunci cerdas (NLP / smart matching) yang melibatkan akronim pendek (< 4 huruf seperti *it*, *ui*, *ux*, *ai*, *sop*) WAJIB menggunakan batas kata (*word-boundary regex*) dan algoritma pembobotan skor kecocokan tertinggi untuk mencegah jebakan substring false-positive (*Scunthorpe-like false positive*).
+
+### [LRN-121] Standardisasi Favicon Resmi Dispusip Surabaya, Eliminasi Margin Kosong (Padding) & Cache-Busting Versioning
+- **Tanggal**: 2026-11-02
+- **Komponen**: `public/favicon.ico`, `public/favicon-32x32.png`, `public/favicon-16x16.png`, `public/apple-touch-icon.png`, `public/android-chrome-*.png`, `resources/views/layouts/app.blade.php`, `resources/views/layouts/guest.blade.php`, `resources/views/errors/403.blade.php`
+- **Problem / Symptom**:
+  Favicon portal web magang terlihat kecil, menciut (~10px), dan pudar di tab browser dibandingkan dengan favicon web utama Dispusip Surabaya (`dispusip.surabaya.go.id`) yang tampak tajam, besar, dan kontras.
+- **Root Cause**:
+  Berkas logo yang digenerate oleh tool favicon generator pihak ketiga (`favicon.io`) memiliki ruang kosong transparan (*transparent padding*) sebesar 30-35% di sekeliling logo (pada kanvas 512x512, logo hanya berukuran 352x346). Saat dirender di tab browser 16x16 atau 32x32, logo menjadi tereduksi dan tenggelam. Sedangkan favicon resmi `dispusip.surabaya.go.id/favicon.ico` memiliki rasio keterisian 96% (*full-bleed / tight-crop* 46px dari 48px kanvas) dengan palet warna kontras tinggi.
+- **Fix Applied**:
+  1. Mengunduh dan menerapkan berkas multi-resolusi resmi dari portal pusat Dispusip (`https://dispusip.surabaya.go.id/favicon.ico`).
+  2. Mengenerate varian turunan berstandar modern (`favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`) ke dalam `public/` dan `public/images/`.
+  3. Memperbarui seluruh template Blade (`app.blade.php`, `guest.blade.php`, `403.blade.php`) dengan parameter cache-busting `?v=4` untuk memastikan browser pengguna segera merefleksikan favicon baru tanpa tertahan cache lama.
+  4. Menjalankan `php artisan optimize:clear` dan `php artisan view:clear`.
+- **Prevention Rule**:
+  Semua aset favicon web wajib berorientasi *tight-crop / full-bleed* (mengisi minimal 90-96% kanvas ikon tanpa margin transparan yang berlebihan) agar logo tetap terbaca tajam dan tidak menciut saat dirender pada tab browser ukuran $16\times16$ piksel. Setiap penggantian aset grafis wajib menaikkan versi query string `?v=...` di layout Blade.
+
+### [LRN-122] Inovasi Template Sertifikat Resmi Dispusip, 5 Logo Kop Horizontal, Kotak TTE Presisi Ber-QR Logo Surabaya, & Certificate Theme Engine Tahunan Terintegrasi
+- **Tanggal**: 2026-11-02
+- **Komponen**: `app/Models/CertificateTheme.php`, `database/migrations/2026_11_02_160000_create_certificate_themes_table.php`, `app/Http/Controllers/Admin/CertificateController.php`, `app/Http/Controllers/Student/CertificateController.php`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/admin/certificates/index.blade.php`
+- **Problem / Symptom**: 
+  1. Desain Halaman 1 sertifikat lama masih menggunakan kop terpisah (logo kampus kanan & dinas kiri) serta badge nilai besar yang padat di lembar utama, tidak sesuai prototipe resmi Dispusip Pemkot Surabaya (`4692.pdf`).
+  2. Kebutuhan dinas mengganti tema warna, format penomoran arsip (`400.14.5.4/.../436.7.17/2026`), dan data pejabat TTE (Sekretaris, NIP, Golongan) setiap tahun ajaran baru tanpa merusak kode program yang ada.
+  3. Kekhawatiran penumpukan daftar mahasiswa yang sangat banyak mendorong antarmuka pengaturan terdorong ke bawah.
+- **Root Cause**: 
+  Nilai dan styling sertifikat sebelumnya di-*hardcode* di dalam Blade template dan controller tanpa adanya skema konfigurasi tema dinamis berbasis data (*Dynamic Theme Engine*), serta ketiadaan tab navigasi terisolasi di halaman manajemen sertifikat admin.
+- **Fix Applied**: 
+  1. **Aset Resmi & Kop Terpadu**: Mengintegrasikan 5 logo resmi instansi horizontal di Halaman 1 (Pemkot Surabaya, Dispusip Baru, ASN BerAKHLAK, Bangga Melayani Bangsa, Zona Integritas) dan ornamen geometris poligon facet cyan-blue di sudut kiri atas serta stepped-tangga orange-coral di sudut kanan bawah.
+  2. **Kotak TTE Presisi Ber-QR Logo Surabaya**: Merancang kotak berborder hitam tegas standar BSrE/Kominfo memuat QR Code lokal dengan *Error Correction Level H* dan logo Pemkot Surabaya di tengah, berdampingan dengan teks pejabat penandatangan berjenjang (Sekretaris Dra. NOVELIJA, SH, NIP, PEMBINA TK I) dan kalimat mandat dinas.
+  3. **Certificate Theme Engine Tahunan**: Membangun tabel `certificate_themes` dan model `CertificateTheme` dengan metode `getActive(?int $year = null)` untuk menyimpan warna (primary, secondary, accent), pola nomor dinas, dan pejabat penandatangan yang berlaku per tahun.
+  4. **Antarmuka 2-Tab Terkunci di Menu Admin**: Menambahkan sistem Tab terkunci di atas (`Tab 1: Daftar Mahasiswa & Cetak` dengan pagination 10 per halaman dan pencarian cepat, serta `Tab 2: Desain & TTE Tahunan` dengan live preview interaktif real-time dan riwayat tema).
+  5. **Harmonisasi Halaman 2**: Menyelaraskan kop transkrip nilai dengan logo resmi dan aksen warna tema aktif.
+- **Prevention Rule**:
+  Desain dokumen resmi berbobot hukum (sertifikat, transkrip) tidak boleh meng-*hardcode* warna atau nama pejabat di Blade view. Selalu sediakan *Dynamic Theme & Signee Token Engine* yang dapat dikelola admin dari UI web secara backward-compatible. Kode QR yang ditumpangi logo tengah WAJIB menggunakan *Error Correction Level H* agar tetap 100% terbaca saat dipindai.
+
+---
+
+### [LRN-123] Migrasi Skema Interaksi Proyek & Galeri Proyek Dinas
 - **Tanggal**: 2026-11-02
 - **Komponen**: `database/migrations/2026_10_28_150000_create_project_interactions_and_comments_table.php`, `app/Http/Controllers/PublicProjectController.php`, PostgreSQL `internship_projects`
 - **Problem / Symptom**: `Illuminate\Database\QueryException: SQLSTATE[42703]: Undefined column: 7 ERROR: column "likes_count" does not exist` saat mengakses rute `/proyek-dinas`.
@@ -3511,7 +3872,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
-### [LRN-108] Standardisasi Tata Letak Filter Bar Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow
+### [LRN-124] Standardisasi Tata Letak Filter Bar Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow
 - **Tanggal**: 2026-11-02
 - **Komponen**: `resources/views/projects/index.blade.php`, Tailwind CSS Grid & Forms
 - **Problem / Symptom**: Filter bar di katalog Proyek Dinas (`/proyek-dinas`) tampak menyempit (*squished*): ikon pencarian bertabrakan dengan teks placeholder, teks opsi dropdown (seperti "Teknologi & Perangkat Lunak") terhimpit menabrak ikon panah dropdown (*chevron*), dan ketiadaan tombol reset cepat.
@@ -3525,7 +3886,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Memvalidasi visual rendering pada desktop (1920x1080) dan smartphone mobile (375x812) via browser runner Chrome.
 ---
 
-### [LRN-109] Perapian Kartu Mobile 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar
+### [LRN-125] Perapian Kartu Mobile 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar
 - **Tanggal**: 2026-11-02
 - **Komponen**: `resources/views/admin/dashboard.blade.php`, `resources/views/supervisor/dashboard.blade.php`
 - **Problem / Symptom**: Di viewport smartphone (<768px), metrik angka pada kartu 4 Bidang Dispusip (Kuota, Mhs Aktif, ACC, Mhs Lulus) runtuh secara vertikal dalam 1 kolom ke bawah yang sangat memanjang dan canggung.
@@ -3540,7 +3901,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Memvalidasi kepatuhan aturan `StatusViewGuardTest` (2/2 PASS) dan menguji rendering visual Playwright Chrome mobile (375x812).
 - **Prevention Rule**: Selalu sertakan inline style cadangan (`grid-template-columns: repeat(N, minmax(0, 1fr))`) pada grid metrik kompak di tampilan mobile untuk mencegah regresi tata letak jika terjadi jeda update bundle aset Vite.
 
-### [LRN-110] Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping
+### [LRN-126] Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping
 - **Tanggal**: 2026-11-02
 - **Komponen**: `resources/views/layouts/navigation.blade.php`, `scripts/browser-runner.mjs`
 - **Problem / Symptom**: Pada drawer navigasi mobile (<768px), beberapa item menu utama teratas (`Home`, `Proyek Dinas`, `Dashboard`, `Pengajuan`) menampilkan ikon SVG dalam kotak rounded (`w-7 h-7 rounded-lg bg-slate-100`), sedangkan item-item menu di bawahnya (Instansi Dinas, Perguruan Tinggi, Semua Pengguna, Mentor, Pengaturan Akun, dll.) berwujud teks bersih tanpa ikon, menciptakan inkonsistensi visual dan kepadatan yang tidak perlu.
@@ -3554,20 +3915,16 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+---
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
-### [LRN-XXX] [Judul Singkat Masalah / Fitur]
+### [LRN-XXX] Judul Singkat & Padat Masalah
 - **Tanggal**: YYYY-MM-DD
-- **Komponen**: [Nama Controller / Model / View / Migration / Script]
-- **Problem / Symptom**: [Pesan error terminal, stack trace, kode status HTTP, atau kegagalan query PostgreSQL]
-- **Root Cause**: [Penyebab teknis mendalam mengapa bug/error tersebut terjadi]
-- **Fix Applied**: [Solusi, patch berkas, atau refactoring kode yang telah berhasil memecahkan masalah]
-- **Prevention Rule**: [Aturan preventif baru yang wajib dipatuhi agen di masa mendatang]
+- **Komponen**: File / Modul yang terdampak
+- **Problem / Symptom**: Gejala yang terlihat di pengguna/console/terminal
+- **Root Cause**: Akar penyebab teknis masalah
+- **Fix Applied**: Langkah-langkah penyelesaian konkret yang telah diterapkan
+- **Prevention Rule**: Aturan permanen untuk mencegah bug terulang
 ```
-
-
-
-
-
-

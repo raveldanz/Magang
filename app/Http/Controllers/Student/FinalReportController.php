@@ -54,7 +54,13 @@ class FinalReportController extends Controller
 
             $finalReport = $placement->finalreport;
             $evaluation = $placement->evaluation;
-            $projects = $placement->internshipProjects;
+            $projects = \App\Models\InternshipProject::with(['members.placement.application.user.studentProfile'])
+                ->where(function ($q) use ($placement) {
+                    $q->where('placement_id', $placement->id)
+                        ->orWhereHas('members', fn ($m) => $m->where('placement_id', $placement->id));
+                })
+                ->latest()
+                ->get();
         }
 
         // 4. Kirimkan $lifecycle ke view agar kartu alur/stepper muncul saat masih pending
