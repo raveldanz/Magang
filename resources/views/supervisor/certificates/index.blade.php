@@ -97,7 +97,7 @@
                                     $profile = $student?->studentProfile;
                                     $unit = $cert->placement?->application?->unit;
                                     $eval = $cert->placement?->evaluation;
-                                    $finalScore = $eval ? $eval->final_score : ($cert->placement?->final_score ?? '-');
+                                    $finalScore = $eval ? ($eval->nilai_akhir ?? $eval->final_score) : ($cert->placement?->final_score ?? '-');
                                 @endphp
                                 <tr class="hover:bg-slate-50 transition">
                                     {{-- Mahasiswa & Kampus --}}
@@ -242,7 +242,7 @@
                             $profile = $student?->studentProfile;
                             $unit = $cert->placement?->application?->unit;
                             $eval = $cert->placement?->evaluation;
-                            $finalScore = $eval ? $eval->final_score : ($cert->placement?->final_score ?? '-');
+                            $finalScore = $eval ? ($eval->nilai_akhir ?? $eval->final_score) : ($cert->placement?->final_score ?? '-');
                         @endphp
                         <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3 hover:border-blue-300 transition"
                              x-data="{ showApproveCertModalMobile: false }">
