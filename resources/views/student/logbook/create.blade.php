@@ -43,62 +43,57 @@
                         <p class="text-xs text-gray-400 mt-1">Minimal 10 karakter</p>
                     </div>
 
-{{-- Lampiran Logbook --}}
-<div x-data="{ 
-        fileUrl: null,
-        handleAttachment(e) {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 2 * 1024 * 1024) {
-                    notify('Ukuran berkas lampiran maksimal 2MB.');
-                    e.target.value = '';
-                    if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
-                    this.fileUrl = null;
-                    return;
-                }
-                if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
-                this.fileUrl = URL.createObjectURL(file);
-            } else {
-                if (this.fileUrl) URL.revokeObjectURL(this.fileUrl);
-                this.fileUrl = null;
-            }
-        }
-     }" 
-     class="space-y-1">
+                    {{-- Lampiran Logbook (Konsisten dengan Gaya Profil & Pengajuan) --}}
+                    <div class="space-y-2" x-data="{ selectedName: '', previewUrl: null }">
+                        <label class="block font-semibold text-xs sm:text-sm text-gray-700">
+                            Lampiran (Opsional)
+                        </label>
 
-    <label for="attachment" class="block font-semibold text-xs sm:text-sm text-gray-700">
-        Lampiran (Opsional)
-    </label>
+                        <div class="flex items-center gap-2 w-full">
+                            <input type="file" 
+                                   id="attachment" 
+                                   name="attachment" 
+                                   accept=".pdf,.jpg,.jpeg,.png" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) { 
+                                       const file = $event.target.files[0];
+                                       if(file.size > 2 * 1024 * 1024) {
+                                           alert('Ukuran berkas lampiran maksimal 2MB.');
+                                           $event.target.value = '';
+                                           selectedName = '';
+                                           previewUrl = null;
+                                           return;
+                                       }
+                                       selectedName = file.name; 
+                                       previewUrl = URL.createObjectURL(file); 
+                                   }" />
 
-    <input id="attachment" 
-           name="attachment" 
-           type="file" 
-           accept=".pdf,.jpg,.jpeg,.png"
-           @change="handleAttachment($event)"
-           class="block w-full text-xs sm:text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                            <!-- Tombol Choose File Mandiri -->
+                            <button type="button" 
+                                    @click="document.getElementById('attachment').click()"
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
 
-    <!-- Baris Status & Aksi -->
-    <div class="flex items-center justify-between pt-0.5 text-xs">
-        <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
-        
-        <a x-show="fileUrl" 
-           x-cloak 
-           :href="fileUrl" 
-           target="_blank" 
-           class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-            </svg>
-            <span>Lihat Berkas</span>
-        </a>
-    </div>
+                            <!-- Nama File Terpilih yang Bisa Diklik Langsung untuk View -->
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                <template x-if="selectedName">
+                                    <a :href="previewUrl" 
+                                       target="_blank" 
+                                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer" 
+                                       :title="selectedName" 
+                                       x-text="selectedName"></a>
+                                </template>
+                                <template x-if="!selectedName">
+                                    <span class="text-slate-400">No file chosen</span>
+                                </template>
+                            </div>
+                        </div>
 
-    <x-input-error :messages="$errors->get('attachment')" class="mt-1" />
-</div>
+                        <p class="text-[10px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
+                        <x-input-error :messages="$errors->get('attachment')" class="mt-1" />
+                    </div>
 
-    <x-input-error :messages="$errors->get('attachment')" class="mt-1" />
-</div>
                     {{-- Tombol Submit --}}
                     <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:space-x-3 gap-2.5 sm:gap-0 pt-4 border-t border-gray-100">
                         <a href="{{ route('student.logbook.index') }}" class="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-bold text-gray-700 uppercase tracking-wider hover:bg-gray-200 transition text-center justify-center flex items-center">
@@ -114,49 +109,4 @@
             </div>
         </div>
     </div>
-
-    @push('scripts')
-    <script>
-        function handleAttachmentPreview(input) {
-            const box = document.getElementById('attachmentPreviewBox');
-            const imgWrapper = document.getElementById('previewImageWrapper');
-            const img = document.getElementById('previewImage');
-            const docWrapper = document.getElementById('previewDocWrapper');
-            const nameEl = document.getElementById('previewFileName');
-            const sizeEl = document.getElementById('previewFileSize');
-
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                if (file.size > 2 * 1024 * 1024) {
-                    notify('Ukuran berkas melebihi batas maksimal 2MB.');
-                    input.value = '';
-                    box.classList.add('hidden');
-                    box.classList.remove('flex');
-                    return;
-                }
-
-                nameEl.textContent = file.name;
-                sizeEl.textContent = (file.size / 1024).toFixed(1) + ' KB';
-                box.classList.remove('hidden');
-                box.classList.add('flex');
-
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        img.src = e.target.result;
-                        imgWrapper.classList.remove('hidden');
-                        docWrapper.classList.add('hidden');
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    imgWrapper.classList.add('hidden');
-                    docWrapper.classList.remove('hidden');
-                }
-            } else {
-                box.classList.add('hidden');
-                box.classList.remove('flex');
-            }
-        }
-    </script>
-    @endpush
 </x-app-layout>
