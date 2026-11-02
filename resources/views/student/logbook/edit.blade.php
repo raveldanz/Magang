@@ -4,7 +4,6 @@
             <h2 class="font-bold text-xl sm:text-2xl text-slate-900 tracking-tight flex items-center gap-2.5">
                 <span>Edit Catatan Logbook Magang</span>
             </h2>
-            
         </div>
     </x-slot>
 
@@ -92,71 +91,79 @@
                         <x-input-error :messages="$errors->get('activity')" class="mt-1" />
                     </div>
 
-                    {{-- Lampiran Berkas --}}
-                    <div x-data="{ 
-                            newFileUrl: null,
-                            handleAttachment(e) {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    if (file.size > 2 * 1024 * 1024) {
-                                        notify('Ukuran berkas lampiran maksimal 2MB.');
-                                        e.target.value = '';
-                                        if (this.newFileUrl) URL.revokeObjectURL(this.newFileUrl);
-                                        this.newFileUrl = null;
-                                        return;
-                                    }
-                                    if (this.newFileUrl) URL.revokeObjectURL(this.newFileUrl);
-                                    this.newFileUrl = URL.createObjectURL(file);
-                                } else {
-                                    if (this.newFileUrl) URL.revokeObjectURL(this.newFileUrl);
-                                    this.newFileUrl = null;
-                                }
-                            }
-                         }" 
-                         class="space-y-2">
+                    {{-- Lampiran Bukti Kegiatan (Konsisten dengan Profil & Pengajuan) --}}
+                    @php
+                        $hasAttachment = !empty($logbook?->attachment_path ?? $logbook?->attachment);
+                        $attachmentPath = $logbook?->attachment_path ?? $logbook?->attachment;
+                        $savedName = $hasAttachment ? basename($attachmentPath) : '';
+                        $savedUrl = $hasAttachment ? ($logbook->attachment_url ?? asset('storage/' . $attachmentPath)) : null;
+                    @endphp
 
-                        <label for="attachment" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    <div class="space-y-2" 
+                         x-data="{ 
+                            selectedName: '', 
+                            previewUrl: null 
+                         }">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                             Lampiran Bukti Kegiatan (Opsional)
                         </label>
 
-                        {{-- Tampilan Lampiran Tersimpan Sebelumnya --}}
-                        @if ($logbook->attachment)
-                            <div class="p-3 bg-slate-50 border border-slate-200/90 rounded-2xl flex items-center justify-between text-xs shadow-2xs">
-                                <div class="flex items-center gap-2.5 min-w-0">
-                                    <div class="min-w-0">
-                                        <span class="font-bold text-slate-800 block truncate">Berkas Tersimpan Saat Ini</span>
-                                        <span class="text-[11px] text-slate-400">Pilih berkas baru di bawah jika ingin mengganti</span>
-                                    </div>
-                                </div>
-                                <a href="{{ $logbook->attachment_url }}" target="_blank" 
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-blue-600 hover:text-blue-800 border border-slate-200 rounded-xl text-xs font-bold transition shrink-0 shadow-2xs">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <span>Buka File</span>
-                                </a>
+                        <div class="flex items-center gap-2 w-full">
+                            <input type="file" 
+                                   id="attachment" 
+                                   name="attachment" 
+                                   accept=".pdf,.jpg,.jpeg,.png" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) { 
+                                       const file = $event.target.files[0];
+                                       if(file.size > 2 * 1024 * 1024) {
+                                           alert('Ukuran berkas lampiran maksimal 2MB.');
+                                           $event.target.value = '';
+                                           selectedName = '';
+                                           previewUrl = null;
+                                           return;
+                                       }
+                                       selectedName = file.name; 
+                                       previewUrl = URL.createObjectURL(file); 
+                                   }" />
+
+                            <!-- Tombol Choose File Mandiri -->
+                            <button type="button" 
+                                    @click="document.getElementById('attachment').click()"
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
+
+                            <!-- Tempat Nama File: File Baru atau File yang Sudah Ada (Dapat Diklik Langsung untuk View) -->
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                {{-- Jika ada file baru yang dipilih --}}
+                                <template x-if="selectedName">
+                                    <a :href="previewUrl" 
+                                       target="_blank" 
+                                       class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer" 
+                                       :title="selectedName" 
+                                       x-text="selectedName"></a>
+                                </template>
+
+                                {{-- Jika belum pilih file baru tetapi ada file lama tersimpan --}}
+                                @if($hasAttachment)
+                                    <template x-if="!selectedName">
+                                        <a href="{{ $savedUrl }}" 
+                                           target="_blank" 
+                                           class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer" 
+                                           title="Buka berkas lampiran saat ini">
+                                            {{ $savedName }}
+                                        </a>
+                                    </template>
+                                @else
+                                    <template x-if="!selectedName">
+                                        <span class="text-slate-400">No file chosen</span>
+                                    </template>
+                                @endif
                             </div>
-                        @endif
-
-                        {{-- Input Berkas Baru --}}
-                        <input id="attachment" name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png"
-                               @change="handleAttachment($event)"
-                               class="block w-full text-xs sm:text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition shadow-2xs" />
-
-                        {{-- Baris Info & Tombol Lihat Berkas Baru --}}
-                        <div class="flex items-center justify-between pt-0.5 text-xs">
-                            <p class="text-[11px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
-                            
-                            <a x-show="newFileUrl" 
-                               x-cloak 
-                               :href="newFileUrl" 
-                               target="_blank" 
-                               class="inline-flex items-center gap-1 font-bold text-blue-600 hover:text-blue-800 hover:underline shrink-0">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                <span>Lihat Berkas Baru</span>
-                            </a>
                         </div>
+
+                        <p class="text-[10px] text-slate-400">Format: PDF, JPG, PNG (Maks. 2MB)</p>
                         <x-input-error :messages="$errors->get('attachment')" class="mt-1" />
                     </div>
 
