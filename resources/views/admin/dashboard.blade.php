@@ -547,35 +547,45 @@
                             $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $uRemaining = max(0, $dUnit->quota - $uActive);
+                            $uPercent = $dUnit->quota > 0 ? min(100, round(($uActive / $dUnit->quota) * 100)) : 0;
                         @endphp
-                        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2.5">
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
                             <div class="flex items-start justify-between gap-2.5">
                                 <a href="{{ route('admin.units.show', $dUnit->id) }}"
-                                   class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1">
-                                    <span>{{ $dUnit->name }}</span>
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                   class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1.5 flex-1 pr-2">
+                                    <span class="leading-snug">{{ $dUnit->name }}</span>
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                 </a>
-                                <span class="px-2 py-0.5 rounded-lg text-xs font-bold {{ $uRemaining > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                                <span class="px-2.5 py-1 rounded-xl text-xs font-bold shrink-0 {{ $uRemaining > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                                     Sisa: {{ $uRemaining }}
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-4 gap-2 text-center text-xs py-2 border-t border-slate-100">
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Kuota</div>
-                                    <div class="font-bold text-slate-800">{{ $dUnit->quota }}</div>
+                            {{-- Progress Bar Mini Kuota Terisi --}}
+                            <div class="space-y-1">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-1.5 rounded-full {{ $uPercent >= 100 ? 'bg-rose-500' : ($uPercent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}"
+                                         style="width: {{ $uPercent }}%"></div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Mhs Aktif</div>
-                                    <div class="font-bold text-emerald-700">{{ $uActive }}</div>
+                            </div>
+
+                            {{-- 4 Kotak Metrik Horizontal --}}
+                            <div class="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;">
+                                <div class="bg-slate-50/80 rounded-xl p-2 text-center border border-slate-200/60">
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Kuota</div>
+                                    <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $dUnit->quota }}</div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">ACC</div>
-                                    <div class="font-bold {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }}">{{ $uWaiting }}</div>
+                                <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
+                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $uActive }}</div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Mhs Lulus</div>
-                                    <div class="font-bold text-slate-700">{{ $uCompleted }}</div>
+                                <div class="{{ $uWaiting > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
+                                    <div class="text-[10px] {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }} uppercase font-bold tracking-wider">ACC</div>
+                                    <div class="text-sm font-extrabold {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $uWaiting }}</div>
+                                </div>
+                                <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
+                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $uCompleted }}</div>
                                 </div>
                             </div>
                         </div>
