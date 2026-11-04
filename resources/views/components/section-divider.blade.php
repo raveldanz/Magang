@@ -43,32 +43,30 @@
               class="transition-all duration-500 ease-out group-hover:stroke-width-[2.6] group-hover:stroke-opacity-100"></path>
     </svg>
 
-    <!-- 3. Ornamen Tengah ◆ ❖ ◆ -->
-    <div class="mx-2 sm:mx-3.5 flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        <!-- Satelit Kiri (Spring Floating Physics) -->
-        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rotate-45 rounded-[2px] bg-gradient-to-tr from-blue-600 to-sky-400 dark:from-blue-500 dark:to-sky-300 shadow-xs shadow-blue-500/40 dark:shadow-sky-400/30 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:-translate-x-1.5 group-hover:scale-125 group-hover:rotate-[55deg] group-hover:shadow-blue-400/70 dark:group-hover:shadow-sky-300/70"></span>
-        
-        <!-- Diamond Pusat -->
-        <div class="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11">
-            <!-- Aura Cahaya Pijar (Glowing Ambient Glow dengan Bloom Halus) -->
-            <div class="absolute inset-0 rounded-2xl bg-blue-500/25 dark:bg-blue-400/30 blur-md group-hover:bg-blue-500/45 dark:group-hover:bg-blue-400/60 group-hover:blur-xl group-hover:scale-135 transition-all duration-700 ease-out"></div>
-            
-            <!-- Diamond Luar dengan Spring Hover Physics (+10 deg dynamic tilt halus & organik) -->
-            <div class="relative w-6 h-6 sm:w-7 sm:h-7 rotate-45 rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 dark:from-blue-500 dark:via-indigo-400 dark:to-sky-300 p-[1.5px] shadow-md shadow-blue-500/25 dark:shadow-sky-400/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:rotate-[55deg] group-hover:scale-115 group-hover:shadow-xl group-hover:shadow-blue-500/40 dark:group-hover:shadow-sky-400/35">
-                <!-- Wajah Diamond Dalam (Adaptif Light/Dark) -->
-                <div class="w-full h-full bg-white dark:bg-slate-900 rounded-[5px] sm:rounded-[6px] flex items-center justify-center transition-colors duration-500">
-                    <!-- Bintang 4 Titik (Lembut Membesar & Bercahaya) -->
-                    <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-600 dark:text-sky-400 -rotate-45 group-hover:-rotate-[55deg] group-hover:scale-125 group-hover:text-blue-500 dark:group-hover:text-sky-300 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]" 
-                         fill="currentColor" 
-                         viewBox="0 0 24 24">
-                        <path d="M12 2L14.3 9.7L22 12L14.3 14.3L12 22L9.7 14.3L2 12L9.7 9.7L12 2Z"></path>
-                    </svg>
-                </div>
-            </div>
+    <!-- 3. Ornamen Tengah: Tiga Titik Bulat Berjenjang & Logo Dispusip Bersih -->
+    <div class="mx-2.5 sm:mx-4 flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+        <!-- 3 Titik Bulat Kiri (Kecil -> Sedang -> Besar) -->
+        <div class="flex items-center gap-1.5 sm:gap-2 transition-transform duration-300 ease-out group-hover:-translate-x-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-300 dark:bg-blue-400/60"></span>
+            <span class="w-2 h-2 rounded-full bg-blue-400 dark:bg-blue-400"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 dark:bg-blue-300 shadow-xs shadow-blue-500/50"></span>
         </div>
 
-        <!-- Satelit Kanan (Spring Floating Physics) -->
-        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rotate-45 rounded-[2px] bg-gradient-to-tl from-blue-600 to-sky-400 dark:from-blue-500 dark:to-sky-300 shadow-xs shadow-blue-500/40 dark:shadow-sky-400/30 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-x-1.5 group-hover:scale-125 group-hover:rotate-[35deg] group-hover:shadow-blue-400/70 dark:group-hover:shadow-sky-300/70"></span>
+        <!-- Logo Dispusip Bersih Tanpa Teks & Tanpa Badge Kaku -->
+        <div class="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-0.5">
+            <!-- Pendaran Cahaya Halus (Atmospheric Soft Glow) -->
+            <div class="absolute inset-0 rounded-full bg-blue-400/20 blur-md opacity-40 group-hover:opacity-90 group-hover:blur-lg transition-all duration-500"></div>
+            <img src="{{ asset('images/logos/dispusip-clean.png') }}" 
+                 class="relative w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.06)] group-hover:drop-shadow-[0_4px_12px_rgba(59,130,246,0.35)] transition-all duration-300 select-none" 
+                 alt="Logo Dispusip Surabaya" />
+        </div>
+
+        <!-- 3 Titik Bulat Kanan (Besar -> Sedang -> Kecil) -->
+        <div class="flex items-center gap-1.5 sm:gap-2 transition-transform duration-300 ease-out group-hover:translate-x-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 dark:bg-blue-300 shadow-xs shadow-blue-500/50"></span>
+            <span class="w-2 h-2 rounded-full bg-blue-400 dark:bg-blue-400"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-300 dark:bg-blue-400/60"></span>
+        </div>
     </div>
 
     <!-- 4. Gelombang Kanan -->

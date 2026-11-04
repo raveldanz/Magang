@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
 
     // Penerbitan Sertifikat
     Route::get('/admin/certificates', [AdminCertificateController::class, 'index'])->name('admin.certificates.index');
+    Route::get('/admin/certificates/batch-print', [AdminCertificateController::class, 'batchPrint'])->name('admin.certificates.batchPrint');
     Route::get('/admin/certificates/{placementId}/preview', [AdminCertificateController::class, 'show'])->name('admin.certificates.show');
     Route::get('/admin/certificates/{placementId}/generate', [AdminCertificateController::class, 'generate'])->name('admin.certificates.generate');
     Route::get('/admin/certificates/{placementId}/revision', [AdminCertificateController::class, 'revision'])->name('admin.certificates.revision');

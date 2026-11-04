@@ -464,4 +464,43 @@ class CertificateController extends Controller
         return redirect()->route('admin.certificates.index', ['tab' => 'settings'])
             ->with('success', "Tema Tahun {$theme->year} ({$theme->theme_name}) sekarang menjadi tema sertifikat aktif!");
     }
+
+    /**
+     * Cetak Kolektif Seluruh E-Sertifikat yang Telah Disahkan (ACC) oleh Atasan
+     */
+    public function batchPrint(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = Placement::whereHas('certificate', function ($cq) {
+            $cq->where('approval_status', 'approved');
+        })->whereHas('application', function ($aq) use ($user) {
+            $aq->where('status', 'completed');
+            if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+                $aq->where('unit_id', $user->unit_id);
+            } elseif ($user && $user->agency_profile_id !== null) {
+                $aq->whereHas('unit', fn ($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
+            }
+        })->with(['application.user', 'application.unit', 'certificate']);
+
+        if ($request->filled('unit_id')) {
+            $query->whereHas('application', fn ($aq) => $aq->where('unit_id', $request->unit_id));
+        }
+
+        $placements = $query->latest('id')->get();
+
+        if ($placements->isEmpty()) {
+            return redirect()->route('admin.certificates.index')
+                ->with('error', 'Belum ada sertifikat yang telah disahkan (ACC) oleh Atasan untuk dicetak kolektif.');
+        }
+
+        $certificatesData = [];
+        foreach ($placements as $p) {
+            $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($p->id, $user);
+            $data['certificateRecord'] = $p->certificate;
+            $certificatesData[] = $data;
+        }
+
+        return view('certificates.batch_print', compact('certificatesData'));
+    }
 }

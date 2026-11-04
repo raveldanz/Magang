@@ -146,6 +146,19 @@ class AgencyController extends Controller
             ->sortBy(fn ($p) => ($p->mentor_id || $p->pembimbing_id) ? 1 : 0)
             ->values();
 
+        // Mahasiswa yang telah menyelesaikan magang (status completed) & sertifikat kelulusan
+        $completedPlacements = Placement::with([
+            'application.user.studentProfile',
+            'application.unit',
+            'certificate',
+            'evaluation',
+        ])
+            ->whereHas('application', function ($aq) use ($unitIds) {
+                $aq->whereIn('unit_id', $unitIds)->where('status', 'completed');
+            })
+            ->latest('id')
+            ->get();
+
         // Metrik khusus dinas ini
         $totalUnits = $agency->units->count();
         $totalQuota = $agency->units->sum('quota');
@@ -172,6 +185,7 @@ class AgencyController extends Controller
             'pending_applications' => $pendingAppsCount,
             'accepted_applications' => $acceptedAppsCount,
             'active_students' => $activePlacements->count(),
+            'completed_students' => $completedPlacements->count(),
             'needs_action' => $priorities->filter(fn ($p) => $p <= Application::ACTION_THRESHOLD)->count(),
         ];
 
@@ -183,7 +197,8 @@ class AgencyController extends Controller
             'supervisorUsers',
             'mentorUsers',
             'applications',
-            'activePlacements'
+            'activePlacements',
+            'completedPlacements'
         ));
     }
 

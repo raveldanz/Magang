@@ -105,10 +105,18 @@
 
                 <!-- Kontainer Tabel Mahasiswa -->
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                    <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-base font-bold text-gray-900">Mahasiswa Memenuhi Kriteria Kelulusan</h3>
                             <p class="text-xs text-gray-500 mt-0.5">Seluruh laporan akhir telah disetujui dan nilai evaluasi lengkap</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('admin.certificates.batchPrint') }}" target="_blank" 
+                               class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+                               title="Buka seluruh sertifikat yang telah disahkan (ACC) untuk dicetak serentak dalam 1 berkas">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                <span>Cetak Semua Ter-ACC</span>
+                            </a>
                         </div>
                     </div>
 
@@ -540,60 +548,123 @@
                                     <span class="text-[10px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-bold">Halaman 1</span>
                                 </div>
 
-                                <!-- Box Visual Mini Sertifikat -->
-                                <div id="previewCard" class="relative w-full aspect-[297/210] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-3 select-none text-[8px] leading-tight">
-                                    <!-- Aksen Top & Bottom -->
-                                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-400 to-amber-500"></div>
-                                    <div id="previewAccentBottom" class="absolute bottom-0 left-0 right-0 h-1.5" style="background-color: {{ $activeTheme->accent_color ?? '#D97706' }};"></div>
+                                <!-- Box Visual Mini Sertifikat Presisi (Replika Halaman 1) -->
+                                @php
+                                    $pPal = method_exists($activeTheme, 'getPrimaryPalette') ? $activeTheme->getPrimaryPalette() : [
+                                        'darkest' => '#004958', 'darker' => '#006a7f', 'dark' => '#0086a1',
+                                        'base' => $activeTheme->primary_color ?? '#00A3C4', 'medium' => '#40bad3', 'light' => '#80d1e2'
+                                    ];
+                                    $sPal = method_exists($activeTheme, 'getSecondaryPalette') ? $activeTheme->getSecondaryPalette() : [
+                                        'darkest' => '#6d320f', 'darker' => '#9e4815', 'dark' => '#c75b1b',
+                                        'base' => $activeTheme->secondary_color ?? '#F36F21', 'medium' => '#f69359', 'light' => '#f9b790'
+                                    ];
+                                @endphp
+                                <div id="previewCard" class="relative w-full aspect-[297/210] bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-2 select-none text-[8px] leading-tight" style="font-family: 'Times New Roman', Times, serif;">
+                                    
+                                    <!-- Dynamic SVG Vector Artwork -->
+                                    <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- Top Stripe -->
+                                        <rect id="prevTopStripe" x="52" y="0" width="245" height="3.5" fill="{{ $pPal['darkest'] }}" />
+                                        
+                                        <!-- Top Left Mosaic -->
+                                        <rect id="prevP_0_0" x="0" y="0" width="10.4" height="10.4" fill="{{ $pPal['darker'] }}" />
+                                        <rect id="prevP_0_1" x="0" y="10.4" width="10.4" height="10.4" fill="{{ $pPal['base'] }}" />
+                                        <polygon id="prevP_0_2" points="0,20.8 10.4,20.8 0,31.2" fill="{{ $pPal['darkest'] }}" />
+                                        <rect id="prevP_0_3" x="0" y="31.2" width="10.4" height="10.4" fill="{{ $pPal['medium'] }}" />
+                                        <polygon id="prevP_0_4" points="0,41.6 10.4,41.6 0,52.0" fill="{{ $pPal['light'] }}" />
 
-                                    <!-- Top Left Mini Polygon -->
-                                    <div class="absolute top-0 left-0 w-16 h-16 pointer-events-none">
-                                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                                            <polygon id="prevPoly1" points="0,0 60,0 30,30 0,30" fill="{{ $activeTheme->primary_color ?? '#00A3C4' }}"/>
-                                            <polygon points="30,30 60,0 80,20 50,50" fill="#0284C7"/>
-                                            <polygon points="0,30 30,30 15,60 0,45" fill="#0369A1"/>
-                                        </svg>
-                                    </div>
+                                        <rect id="prevP_1_0" x="10.4" y="0" width="10.4" height="10.4" fill="{{ $pPal['darkest'] }}" />
+                                        <polygon id="prevP_1_1a" points="10.4,10.4 20.8,10.4 20.8,20.8" fill="{{ $pPal['dark'] }}" />
+                                        <polygon id="prevP_1_1b" points="10.4,10.4 20.8,20.8 10.4,20.8" fill="{{ $pPal['medium'] }}" />
+                                        <rect id="prevP_1_2" x="10.4" y="20.8" width="10.4" height="10.4" fill="{{ $pPal['base'] }}" />
+                                        <polygon id="prevP_1_3" points="10.4,31.2 20.8,31.2 10.4,41.6" fill="{{ $pPal['light'] }}" />
 
-                                    <!-- Bottom Right Mini Polygon -->
-                                    <div class="absolute bottom-0 right-0 w-16 h-16 pointer-events-none">
-                                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                                            <polygon id="prevPoly2" points="100,100 100,60 80,60 80,80 60,80 60,100" fill="{{ $activeTheme->secondary_color ?? '#F36F21' }}"/>
-                                            <polygon points="80,60 80,40 60,40 60,60" fill="#EA580C"/>
-                                            <polygon points="60,80 60,60 40,60 40,80" fill="#F97316"/>
-                                        </svg>
-                                    </div>
+                                        <rect id="prevP_2_0" x="20.8" y="0" width="10.4" height="10.4" fill="{{ $pPal['dark'] }}" />
+                                        <polygon id="prevP_2_1a" points="20.8,10.4 31.2,10.4 20.8,20.8" fill="{{ $pPal['base'] }}" />
+                                        <polygon id="prevP_2_1b" points="20.8,20.8 31.2,10.4 31.2,20.8" fill="{{ $pPal['light'] }}" />
+                                        <polygon id="prevP_2_2" points="20.8,20.8 31.2,20.8 20.8,31.2" fill="{{ $pPal['medium'] }}" />
+
+                                        <polygon id="prevP_3_0" points="31.2,0 41.6,0 31.2,10.4" fill="{{ $pPal['darkest'] }}" />
+                                        <polygon id="prevP_3_1" points="31.2,10.4 41.6,10.4 31.2,20.8" fill="{{ $pPal['medium'] }}" />
+
+                                        <polygon id="prevP_4_0" points="41.6,0 52.0,0 41.6,10.4" fill="{{ $pPal['dark'] }}" />
+
+                                        <!-- Top Left Waves -->
+                                        <g id="prevWaveP" fill="none" stroke="{{ $pPal['medium'] }}" stroke-width="0.35">
+                                            <path d="M 0,46 C 12,82 28,120 0,160" opacity="0.3" />
+                                            <path d="M 0,49 C 18,85 34,123 0,166" opacity="0.35" />
+                                            <path d="M 0,52 C 24,88 40,126 0,172" opacity="0.4" />
+                                            <path d="M 0,55 C 30,91 46,129 0,181" opacity="0.45" />
+                                            <path d="M 0,58 C 36,94 52,134 0,192" opacity="0.5" />
+                                        </g>
+
+                                        <!-- Bottom Right Stepped Cascade -->
+                                        <rect id="prevS_4_0" x="286.6" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['darker'] }}" />
+                                        <rect id="prevS_4_1" x="286.6" y="189.2" width="10.4" height="10.4" fill="{{ $sPal['darkest'] }}" />
+                                        <rect id="prevS_4_2" x="286.6" y="178.8" width="10.4" height="10.4" fill="{{ $sPal['darkest'] }}" />
+                                        <rect id="prevS_4_3" x="286.6" y="168.4" width="10.4" height="10.4" fill="{{ $sPal['darker'] }}" />
+                                        <polygon id="prevS_4_4" points="286.6,168.4 297,168.4 297,158.0" fill="{{ $sPal['darkest'] }}" />
+
+                                        <rect id="prevS_3_0" x="276.2" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['dark'] }}" />
+                                        <polygon id="prevS_3_1a" points="276.2,189.2 286.6,189.2 286.6,199.6" fill="{{ $sPal['dark'] }}" />
+                                        <polygon id="prevS_3_1b" points="276.2,189.2 286.6,199.6 276.2,199.6" fill="{{ $sPal['base'] }}" />
+                                        <rect id="prevS_3_2" x="276.2" y="178.8" width="10.4" height="10.4" fill="{{ $sPal['dark'] }}" />
+                                        <polygon id="prevS_3_3" points="276.2,178.8 286.6,178.8 286.6,168.4" fill="{{ $sPal['dark'] }}" />
+
+                                        <rect id="prevS_2_0" x="265.8" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['base'] }}" />
+                                        <polygon id="prevS_2_1a" points="265.8,189.2 276.2,189.2 265.8,199.6" fill="{{ $sPal['base'] }}" />
+                                        <polygon id="prevS_2_1b" points="265.8,199.6 276.2,189.2 276.2,199.6" fill="{{ $sPal['medium'] }}" />
+                                        <polygon id="prevS_2_2" points="265.8,189.2 276.2,189.2 276.2,178.8" fill="{{ $sPal['base'] }}" />
+
+                                        <rect id="prevS_1_0" x="255.4" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['medium'] }}" />
+                                        <polygon id="prevS_1_1" points="255.4,199.6 265.8,199.6 265.8,189.2" fill="{{ $sPal['medium'] }}" />
+
+                                        <polygon id="prevS_0_0" points="245.0,210.0 255.4,210.0 255.4,199.6" fill="{{ $sPal['light'] }}" />
+
+                                        <!-- Bottom Right Waves -->
+                                        <g id="prevWaveS" fill="none" stroke="{{ $sPal['medium'] }}" stroke-width="0.35">
+                                            <path d="M 297,165 C 270,128 258,85 297,42" opacity="0.3" />
+                                            <path d="M 297,170 C 262,120 250,77 297,54" opacity="0.35" />
+                                            <path d="M 297,175 C 256,114 244,71 297,63" opacity="0.4" />
+                                            <path d="M 297,180 C 250,108 238,65 297,74" opacity="0.45" />
+                                            <path d="M 297,185 C 248,106 236,63 297,78" opacity="0.5" />
+                                        </g>
+                                    </svg>
 
                                     <!-- Mini Header Logos -->
-                                    <div class="relative z-10 flex items-center justify-center gap-1.5 pt-1">
+                                    <div class="relative z-10 flex items-center justify-center gap-2 pt-1">
                                         <img src="{{ asset('images/certificates/logo_surabaya.webp') }}" class="h-4 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
                                         <img src="{{ asset('images/certificates/logo_dispusip.jpg') }}" class="h-4 w-auto object-contain">
                                         <img src="{{ asset('images/certificates/logo_berakhlak.png') }}" class="h-3 w-auto object-contain">
-                                        <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" class="h-3 w-auto object-contain">
+                                        <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" class="h-2.5 w-auto object-contain">
                                         <img src="{{ asset('images/certificates/logo_zona_integritas.png') }}" class="h-3 w-auto object-contain">
                                     </div>
 
                                     <!-- Mini Body Text -->
                                     <div class="relative z-10 text-center my-auto space-y-0.5">
-                                        <div class="font-black text-[10px] tracking-wider uppercase font-serif-title text-slate-900">SERTIFIKAT MAGANG</div>
-                                        <div class="text-[6.5px] font-mono text-slate-600">Nomor : 400.14.5.4/4692/436.7.17/<span id="prevYearText">{{ $activeTheme->year ?? date('Y') }}</span></div>
-                                        <div class="font-extrabold text-[11px] text-slate-950 pt-1">Achmad Dhafa Sholahudin F</div>
-                                        <div class="text-[6.5px] text-slate-600">Universitas 17 Agustus 1945 Surabaya</div>
-                                        <div class="text-[6.5px] text-slate-700 italic pt-0.5">Atas partisipasinya dalam mengikuti kerja magang di Dispusip Surabaya</div>
+                                        <div class="font-bold text-[10.5px] tracking-[0.05em] uppercase text-black" style="font-family: 'Times New Roman', Times, serif;">SERTIFIKAT</div>
+                                        <div class="font-bold text-[7px] tracking-[0.16em] uppercase text-black" style="font-family: 'Times New Roman', Times, serif;">MAGANG</div>
+                                        <div class="text-[6.5px] font-bold text-black" style="font-family: 'Times New Roman', Times, serif;">Nomor : 400.14.5.4/4692/436.7.17/<span id="prevYearText">{{ $activeTheme->year ?? date('Y') }}</span></div>
+                                        <div class="pt-1">
+                                            <span class="inline-block border-b border-black pb-0.5 font-bold text-[10px] text-black">Achmad Dhafa Sholahudin F</span>
+                                        </div>
+                                        <div class="text-[6px] text-black">Mahasiswa Program Studi Manajemen Fakultas Ekonomi dan Bisnis</div>
+                                        <div class="text-[6px] text-black">Universitas 17 Agustus 1945 Surabaya</div>
+                                        <div class="text-[6px] text-black italic pt-0.5">10 Agustus {{ $activeTheme->year ?? date('Y') }} s.d. 10 Oktober {{ $activeTheme->year ?? date('Y') }}</div>
                                     </div>
 
                                     <!-- Mini TTE Box -->
-                                    <div class="relative z-10 flex flex-col items-center pb-1">
-                                        <div class="text-[6px] text-slate-700" id="prevCityDateText">{{ $activeTheme->city ?? 'Surabaya' }}, 27 Oktober {{ $activeTheme->year ?? date('Y') }}</div>
-                                        <div class="text-[6px] font-semibold text-slate-800" id="prevMandateText">{{ $activeTheme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}</div>
-                                        <div class="mt-1 flex items-center gap-1.5 p-1 bg-white border border-slate-900 text-left w-44">
+                                    <div class="relative z-10 flex flex-col items-center pb-0.5">
+                                        <div class="text-[5.5px] text-black" id="prevCityDateText">{{ $activeTheme->city ?? 'Surabaya' }}, 27 Oktober {{ $activeTheme->year ?? date('Y') }}</div>
+                                        <div class="text-[5.5px] text-black" id="prevMandateText">{{ $activeTheme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}</div>
+                                        <div class="mt-0.5 flex items-center gap-1.5 p-1 bg-white border border-black text-left w-48 shadow-2xs">
                                             <div class="w-6 h-6 border border-slate-300 flex items-center justify-center shrink-0 bg-white">
                                                 <div class="w-2.5 h-2.5 bg-blue-600 rounded-2xs"></div>
                                             </div>
-                                            <div class="text-[5.5px] leading-tight text-slate-900 flex-1">
-                                                <div class="text-[5px] text-slate-500">Ditandatangani secara elektronik:</div>
-                                                <div class="font-bold text-[6.5px]" id="prevSigneeName">{{ $activeTheme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
-                                                <div class="text-[5px] text-slate-600" id="prevSigneePos">{{ $activeTheme->signee_position ?? 'Sekretaris' }}</div>
+                                            <div class="text-[5.5px] leading-tight text-black flex-1 font-sans">
+                                                <div class="text-[4.5px] text-slate-500">Ditandatangani secara elektronik:</div>
+                                                <div class="font-bold text-[6px] text-black" id="prevSigneeName">{{ $activeTheme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
+                                                <div class="text-[4.5px] text-slate-600" id="prevSigneePos">{{ $activeTheme->signee_position ?? 'Sekretaris' }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -614,26 +685,34 @@
                                 <div class="space-y-2 max-h-60 overflow-y-auto">
                                     @forelse($allThemes as $t)
                                         <div class="p-3 rounded-2xl border {{ $t->is_active ? 'border-blue-400 bg-blue-50/40' : 'border-slate-200 bg-white' }} flex items-center justify-between gap-2">
-                                            <div>
-                                                <div class="flex items-center gap-1.5">
-                                                    <span class="w-3 h-3 rounded-full" style="background-color: {{ $t->primary_color }};"></span>
-                                                    <span class="w-3 h-3 rounded-full" style="background-color: {{ $t->secondary_color }};"></span>
+                                            <div class="min-w-0 flex-1">
+                                                <div class="flex items-center gap-1.5 flex-wrap">
+                                                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $t->primary_color }};"></span>
+                                                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $t->secondary_color }};"></span>
                                                     <span class="font-bold text-xs text-slate-800">Tahun {{ $t->year }}</span>
                                                     @if($t->is_active)
                                                         <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-blue-600 text-white">AKTIF</span>
                                                     @endif
                                                 </div>
-                                                <div class="text-[10.5px] text-slate-500 mt-0.5">{{ $t->theme_name }}</div>
+                                                <div class="text-[10.5px] text-slate-500 mt-0.5 truncate">{{ $t->theme_name }}</div>
                                             </div>
 
-                                            @if(!$t->is_active)
-                                                <form action="{{ route('admin.certificates.activateTheme', $t->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 text-[10.5px] font-bold rounded-lg transition cursor-pointer">
-                                                        Aktifkan
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            <div class="flex items-center gap-1.5 shrink-0">
+                                                <button type="button" 
+                                                        onclick="loadThemeData({{ json_encode($t) }})"
+                                                        class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10.5px] font-bold rounded-lg transition cursor-pointer"
+                                                        title="Muat data tema tahun {{ $t->year }} ke form editor">
+                                                    Edit
+                                                </button>
+                                                @if(!$t->is_active)
+                                                    <form action="{{ route('admin.certificates.activateTheme', $t->id) }}" method="POST" class="m-0">
+                                                        @csrf
+                                                        <button type="submit" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 text-[10.5px] font-bold rounded-lg transition cursor-pointer">
+                                                            Aktifkan
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
                                         </div>
                                     @empty
                                         <p class="text-xs text-slate-400 text-center py-2">Belum ada riwayat tema lain.</p>
@@ -653,6 +732,42 @@
 
     @push('scripts')
     <script>
+        function loadThemeData(theme) {
+            if (!theme) return;
+            if (theme.year) document.getElementById('year').value = theme.year;
+            if (theme.theme_name) document.getElementById('theme_name').value = theme.theme_name;
+            if (theme.primary_color) {
+                document.getElementById('primary_color').value = theme.primary_color;
+                document.getElementById('primary_color_picker').value = theme.primary_color;
+            }
+            if (theme.secondary_color) {
+                document.getElementById('secondary_color').value = theme.secondary_color;
+                document.getElementById('secondary_color_picker').value = theme.secondary_color;
+            }
+            if (theme.accent_color) {
+                document.getElementById('accent_color').value = theme.accent_color;
+                document.getElementById('accent_color_picker').value = theme.accent_color;
+            }
+            if (theme.number_format_pattern && document.getElementById('number_format_pattern')) {
+                document.getElementById('number_format_pattern').value = theme.number_format_pattern;
+            }
+            if (theme.signee_name) document.getElementById('signee_name').value = theme.signee_name;
+            if (theme.signee_position) document.getElementById('signee_position').value = theme.signee_position;
+            if (theme.signee_rank && document.getElementById('signee_rank')) {
+                document.getElementById('signee_rank').value = theme.signee_rank;
+            }
+            if (theme.signee_nip && document.getElementById('signee_nip')) {
+                document.getElementById('signee_nip').value = theme.signee_nip;
+            }
+            if (theme.mandate_text && document.getElementById('mandate_text')) {
+                document.getElementById('mandate_text').value = theme.mandate_text;
+            }
+            if (theme.city && document.getElementById('city')) {
+                document.getElementById('city').value = theme.city;
+            }
+            updateLivePreview();
+        }
+
         function applyPreset(name, primary, secondary, accent) {
             document.getElementById('theme_name').value = name;
             document.getElementById('primary_color').value = primary;
@@ -664,25 +779,108 @@
             updateLivePreview();
         }
 
+        function adjustBrightnessJs(hex, percent) {
+            hex = (hex || '#000000').replace('#', '');
+            if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            var r = parseInt(hex.substring(0, 2), 16) || 0;
+            var g = parseInt(hex.substring(2, 4), 16) || 0;
+            var b = parseInt(hex.substring(4, 6), 16) || 0;
+            if (percent < 0) {
+                var factor = 1 + (percent / 100);
+                r = Math.max(0, Math.min(255, Math.round(r * factor)));
+                g = Math.max(0, Math.min(255, Math.round(g * factor)));
+                b = Math.max(0, Math.min(255, Math.round(b * factor)));
+            } else {
+                var factor = percent / 100;
+                r = Math.max(0, Math.min(255, Math.round(r + (255 - r) * factor)));
+                g = Math.max(0, Math.min(255, Math.round(g + (255 - g) * factor)));
+                b = Math.max(0, Math.min(255, Math.round(b + (255 - b) * factor)));
+            }
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
         function updateLivePreview() {
-            var primary = document.getElementById('primary_color').value;
-            var secondary = document.getElementById('secondary_color').value;
-            var accent = document.getElementById('accent_color').value;
+            var primary = document.getElementById('primary_color').value || '#00A3C4';
+            var secondary = document.getElementById('secondary_color').value || '#F36F21';
+            var accent = document.getElementById('accent_color').value || '#D97706';
             var year = document.getElementById('year').value;
             var signeeName = document.getElementById('signee_name').value;
             var signeePos = document.getElementById('signee_position').value;
             var mandate = document.getElementById('mandate_text').value;
             var city = document.getElementById('city').value;
 
-            var p1 = document.getElementById('prevPoly1');
-            if (p1) p1.setAttribute('fill', primary);
+            // Palet Primer Dinamis
+            var pDarkest = adjustBrightnessJs(primary, -55);
+            var pDarker  = adjustBrightnessJs(primary, -35);
+            var pDark    = adjustBrightnessJs(primary, -18);
+            var pBase    = primary;
+            var pMedium  = adjustBrightnessJs(primary, 25);
+            var pLight   = adjustBrightnessJs(primary, 50);
 
-            var p2 = document.getElementById('prevPoly2');
-            if (p2) p2.setAttribute('fill', secondary);
+            // Palet Sekunder Dinamis
+            var sDarkest = adjustBrightnessJs(secondary, -55);
+            var sDarker  = adjustBrightnessJs(secondary, -35);
+            var sDark    = adjustBrightnessJs(secondary, -18);
+            var sBase    = secondary;
+            var sMedium  = adjustBrightnessJs(secondary, 25);
+            var sLight   = adjustBrightnessJs(secondary, 50);
 
-            var ab = document.getElementById('previewAccentBottom');
-            if (ab) ab.style.backgroundColor = accent;
+            // Update Top Stripe
+            var topStripe = document.getElementById('prevTopStripe');
+            if (topStripe) topStripe.setAttribute('fill', pDarkest);
 
+            // Update Top Left Mosaic Polygons
+            var p0_0 = document.getElementById('prevP_0_0'); if (p0_0) p0_0.setAttribute('fill', pDarker);
+            var p0_1 = document.getElementById('prevP_0_1'); if (p0_1) p0_1.setAttribute('fill', pBase);
+            var p0_2 = document.getElementById('prevP_0_2'); if (p0_2) p0_2.setAttribute('fill', pDarkest);
+            var p0_3 = document.getElementById('prevP_0_3'); if (p0_3) p0_3.setAttribute('fill', pMedium);
+            var p0_4 = document.getElementById('prevP_0_4'); if (p0_4) p0_4.setAttribute('fill', pLight);
+
+            var p1_0 = document.getElementById('prevP_1_0'); if (p1_0) p1_0.setAttribute('fill', pDarkest);
+            var p1_1a = document.getElementById('prevP_1_1a'); if (p1_1a) p1_1a.setAttribute('fill', pDark);
+            var p1_1b = document.getElementById('prevP_1_1b'); if (p1_1b) p1_1b.setAttribute('fill', pMedium);
+            var p1_2 = document.getElementById('prevP_1_2'); if (p1_2) p1_2.setAttribute('fill', pBase);
+            var p1_3 = document.getElementById('prevP_1_3'); if (p1_3) p1_3.setAttribute('fill', pLight);
+
+            var p2_0 = document.getElementById('prevP_2_0'); if (p2_0) p2_0.setAttribute('fill', pDark);
+            var p2_1a = document.getElementById('prevP_2_1a'); if (p2_1a) p2_1a.setAttribute('fill', pBase);
+            var p2_1b = document.getElementById('prevP_2_1b'); if (p2_1b) p2_1b.setAttribute('fill', pLight);
+            var p2_2 = document.getElementById('prevP_2_2'); if (p2_2) p2_2.setAttribute('fill', pMedium);
+
+            var p3_0 = document.getElementById('prevP_3_0'); if (p3_0) p3_0.setAttribute('fill', pDarkest);
+            var p3_1 = document.getElementById('prevP_3_1'); if (p3_1) p3_1.setAttribute('fill', pMedium);
+            var p4_0 = document.getElementById('prevP_4_0'); if (p4_0) p4_0.setAttribute('fill', pDark);
+
+            var waveP = document.getElementById('prevWaveP');
+            if (waveP) waveP.setAttribute('stroke', pMedium);
+
+            // Update Bottom Right Stepped Cascade
+            var s4_0 = document.getElementById('prevS_4_0'); if (s4_0) s4_0.setAttribute('fill', sDarker);
+            var s4_1 = document.getElementById('prevS_4_1'); if (s4_1) s4_1.setAttribute('fill', sDarkest);
+            var s4_2 = document.getElementById('prevS_4_2'); if (s4_2) s4_2.setAttribute('fill', sDarkest);
+            var s4_3 = document.getElementById('prevS_4_3'); if (s4_3) s4_3.setAttribute('fill', sDarker);
+            var s4_4 = document.getElementById('prevS_4_4'); if (s4_4) s4_4.setAttribute('fill', sDarkest);
+
+            var s3_0 = document.getElementById('prevS_3_0'); if (s3_0) s3_0.setAttribute('fill', sDark);
+            var s3_1a = document.getElementById('prevS_3_1a'); if (s3_1a) s3_1a.setAttribute('fill', sDark);
+            var s3_1b = document.getElementById('prevS_3_1b'); if (s3_1b) s3_1b.setAttribute('fill', sBase);
+            var s3_2 = document.getElementById('prevS_3_2'); if (s3_2) s3_2.setAttribute('fill', sDark);
+            var s3_3 = document.getElementById('prevS_3_3'); if (s3_3) s3_3.setAttribute('fill', sDark);
+
+            var s2_0 = document.getElementById('prevS_2_0'); if (s2_0) s2_0.setAttribute('fill', sBase);
+            var s2_1a = document.getElementById('prevS_2_1a'); if (s2_1a) s2_1a.setAttribute('fill', sBase);
+            var s2_1b = document.getElementById('prevS_2_1b'); if (s2_1b) s2_1b.setAttribute('fill', sMedium);
+            var s2_2 = document.getElementById('prevS_2_2'); if (s2_2) s2_2.setAttribute('fill', sBase);
+
+            var s1_0 = document.getElementById('prevS_1_0'); if (s1_0) s1_0.setAttribute('fill', sMedium);
+            var s1_1 = document.getElementById('prevS_1_1'); if (s1_1) s1_1.setAttribute('fill', sMedium);
+
+            var s0_0 = document.getElementById('prevS_0_0'); if (s0_0) s0_0.setAttribute('fill', sLight);
+
+            var waveS = document.getElementById('prevWaveS');
+            if (waveS) waveS.setAttribute('stroke', sMedium);
+
+            // Update Text Data
             var yr = document.getElementById('prevYearText');
             if (yr) yr.textContent = year;
 
@@ -696,7 +894,7 @@
             if (md) md.textContent = mandate;
 
             var cd = document.getElementById('prevCityDateText');
-            if (cd) cd.textContent = city + ', 27 Oktober ' + year;
+            if (cd) cd.textContent = (city || 'Surabaya') + ', 27 Oktober ' + year;
         }
     </script>
     @endpush
