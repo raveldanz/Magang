@@ -18,7 +18,8 @@
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen flex flex-col justify-between">
+    <body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 h-screen h-[100dvh] overflow-hidden flex flex-col justify-between"
+          x-data="{ mobileMenuOpen: false, openQuotaModal: false }">
 
         @php
             $dispusip = \App\Models\AgencyProfile::first();
@@ -34,22 +35,13 @@
             $uPenyelamatanArsip = $units->first(fn($u) => str_contains(strtolower($u->name), 'penyelamatan kearsipan') || str_contains(strtolower($u->name), 'preservasi'));
         @endphp
 
-        <!-- Styles Khusus Responsif & Alpine Cloak -->
         <style>
             [x-cloak] { display: none !important; }
-            @media (min-width: 1024px) {
-                .dispusip-address-desktop { display: flex !important; }
-                .dispusip-address-mobile { display: none !important; }
-            }
-            @media (max-width: 1023.98px) {
-                .dispusip-address-desktop { display: none !important; }
-                .dispusip-address-mobile { display: flex !important; }
-            }
         </style>
 
-        <!-- Header Navigasi dengan Dukungan Hamburger Menu Responsif di Mobile -->
-        <header x-data="{ mobileMenuOpen: false }" class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shrink-0">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <!-- Header Navigasi -->
+        <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shrink-0">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
                 
                 <!-- Logo & Brand Dispusip Surabaya -->
                 <a href="{{ url('/') }}" class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1 sm:flex-initial group" title="Portal Magang Dispusip Kota Surabaya">
@@ -68,14 +60,11 @@
                             Dinas Perpustakaan dan Kearsipan Kota Surabaya
                         </span>
 
-                        <!-- Tampilan Mobile (< md): Adaptif saat menu ditutup vs dibuka -->
+                        <!-- Mobile View (< md) -->
                         <div class="md:hidden">
-                            <!-- Saat menu DITUTUP: Teks 1 baris standar truncate -->
                             <span x-show="!mobileMenuOpen" class="text-[10px] font-bold text-blue-700 tracking-tight uppercase truncate block">
                                 Dinas Perpustakaan dan Kearsipan Kota Surabaya
                             </span>
-
-                            <!-- Saat menu DIBUKA (Sesuai Permintaan Pengguna): Di-spasi ke bawah dengan 'Kota Surabaya' di baris kedua -->
                             <div x-show="mobileMenuOpen" x-cloak class="flex flex-col leading-tight">
                                 <span class="text-[9.5px] font-bold text-blue-700 tracking-tight uppercase">Dinas Perpustakaan dan Kearsipan</span>
                                 <span class="text-[9px] font-extrabold text-blue-600 tracking-tight uppercase">Kota Surabaya</span>
@@ -94,13 +83,11 @@
                     </a>
 
                     @auth
-                        <!-- Jika Sudah Login: Tombol Berubah Menjadi Dashboard dengan Style Awal -->
                         <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <span>Dashboard</span>
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     @else
-                        <!-- Jika Belum Login: Tombol Masuk & Daftar Sesuai Desain Awal -->
                         <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
                             Masuk
                         </a>
@@ -111,19 +98,16 @@
                     @endauth
                 </div>
 
-                <!-- Mobile Hamburger Button (Hanya Tampil di Layar Kecil < md) -->
+                <!-- Mobile Hamburger Button -->
                 <div class="flex items-center md:hidden shrink-0 ml-2">
                     <button type="button" 
                             @click="mobileMenuOpen = !mobileMenuOpen" 
-                            class="inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all border border-slate-200/80 shadow-2xs"
-                            aria-label="Toggle navigasi menu"
-                            :aria-expanded="mobileMenuOpen">
-                        <!-- Icon Garis 3 (Burger) Saat Menu Tertutup -->
-                        <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-slate-100 focus:outline-none transition-all border border-slate-200/80 shadow-2xs"
+                            aria-label="Toggle navigasi menu">
+                        <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                        <!-- Icon Silang (X) Saat Menu Terbuka -->
-                        <svg x-show="mobileMenuOpen" x-cloak class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg x-show="mobileMenuOpen" x-cloak class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -131,7 +115,7 @@
 
             </div>
 
-            <!-- Mobile Menu Dropdown Panel (Clean, Modern & Lega) -->
+            <!-- Mobile Menu Dropdown Panel -->
             <div x-show="mobileMenuOpen" 
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
@@ -140,41 +124,35 @@
                  x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                  x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
                  x-cloak
-                 class="md:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-xl space-y-4">
-                
-                <!-- Navigasi Menu Mobile -->
+                 class="md:hidden border-b border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-5 shadow-xl space-y-3">
                 <div class="space-y-1">
                     <a href="{{ url('/') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
-                        <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                       class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
+                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         <span>Beranda Utama</span>
                     </a>
                     <a href="{{ route('public.projects.index') }}" 
-                       class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
+                       class="flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:text-blue-600 hover:bg-blue-50/70 transition">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                             <span>Proyek Dinas</span>
                         </div>
-                        <span class="px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 rounded-full">Katalog</span>
+                        <span class="px-2 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-700 rounded-full">Katalog</span>
                     </a>
                 </div>
 
-                <!-- Garis Pemisah -->
                 <div class="h-px bg-slate-100"></div>
 
-                <!-- Tombol Aksi Autentikasi Mobile -->
-                <div class="space-y-2 pt-1">
+                <div class="space-y-2 pt-0.5">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
+                        <a href="{{ route('dashboard') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <span>Buka Dashboard</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     @else
-                        <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
+                        <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <span>Daftar Magang</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
-                        <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
+                        <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
                             Masuk ke Akun
                         </a>
                     @endauth
@@ -182,57 +160,83 @@
             </div>
         </header>
 
-        <!-- Main Hero Section (2-Column Grid on Desktop) -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto py-8 sm:py-12">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <!-- Main Content (Pas 1 Layar Penuh di Mobile & Desktop) -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-0">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center w-full">
                 
-                <!-- Kolom Kiri: Hero & Action -->
-                <div class="lg:col-span-7 space-y-6 text-left">
+                <!-- Kolom Kiri: Card Compact di Mobile, Elegan di Desktop -->
+                <div class="lg:col-span-7 w-full">
+                    <div class="bg-white lg:bg-transparent rounded-3xl lg:rounded-none p-5 sm:p-7 lg:p-0 shadow-md shadow-slate-200/50 lg:shadow-none border border-slate-200/80 lg:border-none space-y-3 sm:space-y-4 lg:space-y-6">
+                        
+                        <!-- Pemicu Sisa Kuota -->
+                        <div>
+                            <!-- Desktop: Badge Statis -->
+                            <span class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-lg shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span>Sisa Kuota: {{ $totalRemaining }} Kursi</span>
+                            </span>
 
-                    <!-- Headline Utama -->
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
-                        Wujudkan Pengalaman Kerja Nyata di <span class="text-blue-600 inline-block">Dispusip Surabaya</span>
-                    </h1>
-
-                    <!-- Deskripsi Sistem Informasi Resmi (Tanpa Style Bold) -->
-                    <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
-                        Sistem Informasi Resmi Pelaksanaan Magang dan Praktik Kerja Lapangan (PKL) di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya. Bergabunglah dalam transformasi layanan otomasi perpustakaan modern, preservasi arsip digital, dan pembudayaan literasi masyarakat.
-                    </p>
-
-                    <!-- Tombol Aksi Utama -->
-                    <div class="flex flex-col sm:flex-row items-center justify-start gap-3.5 pt-2">
-                        @auth
-                            <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-7 py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
-                                <span>Pindah ke Dashboard</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </a>
-                        @else
-                            <a href="{{ route('register') }}" class="w-full sm:w-auto px-7 py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
-                                <span>Daftar Magang Sekarang</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </a>
-                            <a href="{{ route('login') }}" class="w-full sm:w-auto px-6 py-3.5 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center shadow-2xs">
-                                Masuk ke Akun
-                            </a>
-                        @endauth
-                    </div>
-
-                    <!-- Info Kedinasan Dispusip (Desktop: Tetap di kolom kiri bawah tombol aksi) -->
-                    <div class="dispusip-address-desktop pt-3 border-t border-slate-200/80 flex-wrap items-center gap-y-2 gap-x-4 text-xs text-slate-500">
-                        <div class="flex items-center gap-1.5 font-medium">
-                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span>Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya</span>
+                            <!-- Mobile: Banner Interaktif Pop-up Kuota -->
+                            <button type="button" 
+                                    @click="openQuotaModal = true"
+                                    class="w-full lg:hidden flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50/50 to-blue-50/40 border border-emerald-200/80 active:scale-[0.98] transition cursor-pointer text-left">
+                                <div class="flex items-center gap-2">
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    <div>
+                                        <p class="text-xs font-extrabold text-slate-800 leading-tight">Sisa Kuota: {{ $totalRemaining }} Kursi Tersedia</p>
+                                        <p class="text-[10px] text-slate-500 font-medium">Klik untuk rincian 4 bidang magang</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">Lihat</span>
+                            </button>
                         </div>
-                        <div class="flex items-center gap-1.5 font-medium">
-                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                            <span>(031) 8707329</span>
-                        </div>
-                    </div>
 
+                        <!-- Headline Utama -->
+                        <h1 class="text-2xl sm:text-3xl lg:text-[44px] xl:text-5xl font-black tracking-tight text-slate-900 leading-[1.14]">
+                            Wujudkan Pengalaman Kerja Nyata di <span class="text-blue-600 inline-block">Dispusip Surabaya</span>
+                        </h1>
+
+                        <!-- Deskripsi Sistem Informasi Resmi -->
+                        <p class="text-xs sm:text-sm lg:text-sm text-slate-600 leading-relaxed max-w-2xl">
+                            Sistem Informasi Resmi Pelaksanaan Magang dan Praktik Kerja Lapangan (PKL) di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya. Bergabunglah dalam transformasi layanan otomasi perpustakaan modern, preservasi arsip digital, dan pembudayaan literasi masyarakat.
+                        </p>
+
+                        <!-- Tombol Aksi Utama -->
+                        <div class="flex flex-col sm:flex-row items-center justify-start gap-3 pt-1">
+                            @auth
+                                <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
+                                    <span>Pindah ke Dashboard</span>
+                                </a>
+                            @else
+                                <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
+                                    <span>Daftar Magang Sekarang</span>
+                                </a>
+                                <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center shadow-2xs">
+                                    Masuk ke Akun
+                                </a>
+                            @endauth
+                        </div>
+
+                        <!-- Info Kedinasan Dispusip (Alamat Siola) -->
+                        <div class="pt-3 border-t border-slate-100 lg:border-slate-200/80 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-x-4 text-xs text-slate-500">
+                            <div class="flex items-center gap-1.5 font-medium">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 font-medium">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                <span>(031) 8707329</span>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
-                <!-- Kolom Kanan: Kartu Bidang Magang Resmi Dispusip -->
-                <div class="lg:col-span-5 w-full">
+                <!-- Kolom Kanan: 4 Bidang Magang (Tampil di Desktop, Otomatis Dialihkan ke Pop-up Modal di Mobile) -->
+                <div class="hidden lg:block lg:col-span-5 w-full">
                     <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-slate-200/60 border border-slate-200/90 space-y-4">
                         
                         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -340,6 +344,112 @@
                 </div>
             </div>
         </footer>
+
+        <!-- MODAL POPUP SISA KUOTA (Dipanggil saat menekan tombol kuota di mobile) -->
+        <div x-show="openQuotaModal" 
+             x-cloak 
+             class="fixed inset-0 z-50 overflow-y-auto"
+             role="dialog" aria-modal="true">
+            <div class="flex min-h-screen items-center justify-center p-4 text-center">
+                
+                <!-- Backdrop Gelap -->
+                <div x-show="openQuotaModal" 
+                     x-transition:enter="ease-out duration-200" 
+                     x-transition:enter-start="opacity-0" 
+                     x-transition:enter-end="opacity-100" 
+                     x-transition:leave="ease-in duration-150" 
+                     x-transition:leave-start="opacity-100" 
+                     x-transition:leave-end="opacity-0" 
+                     @click="openQuotaModal = false" 
+                     class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
+
+                <!-- Kontainer Dialog Modal Pop-up Mobile -->
+                <div x-show="openQuotaModal" 
+                     x-transition:enter="ease-out duration-200" 
+                     x-transition:enter-start="opacity-0 scale-95" 
+                     x-transition:enter-end="opacity-100 scale-100" 
+                     x-transition:leave="ease-in duration-150" 
+                     x-transition:leave-start="opacity-100 scale-100" 
+                     x-transition:leave-end="opacity-0 scale-95" 
+                     class="relative w-full max-w-sm sm:max-w-md transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all border border-slate-200 p-5 space-y-4 z-10">
+
+                    <!-- Modal Header -->
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Bidang Pilihan Magang</h3>
+                            <p class="text-[11px] text-slate-500">4 Bidang Kerja Aktif di Dispusip Surabaya</p>
+                        </div>
+                        <button type="button" 
+                                @click="openQuotaModal = false" 
+                                class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- 4 Bidang Magang Pop-up -->
+                    <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
+                        <!-- Bidang 1 -->
+                        <div class="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="text-xs font-bold text-slate-900">Bidang Sekretariat</h4>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                    Sisa: {{ $uSekretariat?->remaining_quota ?? 8 }} Kuota
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Administrasi umum, kepegawaian, tata persuratan, perencanaan & keuangan.</p>
+                        </div>
+
+                        <!-- Bidang 2 -->
+                        <div class="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="text-xs font-bold text-slate-900">Pembinaan & Pengelolaan Perpustakaan</h4>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                    Sisa: {{ $uPerpus?->remaining_quota ?? 9 }} Kuota
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Pengembangan perpustakaan, otomasi katalog OPAC & layanan pemustaka.</p>
+                        </div>
+
+                        <!-- Bidang 3 -->
+                        <div class="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="text-xs font-bold text-slate-900">Pembinaan & Layanan Kearsipan</h4>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                    Sisa: {{ $uLayananArsip?->remaining_quota ?? 8 }} Kuota
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Pembinaan kearsipan instansi, pemanfaatan arsip dinamis & statis.</p>
+                        </div>
+
+                        <!-- Bidang 4 -->
+                        <div class="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="text-xs font-bold text-slate-900">Pengelolaan, Perlindungan & Penyelamatan Kearsipan</h4>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md shrink-0">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                    Sisa: {{ $uPenyelamatanArsip?->remaining_quota ?? 8 }} Kuota
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Restorasi naskah kuno bersejarah, alih media digital & preservasi arsip.</p>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+                        <span class="text-[10px] text-slate-400 font-medium">Terbuka MBKM & SMK</span>
+                        <button type="button" 
+                                @click="openQuotaModal = false" 
+                                class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">
+                            Tutup
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
     </body>
 </html>
