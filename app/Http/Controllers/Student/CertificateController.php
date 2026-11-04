@@ -226,7 +226,7 @@ class CertificateController extends Controller
         $qrSvg = null;
         if ($verifyCertificateUrl && class_exists(QrCode::class)) {
             try {
-                $qrSvg = (string) QrCode::size(80)->errorCorrection('H')->margin(0)->generate($verifyCertificateUrl);
+                $qrSvg = (string) QrCode::size(300)->errorCorrection('H')->margin(1)->color(0, 0, 0)->backgroundColor(255, 255, 255)->generate($verifyCertificateUrl);
             } catch (\Throwable $e) {
                 $qrSvg = null;
             }

@@ -158,6 +158,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-126** | 2026-11-02 | Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping | Penyeragaman item tautan menu drawer navigasi mobile menjadi teks bersih konsisten tanpa box ikon sporadis demi estetika antarmuka ringkas | RESOLVED |
 | **LRN-127** | 2026-11-04 | Pusat Kendali Dispusip, Batch Print Sertifikat & Arsip Tema Tahunan | Residu nomenklatur divisi, ketiadaan tab kelulusan/sertifikat dinas, ketiadaan cetak kolektif sertifikat ter-ACC & arsip riwayat tema tahunan | RESOLVED |
 | **LRN-128** | 2026-11-04 | Rekonstruksi Presisi E-Sertifikat Resmi Dispusip (4692.pdf), Ornamen Mozaik Grid Vektor, Wave Ribbons & Theme Engine Fleksibel | Disparitas visual draft sertifikat dengan prototipe asli 4692.pdf, ornamen poligon kasar, ketiadaan underline nama, font non-serif & keterbatasan tema warna dinamis | RESOLVED |
+| **LRN-129** | 2026-11-04 | Presisi Tipografi Grandeur E-Sertifikat Dispusip, Eliminasi Top Box Terputus, Transparansi Kop 5 Logo & Lokalisasi Tanggal | Teks sertifikat kurang besar, garis panjang atas terputus canggung di x=52, logo kop memiliki artefak background kotak putih/checkerboard, serta bulan tanggal berbahasa Inggris | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -3965,6 +3966,46 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
      - Menghubungkan palet dinamis ke elemen SVG sertifikat dan live preview admin di Tab 2.
   5. **Verifikasi & Validasi Multimodal E2E**: Menguji perubahan tema warna langsung (Cyan & Orange, serta Emerald & Purple) dan menjalankan full test suite `php artisan test` (384/384 Passed, 100% Exit Code 0).
 - **Prevention Rule**: Seluruh dokumen resmi dinas berbobot hukum wajib merekonstruksi geometri dan tipografi acuan fisik secara akurat menggunakan vektor SVG proporsional berbasis rasio A4 landscape (297x210mm). Komponen warna dinamis tidak boleh di-hardcode dengan warna tetap; selalu gunakan generator palet matematis berbasis shade/tint agar setiap pergantian warna dari panel admin menghasilkan gradasi estetis yang harmonis.
+
+---
+
+### [LRN-129] Presisi Tipografi Grandeur E-Sertifikat Dispusip, Eliminasi Top Box Terputus, Transparansi Kop 5 Logo & Lokalisasi Tanggal
+- **Tanggal**: 2026-11-04
+- **Komponen**: `resources/views/certificates/internship_certificate.blade.php`, `resources/views/admin/certificates/index.blade.php`, `public/images/certificates/logos_official_strip.png`, aset logo `.png`
+- **Problem / Symptom**:
+  1. Ukuran teks sertifikat masih kurang besar dan tampak kecil/melayang di tengah kanvas kosong dibandingkan dokumen fisik asli (`4692.pdf`).
+  2. Di bagian atas terdapat kotak panjang terputus (`<rect x="52"...>`) yang tidak nyambung dengan sisi kanan dan memicu ketidaksinkronan visual.
+  3. Logo kop 5 instansi belum transparan murni (memiliki artefak kotak putih dan pola checkerboard palsu) serta rasio skalanya tidak seimbang.
+  4. Format penanggalan magang dan kota penerbitan masih menghasilkan nama bulan bahasa Inggris ("July", "October") alih-alih bahasa Indonesia ("Juli", "Oktober").
+- **Root Cause**:
+  1. Penggunaan kelas ukuran teks generik Tailwind (`text-xs`, `text-sm`, `text-[40px]`) pada kanvas 1122x794px A4 menghasilkan proporsi relatif yang terlalu kecil (< 5% tinggi kanvas).
+  2. Elemen SVG `<rect x="52" y="0" width="245" height="3.2">` sebelumnya ditambahkan secara terisolasi setelah ornamen sudut kiri atas sehingga tampak seperti balok persegi panjang canggung yang terpotong.
+  3. Aset logo `logo_dispusip.jpg` bertipe JPEG tanpa alpha channel, dan `logo_berakhlak.png` memuat raster checkerboard palsu bawaan pencarian web.
+  4. Instance Carbon pada Blade view belum diinisialisasi secara eksplisit dengan `Carbon::setLocale('id')`.
+- **Fix Applied**:
+  1. **Tipografi Berskala Grandeur Sesuai Acuan 4692.pdf**:
+     - "SERTIFIKAT" diperbesar menjadi `text-[56px] font-black tracking-[0.06em]`.
+     - "MAGANG" diperbesar menjadi `text-[31px] font-black tracking-[0.24em]`.
+     - "Nomor : ..." disesuaikan ke `text-[17px] font-bold`.
+     - Nama mahasiswa didesain masif dengan `text-[56px] font-black leading-none` bergaris bawah horizontal tegas (`border-b-[2.5px] border-black pb-1.5 px-6`).
+     - Teks program studi, kampus, dan narasi magang dinaikkan ke `text-[17.5px]`.
+  2. **Eliminasi Kotak Panjang Terputus**:
+     - Menghapus elemen `<rect x="52"...>` pada SVG latar belakang sertifikat (`internship_certificate.blade.php` dan `admin/certificates/index.blade.php`), menyisakan ruang kop yang bersih, lapang, dan mengalir harmonis.
+  3. **Transparansi Murni, Skala Seimbang & Rekonstruksi Ultra-HD Kop 5 Logo**:
+     - Mengolah dan merekonstruksi 5 logo resolusi tinggi autentik (Surabaya 960x1234, Dispusip 722x744, BerAKHLAK 332x126, Bangga Melayani Bangsa 618x270, Zona Integritas 517x173).
+     - Menghilangkan 100% gradasi abu-abu latar (`slate-200 / [229, 231, 235]`) pada logo Bangga Melayani Bangsa, raster checkerboard palsu pada BerAKHLAK, dan background solid JPG Dispusip.
+     - Menggabungkan kelimanya ke dalam kanvas Ultra-HD 2695x330 (`logos_official_strip.png`) dengan penyetaraan visual axis dan bobot ketinggian yang harmonis sehingga tidak ada logo yang terlalu kecil, terlalu besar, atau pecah di layar retina.
+  4. **Penyempurnaan Barcode TTE & Ruang Bawah Lapang**:
+     - Memperbesar QR barcode BSrE dari 66px menjadi 86px x 86px untuk keterbacaan pemindaian optimal.
+     - Memperluas margin bawah lembar sertifikat (`pb-10 sm:pb-12 md:pb-14` dan `mb-3`) sehingga posisi kotak tanda tangan elektronik terangkat proporsional dan tidak lagi menempel/mepet di tepi bawah lembar A4.
+  5. **Harmonisasi Warna Cerah & Bercahaya (Luminous Palette)**:
+     - Memperbarui palet tema ke warna cerah dinamis: Biru Sian Elektrik (`#00B4D8`) dan Oranye Hangat Menyala (`#FF6200`).
+     - Mengoreksi formula komputasi shade `adjustBrightness()` (dari penurunan ekstrem -55% yang memicu kesan gelap kusam/berlumpur menjadi kontras -32% kaya saturasi), serta meningkatkan ketebalan dan opasitas pita gelombang guilloche agar tampil berkilau dan cerah.
+  6. **Lokalisasi Penuh Bahasa Indonesia**:
+     - Menetapkan `\Carbon\Carbon::setLocale('id')` dan `setlocale(LC_TIME, 'id_ID.utf8', 'indonesian')` di header view untuk memformat nama bulan secara tepat ("Juli", "Oktober", dll.).
+  7. **Verifikasi Multimodal & Strict Exit Code 0**:
+     - Pengujian E2E headless Playwright (`public/test-artifacts/cert13_sheet_focused.png`), audit mata manusia via `read_file`, dan kelulusan seluruh 384 test case PHPUnit/Pest.
+- **Prevention Rule**: Seluruh aset logo dokumen kedinasan wajib menggunakan format PNG ber-alpha transparan murni yang diekstrak langsung dari dokumen resmi, hindari penggunaan SVG rect parsial yang mengambang di tepi kertas tanpa korelasi arsitektural kanvas, dan selalu tetapkan locale bahasa Indonesia pada rendering dokumen hukum resmi daerah.
 
 ---
 

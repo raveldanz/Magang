@@ -90,38 +90,38 @@ class CertificateTheme extends Model
     }
 
     /**
-     * Menghasilkan palet nuansa lengkap untuk warna primer tema.
+     * Menghasilkan palet nuansa lengkap untuk warna primer tema (Cerah & Bercahaya).
      */
     public function getPrimaryPalette(): array
     {
-        $base = $this->primary_color ?: '#00A3C4';
+        $base = $this->primary_color ?: '#00A8E8';
         return [
-            'darkest' => self::adjustBrightness($base, -55),
-            'darker'  => self::adjustBrightness($base, -35),
-            'dark'    => self::adjustBrightness($base, -18),
+            'darkest' => self::adjustBrightness($base, -22),
+            'darker'  => self::adjustBrightness($base, -13),
+            'dark'    => self::adjustBrightness($base, -6),
             'base'    => $base,
-            'medium'  => self::adjustBrightness($base, 25),
-            'light'   => self::adjustBrightness($base, 50),
-            'lighter' => self::adjustBrightness($base, 72),
-            'pale'    => self::adjustBrightness($base, 88),
+            'medium'  => self::adjustBrightness($base, 20),
+            'light'   => self::adjustBrightness($base, 42),
+            'lighter' => self::adjustBrightness($base, 64),
+            'pale'    => self::adjustBrightness($base, 85),
         ];
     }
 
     /**
-     * Menghasilkan palet nuansa lengkap untuk warna sekunder tema.
+     * Menghasilkan palet nuansa lengkap untuk warna sekunder tema (Cerah & Hangat).
      */
     public function getSecondaryPalette(): array
     {
-        $base = $this->secondary_color ?: '#F36F21';
+        $base = $this->secondary_color ?: '#FF6700';
         return [
-            'darkest' => self::adjustBrightness($base, -55),
-            'darker'  => self::adjustBrightness($base, -35),
-            'dark'    => self::adjustBrightness($base, -18),
+            'darkest' => self::adjustBrightness($base, -22),
+            'darker'  => self::adjustBrightness($base, -13),
+            'dark'    => self::adjustBrightness($base, -6),
             'base'    => $base,
-            'medium'  => self::adjustBrightness($base, 25),
-            'light'   => self::adjustBrightness($base, 50),
-            'lighter' => self::adjustBrightness($base, 72),
-            'pale'    => self::adjustBrightness($base, 88),
+            'medium'  => self::adjustBrightness($base, 20),
+            'light'   => self::adjustBrightness($base, 42),
+            'lighter' => self::adjustBrightness($base, 64),
+            'pale'    => self::adjustBrightness($base, 85),
         ];
     }
 
