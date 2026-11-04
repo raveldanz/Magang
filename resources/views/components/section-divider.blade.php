@@ -17,7 +17,7 @@
     <div class="hidden sm:block flex-1 h-px bg-gradient-to-r from-transparent via-slate-200/80 to-blue-400/40 dark:via-slate-800 dark:to-blue-400/30 transition-opacity duration-500 group-hover:opacity-100 opacity-60"></div>
 
     <!-- 2. Gelombang Kiri -->
-    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-right group-hover:scale-y-115 group-hover:-translate-x-1 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
+    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-right group-hover:scale-y-110 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
          viewBox="0 0 440 56" 
          fill="none" 
          xmlns="http://www.w3.org/2000/svg">
@@ -43,17 +43,20 @@
               class="transition-all duration-500 ease-out group-hover:stroke-width-[2.6] group-hover:stroke-opacity-100"></path>
     </svg>
 
-    <!-- 3. Ornamen Tengah: Tiga Titik Bulat Berjenjang & Logo Dispusip Bersih -->
-    <div class="mx-2.5 sm:mx-4 flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-        <!-- 3 Titik Bulat Kiri (Kecil -> Sedang -> Besar) -->
-        <div class="flex items-center gap-1.5 sm:gap-2 transition-transform duration-300 ease-out group-hover:-translate-x-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-300 dark:bg-blue-400/60"></span>
-            <span class="w-2 h-2 rounded-full bg-blue-400 dark:bg-blue-400"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 dark:bg-blue-300 shadow-xs shadow-blue-500/50"></span>
-        </div>
+    <!-- 3. Ornamen Tengah: Tiga Titik Bulat Vektor Sempurna & Logo Dispusip Bersih -->
+    <div class="mx-2.5 sm:mx-4 flex items-center gap-2 sm:gap-3 shrink-0">
+        <!-- 3 Titik Bulat Kiri (Vector SVG - 100% Bulat Sempurna, Anti-Distorsi Subpixel) -->
+        <svg class="w-8 sm:w-9 h-3 shrink-0 overflow-visible transition-all duration-300 ease-out group-hover:drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" 
+             viewBox="0 0 36 12" 
+             fill="none" 
+             xmlns="http://www.w3.org/2000/svg">
+            <circle cx="4" cy="6" r="2" fill="#93C5FD" class="dark:fill-blue-300" />
+            <circle cx="15" cy="6" r="3" fill="#60A5FA" class="dark:fill-blue-400" />
+            <circle cx="28" cy="6" r="4.5" fill="#2563EB" class="dark:fill-blue-500" />
+        </svg>
 
         <!-- Logo Dispusip Bersih Tanpa Teks & Tanpa Badge Kaku -->
-        <div class="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-0.5">
+        <div class="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
             <!-- Pendaran Cahaya Halus (Atmospheric Soft Glow) -->
             <div class="absolute inset-0 rounded-full bg-blue-400/20 blur-md opacity-40 group-hover:opacity-90 group-hover:blur-lg transition-all duration-500"></div>
             <img src="{{ asset('images/logos/dispusip-clean.png') }}" 
@@ -61,16 +64,19 @@
                  alt="Logo Dispusip Surabaya" />
         </div>
 
-        <!-- 3 Titik Bulat Kanan (Besar -> Sedang -> Kecil) -->
-        <div class="flex items-center gap-1.5 sm:gap-2 transition-transform duration-300 ease-out group-hover:translate-x-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 dark:bg-blue-300 shadow-xs shadow-blue-500/50"></span>
-            <span class="w-2 h-2 rounded-full bg-blue-400 dark:bg-blue-400"></span>
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-300 dark:bg-blue-400/60"></span>
-        </div>
+        <!-- 3 Titik Bulat Kanan (Vector SVG - 100% Bulat Sempurna, Anti-Distorsi Subpixel) -->
+        <svg class="w-8 sm:w-9 h-3 shrink-0 overflow-visible transition-all duration-300 ease-out group-hover:drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" 
+             viewBox="0 0 36 12" 
+             fill="none" 
+             xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="6" r="4.5" fill="#2563EB" class="dark:fill-blue-500" />
+            <circle cx="21" cy="6" r="3" fill="#60A5FA" class="dark:fill-blue-400" />
+            <circle cx="32" cy="6" r="2" fill="#93C5FD" class="dark:fill-blue-300" />
+        </svg>
     </div>
 
     <!-- 4. Gelombang Kanan -->
-    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-left group-hover:scale-y-115 group-hover:translate-x-1 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
+    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-left group-hover:scale-y-110 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
          viewBox="0 0 440 56" 
          fill="none" 
          xmlns="http://www.w3.org/2000/svg">
