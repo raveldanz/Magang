@@ -17,7 +17,7 @@
     <div class="hidden sm:block flex-1 h-px bg-gradient-to-r from-transparent via-slate-200/80 to-blue-400/40 dark:via-slate-800 dark:to-blue-400/30 transition-opacity duration-500 group-hover:opacity-100 opacity-60"></div>
 
     <!-- 2. Gelombang Kiri -->
-    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-right group-hover:scale-y-115 group-hover:-translate-x-1 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
+    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-right group-hover:scale-y-110 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
          viewBox="0 0 440 56" 
          fill="none" 
          xmlns="http://www.w3.org/2000/svg">
@@ -43,36 +43,40 @@
               class="transition-all duration-500 ease-out group-hover:stroke-width-[2.6] group-hover:stroke-opacity-100"></path>
     </svg>
 
-    <!-- 3. Ornamen Tengah ◆ ❖ ◆ -->
-    <div class="mx-2 sm:mx-3.5 flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        <!-- Satelit Kiri (Spring Floating Physics) -->
-        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rotate-45 rounded-[2px] bg-gradient-to-tr from-blue-600 to-sky-400 dark:from-blue-500 dark:to-sky-300 shadow-xs shadow-blue-500/40 dark:shadow-sky-400/30 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:-translate-x-1.5 group-hover:scale-125 group-hover:rotate-[55deg] group-hover:shadow-blue-400/70 dark:group-hover:shadow-sky-300/70"></span>
-        
-        <!-- Diamond Pusat -->
-        <div class="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11">
-            <!-- Aura Cahaya Pijar (Glowing Ambient Glow dengan Bloom Halus) -->
-            <div class="absolute inset-0 rounded-2xl bg-blue-500/25 dark:bg-blue-400/30 blur-md group-hover:bg-blue-500/45 dark:group-hover:bg-blue-400/60 group-hover:blur-xl group-hover:scale-135 transition-all duration-700 ease-out"></div>
-            
-            <!-- Diamond Luar dengan Spring Hover Physics (+10 deg dynamic tilt halus & organik) -->
-            <div class="relative w-6 h-6 sm:w-7 sm:h-7 rotate-45 rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 dark:from-blue-500 dark:via-indigo-400 dark:to-sky-300 p-[1.5px] shadow-md shadow-blue-500/25 dark:shadow-sky-400/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:rotate-[55deg] group-hover:scale-115 group-hover:shadow-xl group-hover:shadow-blue-500/40 dark:group-hover:shadow-sky-400/35">
-                <!-- Wajah Diamond Dalam (Adaptif Light/Dark) -->
-                <div class="w-full h-full bg-white dark:bg-slate-900 rounded-[5px] sm:rounded-[6px] flex items-center justify-center transition-colors duration-500">
-                    <!-- Bintang 4 Titik (Lembut Membesar & Bercahaya) -->
-                    <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-600 dark:text-sky-400 -rotate-45 group-hover:-rotate-[55deg] group-hover:scale-125 group-hover:text-blue-500 dark:group-hover:text-sky-300 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]" 
-                         fill="currentColor" 
-                         viewBox="0 0 24 24">
-                        <path d="M12 2L14.3 9.7L22 12L14.3 14.3L12 22L9.7 14.3L2 12L9.7 9.7L12 2Z"></path>
-                    </svg>
-                </div>
-            </div>
+    <!-- 3. Ornamen Tengah: Tiga Titik Bulat Vektor Sempurna & Logo Dispusip Bersih -->
+    <div class="mx-2.5 sm:mx-4 flex items-center gap-2 sm:gap-3 shrink-0">
+        <!-- 3 Titik Bulat Kiri (Vector SVG - 100% Bulat Sempurna, Anti-Distorsi Subpixel) -->
+        <svg class="w-8 sm:w-9 h-3 shrink-0 overflow-visible transition-all duration-300 ease-out group-hover:drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" 
+             viewBox="0 0 36 12" 
+             fill="none" 
+             xmlns="http://www.w3.org/2000/svg">
+            <circle cx="4" cy="6" r="2" fill="#93C5FD" class="dark:fill-blue-300" />
+            <circle cx="15" cy="6" r="3" fill="#60A5FA" class="dark:fill-blue-400" />
+            <circle cx="28" cy="6" r="4.5" fill="#2563EB" class="dark:fill-blue-500" />
+        </svg>
+
+        <!-- Logo Dispusip Bersih Tanpa Teks & Tanpa Badge Kaku -->
+        <div class="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:scale-110 group-hover:-translate-y-0.5">
+            <!-- Pendaran Cahaya Halus (Atmospheric Soft Glow) -->
+            <div class="absolute inset-0 rounded-full bg-blue-400/20 blur-md opacity-40 group-hover:opacity-90 group-hover:blur-lg transition-all duration-500"></div>
+            <img src="{{ asset('images/logos/dispusip-clean.png') }}" 
+                 class="relative w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.06)] group-hover:drop-shadow-[0_4px_12px_rgba(59,130,246,0.35)] transition-all duration-300 select-none" 
+                 alt="Logo Dispusip Surabaya" />
         </div>
 
-        <!-- Satelit Kanan (Spring Floating Physics) -->
-        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rotate-45 rounded-[2px] bg-gradient-to-tl from-blue-600 to-sky-400 dark:from-blue-500 dark:to-sky-300 shadow-xs shadow-blue-500/40 dark:shadow-sky-400/30 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-x-1.5 group-hover:scale-125 group-hover:rotate-[35deg] group-hover:shadow-blue-400/70 dark:group-hover:shadow-sky-300/70"></span>
+        <!-- 3 Titik Bulat Kanan (Vector SVG - 100% Bulat Sempurna, Anti-Distorsi Subpixel) -->
+        <svg class="w-8 sm:w-9 h-3 shrink-0 overflow-visible transition-all duration-300 ease-out group-hover:drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" 
+             viewBox="0 0 36 12" 
+             fill="none" 
+             xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="6" r="4.5" fill="#2563EB" class="dark:fill-blue-500" />
+            <circle cx="21" cy="6" r="3" fill="#60A5FA" class="dark:fill-blue-400" />
+            <circle cx="32" cy="6" r="2" fill="#93C5FD" class="dark:fill-blue-300" />
+        </svg>
     </div>
 
     <!-- 4. Gelombang Kanan -->
-    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-left group-hover:scale-y-115 group-hover:translate-x-1 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
+    <svg class="w-[130px] min-[400px]:w-[155px] sm:w-56 md:w-72 lg:w-[380px] xl:w-[420px] h-6 sm:h-9 md:h-11 shrink-0 overflow-visible transition-all duration-500 ease-out origin-left group-hover:scale-y-110 group-hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.4)] dark:group-hover:drop-shadow-[0_0_12px_rgba(96,165,250,0.6)]" 
          viewBox="0 0 440 56" 
          fill="none" 
          xmlns="http://www.w3.org/2000/svg">

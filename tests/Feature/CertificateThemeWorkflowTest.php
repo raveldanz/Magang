@@ -179,4 +179,235 @@ class CertificateThemeWorkflowTest extends TestCase
         $response->assertSee('NIP. 197111141992012001');
         $response->assertSee('Lampiran Transkrip Nilai Magang');
     }
+
+    public function test_certificate_renders_with_custom_dynamic_theme_colors(): void
+    {
+        $theme = CertificateTheme::getActive();
+        $theme->update([
+            'primary_color' => '#059669', // Emerald
+            'secondary_color' => '#7C3AED', // Purple
+            'accent_color' => '#F59E0B',
+        ]);
+
+        $agency = AgencyProfile::first() ?? AgencyProfile::create([
+            'government_name' => 'Pemerintah Kota Surabaya',
+            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
+            'signee_name' => 'Mia Santi Dewi, S.H., M.Si.',
+            'signee_nip' => '19720315 199803 2 004',
+            'signee_position' => 'Kepala Dinas',
+            'city' => 'Surabaya',
+        ]);
+
+        $unit = Unit::first() ?? Unit::create([
+            'agency_profile_id' => $agency->id,
+            'name' => 'Bidang Pengelolaan Arsip',
+            'quota' => 10,
+        ]);
+
+        $univ = University::first() ?? University::create([
+            'name' => 'Universitas 17 Agustus 1945 Surabaya',
+            'evaluation_scheme' => 'mentor_only',
+        ]);
+
+        $student = User::factory()->create([
+            'name' => 'Achmad Dhafa Sholahudin F',
+            'role' => 'mahasiswa',
+            'university_id' => $univ->id,
+        ]);
+
+        StudentProfile::create([
+            'user_id' => $student->id,
+            'nim' => '1212200055',
+            'phone' => '081234567890',
+            'jurusan' => 'Manajemen',
+            'fakultas' => 'Ekonomi dan Bisnis',
+            'universitas' => 'Universitas 17 Agustus 1945 Surabaya',
+            'university_id' => $univ->id,
+        ]);
+
+        $app = Application::create([
+            'user_id' => $student->id,
+            'unit_id' => $unit->id,
+            'status' => 'completed',
+            'start_date' => '2026-08-10',
+            'end_date' => '2026-10-10',
+        ]);
+
+        $placement = Placement::create([
+            'application_id' => $app->id,
+            'status' => 'active',
+            'certificate_number' => '400.14.5.4/4692/436.7.17/2026',
+            'certificate_hash' => 'dummy-hash-test-token-color-custom',
+        ]);
+
+        Evaluation::create([
+            'placement_id' => $placement->id,
+            'nilai_pembimbing' => 95,
+            'nilai_akhir' => 95,
+            'grade' => 'A',
+            'status' => 'submitted',
+        ]);
+
+        FinalReport::create([
+            'placement_id' => $placement->id,
+            'file_path' => 'reports/test.pdf',
+            'status' => 'approved',
+        ]);
+
+        Logbook::create([
+            'placement_id' => $placement->id,
+            'date' => '2026-08-11',
+            'activity' => 'Merapikan arsip statis dinas',
+            'status' => 'approved',
+        ]);
+
+        Certificate::create([
+            'placement_id' => $placement->id,
+            'certificate_number' => $placement->certificate_number,
+            'file_path' => 'certificates/cert.pdf',
+            'approval_status' => 'approved',
+            'issued_at' => now()->toDateString(),
+        ]);
+
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email' => 'admin_color@gmail.com',
+            'agency_profile_id' => null,
+            'unit_id' => null,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.certificates.show', $placement->id));
+
+        $response->assertStatus(200);
+        // Assert dynamic shades from emerald and purple are rendered in the SVG
+        $response->assertSee('#059669'); // base primary
+        $response->assertSee('#7C3AED'); // base secondary
+        $response->assertSee('SERTIFIKAT');
+        $response->assertSee('Achmad Dhafa Sholahudin F');
+    }
+
+    public function test_batch_print_renders_approved_certificates(): void
+    {
+        $agency = AgencyProfile::create([
+            'government_name' => 'Pemerintah Kota Surabaya',
+            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
+            'city' => 'Surabaya',
+        ]);
+
+        $unit = Unit::create([
+            'agency_profile_id' => $agency->id,
+            'name' => 'Bidang Pengelolaan Arsip',
+            'quota' => 10,
+        ]);
+
+        $univ = University::create([
+            'name' => 'Universitas Airlangga',
+            'evaluation_scheme' => 'mentor_only',
+        ]);
+
+        $student = User::factory()->create([
+            'name' => 'Budi Santoso',
+            'role' => 'mahasiswa',
+            'university_id' => $univ->id,
+        ]);
+
+        StudentProfile::create([
+            'user_id' => $student->id,
+            'nim' => '1122334455',
+            'phone' => '081234567890',
+            'jurusan' => 'Ilmu Informasi dan Perpustakaan',
+            'universitas' => 'Universitas Airlangga',
+            'university_id' => $univ->id,
+        ]);
+
+        $app = Application::create([
+            'user_id' => $student->id,
+            'unit_id' => $unit->id,
+            'status' => 'completed',
+            'start_date' => '2026-08-01',
+            'end_date' => '2026-10-01',
+        ]);
+
+        $placement = Placement::create([
+            'application_id' => $app->id,
+            'status' => 'active',
+            'certificate_number' => '400.14.5.4/9999/436.7.17/2026',
+            'certificate_hash' => 'hash-test-batch-print-123456789',
+        ]);
+
+        Evaluation::create([
+            'placement_id' => $placement->id,
+            'nilai_pembimbing' => 90,
+            'nilai_akhir' => 90,
+            'grade' => 'A',
+            'status' => 'submitted',
+        ]);
+
+        FinalReport::create([
+            'placement_id' => $placement->id,
+            'file_path' => 'reports/budi.pdf',
+            'status' => 'approved',
+        ]);
+
+        Logbook::create([
+            'placement_id' => $placement->id,
+            'date' => '2026-08-02',
+            'activity' => 'Review buku langka',
+            'status' => 'approved',
+        ]);
+
+        Certificate::create([
+            'placement_id' => $placement->id,
+            'certificate_number' => $placement->certificate_number,
+            'file_path' => 'certificates/budi.pdf',
+            'approval_status' => 'approved',
+            'issued_at' => now()->toDateString(),
+        ]);
+
+        $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
+
+        $response = $this->actingAs($admin)->get(route('admin.certificates.batchPrint'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Cetak Kolektif Sertifikat Magang');
+        $response->assertSee('Budi Santoso');
+        $response->assertSee('Nomor : 400.14.5.4/9999/436.7.17/2026');
+        $response->assertSee('Cetak Semua Halaman (Ctrl + P)');
+    }
+
+    public function test_batch_print_redirects_when_empty(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
+
+        $response = $this->actingAs($admin)->get(route('admin.certificates.batchPrint'));
+
+        $response->assertRedirect(route('admin.certificates.index'));
+        $response->assertSessionHas('error');
+    }
+
+    public function test_agency_show_displays_completed_students_tab_and_quick_links(): void
+    {
+        $agency = AgencyProfile::create([
+            'government_name' => 'Pemerintah Kota Surabaya',
+            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
+            'city' => 'Surabaya',
+        ]);
+
+        $unit = Unit::create([
+            'agency_profile_id' => $agency->id,
+            'name' => 'Bidang Sekretariat',
+            'quota' => 10,
+        ]);
+
+        $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
+
+        $response = $this->actingAs($admin)->get(route('admin.agencies.show', $agency->id));
+
+        $response->assertStatus(200);
+        $response->assertSee('Unit Bidang Magang');
+        $response->assertSee('Unit Bidang & Kuota', false);
+        $response->assertSee('Kelulusan & Sertifikat', false);
+        $response->assertSee('Atur TTE & Tema Sertifikat', false);
+        $response->assertSee('Kelola Sertifikat');
+    }
 }

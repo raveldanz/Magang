@@ -57,6 +57,75 @@ class CertificateTheme extends Model
     }
 
     /**
+     * Helper untuk mengubah kecerahan warna hex (shade / tint).
+     * $percent < 0 untuk menggelapkan (shade), $percent > 0 untuk menerangkan (tint).
+     */
+    public static function adjustBrightness(string $hex, int $percent): string
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        if (strlen($hex) !== 6) {
+            return '#000000';
+        }
+
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        if ($percent < 0) {
+            $factor = 1 + ($percent / 100);
+            $r = (int) max(0, min(255, round($r * $factor)));
+            $g = (int) max(0, min(255, round($g * $factor)));
+            $b = (int) max(0, min(255, round($b * $factor)));
+        } else {
+            $factor = $percent / 100;
+            $r = (int) max(0, min(255, round($r + (255 - $r) * $factor)));
+            $g = (int) max(0, min(255, round($g + (255 - $g) * $factor)));
+            $b = (int) max(0, min(255, round($b + (255 - $b) * $factor)));
+        }
+
+        return sprintf('#%02x%02x%02x', $r, $g, $b);
+    }
+
+    /**
+     * Menghasilkan palet nuansa lengkap untuk warna primer tema.
+     */
+    public function getPrimaryPalette(): array
+    {
+        $base = $this->primary_color ?: '#00A3C4';
+        return [
+            'darkest' => self::adjustBrightness($base, -55),
+            'darker'  => self::adjustBrightness($base, -35),
+            'dark'    => self::adjustBrightness($base, -18),
+            'base'    => $base,
+            'medium'  => self::adjustBrightness($base, 25),
+            'light'   => self::adjustBrightness($base, 50),
+            'lighter' => self::adjustBrightness($base, 72),
+            'pale'    => self::adjustBrightness($base, 88),
+        ];
+    }
+
+    /**
+     * Menghasilkan palet nuansa lengkap untuk warna sekunder tema.
+     */
+    public function getSecondaryPalette(): array
+    {
+        $base = $this->secondary_color ?: '#F36F21';
+        return [
+            'darkest' => self::adjustBrightness($base, -55),
+            'darker'  => self::adjustBrightness($base, -35),
+            'dark'    => self::adjustBrightness($base, -18),
+            'base'    => $base,
+            'medium'  => self::adjustBrightness($base, 25),
+            'light'   => self::adjustBrightness($base, 50),
+            'lighter' => self::adjustBrightness($base, 72),
+            'pale'    => self::adjustBrightness($base, 88),
+        ];
+    }
+
+    /**
      * Format nomor sertifikat dinas berdasarkan pola konfigurasi.
      */
     public function formatNumber($sequenceNumber, ?int $targetYear = null): string

@@ -45,7 +45,7 @@ class DispusipInstansiMenuDirectAccessTest extends TestCase
         $followResponse->assertSee('Pusat Kendali Instansi');
         $followResponse->assertSee('Dinas Perpustakaan dan Kearsipan');
         $followResponse->assertSee('Personil');
-        $followResponse->assertSee('Divisi');
+        $followResponse->assertSee('Unit Bidang');
     }
 
     public function test_navigation_renders_direct_link_to_dispusip_show(): void

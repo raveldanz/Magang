@@ -156,6 +156,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-124** | 2026-11-02 | Form Filter Proyek Dinas: Pola 2-Baris Anti-Squish & Gutter Dropdown Arrow | Elemen input & dropdown filter menyempit (squished), teks menabrak icon chevron & tombol reset absen | RESOLVED |
 | **LRN-125** | 2026-11-02 | Mobile Kartu 4 Bidang Dispusip: 4-Cell Horizontal Grid & Mini Progress Bar | Metrik kuota & mhs aktif runtuh vertikal 1-kolom di HP akibat CSS bundle lama & ketiadaan inline fallback | RESOLVED |
 | **LRN-126** | 2026-11-02 | Standarisasi Tampilan Mobile Navigation Drawer: Penghapusan Ikon Samping | Penyeragaman item tautan menu drawer navigasi mobile menjadi teks bersih konsisten tanpa box ikon sporadis demi estetika antarmuka ringkas | RESOLVED |
+| **LRN-127** | 2026-11-04 | Pusat Kendali Dispusip, Batch Print Sertifikat & Arsip Tema Tahunan | Residu nomenklatur divisi, ketiadaan tab kelulusan/sertifikat dinas, ketiadaan cetak kolektif sertifikat ter-ACC & arsip riwayat tema tahunan | RESOLVED |
+| **LRN-128** | 2026-11-04 | Rekonstruksi Presisi E-Sertifikat Resmi Dispusip (4692.pdf), Ornamen Mozaik Grid Vektor, Wave Ribbons & Theme Engine Fleksibel | Disparitas visual draft sertifikat dengan prototipe asli 4692.pdf, ornamen poligon kasar, ketiadaan underline nama, font non-serif & keterbatasan tema warna dinamis | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -3912,6 +3914,57 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Memperbarui `scripts/browser-runner.mjs` dengan automasi klik tombol burger drawer `button[aria-label="Buka Menu"]` dan penangkapan tangkapan layar otomatis `yolo_${cleanName}_mobile_drawer.png`.
   4. Menjalankan `php artisan view:clear; php artisan optimize:clear` dan verifikasi full test suite `php artisan test` (368 passed, Exit Code 0).
 - **Prevention Rule**: Seluruh item menu di dalam drawer navigasi mobile wajib menjaga keseragaman format list: jika teks polos digunakan untuk daftar entitas sekunder, maka menu utama juga wajib menggunakan teks polos yang konsisten tanpa menambahkan box ikon sporadis.
+
+---
+
+### [LRN-127] Standardisasi Pusat Kendali Dispusip, Cetak Kolektif (Batch Print) Sertifikat & Arsip Riwayat Tema Tahunan
+- **Tanggal**: 2026-11-04
+- **Komponen**: `app/Http/Controllers/Admin/AgencyController.php`, `app/Http/Controllers/Admin/CertificateController.php`, `resources/views/admin/agencies/show.blade.php`, `resources/views/admin/certificates/index.blade.php`, `resources/views/certificates/batch_print.blade.php`, `routes/admin.php`, `tests/Feature/CertificateThemeWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Halaman Pusat Kendali Instansi (`admin/agencies/show.blade.php`) masih memuat residu istilah "Divisi" yang bertentangan dengan standardisasi "Unit Bidang" Dispusip (LRN-119).
+  2. Ketiadaan tab & metrik pemantauan mahasiswa yang telah menyelesaikan magang (status completed) dan sertifikat kelulusan di Pusat Kendali Instansi.
+  3. Ketiadaan tautan cepat (*quick shortcut*) dari panel instansi menuju pengelolaan TTE dan Tema Sertifikat Tahunan.
+  4. Belum adanya fitur cetak kolektif (*batch print*) untuk mencetak seluruh E-Sertifikat ter-ACC sekaligus dalam satu dokumen print A4 Landscape (admin harus mengklik satu per satu).
+  5. Pengaturan tema sertifikat belum menyediakan fitur peninjauan dan pengisian cepat form dari riwayat tema tahun-tahun sebelumnya (*theme archive load*).
+- **Root Cause**:
+  1. Belum dilakukannya sinkronisasi pembersihan istilah residu pasca migrasi spesialisasi 4 bidang tetap Dispusip pada view `show.blade.php`.
+  2. `AgencyController::show` sebelumnya hanya mengambil data mahasiswa berstatus `active` dan belum menyediakan query `completedPlacements`.
+  3. Ketiadaan dedicated route dan controller action `batchPrint` serta view multi-halaman ber-page-break print css.
+- **Fix Applied**:
+  1. Membersihkan seluruh residu kata "Divisi" menjadi "Unit Bidang" dan "Bidang" pada subjudul, kartu metrik, nama tab, header tabel, tombol aksi, dan kartu mobile di `resources/views/admin/agencies/show.blade.php`.
+  2. Menambahkan tombol pintas "Kelola Sertifikat" pada header quick actions dan tombol "Atur TTE & Tema Sertifikat" pada panel sisi kanan pejabat penandatangan.
+  3. Menambahkan query `$completedPlacements` dan metrik `$stats['completed_students']` pada `AgencyController::show` serta merancang Tab 5 (*Kelulusan & Sertifikat*) lengkap dengan rincian nilai akhir dan status ACC sertifikat.
+  4. Menambahkan filter bidang cepat berbasis Alpine.js (`unitFilter`) dan penanda khusus status `waiting_approval` ("Menunggu ACC Atasan") pada tab Pengajuan di Pusat Kendali Instansi.
+  5. Mengimplementasikan method `AdminCertificateController::batchPrint`, rute `admin.certificates.batchPrint`, tombol "Cetak Semua Ter-ACC" di `admin.certificates.index`, dan view khusus `resources/views/certificates/batch_print.blade.php` dengan `@media print` CSS page break.
+  6. Menambahkan fungsi JavaScript `loadThemeData()` dan tombol "Edit" pada daftar arsip riwayat tema tahunan di `admin.certificates.index` untuk memuat data tema lama langsung ke form editor.
+  7. Menambahkan automated feature tests komprehensif pada `CertificateThemeWorkflowTest` (Exit Code 0, 383 passed).
+- **Prevention Rule**: Seluruh modul entitas instansi kedinasan wajib mematuhi istilah baku "Unit Bidang", menyediakan akses terpadu ke siklus kelulusan sertifikat, dan memastikan fitur cetak dokumen resmi mendukung pencetakan mandiri maupun kolektif (*batch printing*).
+
+---
+
+### [LRN-128] Rekonstruksi Presisi E-Sertifikat Resmi Dispusip (4692.pdf), Ornamen Mozaik Grid Vektor, Wave Ribbons & Theme Engine Fleksibel
+- **Tanggal**: 2026-11-04
+- **Komponen**: `app/Models/CertificateTheme.php`, `resources/views/certificates/internship_certificate.blade.php`, `resources/views/admin/certificates/index.blade.php`, `tests/Feature/CertificateThemeWorkflowTest.php`
+- **Problem / Symptom**: 
+  1. Tampilan E-Sertifikat sebelumnya sangat berbeda dengan contoh dokumen asli (`4692.pdf`): sudut kiri atas hanya berbentuk layang-layang poligon kasar tanpa kisi-kisi segitiga facet mozaik, sudut kanan bawah tidak bertingkat rapi, garis gelombang guilloche kaku dan sedikit.
+  2. Judul "MAGANG" dan nama mahasiswa menggunakan font sans-serif generik, ketiadaan garis bawah tegas (underline) di bawah nama penerima, format tanggal magang tidak miring (*italic*), dan kotak TTE BSrE berisiko terpotong pada batas bawah halaman.
+  3. Kebutuhan mutlak pengguna agar sertifikat 100% persis dengan contoh sertifikat dinas asli namun tetap fleksibel diubah-ubah warnanya dari admin panel (*Dynamic Theme Color Engine*).
+- **Root Cause**: 
+  1. Rancangan awal SVG hanya menggunakan poligon perkiraan tanpa memetakan struktur grid $5 \times 5$ bersegitiga siku-siku 45° dan kurva harmonik Bézier dari berkas acuan `4692.pdf`.
+  2. Nilai warna pada sudut ornamen hanya mengandalkan satu warna heksadesimal mentah tanpa komputasi spektrum nuansa (gelap, sedang, terang, pucat).
+- **Fix Applied**: 
+  1. **Rekonstruksi Geometris Vektor Presisi**: Membangun grid SVG mozaik 5-kolom presisi dengan sudut 45° pada sudut kiri atas (nuansa primer) dan kaskade tangga geometris pada sudut kanan bawah (nuansa sekunder).
+  2. **Harmonic Guilloche Wave Ribbons**: Menambahkan 13 kurva Bézier fanning halus faset pita gelombang pengaman pada kedua sudut yang mengalir luwes ke tepi dokumen.
+  3. **Tipografi & Hierarki Resmi Berbobot Hukum**: 
+     - "SERTIFIKAT" & "MAGANG" menggunakan font serif tegas ber-tracking lapang (`Times New Roman Bold` / `Playfair Display`).
+     - Nama mahasiswa didesain megah dengan garis pembatas horizontal tegas di bawah nama (`border-b-2 border-black pb-1`).
+     - Subtitle program studi/kampus dan narasi dinas menggunakan font serif bersih, dengan tanggal magang tercetak miring (*italic*).
+     - Garis atas solid blue (`rect`) membentang dari batas mozaik hingga tepi kanan dokumen.
+  4. **Dynamic Color Palette Engine**:
+     - Menambahkan fungsi `adjustBrightness()` dan metode model `getPrimaryPalette()` & `getSecondaryPalette()` pada `CertificateTheme` yang secara otomatis menghitung 8 tingkat gradasi warna harmonis (`darkest`, `darker`, `dark`, `base`, `medium`, `light`, `lighter`, `pale`) dari kode hex input apa pun.
+     - Menghubungkan palet dinamis ke elemen SVG sertifikat dan live preview admin di Tab 2.
+  5. **Verifikasi & Validasi Multimodal E2E**: Menguji perubahan tema warna langsung (Cyan & Orange, serta Emerald & Purple) dan menjalankan full test suite `php artisan test` (384/384 Passed, 100% Exit Code 0).
+- **Prevention Rule**: Seluruh dokumen resmi dinas berbobot hukum wajib merekonstruksi geometri dan tipografi acuan fisik secara akurat menggunakan vektor SVG proporsional berbasis rasio A4 landscape (297x210mm). Komponen warna dinamis tidak boleh di-hardcode dengan warna tetap; selalu gunakan generator palet matematis berbasis shade/tint agar setiap pergantian warna dari panel admin menghasilkan gradasi estetis yang harmonis.
 
 ---
 
