@@ -551,20 +551,18 @@
                                 <!-- Box Visual Mini Sertifikat Presisi (Replika Halaman 1) -->
                                 @php
                                     $pPal = method_exists($activeTheme, 'getPrimaryPalette') ? $activeTheme->getPrimaryPalette() : [
-                                        'darkest' => '#004958', 'darker' => '#006a7f', 'dark' => '#0086a1',
-                                        'base' => $activeTheme->primary_color ?? '#00A3C4', 'medium' => '#40bad3', 'light' => '#80d1e2'
+                                        'darkest' => '#00587a', 'darker' => '#007ca5', 'dark' => '#0097c9',
+                                        'base' => $activeTheme->primary_color ?? '#00A8E8', 'medium' => '#40c4e4', 'light' => '#80daf0'
                                     ];
                                     $sPal = method_exists($activeTheme, 'getSecondaryPalette') ? $activeTheme->getSecondaryPalette() : [
-                                        'darkest' => '#6d320f', 'darker' => '#9e4815', 'dark' => '#c75b1b',
-                                        'base' => $activeTheme->secondary_color ?? '#F36F21', 'medium' => '#f69359', 'light' => '#f9b790'
+                                        'darkest' => '#b84a00', 'darker' => '#d95700', 'dark' => '#f26200',
+                                        'base' => $activeTheme->secondary_color ?? '#FF6700', 'medium' => '#ff8d38', 'light' => '#ffb37a'
                                     ];
                                 @endphp
                                 <div id="previewCard" class="relative w-full aspect-[297/210] bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between p-2 select-none text-[8px] leading-tight" style="font-family: 'Times New Roman', Times, serif;">
                                     
                                     <!-- Dynamic SVG Vector Artwork -->
                                     <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Top Stripe -->
-                                        <rect id="prevTopStripe" x="52" y="0" width="245" height="3.5" fill="{{ $pPal['darkest'] }}" />
                                         
                                         <!-- Top Left Mosaic -->
                                         <rect id="prevP_0_0" x="0" y="0" width="10.4" height="10.4" fill="{{ $pPal['darker'] }}" />
@@ -632,12 +630,8 @@
                                     </svg>
 
                                     <!-- Mini Header Logos -->
-                                    <div class="relative z-10 flex items-center justify-center gap-2 pt-1">
-                                        <img src="{{ asset('images/certificates/logo_surabaya.webp') }}" class="h-4 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
-                                        <img src="{{ asset('images/certificates/logo_dispusip.jpg') }}" class="h-4 w-auto object-contain">
-                                        <img src="{{ asset('images/certificates/logo_berakhlak.png') }}" class="h-3 w-auto object-contain">
-                                        <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" class="h-2.5 w-auto object-contain">
-                                        <img src="{{ asset('images/certificates/logo_zona_integritas.png') }}" class="h-3 w-auto object-contain">
+                                    <div class="relative z-10 flex items-center justify-center pt-1">
+                                        <img src="{{ asset('images/certificates/logos_official_strip.png') }}" class="h-4 w-auto object-contain mx-auto" alt="Logos">
                                     </div>
 
                                     <!-- Mini Body Text -->
@@ -809,21 +803,21 @@
             var mandate = document.getElementById('mandate_text').value;
             var city = document.getElementById('city').value;
 
-            // Palet Primer Dinamis
-            var pDarkest = adjustBrightnessJs(primary, -55);
-            var pDarker  = adjustBrightnessJs(primary, -35);
-            var pDark    = adjustBrightnessJs(primary, -18);
+            // Palet Primer Dinamis (Cerah & Sinar Harmonis)
+            var pDarkest = adjustBrightnessJs(primary, -32);
+            var pDarker  = adjustBrightnessJs(primary, -18);
+            var pDark    = adjustBrightnessJs(primary, -8);
             var pBase    = primary;
-            var pMedium  = adjustBrightnessJs(primary, 25);
-            var pLight   = adjustBrightnessJs(primary, 50);
+            var pMedium  = adjustBrightnessJs(primary, 22);
+            var pLight   = adjustBrightnessJs(primary, 45);
 
-            // Palet Sekunder Dinamis
-            var sDarkest = adjustBrightnessJs(secondary, -55);
-            var sDarker  = adjustBrightnessJs(secondary, -35);
-            var sDark    = adjustBrightnessJs(secondary, -18);
+            // Palet Sekunder Dinamis (Cerah & Hangat)
+            var sDarkest = adjustBrightnessJs(secondary, -32);
+            var sDarker  = adjustBrightnessJs(secondary, -18);
+            var sDark    = adjustBrightnessJs(secondary, -8);
             var sBase    = secondary;
-            var sMedium  = adjustBrightnessJs(secondary, 25);
-            var sLight   = adjustBrightnessJs(secondary, 50);
+            var sMedium  = adjustBrightnessJs(secondary, 22);
+            var sLight   = adjustBrightnessJs(secondary, 45);
 
             // Update Top Stripe
             var topStripe = document.getElementById('prevTopStripe');

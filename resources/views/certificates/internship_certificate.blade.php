@@ -13,20 +13,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     @php
+        \Carbon\Carbon::setLocale('id');
+        setlocale(LC_TIME, 'id_ID.utf8', 'indonesian');
+
         $theme = $theme ?? \App\Models\CertificateTheme::getActive();
         $primaryColor = $theme->primary_color ?? '#00A3C4';
         $secondaryColor = $theme->secondary_color ?? '#F36F21';
         $accentColor = $theme->accent_color ?? '#D97706';
 
         $pPalette = method_exists($theme, 'getPrimaryPalette') ? $theme->getPrimaryPalette() : [
-            'darkest' => '#004958', 'darker' => '#006a7f', 'dark' => '#0086a1',
-            'base' => $primaryColor, 'medium' => '#40bad3', 'light' => '#80d1e2',
-            'lighter' => '#b8e5ee', 'pale' => '#e0f4f8'
+            'darkest' => '#00587a', 'darker' => '#007ca5', 'dark' => '#0097c9',
+            'base' => $primaryColor, 'medium' => '#40c4e4', 'light' => '#80daf0',
+            'lighter' => '#b8edf8', 'pale' => '#e0f6fc'
         ];
         $sPalette = method_exists($theme, 'getSecondaryPalette') ? $theme->getSecondaryPalette() : [
-            'darkest' => '#6d320f', 'darker' => '#9e4815', 'dark' => '#c75b1b',
-            'base' => $secondaryColor, 'medium' => '#f69359', 'light' => '#f9b790',
-            'lighter' => '#fcd7c1', 'pale' => '#feeee4'
+            'darkest' => '#b84a00', 'darker' => '#d95700', 'dark' => '#f26200',
+            'base' => $secondaryColor, 'medium' => '#ff8d38', 'light' => '#ffb37a',
+            'lighter' => '#ffd5b8', 'pale' => '#ffece0'
         ];
 
         $pDarkest = $pPalette['darkest'];
@@ -189,9 +192,10 @@
     </p>
 
     @php
-        // Logo Utama Dinas & Kota Surabaya
-        $surabayaLogoUrl = asset('images/certificates/logo_surabaya.webp');
-        $dispusipLogoUrl = asset('images/certificates/logo_dispusip.jpg');
+        // Logo Utama Dinas & Kota Surabaya (Transparan Presisi)
+        $officialLogosStripUrl = asset('images/certificates/logos_official_strip.png');
+        $surabayaLogoUrl = asset('images/certificates/logo_surabaya.png');
+        $dispusipLogoUrl = asset('images/certificates/logo_dispusip.png');
         $berakhlakLogoUrl = asset('images/certificates/logo_berakhlak.png');
         $banggaLogoUrl = asset('images/certificates/logo_bangga_melayani.png');
         $zonaLogoUrl = asset('images/certificates/logo_zona_integritas.png');
@@ -205,10 +209,8 @@
     <!-- ================================================================= -->
     <main class="certificate-sheet relative flex flex-col justify-between overflow-hidden bg-white select-none">
         
-        <!-- DYNAMIC SVG VECTOR ARTWORK (SUDUT KIRI ATAS, SUDUT KANAN BAWAH & TOP STRIPE) -->
+        <!-- DYNAMIC SVG VECTOR ARTWORK (SUDUT KIRI ATAS & SUDUT KANAN BAWAH) -->
         <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-            <!-- Top Stripe (Aksen Tepi Atas) -->
-            <rect x="52" y="0" width="245" height="3.2" fill="{{ $pDarkest }}" />
             
             <!-- 1. ORNAMEN SUDUT KIRI ATAS (Geometris Facet Poligon Mozaik Presisi) -->
             <!-- Col 0 (x: 0 - 10.4) -->
@@ -238,21 +240,21 @@
             <!-- Col 4 (x: 41.6 - 52.0) -->
             <polygon points="41.6,0 52.0,0 41.6,10.4" fill="{{ $pDark }}" />
 
-            <!-- Guilloche Wave Curves Kiri (Pita Gelombang S-Curve Halus) -->
-            <g fill="none" stroke="{{ $pMedium }}" stroke-width="0.32">
-                <path d="M 0,46 C 12,82 28,120 0,160" opacity="0.25" />
-                <path d="M 0,47 C 14,83 30,121 0,162" opacity="0.27" />
-                <path d="M 0,48 C 16,84 32,122 0,164" opacity="0.30" />
-                <path d="M 0,49 C 18,85 34,123 0,166" opacity="0.32" />
-                <path d="M 0,50 C 20,86 36,124 0,168" opacity="0.35" />
-                <path d="M 0,51 C 22,87 38,125 0,170" opacity="0.38" />
-                <path d="M 0,52 C 24,88 40,126 0,172" opacity="0.40" />
-                <path d="M 0,53 C 26,89 42,127 0,175" opacity="0.42" />
-                <path d="M 0,54 C 28,90 44,128 0,178" opacity="0.45" />
-                <path d="M 0,55 C 30,91 46,129 0,181" opacity="0.48" />
-                <path d="M 0,56 C 32,92 48,130 0,184" opacity="0.50" />
-                <path d="M 0,57 C 34,93 50,132 0,188" opacity="0.52" />
-                <path d="M 0,58 C 36,94 52,134 0,192" opacity="0.55" />
+            <!-- Guilloche Wave Curves Kiri (Pita Gelombang S-Curve Halus & Cerah Bercahaya) -->
+            <g fill="none" stroke="{{ $pMedium }}" stroke-width="0.45">
+                <path d="M 0,46 C 12,82 28,120 0,160" opacity="0.40" />
+                <path d="M 0,47 C 14,83 30,121 0,162" opacity="0.43" />
+                <path d="M 0,48 C 16,84 32,122 0,164" opacity="0.47" />
+                <path d="M 0,49 C 18,85 34,123 0,166" opacity="0.50" />
+                <path d="M 0,50 C 20,86 36,124 0,168" opacity="0.54" />
+                <path d="M 0,51 C 22,87 38,125 0,170" opacity="0.58" />
+                <path d="M 0,52 C 24,88 40,126 0,172" opacity="0.62" />
+                <path d="M 0,53 C 26,89 42,127 0,175" opacity="0.66" />
+                <path d="M 0,54 C 28,90 44,128 0,178" opacity="0.70" />
+                <path d="M 0,55 C 30,91 46,129 0,181" opacity="0.74" />
+                <path d="M 0,56 C 32,92 48,130 0,184" opacity="0.78" />
+                <path d="M 0,57 C 34,93 50,132 0,188" opacity="0.82" />
+                <path d="M 0,58 C 36,94 52,134 0,192" opacity="0.86" />
             </g>
 
             <!-- 2. ORNAMEN SUDUT KANAN BAWAH (Stepped Tangga Geometris Hangat) -->
@@ -283,127 +285,95 @@
             <!-- Col 0 (x: 245.0 - 255.4) -->
             <polygon points="245.0,210.0 255.4,210.0 255.4,199.6" fill="{{ $sLight }}" />
 
-            <!-- Guilloche Wave Curves Kanan (Pita Gelombang S-Curve Menyapu ke Atas) -->
-            <g fill="none" stroke="{{ $sMedium }}" stroke-width="0.32">
-                <path d="M 297,165 C 270,128 258,85 297,42" opacity="0.25" />
-                <path d="M 297,167 C 268,126 256,83 297,45" opacity="0.27" />
-                <path d="M 297,169 C 266,124 254,81 297,48" opacity="0.30" />
-                <path d="M 297,171 C 264,122 252,79 297,51" opacity="0.32" />
-                <path d="M 297,173 C 262,120 250,77 297,54" opacity="0.35" />
-                <path d="M 297,175 C 260,118 248,75 297,57" opacity="0.38" />
-                <path d="M 297,177 C 258,116 246,73 297,60" opacity="0.40" />
-                <path d="M 297,179 C 256,114 244,71 297,63" opacity="0.42" />
-                <path d="M 297,181 C 254,112 242,69 297,66" opacity="0.45" />
-                <path d="M 297,183 C 252,110 240,67 297,70" opacity="0.48" />
-                <path d="M 297,185 C 250,108 238,65 297,74" opacity="0.50" />
-                <path d="M 297,187 C 248,106 236,63 297,78" opacity="0.55" />
+            <!-- Guilloche Wave Curves Kanan (Pita Gelombang S-Curve Menyapu ke Atas Cerah Hangat) -->
+            <g fill="none" stroke="{{ $sMedium }}" stroke-width="0.45">
+                <path d="M 297,165 C 270,128 258,85 297,42" opacity="0.40" />
+                <path d="M 297,167 C 268,126 256,83 297,45" opacity="0.43" />
+                <path d="M 297,169 C 266,124 254,81 297,48" opacity="0.47" />
+                <path d="M 297,171 C 264,122 252,79 297,51" opacity="0.50" />
+                <path d="M 297,173 C 262,120 250,77 297,54" opacity="0.54" />
+                <path d="M 297,175 C 260,118 248,75 297,57" opacity="0.58" />
+                <path d="M 297,177 C 258,116 246,73 297,60" opacity="0.62" />
+                <path d="M 297,179 C 256,114 244,71 297,63" opacity="0.66" />
+                <path d="M 297,181 C 254,112 242,69 297,66" opacity="0.70" />
+                <path d="M 297,183 C 252,110 240,67 297,70" opacity="0.74" />
+                <path d="M 297,185 C 250,108 238,65 297,74" opacity="0.78" />
+                <path d="M 297,187 C 248,106 236,63 297,78" opacity="0.84" />
             </g>
         </svg>
 
         <!-- KONTEN SERTIFIKAT TERTATA PRESISI (LAYERING Z-INDEX 10) -->
-        <div class="relative z-10 flex flex-col justify-between h-full pt-4 pb-3 px-8 sm:px-12 text-center">
+        <div class="relative z-10 flex flex-col justify-between h-full pt-4 pb-10 sm:pb-12 md:pb-14 px-8 sm:px-12 text-center">
             
-            <!-- 1. HEADER KOP 5 LOGO RESMI SEJAJAR HORIZONTAL -->
-            <div class="pt-1 flex items-center justify-center gap-6 sm:gap-7">
-                <!-- Lambang Kota Surabaya -->
-                <div class="h-11 sm:h-12 flex items-center justify-center">
-                    <img src="{{ $surabayaLogoUrl }}" 
-                         alt="Pemerintah Kota Surabaya" 
-                         class="max-h-11 sm:max-h-12 w-auto object-contain"
-                         onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
-                </div>
-
-                <!-- Logo Baru Dispusip Kota Surabaya -->
-                <div class="h-11 sm:h-12 flex items-center justify-center">
-                    <img src="{{ $dispusipLogoUrl }}" 
-                         alt="Dinas Perpustakaan dan Kearsipan Kota Surabaya" 
-                         class="max-h-11 sm:max-h-12 w-auto object-contain"
-                         onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
-                </div>
-
-                <!-- Logo ASN BerAKHLAK -->
-                <div class="h-9 sm:h-10 flex items-center justify-center">
-                    <img src="{{ $berakhlakLogoUrl }}" 
-                         alt="ASN BerAKHLAK" 
-                         class="max-h-9 sm:max-h-10 w-auto object-contain">
-                </div>
-
-                <!-- Logo Bangga Melayani Bangsa -->
-                <div class="h-8 sm:h-9 flex items-center justify-center">
-                    <img src="{{ $banggaLogoUrl }}" 
-                         alt="Bangga Melayani Bangsa" 
-                         class="max-h-8 sm:max-h-9 w-auto object-contain">
-                </div>
-
-                <!-- Logo Zona Integritas (WBK & WBBM) -->
-                <div class="h-9 sm:h-10 flex items-center justify-center">
-                    <img src="{{ $zonaLogoUrl }}" 
-                         alt="Zona Integritas WBK WBBM" 
-                         class="max-h-9 sm:max-h-10 w-auto object-contain">
-                </div>
+            <!-- 1. HEADER KOP 5 LOGO RESMI SEJAJAR HORIZONTAL (ULTRA-HD TRANSPARAN PRESISI) -->
+            <div class="pt-2 flex items-center justify-center">
+                <img src="{{ $officialLogosStripUrl }}?v={{ @filemtime(public_path('images/certificates/logos_official_strip.png')) ?: 1 }}" 
+                     alt="Pemerintah Kota Surabaya, Dispusip, BerAKHLAK, Bangga Melayani Bangsa, Zona Integritas" 
+                     class="h-11 sm:h-12 md:h-[50px] w-auto max-w-[88%] object-contain"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'flex items-center justify-center gap-6 sm:gap-7\'><img src=\'{{ $surabayaLogoUrl }}\' class=\'h-11 sm:h-12 w-auto object-contain\'><img src=\'{{ $dispusipLogoUrl }}\' class=\'h-11 sm:h-12 w-auto object-contain\'><img src=\'{{ $berakhlakLogoUrl }}\' class=\'h-9 sm:h-10 w-auto object-contain\'><img src=\'{{ $banggaLogoUrl }}\' class=\'h-8 sm:h-9 w-auto object-contain\'><img src=\'{{ $zonaLogoUrl }}\' class=\'h-9 sm:h-10 w-auto object-contain\'></div>';">
             </div>
 
             <!-- 2. JUDUL SERTIFIKAT & NOMOR REGISTRASI RESMI -->
-            <div class="mt-2 space-y-0.5">
-                <h1 class="font-cert-serif text-3xl sm:text-4xl md:text-[40px] font-bold text-black tracking-[0.05em] uppercase leading-none">
+            <div class="mt-2 space-y-1">
+                <h1 class="font-cert-serif text-4xl sm:text-5xl md:text-[56px] font-black text-black tracking-[0.06em] uppercase leading-none">
                     SERTIFIKAT
                 </h1>
-                <h2 class="font-cert-serif text-xl sm:text-2xl md:text-[23px] font-bold text-black tracking-[0.18em] uppercase leading-none pt-1">
+                <h2 class="font-cert-serif text-2xl sm:text-3xl md:text-[31px] font-black text-black tracking-[0.24em] uppercase leading-none pt-2">
                     MAGANG
                 </h2>
-                <p class="font-cert-serif text-xs sm:text-[13.5px] font-bold text-black tracking-wide pt-2">
+                <p class="font-cert-serif text-sm sm:text-base md:text-[17px] font-bold text-black tracking-wide pt-2.5">
                     Nomor : {{ $regNumber }}
                 </p>
             </div>
 
             <!-- 3. NAMA MAHASISWA & GARIS BAWAH PRESISI DENGAN SUBTITLE -->
-            <div class="mt-2 space-y-1">
-                <div class="inline-block border-b-2 border-black pb-1 px-4 max-w-[85%]">
-                    <h2 class="font-cert-name text-3xl sm:text-4xl md:text-[42px] font-extrabold text-black tracking-tight leading-none">
+            <div class="mt-2 space-y-1.5">
+                <div class="inline-block border-b-[2.5px] border-black pb-1.5 px-6 max-w-[92%]">
+                    <h2 class="font-cert-name text-4xl sm:text-5xl md:text-[56px] font-black text-black tracking-tight leading-none">
                         {{ $student->name }}
                     </h2>
                 </div>
-                <p class="font-cert-body text-xs sm:text-[14.5px] font-medium text-black leading-snug pt-1">
+                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] font-medium text-black leading-normal pt-1.5">
                     Mahasiswa Program Studi {{ $profile->jurusan ?? 'Semua Jurusan' }}{{ !empty($profile->fakultas) ? ' Fakultas ' . $profile->fakultas : '' }}
                 </p>
-                <p class="font-cert-body text-xs sm:text-[14.5px] font-medium text-black leading-snug">
+                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] font-medium text-black leading-normal">
                     {{ $profile->universitas ?? ($university->name ?? 'Universitas') }}
                 </p>
             </div>
 
             <!-- 4. NARASI KELULUSAN & PERIODE MAGANG (ITALIC) -->
-            <div class="mt-2 space-y-0.5 max-w-3xl mx-auto">
-                <p class="font-cert-body text-xs sm:text-[14px] text-black leading-relaxed font-normal">
+            <div class="mt-2 space-y-1 max-w-3xl mx-auto">
+                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] text-black leading-relaxed font-normal">
                     Atas partisipasinya dalam mengikuti kerja magang
                 </p>
-                <p class="font-cert-body text-xs sm:text-[14px] text-black leading-relaxed font-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] text-black leading-relaxed font-normal">
                     di Dinas Perpustakaan dan Kearsipan Kota Surabaya
                 </p>
-                <p class="font-cert-body text-xs sm:text-[14px] italic font-medium text-black pt-1">
+                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] italic font-semibold text-black pt-1">
                     {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}
                 </p>
             </div>
 
             <!-- 5. KOTA TANGGAL & KOTAK TTE ELEKTRONIK RESMI STANDAR BSrE -->
-            <div class="mt-2 flex flex-col items-center">
-                <p class="font-cert-body text-xs sm:text-[13px] text-black">
+            <div class="mt-2 mb-2 sm:mb-3 flex flex-col items-center">
+                <p class="font-cert-body text-xs sm:text-sm md:text-[16px] text-black">
                     {{ $theme->city ?? 'Surabaya' }}, {{ \Carbon\Carbon::parse($placement->certificate?->issued_at ?? now())->translatedFormat('d F Y') }}
                 </p>
-                <p class="font-cert-body text-xs sm:text-[13px] text-black mt-0.5">
+                <p class="font-cert-body text-xs sm:text-sm md:text-[16px] text-black mt-0.5">
                     {{ $theme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}
                 </p>
 
                 <!-- Kotak TTE Resmi Standar BSrE / Kominfo -->
-                <div class="mt-1.5 flex items-center gap-3.5 px-3.5 py-2 bg-white border-[1.5px] border-black text-left font-cert-tte shadow-2xs" style="width: 360px; max-width: 95%; height: 78px;">
+                <div class="mt-3 flex items-center gap-4 px-4 py-2.5 bg-white border-[1.5px] border-black text-left font-cert-tte shadow-2xs" style="width: 440px; max-width: 95%; height: 100px;">
                     
-                    <!-- Sisi Kiri Kotak: QR Code dengan Lambang Surabaya di Tengah -->
-                    <div class="relative w-[64px] h-[64px] flex items-center justify-center shrink-0 bg-white border border-slate-300 p-0.5">
+                    <!-- Sisi Kiri Kotak: QR Code dengan Lambang Surabaya di Tengah (Besar & Jelas) -->
+                    <div class="relative w-[86px] h-[86px] flex items-center justify-center shrink-0 bg-white border border-slate-300 p-0.5">
                         <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi Sertifikat">
                             {!! $qrSvg !!}
                         </div>
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div class="w-[18px] h-[18px] bg-white rounded-xs p-[1px] shadow-2xs flex items-center justify-center border border-slate-300">
-                                <img src="{{ $surabayaLogoUrl }}" 
+                            <div class="w-[24px] h-[24px] bg-white rounded-xs p-[1.5px] shadow-2xs flex items-center justify-center border border-slate-300">
+                                <img src="{{ $surabayaLogoUrl }}?v={{ @filemtime(public_path('images/certificates/logo_surabaya.png')) ?: 1 }}" 
                                      alt="SBY" 
                                      class="w-full h-full object-contain"
                                      onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
@@ -412,12 +382,12 @@
                     </div>
 
                     <!-- Sisi Kanan Kotak: Teks Penandatanganan Elektronik Berjenjang -->
-                    <div class="text-[9.5px] leading-tight text-black flex-1">
-                        <div class="text-[8.5px] text-slate-600">Ditandatangani secara elektronik oleh:</div>
-                        <div class="font-medium text-slate-800">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
-                        <div class="mt-0.5 font-bold text-[11px] text-black tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
-                        <div class="text-[8px] font-semibold text-slate-600 uppercase tracking-wide">{{ $theme->signee_rank ?? 'PEMBINA TK I' }}</div>
-                        <div class="text-[8.5px] font-mono text-slate-700 font-medium">NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
+                    <div class="text-[10px] leading-snug text-black flex-1">
+                        <div class="text-[9px] text-slate-600">Ditandatangani secara elektronik oleh:</div>
+                        <div class="font-medium text-slate-800 text-[11px]">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
+                        <div class="mt-0.5 font-bold text-[14px] text-black tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
+                        <div class="text-[9px] font-semibold text-slate-600 uppercase tracking-wide">{{ $theme->signee_rank ?? 'PEMBINA TK I' }}</div>
+                        <div class="text-[10px] font-mono text-slate-700 font-medium">NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
                     </div>
 
                 </div>
