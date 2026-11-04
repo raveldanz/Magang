@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,500;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Roboto+Slab:wght@700;800;900&family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,500;1,600&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -70,9 +70,22 @@
             font-family: 'Times New Roman', Times, 'Playfair Display', serif;
         }
 
-        .font-cert-name {
-            font-family: 'Playfair Display', 'Times New Roman', Times, Georgia, serif;
+        /* Judul tebal ala sertifikat resmi dinas (slab display) */
+        .font-cert-title {
+            font-family: 'Alfa Slab One', 'Roboto Slab', Rockwell, 'Playfair Display', Georgia, serif;
+            font-weight: 400 !important; /* cegah faux-bold (bayangan ganda) pada font display satu bobot */
+            -webkit-text-stroke: 0;
         }
+
+        .font-cert-name {
+            font-family: 'Roboto Slab', Rockwell, 'Playfair Display', Georgia, serif;
+            font-weight: 800;
+        }
+
+        /* QR: tepi modul tajam (tanpa garis halus) saat dicetak / PDF */
+        .qr-wrap svg { display: block; width: 100%; height: 100%; }
+        .qr-wrap svg path,
+        .qr-wrap svg rect { shape-rendering: crispEdges; }
 
         .font-cert-body {
             font-family: 'Times New Roman', 'Playfair Display', Georgia, serif;
@@ -202,6 +215,21 @@
 
         // Simple Grade untuk Halaman 2
         $simpleGrade = $eval->grade_calculated ?? ($eval->grade ?? 'A');
+        $predikat = ['A' => 'Sangat Memuaskan', 'B' => 'Memuaskan', 'C' => 'Cukup'][strtoupper((string) $simpleGrade)] ?? 'Kurang';
+
+        // Ringkasan kegiatan untuk lampiran (halaman 2) — dari data yang sudah ada
+        $hariMagang = 0;
+        try {
+            $hariMagang = \Carbon\Carbon::parse($application->start_date)->startOfDay()->diffInDays(\Carbon\Carbon::parse($application->end_date)->startOfDay()) + 1;
+        } catch (\Throwable $e) {
+            $hariMagang = 0;
+        }
+        $mingguMagang = $hariMagang > 0 ? (int) ceil($hariMagang / 7) : 0;
+        $logTotal = $placement ? $placement->logbooks()->count() : 0;
+        $logApproved = $placement ? $placement->logbooks()->where('status', 'approved')->count() : 0;
+        $laporanRaw = isset($finalReport) && $finalReport ? $finalReport->status : null;
+        $laporanVal = $laporanRaw instanceof \BackedEnum ? $laporanRaw->value : $laporanRaw;
+        $laporanLabel = $laporanVal ? (\App\Enums\ReviewStatus::tryFrom((string) $laporanVal)?->description() ?? 'Belum Ada') : 'Belum Ada';
     @endphp
 
     <!-- ================================================================= -->
@@ -211,95 +239,12 @@
         
         <!-- DYNAMIC SVG VECTOR ARTWORK (SUDUT KIRI ATAS & SUDUT KANAN BAWAH) -->
         <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
-            
-            <!-- 1. ORNAMEN SUDUT KIRI ATAS (Geometris Facet Poligon Mozaik Presisi) -->
-            <!-- Col 0 (x: 0 - 10.4) -->
-            <rect x="0" y="0" width="10.4" height="10.4" fill="{{ $pDarker }}" />
-            <rect x="0" y="10.4" width="10.4" height="10.4" fill="{{ $pBase }}" />
-            <polygon points="0,20.8 10.4,20.8 0,31.2" fill="{{ $pDarkest }}" />
-            <rect x="0" y="31.2" width="10.4" height="10.4" fill="{{ $pMedium }}" />
-            <polygon points="0,41.6 10.4,41.6 0,52.0" fill="{{ $pLight }}" />
-            
-            <!-- Col 1 (x: 10.4 - 20.8) -->
-            <rect x="10.4" y="0" width="10.4" height="10.4" fill="{{ $pDarkest }}" />
-            <polygon points="10.4,10.4 20.8,10.4 20.8,20.8" fill="{{ $pDark }}" />
-            <polygon points="10.4,10.4 20.8,20.8 10.4,20.8" fill="{{ $pMedium }}" />
-            <rect x="10.4" y="20.8" width="10.4" height="10.4" fill="{{ $pBase }}" />
-            <polygon points="10.4,31.2 20.8,31.2 10.4,41.6" fill="{{ $pLight }}" />
 
-            <!-- Col 2 (x: 20.8 - 31.2) -->
-            <rect x="20.8" y="0" width="10.4" height="10.4" fill="{{ $pDark }}" />
-            <polygon points="20.8,10.4 31.2,10.4 20.8,20.8" fill="{{ $pBase }}" />
-            <polygon points="20.8,20.8 31.2,10.4 31.2,20.8" fill="{{ $pLight }}" />
-            <polygon points="20.8,20.8 31.2,20.8 20.8,31.2" fill="{{ $pMedium }}" />
+            <!-- 0. STRIP BINGKAI ATAS (BIRU) & BAWAH (EMAS) SEPERTI SERTIFIKAT ASLI DINAS -->
+            <rect x="0" y="0" width="297" height="2.6" fill="{{ $pDarkest }}" />
+            <rect x="0" y="207.6" width="297" height="2.4" fill="{{ $accentColor }}" />
 
-            <!-- Col 3 (x: 31.2 - 41.6) -->
-            <polygon points="31.2,0 41.6,0 31.2,10.4" fill="{{ $pDarkest }}" />
-            <polygon points="31.2,10.4 41.6,10.4 31.2,20.8" fill="{{ $pMedium }}" />
-
-            <!-- Col 4 (x: 41.6 - 52.0) -->
-            <polygon points="41.6,0 52.0,0 41.6,10.4" fill="{{ $pDark }}" />
-
-            <!-- Guilloche Wave Curves Kiri (Pita Gelombang S-Curve Halus & Cerah Bercahaya) -->
-            <g fill="none" stroke="{{ $pMedium }}" stroke-width="0.45">
-                <path d="M 0,46 C 12,82 28,120 0,160" opacity="0.40" />
-                <path d="M 0,47 C 14,83 30,121 0,162" opacity="0.43" />
-                <path d="M 0,48 C 16,84 32,122 0,164" opacity="0.47" />
-                <path d="M 0,49 C 18,85 34,123 0,166" opacity="0.50" />
-                <path d="M 0,50 C 20,86 36,124 0,168" opacity="0.54" />
-                <path d="M 0,51 C 22,87 38,125 0,170" opacity="0.58" />
-                <path d="M 0,52 C 24,88 40,126 0,172" opacity="0.62" />
-                <path d="M 0,53 C 26,89 42,127 0,175" opacity="0.66" />
-                <path d="M 0,54 C 28,90 44,128 0,178" opacity="0.70" />
-                <path d="M 0,55 C 30,91 46,129 0,181" opacity="0.74" />
-                <path d="M 0,56 C 32,92 48,130 0,184" opacity="0.78" />
-                <path d="M 0,57 C 34,93 50,132 0,188" opacity="0.82" />
-                <path d="M 0,58 C 36,94 52,134 0,192" opacity="0.86" />
-            </g>
-
-            <!-- 2. ORNAMEN SUDUT KANAN BAWAH (Stepped Tangga Geometris Hangat) -->
-            <!-- Col 4 (Paling Kanan: x: 286.6 - 297.0) -->
-            <rect x="286.6" y="199.6" width="10.4" height="10.4" fill="{{ $sDarker }}" />
-            <rect x="286.6" y="189.2" width="10.4" height="10.4" fill="{{ $sDarkest }}" />
-            <rect x="286.6" y="178.8" width="10.4" height="10.4" fill="{{ $sDarkest }}" />
-            <rect x="286.6" y="168.4" width="10.4" height="10.4" fill="{{ $sDarker }}" />
-            <polygon points="286.6,168.4 297,168.4 297,158.0" fill="{{ $sDarkest }}" />
-
-            <!-- Col 3 (x: 276.2 - 286.6) -->
-            <rect x="276.2" y="199.6" width="10.4" height="10.4" fill="{{ $sDark }}" />
-            <polygon points="276.2,189.2 286.6,189.2 286.6,199.6" fill="{{ $sDark }}" />
-            <polygon points="276.2,189.2 286.6,199.6 276.2,199.6" fill="{{ $sBase }}" />
-            <rect x="276.2" y="178.8" width="10.4" height="10.4" fill="{{ $sDark }}" />
-            <polygon points="276.2,178.8 286.6,178.8 286.6,168.4" fill="{{ $sDark }}" />
-
-            <!-- Col 2 (x: 265.8 - 276.2) -->
-            <rect x="265.8" y="199.6" width="10.4" height="10.4" fill="{{ $sBase }}" />
-            <polygon points="265.8,189.2 276.2,189.2 265.8,199.6" fill="{{ $sBase }}" />
-            <polygon points="265.8,199.6 276.2,189.2 276.2,199.6" fill="{{ $sMedium }}" />
-            <polygon points="265.8,189.2 276.2,189.2 276.2,178.8" fill="{{ $sBase }}" />
-
-            <!-- Col 1 (x: 255.4 - 265.8) -->
-            <rect x="255.4" y="199.6" width="10.4" height="10.4" fill="{{ $sMedium }}" />
-            <polygon points="255.4,199.6 265.8,199.6 265.8,189.2" fill="{{ $sMedium }}" />
-
-            <!-- Col 0 (x: 245.0 - 255.4) -->
-            <polygon points="245.0,210.0 255.4,210.0 255.4,199.6" fill="{{ $sLight }}" />
-
-            <!-- Guilloche Wave Curves Kanan (Pita Gelombang S-Curve Menyapu ke Atas Cerah Hangat) -->
-            <g fill="none" stroke="{{ $sMedium }}" stroke-width="0.45">
-                <path d="M 297,165 C 270,128 258,85 297,42" opacity="0.40" />
-                <path d="M 297,167 C 268,126 256,83 297,45" opacity="0.43" />
-                <path d="M 297,169 C 266,124 254,81 297,48" opacity="0.47" />
-                <path d="M 297,171 C 264,122 252,79 297,51" opacity="0.50" />
-                <path d="M 297,173 C 262,120 250,77 297,54" opacity="0.54" />
-                <path d="M 297,175 C 260,118 248,75 297,57" opacity="0.58" />
-                <path d="M 297,177 C 258,116 246,73 297,60" opacity="0.62" />
-                <path d="M 297,179 C 256,114 244,71 297,63" opacity="0.66" />
-                <path d="M 297,181 C 254,112 242,69 297,66" opacity="0.70" />
-                <path d="M 297,183 C 252,110 240,67 297,70" opacity="0.74" />
-                <path d="M 297,185 C 250,108 238,65 297,74" opacity="0.78" />
-                <path d="M 297,187 C 248,106 236,63 297,78" opacity="0.84" />
-            </g>
+            @include('certificates.partials.corner-ornaments')
         </svg>
 
         <!-- KONTEN SERTIFIKAT TERTATA PRESISI (LAYERING Z-INDEX 10) -->
@@ -309,85 +254,93 @@
             <div class="pt-2 flex items-center justify-center">
                 <img src="{{ $officialLogosStripUrl }}?v={{ @filemtime(public_path('images/certificates/logos_official_strip.png')) ?: 1 }}" 
                      alt="Pemerintah Kota Surabaya, Dispusip, BerAKHLAK, Bangga Melayani Bangsa, Zona Integritas" 
-                     class="h-11 sm:h-12 md:h-[50px] w-auto max-w-[88%] object-contain"
+                     class="h-11 sm:h-12 md:h-[56px] w-auto max-w-[88%] object-contain"
                      onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'flex items-center justify-center gap-6 sm:gap-7\'><img src=\'{{ $surabayaLogoUrl }}\' class=\'h-11 sm:h-12 w-auto object-contain\'><img src=\'{{ $dispusipLogoUrl }}\' class=\'h-11 sm:h-12 w-auto object-contain\'><img src=\'{{ $berakhlakLogoUrl }}\' class=\'h-9 sm:h-10 w-auto object-contain\'><img src=\'{{ $banggaLogoUrl }}\' class=\'h-8 sm:h-9 w-auto object-contain\'><img src=\'{{ $zonaLogoUrl }}\' class=\'h-9 sm:h-10 w-auto object-contain\'></div>';">
             </div>
 
             <!-- 2. JUDUL SERTIFIKAT & NOMOR REGISTRASI RESMI -->
             <div class="mt-2 space-y-1">
-                <h1 class="font-cert-serif text-4xl sm:text-5xl md:text-[56px] font-black text-black tracking-[0.06em] uppercase leading-none">
+                <h1 class="font-cert-title text-4xl sm:text-5xl md:text-[64px] text-black tracking-[0.03em] uppercase leading-none">
                     SERTIFIKAT
                 </h1>
-                <h2 class="font-cert-serif text-2xl sm:text-3xl md:text-[31px] font-black text-black tracking-[0.24em] uppercase leading-none pt-2">
+                <h2 class="font-cert-serif text-3xl sm:text-4xl md:text-[42px] font-normal text-black tracking-[0.06em] uppercase leading-none pt-2">
                     MAGANG
                 </h2>
-                <p class="font-cert-serif text-sm sm:text-base md:text-[17px] font-bold text-black tracking-wide pt-2.5">
+                <p class="font-cert-serif text-sm sm:text-base md:text-[18px] font-bold text-black tracking-wide pt-3">
                     Nomor : {{ $regNumber }}
                 </p>
             </div>
 
             <!-- 3. NAMA MAHASISWA & GARIS BAWAH PRESISI DENGAN SUBTITLE -->
             <div class="mt-2 space-y-1.5">
-                <div class="inline-block border-b-[2.5px] border-black pb-1.5 px-6 max-w-[92%]">
-                    <h2 class="font-cert-name text-4xl sm:text-5xl md:text-[56px] font-black text-black tracking-tight leading-none">
+                <div class="inline-block border-b-[3px] border-black pb-2 px-8 max-w-[94%]">
+                    @php
+                        // Ukuran nama menyesuaikan panjang agar selalu besar & tetap muat satu baris
+                        $nameLen = mb_strlen(trim($student->name));
+                        $nameSize = $nameLen <= 18 ? 66 : ($nameLen <= 26 ? 58 : ($nameLen <= 32 ? 49 : ($nameLen <= 40 ? 42 : 36)));
+                    @endphp
+                    <h2 class="font-cert-name text-black tracking-tight leading-none whitespace-nowrap" style="font-size: {{ $nameSize }}px;">
                         {{ $student->name }}
                     </h2>
                 </div>
-                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] font-medium text-black leading-normal pt-1.5">
+                <p class="font-cert-body text-sm sm:text-base md:text-[20px] font-medium text-black leading-normal pt-1.5">
                     Mahasiswa Program Studi {{ $profile->jurusan ?? 'Semua Jurusan' }}{{ !empty($profile->fakultas) ? ' Fakultas ' . $profile->fakultas : '' }}
                 </p>
-                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] font-medium text-black leading-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[20px] font-medium text-black leading-normal">
                     {{ $profile->universitas ?? ($university->name ?? 'Universitas') }}
                 </p>
             </div>
 
             <!-- 4. NARASI KELULUSAN & PERIODE MAGANG (ITALIC) -->
             <div class="mt-2 space-y-1 max-w-3xl mx-auto">
-                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] text-black leading-relaxed font-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[20px] text-black leading-relaxed font-normal">
                     Atas partisipasinya dalam mengikuti kerja magang
                 </p>
-                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] text-black leading-relaxed font-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[20px] text-black leading-relaxed font-normal">
                     di Dinas Perpustakaan dan Kearsipan Kota Surabaya
                 </p>
-                <p class="font-cert-body text-sm sm:text-base md:text-[17.5px] italic font-semibold text-black pt-1">
+                <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-normal text-black pt-2">
                     {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}
                 </p>
             </div>
 
             <!-- 5. KOTA TANGGAL & KOTAK TTE ELEKTRONIK RESMI STANDAR BSrE -->
             <div class="mt-2 mb-2 sm:mb-3 flex flex-col items-center">
-                <p class="font-cert-body text-xs sm:text-sm md:text-[16px] text-black">
+                <p class="font-cert-body text-xs sm:text-sm md:text-[18px] font-bold text-black">
                     {{ $theme->city ?? 'Surabaya' }}, {{ \Carbon\Carbon::parse($placement->certificate?->issued_at ?? now())->translatedFormat('d F Y') }}
                 </p>
-                <p class="font-cert-body text-xs sm:text-sm md:text-[16px] text-black mt-0.5">
+                <p class="font-cert-body text-xs sm:text-sm md:text-[18px] font-bold text-black mt-0.5">
                     {{ $theme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}
                 </p>
 
                 <!-- Kotak TTE Resmi Standar BSrE / Kominfo -->
-                <div class="mt-3 flex items-center gap-4 px-4 py-2.5 bg-white border-[1.5px] border-black text-left font-cert-tte shadow-2xs" style="width: 440px; max-width: 95%; height: 100px;">
-                    
-                    <!-- Sisi Kiri Kotak: QR Code dengan Lambang Surabaya di Tengah (Besar & Jelas) -->
-                    <div class="relative w-[86px] h-[86px] flex items-center justify-center shrink-0 bg-white border border-slate-300 p-0.5">
-                        <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi Sertifikat">
+                <div class="mt-2.5 flex items-center gap-4 px-3.5 py-2 bg-white border-[1.5px] border-black text-left font-cert-tte" style="width: 480px; max-width: 95%; height: 108px;">
+
+                    <!-- Sisi Kiri Kotak: QR (zona tenang putih, ECC H, lambang Surabaya kecil di tengah) -->
+                    <div class="relative w-[88px] h-[88px] shrink-0 bg-white" style="padding: 3px;">
+                        <div class="qr-wrap w-full h-full" aria-label="QR Verifikasi Sertifikat">
                             {!! $qrSvg !!}
                         </div>
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div class="w-[24px] h-[24px] bg-white rounded-xs p-[1.5px] shadow-2xs flex items-center justify-center border border-slate-300">
-                                <img src="{{ $surabayaLogoUrl }}?v={{ @filemtime(public_path('images/certificates/logo_surabaya.png')) ?: 1 }}" 
-                                     alt="SBY" 
+                            <div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center" style="padding: 2px;">
+                                <img src="{{ $surabayaLogoUrl }}?v={{ @filemtime(public_path('images/certificates/logo_surabaya.png')) ?: 1 }}"
+                                     alt="SBY"
                                      class="w-full h-full object-contain"
                                      onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Sisi Kanan Kotak: Teks Penandatanganan Elektronik Berjenjang -->
-                    <div class="text-[10px] leading-snug text-black flex-1">
-                        <div class="text-[9px] text-slate-600">Ditandatangani secara elektronik oleh:</div>
-                        <div class="font-medium text-slate-800 text-[11px]">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
-                        <div class="mt-0.5 font-bold text-[14px] text-black tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
-                        <div class="text-[9px] font-semibold text-slate-600 uppercase tracking-wide">{{ $theme->signee_rank ?? 'PEMBINA TK I' }}</div>
-                        <div class="text-[10px] font-mono text-slate-700 font-medium">NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
+                    <!-- Sisi Kanan Kotak: Teks Penandatanganan Elektronik -->
+                    <div class="leading-snug text-black flex-1 min-w-0">
+                        <div class="text-[10px] text-black">Ditandatangani secara elektronik oleh:</div>
+                        <div class="text-[11px] text-black">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
+                        <div class="mt-1 font-bold text-[14px] text-black tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
+                        <div class="text-[10px] text-black uppercase">{{ $theme->signee_rank ?? 'PEMBINA TK I' }}</div>
+                        <div class="text-[10px] text-black">NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
+                        @if (!empty($verifyCertificateUrl))
+                            <div class="mt-1 pt-1 border-t border-slate-300 text-[7.5px] leading-tight text-slate-600 font-mono break-all">{{ preg_replace('#^https?://#', '', $verifyCertificateUrl) }}</div>
+                        @endif
                     </div>
 
                 </div>
@@ -399,10 +352,14 @@
     <!-- ================================================================= -->
     <!-- HALAMAN 2: LAMPIRAN TRANSKRIP RINCIAN NILAI KOMPETENSI            -->
     <!-- ================================================================= -->
-    <section class="certificate-sheet page-break px-8 py-5 relative flex flex-col justify-between bg-white select-none">
-        
-        <!-- Border Ornamen Halaman 2 -->
-        <div class="absolute inset-3 border-[2px] border-slate-300 rounded-2xl pointer-events-none"></div>
+    <section class="certificate-sheet page-break px-12 pt-7 pb-6 relative flex flex-col justify-between bg-white select-none">
+
+        <!-- Bingkai & ornamen sudut halaman 2 (selaras dengan halaman 1, versi kecil) -->
+        <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="297" height="2.6" fill="{{ $pDarkest }}" />
+            <rect x="0" y="207.6" width="297" height="2.4" fill="{{ $accentColor }}" />
+            @include('certificates.partials.corner-ornaments', ['showWaves' => false, 'scale' => 0.4])
+        </svg>
 
         <!-- Bagian Atas: KOP, BIODATA, DAN TABEL TRANSKRIP -->
         <div class="relative z-10 px-4 pt-0.5">
@@ -435,6 +392,7 @@
                     <p class="font-mono text-[9.5px] text-slate-600 font-bold">
                         Nomor : {{ $regNumber }}
                     </p>
+                    <p class="text-[8.5px] text-slate-400 font-semibold">Halaman 2 dari 2</p>
                 </div>
             </div>
 
@@ -526,9 +484,9 @@
                                 <tr>
                                     <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
                                     <td class="py-1.5 px-3 font-medium">{{ $mComp['name'] ?? $mComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
-                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                    <td class="py-1.5 px-3"></td>
                                     <td class="py-1.5 px-3 text-center font-bold">{{ isset($mComp['score']) && is_numeric($mComp['score']) ? ((float)$mComp['score'] == (int)$mComp['score'] ? (int)$mComp['score'] : number_format((float)$mComp['score'], 1)) : ($mComp['score'] ?? '-') }}</td>
-                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                    <td class="py-1.5 px-3"></td>
                                 </tr>
                             @endforeach
                             <tr class="bg-blue-50/70 font-bold">
@@ -553,9 +511,9 @@
                                 <tr>
                                     <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
                                     <td class="py-1.5 px-3 font-medium">{{ $lComp['name'] ?? $lComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
-                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                    <td class="py-1.5 px-3"></td>
                                     <td class="py-1.5 px-3 text-center font-bold">{{ isset($lComp['score']) && is_numeric($lComp['score']) ? ((float)$lComp['score'] == (int)$lComp['score'] ? (int)$lComp['score'] : number_format((float)$lComp['score'], 1)) : ($lComp['score'] ?? '-') }}</td>
-                                    <td class="py-1.5 px-3 text-center text-slate-400">-</td>
+                                    <td class="py-1.5 px-3"></td>
                                 </tr>
                             @endforeach
                             <tr class="bg-blue-50/70 font-bold">
@@ -578,7 +536,7 @@
                                 {{ $eval?->nilai_akhir ?? 0 }}
                             </td>
                             <td class="py-2.5 px-3 text-center text-amber-300 text-sm">
-                                GRADE {{ $simpleGrade }}
+                                GRADE {{ $simpleGrade }} <span class="block text-[8.5px] font-semibold tracking-wide text-amber-200/90 uppercase">{{ $predikat }}</span>
                             </td>
                         </tr>
 
@@ -588,23 +546,65 @@
 
         </div>
 
-        <!-- 4. FOOTER KETERANGAN TRANSKRIP (Dokumen Sah Tak Terpisahkan) -->
-        <div class="relative z-10 border-t border-slate-200 pt-2.5 px-4 pb-2 flex items-center justify-between text-xs text-slate-500">
-            <div class="space-y-0.5">
-                <p class="font-bold text-[9.5px] uppercase tracking-wider text-slate-700">Keterangan Skala Predikat & Mutu Nilai:</p>
-                <p class="text-[9px] text-slate-600">
-                    <strong>A (85 - 100)</strong> : Sangat Memuaskan &bull; 
-                    <strong>B (70 - 84)</strong> : Memuaskan &bull; 
-                    <strong>C (55 - 69)</strong> : Cukup
+        <!-- 4. FOOTER: RINGKASAN KEGIATAN, SKALA NILAI, DAN TTE (satu kesatuan dengan halaman 1) -->
+        <div class="relative z-10 border-t border-slate-200 pt-2.5 flex items-end justify-between gap-6">
+            <div class="flex-1 min-w-0 space-y-2">
+                <!-- Ringkasan kegiatan magang -->
+                <div class="grid grid-cols-3 gap-2 max-w-md">
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
+                        <div class="text-[7.5px] font-bold uppercase tracking-wider text-slate-500">Lama Magang</div>
+                        <div class="text-[11px] font-black text-slate-900 leading-tight">{{ $hariMagang }} hari</div>
+                        <div class="text-[8px] text-slate-500">&asymp; {{ $mingguMagang }} minggu</div>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
+                        <div class="text-[7.5px] font-bold uppercase tracking-wider text-slate-500">Logbook Disetujui</div>
+                        <div class="text-[11px] font-black text-slate-900 leading-tight">{{ $logApproved }} <span class="text-[8px] font-semibold text-slate-500">dari {{ $logTotal }}</span></div>
+                        <div class="text-[8px] text-slate-500">catatan harian</div>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
+                        <div class="text-[7.5px] font-bold uppercase tracking-wider text-slate-500">Laporan Akhir</div>
+                        <div class="text-[11px] font-black text-slate-900 leading-tight">{{ $laporanLabel }}</div>
+                        <div class="text-[8px] text-slate-500">status review</div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-bold text-[9px] uppercase tracking-wider text-slate-700">Keterangan Skala Predikat &amp; Mutu Nilai:</p>
+                    <p class="text-[9px] text-slate-600">
+                        <strong>A (85 - 100)</strong> : Sangat Memuaskan &bull;
+                        <strong>B (70 - 84)</strong> : Memuaskan &bull;
+                        <strong>C (55 - 69)</strong> : Cukup
+                    </p>
+                </div>
+
+                <p class="text-[8.5px] text-slate-500 leading-snug max-w-md">
+                    Lampiran transkrip nilai ini merupakan satu kesatuan sah dan tak terpisahkan dari Sertifikat Magang Nomor:
+                    <span class="font-bold text-slate-800">{{ $regNumber }}</span>.
                 </p>
             </div>
-            <div class="text-right text-[9px] text-slate-500 max-w-md leading-tight">
-                <p class="font-semibold text-slate-700">
-                    Lampiran transkrip nilai ini merupakan satu kesatuan sah dan tak terpisahkan dari Sertifikat Magang Nomor: <span class="font-bold text-slate-900">{{ $regNumber }}</span>.
-                </p>
-                <p class="text-[8px] text-slate-400 mt-0.5">
-                    Telah disahkan dan terverifikasi secara elektronik melalui Tanda Tangan Elektronik (TTE) pada lembar utama.
-                </p>
+
+            <!-- Blok pengesahan elektronik (QR sama dengan halaman 1) -->
+            <div class="shrink-0 flex flex-col items-center">
+                <p class="font-cert-body text-[10.5px] font-bold text-black">{{ $theme->city ?? 'Surabaya' }}, {{ \Carbon\Carbon::parse($placement->certificate?->issued_at ?? now())->translatedFormat('d F Y') }}</p>
+                <p class="font-cert-body text-[10.5px] font-bold text-black mb-1">{{ $theme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}</p>
+                <div class="flex items-center gap-3 px-2.5 py-1.5 bg-white border-[1.5px] border-black text-left font-cert-tte" style="width: 340px; height: 82px;">
+                    <div class="relative w-[68px] h-[68px] shrink-0 bg-white" style="padding: 2px;">
+                        <div class="qr-wrap w-full h-full" aria-label="QR Verifikasi Sertifikat">
+                            {!! $qrSvg !!}
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="w-[15px] h-[15px] bg-white rounded-full flex items-center justify-center" style="padding: 1.5px;">
+                                <img src="{{ $surabayaLogoUrl }}" alt="SBY" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="leading-snug text-black flex-1 min-w-0">
+                        <div class="text-[8.5px]">Ditandatangani secara elektronik oleh:</div>
+                        <div class="text-[9.5px]">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
+                        <div class="font-bold text-[12px] tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
+                        <div class="text-[8.5px] uppercase">{{ $theme->signee_rank ?? 'PEMBINA TK I' }} &bull; NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 

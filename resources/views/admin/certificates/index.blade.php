@@ -338,57 +338,35 @@
                                     </label>
                                 </div>
 
-                                <!-- Preset Pilihan Cepat -->
+                                <!-- Preset Pilihan Cepat (cerah & kontras tinggi) -->
+                                @php
+                                    $colorPresets = [
+                                        ['name' => 'Tema Dispusip Cerah', 'label' => 'Dispusip Cerah', 'desc' => 'Cyan & Jingga', 'c' => ['#00B4E6', '#FF7A1A', '#FFB800']],
+                                        ['name' => 'Tema Biru Samudra', 'label' => 'Biru Samudra', 'desc' => 'Biru & Aqua', 'c' => ['#2F80ED', '#00C2D1', '#FFC53D']],
+                                        ['name' => 'Tema Hijau Zamrud', 'label' => 'Hijau Zamrud', 'desc' => 'Hijau & Emas', 'c' => ['#10B981', '#FBBF24', '#F59E0B']],
+                                        ['name' => 'Tema Segar Lime', 'label' => 'Segar Lime', 'desc' => 'Lime & Langit', 'c' => ['#84CC16', '#0EA5E9', '#FACC15']],
+                                        ['name' => 'Tema Magenta Surya', 'label' => 'Magenta Surya', 'desc' => 'Pink & Jingga', 'c' => ['#EC4899', '#FF8A3D', '#FFC53D']],
+                                        ['name' => 'Tema Ungu Senja', 'label' => 'Ungu Senja', 'desc' => 'Ungu & Rose', 'c' => ['#8B5CF6', '#F472B6', '#FBBF24']],
+                                        ['name' => 'Tema Merah Berani', 'label' => 'Merah Berani', 'desc' => 'Merah & Kuning', 'c' => ['#F43F5E', '#FF8A00', '#FFCB2E']],
+                                        ['name' => 'Tema Resmi Dispusip 2026', 'label' => 'Dispusip 2026', 'desc' => 'Versi resmi (klasik)', 'c' => ['#00A3C4', '#F36F21', '#D97706']],
+                                    ];
+                                @endphp
                                 <div>
                                     <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-2">Preset Warna Siap Pakai:</label>
                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        <button type="button" 
-                                                onclick="applyPreset('Tema Resmi Dispusip 2026', '#00A3C4', '#F36F21', '#D97706')"
-                                                class="px-3 py-2 rounded-xl border border-slate-200 hover:border-cyan-500 bg-slate-50 hover:bg-cyan-50/50 text-left transition cursor-pointer">
-                                            <div class="flex items-center gap-1.5 mb-1">
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#00A3C4]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#F36F21]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#D97706]"></span>
-                                            </div>
-                                            <div class="text-[11px] font-bold text-slate-800 truncate">Dispusip 2026</div>
-                                            <div class="text-[9.5px] text-slate-500">Cyan & Orange</div>
-                                        </button>
-
-                                        <button type="button" 
-                                                onclick="applyPreset('Tema Emerald Gold', '#059669', '#D97706', '#B45309')"
-                                                class="px-3 py-2 rounded-xl border border-slate-200 hover:border-emerald-500 bg-slate-50 hover:bg-emerald-50/50 text-left transition cursor-pointer">
-                                            <div class="flex items-center gap-1.5 mb-1">
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#059669]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#D97706]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#B45309]"></span>
-                                            </div>
-                                            <div class="text-[11px] font-bold text-slate-800 truncate">Emerald Gold</div>
-                                            <div class="text-[9.5px] text-slate-500">Hijau & Emas</div>
-                                        </button>
-
-                                        <button type="button" 
-                                                onclick="applyPreset('Tema Royal Navy', '#1D4ED8', '#0284C7', '#EAB308')"
-                                                class="px-3 py-2 rounded-xl border border-slate-200 hover:border-blue-500 bg-slate-50 hover:bg-blue-50/50 text-left transition cursor-pointer">
-                                            <div class="flex items-center gap-1.5 mb-1">
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#1D4ED8]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#0284C7]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#EAB308]"></span>
-                                            </div>
-                                            <div class="text-[11px] font-bold text-slate-800 truncate">Royal Navy</div>
-                                            <div class="text-[9.5px] text-slate-500">Biru Klasik</div>
-                                        </button>
-
-                                        <button type="button" 
-                                                onclick="applyPreset('Tema Ruby Coral', '#BE123C', '#F97316', '#CA8A04')"
-                                                class="px-3 py-2 rounded-xl border border-slate-200 hover:border-rose-500 bg-slate-50 hover:bg-rose-50/50 text-left transition cursor-pointer">
-                                            <div class="flex items-center gap-1.5 mb-1">
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#BE123C]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#F97316]"></span>
-                                                <span class="w-3.5 h-3.5 rounded-full bg-[#CA8A04]"></span>
-                                            </div>
-                                            <div class="text-[11px] font-bold text-slate-800 truncate">Ruby Coral</div>
-                                            <div class="text-[9.5px] text-slate-500">Merah & Orange</div>
-                                        </button>
+                                        @foreach ($colorPresets as $pr)
+                                            <button type="button"
+                                                    onclick="applyPreset(@js($pr['name']), @js($pr['c'][0]), @js($pr['c'][1]), @js($pr['c'][2]))"
+                                                    class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-sm bg-white text-left transition cursor-pointer">
+                                                <div class="flex h-3.5 rounded-full overflow-hidden mb-1.5 ring-1 ring-black/5">
+                                                    @foreach ($pr['c'] as $hex)
+                                                        <span class="flex-1" style="background-color: {{ $hex }};"></span>
+                                                    @endforeach
+                                                </div>
+                                                <div class="text-[11px] font-bold text-slate-800 truncate">{{ $pr['label'] }}</div>
+                                                <div class="text-[9.5px] text-slate-500 truncate">{{ $pr['desc'] }}</div>
+                                            </button>
+                                        @endforeach
                                     </div>
                                 </div>
 
@@ -564,69 +542,9 @@
                                     <!-- Dynamic SVG Vector Artwork -->
                                     <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
                                         
-                                        <!-- Top Left Mosaic -->
-                                        <rect id="prevP_0_0" x="0" y="0" width="10.4" height="10.4" fill="{{ $pPal['darker'] }}" />
-                                        <rect id="prevP_0_1" x="0" y="10.4" width="10.4" height="10.4" fill="{{ $pPal['base'] }}" />
-                                        <polygon id="prevP_0_2" points="0,20.8 10.4,20.8 0,31.2" fill="{{ $pPal['darkest'] }}" />
-                                        <rect id="prevP_0_3" x="0" y="31.2" width="10.4" height="10.4" fill="{{ $pPal['medium'] }}" />
-                                        <polygon id="prevP_0_4" points="0,41.6 10.4,41.6 0,52.0" fill="{{ $pPal['light'] }}" />
-
-                                        <rect id="prevP_1_0" x="10.4" y="0" width="10.4" height="10.4" fill="{{ $pPal['darkest'] }}" />
-                                        <polygon id="prevP_1_1a" points="10.4,10.4 20.8,10.4 20.8,20.8" fill="{{ $pPal['dark'] }}" />
-                                        <polygon id="prevP_1_1b" points="10.4,10.4 20.8,20.8 10.4,20.8" fill="{{ $pPal['medium'] }}" />
-                                        <rect id="prevP_1_2" x="10.4" y="20.8" width="10.4" height="10.4" fill="{{ $pPal['base'] }}" />
-                                        <polygon id="prevP_1_3" points="10.4,31.2 20.8,31.2 10.4,41.6" fill="{{ $pPal['light'] }}" />
-
-                                        <rect id="prevP_2_0" x="20.8" y="0" width="10.4" height="10.4" fill="{{ $pPal['dark'] }}" />
-                                        <polygon id="prevP_2_1a" points="20.8,10.4 31.2,10.4 20.8,20.8" fill="{{ $pPal['base'] }}" />
-                                        <polygon id="prevP_2_1b" points="20.8,20.8 31.2,10.4 31.2,20.8" fill="{{ $pPal['light'] }}" />
-                                        <polygon id="prevP_2_2" points="20.8,20.8 31.2,20.8 20.8,31.2" fill="{{ $pPal['medium'] }}" />
-
-                                        <polygon id="prevP_3_0" points="31.2,0 41.6,0 31.2,10.4" fill="{{ $pPal['darkest'] }}" />
-                                        <polygon id="prevP_3_1" points="31.2,10.4 41.6,10.4 31.2,20.8" fill="{{ $pPal['medium'] }}" />
-
-                                        <polygon id="prevP_4_0" points="41.6,0 52.0,0 41.6,10.4" fill="{{ $pPal['dark'] }}" />
-
-                                        <!-- Top Left Waves -->
-                                        <g id="prevWaveP" fill="none" stroke="{{ $pPal['medium'] }}" stroke-width="0.35">
-                                            <path d="M 0,46 C 12,82 28,120 0,160" opacity="0.3" />
-                                            <path d="M 0,49 C 18,85 34,123 0,166" opacity="0.35" />
-                                            <path d="M 0,52 C 24,88 40,126 0,172" opacity="0.4" />
-                                            <path d="M 0,55 C 30,91 46,129 0,181" opacity="0.45" />
-                                            <path d="M 0,58 C 36,94 52,134 0,192" opacity="0.5" />
-                                        </g>
-
-                                        <!-- Bottom Right Stepped Cascade -->
-                                        <rect id="prevS_4_0" x="286.6" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['darker'] }}" />
-                                        <rect id="prevS_4_1" x="286.6" y="189.2" width="10.4" height="10.4" fill="{{ $sPal['darkest'] }}" />
-                                        <rect id="prevS_4_2" x="286.6" y="178.8" width="10.4" height="10.4" fill="{{ $sPal['darkest'] }}" />
-                                        <rect id="prevS_4_3" x="286.6" y="168.4" width="10.4" height="10.4" fill="{{ $sPal['darker'] }}" />
-                                        <polygon id="prevS_4_4" points="286.6,168.4 297,168.4 297,158.0" fill="{{ $sPal['darkest'] }}" />
-
-                                        <rect id="prevS_3_0" x="276.2" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['dark'] }}" />
-                                        <polygon id="prevS_3_1a" points="276.2,189.2 286.6,189.2 286.6,199.6" fill="{{ $sPal['dark'] }}" />
-                                        <polygon id="prevS_3_1b" points="276.2,189.2 286.6,199.6 276.2,199.6" fill="{{ $sPal['base'] }}" />
-                                        <rect id="prevS_3_2" x="276.2" y="178.8" width="10.4" height="10.4" fill="{{ $sPal['dark'] }}" />
-                                        <polygon id="prevS_3_3" points="276.2,178.8 286.6,178.8 286.6,168.4" fill="{{ $sPal['dark'] }}" />
-
-                                        <rect id="prevS_2_0" x="265.8" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['base'] }}" />
-                                        <polygon id="prevS_2_1a" points="265.8,189.2 276.2,189.2 265.8,199.6" fill="{{ $sPal['base'] }}" />
-                                        <polygon id="prevS_2_1b" points="265.8,199.6 276.2,189.2 276.2,199.6" fill="{{ $sPal['medium'] }}" />
-                                        <polygon id="prevS_2_2" points="265.8,189.2 276.2,189.2 276.2,178.8" fill="{{ $sPal['base'] }}" />
-
-                                        <rect id="prevS_1_0" x="255.4" y="199.6" width="10.4" height="10.4" fill="{{ $sPal['medium'] }}" />
-                                        <polygon id="prevS_1_1" points="255.4,199.6 265.8,199.6 265.8,189.2" fill="{{ $sPal['medium'] }}" />
-
-                                        <polygon id="prevS_0_0" points="245.0,210.0 255.4,210.0 255.4,199.6" fill="{{ $sPal['light'] }}" />
-
-                                        <!-- Bottom Right Waves -->
-                                        <g id="prevWaveS" fill="none" stroke="{{ $sPal['medium'] }}" stroke-width="0.35">
-                                            <path d="M 297,165 C 270,128 258,85 297,42" opacity="0.3" />
-                                            <path d="M 297,170 C 262,120 250,77 297,54" opacity="0.35" />
-                                            <path d="M 297,175 C 256,114 244,71 297,63" opacity="0.4" />
-                                            <path d="M 297,180 C 250,108 238,65 297,74" opacity="0.45" />
-                                            <path d="M 297,185 C 248,106 236,63 297,78" opacity="0.5" />
-                                        </g>
+                                        <rect id="prevTopStripe" x="0" y="0" width="297" height="2.6" fill="{{ $pPal['darkest'] }}" />
+                                        <rect id="prevBottomStripe" x="0" y="207.6" width="297" height="2.4" fill="{{ $activeTheme->accent_color ?? '#D97706' }}" />
+                                        @include('certificates.partials.corner-ornaments', ['pPalette' => $pPal, 'sPalette' => $sPal, 'lite' => true])
                                     </svg>
 
                                     <!-- Mini Header Logos -->
@@ -803,76 +721,29 @@
             var mandate = document.getElementById('mandate_text').value;
             var city = document.getElementById('city').value;
 
-            // Palet Primer Dinamis (Cerah & Sinar Harmonis)
-            var pDarkest = adjustBrightnessJs(primary, -32);
-            var pDarker  = adjustBrightnessJs(primary, -18);
-            var pDark    = adjustBrightnessJs(primary, -8);
-            var pBase    = primary;
-            var pMedium  = adjustBrightnessJs(primary, 22);
-            var pLight   = adjustBrightnessJs(primary, 45);
+            // Palet dinamis — persentase sama persis dengan CertificateTheme::getPrimaryPalette()
+            function buildPalette(hex) {
+                return {
+                    darkest: adjustBrightnessJs(hex, -22), darker: adjustBrightnessJs(hex, -13), dark: adjustBrightnessJs(hex, -6),
+                    base: hex, medium: adjustBrightnessJs(hex, 20), light: adjustBrightnessJs(hex, 42), lighter: adjustBrightnessJs(hex, 64)
+                };
+            }
+            var pal = { p: buildPalette(primary), s: buildPalette(secondary) };
 
-            // Palet Sekunder Dinamis (Cerah & Hangat)
-            var sDarkest = adjustBrightnessJs(secondary, -32);
-            var sDarker  = adjustBrightnessJs(secondary, -18);
-            var sDark    = adjustBrightnessJs(secondary, -8);
-            var sBase    = secondary;
-            var sMedium  = adjustBrightnessJs(secondary, 22);
-            var sLight   = adjustBrightnessJs(secondary, 45);
-
-            // Update Top Stripe
             var topStripe = document.getElementById('prevTopStripe');
-            if (topStripe) topStripe.setAttribute('fill', pDarkest);
+            if (topStripe) topStripe.setAttribute('fill', pal.p.darkest);
+            var bottomStripe = document.getElementById('prevBottomStripe');
+            if (bottomStripe) bottomStripe.setAttribute('fill', accent);
 
-            // Update Top Left Mosaic Polygons
-            var p0_0 = document.getElementById('prevP_0_0'); if (p0_0) p0_0.setAttribute('fill', pDarker);
-            var p0_1 = document.getElementById('prevP_0_1'); if (p0_1) p0_1.setAttribute('fill', pBase);
-            var p0_2 = document.getElementById('prevP_0_2'); if (p0_2) p0_2.setAttribute('fill', pDarkest);
-            var p0_3 = document.getElementById('prevP_0_3'); if (p0_3) p0_3.setAttribute('fill', pMedium);
-            var p0_4 = document.getElementById('prevP_0_4'); if (p0_4) p0_4.setAttribute('fill', pLight);
-
-            var p1_0 = document.getElementById('prevP_1_0'); if (p1_0) p1_0.setAttribute('fill', pDarkest);
-            var p1_1a = document.getElementById('prevP_1_1a'); if (p1_1a) p1_1a.setAttribute('fill', pDark);
-            var p1_1b = document.getElementById('prevP_1_1b'); if (p1_1b) p1_1b.setAttribute('fill', pMedium);
-            var p1_2 = document.getElementById('prevP_1_2'); if (p1_2) p1_2.setAttribute('fill', pBase);
-            var p1_3 = document.getElementById('prevP_1_3'); if (p1_3) p1_3.setAttribute('fill', pLight);
-
-            var p2_0 = document.getElementById('prevP_2_0'); if (p2_0) p2_0.setAttribute('fill', pDark);
-            var p2_1a = document.getElementById('prevP_2_1a'); if (p2_1a) p2_1a.setAttribute('fill', pBase);
-            var p2_1b = document.getElementById('prevP_2_1b'); if (p2_1b) p2_1b.setAttribute('fill', pLight);
-            var p2_2 = document.getElementById('prevP_2_2'); if (p2_2) p2_2.setAttribute('fill', pMedium);
-
-            var p3_0 = document.getElementById('prevP_3_0'); if (p3_0) p3_0.setAttribute('fill', pDarkest);
-            var p3_1 = document.getElementById('prevP_3_1'); if (p3_1) p3_1.setAttribute('fill', pMedium);
-            var p4_0 = document.getElementById('prevP_4_0'); if (p4_0) p4_0.setAttribute('fill', pDark);
-
-            var waveP = document.getElementById('prevWaveP');
-            if (waveP) waveP.setAttribute('stroke', pMedium);
-
-            // Update Bottom Right Stepped Cascade
-            var s4_0 = document.getElementById('prevS_4_0'); if (s4_0) s4_0.setAttribute('fill', sDarker);
-            var s4_1 = document.getElementById('prevS_4_1'); if (s4_1) s4_1.setAttribute('fill', sDarkest);
-            var s4_2 = document.getElementById('prevS_4_2'); if (s4_2) s4_2.setAttribute('fill', sDarkest);
-            var s4_3 = document.getElementById('prevS_4_3'); if (s4_3) s4_3.setAttribute('fill', sDarker);
-            var s4_4 = document.getElementById('prevS_4_4'); if (s4_4) s4_4.setAttribute('fill', sDarkest);
-
-            var s3_0 = document.getElementById('prevS_3_0'); if (s3_0) s3_0.setAttribute('fill', sDark);
-            var s3_1a = document.getElementById('prevS_3_1a'); if (s3_1a) s3_1a.setAttribute('fill', sDark);
-            var s3_1b = document.getElementById('prevS_3_1b'); if (s3_1b) s3_1b.setAttribute('fill', sBase);
-            var s3_2 = document.getElementById('prevS_3_2'); if (s3_2) s3_2.setAttribute('fill', sDark);
-            var s3_3 = document.getElementById('prevS_3_3'); if (s3_3) s3_3.setAttribute('fill', sDark);
-
-            var s2_0 = document.getElementById('prevS_2_0'); if (s2_0) s2_0.setAttribute('fill', sBase);
-            var s2_1a = document.getElementById('prevS_2_1a'); if (s2_1a) s2_1a.setAttribute('fill', sBase);
-            var s2_1b = document.getElementById('prevS_2_1b'); if (s2_1b) s2_1b.setAttribute('fill', sMedium);
-            var s2_2 = document.getElementById('prevS_2_2'); if (s2_2) s2_2.setAttribute('fill', sBase);
-
-            var s1_0 = document.getElementById('prevS_1_0'); if (s1_0) s1_0.setAttribute('fill', sMedium);
-            var s1_1 = document.getElementById('prevS_1_1'); if (s1_1) s1_1.setAttribute('fill', sMedium);
-
-            var s0_0 = document.getElementById('prevS_0_0'); if (s0_0) s0_0.setAttribute('fill', sLight);
-
-            var waveS = document.getElementById('prevWaveS');
-            if (waveS) waveS.setAttribute('stroke', sMedium);
+            // Mosaik sudut: warnai ulang tiap segitiga sesuai nuansa (data-pal / data-shade)
+            document.querySelectorAll('#previewCard [data-shade]').forEach(function (el) {
+                var c = pal[el.dataset.pal][el.dataset.shade];
+                el.setAttribute('fill', c);
+                el.setAttribute('stroke', c);
+            });
+            document.querySelectorAll('#previewCard [data-wave]').forEach(function (el) {
+                el.setAttribute('stroke', pal[el.dataset.wave].medium);
+            });
 
             // Update Text Data
             var yr = document.getElementById('prevYearText');

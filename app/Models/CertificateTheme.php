@@ -96,13 +96,13 @@ class CertificateTheme extends Model
     {
         $base = $this->primary_color ?: '#00A8E8';
         return [
-            'darkest' => self::adjustBrightness($base, -32),
-            'darker'  => self::adjustBrightness($base, -18),
-            'dark'    => self::adjustBrightness($base, -8),
+            'darkest' => self::adjustBrightness($base, -22),
+            'darker'  => self::adjustBrightness($base, -13),
+            'dark'    => self::adjustBrightness($base, -6),
             'base'    => $base,
-            'medium'  => self::adjustBrightness($base, 22),
-            'light'   => self::adjustBrightness($base, 45),
-            'lighter' => self::adjustBrightness($base, 68),
+            'medium'  => self::adjustBrightness($base, 20),
+            'light'   => self::adjustBrightness($base, 42),
+            'lighter' => self::adjustBrightness($base, 64),
             'pale'    => self::adjustBrightness($base, 85),
         ];
     }
@@ -114,13 +114,13 @@ class CertificateTheme extends Model
     {
         $base = $this->secondary_color ?: '#FF6700';
         return [
-            'darkest' => self::adjustBrightness($base, -32),
-            'darker'  => self::adjustBrightness($base, -18),
-            'dark'    => self::adjustBrightness($base, -8),
+            'darkest' => self::adjustBrightness($base, -22),
+            'darker'  => self::adjustBrightness($base, -13),
+            'dark'    => self::adjustBrightness($base, -6),
             'base'    => $base,
-            'medium'  => self::adjustBrightness($base, 22),
-            'light'   => self::adjustBrightness($base, 45),
-            'lighter' => self::adjustBrightness($base, 68),
+            'medium'  => self::adjustBrightness($base, 20),
+            'light'   => self::adjustBrightness($base, 42),
+            'lighter' => self::adjustBrightness($base, 64),
             'pale'    => self::adjustBrightness($base, 85),
         ];
     }
