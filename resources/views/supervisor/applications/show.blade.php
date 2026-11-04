@@ -63,7 +63,7 @@
                                     <div class="flex items-center gap-2">
                                         <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-extrabold text-[10px] uppercase tracking-wider">Kelompok Magang</span>
                                         <span class="font-extrabold text-sm text-slate-900">{{ $application->group->name }}</span>
-                                        <span class="text-xs text-indigo-700 font-bold font-mono">({{ $application->group->code }})</span>
+                                        <span class="text-xs text-indigo-700 font-bold font-mono">&bull; Kode: {{ $application->group->code }}</span>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-slate-700">
@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                                 <div class="pt-2 border-t border-indigo-100 text-xs">
-                                    <span class="font-bold text-slate-700 block mb-1.5">Seluruh Anggota Kelompok Ini ({{ $application->group->applications->count() }} Orang):</span>
+                                    <span class="font-bold text-slate-700 block mb-1.5">Seluruh Anggota Kelompok: {{ $application->group->applications->count() }} Orang</span>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                                         @foreach($application->group->applications as $grpMember)
                                             <a href="{{ route('supervisor.applications.show', $grpMember->id) }}" 
@@ -241,7 +241,7 @@
                                 </button>
                                 @if($application->group_id && $application->group)
                                     <p class="text-[11px] text-center text-slate-500 font-medium mt-2.5">
-                                        ⚡ Otomatis menyetujui seluruh anggota kelompok <strong>{{ $application->group->name }}</strong> ({{ $application->group->applications->count() }} orang).
+                                        ⚡ Otomatis menyetujui seluruh anggota kelompok <strong>{{ $application->group->name }}</strong> sejumlah {{ $application->group->applications->count() }} orang.
                                     </p>
                                 @endif
                             </form>
@@ -289,7 +289,7 @@
                                 </div>
                                 <div>
                                     <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Status Persetujuan</span>
-                                    <h3 class="text-base font-black text-slate-900">Telah Disetujui (ACC)</h3>
+                                    <h3 class="text-base font-black text-slate-900">Telah Disetujui</h3>
                                 </div>
                             </div>
                             <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">

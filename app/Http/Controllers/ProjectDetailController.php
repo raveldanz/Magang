@@ -19,6 +19,7 @@ class ProjectDetailController extends Controller
             'placement.application.group',
             'placement.mentor',
             'placement.academicAdvisor',
+            'members.placement.application.user.studentProfile',
             'comments' => fn ($q) => $q->orderBy('created_at', 'desc')->with('user'),
         ])->findOrFail($id);
 
@@ -30,9 +31,10 @@ class ProjectDetailController extends Controller
         // Cek Otorisasi Akses Jika Proyek Berstatus Privat
         $isPrivileged = $user && ($user->isSuperAdmin() || in_array($user->role, ['admin', 'supervisor']));
         $isOwner = $user && $student && $user->id === $student->id;
+        $isMember = $user && $project->members->contains(fn ($m) => $m->placement?->application?->user_id === $user->id);
         $isAssignedMentorOrAdvisor = $user && $placement && ($user->id === $placement->mentor_id || $user->id === $placement->academic_advisor_id);
 
-        if (! $project->is_public && ! ($isPrivileged || $isOwner || $isAssignedMentorOrAdvisor)) {
+        if (! $project->is_public && ! ($isPrivileged || $isOwner || $isMember || $isAssignedMentorOrAdvisor)) {
             abort(403, 'Proyek inovasi ini berstatus privat atau memuat data sensitif kedinasan.');
         }
 
@@ -46,25 +48,25 @@ class ProjectDetailController extends Controller
         // Tentukan tautan kembali (Back Link) yang kontekstual dan aman
         $backUrl = url()->previous();
         if (! $backUrl || $backUrl === url()->current()) {
-            if ($user?->role === 'supervisor' && $placement) {
-                $backUrl = route('supervisor.reports.show', $placement->id);
-            } elseif (in_array($user?->role, ['mentor', 'pembimbing']) && $placement) {
-                $backUrl = route('mentor.students.show', $placement->id);
-            } elseif (in_array($user?->role, ['dosen', 'academic_advisor']) && $placement) {
-                $backUrl = route('lecturer.students.show', $placement->id);
-            } elseif ($user?->role === 'mahasiswa') {
+            if ($user?->role === 'supervisor') {
+                $backUrl = $placement ? route('supervisor.reports.show', $placement->id) : route('supervisor.dashboard');
+            } elseif (in_array($user?->role, ['mentor', 'pembimbing'])) {
+                $backUrl = $placement ? route('mentor.students.show', $placement->id) : route('mentor.dashboard');
+            } elseif (in_array($user?->role, ['dosen', 'academic_advisor', 'lecturer'])) {
+                $backUrl = $placement ? route('lecturer.students.show', $placement->id) : route('lecturer.dashboard');
+            } elseif (in_array($user?->role, ['mahasiswa', 'student'])) {
                 $backUrl = route('student.final_report.index');
             } elseif ($user?->isSuperAdmin()) {
                 $backUrl = route('admin.dashboard');
             } elseif ($user?->role === 'admin') {
                 $backUrl = route('admin.applications.index');
-            } elseif (in_array($user?->role, ['university', 'admin_univ'])) {
+            } elseif (in_array($user?->role, ['university', 'admin_univ', 'universitas'])) {
                 $backUrl = route('university.dashboard');
             } else {
                 $backUrl = route('public.projects.index');
             }
         }
 
-        return view('projects.show', compact('project', 'placement', 'application', 'student', 'backUrl', 'isLikedByMe', 'canModerate', 'guestId', 'user'));
+        return view('projects.show', compact('project', 'placement', 'application', 'student', 'backUrl', 'isLikedByMe', 'canModerate', 'guestId', 'user', 'isOwner', 'isMember'));
     }
 }

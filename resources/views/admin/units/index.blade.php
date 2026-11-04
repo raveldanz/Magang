@@ -4,7 +4,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    {{ __('Manajemen Bidang Devisi & Kuota Magang') }}
+                    {{ __('Manajemen Unit Bidang & Kuota Magang') }}
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1 flex items-center gap-2">
                     @if(isset($selectedAgency) && $selectedAgency)
@@ -22,7 +22,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                     </svg>
-                    Tambah Devisi
+                    Tambah Unit Bidang
                 </a>
             @endif
         </div>
@@ -83,7 +83,7 @@
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Divisi / Bidang</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Unit Bidang</p>
                     <h3 class="text-2xl font-black text-gray-900 mt-1">{{ $stats['total_units'] }}</h3>
                     <p class="text-xs text-gray-500 mt-1">Unit kerja aktif</p>
                 </div>
@@ -122,7 +122,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama divisi..." 
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama unit bidang..." 
                                class="w-full text-xs border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
                                style="padding-left: 2.5rem !important; padding-right: 0.75rem !important; padding-top: 0.55rem !important; padding-bottom: 0.55rem !important;">
                     </div>
@@ -135,7 +135,7 @@
             <!-- Table Divisi / Unit Kerja -->
             <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-200">
                 <div class="p-6 border-b border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900">Daftar Divisi & Penyesuaian Kuota</h3>
+                    <h3 class="text-lg font-bold text-gray-900">Daftar Unit Bidang & Penyesuaian Kuota</h3>
                 </div>
 
 {{-- Tampilan HP: kartu --}}
@@ -189,7 +189,7 @@
                                         <button type="button"
                                                 @click="$dispatch('open-delete-modal', {
                                                     action: '{{ route('admin.units.destroy', $unit->id) }}',
-                                                    title: 'Hapus Devisi',
+                                                    title: 'Hapus Unit Bidang',
                                                     name: '{{ addslashes($unit->name) }}',
                                                     desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                 })"
@@ -200,8 +200,8 @@
                         </div>
                     @empty
                         <div class="mempty">
-                            <p style="font-weight:700;color:#475569">Belum Ada Devisi</p>
-                            <p style="margin-top:4px">Klik tombol "Tambah Devisi" untuk menambahkan devisi baru.</p>
+                            <p style="font-weight:700;color:#475569">Belum Ada Unit Bidang</p>
+                            <p style="margin-top:4px">Klik tombol "Tambah Unit Bidang" untuk menambahkan unit bidang baru.</p>
                         </div>
                     @endforelse
                 </div>
@@ -211,7 +211,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50/75 border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                                <th class="py-3.5 px-4">Nama Divisi / Bidang</th>
+                                <th class="py-3.5 px-4">Nama Unit Bidang</th>
                                 <th class="py-3.5 px-4">Instansi Induk</th>
                                 <th class="py-3.5 px-4 text-center">Status Kuota</th>
                                 <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
@@ -324,12 +324,12 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.units.destroy', $unit->id) }}',
-                                                            title: 'Hapus Devisi',
+                                                            title: 'Hapus Unit Bidang',
                                                             name: '{{ addslashes($unit->name) }}',
                                                             desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
-                                                        title="Hapus Divisi">
+                                                        title="Hapus Unit Bidang">
                                                     Hapus
                                                 </button>
                                             @endif
@@ -340,8 +340,8 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="py-12 text-center text-gray-400">
-                                        <p class="font-medium text-gray-600">Belum Ada Devisi</p>
-                                        <p class="text-xs text-gray-400 mt-1">Silakan klik tombol "Tambah Devisi" untuk menambahkan devisi baru.</p>
+                                        <p class="font-medium text-gray-600">Belum Ada Unit Bidang</p>
+                                        <p class="text-xs text-gray-400 mt-1">Silakan klik tombol "Tambah Unit Bidang" untuk menambahkan unit bidang baru.</p>
                                     </td>
                                 </tr>
                             @endforelse

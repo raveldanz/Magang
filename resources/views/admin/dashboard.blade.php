@@ -136,7 +136,7 @@
                                         style="background-color: rgba(255, 255, 255, 0.18); color: #ffffff;">Kuota {{ $stats['total_quota_available'] ?? 0 }}</span>
                                 </div>
                                 <div>
-                                    <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Bidang Saya
+                                    <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Kelola Bidang
                                     </div>
                                     <div class="text-[11px]" style="color: #bfdbfe !important;">Kapasitas Formasi</div>
                                 </div>
@@ -151,7 +151,7 @@
                                         Unit</span>
                                 </div>
                                 <div>
-                                    <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Bidang Devisi
+                                    <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Unit Bidang
                                     </div>
                                     <div class="text-[11px]" style="color: #bfdbfe !important;">Alokasi Slot Magang</div>
                                 </div>
@@ -432,10 +432,18 @@
 
                     {{-- Kolom Kanan: Tim Pembimbing Lapangan (Mentor) --}}
                     <div class="lg:col-span-7 space-y-3">
+                        @php $mentorCount = count($myUnit->mentors ?? []); @endphp
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-slate-100">
                             <div>
-                                <h3 class="text-xs sm:text-sm font-bold text-slate-900">Tim Pembimbing Lapangan Bidang</h3>
-                                <p class="text-[11px] text-slate-500">Pegawai pendamping teknis mahasiswa magang di bidang ini</p>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-xs sm:text-sm font-bold text-slate-900">Tim Pembimbing Lapangan Bidang</h3>
+                                    @if($mentorCount > 0)
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                            {{ $mentorCount }} Personel
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Pegawai pendamping teknis mahasiswa magang di bidang ini</p>
                             </div>
                             <a href="{{ route('admin.mentors.create') }}"
                                class="self-start sm:self-auto inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition">
@@ -444,22 +452,26 @@
                             </a>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            @forelse($myUnit->mentors ?? [] as $mentor)
-                                <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-start justify-between gap-2.5 hover:border-blue-200 transition">
-                                    <div class="min-w-0">
-                                        <h4 class="font-bold text-xs sm:text-sm text-slate-900 truncate">{{ $mentor->name }}</h4>
-                                        <p class="text-[11px] text-slate-500 truncate mt-0.5">{{ $mentor->email }}</p>
+                        {{-- Kontainer Scrollable: Maksimal ~4 mentor tampil (2 baris kartu), selebihnya dapat di-scroll agar UI tetap rapi dan seimbang dengan kolom kiri --}}
+                        <div class="max-h-[220px] overflow-y-auto pr-1.5 scrollbar-thin space-y-2.5"
+                             style="max-height: 220px; overflow-y: auto; scrollbar-width: thin;">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
+                                @forelse($myUnit->mentors ?? [] as $mentor)
+                                    <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-start justify-between gap-2.5 hover:border-blue-200 transition">
+                                        <div class="min-w-0">
+                                            <h4 class="font-bold text-xs sm:text-sm text-slate-900 truncate" title="{{ $mentor->name }}">{{ $mentor->name }}</h4>
+                                            <p class="text-[11px] text-slate-500 truncate mt-0.5" title="{{ $mentor->email }}">{{ $mentor->email }}</p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold bg-blue-100 text-blue-800 shrink-0">
+                                            {{ $mentor->active_students_count ?? 0 }} Mhs
+                                        </span>
                                     </div>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-bold bg-blue-100 text-blue-800 shrink-0">
-                                        {{ $mentor->active_students_count ?? 0 }} Mhs
-                                    </span>
-                                </div>
-                            @empty
-                                <div class="col-span-full py-8 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                                    Belum ada mentor yang ditugaskan pada bidang ini. Silakan tambahkan akun mentor pembimbing lapangan.
-                                </div>
-                            @endforelse
+                                @empty
+                                    <div class="col-span-full py-8 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                        Belum ada mentor yang ditugaskan pada bidang ini. Silakan tambahkan akun mentor pembimbing lapangan.
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -469,10 +481,10 @@
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
                 <div class="p-5 sm:p-6 bg-slate-50/80 border-b border-slate-200">
                     <h2 class="text-base sm:text-lg font-black text-slate-900">
-                        Bidang Devisi Dinas Perpustakaan dan Kearsipan
+                        Unit Bidang Dinas Perpustakaan dan Kearsipan
                     </h2>
                     <p class="text-xs text-slate-500 mt-0.5">
-                        Rekapitulasi alokasi kuota dan status peserta magang per bidang / devisi. Klik nama bidang untuk melihat detail dashboard bidang.
+                        Rekapitulasi alokasi kuota dan status peserta magang per unit bidang. Klik nama bidang untuk melihat detail dashboard bidang.
                     </p>
                 </div>
 
@@ -481,7 +493,7 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-                                <th class="py-3.5 px-6">Nama Bidang / Devisi</th>
+                                <th class="py-3.5 px-6">Nama Unit Bidang</th>
                                 <th class="py-3.5 px-4 text-center">Kuota Total</th>
                                 <th class="py-3.5 px-4 text-center">Mhs Aktif</th>
                                 <th class="py-3.5 px-4 text-center">Sisa Kuota</th>
@@ -547,35 +559,45 @@
                             $uWaiting = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::WAITING_APPROVAL->value)->count();
                             $uCompleted = $dUnit->applications->where('status', \App\Enums\ApplicationStatus::COMPLETED->value)->count();
                             $uRemaining = max(0, $dUnit->quota - $uActive);
+                            $uPercent = $dUnit->quota > 0 ? min(100, round(($uActive / $dUnit->quota) * 100)) : 0;
                         @endphp
-                        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2.5">
+                        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
                             <div class="flex items-start justify-between gap-2.5">
                                 <a href="{{ route('admin.units.show', $dUnit->id) }}"
-                                   class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1">
-                                    <span>{{ $dUnit->name }}</span>
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                   class="font-bold text-slate-900 text-sm hover:text-blue-600 transition inline-flex items-center gap-1.5 flex-1 pr-2">
+                                    <span class="leading-snug">{{ $dUnit->name }}</span>
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                 </a>
-                                <span class="px-2 py-0.5 rounded-lg text-xs font-bold {{ $uRemaining > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                                <span class="px-2.5 py-1 rounded-xl text-xs font-bold shrink-0 {{ $uRemaining > 0 ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                                     Sisa: {{ $uRemaining }}
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-4 gap-2 text-center text-xs py-2 border-t border-slate-100">
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Kuota</div>
-                                    <div class="font-bold text-slate-800">{{ $dUnit->quota }}</div>
+                            {{-- Progress Bar Mini Kuota Terisi --}}
+                            <div class="space-y-1">
+                                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-1.5 rounded-full {{ $uPercent >= 100 ? 'bg-rose-500' : ($uPercent >= 75 ? 'bg-amber-500' : 'bg-emerald-500') }}"
+                                         style="width: {{ $uPercent }}%"></div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Mhs Aktif</div>
-                                    <div class="font-bold text-emerald-700">{{ $uActive }}</div>
+                            </div>
+
+                            {{-- 4 Kotak Metrik Horizontal --}}
+                            <div class="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;">
+                                <div class="bg-slate-50/80 rounded-xl p-2 text-center border border-slate-200/60">
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Kuota</div>
+                                    <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $dUnit->quota }}</div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">ACC</div>
-                                    <div class="font-bold {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }}">{{ $uWaiting }}</div>
+                                <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
+                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $uActive }}</div>
                                 </div>
-                                <div>
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold">Mhs Lulus</div>
-                                    <div class="font-bold text-slate-700">{{ $uCompleted }}</div>
+                                <div class="{{ $uWaiting > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
+                                    <div class="text-[10px] {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }} uppercase font-bold tracking-wider">ACC</div>
+                                    <div class="text-sm font-extrabold {{ $uWaiting > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $uWaiting }}</div>
+                                </div>
+                                <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
+                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $uCompleted }}</div>
                                 </div>
                             </div>
                         </div>

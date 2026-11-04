@@ -28,6 +28,18 @@ class InternshipProject extends Model
         return $this->belongsTo(Placement::class);
     }
 
+    public function members()
+    {
+        return $this->hasMany(InternshipProjectMember::class, 'internship_project_id');
+    }
+
+    public function collaborators()
+    {
+        return $this->belongsToMany(Placement::class, 'internship_project_members')
+            ->withPivot(['role_in_project', 'is_leader'])
+            ->withTimestamps();
+    }
+
     public function likes()
     {
         return $this->hasMany(ProjectLike::class, 'internship_project_id');
@@ -157,44 +169,187 @@ class InternshipProject extends Model
 
     public const CATEGORIES = [
         'teknologi' => [
-            'label' => 'Teknologi & Perangkat Lunak',
-            'badge' => 'bg-blue-50 text-blue-700 border-blue-200',
+            'label' => 'Sistem Digital',
+            'badge' => 'bg-blue-100 text-blue-800 border-blue-300',
+            'bg' => '#dbeafe',
+            'text' => '#1e40af',
+            'border' => '#93c5fd',
         ],
         'buku' => [
-            'label' => 'Buku & Karya Tulis Literasi',
-            'badge' => 'bg-amber-50 text-amber-800 border-amber-200',
-        ],
-        'desain' => [
-            'label' => 'Desain Grafis & Penataan Ruang',
-            'badge' => 'bg-purple-50 text-purple-700 border-purple-200',
-        ],
-        'preservasi' => [
-            'label' => 'Preservasi & Konservasi Kearsipan',
-            'badge' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
+            'label' => 'Karya Literasi',
+            'badge' => 'bg-amber-100 text-amber-900 border-amber-300',
+            'bg' => '#fef3c7',
+            'text' => '#92400e',
+            'border' => '#fcd34d',
         ],
         'media' => [
-            'label' => 'Media Kreatif & Audio-Visual',
-            'badge' => 'bg-rose-50 text-rose-700 border-rose-200',
+            'label' => 'Media Kreatif',
+            'badge' => 'bg-rose-100 text-rose-800 border-rose-300',
+            'bg' => '#ffe4e6',
+            'text' => '#9f1239',
+            'border' => '#fda4af',
+        ],
+        'desain' => [
+            'label' => 'Media Kreatif',
+            'badge' => 'bg-rose-100 text-rose-800 border-rose-300',
+            'bg' => '#ffe4e6',
+            'text' => '#9f1239',
+            'border' => '#fda4af',
+        ],
+        'preservasi' => [
+            'label' => 'Preservasi Kearsipan',
+            'badge' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
+            'bg' => '#d1fae5',
+            'text' => '#065f46',
+            'border' => '#6ee7b7',
         ],
         'tata_kelola' => [
-            'label' => 'Tata Kelola & SOP Layanan',
-            'badge' => 'bg-slate-100 text-slate-800 border-slate-300',
+            'label' => 'Tata Kelola Layanan',
+            'badge' => 'bg-slate-200 text-slate-800 border-slate-300',
+            'bg' => '#e2e8f0',
+            'text' => '#1e293b',
+            'border' => '#cbd5e1',
         ],
         'lainnya' => [
-            'label' => 'Karya Inovasi Lainnya',
-            'badge' => 'bg-teal-50 text-teal-800 border-teal-200',
+            'label' => 'Inovasi Lainnya',
+            'badge' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
+            'bg' => '#d1fae5',
+            'text' => '#065f46',
+            'border' => '#6ee7b7',
         ],
     ];
+
+    /**
+     * Rekomendasi peran dinamis berdasarkan kategori proyek
+     */
+    public const ROLE_RECOMMENDATIONS = [
+        'teknologi' => ['Koordinator', 'Frontend', 'Backend', 'UI/UX', 'Mobile Dev', 'Database', 'QA'],
+        'buku' => ['Penulis Naskah', 'Penyusun Antologi', 'Editor Bahasa', 'Ilustrator', 'Layout', 'Riset Materi'],
+        'media' => ['Desainer Grafis', 'Videografer', 'Editor Video', 'Ilustrator', 'Voice Over', 'Penata Display', 'Dokumenter'],
+        'desain' => ['Desainer Grafis', 'Videografer', 'Editor Video', 'Ilustrator', 'Voice Over', 'Penata Display', 'Dokumenter'],
+        'preservasi' => ['Restorator Fisik', 'Alih Media Digital', 'Kurator Metadata', 'Fumigasi', 'Inventarisasi Arsip'],
+        'tata_kelola' => ['Penyusun SOP', 'Analis Alur Layanan', 'Surveyor', 'Dokumenter', 'Notulis'],
+        'lainnya' => ['Koordinator', 'Pelaksana Teknis', 'Riset', 'Dokumentasi', 'Publikasi'],
+    ];
+
+    /**
+     * Kamus kata kunci pintar untuk mencocokkan input kategori lainnya dengan kategori standar
+     */
+    public const CATEGORY_KEYWORDS = [
+        'teknologi' => [
+            'it', 'web', 'website', 'aplikasi', 'software', 'coding', 'koding', 'pemrograman', 'program', 'programmer', 
+            'developer', 'ui', 'ux', 'ui/ux', 'mobile', 'frontend', 'backend', 'fullstack', 'database', 'basis data', 
+            'android', 'ios', 'flutter', 'laravel', 'react', 'vue', 'digital', 'sistem digital', 'sistem informasi', 
+            'komputer', 'jaringan', 'iot', 'ai', 'kecerdasan buatan', 'machine learning', 'api', 'server', 'cloud', 
+            'otomasi digital', 'bot', 'chatbot', 'dashboard', 'portal web', 'e-library', 'perpustakaan digital', 
+            'arsip digital', 'katalog online', 'opac'
+        ],
+        'buku' => [
+            'buku', 'karya literasi', 'literasi', 'buku bacaan', 'novel', 'cerita', 'cerpen', 'cerita anak', 'cerita pendek', 
+            'cerita rakyat', 'antologi', 'kamus', 'modul', 'modul ajar', 'ensiklopedia', 'bacaan', 'karya tulis', 
+            'karya ilmiah', 'puisi', 'pantun', 'komik', 'penulisan naskah', 'naskah buku', 'penulisan buku', 'resensi', 
+            'jurnal', 'artikel', 'buletin', 'majalah', 'sinopsis', 'esai', 'storytelling', 'dongeng', 'mendongeng', 
+            'pojok baca', 'minat baca', 'klub buku', 'literasi inklusif', 'braille', 'buku saku', 'panduan membaca'
+        ],
+        'media' => [
+            'media kreatif', 'videografi', 'videografer', 'video', 'edit video', 'editing video', 'video editor', 
+            'sinematografi', 'film', 'film pendek', 'dokumenter', 'animasi', 'motion graphic', 'fotografi', 'fotografer', 
+            'foto', 'photoshoot', 'pemotretan', 'podcast', 'audio', 'audiobook', 'rekaman suara', 'voice over', 
+            'narasi suara', 'multimedia', 'desain grafis', 'grafis', 'desain', 'desainer', 'karya seni', 'seni rupa', 
+            'seni visual', 'seni lukis', 'lukisan', 'melukis', 'sketsa', 'kaligrafi', 'lettering', 'tipografi', 
+            'mural', 'ilustrasi', 'ilustrator', 'poster', 'infografis', 'flyer', 'brosur', 'leaflet', 'pamflet', 
+            'banner', 'spanduk', 'baliho', 'dekorasi visual', 'penata display', 'display pameran', 'maket', 
+            'interior ruang', 'tata ruang', 'wayfinding', 'signage', 'penunjuk arah', 'branding', 'logo', 
+            'feed instagram', 'konten kreatif', 'media sosial', 'youtube', 'reels', 'tiktok', 'katalog visual'
+        ],
+        'preservasi' => [
+            'preservasi', 'preservasi kearsipan', 'konservasi', 'konservasi arsip', 'arsip sejarah', 'sejarah', 
+            'sejarah lokal', 'sejarah surabaya', 'naskah kuno', 'manuskrip', 'naskah bersejarah', 'dokumen sejarah', 
+            'presentasi sejarah', 'kajian sejarah', 'telaah sejarah', 'cagar budaya', 'restorasi', 'restorasi naskah', 
+            'fumigasi', 'laminasi', 'enkapsulasi', 'alih media arsip', 'scanning arsip', 'digitalisasi arsip', 
+            'arsip kuno', 'arsip statis', 'arsip vital', 'khazanah arsip', 'perawatan arsip', 'perawatan fisik', 
+            'penjilidan arsip', 'penyelamatan arsip', 'inventarisasi arsip', 'kurasi arsip', 'pameran arsip', 
+            'diorama sejarah', 'arsiparis'
+        ],
+        'tata_kelola' => [
+            'tata kelola', 'tata kelola layanan', 'sop', 'standar operasional', 'standar operasional prosedur', 
+            'standar pelayanan', 'maklumat pelayanan', 'pedoman kerja', 'pedoman tata kelola', 'alur layanan', 
+            'alur kerja', 'kebijakan', 'regulasi', 'aturan', 'prosedur kerja', 'analisis jabatan', 'survei kepuasan', 
+            'ikm', 'indeks kepuasan masyarakat', 'kuesioner', 'evaluasi layanan', 'penilaian kinerja', 
+            'jadwal retensi arsip', 'jra', 'penyusutan arsip', 'pemusnahan arsip', 'tata naskah dinas', 
+            'penataan berkas', 'klasifikasi arsip', 'pengelolaan arsip inaktif', 'arsip dinamis', 
+            'administrasi perkantoran', 'manajemen kantor', 'reformasi birokrasi', 'pelayanan publik', 'inovasi layanan'
+        ],
+    ];
+
+    /**
+     * Deteksi kecocokan kategori dari teks bebas input lainnya berbasis pembobotan kata kunci
+     */
+    public static function detectMatchingCategory(?string $customText): ?string
+    {
+        if (empty($customText)) {
+            return null;
+        }
+
+        $text = strtolower(trim($customText));
+        $scores = [];
+
+        foreach (self::CATEGORY_KEYWORDS as $catKey => $keywords) {
+            $scores[$catKey] = 0;
+            foreach ($keywords as $kw) {
+                $kw = strtolower(trim($kw));
+                if (empty($kw)) continue;
+
+                if (mb_strlen($kw) < 4) {
+                    if (preg_match('/(^|[^a-z0-9])' . preg_quote($kw, '/') . '([^a-z0-9]|$)/i', $text)) {
+                        $scores[$catKey] += mb_strlen($kw) * 3;
+                    }
+                } else {
+                    if (str_contains($text, $kw)) {
+                        $scores[$catKey] += mb_strlen($kw);
+                    }
+                }
+            }
+        }
+
+        arsort($scores);
+        $topScore = reset($scores);
+        $topCat = key($scores);
+
+        return $topScore > 0 ? $topCat : null;
+    }
 
     public function getCategoryLabelAttribute(): string
     {
         $key = strtolower(trim((string) $this->category));
-        return self::CATEGORIES[$key]['label'] ?? ($this->category ?: 'Inovasi Umum');
+        if ($key === 'lainnya' && ! empty($this->custom_category)) {
+            return $this->custom_category;
+        }
+
+        return self::CATEGORIES[$key]['label'] ?? ($this->custom_category ?: ($this->category ?: 'Inovasi Lainnya'));
     }
 
     public function getCategoryBadgeClassAttribute(): string
     {
         $key = strtolower(trim((string) $this->category));
-        return self::CATEGORIES[$key]['badge'] ?? 'bg-slate-100 text-slate-700 border-slate-200';
+        return self::CATEGORIES[$key]['badge'] ?? 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    }
+
+    public function getCategoryBgColorAttribute(): string
+    {
+        $key = strtolower(trim((string) $this->category));
+        return self::CATEGORIES[$key]['bg'] ?? '#d1fae5';
+    }
+
+    public function getCategoryTextColorAttribute(): string
+    {
+        $key = strtolower(trim((string) $this->category));
+        return self::CATEGORIES[$key]['text'] ?? '#065f46';
+    }
+
+    public function getCategoryBorderColorAttribute(): string
+    {
+        $key = strtolower(trim((string) $this->category));
+        return self::CATEGORIES[$key]['border'] ?? '#6ee7b7';
     }
 }

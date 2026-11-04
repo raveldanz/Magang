@@ -31,12 +31,13 @@
             
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
-                @if($agency)
-                    <img src="{{ $agency->logo_url }}" alt="Logo {{ $agencyName }}" class="w-16 h-16 mx-auto mb-2 object-contain">
-                @endif
-                <h2 class="text-lg font-bold text-gray-800 uppercase tracking-wide">{{ $govName }}</h2>
-                <h1 class="text-xl font-extrabold text-blue-900 uppercase">{{ $agencyName }}</h1>
-                <p class="text-xs text-gray-500 mt-1">Sistem Informasi Pendaftaran & Sertifikasi Magang Resmi</p>
+                <div class="flex items-center justify-center gap-3 mb-2.5">
+                    <img src="{{ asset('images/certificates/logo_surabaya.webp') }}" alt="Surabaya" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                    <img src="{{ asset('images/certificates/logo_dispusip.jpg') }}" alt="Dispusip" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
+                </div>
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest">{{ $govName }}</h2>
+                <h1 class="text-lg font-black text-slate-900 uppercase tracking-wide">{{ $agencyName }}</h1>
+                <p class="text-[11px] text-gray-500 mt-0.5">Sistem Informasi Pendaftaran &amp; Sertifikasi Magang Resmi</p>
             </div>
 
             <!-- Badge Status Verifikasi Sah / Peringatan -->
@@ -134,9 +135,15 @@
                         <dt class="vlabel">Pembimbing Lapangan</dt>
                         <dd class="vvalue">{{ $placement->mentor->name ?? $placement->pembimbing->name ?? '-' }}</dd>
                     </div>
+                    @php
+                        $certYear = $placement->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->format('Y') : date('Y');
+                        $certTheme = \App\Models\CertificateTheme::getActive((int)$certYear);
+                        $signeeName = $certTheme->signee_name ?: ($agency->signee_name ?? '-');
+                        $signeePos = $certTheme->signee_position ?: ($agency->signee_position ?? '-');
+                    @endphp
                     <div class="vrow">
                         <dt class="vlabel">Pejabat Pengesah</dt>
-                        <dd class="vvalue">{{ $agency->signee_name }}<span class="vsub">{{ $agency->signee_position }}</span></dd>
+                        <dd class="vvalue">{{ $signeeName }}<span class="vsub">{{ $signeePos }} (TTE BSrE Terverifikasi)</span></dd>
                     </div>
                 </dl>
             </div>

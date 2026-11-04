@@ -56,7 +56,7 @@
                                     </span>
                                 @endif
                             </div>
-                            <h3 class="text-base sm:text-lg font-black text-slate-900 mt-2 leading-snug">
+                            <h3 class="text-base sm:text-lg font-black text-slate-900 mt-2 leading-snug whitespace-pre-line">
                                 {{ $certificate->notes ?: 'Terdapat aspek nilai atau data kelulusan yang perlu disesuaikan sebelum sertifikat dapat disahkan resmi.' }}
                             </h3>
                             <p class="text-xs text-slate-600 mt-1">

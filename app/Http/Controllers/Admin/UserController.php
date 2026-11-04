@@ -6,6 +6,7 @@ use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
+use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -86,7 +87,7 @@ class UserController extends Controller
         $currentUser = Auth::user();
         $isSuperAdmin = $currentUser->isSuperAdmin();
 
-        $query = User::with(['agencyProfile', 'university', 'studentProfile']);
+        $query = User::with(['agencyProfile', 'university', 'studentProfile', 'unit']);
 
         // Isolasi Bidang & Multi-Tenant
         if (! $isSuperAdmin && $currentUser->unit_id) {
@@ -105,6 +106,17 @@ class UserController extends Controller
             } else {
                 $query->where('role', $roleFilter);
             }
+        }
+
+        // Filter Unit / Bidang Dinas
+        $selectedUnit = null;
+        if ($request->filled('unit_id')) {
+            $unitId = $request->unit_id;
+            $selectedUnit = Unit::find($unitId);
+            $query->where(function ($q) use ($unitId) {
+                $q->where('unit_id', $unitId)
+                    ->orWhereHas('applications', fn ($aq) => $aq->where('unit_id', $unitId));
+            });
         }
 
         // Filter Instansi
@@ -146,15 +158,18 @@ class UserController extends Controller
         $users = $query->latest()->paginate(15)->withQueryString();
         $agencies = AgencyProfile::all();
         $universities = University::all();
+        $units = Unit::all();
 
         return view('admin.users.index', compact(
             'users',
             'agencies',
             'universities',
+            'units',
             'isSuperAdmin',
             'currentUser',
             'selectedAgency',
-            'selectedUniversity'
+            'selectedUniversity',
+            'selectedUnit'
         ));
     }
 

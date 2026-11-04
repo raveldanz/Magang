@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sertifikat Kelulusan Magang — {{ $student->name }}</title>
+    <title>Sertifikat Magang — {{ $student->name }}</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,20 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
 
+    @php
+        $theme = $theme ?? \App\Models\CertificateTheme::getActive();
+        $primaryColor = $theme->primary_color ?? '#00A3C4';
+        $secondaryColor = $theme->secondary_color ?? '#F36F21';
+        $accentColor = $theme->accent_color ?? '#D97706';
+    @endphp
+
     <style>
+        :root {
+            --theme-primary: {{ $primaryColor }};
+            --theme-secondary: {{ $secondaryColor }};
+            --theme-accent: {{ $accentColor }};
+        }
+
         @page {
             size: A4 landscape;
             margin: 0;
@@ -103,6 +116,9 @@
         if (Auth::user()?->role === 'admin' || Auth::user()?->role === 'super_admin') {
             $backUrl = route('admin.certificates.index');
             $backLabel = 'Kembali ke Daftar Sertifikat';
+        } elseif (Auth::user()?->role === 'supervisor') {
+            $backUrl = route('supervisor.certificates.index');
+            $backLabel = 'Kembali ke Pengesahan Sertifikat';
         } elseif (Auth::user()?->role === 'dosen') {
             $backUrl = route('lecturer.dashboard');
             $backLabel = 'Kembali ke Dashboard Dosen';
@@ -140,181 +156,195 @@
     </p>
 
     @php
-        // 1. Logo Dinas Instansi Tempat Mahasiswa Magang (Gunakan Accessor Terpusat)
-        $agencyLogoUrl = $agencyProfile?->logo_url ?? asset('images/logos/surabaya.png');
+        // Logo Utama Dinas & Kota Surabaya
+        $surabayaLogoUrl = asset('images/certificates/logo_surabaya.webp');
+        $dispusipLogoUrl = asset('images/certificates/logo_dispusip.jpg');
+        $berakhlakLogoUrl = asset('images/certificates/logo_berakhlak.png');
+        $banggaLogoUrl = asset('images/certificates/logo_bangga_melayani.png');
+        $zonaLogoUrl = asset('images/certificates/logo_zona_integritas.png');
 
-        // 2. Logo Universitas Mahasiswa (Gunakan Accessor Terpusat)
-        $univLogoUrl = $university?->logo_url ?? ($profile?->user?->universityRelation?->logo_url ?? asset('images/default-university.svg'));
-
-        // 3. Simple Grade (e.g. "A")
+        // Simple Grade untuk Halaman 2
         $simpleGrade = $eval->grade_calculated ?? ($eval->grade ?? 'A');
     @endphp
 
     <!-- ================================================================= -->
-    <!-- HALAMAN 1: SERTIFIKAT KELULUSAN RESMI                             -->
+    <!-- HALAMAN 1: SERTIFIKAT PENGHARGAAN RESMI DISPUSIP (DESAIN BARU)    -->
     <!-- ================================================================= -->
-    <main class="certificate-sheet p-8 relative flex flex-col justify-between">
+    <main class="certificate-sheet relative flex flex-col justify-between overflow-hidden bg-white select-none">
         
-        <!-- Double Border Ornamen Resmi & Sudut Emas -->
-        <div class="absolute inset-3 border-[2.5px] border-amber-600/50 rounded-2xl pointer-events-none"></div>
-        <div class="absolute inset-4.5 border border-amber-500/25 rounded-xl pointer-events-none"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(#f8fafc_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none"></div>
+        <!-- Aksen Garis Atas & Bawah -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-500 via-blue-600 to-amber-500"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-2" style="background-color: var(--theme-accent, #D97706);"></div>
 
-        <!-- Watermark Lambang Dinas Samar di Tengah -->
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04]">
-            <img src="{{ $agencyLogoUrl }}" alt="Watermark" class="w-[360px] object-contain">
+        <!-- 1. ORNAMEN SUDUT KIRI ATAS: Geometris Poligon Bernuansa Cyan/Blue + Guilloche Waves -->
+        <div class="absolute top-0 left-0 pointer-events-none w-[270px] h-[270px] z-0 overflow-hidden">
+            <svg viewBox="0 0 270 270" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <!-- Poligon Facet Mosaic -->
+                <polygon points="0,0 120,0 60,60 0,60" fill="var(--theme-primary, #00A3C4)" opacity="0.95"/>
+                <polygon points="60,60 120,0 160,40 100,100" fill="#0284C7" opacity="0.9"/>
+                <polygon points="0,60 60,60 30,120 0,90" fill="#0369A1" opacity="0.85"/>
+                <polygon points="30,120 100,100 70,160 10,150" fill="#0284C7" opacity="0.9"/>
+                <polygon points="100,100 160,40 190,70 140,130" fill="var(--theme-primary, #00A3C4)" opacity="0.95"/>
+                <polygon points="140,130 190,70 220,100 170,160" fill="#0369A1" opacity="0.8"/>
+                <polygon points="70,160 140,130 120,200 40,190" fill="#007799" opacity="0.85"/>
+                
+                <!-- Guilloche Wave Curves Cyan -->
+                <path d="M 0,90 C 60,110 90,160 70,260" fill="none" stroke="var(--theme-primary, #00A3C4)" stroke-width="1.2" opacity="0.45"/>
+                <path d="M 0,110 C 70,130 110,180 90,270" fill="none" stroke="#0284C7" stroke-width="1.2" opacity="0.4"/>
+                <path d="M 0,130 C 80,150 130,200 110,270" fill="none" stroke="#38BDF8" stroke-width="1.2" opacity="0.35"/>
+                <path d="M 0,150 C 90,170 150,220 130,270" fill="none" stroke="var(--theme-primary, #00A3C4)" stroke-width="1.2" opacity="0.3"/>
+            </svg>
         </div>
 
-        <!-- 1. KOP RESMI DINAS INSTANSI MAGANG & UNIVERSITAS (Bagian Atas) -->
-        <div class="relative z-10 px-6 pt-1">
-            <div class="flex items-center justify-between border-b-2 border-amber-600/40 pb-3">
+        <!-- 2. ORNAMEN SUDUT KANAN BAWAH: Stepped Polygon Tangga Bernuansa Orange/Coral + Guilloche Waves -->
+        <div class="absolute bottom-0 right-0 pointer-events-none w-[270px] h-[270px] z-0 overflow-hidden">
+            <svg viewBox="0 0 270 270" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <!-- Stepped Tangga Geometris Orange -->
+                <polygon points="270,270 270,190 230,190 230,230 190,230 190,270" fill="var(--theme-secondary, #F36F21)" opacity="0.95"/>
+                <polygon points="230,190 230,150 190,150 190,190" fill="#EA580C" opacity="0.9"/>
+                <polygon points="190,230 190,190 150,190 150,230" fill="#F97316" opacity="0.9"/>
+                <polygon points="190,150 190,110 150,110 150,150" fill="#FB923C" opacity="0.85"/>
+                <polygon points="150,190 150,150 110,150 110,190" fill="#C2410C" opacity="0.85"/>
+                <polygon points="270,190 270,130 230,150" fill="#FB923C" opacity="0.8"/>
+                <polygon points="150,110 150,70 110,70 110,110" fill="var(--theme-secondary, #F36F21)" opacity="0.8"/>
                 
-                <!-- Logo Dinas Instansi Tempat Magang (Kiri) -->
-                <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                    <img src="{{ $agencyLogoUrl }}" 
-                         alt="{{ $agencyProfile->agency_name ?? 'Logo Dinas' }}" 
-                         class="max-h-16 max-w-full object-contain"
-                         style="height: 58px; width: auto;">
+                <!-- Guilloche Wave Curves Orange -->
+                <path d="M 270,140 C 200,130 150,70 170,0" fill="none" stroke="var(--theme-secondary, #F36F21)" stroke-width="1.2" opacity="0.45"/>
+                <path d="M 250,170 C 180,150 130,90 150,0" fill="none" stroke="#EA580C" stroke-width="1.2" opacity="0.4"/>
+                <path d="M 230,200 C 160,170 110,110 130,0" fill="none" stroke="#FB923C" stroke-width="1.2" opacity="0.35"/>
+                <path d="M 210,230 C 140,190 90,130 110,0" fill="none" stroke="#F97316" stroke-width="1.2" opacity="0.3"/>
+            </svg>
+        </div>
+
+        <!-- 3. HEADER KOP LOGO RESMI (Deretan Horizontal Terpadu di Bagian Atas) -->
+        <div class="relative z-10 pt-4 px-10">
+            <div class="flex items-center justify-center gap-5 sm:gap-7">
+                <!-- Lambang Kota Surabaya -->
+                <div class="h-11 sm:h-12 flex items-center justify-center">
+                    <img src="{{ $surabayaLogoUrl }}" 
+                         alt="Pemerintah Kota Surabaya" 
+                         class="max-h-11 sm:max-h-12 w-auto object-contain"
+                         onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
                 </div>
 
-                <!-- Teks Instansi Pemerintah Kota -->
-                <div class="text-center flex-1 px-4">
-                    <h3 class="font-bold text-[11px] uppercase tracking-[0.25em] text-slate-600">
-                        {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
-                    </h3>
-                    <h2 class="font-serif-title font-black text-lg text-slate-900 tracking-wider mt-0.5 uppercase">
-                        {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
-                    </h2>
-                    <p class="text-[9.5px] text-slate-500 mt-0.5 leading-tight">
-                        {{ $agencyProfile->address ?? 'Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya 60275' }} &bull; Website: {{ $agencyProfile->website ?? 'https://dispusip.surabaya.go.id' }}
-                    </p>
+                <!-- Logo Baru Dispusip Kota Surabaya -->
+                <div class="h-11 sm:h-12 flex items-center justify-center">
+                    <img src="{{ $dispusipLogoUrl }}" 
+                         alt="Dinas Perpustakaan dan Kearsipan Kota Surabaya" 
+                         class="max-h-11 sm:max-h-12 w-auto object-contain"
+                         onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
                 </div>
 
-                <!-- Logo Universitas Mitra (Kanan) -->
-                <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                    <img src="{{ $univLogoUrl }}" alt="{{ $profile->universitas ?? 'Logo Kampus' }}" class="max-h-16 max-w-full object-contain" style="height: 56px; width: auto;">
+                <!-- Logo ASN BerAKHLAK -->
+                <div class="h-9 sm:h-10 flex items-center justify-center">
+                    <img src="{{ $berakhlakLogoUrl }}" 
+                         alt="ASN BerAKHLAK" 
+                         class="max-h-9 sm:max-h-10 w-auto object-contain">
                 </div>
 
+                <!-- Logo Bangga Melayani Bangsa -->
+                <div class="h-9 sm:h-10 flex items-center justify-center">
+                    <img src="{{ $banggaLogoUrl }}" 
+                         alt="Bangga Melayani Bangsa" 
+                         class="max-h-9 sm:max-h-10 w-auto object-contain">
+                </div>
+
+                <!-- Logo Zona Integritas (WBK & WBBM) -->
+                <div class="h-9 sm:h-10 flex items-center justify-center">
+                    <img src="{{ $zonaLogoUrl }}" 
+                         alt="Zona Integritas WBK WBBM" 
+                         class="max-h-9 sm:max-h-10 w-auto object-contain">
+                </div>
             </div>
         </div>
 
-        <!-- 2. KONTEN UTAMA SERTIFIKAT (Tengah - Spasi Vertikal Merata & Proporsional) -->
-        <div class="relative z-10 px-6 my-auto text-center space-y-4">
+        <!-- 4. KONTEN UTAMA SERTIFIKAT (Tengah - Proporsional, Bersih, dan Berwibawa) -->
+        <div class="relative z-10 px-8 my-auto text-center space-y-4">
             
-            <!-- Judul Sertifikat & Nomor Registrasi -->
-            <div class="space-y-1">
-                <h1 class="font-serif-title text-2xl sm:text-3xl font-black tracking-widest text-slate-900 uppercase">
-                    Sertifikat Kelulusan Magang
+            <!-- Judul Sertifikat & Nomor Registrasi Dinas -->
+            <div class="space-y-0.5">
+                <h1 class="font-black text-3xl sm:text-4xl text-slate-950 tracking-wider uppercase font-serif-title">
+                    SERTIFIKAT
                 </h1>
-                <p class="font-mono text-xs font-bold text-amber-700 tracking-wider">
-                    NOMOR: {{ $regNumber }}
+                <h2 class="font-extrabold text-lg sm:text-xl text-slate-900 tracking-[0.22em] uppercase">
+                    MAGANG
+                </h2>
+                <p class="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-wide pt-0.5 font-mono">
+                    Nomor : {{ $regNumber }}
                 </p>
-                <div class="w-32 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto mt-1"></div>
             </div>
 
-            <!-- Isi Pernyataan & Identitas Mahasiswa -->
-            <div class="max-w-4xl mx-auto space-y-3">
-                <p class="font-serif text-xs italic text-slate-500">Diberikan secara resmi dan sah kepada:</p>
-                
-                <div class="space-y-1">
-                    <h2 class="text-2xl font-black text-slate-900 tracking-tight uppercase underline decoration-amber-500/50 decoration-2 underline-offset-4">
-                        {{ $student->name }}
-                    </h2>
-                    <p class="text-xs font-bold text-blue-900">
-                        NIM: {{ $profile->nim ?? '-' }} &bull; Program Studi: {{ $profile->jurusan ?? 'Informatika' }}
-                    </p>
-                    <p class="text-xs font-semibold text-slate-600">
-                        {{ $profile->universitas ?? ($university->name ?? 'Universitas Dr. Soetomo') }}
-                    </p>
-                </div>
-
-                <p class="text-xs text-slate-600 max-w-3xl mx-auto leading-relaxed pt-1">
-                    Telah menyelesaikan seluruh rangkaian program <strong>Praktik Kerja Lapangan (PKL) / Magang MBKM</strong> pada unit kerja 
-                    <strong>{{ $application->unit->name ?? 'Bidang Pembinaan dan Pengelolaan Perpustakaan' }}</strong>, 
-                    {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}, Pemerintah Kota Surabaya 
-                    terhitung sejak tanggal <strong>{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }}</strong> 
-                    sampai dengan <strong>{{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}</strong> dengan predikat:
+            <!-- Nama & Identitas Mahasiswa Penerima -->
+            <div class="space-y-1 pt-1">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-950 tracking-tight font-sans">
+                    {{ $student->name }}
+                </h2>
+                <p class="text-xs sm:text-[13px] font-semibold text-slate-700">
+                    Mahasiswa Program Studi {{ $profile->jurusan ?? 'Semua Jurusan' }}{{ !empty($profile->fakultas) ? ' Fakultas ' . $profile->fakultas : '' }}
                 </p>
-
-                <!-- Predikat Badge Box Emas -->
-                <div class="pt-2">
-                    <div class="inline-flex items-center gap-3 px-8 py-2 bg-gradient-to-r from-amber-50 via-amber-100/80 to-amber-50 border border-amber-300 rounded-xl shadow-2xs">
-                        <span class="text-xs font-black text-amber-900 uppercase tracking-wider">PREDIKAT:</span>
-                        <span class="text-base font-black text-amber-950 font-serif-title tracking-wide">
-                            GRADE {{ $simpleGrade }} (NILAI: {{ $eval->nilai_akhir ?? 0 }})
-                        </span>
-                    </div>
-                </div>
+                <p class="text-xs sm:text-[13px] font-semibold text-slate-700">
+                    {{ $profile->universitas ?? ($university->name ?? 'Universitas') }}
+                </p>
             </div>
 
-        </div>
-
-        <!-- 3. FOOTER TANDA TANGAN RESMI KEPALA DINAS DENGAN TTE & QR VERIFIKASI (Bagian Bawah) -->
-        @php
-            $verifyHost = parse_url(url('/'), PHP_URL_HOST) . (parse_url(url('/'), PHP_URL_PORT) ? ':' . parse_url(url('/'), PHP_URL_PORT) : '');
-            $codeGroups = $placement?->certificate_hash ? str_split($placement->verification_code, 20) : [];
-        @endphp
-        <div class="relative z-10 flex items-end justify-between px-10 pb-4 text-xs">
-            
-            <!-- Panel Keterangan & Keaslian Dokumen (Kiri) -->
-            <div class="max-w-[340px] text-left text-slate-600 space-y-1.5 pb-1">
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-[10px] text-slate-900 uppercase tracking-wider">Verifikasi Keaslian Sertifikat</h4>
-                        <p class="text-[8.5px] text-slate-500">Tersertifikasi Tanda Tangan Elektronik (TTE) Sah</p>
-                    </div>
-                </div>
-                <p class="text-[8.5px] text-slate-500 leading-relaxed">
-                    Sertifikat ini diterbitkan secara sah oleh Pemerintah Kota Surabaya. Keaslian dokumen dapat diverifikasi dengan memindai kode QR pada tanda tangan elektronik di samping atau mengakses tautan:
+            <!-- Narasi Penghargaan Selesai Magang -->
+            <div class="max-w-3xl mx-auto space-y-1 pt-0.5">
+                <p class="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-medium">
+                    Atas partisipasinya dalam mengikuti kerja magang di Dinas Perpustakaan dan Kearsipan Kota Surabaya
                 </p>
-                <p class="text-[8.5px] font-semibold text-slate-700 truncate">
-                    <a href="{{ $verifyCertificateUrl }}" target="_blank" class="text-blue-600 hover:underline">{{ $verifyHost }}/verify-certificate/{{ $certificateHash }}</a>
+                <p class="text-xs sm:text-[13px] font-bold text-slate-900 pt-0.5">
+                    {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d F Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d F Y') }}
                 </p>
-                @if (!empty($codeGroups))
-                    <p class="text-[8px] text-slate-500">
-                        Kode Verifikasi: <span class="font-mono font-bold text-slate-800 select-all">{{ $placement?->verification_code ?? $certificateHash }}</span>
-                    </p>
-                @endif
             </div>
 
-            <!-- TTD TUNGGAL: Kepala Dinas dengan QR Code TTE (Kanan) -->
-            <div class="text-center w-72" data-verify-url="{{ $verifyCertificateUrl }}">
-                <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-                <p class="font-bold text-slate-900 text-xs mt-0.5">{{ $agencyProfile->signee_position ?? 'Kepala Dinas' }}</p>
-                <p class="text-[10px] text-slate-500 truncate">{{ $agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</p>
-                
-                <!-- QR Code TTD Elektronik Kepala Dinas -->
-                <div class="my-1.5 flex flex-col items-center justify-center">
-                    <div class="p-1 bg-white border border-slate-300 rounded-md shadow-2xs">
-                        @if (!empty($qrSvg))
-                            <div class="w-[68px] h-[68px] flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi Sertifikat">{!! $qrSvg !!}</div>
-                        @else
-                            <div class="w-[68px] h-[68px] flex items-center justify-center text-[7px] text-slate-500 text-center leading-tight">QR tidak tersedia</div>
-                        @endif
-                    </div>
-                    <span class="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-md border border-emerald-800/25 bg-emerald-50/70 text-emerald-900 text-[8px] font-bold uppercase tracking-wider">
-                        <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                        Ditandatangani Secara Elektronik
-                    </span>
-                </div>
+            <!-- 5. TANDA TANGAN ELEKTRONIK RESMI KEPALA DINAS / SEKRETARIS (KOTAK TTE PRESISI) -->
+            <div class="pt-2 flex flex-col items-center">
+                <p class="text-[11.5px] font-medium text-slate-800">
+                    {{ $theme->city ?? 'Surabaya' }}, {{ \Carbon\Carbon::parse($placement->certificate?->issued_at ?? now())->translatedFormat('d F Y') }}
+                </p>
+                <p class="text-[11.5px] font-semibold text-slate-800 mt-0.5">
+                    {{ $theme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}
+                </p>
 
-                <div class="border-t border-slate-400/60 pt-1 max-w-[220px] mx-auto">
-                    <p class="font-bold text-slate-900 text-xs">{{ $agencyProfile->signee_name ?? 'Mia Santi Dewi, S.H., M.Si.' }}</p>
-                    <p class="text-[9.5px] text-slate-500">NIP: {{ $agencyProfile->signee_nip ?? '19720315 199803 2 004' }}</p>
+                <!-- Kotak TTE Resmi Standar BSrE / Kominfo -->
+                <div class="mt-2 flex items-center gap-3.5 px-3.5 py-2.5 bg-white border border-slate-900 text-left shadow-2xs" style="width: 360px; max-width: 95%;">
+                    
+                    <!-- Sisi Kiri Kotak: QR Code dengan Lambang Surabaya di Tengah -->
+                    <div class="relative w-[74px] h-[74px] flex items-center justify-center shrink-0 bg-white border border-slate-200 p-0.5">
+                        <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full" aria-label="QR Verifikasi Sertifikat">
+                            {!! $qrSvg !!}
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="w-[19px] h-[19px] bg-white rounded-xs p-[1px] shadow-2xs flex items-center justify-center border border-slate-300">
+                                <img src="{{ $surabayaLogoUrl }}" 
+                                     alt="SBY" 
+                                     class="w-full h-full object-contain"
+                                     onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sisi Kanan Kotak: Teks Penandatanganan Elektronik Berjenjang -->
+                    <div class="text-[9.5px] leading-snug text-slate-900 font-sans flex-1">
+                        <div class="text-[9px] text-slate-600">Ditandatangani secara elektronik oleh:</div>
+                        <div class="font-medium text-slate-800">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
+                        <div class="mt-1 font-bold text-[10.5px] text-slate-950 tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
+                        <div class="text-[8.5px] font-semibold text-slate-600 uppercase tracking-wide">{{ $theme->signee_rank ?? 'PEMBINA TK I' }}</div>
+                        <div class="text-[8.5px] font-mono text-slate-700 font-medium">NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
+                    </div>
+
                 </div>
             </div>
 
         </div>
 
+        <div class="pb-1"></div>
     </main>
 
     <!-- ================================================================= -->
     <!-- HALAMAN 2: LAMPIRAN TRANSKRIP RINCIAN NILAI KOMPETENSI            -->
     <!-- ================================================================= -->
-    <section class="certificate-sheet page-break px-8 py-5 relative flex flex-col justify-between">
+    <section class="certificate-sheet page-break px-8 py-5 relative flex flex-col justify-between bg-white select-none">
         
         <!-- Border Ornamen Halaman 2 -->
         <div class="absolute inset-3 border-[2px] border-slate-300 rounded-2xl pointer-events-none"></div>
@@ -322,18 +352,23 @@
         <!-- Bagian Atas: KOP, BIODATA, DAN TABEL TRANSKRIP -->
         <div class="relative z-10 px-4 pt-0.5">
             
-            <!-- 1. HEADER TRANSKRIP NILAI DENGAN LOGO DINAS -->
+            <!-- 1. HEADER TRANSKRIP NILAI DENGAN LOGO RESMI DISPUSIP & SURABAYA -->
             <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2">
                 <div class="flex items-center gap-3">
-                    <img src="{{ $agencyLogoUrl }}" 
-                         alt="{{ $agencyProfile->agency_name ?? 'Logo Dinas' }}" 
-                         class="w-10 h-10 object-contain">
+                    <img src="{{ $surabayaLogoUrl }}" 
+                         alt="Pemerintah Kota Surabaya" 
+                         class="w-9 h-9 object-contain"
+                         onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                    <img src="{{ $dispusipLogoUrl }}" 
+                         alt="Dinas Perpustakaan dan Kearsipan" 
+                         class="w-9 h-9 object-contain"
+                         onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
                     <div>
                         <h3 class="font-bold text-[9px] uppercase tracking-wider text-slate-500">
-                            {{ $agencyProfile->government_name ?? 'Pemerintah Kota Surabaya' }}
+                            Pemerintah Kota Surabaya
                         </h3>
                         <h2 class="font-black text-xs text-slate-900 uppercase">
-                            {{ $agencyProfile->agency_name ?? 'Dinas Perpustakaan dan Kearsipan' }}
+                            Dinas Perpustakaan dan Kearsipan
                         </h2>
                     </div>
                 </div>
@@ -342,8 +377,8 @@
                     <h1 class="font-black text-xs uppercase tracking-wider text-slate-900">
                         Lampiran Transkrip Nilai Magang
                     </h1>
-                    <p class="font-mono text-[9.5px] text-slate-500 font-bold">
-                        NOMOR: {{ $regNumber }}
+                    <p class="font-mono text-[9.5px] text-slate-600 font-bold">
+                        Nomor : {{ $regNumber }}
                     </p>
                 </div>
             </div>
@@ -364,7 +399,7 @@
                     <tr>
                         <td class="w-28 text-slate-500 font-medium py-0.5">Program Studi</td>
                         <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-medium text-slate-800 py-0.5">{{ $profile->jurusan ?? 'Informatika' }}</td>
+                        <td class="font-medium text-slate-800 py-0.5">{{ $profile->jurusan ?? 'Semua Jurusan' }}</td>
                     </tr>
                 </table>
                 <table class="w-full text-xs">
@@ -376,7 +411,7 @@
                     <tr>
                         <td class="w-28 text-slate-500 font-medium py-0.5">Unit Kerja Magang</td>
                         <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-medium text-slate-800 py-0.5">{{ $application->unit->name ?? '-' }}</td>
+                        <td class="font-medium text-slate-800 py-0.5">{{ $application->unit->name ?? 'Dinas Perpustakaan dan Kearsipan' }}</td>
                     </tr>
                     <tr>
                         <td class="w-28 text-slate-500 font-medium py-0.5">Periode Magang</td>
@@ -389,7 +424,7 @@
             <!-- 3. TABEL TRANSKRIP RINCIAN PENILAIAN -->
             <div class="mt-2.5 overflow-hidden rounded-xl border border-slate-300">
                 <table class="min-w-full text-left text-[10.5px] divide-y divide-slate-200">
-                    <thead class="bg-slate-900 text-white font-bold uppercase text-[9px] tracking-wider">
+                    <thead class="text-white font-bold uppercase text-[9px] tracking-wider" style="background-color: var(--theme-primary, #0f172a);">
                         <tr>
                             <th class="py-1.5 px-3 text-center w-10">No</th>
                             <th class="py-1.5 px-3">Komponen Penilaian & Aspek Kompetensi Magang</th>
@@ -498,7 +533,7 @@
 
         </div>
 
-        <!-- 4. FOOTER KETERANGAN TRANSKRIP (Tanpa TTD Sesuai Kebijakan Dokumen Tunggal Sah) -->
+        <!-- 4. FOOTER KETERANGAN TRANSKRIP (Dokumen Sah Tak Terpisahkan) -->
         <div class="relative z-10 border-t border-slate-200 pt-2.5 px-4 pb-2 flex items-center justify-between text-xs text-slate-500">
             <div class="space-y-0.5">
                 <p class="font-bold text-[9.5px] uppercase tracking-wider text-slate-700">Keterangan Skala Predikat & Mutu Nilai:</p>
@@ -508,12 +543,12 @@
                     <strong>C (55 - 69)</strong> : Cukup
                 </p>
             </div>
-            <div class="text-right text-[9px] text-slate-400 max-w-md leading-tight">
-                <p class="font-semibold text-slate-600">
-                    Lampiran transkrip nilai ini merupakan satu kesatuan sah dan tak terpisahkan dari Sertifikat Kelulusan Magang Nomor: <span class="font-bold text-slate-800">{{ $regNumber }}</span>.
+            <div class="text-right text-[9px] text-slate-500 max-w-md leading-tight">
+                <p class="font-semibold text-slate-700">
+                    Lampiran transkrip nilai ini merupakan satu kesatuan sah dan tak terpisahkan dari Sertifikat Magang Nomor: <span class="font-bold text-slate-900">{{ $regNumber }}</span>.
                 </p>
                 <p class="text-[8px] text-slate-400 mt-0.5">
-                    Telah disahkan dan terverifikasi secara elektronik melalui Tanda Tangan Elektronik (TTE) Kepala Dinas pada lembar utama.
+                    Telah disahkan dan terverifikasi secara elektronik melalui Tanda Tangan Elektronik (TTE) pada lembar utama.
                 </p>
             </div>
         </div>

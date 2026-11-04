@@ -467,7 +467,7 @@ class InternshipGroupWorkflowTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Pengajuan Kelompok');
         $response->assertSee('Tim Pengujian Admin');
-        $response->assertSee('Ketua Kelompok');
+        $response->assertSee('Ketua');
         $response->assertSee($this->member->name);
     }
 
@@ -729,7 +729,7 @@ class InternshipGroupWorkflowTest extends TestCase
         // Aksi Kelompok sekarang dipusatkan di halaman Detail sesuai permintaan user
         $detailResponse = $this->actingAs($this->admin)->get(route('admin.applications.show', $leaderApp->id));
         $detailResponse->assertOk();
-        $detailResponse->assertSee('Aksi Serentak Kelompok');
+        $detailResponse->assertSee('Proses Pengajuan Tim');
     }
 
     public function test_admin_can_update_entire_group_status_serentak(): void

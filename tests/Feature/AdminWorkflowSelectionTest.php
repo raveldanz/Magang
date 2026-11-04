@@ -401,5 +401,37 @@ class AdminWorkflowSelectionTest extends TestCase
             ->first();
         $this->assertNotNull($audit);
     }
+
+    /**
+     * 12. Verifikasi penguncian tombol ACCEPTED (Kunci ACC) pada tahap seleksi awal (pending & waiting_approval) bagi Admin staf.
+     */
+    public function test_admin_staff_sees_locked_accepted_button_on_pending_and_waiting_approval(): void
+    {
+        $adminQa = User::where('email', 'admin.qa@test.local')->firstOrFail();
+        $mhsPending = User::where('email', 'mhs.qa.pending@test.local')->firstOrFail();
+        $app = Application::where('user_id', $mhsPending->id)->firstOrFail();
+
+        // 1. Saat status PENDING: Admin staf melihat tombol ACCEPTED terkunci
+        $app->update(['status' => 'pending']);
+        $responsePending = $this->actingAs($adminQa)->get(route('admin.applications.show', $app->id));
+        $responsePending->assertOk();
+        $responsePending->assertSee('Kunci ACC');
+        $responsePending->assertSee('Persetujuan akhir disahkan oleh Atasan (Supervisor)');
+        $responsePending->assertDontSee('Usulkan pengesahan penerimaan ke Atasan');
+
+        // 2. Saat status WAITING_APPROVAL: Admin staf juga melihat tombol ACCEPTED terkunci
+        $app->update(['status' => 'waiting_approval']);
+        $responseWaiting = $this->actingAs($adminQa)->get(route('admin.applications.show', $app->id));
+        $responseWaiting->assertOk();
+        $responseWaiting->assertSee('Kunci ACC');
+        $responseWaiting->assertSee('Menunggu ACC Atasan Tim Kerja Umum');
+
+        // 3. Saat dibuka oleh Supervisor: Tombol ACCEPTED TIDAK terkunci bagi Supervisor
+        $supervisor = User::where('role', 'supervisor')->first()
+            ?? User::factory()->create(['role' => 'supervisor']);
+        $responseSupervisor = $this->actingAs($supervisor)->get(route('admin.applications.show', $app->id));
+        $responseSupervisor->assertOk();
+        $responseSupervisor->assertDontSee('Kunci ACC');
+    }
 }
 

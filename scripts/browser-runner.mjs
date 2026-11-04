@@ -65,11 +65,13 @@ async function authenticateIfNeeded(page, targetRole) {
     const password = 'password';
 
     console.log(`[YOLO] Otentikasi otomatis sebagai [${roleName}] (${email})...`);
-    await page.goto('http://127.0.0.1:8000/login', { waitUntil: 'networkidle' });
+    await page.goto('http://127.0.0.1:8000/login', { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', password);
-    await page.click('button[type="submit"]');
-    await page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 });
+    await Promise.all([
+        page.waitForURL(url => !url.pathname.includes('/login'), { timeout: 15000 }),
+        page.click('button[type="submit"]')
+    ]);
 }
 
 async function runYolo() {
@@ -99,7 +101,8 @@ async function runYolo() {
         });
         const pageDesktop = await contextDesktop.newPage();
         await authenticateIfNeeded(pageDesktop, role);
-        await pageDesktop.goto(baseUrl, { waitUntil: 'networkidle' });
+        await pageDesktop.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await pageDesktop.waitForTimeout(600);
 
         const desktopGuard = await assertVisualStyles(pageDesktop);
         console.log(`[YOLO] Desktop Body Font   : ${desktopGuard.bodyFont}`);
@@ -125,7 +128,8 @@ async function runYolo() {
         });
         const pageMobile = await contextMobile.newPage();
         await authenticateIfNeeded(pageMobile, role);
-        await pageMobile.goto(baseUrl, { waitUntil: 'networkidle' });
+        await pageMobile.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await pageMobile.waitForTimeout(600);
 
         const mobileGuard = await assertVisualStyles(pageMobile);
         console.log(`[YOLO] Mobile Horizontal Scroll : ${mobileGuard.hasHorizontalScroll ? 'ADA OVERFLOW (FAIL)' : 'TIDAK ADA (PASS)'}`);
@@ -135,6 +139,17 @@ async function runYolo() {
         await pageMobile.screenshot({ path: publicMobileShot, fullPage: true });
         try { fs.copyFileSync(publicMobileShot, brainMobileShot); } catch (_) {}
         console.log(`[YOLO] [+] Mobile Screenshot tersimpan : ${publicMobileShot}`);
+
+        const menuBtn = await pageMobile.$('button[aria-label="Buka Menu"]');
+        if (menuBtn) {
+            await menuBtn.click();
+            await pageMobile.waitForTimeout(400);
+            const publicDrawerShot = path.join(publicTestArtifactsDir, `yolo_${cleanName}_mobile_drawer.png`);
+            const brainDrawerShot = path.join(artifactDir, `yolo_${cleanName}_mobile_drawer.png`);
+            await pageMobile.screenshot({ path: publicDrawerShot });
+            try { fs.copyFileSync(publicDrawerShot, brainDrawerShot); } catch (_) {}
+            console.log(`[YOLO] [+] Mobile Drawer Screenshot tersimpan : ${publicDrawerShot}`);
+        }
         await contextMobile.close();
 
         console.log('================================================================');

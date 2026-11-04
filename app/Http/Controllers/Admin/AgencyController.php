@@ -108,7 +108,7 @@ class AgencyController extends Controller
                 ])->orderBy('name');
             },
             'users' => function ($uq) {
-                $uq->whereIn('role', ['admin', 'mentor', 'pembimbing'])->orderBy('name');
+                $uq->whereIn('role', ['admin', 'supervisor', 'mentor', 'pembimbing'])->orderBy('name');
             },
         ])->findOrFail($id);
 
@@ -153,6 +153,7 @@ class AgencyController extends Controller
         $totalRemaining = max(0, $totalQuota - $totalFilled);
 
         $adminUsers = $agency->users->where('role', 'admin')->values();
+        $supervisorUsers = $agency->users->where('role', 'supervisor')->values();
         $mentorUsers = $agency->users->whereIn('role', ['mentor', 'pembimbing'])->values();
 
         // Bandingkan sebagai string: status di-cast ke enum, sehingga where('status', '...') pada Collection selalu 0
@@ -165,6 +166,7 @@ class AgencyController extends Controller
             'total_filled' => $totalFilled,
             'total_remaining' => $totalRemaining,
             'total_admins' => $adminUsers->count(),
+            'total_supervisors' => $supervisorUsers->count(),
             'total_mentors' => $mentorUsers->count(),
             'total_applications' => $applications->count(),
             'pending_applications' => $pendingAppsCount,
@@ -178,6 +180,7 @@ class AgencyController extends Controller
             'isSuperAdmin',
             'stats',
             'adminUsers',
+            'supervisorUsers',
             'mentorUsers',
             'applications',
             'activePlacements'
