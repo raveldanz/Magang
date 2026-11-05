@@ -85,12 +85,12 @@
             <div class="pt-1 flex items-center justify-center">
                 <div class="inline-flex items-center justify-center gap-[16px] rounded-full px-7 h-[56px] max-w-[94%]"
                      style="background: linear-gradient(90deg, {{ $pPalette['lighter'] }}40 0%, #ffffff 28%, #ffffff 72%, {{ $sPalette['lighter'] }}40 100%); border: 1px solid {{ $pPalette['light'] }}; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.10), inset 0 0 0 1px rgba(255,255,255,0.7);">
+                    <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-[40px] w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya.png') }}';">
                     <img src="{{ $dispusipLogoUrl }}" alt="Dispusip Kota Surabaya" class="h-[40px] w-auto object-contain" onerror="this.style.display='none'">
                     <img src="{{ $berakhlakLogoUrl }}" alt="BerAKHLAK" class="h-[30px] w-auto object-contain" onerror="this.style.display='none'">
                     <img src="{{ $banggaLogoUrl }}" alt="Bangga Melayani Bangsa" class="h-[34px] w-auto object-contain" onerror="this.style.display='none'">
                     <img src="{{ $zonaLogoUrl }}" alt="Zona Integritas" class="h-[30px] w-auto object-contain" onerror="this.style.display='none'">
                     <span class="self-center block w-[2px] h-[36px] bg-black rounded-full"></span>
-                    <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-[40px] w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
                     <img src="{{ $surabayaWordmarkUrl }}" alt="Surabaya City of Heroes" class="h-[27px] w-auto object-contain" onerror="this.style.display='none'">
                 </div>
             </div>
@@ -163,7 +163,7 @@
                                 <img src="{{ $surabayaLogoUrl }}?v={{ @filemtime(public_path('images/certificates/logo_surabaya.png')) ?: 1 }}"
                                      alt="SBY"
                                      class="w-full h-full object-contain"
-                                     onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                                     onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya.png') }}';">
                             </div>
                         </div>
                     </div>
@@ -239,7 +239,7 @@
             <div class="flex items-center justify-between pb-3">
                 <div class="flex items-center gap-3">
                     <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-11 w-auto object-contain"
-                         onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                         onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya.png') }}';">
                     <img src="{{ $dispusipLogoUrl }}" alt="Dinas Perpustakaan dan Kearsipan" class="h-11 w-auto object-contain"
                          onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
                     <div class="leading-tight">
@@ -363,19 +363,12 @@
                             </tr>
                         @endif
 
-                        <!-- Nilai akhir: terang, ditegaskan dengan garis tebal & angka besar -->
-                        <tr style="background-color: {{ $tHead }}; border-top: 2px solid {{ $primaryColor }};">
-                            <td colspan="2" class="py-4 px-4 text-right font-black uppercase tracking-wider text-[13px] text-slate-900">
-                                Nilai Akhir Total &amp; Mutu:
-                            </td>
-                            <td class="py-4 px-4 text-center font-bold text-slate-700">100%</td>
-                            <td class="py-4 px-4 text-center font-black text-[22px] leading-none text-emerald-700">
-                                {{ $eval?->nilai_akhir ?? 0 }}
-                            </td>
-                            <td class="py-4 px-4 text-center leading-tight">
-                                <span class="inline-block rounded-lg px-3 py-1 font-black text-[13px] text-amber-900" style="background-color: #fef3c7; border: 1px solid #fcd34d;">GRADE {{ $simpleGrade }}</span>
-                                <span class="block mt-1 text-[10px] font-semibold uppercase tracking-wide text-slate-600">{{ $predikat }}</span>
-                            </td>
+                        <!-- Nilai akhir: formal, satu warna teks (predikat sudah dijelaskan di keterangan skala) -->
+                        <tr class="font-black text-slate-900" style="background-color: {{ $tHead }}; border-top: 2px solid {{ $primaryColor }};">
+                            <td colspan="2" class="py-3.5 px-4 text-right uppercase tracking-wider text-[13px]">Nilai Akhir Total &amp; Mutu:</td>
+                            <td class="py-3.5 px-4 text-center">100%</td>
+                            <td class="py-3.5 px-4 text-center text-[15px]">{{ $eval?->nilai_akhir ?? 0 }}</td>
+                            <td class="py-3.5 px-4 text-center uppercase tracking-wide">Grade {{ $simpleGrade }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -399,5 +392,4 @@
                 <p class="text-[9px] text-slate-400 mt-0.5">Telah disahkan dan terverifikasi secara elektronik melalui Tanda Tangan Elektronik (TTE) pada lembar utama.</p>
             </div>
         </div>
-    </section>
     </section>
