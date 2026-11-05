@@ -375,6 +375,60 @@ class CertificateThemeWorkflowTest extends TestCase
         $response->assertSee('Cetak Semua Halaman (Ctrl + P)');
     }
 
+    public function test_theme_preview_renders_unsaved_values_without_persisting(): void
+    {
+        $agency = AgencyProfile::create([
+            'government_name' => 'Pemerintah Kota Surabaya',
+            'agency_name' => 'Dinas Perpustakaan dan Kearsipan',
+            'city' => 'Surabaya',
+        ]);
+        $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Bidang Arsip', 'quota' => 5]);
+        $univ = University::create(['name' => 'Universitas Airlangga', 'evaluation_scheme' => 'mentor_only']);
+        $student = User::factory()->create(['name' => 'Siti Contoh', 'role' => 'mahasiswa', 'university_id' => $univ->id]);
+        StudentProfile::create([
+            'user_id' => $student->id, 'nim' => '99887766', 'phone' => '081200000000',
+            'jurusan' => 'Ilmu Perpustakaan', 'universitas' => 'Universitas Airlangga', 'university_id' => $univ->id,
+        ]);
+        $app = Application::create([
+            'user_id' => $student->id, 'unit_id' => $unit->id, 'status' => 'completed',
+            'start_date' => '2026-08-01', 'end_date' => '2026-10-01',
+        ]);
+        // sengaja tanpa certificate_number/hash: pratinjau tidak boleh menerbitkannya
+        $placement = Placement::create(['application_id' => $app->id, 'status' => 'active']);
+        Evaluation::create(['placement_id' => $placement->id, 'nilai_pembimbing' => 88, 'nilai_akhir' => 88, 'grade' => 'A', 'status' => 'submitted']);
+
+        $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
+        $themesBefore = CertificateTheme::count();
+        $activeColor = CertificateTheme::getActive()->primary_color;
+
+        $response = $this->actingAs($admin)->post(route('admin.certificates.previewTheme'), [
+            'primary_color' => '#12ABCD',
+            'secondary_color' => '#FF8800',
+            'accent_color' => '#FFB800',
+            'signee_name' => 'Pejabat Uji Pratinjau',
+            'sample_placement_id' => $placement->id,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertSee('Siti Contoh');
+        $response->assertSee('Pratinjau tema');
+        $response->assertSee('#12ABCD');
+        $response->assertSee('Pejabat Uji Pratinjau');
+
+        $this->assertSame($themesBefore, CertificateTheme::count());
+        $this->assertSame($activeColor, CertificateTheme::getActive()->primary_color);
+        $this->assertNull($placement->fresh()->certificate_hash);
+        $this->assertNull($placement->fresh()->certificate_number);
+    }
+
+    public function test_theme_preview_rejects_invalid_color(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);
+        $this->actingAs($admin)
+            ->post(route('admin.certificates.previewTheme'), ['primary_color' => 'bukan-warna'])
+            ->assertSessionHasErrors('primary_color');
+    }
+
     public function test_batch_print_redirects_when_empty(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'agency_profile_id' => null]);

@@ -549,7 +549,15 @@
 
                                     <!-- Mini Header Logos -->
                                     <div class="relative z-10 flex items-center justify-center pt-1">
-                                        <img src="{{ asset('images/certificates/logos_official_strip.png') }}" class="h-4 w-auto object-contain mx-auto" alt="Logos">
+                                        <div style="display:inline-flex;align-items:center;gap:3px;border-radius:9999px;border:1px solid #cbd5e1;padding:0 8px;height:16px;background:#fff;">
+                                            <img src="{{ asset('images/certificates/logo_surabaya.png') }}" style="height:10px;width:auto;" alt="Surabaya">
+                                            <img src="{{ asset('images/certificates/logo_dispusip.png') }}" style="height:10px;width:auto;" alt="Dispusip">
+                                            <img src="{{ asset('images/certificates/logo_berakhlak.png') }}" style="height:7px;width:auto;" alt="BerAKHLAK">
+                                            <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" style="height:8px;width:auto;" alt="Bangga Melayani Bangsa">
+                                            <img src="{{ asset('images/certificates/logo_zona_integritas.png') }}" style="height:7px;width:auto;" alt="Zona Integritas">
+                                            <span style="width:1px;height:9px;background:#000;"></span>
+                                            <img src="{{ asset('images/certificates/logo_surabaya_wordmark.png') }}" style="height:7px;width:auto;" alt="Surabaya City of Heroes">
+                                        </div>
                                     </div>
 
                                     <!-- Mini Body Text -->
@@ -584,6 +592,28 @@
 
                                 <div class="text-[11px] text-slate-500 leading-relaxed text-center">
                                     Warna dan teks di atas berubah secara real-time saat Anda mengedit form di samping.
+                                </div>
+
+                                <!-- Pratinjau ukuran penuh: hasil generate nyata (2 halaman) dengan isian form yang belum disimpan -->
+                                <div class="border-t border-slate-100 pt-3 space-y-2">
+                                    <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Contoh mahasiswa untuk pratinjau penuh:</label>
+                                    <select id="sample_placement_id" name="sample_placement_id" class="w-full rounded-xl border-slate-200 text-xs focus:border-blue-600 focus:ring-blue-600">
+                                        <option value="">Otomatis (lulusan terbaru)</option>
+                                        @foreach (($eligibleApps ?? collect())->take(40) as $sampleApp)
+                                            @if ($sampleApp->placement)
+                                                <option value="{{ $sampleApp->placement->id }}">{{ $sampleApp->user->name }} — {{ $sampleApp->user->studentProfile->universitas ?? '-' }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                    <button type="submit"
+                                            formaction="{{ route('admin.certificates.previewTheme') }}"
+                                            formmethod="post"
+                                            formtarget="_blank"
+                                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span>Lihat Hasil Generate (Ukuran Penuh)</span>
+                                    </button>
+                                    <p class="text-[10.5px] text-slate-400 text-center leading-snug">Dibuka di tab baru dengan isian form saat ini. Tidak menyimpan perubahan apa pun.</p>
                                 </div>
                             </div>
 
