@@ -180,40 +180,6 @@
 
     @include('certificates.partials.sheets')
 
-    {{-- Skala otomatis agar lembar A4 landscape muat di layar HP/tablet (tampilan cetak tidak berubah) --}}
-    <script>
-        (function () {
-            var sheets = Array.prototype.slice.call(document.querySelectorAll('.certificate-sheet'));
-            sheets.forEach(function (sheet) {
-                var wrap = document.createElement('div');
-                wrap.className = 'sheet-scale-wrap';
-                sheet.parentNode.insertBefore(wrap, sheet);
-                wrap.appendChild(sheet);
-            });
-
-            function fit() {
-                var available = document.documentElement.clientWidth - 16;
-                sheets.forEach(function (sheet) {
-                    var wrap = sheet.parentNode;
-                    sheet.style.transform = 'none';
-                    var w = sheet.offsetWidth, h = sheet.offsetHeight;
-                    var styles = getComputedStyle(sheet);
-                    var mt = parseFloat(styles.marginTop) || 0, mb = parseFloat(styles.marginBottom) || 0;
-                    var scale = Math.min(1, available / w);
-                    sheet.style.transform = scale < 1 ? 'scale(' + scale + ')' : 'none';
-                    sheet.style.marginLeft = scale < 1 ? '0' : '';
-                    wrap.style.width = scale < 1 ? (w * scale) + 'px' : '';
-                    wrap.style.height = scale < 1 ? (h * scale + (mt + mb) * scale) + 'px' : '';
-                });
-            }
-
-            fit();
-            window.addEventListener('resize', fit);
-            window.addEventListener('beforeprint', function () {
-                sheets.forEach(function (s) { s.style.transform = 'none'; s.parentNode.style.height = ''; s.parentNode.style.width = ''; });
-            });
-            window.addEventListener('afterprint', fit);
-        })();
-    </script>
+    @include('certificates.partials.sheets-script')
 </body>
 </html>

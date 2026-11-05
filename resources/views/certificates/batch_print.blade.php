@@ -120,34 +120,6 @@
         @include('certificates.partials.sheets', $data)
     @endforeach
 
-    <script>
-        (function () {
-            var sheets = Array.prototype.slice.call(document.querySelectorAll('.certificate-sheet'));
-            sheets.forEach(function (sheet) {
-                var wrap = document.createElement('div');
-                wrap.className = 'sheet-scale-wrap';
-                sheet.parentNode.insertBefore(wrap, sheet);
-                wrap.appendChild(sheet);
-            });
-
-            function fit() {
-                var available = document.documentElement.clientWidth - 16;
-                sheets.forEach(function (sheet) {
-                    var wrap = sheet.parentNode;
-                    sheet.style.transform = 'none';
-                    var w = sheet.offsetWidth;
-                    var scale = Math.min(1, available / w);
-                    sheet.style.transform = scale < 1 ? 'scale(' + scale + ')' : 'none';
-                    sheet.style.marginLeft = scale < 1 ? '0' : '';
-                    wrap.style.width = scale < 1 ? (w * scale) + 'px' : '';
-                    wrap.style.height = scale < 1 ? (sheet.offsetHeight * scale) + 'px' : '';
-                });
-            }
-
-            window.addEventListener('resize', fit);
-            window.addEventListener('load', fit);
-            setTimeout(fit, 100);
-        })();
-    </script>
+    @include('certificates.partials.sheets-script')
 </body>
 </html>

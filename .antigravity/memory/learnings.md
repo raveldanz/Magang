@@ -4011,6 +4011,14 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-131] Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek
+- **Tanggal**: 2026-11-05
+- **Komponen**: `resources/views/certificates/partials/sheets.blade.php`, `partials/sheets-script.blade.php`
+- **Problem / Symptom**: Pada penilaian dua pihak (3+3 aspek), keterangan skala menabrak strip bawah dan terpotong di tepi lembar A4.
+- **Root Cause**: Kepadatan tabel dipilih dari jumlah aspek saja, padahal judul bagian, subtotal, biodata, dan nama aspek yang terlipat ikut memakan tinggi lembar berukuran tetap.
+- **Fix Applied**: Tiga tingkat kepadatan lewat variabel CSS (`data-density`), dipilih dari hasil ukur di browser setelah font dimuat dan sebelum cetak; bila tingkat `tight` tidak muat, tabel berlanjut ke lembar berikutnya dengan judul kolom berulang dan nomor halaman dinamis.
+- **Prevention Rule**: Jangan menebak muat/tidaknya konten dari jumlah baris pada lembar berukuran tetap; ukur tinggi hasil render, dan uji kasus ekstrem (10+10, 20+20, nama aspek panjang) di layar dan PDF. Kelas `flex`/`grid` Tailwind mengalahkan atribut `hidden`, jadi tambahkan aturan `display:none !important`.
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
