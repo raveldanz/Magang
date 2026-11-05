@@ -161,6 +161,9 @@
             <div class="hidden sm:block text-xs text-slate-400 border-l border-slate-700 pl-3">
                 <span>Dokumen Resmi: </span>
                 <strong class="text-slate-200">{{ $regNumber }}</strong>
+                @if (!empty($themePreview))
+                    <span class="ml-2 px-2 py-0.5 rounded-md bg-amber-400 text-slate-900 font-black uppercase tracking-wide">Pratinjau tema — belum disimpan</span>
+                @endif
             </div>
         </div>
 

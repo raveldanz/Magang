@@ -442,6 +442,73 @@ class CertificateController extends Controller
     }
 
     /**
+     * Pratinjau ukuran penuh hasil generate sertifikat dengan nilai form tema yang BELUM disimpan.
+     * Memakai data mahasiswa nyata sebagai contoh; tidak ada data yang disimpan (transaksi di-rollback).
+     */
+    public function previewTheme(Request $request)
+    {
+        $user = Auth::user();
+        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
+            abort(403, 'Hanya Admin Utama atau Super Admin yang dapat melihat pratinjau tema sertifikat dinas.');
+        }
+
+        $hex = ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'];
+        $v = $request->validate([
+            'year' => 'nullable|integer|min:2020|max:2099',
+            'theme_name' => 'nullable|string|max:255',
+            'primary_color' => $hex,
+            'secondary_color' => $hex,
+            'accent_color' => $hex,
+            'number_format_pattern' => 'nullable|string|max:255',
+            'signee_name' => 'nullable|string|max:255',
+            'signee_position' => 'nullable|string|max:255',
+            'signee_rank' => 'nullable|string|max:255',
+            'signee_nip' => 'nullable|string|max:50',
+            'mandate_text' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'sample_placement_id' => 'nullable|integer',
+        ]);
+
+        // Nilai form menimpa tema aktif; yang kosong memakai nilai tema aktif (tidak disimpan)
+        $base = \App\Models\CertificateTheme::getActive();
+        $theme = new \App\Models\CertificateTheme(array_merge($base->only([
+            'year', 'theme_name', 'primary_color', 'secondary_color', 'accent_color', 'number_format_pattern',
+            'signee_name', 'signee_position', 'signee_rank', 'signee_nip', 'mandate_text', 'city',
+        ]), array_filter(collect($v)->except('sample_placement_id')->all(), fn ($x) => $x !== null && $x !== '')));
+
+        $samples = Placement::whereHas('application', function ($aq) use ($user) {
+            $aq->where('status', 'completed');
+            if ($user && $user->agency_profile_id !== null) {
+                $aq->whereHas('unit', fn ($uq) => $uq->where('agency_profile_id', $user->agency_profile_id));
+            }
+        });
+
+        $placement = ! empty($v['sample_placement_id'])
+            ? (clone $samples)->whereKey($v['sample_placement_id'])->first()
+            : null;
+        $placement ??= $samples->latest('id')->first();
+
+        if (! $placement) {
+            return redirect()->route('admin.certificates.index', ['tab' => 'settings'])
+                ->with('error', 'Belum ada mahasiswa yang lulus untuk dijadikan contoh pratinjau sertifikat.');
+        }
+
+        // getCertificateData dapat menerbitkan nomor/hash bila kosong — di-rollback agar pratinjau tidak mengubah data
+        DB::beginTransaction();
+        try {
+            $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placement->id, $user);
+        } finally {
+            DB::rollBack();
+        }
+
+        $data['theme'] = $theme;
+        $data['themePreview'] = true;
+        $data['certificateRecord'] = Certificate::where('placement_id', $placement->id)->first();
+
+        return view('certificates.internship_certificate', $data);
+    }
+
+    /**
      * Aktifkan salah satu tema tahunan sebagai tema aktif
      */
     public function activateTheme($id)

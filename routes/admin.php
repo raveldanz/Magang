@@ -48,6 +48,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::get('/admin/certificates/{placementId}/revision', [AdminCertificateController::class, 'revision'])->name('admin.certificates.revision');
     Route::post('/admin/certificates/{placementId}/revision', [AdminCertificateController::class, 'updateRevision'])->name('admin.certificates.updateRevision');
     Route::post('/admin/certificates/theme', [AdminCertificateController::class, 'updateTheme'])->name('admin.certificates.updateTheme');
+    Route::post('/admin/certificates/theme/preview', [AdminCertificateController::class, 'previewTheme'])->name('admin.certificates.previewTheme');
     Route::post('/admin/certificates/theme/{id}/activate', [AdminCertificateController::class, 'activateTheme'])->name('admin.certificates.activateTheme');
 
     // Pengaturan Profil Instansi & TTD Surat
