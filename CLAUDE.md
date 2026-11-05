@@ -71,6 +71,8 @@ Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `
 - **Read `.antigravity/memory/learnings.md` before non-trivial changes** — it records past bugs with root causes and prevention rules. After fixing a notable bug, append an entry using its `[LRN-XXX]` template (Problem, Root Cause, Fix Applied, Prevention Rule).
 - Verify real column names against `database/migrations/` before writing queries or model changes; no raw SQL without parameter binding; use `DB::transaction` for multi-table writes.
 - Thin controllers: when a method exceeds ~15 lines or a controller ~100 lines, move logic into `app/Services/`.
+- **Tanpa atribusi Claude di GitHub.** Jangan menulis `Co-Authored-By: Claude ...` di pesan commit, dan jangan menulis "Generated with Claude Code" (atau teks/ikon Claude lain) di deskripsi PR, komentar PR/issue, maupun commit. Commit dan PR harus tampil murni atas nama pemilik repo, supaya tidak muncul avatar/ikon Claude sebagai kontributor. Aturan ini menggantikan atribusi bawaan alat.
+- Pesan commit multi-baris: tulis ke file sementara lalu `git commit -F <file>` (tanda kutip ganda di here-string PowerShell memecah argumen). Untuk PR/komentar gunakan `--body-file`.
 - Make surgical, backward-compatible edits (keep accessors/aliases that older views rely on, e.g. `lifecycle_status`, `rejection_reason`/`rejection_note`).
 - Done means `php -l` on changed files and `php artisan test` both exit 0; fix failures before reporting completion.
 - Logos/media: reference via `asset('storage/logos/...')` with `object-contain` to avoid distortion (see `.antigravity/rules/media.md`).
