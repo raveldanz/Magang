@@ -18,7 +18,7 @@
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 h-screen h-[100dvh] overflow-hidden flex flex-col justify-between"
+    <body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-700 min-h-screen lg:h-screen lg:h-[100dvh] lg:overflow-hidden flex flex-col justify-between"
           x-data="{ mobileMenuOpen: false, openQuotaModal: false }">
 
         @php
@@ -55,7 +55,7 @@
                     <div class="flex flex-col min-w-0">
                         <span class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900 leading-tight truncate">Portal Magang Dispusip</span>
                         
-                        <!-- Tampilan Desktop & Tablet (md ke atas): Satu baris penuh proporsional -->
+                        <!-- Desktop View (md ke atas) -->
                         <span class="hidden md:inline text-[10.5px] lg:text-xs font-bold text-blue-700 tracking-normal uppercase truncate">
                             Dinas Perpustakaan dan Kearsipan Kota Surabaya
                         </span>
@@ -73,9 +73,8 @@
                     </div>
                 </a>
 
-                <!-- Desktop Right Header Actions (Tampil Khusus Layar md ke Atas) -->
-                <div class="hidden md:flex items-center gap-1.5 lg:gap-3">
-                    <!-- Menu Proyek Dinas -->
+                <!-- Desktop Actions -->
+                <div class="hidden md:flex items-center gap-2 sm:gap-3">
                     <a href="{{ route('public.projects.index') }}" 
                        class="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-blue-600 transition rounded-xl hover:bg-slate-50">
                         <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -93,7 +92,6 @@
                         </a>
                         <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <span>Daftar</span>
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     @endauth
                 </div>
@@ -160,37 +158,37 @@
             </div>
         </header>
 
-        <!-- Main Content (Pas 1 Layar Penuh di Mobile & Desktop) -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-0">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center w-full">
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex items-center justify-center py-4 lg:py-0">
+            <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
                 
-                <!-- Kolom Kiri: Card Compact di Mobile, Elegan di Desktop -->
-                <div class="lg:col-span-7 w-full">
+                <!-- Kolom Kiri: Hero & Action -->
+                <div class="w-full lg:col-span-7">
                     <div class="bg-white lg:bg-transparent rounded-3xl lg:rounded-none p-5 sm:p-7 lg:p-0 shadow-md shadow-slate-200/50 lg:shadow-none border border-slate-200/80 lg:border-none space-y-3 sm:space-y-4 lg:space-y-6">
                         
                         <!-- Pemicu Sisa Kuota -->
-                        <div>
+                        <div class="w-full">
                             <!-- Desktop: Badge Statis -->
                             <span class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-lg shadow-2xs">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                                 <span>Sisa Kuota: {{ $totalRemaining }} Kursi</span>
                             </span>
 
-                            <!-- Mobile: Banner Interaktif Pop-up Kuota -->
+                            <!-- Mobile: Banner Interaktif Pop-up Kuota (Full-Width) -->
                             <button type="button" 
                                     @click="openQuotaModal = true"
-                                    class="w-full lg:hidden flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50/50 to-blue-50/40 border border-emerald-200/80 active:scale-[0.98] transition cursor-pointer text-left">
-                                <div class="flex items-center gap-2">
-                                    <span class="relative flex h-2 w-2">
+                                    class="w-full lg:hidden flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50/50 to-blue-50/40 border border-emerald-200/80 active:scale-[0.98] transition cursor-pointer text-left">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="relative flex h-2.5 w-2.5 shrink-0">
                                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                                     </span>
-                                    <div>
+                                    <div class="min-w-0">
                                         <p class="text-xs font-extrabold text-slate-800 leading-tight">Sisa Kuota: {{ $totalRemaining }} Kursi Tersedia</p>
                                         <p class="text-[10px] text-slate-500 font-medium">Klik untuk rincian 4 bidang magang</p>
                                     </div>
                                 </div>
-                                <span class="text-xs font-bold text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">Lihat</span>
+                                <span class="text-xs font-bold text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs shrink-0 ml-2">Lihat</span>
                             </button>
                         </div>
 
@@ -200,7 +198,7 @@
                         </h1>
 
                         <!-- Deskripsi Sistem Informasi Resmi -->
-                        <p class="text-xs sm:text-sm lg:text-sm text-slate-600 leading-relaxed max-w-2xl">
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
                             Sistem Informasi Resmi Pelaksanaan Magang dan Praktik Kerja Lapangan (PKL) di lingkungan Dinas Perpustakaan dan Kearsipan Kota Surabaya. Bergabunglah dalam transformasi layanan otomasi perpustakaan modern, preservasi arsip digital, dan pembudayaan literasi masyarakat.
                         </p>
 
@@ -209,18 +207,19 @@
                             @auth
                                 <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
                                     <span>Pindah ke Dashboard</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                                 </a>
                             @else
                                 <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
                                     <span>Daftar Magang Sekarang</span>
-                                </a>
+                                    </a>
                                 <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center shadow-2xs">
                                     Masuk ke Akun
                                 </a>
                             @endauth
                         </div>
 
-                        <!-- Info Kedinasan Dispusip (Alamat Siola) -->
+                        <!-- Info Alamat Siola (Menyatu di Bawah Form Tanpa Membuat Kolom Baru) -->
                         <div class="pt-3 border-t border-slate-100 lg:border-slate-200/80 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-x-4 text-xs text-slate-500">
                             <div class="flex items-center gap-1.5 font-medium">
                                 <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -235,7 +234,7 @@
                     </div>
                 </div>
 
-                <!-- Kolom Kanan: 4 Bidang Magang (Tampil di Desktop, Otomatis Dialihkan ke Pop-up Modal di Mobile) -->
+                <!-- Kolom Kanan: 4 Bidang Magang (Tampil di Desktop, Masuk Pop-up di Mobile) -->
                 <div class="hidden lg:block lg:col-span-5 w-full">
                     <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-slate-200/60 border border-slate-200/90 space-y-4">
                         
@@ -249,6 +248,7 @@
 
                         <!-- 4 Unit Divisi Dispusip -->
                         <div class="space-y-2.5">
+                            
                             <!-- Bidang 1: Bidang Sekretariat -->
                             <div class="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-blue-50/40 border border-slate-200/70 hover:border-blue-200 transition group">
                                 <div class="flex items-center justify-between gap-2">
@@ -296,6 +296,7 @@
                                 </div>
                                 <p class="text-[11px] text-slate-500 mt-1 line-clamp-1">Restorasi naskah kuno bersejarah, alih media digital & preservasi arsip.</p>
                             </div>
+
                         </div>
 
                         <!-- Footer Catatan -->
@@ -307,41 +308,13 @@
                 </div>
 
             </div>
-
-            <!-- Info Kedinasan Dispusip (Mobile: Tampil Paling Akhir di Bawah Kartu Bidang) -->
-            <div class="dispusip-address-mobile py-6 mt-6 border-t border-slate-200/80 flex-col sm:flex-row items-center justify-center gap-2 sm:gap-x-4 text-xs text-slate-500 text-center sm:text-left">
-                <div class="flex items-center gap-1.5 font-medium">
-                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span>Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4, Surabaya</span>
-                </div>
-                <div class="flex items-center gap-1.5 font-medium">
-                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                    <span>(031) 8707329</span>
-                </div>
-            </div>
-
         </main>
 
         <!-- Footer -->
-        <footer class="w-full bg-white border-t border-slate-200/80 shrink-0">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Tampilan Desktop Normal: Kunci 100% Persis Sesuai Desain Asli (hidden lg:flex) -->
-                <div class="hidden lg:flex items-center justify-between gap-2 py-4 text-xs text-slate-500">
-                    <p>&copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.</p>
-                    <p class="text-[11px] text-slate-400 font-medium">Sistem Informasi Penerimaan, Logbook, Evaluasi & Monitoring Magang Dispusip</p>
-                </div>
-
-                <!-- Tampilan Mobile & Tablet (block lg:hidden): Rata Tengah, Estetis & Bersih ala Eagle High Plantations -->
-                <div class="block lg:hidden py-5 text-center">
-                    <div class="space-y-1">
-                        <p class="text-xs font-semibold text-slate-600 tracking-tight">
-                            &copy; {{ date('Y') }} Dispusip Kota Surabaya &bull; Hak Cipta Dilindungi
-                        </p>
-                        <p class="text-[11px] text-slate-400 font-medium">
-                            Sistem Informasi Magang Dispusip
-                        </p>
-                    </div>
-                </div>
+        <footer class="w-full bg-white border-t border-slate-200/80 py-3 shrink-0">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-slate-500 text-center sm:text-left">
+                <p>&copy; {{ date('Y') }} Dinas Perpustakaan dan Kearsipan Kota Surabaya. Hak Cipta Dilindungi.</p>
+                <p class="text-[11px] text-slate-400 font-medium">Sistem Informasi Penerimaan, Logbook, Evaluasi & Monitoring Magang Dispusip</p>
             </div>
         </footer>
 

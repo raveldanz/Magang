@@ -91,11 +91,13 @@
                         <x-input-error :messages="$errors->get('activity')" class="mt-1" />
                     </div>
 
-                    {{-- Lampiran Bukti Kegiatan (Konsisten dengan Profil & Pengajuan) --}}
+                    {{-- Lampiran Bukti Kegiatan (Nama Berkas Rapi & Bersih ala Profil) --}}
                     @php
                         $hasAttachment = !empty($logbook?->attachment_path ?? $logbook?->attachment);
                         $attachmentPath = $logbook?->attachment_path ?? $logbook?->attachment;
-                        $savedName = $hasAttachment ? basename($attachmentPath) : '';
+                        $savedExt = $hasAttachment ? pathinfo($attachmentPath, PATHINFO_EXTENSION) : 'jpg';
+                        $logbookDateFormatted = !empty($logbook?->date) ? \Carbon\Carbon::parse($logbook->date)->format('d-m-Y') : 'Kegiatan';
+                        $savedName = $hasAttachment ? ('Lampiran_Logbook_' . $logbookDateFormatted . '.' . $savedExt) : '';
                         $savedUrl = $hasAttachment ? ($logbook->attachment_url ?? asset('storage/' . $attachmentPath)) : null;
                     @endphp
 
@@ -136,7 +138,7 @@
 
                             <!-- Tempat Nama File: File Baru atau File yang Sudah Ada (Dapat Diklik Langsung untuk View) -->
                             <div class="min-w-0 flex-1 truncate text-xs">
-                                {{-- Jika ada file baru yang dipilih --}}
+                                {{-- Jika ada file baru yang dipilih dari komputer --}}
                                 <template x-if="selectedName">
                                     <a :href="previewUrl" 
                                        target="_blank" 

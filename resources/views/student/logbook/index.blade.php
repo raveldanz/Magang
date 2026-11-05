@@ -78,7 +78,7 @@
                         <div class="flex items-center gap-3">
                             <div>
                                 <h3 class="font-black text-base text-gray-900">Alur Proses & Informasi Pengajuan Magang</h3>
-                                </div>
+                            </div>
                         </div>
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800">
                             Buka Dashboard Utama 
@@ -336,28 +336,26 @@
                         </div>
 
                         {{-- Tombol Tambah Logbook (Hanya Tampil Jika Status ACTIVE) --}}
-@if ($lifecycle === 'ACTIVE')
-    @if ($placement)
-        {{-- Tombol Aktif / Bisa Dipencet --}}
-        <a href="{{ route('student.logbook.create') }}" 
-           class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Aktivitas Logbook</span>
-        </a>
-    @else
-        {{-- Tombol Terkunci / Disable jika belum pilih DPL --}}
-        <button type="button" 
-                disabled 
-                title="Data penempatan magang Anda belum tersedia. Hubungi Admin Dinas."
-                class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 text-slate-400 border border-slate-300 rounded-xl text-xs font-bold cursor-not-allowed select-none shadow-none">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah Aktivitas Logbook</span>
-        </button>
-    @endif
+                        @if ($lifecycle === 'ACTIVE')
+                            @if ($placement)
+                                <a href="{{ route('student.logbook.create') }}" 
+                                   class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>Tambah Aktivitas Logbook</span>
+                                </a>
+                            @else
+                                <button type="button" 
+                                        disabled 
+                                        title="Data penempatan magang Anda belum tersedia. Hubungi Admin Dinas."
+                                        class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 text-slate-400 border border-slate-300 rounded-xl text-xs font-bold cursor-not-allowed select-none shadow-none">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>Tambah Aktivitas Logbook</span>
+                                </button>
+                            @endif
                         @elseif ($lifecycle === 'COMPLETED')
                             <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200">
                                 Mode Arsip Magang Selesai
@@ -407,8 +405,16 @@
                                         </td>
                                         <td class="p-4">
                                             @if ($log->attachment)
+                                                @php
+                                                    $ext = pathinfo($log->attachment, PATHINFO_EXTENSION);
+                                                    $isImg = in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+                                                @endphp
                                                 <a href="{{ $log->attachment_url }}" 
-                                                   @click.prevent="$dispatch('open-lightbox', { url: '{{ $log->attachment_url }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                                   @click.prevent="$dispatch('open-lightbox', { 
+                                                       url: '{{ $log->attachment_url }}', 
+                                                       isImage: {{ $isImg ? 'true' : 'false' }}, 
+                                                       title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' 
+                                                   })"
                                                    target="_blank" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                                     <span>Buka Lampiran</span>
@@ -484,8 +490,16 @@
                                         </span>
                                     </div>
                                     @if ($log->attachment)
+                                        @php
+                                            $ext = pathinfo($log->attachment, PATHINFO_EXTENSION);
+                                            $isImg = in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+                                        @endphp
                                         <a href="{{ $log->attachment_url }}" 
-                                           @click.prevent="$dispatch('open-lightbox', { url: '{{ $log->attachment_url }}', title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' })"
+                                           @click.prevent="$dispatch('open-lightbox', { 
+                                               url: '{{ $log->attachment_url }}', 
+                                               isImage: {{ $isImg ? 'true' : 'false' }}, 
+                                               title: 'Lampiran Logbook: {{ \Carbon\Carbon::parse($log->date)->format('d M Y') }}' 
+                                           })"
                                            target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1 cursor-pointer">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                             <span>Lampiran</span>
@@ -551,27 +565,32 @@
         </div>
     </div>
 
-    <!-- Lightbox Image Viewer Modal -->
-    <div x-data="{ openLightbox: false, lightboxUrl: '', lightboxTitle: '' }"
-         @open-lightbox.window="openLightbox = true; lightboxUrl = $event.detail.url; lightboxTitle = $event.detail.title || 'Lampiran Dokumen Logbook'">
+    <!-- Lightbox Image Viewer Modal (Diperbaiki: deteksi gambar akurat & pas proporsi tanpa scrollbar) -->
+    <div x-data="{ openLightbox: false, lightboxUrl: '', lightboxTitle: '', isImage: true }"
+         @open-lightbox.window="openLightbox = true; lightboxUrl = $event.detail.url; isImage = $event.detail.isImage; lightboxTitle = $event.detail.title || 'Lampiran Dokumen Logbook'">
         <div x-show="openLightbox" x-cloak class="fixed inset-0 z-[9999] overflow-y-auto">
             <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs transition-opacity" @click="openLightbox = false"></div>
             <div class="flex min-h-full items-center justify-center p-4">
-                <div class="relative transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all max-w-3xl w-full p-6 space-y-4">
+                <div class="relative transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all max-w-2xl w-full p-6 space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <h3 class="text-sm font-bold text-slate-800" x-text="lightboxTitle"></h3>
+                        <h3 class="text-sm font-bold text-slate-800 truncate pr-4" x-text="lightboxTitle"></h3>
                         <button type="button" @click="openLightbox = false" class="text-slate-400 hover:text-slate-600 text-base p-1 cursor-pointer">✕</button>
                     </div>
-                    <div class="bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center p-2 min-h-[300px] max-h-[70vh]">
-                        <template x-if="lightboxUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i)">
-                            <img :src="lightboxUrl" alt="Preview Lampiran" class="max-h-[65vh] w-auto object-contain rounded-xl shadow-md">
+
+                    <div class="bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center p-2 min-h-[250px] max-h-[70vh]">
+                        <!-- Tampilan Gambar -->
+                        <template x-if="isImage">
+                            <img :src="lightboxUrl" alt="Preview Lampiran" class="max-h-[65vh] max-w-full w-auto h-auto object-contain rounded-xl shadow-md">
                         </template>
-                        <template x-if="!lightboxUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i)">
+
+                        <!-- Tampilan Non-Gambar (PDF / Dokumen) -->
+                        <template x-if="!isImage">
                             <iframe :src="lightboxUrl" class="w-full h-[60vh] rounded-xl border-0"></iframe>
                         </template>
                     </div>
-                    <div class="flex justify-end gap-2">
-                        <a :href="lightboxUrl" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">Buka Berkas Utama</a>
+
+                    <div class="flex justify-end gap-2 pt-1">
+                        <a :href="lightboxUrl" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">Buka di Tab Baru</a>
                         <button type="button" @click="openLightbox = false" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">Tutup</button>
                     </div>
                 </div>

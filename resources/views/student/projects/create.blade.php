@@ -40,7 +40,7 @@
                 <div class="space-y-1 text-xs text-blue-900 leading-relaxed">
                     <h4 class="font-bold text-blue-950 text-sm">Ketentuan Dokumentasi Luaran Inovasi</h4>
                     <p>
-                        Unggah karya inovasi, dokumentasi kegiatan di masyarakat / desa, tautan video, dan dokumen pendukung seperti buku panduan teknis (*manual book*). Anda dapat menambahkan lebih dari satu proyek jika mengerjakan beberapa output luaran.
+                        Unggah karya inovasi, dokumentasi kegiatan di masyarakat / instansi, tautan video, dan dokumen pendukung seperti buku panduan teknis (*manual book*). Anda dapat menambahkan lebih dari satu proyek jika mengerjakan beberapa output luaran.
                     </p>
                 </div>
             </div>
@@ -166,7 +166,6 @@
                                placeholder="Tuliskan nama bidang proyek Anda..." 
                                class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
                         
-                        {{-- Rekomendasi Pintar Jika Cocok dengan Kategori Standar --}}
                         <template x-if="detectedCategory">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 mt-2">
                                 <div>
@@ -223,15 +222,6 @@
                                   placeholder="Jelaskan ruang lingkup inovasi, masalah yang diatasi, metodologi/teknologi/media yang digunakan, serta kontribusi mahasiswa selama masa magang..." 
                                   class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 leading-relaxed">{{ old('description') }}</textarea>
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                            Manfaat untuk Masyarakat & Layanan Dinas <span class="text-rose-500">*</span>
-                        </label>
-                        <textarea name="community_benefit" rows="3" required 
-                                  placeholder="Jelaskan dampak nyata inovasi terhadap pelayanan dinas, pemustaka, arsip daerah, atau masyarakat umum..." 
-                                  class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 leading-relaxed">{{ old('community_benefit') }}</textarea>
-                    </div>
                 </div>
 
                 <!-- BAGIAN 2: PENGERJAAN PROYEK & ANGGOTA TIM -->
@@ -278,7 +268,7 @@
                         <div>
                             <input type="text" name="creator_role" id="creator_role_input"
                                    value="{{ old('creator_role', 'Koordinator Proyek') }}" 
-                                   placeholder="Contoh: Koordinator Proyek & Desain Grafis"
+                                   placeholder="Contoh: Koordinator Proyek & Desain Grafis" 
                                    class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
                         </div>
                         <div class="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-slate-500">
@@ -330,7 +320,6 @@
                                                     </div>
                                                 </label>
 
-                                                <!-- Form Input Peran Anggota (Tampil Jika Dicentang) -->
                                                 <div x-show="checked" x-cloak class="mt-3 pt-3 border-t border-slate-100 space-y-2">
                                                     <input type="hidden" name="members[{{ $pIdx }}][placement_id]" value="{{ $peer->id }}" :disabled="!checked">
                                                     
@@ -366,7 +355,6 @@
                         @endif
                     </div>
                 </div>
-                </div>
 
                 <!-- BAGIAN 3: PUSAT AKSES & TAUTAN PROYEK -->
                 <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-6">
@@ -378,7 +366,7 @@
                             <h3 class="font-bold text-base text-slate-900">Pusat Akses Proyek</h3>
                         </div>
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, dosen pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Mahasiswa dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek (aplikasi, buku, desain fisik, dll):
+                            Sediakan akses langsung ke karya inovasi Anda agar mentor dinas, dosen pembimbing, dan atasan dapat menguji atau meninjau karya Anda. Mahasiswa dapat mengisi salah satu atau seluruh opsi di bawah ini sesuai karakteristik proyek:
                         </p>
                     </div>
 
@@ -416,19 +404,52 @@
                         </div>
                     </div>
 
-                    <!-- 3. Unggah Berkas Sumber Proyek / File ZIP -->
-                    <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2.5">
+                    <!-- 3. Unggah Berkas Sumber Proyek / File ZIP (Konsisten ala Profil) -->
+                    <div class="space-y-2 pt-2" x-data="{ zipName: '' }">
                         <div class="flex items-center justify-between">
-                            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                            <label for="source_code" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                                 Unggah Berkas Sumber Proyek / File ZIP (Opsional)
                             </label>
-                            <span class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded">ZIP / RAR / TAR.GZ (Maks. 50 MB)</span>
+                            <span class="text-[10px] text-slate-400 font-mono">ZIP / RAR / TAR.GZ (Maks. 50 MB)</span>
                         </div>
-                        <p class="text-xs text-slate-500 leading-relaxed">
+                        
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
                             Bila proyek berupa web offline, source code, master file desain (PSD/AI), e-book PDF resolusi cetak, atau arsip lengkap dokumen, unggah file arsip .ZIP proyek Anda di sini.
                         </p>
-                        <input type="file" name="source_code" accept=".zip,.rar,.7z,.tar,.gz"
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-dashed border-slate-300 rounded-xl p-2 bg-white">
+
+                        <div class="flex items-center gap-2 w-full pt-1">
+                            <input type="file" 
+                                   id="source_code" 
+                                   name="source_code" 
+                                   accept=".zip,.rar,.7z,.tar,.gz" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) { 
+                                       const f = $event.target.files[0];
+                                       if(f.size > 50 * 1024 * 1024) {
+                                           alert('Ukuran file arsip maksimal 50MB.');
+                                           $event.target.value = '';
+                                           zipName = '';
+                                           return;
+                                       }
+                                       zipName = f.name; 
+                                   }" />
+
+                            <button type="button" 
+                                    @click="document.getElementById('source_code').click()"
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
+
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                <template x-if="zipName">
+                                    <span class="text-blue-700 font-bold truncate block" x-text="zipName"></span>
+                                </template>
+                                <template x-if="!zipName">
+                                    <span class="text-slate-400">No file chosen</span>
+                                </template>
+                            </div>
+                        </div>
+                        <x-input-error :messages="$errors->get('source_code')" class="mt-1" />
                     </div>
                 </div>
 
@@ -439,46 +460,94 @@
                         <h3 class="font-bold text-base text-slate-900 mt-0.5">Dokumentasi Visual & Tangkapan Layar</h3>
                     </div>
 
-                    <!-- Foto Sampul Utama -->
-                    <div class="space-y-2">
+                    <!-- Foto Sampul Utama (Choose File Rapi) -->
+                    <div class="space-y-2" x-data="{ coverName: '' }">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                             Foto Sampul Utama Proyek <span class="text-rose-500">*</span>
                         </label>
-                        <p class="text-xs text-slate-500 leading-relaxed">
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
                             Foto ini akan menjadi gambar utama yang tampil di kartu luar. Format JPG, PNG, atau WebP (maksimal 4 MB).
                         </p>
-                        <input type="file" name="photo" id="coverPhotoInput" required accept="image/jpeg,image/png,image/jpg,image/webp" 
-                               onchange="previewCoverImage(this)"
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
 
-                        <!-- Preview Container Proporsional & Terkendali (Anti Gambar Pecah / Over-Sized) -->
+                        <div class="flex items-center gap-2 w-full pt-1">
+                            <input type="file" 
+                                   name="photo" 
+                                   id="coverPhotoInput" 
+                                   required 
+                                   accept="image/jpeg,image/png,image/jpg,image/webp" 
+                                   class="hidden"
+                                   onchange="previewCoverImage(this)"
+                                   @change="if($event.target.files.length) { coverName = $event.target.files[0].name; }" />
+
+                            <button type="button" 
+                                    @click="document.getElementById('coverPhotoInput').click()"
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
+
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                <template x-if="coverName">
+                                    <span class="text-blue-700 font-bold truncate block" x-text="coverName"></span>
+                                </template>
+                                <template x-if="!coverName">
+                                    <span class="text-slate-400">No file chosen</span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Preview Container Proporsional -->
                         <div class="mt-3 w-full aspect-video max-h-72 rounded-2xl bg-slate-950/5 border border-slate-200 overflow-hidden flex items-center justify-center p-2 relative">
                             <div id="coverPlaceholder" class="text-center p-4 text-slate-400 text-xs">
                                 Pratinjau foto sampul akan muncul di sini (tampilan otomatis menyesuaikan proporsi rapi)
                             </div>
                             <img id="coverPreview" src="" alt="Pratinjau Sampul" class="hidden max-h-64 w-auto max-w-full object-contain rounded-xl shadow-xs">
                         </div>
+                        <x-input-error :messages="$errors->get('photo')" class="mt-1" />
                     </div>
 
-                    <!-- Tangkapan Layar Aplikasi Tambahan (Multi-Upload) -->
-                    <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2.5">
-                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    <!-- Tangkapan Layar Aplikasi Tambahan (Multi-Upload Rapi) -->
+                    <div class="space-y-2 pt-2" x-data="{ ssCountText: '' }">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                             Galeri Tangkapan Layar / Foto Produk / Mockup Fitur (Opsional)
                         </label>
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Pilih beberapa foto produk fisik, mockup buku, atau tangkapan layar antarmuka sistem untuk ditampilkan di galeri interaktif. Maksimal 5 berkas, masing-masing maks 4 MB.
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                            Pilih beberapa foto produk fisik, mockup buku, atau tangkapan layar antarmuka sistem (Maksimal 5 berkas, masing-masing maks 4 MB).
                         </p>
-                        <input type="file" name="screenshots[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-800 hover:file:bg-slate-300">
+
+                        <div class="flex items-center gap-2 w-full pt-1">
+                            <input type="file" 
+                                   id="screenshotsInput" 
+                                   name="screenshots[]" 
+                                   multiple 
+                                   accept="image/jpeg,image/png,image/jpg,image/webp" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) { ssCountText = $event.target.files.length + ' file foto dipilih'; } else { ssCountText = ''; }" />
+
+                            <button type="button" 
+                                    @click="document.getElementById('screenshotsInput').click()"
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
+
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                <template x-if="ssCountText">
+                                    <span class="text-blue-700 font-bold truncate block" x-text="ssCountText"></span>
+                                </template>
+                                <template x-if="!ssCountText">
+                                    <span class="text-slate-400">No file chosen</span>
+                                </template>
+                            </div>
+                        </div>
+                        <x-input-error :messages="$errors->get('screenshots')" class="mt-1" />
                     </div>
                 </div>
 
-                <!-- BAGIAN 4: MANFAAT MASYARAKAT, DOKUMENTASI DESA & VIDEO -->
+                <!-- BAGIAN 5: MANFAAT MASYARAKAT, DOKUMENTASI DESA & VIDEO -->
                 <div class="bg-gradient-to-br from-emerald-50/50 via-white to-teal-50/30 rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-emerald-200/80 shadow-xs space-y-6">
                     <div class="pb-3 border-b border-emerald-100">
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase tracking-wider">
-                                Bagian 4
+                                Bagian 5
                             </span>
                             <h3 class="font-bold text-base text-emerald-950">Dampak Sosial & Dokumentasi Lapangan</h3>
                         </div>
@@ -493,16 +562,39 @@
                                   class="w-full text-xs sm:text-sm border-emerald-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 leading-relaxed">{{ old('community_benefit') }}</textarea>
                     </div>
 
-                    <!-- Dokumentasi Foto Kegiatan Lapangan / Desa -->
-                    <div class="p-4 sm:p-5 bg-white border border-emerald-200 rounded-2xl space-y-2.5 shadow-2xs">
+                    <!-- Dokumentasi Foto Kegiatan Lapangan / Desa (Rapi) -->
+                    <div class="space-y-2" x-data="{ cpCountText: '' }">
                         <label class="block text-xs font-bold text-emerald-950 uppercase tracking-wider">
                             Foto Dokumentasi Kegiatan / Presentasi di Lapangan (Opsional)
                         </label>
-                        <p class="text-xs text-emerald-800 leading-relaxed">
-                            Unggah foto kegiatan saat sosialisasi ke warga, presentasi di balai desa, atau penyerahan sistem ke pihak mitra. Maksimal 5 foto, masing-masing maks 4 MB.
+                        <p class="text-[11px] text-emerald-800 leading-relaxed">
+                            Unggah foto kegiatan saat sosialisasi ke warga, presentasi, atau penyerahan sistem (Maksimal 5 foto, masing-masing maks 4 MB).
                         </p>
-                        <input type="file" name="community_photos[]" multiple accept="image/jpeg,image/png,image/jpg,image/webp" 
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200">
+
+                        <div class="flex items-center gap-2 w-full pt-1">
+                            <input type="file" 
+                                   id="communityPhotosInput" 
+                                   name="community_photos[]" 
+                                   multiple 
+                                   accept="image/jpeg,image/png,image/jpg,image/webp" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) { cpCountText = $event.target.files.length + ' foto dokumentasi dipilih'; } else { cpCountText = ''; }" />
+
+                            <button type="button" 
+                                    @click="document.getElementById('communityPhotosInput').click()"
+                                    class="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
+
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                <template x-if="cpCountText">
+                                    <span class="text-emerald-800 font-bold truncate block" x-text="cpCountText"></span>
+                                </template>
+                                <template x-if="!cpCountText">
+                                    <span class="text-slate-400">No file chosen</span>
+                                </template>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Tautan Video Dokumentasi YouTube / Drive -->
@@ -512,29 +604,52 @@
                         </label>
                         <input type="url" name="video_url" value="{{ old('video_url') }}" 
                                placeholder="Contoh: https://youtu.be/jlKU3exv4Oc?si=... atau link rekaman video" 
-                               class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white">
                         <p class="text-[11px] text-slate-500 mt-1">
                             Jika menggunakan link YouTube, pemutar video akan otomatis muncul secara interaktif di halaman detail proyek.
                         </p>
                     </div>
                 </div>
 
-                <!-- BAGIAN 5: DOKUMEN PENDUKUNG & BUKU PANDUAN TEKNIS -->
+                <!-- BAGIAN 6: DOKUMEN PENDUKUNG & BUKU PANDUAN TEKNIS -->
                 <div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
                     <div class="pb-3 border-b border-slate-100">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bagian 5</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bagian 6</span>
                         <h3 class="font-bold text-base text-slate-900 mt-0.5">Buku Panduan Teknis & Dokumen Lampiran</h3>
                     </div>
 
-                    <div class="p-4 sm:p-5 bg-blue-50/50 border border-blue-200 rounded-2xl space-y-2.5">
+                    <div class="space-y-2" x-data="{ docCountText: '' }">
                         <label class="block text-xs font-bold text-blue-950 uppercase tracking-wider">
                             Unggah Dokumen PDF / Manual Book / Laporan Teknis (Opsional)
                         </label>
-                        <p class="text-xs text-blue-800 leading-relaxed">
+                        <p class="text-[11px] text-blue-800 leading-relaxed">
                             Lampirkan buku panduan teknis (*manual book*), SOP penggunaan sistem, atau laporan teknis inovasi (Format: PDF, DOC, DOCX. Maksimal 10 berkas, masing-masing maks 10 MB).
                         </p>
-                        <input type="file" name="documents[]" multiple accept=".pdf,.doc,.docx,application/pdf" 
-                               class="w-full text-xs text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200">
+
+                        <div class="flex items-center gap-2 w-full pt-1">
+                            <input type="file" 
+                                   id="documentsInput" 
+                                   name="documents[]" 
+                                   multiple 
+                                   accept=".pdf,.doc,.docx,application/pdf" 
+                                   class="hidden"
+                                   @change="if($event.target.files.length) { docCountText = $event.target.files.length + ' dokumen lampiran dipilih'; } else { docCountText = ''; }" />
+
+                            <button type="button" 
+                                    @click="document.getElementById('documentsInput').click()"
+                                    class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
+                                Choose File
+                            </button>
+
+                            <div class="min-w-0 flex-1 truncate text-xs">
+                                <template x-if="docCountText">
+                                    <span class="text-blue-700 font-bold truncate block" x-text="docCountText"></span>
+                                </template>
+                                <template x-if="!docCountText">
+                                    <span class="text-slate-400">No file chosen</span>
+                                </template>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
