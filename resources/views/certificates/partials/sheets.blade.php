@@ -51,6 +51,7 @@
         // Logo Utama Dinas & Kota Surabaya (Transparan Presisi)
         $officialLogosStripUrl = asset('images/certificates/logos_official_strip.png');
         $surabayaLogoUrl = asset('images/certificates/logo_surabaya.png');
+        $surabayaWordmarkUrl = asset('images/certificates/logo_surabaya_wordmark.png');
         $dispusipLogoUrl = asset('images/certificates/logo_dispusip.png');
         $berakhlakLogoUrl = asset('images/certificates/logo_berakhlak.png');
         $banggaLogoUrl = asset('images/certificates/logo_bangga_melayani.png');
@@ -93,12 +94,18 @@
         <!-- KONTEN SERTIFIKAT TERTATA PRESISI (LAYERING Z-INDEX 10) -->
         <div class="relative z-10 flex flex-col justify-between h-full pt-4 pb-10 sm:pb-12 md:pb-14 px-8 sm:px-12 text-center">
             
-            <!-- 1. HEADER KOP 5 LOGO RESMI SEJAJAR HORIZONTAL (ULTRA-HD TRANSPARAN PRESISI) -->
-            <div class="pt-2 flex items-center justify-center">
-                <img src="{{ $officialLogosStripUrl }}?v={{ @filemtime(public_path('images/certificates/logos_official_strip.png')) ?: 1 }}" 
-                     alt="Pemerintah Kota Surabaya, Dispusip, BerAKHLAK, Bangga Melayani Bangsa, Zona Integritas" 
-                     class="h-11 sm:h-12 md:h-[56px] w-auto max-w-[88%] object-contain"
-                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'flex items-center justify-center gap-6 sm:gap-7\'><img src=\'{{ $surabayaLogoUrl }}\' class=\'h-11 sm:h-12 w-auto object-contain\'><img src=\'{{ $dispusipLogoUrl }}\' class=\'h-11 sm:h-12 w-auto object-contain\'><img src=\'{{ $berakhlakLogoUrl }}\' class=\'h-9 sm:h-10 w-auto object-contain\'><img src=\'{{ $banggaLogoUrl }}\' class=\'h-8 sm:h-9 w-auto object-contain\'><img src=\'{{ $zonaLogoUrl }}\' class=\'h-9 sm:h-10 w-auto object-contain\'></div>';">
+            <!-- 1. HEADER KOP: LOGO RESMI DALAM KAPSUL (Dispusip, BerAKHLAK, Bangga Melayani Bangsa, Zona Integritas | Lambang + Surabaya City of Heroes) -->
+            <div class="pt-1 flex items-center justify-center">
+                <div class="inline-flex items-center justify-center gap-[18px] rounded-full px-8 h-[62px] max-w-[94%]"
+                     style="background: linear-gradient(90deg, {{ $pPalette['lighter'] }}40 0%, #ffffff 28%, #ffffff 72%, {{ $sPalette['lighter'] }}40 100%); border: 1px solid {{ $pPalette['light'] }}; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.10), inset 0 0 0 1px rgba(255,255,255,0.7);">
+                    <img src="{{ $dispusipLogoUrl }}" alt="Dispusip Kota Surabaya" class="h-[44px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $berakhlakLogoUrl }}" alt="BerAKHLAK" class="h-[34px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $banggaLogoUrl }}" alt="Bangga Melayani Bangsa" class="h-[38px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $zonaLogoUrl }}" alt="Zona Integritas" class="h-[34px] w-auto object-contain" onerror="this.style.display='none'">
+                    <span class="self-center block w-[2px] h-[40px] bg-black rounded-full"></span>
+                    <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-[44px] w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                    <img src="{{ $surabayaWordmarkUrl }}" alt="Surabaya City of Heroes" class="h-[30px] w-auto object-contain" onerror="this.style.display='none'">
+                </div>
             </div>
 
             <!-- 2. JUDUL SERTIFIKAT & NOMOR REGISTRASI RESMI -->

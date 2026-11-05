@@ -549,7 +549,15 @@
 
                                     <!-- Mini Header Logos -->
                                     <div class="relative z-10 flex items-center justify-center pt-1">
-                                        <img src="{{ asset('images/certificates/logos_official_strip.png') }}" class="h-4 w-auto object-contain mx-auto" alt="Logos">
+                                        <div class="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2 h-[15px] bg-white">
+                                            <img src="{{ asset('images/certificates/logo_dispusip.png') }}" class="h-[10px] w-auto" alt="Dispusip">
+                                            <img src="{{ asset('images/certificates/logo_berakhlak.png') }}" class="h-[7px] w-auto" alt="BerAKHLAK">
+                                            <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" class="h-[8px] w-auto" alt="Bangga Melayani Bangsa">
+                                            <img src="{{ asset('images/certificates/logo_zona_integritas.png') }}" class="h-[7px] w-auto" alt="Zona Integritas">
+                                            <span class="w-px h-[9px] bg-black"></span>
+                                            <img src="{{ asset('images/certificates/logo_surabaya.png') }}" class="h-[10px] w-auto" alt="Surabaya">
+                                            <img src="{{ asset('images/certificates/logo_surabaya_wordmark.png') }}" class="h-[7px] w-auto" alt="Surabaya City of Heroes">
+                                        </div>
                                     </div>
 
                                     <!-- Mini Body Text -->
