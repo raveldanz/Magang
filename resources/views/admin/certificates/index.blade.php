@@ -549,14 +549,14 @@
 
                                     <!-- Mini Header Logos -->
                                     <div class="relative z-10 flex items-center justify-center pt-1">
-                                        <div class="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2 h-[15px] bg-white">
-                                            <img src="{{ asset('images/certificates/logo_dispusip.png') }}" class="h-[10px] w-auto" alt="Dispusip">
-                                            <img src="{{ asset('images/certificates/logo_berakhlak.png') }}" class="h-[7px] w-auto" alt="BerAKHLAK">
-                                            <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" class="h-[8px] w-auto" alt="Bangga Melayani Bangsa">
-                                            <img src="{{ asset('images/certificates/logo_zona_integritas.png') }}" class="h-[7px] w-auto" alt="Zona Integritas">
-                                            <span class="w-px h-[9px] bg-black"></span>
-                                            <img src="{{ asset('images/certificates/logo_surabaya.png') }}" class="h-[10px] w-auto" alt="Surabaya">
-                                            <img src="{{ asset('images/certificates/logo_surabaya_wordmark.png') }}" class="h-[7px] w-auto" alt="Surabaya City of Heroes">
+                                        <div style="display:inline-flex;align-items:center;gap:3px;border-radius:9999px;border:1px solid #cbd5e1;padding:0 8px;height:16px;background:#fff;">
+                                            <img src="{{ asset('images/certificates/logo_surabaya.png') }}" style="height:10px;width:auto;" alt="Surabaya">
+                                            <img src="{{ asset('images/certificates/logo_dispusip.png') }}" style="height:10px;width:auto;" alt="Dispusip">
+                                            <img src="{{ asset('images/certificates/logo_berakhlak.png') }}" style="height:7px;width:auto;" alt="BerAKHLAK">
+                                            <img src="{{ asset('images/certificates/logo_bangga_melayani.png') }}" style="height:8px;width:auto;" alt="Bangga Melayani Bangsa">
+                                            <img src="{{ asset('images/certificates/logo_zona_integritas.png') }}" style="height:7px;width:auto;" alt="Zona Integritas">
+                                            <span style="width:1px;height:9px;background:#000;"></span>
+                                            <img src="{{ asset('images/certificates/logo_surabaya_wordmark.png') }}" style="height:7px;width:auto;" alt="Surabaya City of Heroes">
                                         </div>
                                     </div>
 
