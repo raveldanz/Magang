@@ -61,19 +61,6 @@
         $simpleGrade = $eval->grade_calculated ?? ($eval->grade ?? 'A');
         $predikat = ['A' => 'Sangat Memuaskan', 'B' => 'Memuaskan', 'C' => 'Cukup'][strtoupper((string) $simpleGrade)] ?? 'Kurang';
 
-        // Ringkasan kegiatan untuk lampiran (halaman 2) — dari data yang sudah ada
-        $hariMagang = 0;
-        try {
-            $hariMagang = \Carbon\Carbon::parse($application->start_date)->startOfDay()->diffInDays(\Carbon\Carbon::parse($application->end_date)->startOfDay()) + 1;
-        } catch (\Throwable $e) {
-            $hariMagang = 0;
-        }
-        $mingguMagang = $hariMagang > 0 ? (int) ceil($hariMagang / 7) : 0;
-        $logTotal = $placement ? $placement->logbooks()->count() : 0;
-        $logApproved = $placement ? $placement->logbooks()->where('status', 'approved')->count() : 0;
-        $laporanRaw = isset($finalReport) && $finalReport ? $finalReport->status : null;
-        $laporanVal = $laporanRaw instanceof \BackedEnum ? $laporanRaw->value : $laporanRaw;
-        $laporanLabel = $laporanVal ? (\App\Enums\ReviewStatus::tryFrom((string) $laporanVal)?->description() ?? 'Belum Ada') : 'Belum Ada';
     @endphp
 
     <!-- ================================================================= -->
@@ -92,28 +79,28 @@
         </svg>
 
         <!-- KONTEN SERTIFIKAT TERTATA PRESISI (LAYERING Z-INDEX 10) -->
-        <div class="relative z-10 flex flex-col justify-between h-full pt-4 pb-10 sm:pb-12 md:pb-14 px-8 sm:px-12 text-center">
+        <div class="relative z-10 flex flex-col justify-between h-full pt-12 pb-9 px-8 sm:px-12 text-center">
             
             <!-- 1. HEADER KOP: LOGO RESMI DALAM KAPSUL (Dispusip, BerAKHLAK, Bangga Melayani Bangsa, Zona Integritas | Lambang + Surabaya City of Heroes) -->
             <div class="pt-1 flex items-center justify-center">
-                <div class="inline-flex items-center justify-center gap-[18px] rounded-full px-8 h-[62px] max-w-[94%]"
+                <div class="inline-flex items-center justify-center gap-[16px] rounded-full px-7 h-[56px] max-w-[94%]"
                      style="background: linear-gradient(90deg, {{ $pPalette['lighter'] }}40 0%, #ffffff 28%, #ffffff 72%, {{ $sPalette['lighter'] }}40 100%); border: 1px solid {{ $pPalette['light'] }}; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.10), inset 0 0 0 1px rgba(255,255,255,0.7);">
-                    <img src="{{ $dispusipLogoUrl }}" alt="Dispusip Kota Surabaya" class="h-[44px] w-auto object-contain" onerror="this.style.display='none'">
-                    <img src="{{ $berakhlakLogoUrl }}" alt="BerAKHLAK" class="h-[34px] w-auto object-contain" onerror="this.style.display='none'">
-                    <img src="{{ $banggaLogoUrl }}" alt="Bangga Melayani Bangsa" class="h-[38px] w-auto object-contain" onerror="this.style.display='none'">
-                    <img src="{{ $zonaLogoUrl }}" alt="Zona Integritas" class="h-[34px] w-auto object-contain" onerror="this.style.display='none'">
-                    <span class="self-center block w-[2px] h-[40px] bg-black rounded-full"></span>
-                    <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-[44px] w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
-                    <img src="{{ $surabayaWordmarkUrl }}" alt="Surabaya City of Heroes" class="h-[30px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $dispusipLogoUrl }}" alt="Dispusip Kota Surabaya" class="h-[40px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $berakhlakLogoUrl }}" alt="BerAKHLAK" class="h-[30px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $banggaLogoUrl }}" alt="Bangga Melayani Bangsa" class="h-[34px] w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="{{ $zonaLogoUrl }}" alt="Zona Integritas" class="h-[30px] w-auto object-contain" onerror="this.style.display='none'">
+                    <span class="self-center block w-[2px] h-[36px] bg-black rounded-full"></span>
+                    <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-[40px] w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
+                    <img src="{{ $surabayaWordmarkUrl }}" alt="Surabaya City of Heroes" class="h-[27px] w-auto object-contain" onerror="this.style.display='none'">
                 </div>
             </div>
 
             <!-- 2. JUDUL SERTIFIKAT & NOMOR REGISTRASI RESMI -->
             <div class="mt-2 space-y-1">
-                <h1 class="font-cert-title text-4xl sm:text-5xl md:text-[64px] text-black tracking-[0.03em] uppercase leading-none">
+                <h1 class="font-cert-title text-4xl sm:text-5xl md:text-[58px] text-black tracking-[0.03em] uppercase leading-none">
                     SERTIFIKAT
                 </h1>
-                <h2 class="font-cert-serif text-3xl sm:text-4xl md:text-[42px] font-normal text-black tracking-[0.06em] uppercase leading-none pt-2">
+                <h2 class="font-cert-serif text-3xl sm:text-4xl md:text-[38px] font-normal text-black tracking-[0.06em] uppercase leading-none pt-2">
                     MAGANG
                 </h2>
                 <p class="font-cert-serif text-sm sm:text-base md:text-[18px] font-bold text-black tracking-wide pt-3">
@@ -127,26 +114,26 @@
                     @php
                         // Ukuran nama menyesuaikan panjang agar selalu besar & tetap muat satu baris
                         $nameLen = mb_strlen(trim($student->name));
-                        $nameSize = $nameLen <= 18 ? 66 : ($nameLen <= 26 ? 58 : ($nameLen <= 32 ? 49 : ($nameLen <= 40 ? 42 : 36)));
+                        $nameSize = $nameLen <= 18 ? 60 : ($nameLen <= 26 ? 54 : ($nameLen <= 32 ? 46 : ($nameLen <= 40 ? 40 : 34)));
                     @endphp
                     <h2 class="font-cert-name text-black tracking-tight leading-none whitespace-nowrap" style="font-size: {{ $nameSize }}px;">
                         {{ $student->name }}
                     </h2>
                 </div>
-                <p class="font-cert-body text-sm sm:text-base md:text-[20px] font-medium text-black leading-normal pt-1.5">
+                <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-medium text-black leading-normal pt-1.5">
                     Mahasiswa Program Studi {{ $profile->jurusan ?? 'Semua Jurusan' }}{{ !empty($profile->fakultas) ? ' Fakultas ' . $profile->fakultas : '' }}
                 </p>
-                <p class="font-cert-body text-sm sm:text-base md:text-[20px] font-medium text-black leading-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-medium text-black leading-normal">
                     {{ $profile->universitas ?? ($university->name ?? 'Universitas') }}
                 </p>
             </div>
 
             <!-- 4. NARASI KELULUSAN & PERIODE MAGANG (ITALIC) -->
             <div class="mt-2 space-y-1 max-w-3xl mx-auto">
-                <p class="font-cert-body text-sm sm:text-base md:text-[20px] text-black leading-relaxed font-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[19px] text-black leading-relaxed font-normal">
                     Atas partisipasinya dalam mengikuti kerja magang
                 </p>
-                <p class="font-cert-body text-sm sm:text-base md:text-[20px] text-black leading-relaxed font-normal">
+                <p class="font-cert-body text-sm sm:text-base md:text-[19px] text-black leading-relaxed font-normal">
                     di Dinas Perpustakaan dan Kearsipan Kota Surabaya
                 </p>
                 <p class="font-cert-body text-sm sm:text-base md:text-[19px] font-normal text-black pt-2">
@@ -200,9 +187,45 @@
     </main>
 
     <!-- ================================================================= -->
+    <!-- ================================================================= -->
     <!-- HALAMAN 2: LAMPIRAN TRANSKRIP RINCIAN NILAI KOMPETENSI            -->
     <!-- ================================================================= -->
-    <section class="certificate-sheet page-break px-12 pt-7 pb-6 relative flex flex-col justify-between bg-white select-none">
+    @php
+        // Tabel selalu terang (apa pun palet temanya): hanya tint pucat dari warna tema + teks gelap.
+        $tHead = $pPalette['pale'];
+        $tBand = \App\Models\CertificateTheme::adjustBrightness($primaryColor, 94);
+        $tLine = $pPalette['lighter'];
+
+        $univ = $eval ? $eval->getUniversity() : ($university ?? null);
+        if (! $univ && isset($student)) {
+            $univ = app(\App\Services\UniversityResolver::class)->forUser($student);
+        }
+        $scheme = $univ->evaluation_scheme ?? 'mentor_only';
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
+
+        $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
+        $isLecturerOnly = ($weightMentor === 0 && $weightLecturer > 0);
+
+        $mentorComponents = $eval ? $eval->mentor_aspects_list : [];
+        if (empty($mentorComponents) && $eval) {
+            $mentorComponents = $eval->getMentorComponents();
+        }
+        $lecturerComponents = $eval ? $eval->dosen_aspects_list : [];
+        if (empty($lecturerComponents) && $eval) {
+            $lecturerComponents = $eval->getLecturerComponents();
+        }
+
+        // Kepadatan tabel menyesuaikan jumlah aspek agar selalu muat satu halaman
+        $rowCount = (! $isLecturerOnly ? count($mentorComponents) : 0) + (! $isMentorOnly ? count($lecturerComponents) : 0);
+        [$cellPad, $cellText] = $rowCount <= 5 ? ['py-3.5', 'text-[13px]'] : ($rowCount <= 9 ? ['py-2.5', 'text-[12px]'] : ['py-1.5', 'text-[10.5px]']);
+
+        $fmtScore = function ($v) {
+            return isset($v) && is_numeric($v) ? ((float) $v == (int) $v ? (int) $v : number_format((float) $v, 1)) : ($v ?? '-');
+        };
+    @endphp
+
+    <section class="certificate-sheet page-break px-12 pt-8 pb-7 relative flex flex-col bg-white select-none">
 
         <!-- Bingkai & ornamen sudut halaman 2 (selaras dengan halaman 1, versi kecil) -->
         <svg viewBox="0 0 297 210" class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
@@ -211,251 +234,170 @@
             @include('certificates.partials.corner-ornaments', ['showWaves' => false, 'scale' => 0.4])
         </svg>
 
-        <!-- Bagian Atas: KOP, BIODATA, DAN TABEL TRANSKRIP -->
-        <div class="relative z-10 px-4 pt-0.5">
-            
-            <!-- 1. HEADER TRANSKRIP NILAI DENGAN LOGO RESMI DISPUSIP & SURABAYA -->
-            <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2">
+        <!-- 1. KOP LAMPIRAN -->
+        <div class="relative z-10 px-8">
+            <div class="flex items-center justify-between pb-3">
                 <div class="flex items-center gap-3">
-                    <img src="{{ $surabayaLogoUrl }}" 
-                         alt="Pemerintah Kota Surabaya" 
-                         class="w-9 h-9 object-contain"
+                    <img src="{{ $surabayaLogoUrl }}" alt="Pemerintah Kota Surabaya" class="h-11 w-auto object-contain"
                          onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
-                    <img src="{{ $dispusipLogoUrl }}" 
-                         alt="Dinas Perpustakaan dan Kearsipan" 
-                         class="w-9 h-9 object-contain"
+                    <img src="{{ $dispusipLogoUrl }}" alt="Dinas Perpustakaan dan Kearsipan" class="h-11 w-auto object-contain"
                          onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
-                    <div>
-                        <h3 class="font-bold text-[9px] uppercase tracking-wider text-slate-500">
-                            Pemerintah Kota Surabaya
-                        </h3>
-                        <h2 class="font-black text-xs text-slate-900 uppercase">
-                            Dinas Perpustakaan dan Kearsipan
-                        </h2>
+                    <div class="leading-tight">
+                        <div class="font-bold text-[10px] uppercase tracking-[0.14em] text-slate-500">Pemerintah Kota Surabaya</div>
+                        <div class="font-black text-[15px] text-slate-900 uppercase">Dinas Perpustakaan dan Kearsipan</div>
                     </div>
                 </div>
 
-                <div class="text-right">
-                    <h1 class="font-black text-xs uppercase tracking-wider text-slate-900">
-                        Lampiran Transkrip Nilai Magang
-                    </h1>
-                    <p class="font-mono text-[9.5px] text-slate-600 font-bold">
-                        Nomor : {{ $regNumber }}
-                    </p>
-                    <p class="text-[8.5px] text-slate-400 font-semibold">Halaman 2 dari 2</p>
+                <div class="text-right leading-tight">
+                    <div class="font-black text-[15px] uppercase tracking-[0.1em] text-slate-900">Lampiran Transkrip Nilai Magang</div>
+                    <div class="font-mono text-[11px] text-slate-700 font-bold mt-1">Nomor : {{ $regNumber }}</div>
+                    <div class="text-[10px] text-slate-500 font-semibold">Halaman 2 dari 2</div>
                 </div>
             </div>
+            <div class="h-[3px] rounded-full" style="background: linear-gradient(90deg, {{ $primaryColor }}, {{ $secondaryColor }});"></div>
+        </div>
 
-            <!-- 2. DATA MAHASISWA & PENEMPATAN (TABEL RAPI DENGAN KOLOM TITIK DUA TERSEJAJARKAN) -->
-            <div class="grid grid-cols-2 gap-4 mt-2 p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                <table class="w-full text-xs">
+        <!-- 2. ISI: BIODATA + TABEL NILAI (di tengah ruang tersisa agar komposisi seimbang) -->
+        <div class="relative z-10 flex-1 flex flex-col justify-center gap-5 px-8 py-4">
+
+            <!-- Biodata -->
+            <div class="grid grid-cols-2 gap-x-10 rounded-2xl px-6 py-4 text-[13px]" style="background-color: {{ $tBand }}; border: 1px solid {{ $tLine }};">
+                <table class="w-full">
                     <tr>
-                        <td class="w-28 text-slate-500 font-medium py-0.5">Nama Mahasiswa</td>
-                        <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-bold text-slate-900 py-0.5">{{ $student->name }}</td>
+                        <td class="w-36 text-slate-500 py-1">Nama Mahasiswa</td>
+                        <td class="w-3 text-slate-400 py-1">:</td>
+                        <td class="font-bold text-slate-900 py-1">{{ $student->name }}</td>
                     </tr>
                     <tr>
-                        <td class="w-28 text-slate-500 font-medium py-0.5">NIM</td>
-                        <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-bold text-slate-900 py-0.5">{{ $profile->nim ?? '-' }}</td>
+                        <td class="text-slate-500 py-1">NIM</td>
+                        <td class="text-slate-400 py-1">:</td>
+                        <td class="font-bold text-slate-900 py-1">{{ $profile->nim ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td class="w-28 text-slate-500 font-medium py-0.5">Program Studi</td>
-                        <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-medium text-slate-800 py-0.5">{{ $profile->jurusan ?? 'Semua Jurusan' }}</td>
+                        <td class="text-slate-500 py-1">Program Studi</td>
+                        <td class="text-slate-400 py-1">:</td>
+                        <td class="text-slate-800 py-1">{{ $profile->jurusan ?? 'Semua Jurusan' }}</td>
                     </tr>
                 </table>
-                <table class="w-full text-xs">
+                <table class="w-full">
                     <tr>
-                        <td class="w-28 text-slate-500 font-medium py-0.5">Universitas Asal</td>
-                        <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-bold text-slate-900 py-0.5">{{ $profile->universitas ?? ($university->name ?? '-') }}</td>
+                        <td class="w-36 text-slate-500 py-1">Universitas Asal</td>
+                        <td class="w-3 text-slate-400 py-1">:</td>
+                        <td class="font-bold text-slate-900 py-1">{{ $profile->universitas ?? ($university->name ?? '-') }}</td>
                     </tr>
                     <tr>
-                        <td class="w-28 text-slate-500 font-medium py-0.5">Unit Kerja Magang</td>
-                        <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-medium text-slate-800 py-0.5">{{ $application->unit->name ?? 'Dinas Perpustakaan dan Kearsipan' }}</td>
+                        <td class="text-slate-500 py-1">Unit Kerja Magang</td>
+                        <td class="text-slate-400 py-1">:</td>
+                        <td class="text-slate-800 py-1">{{ $application->unit->name ?? 'Dinas Perpustakaan dan Kearsipan' }}</td>
                     </tr>
                     <tr>
-                        <td class="w-28 text-slate-500 font-medium py-0.5">Periode Magang</td>
-                        <td class="w-3 text-slate-400 py-0.5">:</td>
-                        <td class="font-medium text-slate-800 py-0.5">{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d/m/Y') }}</td>
+                        <td class="text-slate-500 py-1">Periode Magang</td>
+                        <td class="text-slate-400 py-1">:</td>
+                        <td class="text-slate-800 py-1">{{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d/m/Y') }}</td>
                     </tr>
                 </table>
             </div>
 
-            <!-- 3. TABEL TRANSKRIP RINCIAN PENILAIAN -->
-            <div class="mt-2.5 overflow-hidden rounded-xl border border-slate-300">
-                <table class="min-w-full text-left text-[10.5px] divide-y divide-slate-200">
-                    <thead class="text-white font-bold uppercase text-[9px] tracking-wider" style="background-color: {{ $primaryColor }};">
-                        <tr>
-                            <th class="py-1.5 px-3 text-center w-10">No</th>
-                            <th class="py-1.5 px-3">Komponen Penilaian & Aspek Kompetensi Magang</th>
-                            <th class="py-1.5 px-3 text-center w-20">Bobot (%)</th>
-                            <th class="py-1.5 px-3 text-center w-24">Skor (0-100)</th>
-                            <th class="py-1.5 px-3 text-center w-28">Skor Tertimbang</th>
+            <!-- Tabel nilai (selalu terang) -->
+            <div class="overflow-hidden rounded-2xl bg-white" style="border: 1px solid {{ $tLine }};">
+                <table class="w-full text-left {{ $cellText }} text-slate-800" style="border-collapse: collapse;">
+                    <thead>
+                        <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-800" style="background-color: {{ $tHead }};">
+                            <th class="py-3 px-4 text-center w-12">No</th>
+                            <th class="py-3 px-4">Komponen Penilaian &amp; Aspek Kompetensi Magang</th>
+                            <th class="py-3 px-4 text-center w-24">Bobot</th>
+                            <th class="py-3 px-4 text-center w-28">Skor (0-100)</th>
+                            <th class="py-3 px-4 text-center w-32">Skor Tertimbang</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-slate-800">
-                        
-@php
-    $univ = $eval ? $eval->getUniversity() : ($university ?? null);
-    if (! $univ && isset($student)) {
-        $univ = app(\App\Services\UniversityResolver::class)->forUser($student);
-    }
-    $scheme = $univ->evaluation_scheme ?? 'mentor_only';
-    $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
-    $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
-
-    $isMentorOnly = ($scheme === 'mentor_only' || $weightLecturer === 0);
-    $isLecturerOnly = ($weightMentor === 0 && $weightLecturer > 0);
-    $isDual = ! $isMentorOnly && ! $isLecturerOnly;
-
-    $mentorComponents = $eval ? $eval->mentor_aspects_list : [];
-    if (empty($mentorComponents) && $eval) {
-        $mentorComponents = $eval->getMentorComponents();
-    }
-
-    $lecturerComponents = $eval ? $eval->dosen_aspects_list : [];
-    if (empty($lecturerComponents) && $eval) {
-        $lecturerComponents = $eval->getLecturerComponents();
-    }
-@endphp
-
+                    <tbody>
                         @if (! $isLecturerOnly)
-                            <!-- ASPEK I: KINERJA LAPANGAN DINAS -->
-                            <tr class="bg-slate-100/90 font-bold text-slate-900">
-                                <td class="py-1.5 px-3 text-center font-bold">A</td>
-                                <td colspan="4" class="py-1.5 px-3 uppercase text-[10px] text-blue-900">
+                            <tr style="background-color: {{ $tBand }}; border-top: 1px solid {{ $tLine }};">
+                                <td class="py-2 px-4 text-center font-black text-slate-900">A</td>
+                                <td colspan="4" class="py-2 px-4 font-bold uppercase text-[11px] tracking-wide text-slate-900">
                                     Penilaian Pembimbing Lapangan Dinas (Dinas Perpustakaan dan Kearsipan)
                                 </td>
                             </tr>
                             @foreach ($mentorComponents as $idx => $mComp)
-                                <tr>
-                                    <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
-                                    <td class="py-1.5 px-3 font-medium">{{ $mComp['name'] ?? $mComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
-                                    <td class="py-1.5 px-3"></td>
-                                    <td class="py-1.5 px-3 text-center font-bold">{{ isset($mComp['score']) && is_numeric($mComp['score']) ? ((float)$mComp['score'] == (int)$mComp['score'] ? (int)$mComp['score'] : number_format((float)$mComp['score'], 1)) : ($mComp['score'] ?? '-') }}</td>
-                                    <td class="py-1.5 px-3"></td>
+                                <tr style="border-top: 1px solid #e2e8f0;">
+                                    <td class="{{ $cellPad }} px-4 text-center text-slate-400">{{ $idx + 1 }}</td>
+                                    <td class="{{ $cellPad }} px-4 font-medium">{{ $mComp['name'] ?? $mComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
+                                    <td class="{{ $cellPad }} px-4"></td>
+                                    <td class="{{ $cellPad }} px-4 text-center font-bold">{{ $fmtScore($mComp['score'] ?? null) }}</td>
+                                    <td class="{{ $cellPad }} px-4"></td>
                                 </tr>
                             @endforeach
-                            <tr class="bg-blue-50/70 font-bold">
-                                <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai Dinas (Rata-rata):</td>
-                                <td class="py-2 px-3 text-center text-blue-900">{{ $isMentorOnly ? '100%' : ($weightMentor . '%') }}</td>
-                                <td class="py-2 px-3 text-center text-blue-900">{{ $eval?->nilai_pembimbing ?? 0 }}</td>
-                                <td class="py-2 px-3 text-center text-blue-950 font-black">
+                            <tr class="font-bold" style="background-color: #f8fafc; border-top: 1px solid {{ $tLine }};">
+                                <td colspan="2" class="py-2.5 px-4 text-right text-slate-700">Subtotal Nilai Dinas (Rata-rata):</td>
+                                <td class="py-2.5 px-4 text-center">{{ $isMentorOnly ? '100%' : ($weightMentor . '%') }}</td>
+                                <td class="py-2.5 px-4 text-center">{{ $eval?->nilai_pembimbing ?? 0 }}</td>
+                                <td class="py-2.5 px-4 text-center font-black text-slate-900">
                                     {{ $isMentorOnly ? ($eval?->nilai_pembimbing ?? 0) : round(($weightMentor / 100) * ($eval?->nilai_pembimbing ?? 0), 2) }}
                                 </td>
                             </tr>
                         @endif
 
                         @if (! $isMentorOnly)
-                            <!-- ASPEK II: AKADEMIK DPL KAMPUS -->
-                            <tr class="bg-slate-100/90 font-bold text-slate-900">
-                                <td class="py-1.5 px-3 text-center font-bold">{{ $isLecturerOnly ? 'A' : 'B' }}</td>
-                                <td colspan="4" class="py-1.5 px-3 uppercase text-[10px] text-blue-900">
+                            <tr style="background-color: {{ $tBand }}; border-top: 1px solid {{ $tLine }};">
+                                <td class="py-2 px-4 text-center font-black text-slate-900">{{ $isLecturerOnly ? 'A' : 'B' }}</td>
+                                <td colspan="4" class="py-2 px-4 font-bold uppercase text-[11px] tracking-wide text-slate-900">
                                     Penilaian Akademik Dosen Pembimbing Lapangan (DPL Kampus)
                                 </td>
                             </tr>
                             @foreach ($lecturerComponents as $idx => $lComp)
-                                <tr>
-                                    <td class="py-1.5 px-3 text-center text-slate-400">{{ $idx + 1 }}</td>
-                                    <td class="py-1.5 px-3 font-medium">{{ $lComp['name'] ?? $lComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
-                                    <td class="py-1.5 px-3"></td>
-                                    <td class="py-1.5 px-3 text-center font-bold">{{ isset($lComp['score']) && is_numeric($lComp['score']) ? ((float)$lComp['score'] == (int)$lComp['score'] ? (int)$lComp['score'] : number_format((float)$lComp['score'], 1)) : ($lComp['score'] ?? '-') }}</td>
-                                    <td class="py-1.5 px-3"></td>
+                                <tr style="border-top: 1px solid #e2e8f0;">
+                                    <td class="{{ $cellPad }} px-4 text-center text-slate-400">{{ $idx + 1 }}</td>
+                                    <td class="{{ $cellPad }} px-4 font-medium">{{ $lComp['name'] ?? $lComp['label'] ?? ('Aspek ' . ($idx + 1)) }}</td>
+                                    <td class="{{ $cellPad }} px-4"></td>
+                                    <td class="{{ $cellPad }} px-4 text-center font-bold">{{ $fmtScore($lComp['score'] ?? null) }}</td>
+                                    <td class="{{ $cellPad }} px-4"></td>
                                 </tr>
                             @endforeach
-                            <tr class="bg-blue-50/70 font-bold">
-                                <td colspan="2" class="py-2 px-3 text-right text-blue-950">Subtotal Nilai DPL (Rata-rata):</td>
-                                <td class="py-2 px-3 text-center text-blue-900">{{ $isLecturerOnly ? '100%' : ($weightLecturer . '%') }}</td>
-                                <td class="py-2 px-3 text-center text-blue-900">{{ $eval?->nilai_dosen_calculated ?? 0 }}</td>
-                                <td class="py-2 px-3 text-center text-blue-950 font-black">
+                            <tr class="font-bold" style="background-color: #f8fafc; border-top: 1px solid {{ $tLine }};">
+                                <td colspan="2" class="py-2.5 px-4 text-right text-slate-700">Subtotal Nilai DPL (Rata-rata):</td>
+                                <td class="py-2.5 px-4 text-center">{{ $isLecturerOnly ? '100%' : ($weightLecturer . '%') }}</td>
+                                <td class="py-2.5 px-4 text-center">{{ $eval?->nilai_dosen_calculated ?? 0 }}</td>
+                                <td class="py-2.5 px-4 text-center font-black text-slate-900">
                                     {{ $isLecturerOnly ? ($eval?->nilai_dosen_calculated ?? 0) : round(($weightLecturer / 100) * ($eval?->nilai_dosen_calculated ?? 0), 2) }}
                                 </td>
                             </tr>
                         @endif
 
-                        <!-- REKAPITULASI TOTAL NILAI AKHIR -->
-                        <tr class="bg-slate-900 text-white font-black text-xs">
-                            <td colspan="2" class="py-2.5 px-3 text-right uppercase tracking-wider">
-                                Nilai Akhir Total & Mutu:
+                        <!-- Nilai akhir: terang, ditegaskan dengan garis tebal & angka besar -->
+                        <tr style="background-color: {{ $tHead }}; border-top: 2px solid {{ $primaryColor }};">
+                            <td colspan="2" class="py-4 px-4 text-right font-black uppercase tracking-wider text-[13px] text-slate-900">
+                                Nilai Akhir Total &amp; Mutu:
                             </td>
-                            <td class="py-2.5 px-3 text-center">100%</td>
-                            <td class="py-2.5 px-3 text-center text-emerald-400 text-sm">
+                            <td class="py-4 px-4 text-center font-bold text-slate-700">100%</td>
+                            <td class="py-4 px-4 text-center font-black text-[22px] leading-none text-emerald-700">
                                 {{ $eval?->nilai_akhir ?? 0 }}
                             </td>
-                            <td class="py-2.5 px-3 text-center text-amber-300 text-sm">
-                                GRADE {{ $simpleGrade }} <span class="block text-[8.5px] font-semibold tracking-wide text-amber-200/90 uppercase">{{ $predikat }}</span>
+                            <td class="py-4 px-4 text-center leading-tight">
+                                <span class="inline-block rounded-lg px-3 py-1 font-black text-[13px] text-amber-900" style="background-color: #fef3c7; border: 1px solid #fcd34d;">GRADE {{ $simpleGrade }}</span>
+                                <span class="block mt-1 text-[10px] font-semibold uppercase tracking-wide text-slate-600">{{ $predikat }}</span>
                             </td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
-
         </div>
 
-        <!-- 4. FOOTER: RINGKASAN KEGIATAN, SKALA NILAI, DAN TTE (satu kesatuan dengan halaman 1) -->
-        <div class="relative z-10 border-t border-slate-200 pt-2.5 flex items-end justify-between gap-6">
-            <div class="flex-1 min-w-0 space-y-2">
-                <!-- Ringkasan kegiatan magang -->
-                <div class="grid grid-cols-3 gap-2 max-w-md">
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-                        <div class="text-[7.5px] font-bold uppercase tracking-wider text-slate-500">Lama Magang</div>
-                        <div class="text-[11px] font-black text-slate-900 leading-tight">{{ $hariMagang }} hari</div>
-                        <div class="text-[8px] text-slate-500">&asymp; {{ $mingguMagang }} minggu</div>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-                        <div class="text-[7.5px] font-bold uppercase tracking-wider text-slate-500">Logbook Disetujui</div>
-                        <div class="text-[11px] font-black text-slate-900 leading-tight">{{ $logApproved }} <span class="text-[8px] font-semibold text-slate-500">dari {{ $logTotal }}</span></div>
-                        <div class="text-[8px] text-slate-500">catatan harian</div>
-                    </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-                        <div class="text-[7.5px] font-bold uppercase tracking-wider text-slate-500">Laporan Akhir</div>
-                        <div class="text-[11px] font-black text-slate-900 leading-tight">{{ $laporanLabel }}</div>
-                        <div class="text-[8px] text-slate-500">status review</div>
-                    </div>
-                </div>
-
-                <div>
-                    <p class="font-bold text-[9px] uppercase tracking-wider text-slate-700">Keterangan Skala Predikat &amp; Mutu Nilai:</p>
-                    <p class="text-[9px] text-slate-600">
-                        <strong>A (85 - 100)</strong> : Sangat Memuaskan &bull;
-                        <strong>B (70 - 84)</strong> : Memuaskan &bull;
-                        <strong>C (55 - 69)</strong> : Cukup
-                    </p>
-                </div>
-
-                <p class="text-[8.5px] text-slate-500 leading-snug max-w-md">
-                    Lampiran transkrip nilai ini merupakan satu kesatuan sah dan tak terpisahkan dari Sertifikat Magang Nomor:
-                    <span class="font-bold text-slate-800">{{ $regNumber }}</span>.
+        <!-- 3. KETERANGAN SKALA NILAI & PERNYATAAN KEABSAHAN -->
+        <div class="relative z-10 px-8 pt-3 flex items-end justify-between gap-8" style="border-top: 1px solid {{ $tLine }};">
+            <div>
+                <p class="font-bold text-[10px] uppercase tracking-wider text-slate-700">Keterangan Skala Predikat &amp; Mutu Nilai:</p>
+                <p class="text-[10.5px] text-slate-600 mt-0.5">
+                    <strong>A (85 - 100)</strong> : Sangat Memuaskan &bull;
+                    <strong>B (70 - 84)</strong> : Memuaskan &bull;
+                    <strong>C (55 - 69)</strong> : Cukup
                 </p>
             </div>
-
-            <!-- Blok pengesahan elektronik (QR sama dengan halaman 1) -->
-            <div class="shrink-0 flex flex-col items-center">
-                <p class="font-cert-body text-[10.5px] font-bold text-black">{{ $theme->city ?? 'Surabaya' }}, {{ \Carbon\Carbon::parse($placement->certificate?->issued_at ?? now())->translatedFormat('d F Y') }}</p>
-                <p class="font-cert-body text-[10.5px] font-bold text-black mb-1">{{ $theme->mandate_text ?? 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya' }}</p>
-                <div class="flex items-center gap-3 px-2.5 py-1.5 bg-white border-[1.5px] border-black text-left font-cert-tte" style="width: 340px; height: 82px;">
-                    <div class="relative w-[68px] h-[68px] shrink-0 bg-white" style="padding: 2px;">
-                        <div class="qr-wrap w-full h-full" aria-label="QR Verifikasi Sertifikat">
-                            {!! $qrSvg !!}
-                        </div>
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div class="w-[15px] h-[15px] bg-white rounded-full flex items-center justify-center" style="padding: 1.5px;">
-                                <img src="{{ $surabayaLogoUrl }}" alt="SBY" class="w-full h-full object-contain">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="leading-snug text-black flex-1 min-w-0">
-                        <div class="text-[8.5px]">Ditandatangani secara elektronik oleh:</div>
-                        <div class="text-[9.5px]">{{ $theme->signee_position ?? 'Sekretaris' }},</div>
-                        <div class="font-bold text-[12px] tracking-tight">{{ $theme->signee_name ?? 'Dra. NOVELIJA, SH' }}</div>
-                        <div class="text-[8.5px] uppercase">{{ $theme->signee_rank ?? 'PEMBINA TK I' }} &bull; NIP. {{ $theme->signee_nip ?? '197111141992012001' }}</div>
-                    </div>
-                </div>
+            <div class="text-right text-[10px] text-slate-500 max-w-md leading-snug">
+                <p class="font-semibold text-slate-700">
+                    Lampiran transkrip nilai ini merupakan satu kesatuan sah dan tak terpisahkan dari Sertifikat Magang Nomor: <span class="font-bold text-slate-900">{{ $regNumber }}</span>.
+                </p>
+                <p class="text-[9px] text-slate-400 mt-0.5">Telah disahkan dan terverifikasi secara elektronik melalui Tanda Tangan Elektronik (TTE) pada lembar utama.</p>
             </div>
         </div>
-
+    </section>
     </section>
