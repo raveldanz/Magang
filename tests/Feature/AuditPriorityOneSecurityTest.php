@@ -15,6 +15,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -120,6 +122,29 @@ class AuditPriorityOneSecurityTest extends TestCase
         auth()->logout();
         $this->post('/login', ['email' => 'dr.baru@unesa.ac.id', 'password' => User::DEFAULT_PASSWORD]);
         $this->assertGuest();
+    }
+
+    public function test_inactive_account_cannot_request_password_reset_link(): void
+    {
+        Notification::fake();
+        $inactive = User::factory()->create(['role' => 'dosen', 'status' => 'inactive', 'email' => 'dpl.pending@unesa.ac.id']);
+
+        $this->post(route('password.email'), ['email' => $inactive->email])->assertSessionHasErrors('email');
+
+        Notification::assertNothingSentTo($inactive);
+    }
+
+    public function test_inactive_account_cannot_complete_password_reset_with_planted_token(): void
+    {
+        $inactive = User::factory()->create(['role' => 'dosen', 'status' => 'inactive', 'email' => 'dpl.pending@unesa.ac.id', 'password' => 'Acak-Tidak-Diketahui-1']);
+        $token = Password::createToken($inactive);
+
+        $this->post(route('password.store'), [
+            'token' => $token, 'email' => $inactive->email,
+            'password' => 'Dipasang-Mahasiswa-9', 'password_confirmation' => 'Dipasang-Mahasiswa-9',
+        ])->assertSessionHasErrors('email');
+
+        $this->assertFalse(Hash::check('Dipasang-Mahasiswa-9', $inactive->fresh()->password));
     }
 
     public function test_student_dashboard_renders_pending_advisor_modal_without_password(): void

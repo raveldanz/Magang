@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\EnsureAccountIsActive;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
@@ -36,6 +37,12 @@ class NewPasswordController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        // Token yang terlanjur diterbitkan saat akun masih/menjadi Nonaktif tidak boleh dipakai.
+        if (User::where('email', strtolower(trim((string) $request->email)))->first()?->isInactive()) {
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => EnsureAccountIsActive::MESSAGE]);
+        }
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
