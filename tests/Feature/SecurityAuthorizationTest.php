@@ -108,7 +108,9 @@ class SecurityAuthorizationTest extends TestCase
             ->post(route('admin.users.bulk_reset_password'), ['user_ids' => [$this->adminB->id, $this->mentorA->id]]);
 
         $this->assertTrue(Hash::check('rahasia-b', $this->adminB->fresh()->password));
-        $this->assertTrue(Hash::check('password', $this->mentorA->fresh()->password));
+        // Reset kini memakai password sementara acak (bukan 'password') yang wajib diganti
+        $this->assertFalse(Hash::check('rahasia-mentor', $this->mentorA->fresh()->password));
+        $this->assertTrue($this->mentorA->fresh()->must_change_password);
     }
 
     public function test_admin_dinas_can_still_manage_own_agency_mentor(): void
@@ -117,7 +119,9 @@ class SecurityAuthorizationTest extends TestCase
             ->post(route('admin.users.reset_password', $this->mentorA->id))
             ->assertRedirect();
 
-        $this->assertTrue(Hash::check('password', $this->mentorA->fresh()->password));
+        $this->assertFalse(Hash::check('rahasia-mentor', $this->mentorA->fresh()->password));
+        $this->assertFalse(Hash::check('password', $this->mentorA->fresh()->password));
+        $this->assertTrue($this->mentorA->fresh()->must_change_password);
     }
 
     public function test_admin_dinas_cannot_create_admin_for_other_agency(): void
@@ -141,7 +145,9 @@ class SecurityAuthorizationTest extends TestCase
             ->post(route('admin.users.reset_password', $this->adminB->id))
             ->assertRedirect();
 
-        $this->assertTrue(Hash::check('password', $this->adminB->fresh()->password));
+        $this->assertFalse(Hash::check('rahasia-b', $this->adminB->fresh()->password));
+        $this->assertFalse(Hash::check('password', $this->adminB->fresh()->password));
+        $this->assertTrue($this->adminB->fresh()->must_change_password);
     }
 
     public function test_return_to_rejects_external_url(): void
@@ -230,7 +236,8 @@ class SecurityAuthorizationTest extends TestCase
             ->post(route('admin.universities.dosens.reset_password', [$univ->id, $dosen->id]))
             ->assertRedirect();
 
-        $this->assertTrue(Hash::check('password', $dosen->fresh()->password));
+        $this->assertFalse(Hash::check('password', $dosen->fresh()->password));
+        $this->assertTrue($dosen->fresh()->must_change_password);
     }
 
     // ---------------------------------------------------------------

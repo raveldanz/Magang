@@ -76,14 +76,17 @@
                 @include('layouts.navigation')
             </header>
 
-            {{-- Peringatan password bawaan: tidak memaksa, tapi tetap tampil di setiap halaman sampai password diganti --}}
+            @include('layouts.partials.temporary-credentials')
+
+            {{-- Peringatan password bawaan/sementara: tampil di setiap halaman sampai password diganti
+                 (di production juga dipaksa oleh EnsurePasswordChanged) --}}
             @auth
                 @if (auth()->user()->must_change_password && !session()->has('impersonator_id'))
                     <aside aria-label="Peringatan Keamanan Password" class="bg-amber-50 border-b border-amber-300 w-full">
                         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <p class="text-xs sm:text-sm text-amber-900 flex items-start gap-2">
                                 <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                <span><strong>Akun Anda masih memakai password bawaan.</strong> Siapa pun yang mengetahuinya bisa masuk ke akun ini. Segera ganti password Anda — peringatan ini akan terus tampil sampai password diganti.</span>
+                                <span><strong>Akun Anda masih memakai password bawaan/sementara.</strong> Password ini diketahui orang lain (pembuat akun atau publik). Segera ganti password Anda — peringatan ini akan terus tampil sampai password diganti.</span>
                             </p>
                             <a href="{{ route('profile.edit') }}#update-password" class="shrink-0 inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition">
                                 Ganti Password Sekarang

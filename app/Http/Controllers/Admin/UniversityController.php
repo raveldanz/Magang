@@ -14,10 +14,12 @@ use App\Models\User;
 use App\Services\UniversityHubService;
 use App\Services\UniversityResolver;
 use App\Services\Admin\UniversityManagementService;
+use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class UniversityController extends Controller
@@ -174,7 +176,7 @@ class UniversityController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanCode.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
@@ -295,7 +297,7 @@ class UniversityController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanCode.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
@@ -341,17 +343,17 @@ class UniversityController extends Controller
             $counter++;
         }
 
-        $password = 'password';
-
         $user = User::create([
             'name' => 'Admin Portal '.$univ->name,
             'email' => $email,
-            'password' => Hash::make($password),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'universitas',
             'university_id' => $univ->id,
             'university' => $univ->name,
             'email_verified_at' => now(),
         ]);
+        // Password sementara acak; ditampilkan sekali di modal kredensial.
+        $password = $user->issueTemporaryPassword();
 
         AuditLog::record('UNIVERSITY_ACCOUNT_CREATE', 'User', $user->id, [
             'university_name' => $univ->name,
@@ -465,18 +467,17 @@ class UniversityController extends Controller
             $dosenName .= ' (NIDN: '.trim($request->nidn).')';
         }
 
-        $password = 'password';
-
         $dosen = User::create([
             'name' => $dosenName,
             'email' => strtolower(trim($request->email)),
-            'password' => Hash::make($password),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'dosen',
             'university_id' => $university->id,
             'university' => $university->name,
             'phone' => $request->phone,
             'email_verified_at' => now(),
         ]);
+        $this->issueTemporaryPasswordFor($dosen);
 
         AuditLog::record('UNIVERSITY_DOSEN_CREATE', 'User', $dosen->id, [
             'university_id' => $university->id,
@@ -486,7 +487,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-            ->with('success', "Dosen Pembimbing '{$dosen->name}' berhasil ditambahkan ke {$university->name}! Password default: 'password'");
+            ->with('success', "Dosen Pembimbing '{$dosen->name}' berhasil ditambahkan ke {$university->name}! Password sementara ditampilkan sekali di layar ini.");
     }
 
     /**
@@ -503,9 +504,7 @@ class UniversityController extends Controller
             })
             ->findOrFail($dosenId);
 
-        $dosen->update([
-            'password' => Hash::make('password'),
-        ]);
+        $this->issueTemporaryPasswordFor($dosen);
 
         AuditLog::record('UNIVERSITY_DOSEN_RESET_PASSWORD', 'User', $dosen->id, [
             'dosen_name' => $dosen->name,
@@ -513,7 +512,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.show', ['university' => $university->id, 'tab' => 'dosen'])
-            ->with('success', "Password untuk Dosen '{$dosen->name}' ({$dosen->email}) berhasil direset ke default ('password')!");
+            ->with('success', "Password untuk Dosen '{$dosen->name}' ({$dosen->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
     }
 
     /**

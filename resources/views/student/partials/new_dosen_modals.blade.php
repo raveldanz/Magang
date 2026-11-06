@@ -85,7 +85,7 @@
 @if (session('new_advisor_credential'))
         @php
             $cred = session('new_advisor_credential');
-            $waText = "Halo Bapak/Ibu {$cred['name']},\n\nBerikut adalah akun akses Portal Dosen Pembimbing Magang Anda:\n- Portal Login: {$cred['login_url']}\n- Email: {$cred['email']}\n- Password: {$cred['password']}\n\nSilakan login untuk memonitor logbook mingguan dan memberikan nilai akhir magang mahasiswa. Terima kasih.";
+            $waText = "Halo Bapak/Ibu {$cred['name']},\n\nSaya telah mendaftarkan Bapak/Ibu sebagai Dosen Pembimbing magang saya di Portal SIP-MAGANG dengan email {$cred['email']}.\nAkun tersebut akan diaktifkan oleh Admin Kampus {$cred['univ_name']}. Setelah aktif, silakan atur password Anda sendiri melalui: {$cred['forgot_url']}\nLalu login di: {$cred['login_url']}\n\nTerima kasih.";
         @endphp
         <div x-show="showCredentialModal" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -107,7 +107,7 @@
 
                             <div>
                                 <h3 class="text-lg font-black text-slate-900 leading-snug">Akun Dosen Pembimbing
-                                    Berhasil Dibuat</h3>
+                                    Menunggu Aktivasi</h3>
                                 <p class="text-xs text-emerald-600 font-semibold">Tersambung ke
                                     {{ $cred['univ_name'] }}
                                 </p>
@@ -124,10 +124,10 @@
                         class="rounded-2xl bg-slate-900 text-slate-100 p-5 space-y-3 font-mono text-xs border border-slate-800 shadow-inner">
                         <div class="flex justify-between items-center pb-2 border-b border-slate-800">
                             <span
-                                class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">Kredensial
-                                Akses Dosen</span>
+                                class="text-slate-400 font-sans text-[11px] font-bold uppercase tracking-wider">Data
+                                Akun Dosen</span>
                             <span
-                                class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-sans font-bold">{{ \App\Enums\AccountStatus::ACTIVE->label() }}</span>
+                                class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-sans font-bold">{{ \App\Enums\AccountStatus::INACTIVE->label() }}</span>
                         </div>
 
                         <div class="grid grid-cols-3 gap-1">
@@ -139,12 +139,6 @@
                             <span class="text-slate-400 font-sans">Email Login:</span>
                             <span
                                 class="col-span-2 font-bold text-amber-300 select-all">{{ $cred['email'] }}</span>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-1">
-                            <span class="text-slate-400 font-sans">Password Default:</span>
-                            <span
-                                class="col-span-2 font-bold text-emerald-300 select-all">{{ $cred['password'] }}</span>
                         </div>
 
                         <div class="grid grid-cols-3 gap-1">
@@ -164,10 +158,10 @@
                         </svg>
                         <div>
                             <strong class="font-bold">Instruksi Mahasiswa:</strong>
-                            <p class="mt-1 text-amber-800">Harap simpan dan teruskan kredensial di atas kepada
-                                <strong>Dosen Pembimbing</strong> Anda agar beliau dapat login ke
-                                Portal Dosen untuk memonitor logbook mingguan dan memberikan penilaian akhir
-                                magang.
+                            <p class="mt-1 text-amber-800">Akun ini <strong>belum aktif</strong> dan akan diaktifkan
+                                oleh <strong>Admin Kampus</strong>. Teruskan informasi di atas kepada Dosen Pembimbing
+                                Anda; setelah akun aktif, beliau mengatur password sendiri melalui menu
+                                <strong>Lupa Password</strong>. Demi keamanan, mahasiswa tidak menerima password dosen.
                             </p>
                         </div>
                     </div>
@@ -182,8 +176,8 @@
                                     d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                             </svg>
                             <span
-                                x-text="copied ? 'Berhasil Disalin ke Clipboard!' : 'Salin Informasi Login (WhatsApp)'">Salin
-                                Informasi Login</span>
+                                x-text="copied ? 'Berhasil Disalin ke Clipboard!' : 'Salin Pesan untuk Dosen (WhatsApp)'">Salin
+                                Pesan untuk Dosen</span>
                         </button>
 
                         <button type="button" @click="showCredentialModal = false"

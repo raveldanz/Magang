@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
@@ -39,15 +40,25 @@ class User extends Authenticatable
         ];
     }
 
-    /** Password bawaan untuk akun yang dibuat/di-reset oleh admin. */
+    /** Password bawaan lama (akun demo/seed). Akun baru dari staf memakai issueTemporaryPassword(). */
     public const DEFAULT_PASSWORD = 'password';
+
+    /** Penanda sementara (bukan kolom DB) untuk issueTemporaryPassword(). */
+    public bool $issuingTemporaryPassword = false;
 
     protected static function booted(): void
     {
         // Setiap kali password berubah, tandai apakah masih password bawaan. Berlaku untuk semua
         // jalur (buat akun, reset oleh admin, seeder) tanpa perlu mengubah tiap controller;
         // flag otomatis hilang saat pemilik akun mengganti passwordnya sendiri.
+        // Password sementara dari issueTemporaryPassword selalu wajib diganti (penanda tidak dihitung ulang).
         static::saving(function (User $user) {
+            if ($user->issuingTemporaryPassword) {
+                $user->must_change_password = true;
+                $user->issuingTemporaryPassword = false;
+
+                return;
+            }
             if ($user->isDirty('password') && ! empty($user->getAttributes()['password'] ?? null)) {
                 try {
                     $user->must_change_password = Hash::check(self::DEFAULT_PASSWORD, $user->getAttributes()['password']);
@@ -56,6 +67,25 @@ class User extends Authenticatable
                 }
             }
         });
+    }
+
+    /** Password acak untuk akun yang dibuat/di-reset staf; hanya ditampilkan sekali kepada staf tersebut. */
+    public static function generateTemporaryPassword(): string
+    {
+        return 'Mg-'.Str::password(12, letters: true, numbers: true, symbols: false);
+    }
+
+    /**
+     * Ganti password akun dengan password sementara acak dan wajibkan pemiliknya menggantinya
+     * saat login berikutnya. Mengembalikan password polos untuk ditampilkan sekali.
+     */
+    public function issueTemporaryPassword(): string
+    {
+        $plain = self::generateTemporaryPassword();
+        $this->issuingTemporaryPassword = true;
+        $this->forceFill(['password' => Hash::make($plain)])->save();
+
+        return $plain;
     }
 
     /**

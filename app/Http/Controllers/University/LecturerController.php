@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class LecturerController extends Controller
@@ -120,12 +121,13 @@ class LecturerController extends Controller
         $lecturer = User::create([
             'name' => $dosenName,
             'email' => strtolower(trim($request->email)),
-            'password' => Hash::make('password'),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'dosen',
             'university_id' => $universityId,
             'university' => $univName,
             'email_verified_at' => now(),
         ]);
+        $this->issueTemporaryPasswordFor($lecturer);
 
         return redirect()->route('university.lecturers.index')
             ->with('success', "Dosen Pembimbing Baru '{$lecturer->name}' berhasil ditambahkan ke daftar dosen kampus!");
@@ -205,12 +207,10 @@ class LecturerController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mereset password dosen kampus lain.');
         }
 
-        $lecturer->update([
-            'password' => Hash::make('password'),
-        ]);
+        $this->issueTemporaryPasswordFor($lecturer);
 
         return redirect()->route('university.lecturers.index')
-            ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset ke default ('password')!");
+            ->with('success', "Password untuk Dosen '{$lecturer->name}' ({$lecturer->email}) berhasil direset. Password sementara ditampilkan sekali di layar ini.");
     }
 
     /**

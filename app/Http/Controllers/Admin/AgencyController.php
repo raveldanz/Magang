@@ -9,10 +9,12 @@ use App\Models\AuditLog;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
+use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AgencyController extends Controller
 {
@@ -230,7 +232,7 @@ class AgencyController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
-            $filename = $cleanName.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanName.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
@@ -305,7 +307,7 @@ class AgencyController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanName = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->agency_name ?? 'agency'));
-            $filename = $cleanName.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanName.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {
                 File::makeDirectory($targetDir, 0755, true);
@@ -399,16 +401,16 @@ class AgencyController extends Controller
             $counter++;
         }
 
-        $password = 'password';
-
         $user = User::create([
             'name' => 'Admin '.$agency->agency_name,
             'email' => $email,
-            'password' => Hash::make($password),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'admin',
             'agency_profile_id' => $agency->id,
             'email_verified_at' => now(),
         ]);
+        // Password sementara acak; ditampilkan sekali di modal kredensial di bawah.
+        $password = $user->issueTemporaryPassword();
 
         AuditLog::record('AGENCY_ACCOUNT_CREATE', 'User', $user->id, [
             'agency_name' => $agency->agency_name,

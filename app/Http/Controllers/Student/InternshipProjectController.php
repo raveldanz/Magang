@@ -8,6 +8,7 @@ use App\Models\AuditLog;
 use App\Models\InternshipProject;
 use App\Models\InternshipProjectMember;
 use App\Models\Placement;
+use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -143,7 +144,7 @@ class InternshipProjectController extends Controller
 
         // 1. Simpan Foto Sampul Utama
         $photoFile = $request->file('photo');
-        $ext = strtolower($photoFile->getClientOriginalExtension());
+        $ext = SafeUpload::extension($photoFile, ['jpg', 'jpeg', 'png', 'webp'], 'jpg');
         $filename = 'project_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$ext;
         $photoPath = $photoFile->storeAs('internship_projects', $filename, 'public');
 
@@ -154,7 +155,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('source_code')) {
             $scFile = $request->file('source_code');
             if ($scFile->isValid()) {
-                $scExt = strtolower($scFile->getClientOriginalExtension());
+                $scExt = SafeUpload::extension($scFile, ['zip', 'rar', '7z', 'tar', 'gz'], 'zip');
                 $scName = 'source_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$scExt;
                 $sourceCodePath = $scFile->storeAs('internship_projects/source_codes', $scName, 'public');
                 $sourceCodeName = $scFile->getClientOriginalName();
@@ -167,7 +168,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('screenshots')) {
             foreach ($request->file('screenshots') as $ssFile) {
                 if ($ssFile->isValid()) {
-                    $ssExt = strtolower($ssFile->getClientOriginalExtension());
+                    $ssExt = SafeUpload::extension($ssFile, ['jpg', 'jpeg', 'png', 'webp'], 'jpg');
                     $ssName = 'ss_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$ssExt;
                     $screenshots[] = $ssFile->storeAs('internship_projects/screenshots', $ssName, 'public');
                 }
@@ -179,7 +180,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('community_photos')) {
             foreach ($request->file('community_photos') as $cpFile) {
                 if ($cpFile->isValid()) {
-                    $cpExt = strtolower($cpFile->getClientOriginalExtension());
+                    $cpExt = SafeUpload::extension($cpFile, ['jpg', 'jpeg', 'png', 'webp'], 'jpg');
                     $cpName = 'cp_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$cpExt;
                     $communityPhotos[] = $cpFile->storeAs('internship_projects/community', $cpName, 'public');
                 }
@@ -191,7 +192,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('documents')) {
             foreach ($request->file('documents') as $docFile) {
                 if ($docFile->isValid()) {
-                    $docExt = strtolower($docFile->getClientOriginalExtension());
+                    $docExt = SafeUpload::extension($docFile, ['pdf', 'doc', 'docx', 'zip'], 'bin');
                     $docName = 'doc_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$docExt;
                     $docPath = $docFile->storeAs('internship_projects/documents', $docName, 'public');
                     $documents[] = [
@@ -336,7 +337,7 @@ class InternshipProjectController extends Controller
             }
 
             $photoFile = $request->file('photo');
-            $ext = strtolower($photoFile->getClientOriginalExtension());
+            $ext = SafeUpload::extension($photoFile, ['jpg', 'jpeg', 'png', 'webp'], 'jpg');
             $filename = 'project_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$ext;
             $photoPath = $photoFile->storeAs('internship_projects', $filename, 'public');
         }
@@ -361,7 +362,7 @@ class InternshipProjectController extends Controller
             }
             $scFile = $request->file('source_code');
             if ($scFile->isValid()) {
-                $scExt = strtolower($scFile->getClientOriginalExtension());
+                $scExt = SafeUpload::extension($scFile, ['zip', 'rar', '7z', 'tar', 'gz'], 'zip');
                 $scName = 'source_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$scExt;
                 $sourceCodePath = $scFile->storeAs('internship_projects/source_codes', $scName, 'public');
                 $sourceCodeName = $scFile->getClientOriginalName();
@@ -374,7 +375,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('screenshots')) {
             foreach ($request->file('screenshots') as $ssFile) {
                 if ($ssFile->isValid()) {
-                    $ssExt = strtolower($ssFile->getClientOriginalExtension());
+                    $ssExt = SafeUpload::extension($ssFile, ['jpg', 'jpeg', 'png', 'webp'], 'jpg');
                     $ssName = 'ss_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$ssExt;
                     $screenshots[] = $ssFile->storeAs('internship_projects/screenshots', $ssName, 'public');
                 }
@@ -386,7 +387,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('community_photos')) {
             foreach ($request->file('community_photos') as $cpFile) {
                 if ($cpFile->isValid()) {
-                    $cpExt = strtolower($cpFile->getClientOriginalExtension());
+                    $cpExt = SafeUpload::extension($cpFile, ['jpg', 'jpeg', 'png', 'webp'], 'jpg');
                     $cpName = 'cp_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$cpExt;
                     $communityPhotos[] = $cpFile->storeAs('internship_projects/community', $cpName, 'public');
                 }
@@ -398,7 +399,7 @@ class InternshipProjectController extends Controller
         if ($request->hasFile('documents')) {
             foreach ($request->file('documents') as $docFile) {
                 if ($docFile->isValid()) {
-                    $docExt = strtolower($docFile->getClientOriginalExtension());
+                    $docExt = SafeUpload::extension($docFile, ['pdf', 'doc', 'docx', 'zip'], 'bin');
                     $docName = 'doc_'.$placement->id.'_'.time().'_'.Str::random(6).'.'.$docExt;
                     $docPath = $docFile->storeAs('internship_projects/documents', $docName, 'public');
                     $documents[] = [

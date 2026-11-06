@@ -29,9 +29,14 @@ php artisan key:generate
 php artisan migrate --force
 php artisan storage:link      # logo & aset publik
 php artisan app:move-private-files   # hanya sekali, bila ada data lama di disk public
+php artisan app:create-super-admin it@dispusip.surabaya.go.id --name="Super Admin"   # akun pertama; password sementara tampil sekali
 npm ci && npm run build
 php artisan config:cache && php artisan route:cache && php artisan view:cache
 ```
+
+> **Jangan jalankan `php artisan db:seed` / `migrate --seed` di produksi.** Seeder hanya untuk data demo
+> (akun dengan password yang tertulis di repositori) dan otomatis menolak berjalan di luar
+> `APP_ENV=local|testing|development`. Buat Super Admin pertama dengan `app:create-super-admin`.
 
 ## 3. Variabel `.env` penting untuk produksi
 
@@ -48,6 +53,8 @@ CACHE_STORE=database
 SESSION_DRIVER=database
 
 VERIFY_NUMERIC_FALLBACK=false
+AUTH_FORCE_PASSWORD_CHANGE=true # bawaan true di production: akun berpassword bawaan/sementara wajib ganti password
+SESSION_SECURE_COOKIE=true      # cookie sesi hanya lewat HTTPS
 # VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY untuk web push (php artisan webpush:vapid)
 ```
 

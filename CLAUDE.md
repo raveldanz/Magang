@@ -63,7 +63,10 @@ Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `
 - Resolve a user's university with `App\Services\UniversityResolver` (`university_id` → exact name/acronym/code), never `LIKE '%name%'`.
 - Production needs a cron for `php artisan schedule:run` (every minute) and a permanent `php artisan queue:work`; heartbeats are shown on the Super Admin dashboard (`App\Services\SystemHealth`). Never use external QR services — QR codes are generated locally (simple-qrcode).
 - Large Blade pages are split into `@include` partials (`student/dashboard/*`, `admin/universities/partials/*`); partials share the parent's variables, so a variable defined inside one partial is NOT visible to the next.
-- `users.must_change_password` is maintained automatically by `User::booted()` whenever the password changes (true when it equals `User::DEFAULT_PASSWORD`); the layout shows a persistent warning.
+- `users.must_change_password` is maintained automatically by `User::booted()` whenever the password changes (true when it equals `User::DEFAULT_PASSWORD`); the layout shows a persistent warning. When `config('auth.force_password_change')` is on (default only in production, env `AUTH_FORCE_PASSWORD_CHANGE`), `EnsurePasswordChanged` redirects flagged users to `profile.edit` and the API login refuses a token.
+- Accounts created/reset by staff get a random temporary password via `$this->issueTemporaryPasswordFor($user)` (base `Controller`) — shown once through the `temporary_credentials` flash (`layouts/partials/temporary-credentials`). Never hash the literal `'password'` in app code; student-created DPL accounts are created inactive with an undisclosed password.
+- Derive stored upload extensions from content with `App\Support\SafeUpload::extension()`, never `getClientOriginalExtension()` (files under `public/` are served by extension).
+- `DatabaseSeeder` only runs in `local`/`testing`/`development`; production bootstraps the first Super Admin with `php artisan app:create-super-admin {email}`. There is no hardcoded login fallback — authentication is `Auth::attempt` only.
 
 ## Project conventions (from AGENTS.md / .antigravity/)
 

@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class MentorController extends Controller
@@ -107,13 +108,14 @@ class MentorController extends Controller
         $mentor = User::create([
             'name' => trim($request->name),
             'email' => strtolower(trim($request->email)),
-            'password' => Hash::make('password'),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'mentor',
             'agency_profile_id' => $agencyId,
             'unit_id' => $assignedUnitId,
             'status' => $request->status ?? 'active',
             'email_verified_at' => now(),
         ]);
+        $this->issueTemporaryPasswordFor($mentor);
 
         AuditLog::record('MENTOR_CREATE', 'User', $mentor->id, [
             'name' => $mentor->name,
@@ -203,13 +205,13 @@ class MentorController extends Controller
             abort(403, 'Anda tidak memiliki hak akses mereset password mentor bidang lain.');
         }
 
-        $mentor->update(['password' => Hash::make('password')]);
+        $this->issueTemporaryPasswordFor($mentor);
 
         AuditLog::record('MENTOR_PASSWORD_RESET', 'User', $mentor->id, [
             'name' => $mentor->name,
         ]);
 
-        return redirect()->back()->with('success', "Password mentor '{$mentor->name}' berhasil direset ke 'password'.");
+        return redirect()->back()->with('success', "Password mentor '{$mentor->name}' berhasil direset. Password sementara ditampilkan sekali di layar ini.");
     }
 
     public function destroy($id)

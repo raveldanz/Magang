@@ -92,6 +92,14 @@ return [
     |
     */
 
+    /*
+    | Wajib ganti password: akun yang masih memakai password bawaan/sementara diarahkan ke
+    | halaman profil sampai passwordnya diganti (App\Http\Middleware\EnsurePasswordChanged),
+    | dan login API ditolak. Bawaan aktif hanya di production; set
+    | AUTH_FORCE_PASSWORD_CHANGE=true untuk mengaktifkannya di staging.
+    */
+    'force_password_change' => (bool) env('AUTH_FORCE_PASSWORD_CHANGE', env('APP_ENV', 'production') === 'production'),
+
     'passwords' => [
         'users' => [
             'provider' => 'users',

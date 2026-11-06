@@ -160,7 +160,9 @@ class Phase3SecurityDataIntegrityTest extends TestCase
         $this->actingAs($this->admin)->post(route('admin.mentors.reset_password', $mentor->id));
 
         $this->assertTrue($mentor->fresh()->must_change_password);
-        $this->assertTrue(Hash::check('password', $mentor->fresh()->password));
+        // Password sementara acak, bukan 'password' yang diketahui umum
+        $this->assertFalse(Hash::check('PunyaSendiri99', $mentor->fresh()->password));
+        $this->assertFalse(Hash::check('password', $mentor->fresh()->password));
     }
 
     // ---- 4. Mentor & DPL di form ubah status ---------------------------------------------

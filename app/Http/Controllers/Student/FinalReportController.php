@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\FinalReport;
+use App\Support\SafeUpload;
 use App\Support\UploadRules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -135,7 +136,7 @@ class FinalReportController extends Controller
 
             // Format nama file terstruktur: Laporan_Akhir_[NIM]_[Nama_Mahasiswa]_[Timestamp].[ext]
             $file = $request->file('file_laporan');
-            $ext = strtolower($file->getClientOriginalExtension());
+            $ext = SafeUpload::extension($file, ['pdf'], 'pdf');
             $nim = $user->studentProfile?->nim ?? 'NIM';
             $cleanNim = preg_replace('/[^A-Za-z0-9]/', '', $nim) ?: 'NIM';
             $cleanName = Str::slug($user->name, '_') ?: 'Mahasiswa';

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\University;
 
 use App\Http\Controllers\Controller;
 use App\Models\University;
+use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -139,7 +140,7 @@ class ProfileController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $request->code ?? 'univ'));
-            $filename = $cleanCode.'_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = $cleanCode.'_'.time().'.'.SafeUpload::extension($file, ['jpg', 'jpeg', 'png', 'webp'], 'png');
 
             $targetDir = public_path('images/logos');
             if (! File::exists($targetDir)) {

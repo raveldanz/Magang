@@ -26,6 +26,21 @@ abstract class Controller
     }
 
     /**
+     * Beri akun password sementara acak dan tampilkan sekali kepada staf yang melakukannya
+     * (flash 'temporary_credentials', dirender oleh layouts/partials/temporary-credentials).
+     */
+    protected function issueTemporaryPasswordFor(User $user): string
+    {
+        $plain = $user->issueTemporaryPassword();
+
+        $credentials = session('temporary_credentials', []);
+        $credentials[] = ['name' => $user->name, 'email' => $user->email, 'password' => $plain];
+        session()->flash('temporary_credentials', $credentials);
+
+        return $plain;
+    }
+
+    /**
      * Kembalikan URL return_to hanya jika mengarah ke aplikasi ini sendiri (mencegah open redirect).
      */
     protected function safeReturnTo(?string $returnTo): ?string

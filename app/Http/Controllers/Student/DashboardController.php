@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Enums\AccountStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Placement;
@@ -11,6 +12,7 @@ use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -289,14 +291,17 @@ class DashboardController extends Controller
             $dosenName .= ' (NIDN: '.trim($request->nidn).')';
         }
 
+        // Mahasiswa tidak boleh menguasai akun DPL yang menilainya: akun dibuat NONAKTIF dengan
+        // password acak yang tidak diberitahukan ke siapa pun. Admin Kampus mengaktifkan akun ini,
+        // lalu dosen mengatur passwordnya sendiri lewat "Lupa Password".
         $newDosen = User::create([
             'name' => $dosenName,
             'email' => $cleanEmail,
-            'password' => Hash::make('password'),
+            'password' => Hash::make(Str::random(40)),
             'role' => 'dosen',
+            'status' => AccountStatus::INACTIVE->value,
             'university_id' => $targetUnivId,
             'university' => $univName,
-            'email_verified_at' => now(),
         ]);
 
         $placement = Placement::updateOrCreate(
@@ -308,15 +313,15 @@ class DashboardController extends Controller
             ->where('id', '!=', $placement->id)
             ->delete();
 
-        // Kirimkan session flash detail kredensial untuk ditampilkan di modal informasi mahasiswa
+        // Informasi untuk modal mahasiswa (tanpa password).
         session()->flash('new_advisor_credential', [
             'name' => $newDosen->name,
             'email' => $newDosen->email,
-            'password' => 'password',
             'login_url' => url('/login'),
+            'forgot_url' => route('password.request'),
             'univ_name' => $univName,
         ]);
 
-        return redirect()->route('dashboard')->with('success', "Akun Dosen Pembimbing Baru ({$newDosen->name}) berhasil didaftarkan dan dipilih sebagai DPL!");
+        return redirect()->route('dashboard')->with('success', "Akun Dosen Pembimbing Baru ({$newDosen->name}) berhasil didaftarkan dan menunggu aktivasi Admin Kampus.");
     }
 }
