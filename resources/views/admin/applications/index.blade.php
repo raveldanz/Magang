@@ -100,7 +100,7 @@
                                 </div>
                             @else
                                 <select name="unit_id" class="w-full h-10 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-2xs bg-white font-medium">
-                                    <option value="">-- Semua Unit/Divisi --</option>
+                                    <option value="">-- Semua Unit Bidang --</option>
                                     @if (isset($groupedUnits) && $groupedUnits !== null)
                                         @foreach ($groupedUnits as $agencyName => $agencyUnits)
                                             @if(count($groupedUnits) > 1)
@@ -762,33 +762,31 @@
                                 $isUniformGroupStatus = $groupStatuses->count() === 1;
                                 $groupPendingOrWaiting = in_array($app->group->status, ['pending', 'waiting_approval']) || in_array($rawStatus, ['pending', 'waiting_approval']);
                             @endphp
-                            <div class="p-4 bg-white rounded-2xl border border-indigo-200/90 shadow-2xs space-y-3 relative" 
+                            <div class="p-4 bg-white rounded-2xl border border-indigo-200/90 shadow-2xs space-y-2.5 relative" 
                                  x-data="{ expanded: false }">
-                                @if($groupPendingOrWaiting)
-                                    <div class="absolute top-4 right-4 z-10">
-                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                                    </div>
-                                @endif
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="min-w-0 pr-2">
-                                        <div class="flex items-center gap-1.5 mb-1">
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200 uppercase">
-                                                Jalur Kelompok
-                                            </span>
-                                            <span class="font-mono text-[10px] font-bold text-slate-500">#{{ $app->group->code }}</span>
-                                        </div>
-                                        <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->group->name }}</h4>
-                                        <p class="text-xs text-slate-600 mt-0.5 font-normal">Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</p>
-                                        <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }}</p>
-                                    </div>
-                                    <div class="text-right shrink-0 {{ $groupPendingOrWaiting ? 'pr-8' : '' }}">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
                                         <x-status-badge :status="$app->group->status ?? $app->status" />
                                         @if(! $isUniformGroupStatus)
-                                            <div class="mt-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 inline-block">
+                                            <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 inline-block">
                                                 Status Beragam
-                                            </div>
+                                            </span>
                                         @endif
                                     </div>
+                                    @if($groupPendingOrWaiting)
+                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0">
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200 uppercase whitespace-nowrap">
+                                        Jalur Kelompok
+                                    </span>
+                                    <span class="font-mono text-[10px] font-bold text-slate-500 whitespace-nowrap">#{{ $app->group->code }}</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->group->name }}</h4>
+                                    <p class="text-xs text-slate-600 mt-0.5 font-normal">Ketua: {{ $app->group->leader?->name ?? $app->user?->name ?? 'Mahasiswa' }}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }}</p>
                                 </div>
 
                                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
@@ -850,23 +848,21 @@
                             </div>
                         @else
                             <!-- Jalur Individu Mobile -->
-                            <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 relative">
-                                @if(in_array($rawStatus, ['pending', 'waiting_approval']))
-                                    <div class="absolute top-4 right-4 z-10">
-                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                                    </div>
-                                @endif
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="min-w-0 pr-2">
-                                        <h4 class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
-                                        <p class="text-xs text-slate-500 mt-0.5">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">· {{ $app->user?->studentProfile?->jurusan ?? '-' }}</span></p>
-                                    </div>
-                                    <div class="text-right shrink-0 {{ in_array($rawStatus, ['pending', 'waiting_approval']) ? 'pr-8' : '' }}">
+                            <div class="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5 relative">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
                                         <x-status-badge :status="$app->status" />
                                         @if($app->isPastEndDate())
-                                            <div class="mt-1 text-[10px] font-bold text-rose-700">Lewat {{ $app->daysPastEndDate() }} hari</div>
+                                            <span class="text-[10px] font-bold text-rose-700">Lewat {{ $app->daysPastEndDate() }} hari</span>
                                         @endif
                                     </div>
+                                    @if(in_array($rawStatus, ['pending', 'waiting_approval']))
+                                        <input type="checkbox" name="application_ids[]" value="{{ $app->id }}" x-model="selected" class="bulk-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0">
+                                    @endif
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-slate-900 leading-snug">{{ $app->user?->name ?? 'Mahasiswa' }}</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">{{ $app->user?->studentProfile?->universitas ?? '-' }} <span class="text-slate-400">· {{ $app->user?->studentProfile?->jurusan ?? '-' }}</span></p>
                                 </div>
 
                                 @if($isActive && $isReadyToComplete)
