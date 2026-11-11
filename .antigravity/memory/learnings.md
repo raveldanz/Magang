@@ -159,6 +159,9 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-127** | 2026-11-04 | Pusat Kendali Dispusip, Batch Print Sertifikat & Arsip Tema Tahunan | Residu nomenklatur divisi, ketiadaan tab kelulusan/sertifikat dinas, ketiadaan cetak kolektif sertifikat ter-ACC & arsip riwayat tema tahunan | RESOLVED |
 | **LRN-128** | 2026-11-04 | Rekonstruksi Presisi E-Sertifikat Resmi Dispusip (4692.pdf), Ornamen Mozaik Grid Vektor, Wave Ribbons & Theme Engine Fleksibel | Disparitas visual draft sertifikat dengan prototipe asli 4692.pdf, ornamen poligon kasar, ketiadaan underline nama, font non-serif & keterbatasan tema warna dinamis | RESOLVED |
 | **LRN-129** | 2026-11-04 | Presisi Tipografi Grandeur E-Sertifikat Dispusip, Eliminasi Top Box Terputus, Transparansi Kop 5 Logo & Lokalisasi Tanggal | Teks sertifikat kurang besar, garis panjang atas terputus canggung di x=52, logo kop memiliki artefak background kotak putih/checkerboard, serta bulan tanggal berbahasa Inggris | RESOLVED |
+| **LRN-130** | 2026-11-05 | Pembersihan Micro-copy Redundan, Ikon Profesional & Tombol Simpan Desain Saja | Teks petunjuk real-time & tab baru mengganggu estetika, emoji mentah, dan ketiadaan fitur penyimpanan terpisah untuk perubahan desain/warna tanpa mengganggu data TTE | RESOLVED |
+| **LRN-131** | 2026-11-05 | Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek | Keterangan skala menabrak strip bawah dan terpotong di tepi lembar A4 pada penilaian 2 pihak | RESOLVED |
+| **LRN-132** | 2026-11-11 | Sinkronisasi Merge GitHub, Guard Redirect Login Hermes E2E & Akun Demo Dispusip | False-positive PASS saat login gagal (redirect 302 ke `/login`) & residu akun Kominfo pada runner `hermes_all_roles_test.mjs` | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4009,6 +4012,28 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 ---
 
+### [LRN-130] Pembersihan Teks Penjelas Redundan, Eliminasi Emoji ke Ikon Profesional & Fitur "Simpan Desain Saja" pada Pengaturan Tema Sertifikat
+- **Tanggal**: 2026-11-05
+- **Komponen**: `resources/views/admin/certificates/index.blade.php`, `app/Http/Controllers/Admin/CertificateController.php`, `tests/Feature/CertificateThemeWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Halaman pengaturan sertifikat memuat teks instruksi redundan ("Warna dan teks di atas berubah secara real-time saat Anda mengedit form di samping." dan "Dibuka di tab baru dengan isian form saat ini. Tidak menyimpan perubahan apa pun.").
+  2. Label dropdown contoh memuat teks "(lulusan terbaru)" dan tombol pratinjau memuat teks "(Ukuran Penuh)" yang membuat antarmuka terasa ramai.
+  3. Header kartu menggunakan emoji mentah (🎨, ✍️, 👁️, 📚) yang kurang formal untuk sistem pemerintahan kedinasan.
+  4. Tidak ada opsi untuk menyimpan perubahan tema warna/desain saja tanpa harus mengubah atau memvalidasi ulang seluruh data pejabat penandatangan TTE.
+- **Root Cause**:
+  1. Desain awal menyertakan micro-copy penjelas yang kini tidak lagi diperlukan karena antarmuka sudah intuitif.
+  2. Alur penyimpanan pada `CertificateController@updateTheme` sebelumnya mewajibkan (`required`) seluruh data penandatangan TTE (`signee_name`, `signee_position`, `city`, `number_format_pattern`), sehingga jika admin hanya ingin mengubah desain/warna tahunan, form akan memvalidasi ulang data TTE.
+- **Fix Applied**:
+  1. Menghapus teks penjelas real-time dan catatan tab baru.
+  2. Menyederhanakan opsi dropdown menjadi `Otomatis` dan tombol menjadi `Lihat Hasil Generate`.
+  3. Mengganti seluruh emoji halaman dengan ikon vektor SVG Heroicons profesional (palette, signature pen, eye preview, archive/history).
+  4. Menambahkan tombol **"Simpan Desain Saja"** di atas "Riwayat Tema Tahunan" dan pada action bar bawah.
+  5. Memperbarui `CertificateController@updateTheme` untuk mendukung mode `save_mode=design_only`, mempertahankan data TTE yang ada (atau fallback aktif/default), serta menambahkan unit test `test_admin_can_save_design_only_without_modifying_signee()`.
+  6. Menguji secara visual melalui Playwright E2E (`public/test-artifacts/cert_settings_perfect.png`) dan memastikan 387 test suite passed (100% Exit Code 0).
+- **Prevention Rule**: Antarmuka kedinasan wajib menggunakan ikon vektor SVG profesional berpadu palet tema institusi daripada emoji mentah OS. Saat menyediakan konfigurasi multi-bagian (desain visual vs legalitas TTE), sediakan aksi terisolasi (*action splitting*) agar pengguna dapat menyimpan aspek estetika tanpa terhambat validasi form legalitas.
+
+---
+
 ---
 
 ### [LRN-131] Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek
@@ -4018,6 +4043,23 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Root Cause**: Kepadatan tabel dipilih dari jumlah aspek saja, padahal judul bagian, subtotal, biodata, dan nama aspek yang terlipat ikut memakan tinggi lembar berukuran tetap.
 - **Fix Applied**: Tiga tingkat kepadatan lewat variabel CSS (`data-density`), dipilih dari hasil ukur di browser setelah font dimuat dan sebelum cetak; bila tingkat `tight` tidak muat, tabel berlanjut ke lembar berikutnya dengan judul kolom berulang dan nomor halaman dinamis.
 - **Prevention Rule**: Jangan menebak muat/tidaknya konten dari jumlah baris pada lembar berukuran tetap; ukur tinggi hasil render, dan uji kasus ekstrem (10+10, 20+20, nama aspek panjang) di layar dan PDF. Kelas `flex`/`grid` Tailwind mengalahkan atribut `hidden`, jadi tambahkan aturan `display:none !important`.
+
+---
+
+### [LRN-132] Sinkronisasi Merge GitHub, Guard Redirect Login Hermes E2E & Akun Demo Dispusip
+- **Tanggal**: 2026-11-11
+- **Komponen**: `scripts/hermes_all_roles_test.mjs`, `GEMINI.md`
+- **Problem / Symptom**:
+  1. Pada runner `scripts/hermes_all_roles_test.mjs`, peran `AdminDinas` dan `Mentor` masih mencoba login menggunakan email lama `admin.kominfo@surabaya.go.id` dan `mentor.kominfo@surabaya.go.id` yang sudah dihapus pasca standarisasi single-agency Dispusip.
+  2. Ketika login gagal, Laravel mengembalikan HTTP 302 redirect kembali ke `/login` yang merender halaman login dengan status HTTP 200. Method `HermesSession.login()` tidak memeriksa apakah lokasi redirect kembali ke `/login`, sehingga menghasilkan false-positive `PASS (http://127.0.0.1:8000/login)`.
+- **Root Cause**:
+  1. Residu email akun OPD lama (Kominfo) di skrip E2E dan dokumentasi akun demo.
+  2. Kurangnya pengecekan URL tujuan pada `res.headers.get('location')` setelah `POST /login` di `HermesSession.login()`.
+- **Fix Applied**:
+  1. Menambahkan guard eksplisit `if (target.endsWith('/login')) throw new Error(...)` pada `HermesSession.login()` di `scripts/hermes_all_roles_test.mjs`.
+  2. Memperbarui kredensial uji `AdminDinas` ke `admin.dispusip@surabaya.go.id` dan `Mentor` ke `mentor.dispusip@surabaya.go.id` di `scripts/hermes_all_roles_test.mjs` serta dokumentasi `GEMINI.md`.
+  3. Melakukan sinkronisasi merge `origin/main` (`e09f276`) dan memverifikasi seluruh test suite: PHPUnit (416/416 PASS), Hermes Multi-Role E2E (56/56 PASS menuju dashboard masing-masing peran), dan Tier 3 Playwright Visual Audit (PASS, Strict Exit Code 0).
+- **Prevention Rule**: Setiap pengujian login E2E berbasis HTTP client manual wajib memvalidasi bahwa header `Location` dari respons `302` tidak mengarah kembali ke `/login`, dan seluruh skrip otomasi wajib menggunakan akun resmi Dispusip (`*.dispusip@surabaya.go.id`).
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 

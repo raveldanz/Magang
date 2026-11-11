@@ -85,8 +85,8 @@
         /* Hero */
         .cc-hero { padding: 16px !important; border-radius: 20px !important; }
         .cc-hero-main { gap: 12px !important; }
-        .cc-logo { width: 56px !important; height: 56px !important; min-width: 56px !important; min-height: 56px !important; max-width: 56px !important; max-height: 56px !important; padding: 8px !important; border-radius: 14px !important; }
-        .cc-logo img { width: 40px !important; height: 40px !important; max-width: 40px !important; max-height: 40px !important; }
+        .cc-logo { width: auto !important; height: 56px !important; min-width: 56px !important; min-height: 56px !important; max-width: 96px !important; max-height: 56px !important; padding: 8px !important; border-radius: 14px !important; }
+        .cc-logo img { width: auto !important; height: 40px !important; min-width: 40px !important; max-width: 80px !important; max-height: 40px !important; }
         .cc-hero h1 { font-size: 17px !important; line-height: 1.3 !important; }
         .cc-badges { gap: 6px !important; }
         .cc-badges > span { font-size: 12px !important; padding: 2px 8px !important; }

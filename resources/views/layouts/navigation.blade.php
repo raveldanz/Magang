@@ -393,8 +393,8 @@
                             class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-slate-300 bg-white transition cursor-pointer shadow-2xs">
                         <span class="text-xs font-semibold text-slate-700 max-w-[140px] truncate">{{ Auth::user()->name ?? 'Pengguna' }}</span>
                         @if($navAvatarLogo)
-                            <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-0.5" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                            <div class="rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs" style="height: 28px; min-width: 28px; max-width: 52px; padding: 2px;">
+                                <img src="{{ $navAvatarLogo }}" alt="Logo" class="object-contain" style="height: 100%; width: auto; max-width: 100%;" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                             </div>
                         @else
                             <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -419,8 +419,8 @@
                         <div class="px-3 py-2.5 bg-slate-50 rounded-2xl mb-2 flex items-center justify-between" style="background-color: #f8fafc !important;">
                             <div class="flex items-center gap-2.5 overflow-hidden">
                                 @if($navAvatarLogo)
-                                    <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                                    <div class="rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs" style="height: 36px; min-width: 36px; max-width: 64px; padding: 4px;">
+                                        <img src="{{ $navAvatarLogo }}" alt="Logo" class="object-contain" style="height: 100%; width: auto; max-width: 100%;" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                                     </div>
                                 @else
                                     <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -658,8 +658,8 @@
             <div class="p-3 rounded-2xl border border-slate-100 flex items-center justify-between bg-slate-50">
                 <div class="flex items-center gap-2.5">
                     @if($navAvatarLogo)
-                        <div class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                        <div class="rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs" style="height: 36px; min-width: 36px; max-width: 64px; padding: 4px;">
+                            <img src="{{ $navAvatarLogo }}" alt="Logo" class="object-contain" style="height: 100%; width: auto; max-width: 100%;" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
                         </div>
                     @else
                         <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">

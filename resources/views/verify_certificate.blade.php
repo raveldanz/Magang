@@ -32,8 +32,8 @@
             <!-- Header Logo / Instansi -->
             <div class="text-center pb-4 border-b">
                 <div class="flex items-center justify-center gap-3 mb-2.5">
-                    <img src="{{ asset('images/certificates/logo_surabaya.webp') }}" alt="Surabaya" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/certificates/logo_surabaya_lambang.jpeg') }}';">
-                    <img src="{{ asset('images/certificates/logo_dispusip.jpg') }}" alt="Dispusip" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
+                    <img src="{{ asset('images/certificates/logo_surabaya.png') }}" alt="Surabaya" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/logos/surabaya.png') }}';">
+                    <img src="{{ asset('images/certificates/logo_dispusip.png') }}" alt="Dispusip" class="h-12 w-auto object-contain" onerror="this.onerror=null; this.src='{{ asset('images/logos/dispusip.png') }}';">
                 </div>
                 <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest">{{ $govName }}</h2>
                 <h1 class="text-lg font-black text-slate-900 uppercase tracking-wide">{{ $agencyName }}</h1>

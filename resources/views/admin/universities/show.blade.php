@@ -72,11 +72,11 @@
                     <!-- Sisi Kiri: Logo Resmi, Nama & Informasi Kontak -->
                     <div class="cc-hero-main flex items-start gap-4 sm:gap-6 flex-1 min-w-0">
                         <div class="cc-logo border border-slate-200 rounded-xl p-2 bg-white shadow-2xs flex items-center justify-center shrink-0 overflow-hidden"
-                             style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; max-width: 88px; max-height: 88px;">
+                             style="height: 88px; min-width: 88px; max-width: 180px;">
                             @if($univLogoUrl)
-                                <img src="{{ $univLogoUrl }}" alt="Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;">
+                                <img src="{{ $univLogoUrl }}" alt="Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="height: 64px; width: auto; max-width: 160px; object-fit: contain;">
                             @else
-                                <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="width: 64px; height: 64px; max-width: 64px; max-height: 64px; object-fit: contain;">
+                                <img src="{{ asset('images/default-university.svg') }}" alt="Default Logo {{ $university->name }}" class="w-16 h-16 object-contain shrink-0" style="height: 64px; width: auto; max-width: 160px; object-fit: contain;">
                             @endif
                         </div>
 

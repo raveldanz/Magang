@@ -75,6 +75,36 @@ class CertificateThemeWorkflowTest extends TestCase
         $this->assertEquals('Kepala Dinas', $activeTheme->signee_position);
     }
 
+    public function test_admin_can_save_design_only_without_modifying_signee(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email' => 'admin_design@gmail.com',
+            'agency_profile_id' => null,
+            'unit_id' => null,
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('admin.certificates.updateTheme'), [
+            'save_mode' => 'design_only',
+            'year' => 2026,
+            'theme_name' => 'Tema Sunset Orange 2026',
+            'primary_color' => '#FF4500',
+            'secondary_color' => '#FFA500',
+            'accent_color' => '#FFD700',
+            'is_active' => '1',
+        ]);
+
+        $response->assertRedirect(route('admin.certificates.index', ['tab' => 'settings']));
+        $response->assertSessionHas('success');
+
+        $activeTheme = CertificateTheme::getActive();
+        $this->assertEquals(2026, $activeTheme->year);
+        $this->assertEquals('Tema Sunset Orange 2026', $activeTheme->theme_name);
+        $this->assertEquals('#FF4500', $activeTheme->primary_color);
+        $this->assertEquals('Dra. NOVELIJA, SH', $activeTheme->signee_name);
+        $this->assertEquals('Sekretaris', $activeTheme->signee_position);
+    }
+
     public function test_certificate_view_renders_new_layout_and_tte_box(): void
     {
         $agency = AgencyProfile::create([

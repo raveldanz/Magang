@@ -322,8 +322,10 @@
                             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm space-y-5">
                                 <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 font-bold">
-                                            🎨
+                                        <div class="w-8 h-8 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-blue-600 shadow-2xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                            </svg>
                                         </div>
                                         <div>
                                             <h3 class="text-base font-bold text-slate-800">Tema Desain & Palet Warna Tahunan</h3>
@@ -435,8 +437,10 @@
                             <!-- 2. KARTU PEJABAT PENANDATANGAN TTE RESMI (STANDAR BSrE) -->
                             <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-sm space-y-4">
                                 <div class="border-b border-slate-100 pb-3 flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 font-bold">
-                                        ✍️
+                                    <div class="w-8 h-8 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-2xs">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                        </svg>
                                     </div>
                                     <div>
                                         <h3 class="text-base font-bold text-slate-800">Pejabat Penandatangan TTE Resmi (BSrE/Dispusip)</h3>
@@ -504,8 +508,18 @@
                             </div>
 
                             <!-- Tombol Simpan -->
-                            <div class="flex items-center justify-end gap-3 pt-2">
-                                <button type="submit" class="w-full sm:w-auto px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+                            <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+                                <button type="submit" 
+                                        name="save_mode" 
+                                        value="design_only" 
+                                        class="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-blue-700 border border-blue-300 rounded-xl text-xs sm:text-sm font-bold shadow-xs transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                                    <span>Simpan Desain Saja</span>
+                                </button>
+                                <button type="submit" 
+                                        name="save_mode" 
+                                        value="full" 
+                                        class="w-full sm:w-auto px-7 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     <span>Simpan Pengaturan Tema & TTE</span>
                                 </button>
@@ -519,8 +533,11 @@
                             <!-- LIVE MINI PREVIEW SERTIFIKAT HALAMAN 1 -->
                             <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3 sticky top-24">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                                        <span>👁️</span>
+                                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
                                         <span>Pratinjau Langsung (Live)</span>
                                     </h4>
                                     <span class="text-[10px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-bold">Halaman 1</span>
@@ -590,37 +607,50 @@
                                     </div>
                                 </div>
 
-                                <div class="text-[11px] text-slate-500 leading-relaxed text-center">
-                                    Warna dan teks di atas berubah secara real-time saat Anda mengedit form di samping.
-                                </div>
+                                <!-- Pratinjau hasil generate nyata (2 halaman) dengan isian form yang belum disimpan -->
+                                <div class="border-t border-slate-100 pt-3 space-y-2.5">
+                                    <div>
+                                        <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Contoh mahasiswa untuk pratinjau:</label>
+                                        <select id="sample_placement_id" name="sample_placement_id" class="w-full rounded-xl border-slate-200 text-xs focus:border-blue-600 focus:ring-blue-600">
+                                            <option value="">Otomatis</option>
+                                            @foreach (($eligibleApps ?? collect())->take(40) as $sampleApp)
+                                                @if ($sampleApp->placement)
+                                                    <option value="{{ $sampleApp->placement->id }}">{{ $sampleApp->user->name }} — {{ $sampleApp->user->studentProfile->universitas ?? '-' }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                <!-- Pratinjau ukuran penuh: hasil generate nyata (2 halaman) dengan isian form yang belum disimpan -->
-                                <div class="border-t border-slate-100 pt-3 space-y-2">
-                                    <label for="sample_placement_id" class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Contoh mahasiswa untuk pratinjau penuh:</label>
-                                    <select id="sample_placement_id" name="sample_placement_id" class="w-full rounded-xl border-slate-200 text-xs focus:border-blue-600 focus:ring-blue-600">
-                                        <option value="">Otomatis (lulusan terbaru)</option>
-                                        @foreach (($eligibleApps ?? collect())->take(40) as $sampleApp)
-                                            @if ($sampleApp->placement)
-                                                <option value="{{ $sampleApp->placement->id }}">{{ $sampleApp->user->name }} — {{ $sampleApp->user->studentProfile->universitas ?? '-' }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                    <button type="submit"
-                                            formaction="{{ route('admin.certificates.previewTheme') }}"
-                                            formmethod="post"
-                                            formtarget="_blank"
-                                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        <span>Lihat Hasil Generate (Ukuran Penuh)</span>
-                                    </button>
-                                    <p class="text-[10.5px] text-slate-400 text-center leading-snug">Dibuka di tab baru dengan isian form saat ini. Tidak menyimpan perubahan apa pun.</p>
+                                    <div class="grid grid-cols-1 gap-2 pt-1">
+                                        <button type="submit"
+                                                formaction="{{ route('admin.certificates.previewTheme') }}"
+                                                formmethod="post"
+                                                formtarget="_blank"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+                                            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat Hasil Generate</span>
+                                        </button>
+
+                                        <!-- Tombol Simpan Desain Saja (tepat di atas Riwayat Tema Tahunan) -->
+                                        <button type="submit"
+                                                name="save_mode"
+                                                value="design_only"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition transform active:scale-95 cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            <span>Simpan Desain Saja</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- RIWAYAT TEMA TAHUNAN -->
                             <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3">
-                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                                    <span>📚</span>
+                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+                                    <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                     <span>Riwayat Tema Tahunan</span>
                                 </h4>
 
@@ -708,6 +738,7 @@
                 document.getElementById('city').value = theme.city;
             }
             updateLivePreview();
+            window.scrollTo({ top: 120, behavior: 'smooth' });
         }
 
         function applyPreset(name, primary, secondary, accent) {
