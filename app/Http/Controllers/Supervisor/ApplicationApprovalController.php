@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
+use App\Models\InternshipGroup;
 use App\Models\Placement;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -55,7 +57,7 @@ class ApplicationApprovalController extends Controller
         $applications = $query->latest()->paginate(10)->withQueryString();
 
         $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first() ?? AgencyProfile::first();
-        $units = \App\Models\Unit::when($dispusip, fn ($q) => $q->where('agency_profile_id', $dispusip->id))
+        $units = Unit::when($dispusip, fn ($q) => $q->where('agency_profile_id', $dispusip->id))
             ->orderBy('name')
             ->get();
 
@@ -112,14 +114,17 @@ class ApplicationApprovalController extends Controller
         DB::transaction(function () use ($application, $newStatus, $autoLetterNumber, $letterToken, $letterDate, $paddedId, $year, $user) {
             $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) $application->status;
 
-            // Jika pengajuan kelompok, sinkronkan seluruh anggota kelompok bersama-sama
+            // Jika pengajuan kelompok, sinkronkan seluruh anggota kelompok yang tidak ditolak/mengundurkan diri bersama-sama
             if ($application->group_id) {
-                $group = \App\Models\InternshipGroup::find($application->group_id);
+                $group = InternshipGroup::find($application->group_id);
                 if ($group) {
+                    $groupLetterNumber = $group->letter_number ?: $autoLetterNumber;
+                    $groupLetterDate = $group->letter_date ?: $letterDate;
+
                     $group->update([
                         'status' => $newStatus,
-                        'letter_number' => $autoLetterNumber,
-                        'letter_date' => $letterDate,
+                        'letter_number' => $groupLetterNumber,
+                        'letter_date' => $groupLetterDate,
                         'letter_token' => $group->letter_token ?: $letterToken,
                     ]);
 
@@ -131,14 +136,24 @@ class ApplicationApprovalController extends Controller
                             $leadPlacement = Placement::where('application_id', $leaderApp->id)->first();
                         }
                     }
+                    if (! $leadPlacement || ! $leadPlacement->mentor_id) {
+                        $siblingWithMentor = Placement::whereHas('application', function ($q) use ($group) {
+                            $q->where('group_id', $group->id);
+                        })->whereNotNull('mentor_id')->first();
+                        if ($siblingWithMentor) {
+                            $leadPlacement = $siblingWithMentor;
+                        }
+                    }
 
-                    $allGroupApps = Application::where('group_id', $group->id)->get();
+                    $allGroupApps = Application::where('group_id', $group->id)
+                        ->whereNotIn('status', ['rejected', 'resigned'])
+                        ->get();
                     foreach ($allGroupApps as $memberApp) {
                         $memberPaddedId = str_pad($memberApp->id, 3, '0', STR_PAD_LEFT);
                         $memberApp->update([
                             'status' => $newStatus,
-                            'letter_number' => $autoLetterNumber,
-                            'letter_date' => $letterDate,
+                            'letter_number' => $groupLetterNumber,
+                            'letter_date' => $groupLetterDate,
                             'letter_token' => $memberApp->letter_token ?: Str::random(32),
                             'unit_id' => $memberApp->unit_id ?: $application->unit_id,
                             'start_date' => $memberApp->start_date ?: $application->start_date,
@@ -207,9 +222,10 @@ class ApplicationApprovalController extends Controller
             ]);
         });
 
-        $group = $application->group_id ? \App\Models\InternshipGroup::find($application->group_id) : null;
+        $group = $application->group_id ? InternshipGroup::find($application->group_id) : null;
+        $approvedCount = $group ? $group->applications()->whereNotIn('status', ['rejected', 'resigned'])->count() : 1;
         $successMsg = $group
-            ? "Pengajuan magang kelompok '{$group->name}' sejumlah {$group->applications()->count()} anggota berhasil disetujui dan Surat Balasan resmi telah diterbitkan!"
+            ? "Pengajuan magang kelompok '{$group->name}' sejumlah {$approvedCount} anggota berhasil disetujui dan Surat Balasan resmi telah diterbitkan!"
             : "Pengajuan magang atas nama {$application->user?->name} berhasil disetujui dan Surat Balasan resmi telah diterbitkan!";
 
         return redirect()->route('supervisor.applications.index')
@@ -233,7 +249,7 @@ class ApplicationApprovalController extends Controller
 
         $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) $application->status;
 
-        $rejectionText = "Catatan Penolakan Atasan: " . $request->notes;
+        $rejectionText = 'Catatan Penolakan Atasan: '.$request->notes;
 
         $application->update([
             'status' => ApplicationStatus::PENDING->value,
@@ -242,20 +258,32 @@ class ApplicationApprovalController extends Controller
         ]);
 
         if ($application->group_id) {
-            $group = \App\Models\InternshipGroup::find($application->group_id);
+            $group = InternshipGroup::find($application->group_id);
             if ($group) {
-                $group->update([
-                    'status' => 'pending',
-                    'rejection_reason' => $rejectionText,
-                ]);
-                Application::where('group_id', $group->id)
-                    ->where('id', '!=', $application->id)
-                    ->where('status', '!=', 'rejected')
-                    ->update([
-                        'status' => ApplicationStatus::PENDING->value,
-                        'rejection_note' => $rejectionText,
+                $shouldSyncSiblings = $request->boolean('sync_group', true);
+                if ($shouldSyncSiblings) {
+                    $group->update([
+                        'status' => 'pending',
                         'rejection_reason' => $rejectionText,
                     ]);
+                    Application::where('group_id', $group->id)
+                        ->where('id', '!=', $application->id)
+                        ->whereNotIn('status', ['rejected', 'resigned'])
+                        ->update([
+                            'status' => ApplicationStatus::PENDING->value,
+                            'rejection_note' => $rejectionText,
+                            'rejection_reason' => $rejectionText,
+                        ]);
+                } else {
+                    $nonRejectedStatuses = Application::where('group_id', $group->id)
+                        ->pluck('status')
+                        ->map(fn ($s) => $s instanceof ApplicationStatus ? $s->value : (string) $s)
+                        ->reject(fn ($s) => in_array($s, ['rejected', 'resigned'], true))
+                        ->unique();
+                    if ($nonRejectedStatuses->count() === 1) {
+                        $group->update(['status' => $nonRejectedStatuses->first()]);
+                    }
+                }
             }
         }
 

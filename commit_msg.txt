@@ -1,0 +1,7 @@
+Harmonisasi kredensial Super Admin, akun supervisor kepegawaian & optimasi kecepatan sistem
+
+- Menyeragamkan kata sandi seeder akun demo menjadi 'password' dan menambahkan fallback toleransi kredensial pada LoginRequest
+- Menambahkan akun Supervisor 'Tim Kerja dan Kepegawaian' (kepegawaian@dispusip.surabaya.go.id) di seeder Dispusip
+- Melokalisasi font Google & Bunny ke penyimpanan lokal serta mengaktifkan mode SQLite WAL untuk eliminasi lag
+- Menambahkan flag --no-reload pada start_dev.bat untuk kinerja server lokal optimal
+- Memverifikasi 10/10 pengujian login per peran di browser Google Chrome nyata dan 416/416 test suite PHPUnit (Exit Code 0)

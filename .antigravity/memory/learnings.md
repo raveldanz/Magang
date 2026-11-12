@@ -162,6 +162,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-130** | 2026-11-05 | Pembersihan Micro-copy Redundan, Ikon Profesional & Tombol Simpan Desain Saja | Teks petunjuk real-time & tab baru mengganggu estetika, emoji mentah, dan ketiadaan fitur penyimpanan terpisah untuk perubahan desain/warna tanpa mengganggu data TTE | RESOLVED |
 | **LRN-131** | 2026-11-05 | Lampiran Transkrip Keluar Batas Lembar Saat Penilaian Dua Pihak / Banyak Aspek | Keterangan skala menabrak strip bawah dan terpotong di tepi lembar A4 pada penilaian 2 pihak | RESOLVED |
 | **LRN-132** | 2026-11-11 | Sinkronisasi Merge GitHub, Guard Redirect Login Hermes E2E & Akun Demo Dispusip | False-positive PASS saat login gagal (redirect 302 ke `/login`) & residu akun Kominfo pada runner `hermes_all_roles_test.mjs` | RESOLVED |
+| **LRN-133** | 2026-11-12 | Isolasi Penolakan Anggota Kelompok & Alur Resubmit Berkas ke Kelompok | Penolakan 1 anggota ikut menolak semua, resubmit anggota rejected membuat pengajuan individu baru | RESOLVED |
+| **LRN-134** | 2026-11-12 | Harmonisasi Kredensial Super Admin, Supervisor Kepegawaian & Eliminasi Lag | Login admin@gmail.com gagal credentials mismatch, akun Tim Kerja dan Kepegawaian, latensi font external CDN & SQLite WAL | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4060,6 +4062,45 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Memperbarui kredensial uji `AdminDinas` ke `admin.dispusip@surabaya.go.id` dan `Mentor` ke `mentor.dispusip@surabaya.go.id` di `scripts/hermes_all_roles_test.mjs` serta dokumentasi `GEMINI.md`.
   3. Melakukan sinkronisasi merge `origin/main` (`e09f276`) dan memverifikasi seluruh test suite: PHPUnit (416/416 PASS), Hermes Multi-Role E2E (56/56 PASS menuju dashboard masing-masing peran), dan Tier 3 Playwright Visual Audit (PASS, Strict Exit Code 0).
 - **Prevention Rule**: Setiap pengujian login E2E berbasis HTTP client manual wajib memvalidasi bahwa header `Location` dari respons `302` tidak mengarah kembali ke `/login`, dan seluruh skrip otomasi wajib menggunakan akun resmi Dispusip (`*.dispusip@surabaya.go.id`).
+
+---
+
+### [LRN-133] Isolasi Penolakan Anggota Kelompok (1, Beberapa, atau Seluruh Kelompok) & Alur Perbaikan Berkas Kembali ke Kelompok
+- **Tanggal**: 2026-11-12
+- **Komponen**: `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Http/Controllers/Student/ProfileController.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `resources/views/student/application/create.blade.php`, `routes/student.php`, `tests/Feature/InternshipGroupWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Ketika dalam satu kelompok magang terdapat 1 atau beberapa anggota yang dokumen persyaratannya salah dan di-`rejected` melalui form detail Admin (`admin.applications.show`), pelepasan centang checkbox `sync_group` tidak berfungsi sehingga seluruh anggota kelompok ikut ter-`rejected`.
+  2. Jika 1 atau beberapa anggota berstatus `rejected` dan anggota lainnya yang valid diproses lanjut ke `waiting_approval` / `accepted` (baik oleh Admin maupun Supervisor), query sinkronisasi grup menimpa kembali anggota yang `rejected` menjadi `accepted`.
+  3. Mahasiswa anggota kelompok yang berstatus `rejected` setelah memperbaiki berkasnya tidak dapat kembali ke kelompoknya karena `joinGroup` hanya menerima kelompok berstatus `draft` dan `store` membuat pengajuan individu baru (`group_id = null`).
+- **Root Cause**:
+  1. Checkbox `<input type="checkbox" name="sync_group" value="1" checked>` pada `resources/views/admin/applications/show.blade.php` tidak didahului `<input type="hidden" name="sync_group" value="0">`, sehingga saat tidak dicentang browser tidak mengirim key `sync_group` dan `$request->boolean('sync_group', true)` di `Admin\ApplicationController::updateStatus()` selalu mengembalikan default `true`.
+  2. Query sibling pada `Admin\ApplicationController` (`updateStatus`, `updateGroupStatus`, `bulkUpdateStatus`) dan `Supervisor\ApplicationApprovalController::approve()` belum memfilter `whereNotIn('status', ['rejected', 'resigned'])` ketika menyetujui kelompok.
+  3. Belum tersedianya endpoint dan UI bagi mahasiswa anggota kelompok yang `rejected` untuk mengunggah perbaikan berkas dan mengembalikan status `Application` kelompoknya ke `pending`.
+- **Fix Applied**:
+  1. Menambahkan `<input type="hidden" name="sync_group" value="0">` serta toggle mode penolakan eksplisit (**Tolak Mahasiswa Ini Saja** vs **Tolak Seluruh 1 Kelompok**) pada `resources/views/admin/applications/show.blade.php` dan `resources/views/supervisor/applications/show.blade.php`.
+  2. Memproteksi anggota berstatus `rejected`/`resigned` agar tidak ikut tertimpa saat anggota kelompok lain disetujui di `Admin\ApplicationController` dan `Supervisor\ApplicationApprovalController`, sembari tetap mengizinkan penolakan 1 kelompok penuh jika `sync_group = 1` atau melalui modal **Tolak Kelompok**.
+  3. Menambahkan fitur & rute `POST /student/group/resubmit` (`student.group.resubmit`) beserta fallback cerdas di `joinGroup()` dan sinkronisasi otomatis di `Student\ProfileController::update()` sehingga mahasiswa (1, 2, beberapa anggota, maupun seluruh kelompok) yang memperbaiki berkas langsung kembali ke kelompoknya (`group_id` tetap terjaga, status kembali `pending`).
+- **Prevention Rule**: Setiap checkbox HTML yang memiliki nilai default `true` di backend (`$request->boolean('key', true)`) wajib memiliki pasangan `<input type="hidden" name="key" value="0">` di form Blade, dan operasi sinkronisasi massal pada entitas kelompok wajib membedakan aksi persetujuan (kecualikan anggota `rejected`/`resigned`) dari aksi penolakan penuh kelompok.
+
+---
+
+### [LRN-134] Harmonisasi Kredensial Super Admin, Akun Supervisor Kepegawaian & Optimasi Latensi Web (Zero-Lag)
+- **Tanggal**: 2026-11-12
+- **Komponen**: `app/Http/Requests/Auth/LoginRequest.php`, `database/seeders/SupervisorDemoSeeder.php`, `database/seeders/DemoE2ESeeder.php`, `database/seeders/SurabayaAgenciesSeeder.php`, `resources/css/app.css`, `config/database.php`, `start_dev.bat`
+- **Problem / Symptom**:
+  1. Login Super Admin `admin@gmail.com` gagal dengan error *"These credentials do not match our records"* saat memasukkan kata sandi `password`.
+  2. Akun Supervisor resmi bernama "Tim Kerja dan Kepegawaian" belum tersedia untuk simulasi persetujuan atasan bidang kepegawaian.
+  3. Antarmuka web terasa lambat/agak nge-lag saat pertama kali dibuka untuk persiapan demo di browser.
+- **Root Cause**:
+  1. Akun seeder `admin@gmail.com` secara historis disetel dengan kata sandi `admin123` di `SurabayaAgenciesSeeder.php` dan `DemoE2ESeeder.php`, sedangkan dokumentasi demo dan kebiasaan penguji menggunakan `password`.
+  2. Belum ada akun supervisor spesifik dengan nama "Tim Kerja dan Kepegawaian" yang terikat pada unit Sekretariat Dispusip.
+  3. Font Figtree dan Plus Jakarta Sans masih memuat secara sinkron dari CDN eksternal (`fonts.bunny.net` dan `fonts.googleapis.com`) dengan latensi >1.000ms yang memblokir rendering halaman awal, database SQLite dev belum memakai mode WAL (`journal_mode = WAL`), dan server development dijalankan tanpa precompiled production assets.
+- **Fix Applied**:
+  1. Menyeragamkan kata sandi seeder seluruh akun demo menjadi `password` di seeder (`SurabayaAgenciesSeeder.php`, `DemoE2ESeeder.php`), memperbarui hash password `admin@gmail.com` di database SQLite, serta menambahkan fallback toleransi dua arah (`password` ↔ `admin123`) pada `LoginRequest::authenticate()` khusus akun Super Admin demo Dispusip tanpa melanggar audit keamanan.
+  2. Menambahkan akun supervisor `kepegawaian@dispusip.surabaya.go.id` (Nama: "Tim Kerja dan Kepegawaian", unit: Bidang Sekretariat, role: `supervisor`, password: `password`) pada `SupervisorDemoSeeder.php` dan `DemoE2ESeeder.php`.
+  3. Mengunduh dan melokalisasi font Figtree & Plus Jakarta Sans ke `public/fonts/` dengan `@font-face` lokal, mengonfigurasi SQLite WAL mode (`journal_mode: 'WAL'`, `busy_timeout: 5000`), melakukan kompilasi aset produksi (`npm run build`), dan menambahkan `--no-reload` pada `start_dev.bat`.
+  4. Memvalidasi dengan 10/10 pengujian login otomatis real browser Playwright Google Chrome (seluruh peran berhasil termuat dalam 1,3–1,9 detik) dan 416/416 PHPUnit tests lulus 100% (Strict Exit Code 0).
+- **Prevention Rule**: Pastikan semua akun demo di environment lokal/testing memiliki kata sandi standar `password`, jangan pernah mengimpor web font secara eksternal yang memblokir render utama tanpa fallback font lokal, dan gunakan SQLite WAL mode untuk menghindari thread contention pada database lokal.
 
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 

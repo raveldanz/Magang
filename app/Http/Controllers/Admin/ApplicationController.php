@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
+use App\Models\InternshipGroup;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\Chat\ChatGroupService;
 use App\Services\NotificationService;
 use App\Services\PlacementAssignmentService;
 use Illuminate\Http\Request;
@@ -54,8 +56,8 @@ class ApplicationController extends Controller
         // Tampilkan 1 baris per pengajuan: pengajuan mandiri tampil mandiri, pengajuan kelompok diwakili ketua/baris utama kelompok
         $query->where(function ($q) {
             $q->whereNull('applications.group_id')
-              ->orWhere('applications.role_in_group', 'leader')
-              ->orWhereRaw('applications.id = (SELECT MIN(a2.id) FROM applications a2 WHERE a2.group_id = applications.group_id)');
+                ->orWhere('applications.role_in_group', 'leader')
+                ->orWhereRaw('applications.id = (SELECT MIN(a2.id) FROM applications a2 WHERE a2.group_id = applications.group_id)');
         });
 
         // Isolasi Bidang & Multi-Tenant:
@@ -102,9 +104,9 @@ class ApplicationController extends Controller
             } else {
                 $query->where(function ($q) use ($statusVal) {
                     $q->where('applications.status', $statusVal)
-                      ->orWhereHas('group.applications', function ($gq) use ($statusVal) {
-                          $gq->where('status', $statusVal);
-                      });
+                        ->orWhereHas('group.applications', function ($gq) use ($statusVal) {
+                            $gq->where('status', $statusVal);
+                        });
                 });
             }
         }
@@ -385,9 +387,18 @@ class ApplicationController extends Controller
 
         $year = date('Y');
         $paddedId = str_pad($application->id, 3, '0', STR_PAD_LEFT);
-        $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
+        $groupRef = $application->group_id ? InternshipGroup::find($application->group_id) : null;
+        $autoLetterNumber = ($groupRef && $groupRef->letter_number) ? $groupRef->letter_number : "500.12.1/{$paddedId}/436.7.14/{$year}";
         $letterToken = $application->letter_token ?: Str::random(32);
         $assignedMentorId = $request->mentor_id ?? $request->pembimbing_id;
+        if (! $assignedMentorId && $groupRef) {
+            $siblingPlacementWithMentor = Placement::whereHas('application', function ($q) use ($groupRef) {
+                $q->where('group_id', $groupRef->id);
+            })->whereNotNull('mentor_id')->first();
+            if ($siblingPlacementWithMentor) {
+                $assignedMentorId = $siblingPlacementWithMentor->mentor_id;
+            }
+        }
         $placementEligibleStatuses = ['waiting_approval', 'accepted', 'active', 'completed'];
 
         DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses, $user) {
@@ -462,7 +473,7 @@ class ApplicationController extends Controller
 
             // Sinkronkan seluruh anggota kelompok jika ini adalah pengajuan kelompok
             if ($application->group_id) {
-                $group = \App\Models\InternshipGroup::find($application->group_id);
+                $group = InternshipGroup::find($application->group_id);
                 if ($group) {
                     $shouldSyncSiblings = $request->boolean('sync_group', true);
 
@@ -475,9 +486,18 @@ class ApplicationController extends Controller
                             'rejection_reason' => $appUpdateData['rejection_reason'] ?? null,
                         ]);
 
-                        $siblingApps = Application::where('group_id', $group->id)
-                            ->where('id', '!=', $application->id)
-                            ->get();
+                        $siblingQuery = Application::where('group_id', $group->id)
+                            ->where('id', '!=', $application->id);
+
+                        // Jika keputusan kelompok adalah menyetujui/melanjutkan (bukan menolak seluruh kelompok),
+                        // jangan timpa anggota yang sedang ditolak berkasnya (rejected) atau mengundurkan diri (resigned).
+                        if ($newStatus !== 'rejected') {
+                            $siblingQuery->whereNotIn('status', ['rejected', 'resigned']);
+                        } else {
+                            $siblingQuery->whereNotIn('status', ['completed', 'resigned']);
+                        }
+
+                        $siblingApps = $siblingQuery->get();
 
                         foreach ($siblingApps as $sibling) {
                             $siblingUpdateData = $appUpdateData;
@@ -501,14 +521,27 @@ class ApplicationController extends Controller
                             }
                         }
                     } else {
-                        // Pembaruan individu: perbarui status agregat kelompok tanpa merusak anggota lain
-                        $groupStatuses = Application::where('group_id', $group->id)->pluck('status')->map(fn ($s) => $s instanceof \App\Enums\ApplicationStatus ? $s->value : (string) $s)->unique();
-                        if ($groupStatuses->count() === 1) {
-                            $group->update(['status' => $groupStatuses->first()]);
-                        } elseif ($groupStatuses->contains('accepted') || $groupStatuses->contains('active')) {
+                        // Pembaruan individu: perbarui status agregat kelompok berdasarkan anggota yang masih aktif (tidak ditolak/resigned)
+                        $allStatuses = Application::where('group_id', $group->id)
+                            ->pluck('status')
+                            ->map(fn ($s) => $s instanceof ApplicationStatus ? $s->value : (string) $s);
+                        $nonRejectedStatuses = $allStatuses->reject(fn ($s) => in_array($s, ['rejected', 'resigned'], true))->unique();
+
+                        if ($nonRejectedStatuses->isEmpty()) {
+                            $group->update([
+                                'status' => $allStatuses->contains('rejected') ? 'rejected' : ($allStatuses->first() ?: 'rejected'),
+                                'rejection_reason' => $appUpdateData['rejection_reason'] ?? $group->rejection_reason,
+                            ]);
+                        } elseif ($nonRejectedStatuses->count() === 1) {
+                            $group->update(['status' => $nonRejectedStatuses->first()]);
+                        } elseif ($nonRejectedStatuses->contains('active')) {
+                            $group->update(['status' => 'active']);
+                        } elseif ($nonRejectedStatuses->contains('accepted')) {
                             $group->update(['status' => 'accepted']);
-                        } elseif ($groupStatuses->contains('waiting_approval')) {
+                        } elseif ($nonRejectedStatuses->contains('waiting_approval')) {
                             $group->update(['status' => 'waiting_approval']);
+                        } elseif ($nonRejectedStatuses->contains('pending')) {
+                            $group->update(['status' => 'pending']);
                         }
                     }
                 }
@@ -527,7 +560,7 @@ class ApplicationController extends Controller
             // Sinkronkan grup bimbingan chat jika mentor ditetapkan/berganti
             if ($assignedMentorId && (! $oldMentor || (int) $oldMentor->id !== (int) $assignedMentorId)) {
                 try {
-                    $chatGroups = app(\App\Services\Chat\ChatGroupService::class);
+                    $chatGroups = app(ChatGroupService::class);
                     if ($oldMentor) {
                         $chatGroups->syncMentorGroup($oldMentor);
                     }
@@ -544,7 +577,7 @@ class ApplicationController extends Controller
                 $newAdvisorId = (int) $request->academic_advisor_id;
                 if (! $oldAdvisor || (int) $oldAdvisor->id !== $newAdvisorId) {
                     try {
-                        $chatGroups = app(\App\Services\Chat\ChatGroupService::class);
+                        $chatGroups = app(ChatGroupService::class);
                         if ($oldAdvisor) {
                             $chatGroups->syncDplGroup($oldAdvisor);
                         }
@@ -576,13 +609,22 @@ class ApplicationController extends Controller
 
         // Sinkronkan status kelompok jika pengajuan memiliki grup
         if ($application->group_id) {
-            $group = \App\Models\InternshipGroup::with('applications')->find($application->group_id);
+            $group = InternshipGroup::with('applications')->find($application->group_id);
             if ($group) {
-                $statuses = $group->applications->map(fn ($a) => $a->statusValue())->unique();
-                if ($statuses->count() === 1) {
-                    $group->update(['status' => $statuses->first()]);
-                } elseif ($statuses->contains('accepted') || $statuses->contains('active')) {
+                $allStatuses = $group->applications->map(fn ($a) => $a->statusValue());
+                $nonRejectedStatuses = $allStatuses->reject(fn ($s) => in_array($s, ['rejected', 'resigned'], true))->unique();
+                if ($nonRejectedStatuses->isEmpty()) {
+                    $group->update(['status' => $allStatuses->contains('rejected') ? 'rejected' : ($allStatuses->first() ?: 'rejected')]);
+                } elseif ($nonRejectedStatuses->count() === 1) {
+                    $group->update(['status' => $nonRejectedStatuses->first()]);
+                } elseif ($nonRejectedStatuses->contains('active')) {
+                    $group->update(['status' => 'active']);
+                } elseif ($nonRejectedStatuses->contains('accepted')) {
                     $group->update(['status' => 'accepted']);
+                } elseif ($nonRejectedStatuses->contains('waiting_approval')) {
+                    $group->update(['status' => 'waiting_approval']);
+                } elseif ($nonRejectedStatuses->contains('pending')) {
+                    $group->update(['status' => 'pending']);
                 }
             }
         }
@@ -601,7 +643,7 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
-        $group = \App\Models\InternshipGroup::with(['applications.user', 'unit'])->findOrFail($id);
+        $group = InternshipGroup::with(['applications.user', 'unit'])->findOrFail($id);
 
         if (! $isSuperAdmin && $user->agency_profile_id !== null && optional($group->unit)->agency_profile_id !== $user->agency_profile_id) {
             abort(403, 'Anda tidak memiliki hak akses ke data pengajuan instansi lain.');
@@ -626,11 +668,21 @@ class ApplicationController extends Controller
             $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
         }
 
+        $targetApplications = $group->applications;
+        if ($newStatus !== 'rejected') {
+            $targetApplications = $group->applications->reject(fn ($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true));
+            if ($targetApplications->isEmpty()) {
+                return redirect()->back()->with('error', 'Seluruh anggota dalam kelompok ini berstatus ditolak/mengundurkan diri. Tidak ada anggota aktif yang dapat disetujui.');
+            }
+        } else {
+            $targetApplications = $group->applications->reject(fn ($a) => in_array($a->statusValue(), ['completed', 'resigned'], true));
+        }
+
         $year = date('Y');
         $letterDate = date('Y-m-d');
         $letterToken = $group->letter_token ?: Str::random(32);
 
-        DB::transaction(function () use ($group, $newStatus, $request, $year, $letterDate, $letterToken) {
+        DB::transaction(function () use ($group, $targetApplications, $newStatus, $request, $year, $letterDate, $letterToken) {
             $group->update([
                 'status' => $newStatus,
                 'rejection_reason' => $newStatus === 'rejected' ? $request->rejection_note : null,
@@ -638,7 +690,7 @@ class ApplicationController extends Controller
                 'letter_token' => in_array($newStatus, ['waiting_approval', 'accepted']) ? $letterToken : $group->letter_token,
             ]);
 
-            foreach ($group->applications as $app) {
+            foreach ($targetApplications as $app) {
                 $paddedId = str_pad($app->id, 3, '0', STR_PAD_LEFT);
                 $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
 
@@ -746,7 +798,9 @@ class ApplicationController extends Controller
             // Kuota Check jika accepted
             if ($action === 'accepted') {
                 if ($unit) {
-                    $groupSize = $application->group ? $application->group->applications()->count() : 1;
+                    $groupSize = $application->group
+                        ? $application->group->applications()->whereNotIn('status', ['rejected', 'resigned'])->count()
+                        : 1;
                     $overlappingInterns = $unit->applications()
                         ->whereIn('status', ['accepted', 'active'])
                         ->where('id', '!=', $application->id)
@@ -820,7 +874,7 @@ class ApplicationController extends Controller
 
                 // Sinkronkan seluruh anggota kelompok jika pengajuan kelompok diproses massal
                 if ($application->group_id) {
-                    $group = \App\Models\InternshipGroup::find($application->group_id);
+                    $group = InternshipGroup::find($application->group_id);
                     if ($group) {
                         $group->update([
                             'status' => $effectiveAction,
@@ -830,9 +884,14 @@ class ApplicationController extends Controller
                             'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
                         ]);
 
-                        $siblingApps = Application::where('group_id', $group->id)
-                            ->where('id', '!=', $application->id)
-                            ->get();
+                        $siblingQuery = Application::where('group_id', $group->id)
+                            ->where('id', '!=', $application->id);
+                        if ($effectiveAction !== 'rejected') {
+                            $siblingQuery->whereNotIn('status', ['rejected', 'resigned']);
+                        } else {
+                            $siblingQuery->whereNotIn('status', ['completed', 'resigned']);
+                        }
+                        $siblingApps = $siblingQuery->get();
 
                         foreach ($siblingApps as $sibling) {
                             $sibling->update([

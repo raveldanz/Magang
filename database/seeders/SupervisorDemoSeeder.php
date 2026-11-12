@@ -69,11 +69,24 @@ class SupervisorDemoSeeder extends Seeder
             ['description' => 'Preservasi, digitalisasi arsip bersejarah, restorasi naskah kuno, dan penyelamatan memori kolektif daerah.', 'quota' => 10]
         );
 
-        // 3. Akun Supervisor Utama (Untuk Login Pengujian)
+        // 3. Akun Supervisor Utama & Kepegawaian (Untuk Login Pengujian)
         $supervisorDispusip = User::updateOrCreate(
             ['email' => 'supervisor@dispusip.surabaya.go.id'],
             [
                 'name' => 'Bambang Supriyadi, S.Sos., M.AP',
+                'password' => $defaultPassword,
+                'role' => 'supervisor',
+                'agency_profile_id' => $dispusip->id,
+                'unit_id' => $unitSekretariat->id,
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $supervisorKepegawaian = User::updateOrCreate(
+            ['email' => 'kepegawaian@dispusip.surabaya.go.id'],
+            [
+                'name' => 'Tim Kerja dan Kepegawaian',
                 'password' => $defaultPassword,
                 'role' => 'supervisor',
                 'agency_profile_id' => $dispusip->id,

@@ -99,7 +99,7 @@ class SurabayaAgenciesSeeder extends Seeder
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Super Admin Dispusip',
-                'password' => Hash::make('admin123'),
+                'password' => $defaultPassword,
                 'role' => 'super_admin',
                 'agency_profile_id' => $dispusip->id,
                 'status' => 'active',

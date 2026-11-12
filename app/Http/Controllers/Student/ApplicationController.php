@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
+use App\Models\AuditLog;
 use App\Models\InternshipGroup;
 use App\Models\Unit;
 use App\Models\User;
@@ -51,16 +52,22 @@ class ApplicationController extends Controller
             ->first();
 
         // 3. Ambil seluruh riwayat pengajuan mahasiswa
-        $applicationHistory = Application::with(['unit.agencyProfile', 'group'])
+        $applicationHistory = Application::with(['unit.agencyProfile', 'group.leader', 'group.applications.user.studentProfile'])
             ->where('user_id', $user->id)
             ->latest()
             ->get();
+
+        // 3b. Cek apakah pengajuan terakhir mahasiswa adalah anggota kelompok yang ditolak (perlu perbaikan berkas untuk kembali ke kelompoknya)
+        $latestApp = $applicationHistory->first();
+        $rejectedGroupApplication = (! $activeApplication && ! $draftGroup && $latestApp && $latestApp->statusValue() === 'rejected' && $latestApp->group_id && $latestApp->group)
+            ? $latestApp
+            : null;
 
         $agencies = AgencyProfile::orderBy('agency_name')->get();
         $defaultAgency = $agencies->first();
         $maxGroupMembers = 100;
 
-        return view('student.application.create', compact('units', 'groupedUnits', 'agencies', 'activeApplication', 'draftGroup', 'applicationHistory', 'maxGroupMembers'));
+        return view('student.application.create', compact('units', 'groupedUnits', 'agencies', 'activeApplication', 'draftGroup', 'applicationHistory', 'maxGroupMembers', 'rejectedGroupApplication'));
     }
 
     // Menyimpan data pengajuan magang & upload dokumen
@@ -269,7 +276,7 @@ class ApplicationController extends Controller
         DB::transaction(function () use ($user, $request) {
             $group = InternshipGroup::create([
                 'code' => InternshipGroup::generateUniqueCode(),
-                'name' => $request->name ?: ('Kelompok ' . $user->name),
+                'name' => $request->name ?: ('Kelompok '.$user->name),
                 'leader_user_id' => $user->id,
                 'unit_id' => $request->unit_id,
                 'start_date' => $request->start_date,
@@ -327,6 +334,18 @@ class ApplicationController extends Controller
         $group = InternshipGroup::with(['leader.studentProfile', 'unit'])->where('code', $code)->where('status', 'draft')->first();
 
         if (! $group) {
+            $existingGroup = InternshipGroup::with(['leader.studentProfile', 'unit'])->where('code', $code)->first();
+            if ($existingGroup) {
+                $rejectedMemberApp = Application::where('group_id', $existingGroup->id)
+                    ->where('user_id', $user->id)
+                    ->where('status', 'rejected')
+                    ->latest()
+                    ->first();
+                if ($rejectedMemberApp) {
+                    return $this->resubmitToExistingGroup($request, $rejectedMemberApp, $existingGroup);
+                }
+            }
+
             return redirect()->back()->with('error', 'Kode kelompok tidak valid atau pendaftaran kelompok tersebut sudah dikirim/ditutup.');
         }
 
@@ -334,7 +353,7 @@ class ApplicationController extends Controller
         $leaderUnivId = $group->leader?->university_id;
         $userUnivId = $user->university_id;
         if ($leaderUnivId && $userUnivId && $leaderUnivId !== $userUnivId) {
-            return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk mahasiswa dari ' . ($group->leader->university ?? 'kampus lain') . '.');
+            return redirect()->back()->with('error', 'Anda tidak dapat bergabung karena kelompok ini dikhususkan untuk mahasiswa dari '.($group->leader->university ?? 'kampus lain').'.');
         }
 
         // Validasi batas maksimal aman anggota kelompok standar 100 orang
@@ -441,7 +460,7 @@ class ApplicationController extends Controller
         }
 
         $request->validate([
-            'surat_pengantar' => 'required|' . UploadRules::APPLICATION_DOCUMENT,
+            'surat_pengantar' => 'required|'.UploadRules::APPLICATION_DOCUMENT,
         ], [
             'surat_pengantar.required' => 'Surat Pengantar / Proposal magang kelompok wajib diunggah.',
             'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
@@ -495,5 +514,205 @@ class ApplicationController extends Controller
 
         return redirect()->route('student.application.create')
             ->with('success', 'Pengajuan kelompok magang berhasil dikirim ke Admin Dinas untuk diverifikasi!');
+    }
+
+    /**
+     * Mahasiswa anggota kelompok yang berstatus rejected memperbaiki berkas & mengajukan ulang kembali ke kelompoknya.
+     */
+    public function resubmitGroupMember(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user->studentProfile) {
+            return redirect()->route('student.profile.edit')
+                ->with('error', 'Silakan lengkapi profil Anda terlebih dahulu.');
+        }
+
+        $hasActive = Application::where('user_id', $user->id)
+            ->whereIn('status', ['draft', 'pending', 'waiting_approval', 'accepted', 'active', 'completed'])
+            ->exists();
+        if ($hasActive) {
+            return redirect()->route('student.application.create')
+                ->with('error', 'Anda sudah memiliki pengajuan magang aktif yang sedang diproses.');
+        }
+
+        $application = Application::with(['group', 'unit'])
+            ->where('user_id', $user->id)
+            ->whereNotNull('group_id')
+            ->where('status', 'rejected')
+            ->latest()
+            ->first();
+
+        if (! $application || ! $application->group) {
+            return redirect()->route('student.application.create')
+                ->with('error', 'Data pengajuan kelompok yang perlu diperbaiki tidak ditemukan.');
+        }
+
+        $request->validate([
+            'cv' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
+            'transkrip' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
+            'id_card' => 'nullable|'.UploadRules::APPLICATION_ID_CARD,
+            'surat_pengantar' => 'nullable|'.UploadRules::APPLICATION_DOCUMENT,
+        ], [
+            'cv.mimes' => 'File CV harus berformat PDF.',
+            'cv.max' => 'Ukuran file CV maksimal 2MB (2048 KB).',
+            'transkrip.mimes' => 'File Transkrip Nilai harus berformat PDF.',
+            'transkrip.max' => 'Ukuran file Transkrip Nilai maksimal 2MB (2048 KB).',
+            'id_card.mimes' => 'File KTM atau Kartu Identitas harus berformat PDF, JPG, JPEG, atau PNG.',
+            'id_card.max' => 'Ukuran file KTM atau Kartu Identitas maksimal 2MB (2048 KB).',
+            'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
+            'surat_pengantar.max' => 'Ukuran file Surat Pengantar maksimal 2MB (2048 KB).',
+        ]);
+
+        return $this->resubmitToExistingGroup($request, $application, $application->group);
+    }
+
+    /**
+     * Proses inti sinkronisasi berkas perbaikan & pengembalian status anggota ke dalam kelompok yang sama.
+     */
+    protected function resubmitToExistingGroup(Request $request, Application $application, InternshipGroup $group)
+    {
+        $user = Auth::user();
+        $profile = $user->studentProfile;
+        $storage = app(PrivateDocumentStorage::class);
+
+        $cvPath = $profile->cv_path;
+        $transcriptPath = $profile->transcript_path;
+        $idCardPath = $profile->id_card_path;
+
+        if ($request->hasFile('cv')) {
+            $cvPath = $storage->store($request->file('cv'), 'documents/student-profiles');
+        }
+        if ($request->hasFile('transkrip')) {
+            $transcriptPath = $storage->store($request->file('transkrip'), 'documents/student-profiles');
+        }
+        if ($request->hasFile('id_card')) {
+            $idCardPath = $storage->store($request->file('id_card'), 'documents/student-profiles');
+        }
+
+        if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
+            $profile->update([
+                'cv_path' => $cvPath,
+                'transcript_path' => $transcriptPath,
+                'id_card_path' => $idCardPath,
+            ]);
+        }
+
+        if (empty($cvPath) || empty($transcriptPath) || empty($idCardPath)) {
+            return redirect()->back()->with('error', 'Berkas personal (CV, Transkrip Nilai, dan KTM) wajib lengkap sebelum mengajukan ulang ke kelompok.');
+        }
+
+        $newProposalPath = null;
+        if ($request->hasFile('surat_pengantar')) {
+            $newProposalPath = $storage->storeApplicationDocument($request->file('surat_pengantar'));
+        }
+
+        $finalProposalPath = $newProposalPath ?: ($application->proposal_letter_path ?: $group->proposal_letter_path);
+
+        DB::transaction(function () use ($application, $group, $user, $cvPath, $transcriptPath, $idCardPath, $newProposalPath, $finalProposalPath, $request) {
+            $application->update([
+                'status' => 'pending',
+                'rejection_note' => null,
+                'rejection_reason' => null,
+                'cv_path' => $cvPath,
+                'transcript_path' => $transcriptPath,
+                'id_card_path' => $idCardPath,
+                'proposal_letter_path' => $finalProposalPath,
+            ]);
+
+            if ($finalProposalPath) {
+                ApplicationDocument::updateOrCreate(
+                    ['application_id' => $application->id, 'document_type' => 'Surat Pengantar'],
+                    ['file_path' => $finalProposalPath]
+                );
+            }
+
+            ApplicationDocument::updateOrCreate(
+                ['application_id' => $application->id, 'document_type' => 'CV'],
+                ['file_path' => $cvPath]
+            );
+            ApplicationDocument::updateOrCreate(
+                ['application_id' => $application->id, 'document_type' => 'Transkrip Nilai'],
+                ['file_path' => $transcriptPath]
+            );
+            ApplicationDocument::updateOrCreate(
+                ['application_id' => $application->id, 'document_type' => 'KTM / Kartu Identitas'],
+                ['file_path' => $idCardPath]
+            );
+
+            // Jika ketua mengunggah surat pengantar baru, perbarui juga surat pengantar kelompok
+            if ($newProposalPath && ($application->role_in_group === 'leader' || (int) $group->leader_user_id === (int) $user->id)) {
+                $group->update(['proposal_letter_path' => $newProposalPath]);
+            }
+
+            // Jika seluruh kelompok sebelumnya ditolak dan Ketua memilih mengajukan ulang seluruh kelompok bersama-sama
+            if ($request->boolean('resubmit_entire_group') && ($application->role_in_group === 'leader' || (int) $group->leader_user_id === (int) $user->id)) {
+                $rejectedSiblings = Application::where('group_id', $group->id)
+                    ->where('id', '!=', $application->id)
+                    ->where('status', 'rejected')
+                    ->get();
+
+                foreach ($rejectedSiblings as $sibling) {
+                    $sibProfile = $sibling->user?->studentProfile;
+                    $sibCv = $sibProfile?->cv_path ?: $sibling->cv_path;
+                    $sibTranscript = $sibProfile?->transcript_path ?: $sibling->transcript_path;
+                    $sibIdCard = $sibProfile?->id_card_path ?: $sibling->id_card_path;
+                    $sibProposal = $newProposalPath ?: ($sibling->proposal_letter_path ?: $finalProposalPath);
+
+                    $sibling->update([
+                        'status' => 'pending',
+                        'rejection_note' => null,
+                        'rejection_reason' => null,
+                        'cv_path' => $sibCv,
+                        'transcript_path' => $sibTranscript,
+                        'id_card_path' => $sibIdCard,
+                        'proposal_letter_path' => $sibProposal,
+                    ]);
+
+                    if ($sibProposal) {
+                        ApplicationDocument::updateOrCreate(
+                            ['application_id' => $sibling->id, 'document_type' => 'Surat Pengantar'],
+                            ['file_path' => $sibProposal]
+                        );
+                    }
+                    if ($sibCv) {
+                        ApplicationDocument::updateOrCreate(
+                            ['application_id' => $sibling->id, 'document_type' => 'CV'],
+                            ['file_path' => $sibCv]
+                        );
+                    }
+                    if ($sibTranscript) {
+                        ApplicationDocument::updateOrCreate(
+                            ['application_id' => $sibling->id, 'document_type' => 'Transkrip Nilai'],
+                            ['file_path' => $sibTranscript]
+                        );
+                    }
+                    if ($sibIdCard) {
+                        ApplicationDocument::updateOrCreate(
+                            ['application_id' => $sibling->id, 'document_type' => 'KTM / Kartu Identitas'],
+                            ['file_path' => $sibIdCard]
+                        );
+                    }
+                }
+            }
+
+            // Jika status kelompok sebelumnya rejected atau draft, kembalikan ke pending
+            if (in_array($group->status, ['rejected', 'draft'], true)) {
+                $group->update([
+                    'status' => 'pending',
+                    'rejection_reason' => null,
+                ]);
+            }
+
+            AuditLog::record('GROUP_MEMBER_RESUBMIT', 'Application', $application->id, [
+                'group_id' => $group->id,
+                'group_name' => $group->name,
+                'student_name' => $user->name,
+                'resubmit_entire_group' => $request->boolean('resubmit_entire_group'),
+            ]);
+        });
+
+        return redirect()->route('student.application.create')
+            ->with('success', "Perbaikan berkas berhasil dikirim! Anda telah kembali terdaftar aktif pada kelompok '{$group->name}' dan sedang menunggu verifikasi Admin Dinas.");
     }
 }

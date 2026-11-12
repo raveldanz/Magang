@@ -13,4 +13,5 @@ echo [2/3] Membuka Vite dev bundler di window baru...
 start "Vite Dev" cmd /k "npm run dev"
 
 echo [3/3] Menjalankan server Laravel di http://127.0.0.1:8000 ...
-"C:\Users\TK ABA SBY 69 (3)\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe" artisan serve --port=8000
+set PHP_CLI_SERVER_WORKERS=4
+"C:\Users\TK ABA SBY 69 (3)\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe" artisan serve --port=8000 --no-reload

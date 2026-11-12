@@ -415,9 +415,15 @@
             @endphp
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
-                     status: '{{ old('status', $currentStatusVal) }}' 
+                     status: '{{ old('status', $currentStatusVal) }}',
+                     syncGroup: {{ old('sync_group', $currentStatusVal === 'rejected' ? '0' : '1') == '1' ? 'true' : 'false' }}
                  }"
                  x-init="$watch('status', val => {
+                     if (val === 'rejected') {
+                         syncGroup = false;
+                     } else {
+                         syncGroup = true;
+                     }
                      const sel = document.getElementById('status-select');
                      if (sel) {
                          sel.value = val;
@@ -486,16 +492,45 @@
                     @endif
 
                     @if($application->group_id && $application->group)
-                        <div class="mb-5 p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200 flex items-start gap-3 shadow-2xs">
-                            <input type="checkbox" id="sync_group" name="sync_group" value="1" checked
-                                   class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
-                            <div class="flex-1">
-                                <label for="sync_group" class="text-xs font-bold text-indigo-950 cursor-pointer select-none">
-                                    Terapkan keputusan ini ke seluruh anggota kelompok ({{ $application->group->name }})
-                                </label>
-                                <p class="text-[11px] text-indigo-700 mt-0.5 leading-relaxed">
-                                    Centang opsi ini agar keputusan status, surat balasan, tanggal pelaksanaan, dan penugasan mentor diterapkan ke {{ $application->group->applications->count() }} anggota tim sekaligus. <strong>Hilangkan centang</strong> jika ingin memproses mahasiswa ini secara mandiri (khusus individu).
-                                </p>
+                        <div class="mb-5 p-4 rounded-2xl border shadow-2xs transition-colors"
+                             :class="status === 'rejected' ? (syncGroup ? 'bg-rose-50/90 border-rose-300' : 'bg-amber-50/80 border-amber-200') : 'bg-indigo-50/80 border-indigo-200'">
+                            <div class="flex items-start gap-3">
+                                <input type="hidden" name="sync_group" value="0">
+                                <input type="checkbox" id="sync_group" name="sync_group" value="1" x-model="syncGroup"
+                                       class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                <div class="flex-1 space-y-2">
+                                    <div>
+                                        <label for="sync_group" class="text-xs font-bold text-slate-900 cursor-pointer select-none block">
+                                            Terapkan keputusan ini ke seluruh anggota kelompok ({{ $application->group->name }})
+                                        </label>
+                                        <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed" x-show="status !== 'rejected'">
+                                            Centang opsi ini agar keputusan status, surat balasan, tanggal pelaksanaan, dan penugasan mentor diterapkan ke seluruh anggota tim yang aktif sekaligus (anggota yang sedang berstatus ditolak tidak akan ikut tertimpa sebelum memperbaiki berkasnya). <strong>Hilangkan centang</strong> jika ingin memproses mahasiswa ini secara mandiri.
+                                        </p>
+                                        <p class="text-[11px] mt-0.5 leading-relaxed" x-show="status === 'rejected'" :class="syncGroup ? 'text-rose-800 font-semibold' : 'text-amber-900'">
+                                            <span x-show="!syncGroup">
+                                                <strong>Mode Penolakan Individu (Perbaikan Berkas Anggota):</strong> Hanya berkas <strong>{{ $application->user->name }}</strong> yang ditolak agar mahasiswa ini dapat memperbaiki &amp; mengunggah ulang berkasnya kembali ke kelompok ini. Anggota kelompok lainnya tetap berjalan.
+                                            </span>
+                                            <span x-show="syncGroup">
+                                                <strong>Mode Penolakan Seluruh Kelompok:</strong> Seluruh {{ $application->group->applications->count() }} anggota dalam kelompok <strong>{{ $application->group->name }}</strong> akan ditolak secara serentak.
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <div x-show="status === 'rejected'" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                                        <button type="button"
+                                                @click="syncGroup = false"
+                                                :class="!syncGroup ? 'bg-amber-600 text-white border-amber-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50'"
+                                                class="px-3 py-2 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <span>Tolak Mahasiswa Ini Saja (Perbaikan Berkas)</span>
+                                        </button>
+                                        <button type="button"
+                                                @click="syncGroup = true"
+                                                :class="syncGroup ? 'bg-rose-600 text-white border-rose-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-rose-50'"
+                                                class="px-3 py-2 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <span>Tolak Seluruh 1 Kelompok ({{ $application->group->applications->count() }} Orang)</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endif

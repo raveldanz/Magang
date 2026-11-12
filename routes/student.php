@@ -4,6 +4,7 @@ use App\Http\Controllers\Student\ApplicationController as StudentApplicationCont
 use App\Http\Controllers\Student\CertificateController as StudentCertificateController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\FinalReportController as StudentFinalReportController;
+use App\Http\Controllers\Student\InternshipProjectController;
 use App\Http\Controllers\Student\LogbookController as StudentLogbookController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::post('/student/group/remove-member', [StudentApplicationController::class, 'removeMember'])->name('student.group.remove_member');
     Route::post('/student/group/cancel', [StudentApplicationController::class, 'cancelGroup'])->name('student.group.cancel');
     Route::post('/student/group/submit', [StudentApplicationController::class, 'submitGroup'])->name('student.group.submit');
+    Route::post('/student/group/resubmit', [StudentApplicationController::class, 'resubmitGroupMember'])->name('student.group.resubmit');
 
     // Logbook Magang
     Route::get('/student/logbook', [StudentLogbookController::class, 'index'])->name('student.logbook.index');
@@ -43,11 +45,11 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     // Laporan Akhir & E-Sertifikat
     Route::get('/student/final-report', [StudentFinalReportController::class, 'index'])->name('student.final_report.index');
     Route::post('/student/final-report', [StudentFinalReportController::class, 'store'])->name('student.final_report.store');
-    Route::get('/student/projects/create', [\App\Http\Controllers\Student\InternshipProjectController::class, 'create'])->name('student.projects.create');
-    Route::post('/student/projects', [\App\Http\Controllers\Student\InternshipProjectController::class, 'store'])->name('student.projects.store');
-    Route::get('/student/projects/{id}/edit', [\App\Http\Controllers\Student\InternshipProjectController::class, 'edit'])->name('student.projects.edit');
-    Route::put('/student/projects/{id}', [\App\Http\Controllers\Student\InternshipProjectController::class, 'update'])->name('student.projects.update');
-    Route::delete('/student/projects/{id}', [\App\Http\Controllers\Student\InternshipProjectController::class, 'destroy'])->name('student.projects.destroy');
+    Route::get('/student/projects/create', [InternshipProjectController::class, 'create'])->name('student.projects.create');
+    Route::post('/student/projects', [InternshipProjectController::class, 'store'])->name('student.projects.store');
+    Route::get('/student/projects/{id}/edit', [InternshipProjectController::class, 'edit'])->name('student.projects.edit');
+    Route::put('/student/projects/{id}', [InternshipProjectController::class, 'update'])->name('student.projects.update');
+    Route::delete('/student/projects/{id}', [InternshipProjectController::class, 'destroy'])->name('student.projects.destroy');
     Route::get('/student/certificate/{placementId}/download', [StudentCertificateController::class, 'download'])->name('student.certificate.download');
     Route::get('/student/certificate/{id}', [StudentCertificateController::class, 'show'])->name('student.certificate.show');
 

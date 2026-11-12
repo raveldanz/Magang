@@ -240,8 +240,11 @@
                                     <span>Setujui & Terbitkan Surat</span>
                                 </button>
                                 @if($application->group_id && $application->group)
+                                    @php
+                                        $eligibleGroupCount = $application->group->applications->reject(fn($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true))->count();
+                                    @endphp
                                     <p class="text-[11px] text-center text-slate-500 font-medium mt-2.5">
-                                        ⚡ Otomatis menyetujui seluruh anggota kelompok <strong>{{ $application->group->name }}</strong> sejumlah {{ $application->group->applications->count() }} orang.
+                                        Otomatis menyetujui seluruh anggota kelompok <strong>{{ $application->group->name }}</strong> yang memenuhi syarat sejumlah {{ $eligibleGroupCount }} orang.
                                     </p>
                                 @endif
                             </form>
@@ -265,6 +268,17 @@
                                 <div x-show="openReject" x-cloak class="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                                     <form method="POST" action="{{ route('supervisor.applications.revise', $application->id) }}">
                                         @csrf
+                                        @if($application->group_id && $application->group)
+                                            <div class="mb-3 p-3 rounded-xl bg-white border border-slate-200 flex items-start gap-2.5">
+                                                <input type="hidden" name="sync_group" value="0">
+                                                <input type="checkbox" id="sup_sync_group" name="sync_group" value="1" checked
+                                                       class="w-4 h-4 mt-0.5 rounded border-rose-300 text-rose-600 focus:ring-rose-500 cursor-pointer">
+                                                <label for="sup_sync_group" class="text-[11px] text-slate-700 leading-snug cursor-pointer select-none">
+                                                    <strong class="text-slate-900 block">Terapkan ke seluruh anggota kelompok ({{ $application->group->name }})</strong>
+                                                    Hilangkan centang jika hanya ingin mengembalikan berkas mahasiswa ini saja.
+                                                </label>
+                                            </div>
+                                        @endif
                                         <label class="block text-xs font-bold text-slate-800">
                                             Catatan Penolakan:
                                         </label>

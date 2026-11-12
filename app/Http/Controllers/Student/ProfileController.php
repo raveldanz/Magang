@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Application;
+use App\Models\ApplicationDocument;
 use App\Models\AuditLog;
 use App\Models\StudentProfile;
 use App\Models\University;
@@ -195,6 +197,40 @@ class ProfileController extends Controller
                 'id_card_path' => $idCardPath,
             ]
         );
+
+        // Sinkronkan path berkas personal terbaru ke pengajuan yang sedang berjalan atau menunggu perbaikan
+        if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
+            $syncableApps = Application::where('user_id', $user->id)
+                ->whereIn('status', ['draft', 'pending', 'waiting_approval', 'rejected'])
+                ->get();
+
+            foreach ($syncableApps as $app) {
+                $app->update([
+                    'cv_path' => $cvPath,
+                    'transcript_path' => $transcriptPath,
+                    'id_card_path' => $idCardPath,
+                ]);
+
+                if ($cvPath) {
+                    ApplicationDocument::updateOrCreate(
+                        ['application_id' => $app->id, 'document_type' => 'CV'],
+                        ['file_path' => $cvPath]
+                    );
+                }
+                if ($transcriptPath) {
+                    ApplicationDocument::updateOrCreate(
+                        ['application_id' => $app->id, 'document_type' => 'Transkrip Nilai'],
+                        ['file_path' => $transcriptPath]
+                    );
+                }
+                if ($idCardPath) {
+                    ApplicationDocument::updateOrCreate(
+                        ['application_id' => $app->id, 'document_type' => 'KTM / Kartu Identitas'],
+                        ['file_path' => $idCardPath]
+                    );
+                }
+            }
+        }
 
         $message = $university->is_verified
             ? (session('university_auto_matched')

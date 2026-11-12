@@ -46,8 +46,155 @@
                         </p>
                     </div>
                     <p class="text-[11px] text-red-600">
-                        Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.
+                        @if(!empty($rejectedGroupApplication))
+                            Anda dapat memperbaiki/mengunggah ulang berkas yang salah pada kartu <strong>Perbaikan Berkas Anggota Kelompok</strong> di bawah untuk langsung kembali ke kelompok Anda, atau membuat pengajuan baru.
+                        @else
+                            Silakan buat pengajuan baru di bawah dengan melengkapi/memperbaiki berkas sesuai catatan admin di atas.
+                        @endif
                     </p>
+                </div>
+            @endif
+
+            <!-- Kartu Khusus: Perbaikan Berkas Anggota Kelompok & Kembali ke Kelompok Semula -->
+            @if (!empty($rejectedGroupApplication) && $rejectedGroupApplication->group)
+                @php
+                    $rejGroup = $rejectedGroupApplication->group;
+                    $rejMembers = $rejGroup->applications;
+                    $otherRejectedCount = $rejMembers->where('id', '!=', $rejectedGroupApplication->id)->filter(fn($a) => $a->statusValue() === 'rejected')->count();
+                    $activeSiblingsCount = $rejMembers->where('id', '!=', $rejectedGroupApplication->id)->reject(fn($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true))->count();
+                    $isRejLeader = $rejectedGroupApplication->role_in_group === 'leader' || (int) $rejGroup->leader_user_id === (int) Auth::id();
+                    $studentProf = Auth::user()->studentProfile;
+                @endphp
+                <div class="bg-white rounded-2xl border-2 border-indigo-200 shadow-sm p-6 sm:p-7 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-indigo-100">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-600 text-white">
+                                    Perbaikan Berkas Kelompok
+                                </span>
+                                <span class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                    Kode: {{ $rejGroup->code }}
+                                </span>
+                                @if($activeSiblingsCount > 0)
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        {{ $activeSiblingsCount }} Rekan Tim Tetap Berjalan di Kelompok Ini
+                                    </span>
+                                @endif
+                            </div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-slate-900">
+                                Kembalikan Pengajuan ke Kelompok: {{ $rejGroup->name }}
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Perbaiki dokumen yang ditolak sesuai catatan Admin di atas lalu kirim ulang. Pengajuan Anda akan langsung kembali terhubung ke kelompok <strong>{{ $rejGroup->name }}</strong> pada <strong>{{ $rejectedGroupApplication->unit->name ?? '-' }}</strong> tanpa perlu membuat kelompok baru.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Ringkasan Status Anggota Kelompok Saat Ini -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                        <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                            <span>Status Anggota Kelompok ({{ $rejMembers->count() }} Mahasiswa):</span>
+                            <span class="text-[11px] font-normal text-slate-500">
+                                Periode: {{ \Carbon\Carbon::parse($rejectedGroupApplication->start_date)->translatedFormat('d M Y') }} – {{ \Carbon\Carbon::parse($rejectedGroupApplication->end_date)->translatedFormat('d M Y') }}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            @foreach($rejMembers as $mApp)
+                                @php $mSt = $mApp->statusValue(); @endphp
+                                <div class="p-2.5 rounded-xl border flex items-center justify-between gap-2 {{ $mApp->id === $rejectedGroupApplication->id ? 'bg-rose-50/70 border-rose-200' : 'bg-white border-slate-200' }}">
+                                    <div class="min-w-0">
+                                        <div class="text-xs font-bold text-slate-900 truncate">
+                                            {{ $mApp->user?->name }} {{ $mApp->id === $rejectedGroupApplication->id ? '(Anda)' : '' }}
+                                        </div>
+                                        <div class="text-[10px] text-slate-500 font-mono">
+                                            {{ $mApp->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }} &bull; NIM: {{ $mApp->user?->studentProfile?->nim ?? '-' }}
+                                        </div>
+                                    </div>
+                                    <x-status-badge :status="$mApp->status" />
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Form Upload Ulang Berkas & Resubmit ke Kelompok -->
+                    <form action="{{ route('student.group.resubmit') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <div class="text-xs font-bold text-slate-800">
+                            Unggah Berkas Perbaikan (Pilih berkas yang perlu diganti; berkas yang tidak diunggah ulang akan tetap menggunakan berkas terakhir di profil Anda):
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- 1. CV -->
+                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <label for="resubmit_cv" class="text-xs font-bold text-slate-800">1. Curriculum Vitae (CV) - PDF</label>
+                                    @if(!empty($studentProf?->cv_path))
+                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'cv']) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
+                                    @endif
+                                </div>
+                                <input type="file" id="resubmit_cv" name="cv" accept=".pdf"
+                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
+                            </div>
+
+                            <!-- 2. Transkrip Nilai -->
+                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <label for="resubmit_transkrip" class="text-xs font-bold text-slate-800">2. Transkrip Nilai - PDF</label>
+                                    @if(!empty($studentProf?->transcript_path))
+                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'transkrip']) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
+                                    @endif
+                                </div>
+                                <input type="file" id="resubmit_transkrip" name="transkrip" accept=".pdf"
+                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
+                            </div>
+
+                            <!-- 3. KTM -->
+                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <label for="resubmit_id_card" class="text-xs font-bold text-slate-800">3. KTM / Kartu Identitas (PDF/JPG/PNG)</label>
+                                    @if(!empty($studentProf?->id_card_path))
+                                        <a href="{{ route('student.document', ['userId' => Auth::id(), 'type' => 'id_card']) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Saat Ini</a>
+                                    @endif
+                                </div>
+                                <input type="file" id="resubmit_id_card" name="id_card" accept=".pdf,.jpg,.jpeg,.png"
+                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
+                            </div>
+
+                            <!-- 4. Surat Pengantar Kampus (Opsional) -->
+                            <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <label for="resubmit_surat_pengantar" class="text-xs font-bold text-slate-800">4. Surat Pengantar / Proposal (Opsional - PDF)</label>
+                                    @if(!empty($rejGroup->proposal_letter_path))
+                                        <a href="{{ route('documents.group.proposal', $rejGroup->id) }}" target="_blank" class="text-[11px] font-semibold text-blue-600 hover:underline">Lihat Proposal Tim</a>
+                                    @endif
+                                </div>
+                                <input type="file" id="resubmit_surat_pengantar" name="surat_pengantar" accept=".pdf"
+                                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer bg-white border border-slate-200 rounded-lg p-1" />
+                            </div>
+                        </div>
+
+                        @if($isRejLeader && $otherRejectedCount > 0)
+                            <div class="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200 flex items-start gap-2.5">
+                                <input type="checkbox" id="resubmit_entire_group" name="resubmit_entire_group" value="1" checked
+                                       class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                <label for="resubmit_entire_group" class="text-xs text-indigo-950 cursor-pointer select-none">
+                                    <strong class="block">Ajukan ulang bersama {{ $otherRejectedCount }} rekan anggota kelompok lain yang juga berstatus Ditolak</strong>
+                                    <span class="text-[11px] text-indigo-700">Sebagai Ketua Kelompok, centang opsi ini jika seluruh kelompok ditolak (misal karena perbaikan Surat Pengantar Kelompok) agar seluruh anggota tim langsung aktif kembali.</span>
+                                </label>
+                            </div>
+                        @endif
+
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                            <a href="{{ route('student.profile.edit') }}" class="text-xs font-bold text-slate-600 hover:text-indigo-700 underline">
+                                Atau perbarui detail biodata &amp; berkas di menu Profil Saya
+                            </a>
+                            <button type="submit"
+                                    class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                <span>Kirim Perbaikan &amp; Kembali ke Kelompok ({{ $rejGroup->name }})</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             @endif
 

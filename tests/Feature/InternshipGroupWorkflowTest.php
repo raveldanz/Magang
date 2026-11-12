@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\InternshipGroup;
+use App\Models\Placement;
 use App\Models\StudentProfile;
 use App\Models\Unit;
 use App\Models\University;
@@ -19,10 +20,15 @@ class InternshipGroupWorkflowTest extends TestCase
     use RefreshDatabase;
 
     private User $leader;
+
     private User $member;
+
     private User $admin;
+
     private User $mentor;
+
     private Unit $unit;
+
     private University $university;
 
     protected function setUp(): void
@@ -493,7 +499,7 @@ class InternshipGroupWorkflowTest extends TestCase
             'status' => 'active',
         ]);
 
-        $placement = \App\Models\Placement::create([
+        $placement = Placement::create([
             'application_id' => $leaderApp->id,
             'mentor_id' => $this->mentor->id,
             'agency_profile_id' => $this->admin->agency_profile_id,
@@ -652,7 +658,7 @@ class InternshipGroupWorkflowTest extends TestCase
             'university_id' => $this->university->id,
         ]);
 
-        $placement = \App\Models\Placement::create([
+        $placement = Placement::create([
             'application_id' => $leaderApp->id,
             'mentor_id' => $this->mentor->id,
             'academic_advisor_id' => $dosen->id,
@@ -895,5 +901,200 @@ class InternshipGroupWorkflowTest extends TestCase
         $dashboardResponse->assertDontSee('Persetujuan Pengajuan');
         $dashboardResponse->assertDontSee('Pengesahan Sertifikat');
     }
-}
 
+    public function test_rejected_members_are_not_overwritten_when_other_group_members_are_approved_and_can_resubmit_back_to_group(): void
+    {
+        Storage::fake('local');
+
+        $supervisor = User::factory()->create([
+            'role' => 'supervisor',
+            'agency_profile_id' => $this->unit->agency_profile_id,
+        ]);
+
+        // Buat anggota ke-3 agar ada skenario beberapa anggota salah (2 ditolak, 1 lanjut)
+        $member2 = User::factory()->create([
+            'role' => 'mahasiswa',
+            'university_id' => $this->university->id,
+            'university' => $this->university->name,
+        ]);
+        StudentProfile::create([
+            'user_id' => $member2->id,
+            'nim' => '22051204999',
+            'universitas' => $this->university->name,
+            'university_id' => $this->university->id,
+            'jurusan' => 'Teknik Informatika',
+            'phone' => '081234567800',
+            'cv_path' => 'documents/student-profiles/old_cv_2.pdf',
+            'transcript_path' => 'documents/student-profiles/old_transkrip_2.pdf',
+            'id_card_path' => 'documents/student-profiles/old_ktm_2.pdf',
+        ]);
+
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Perbaikan Berkas',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(10)->toDateString(),
+            'end_date' => now()->addDays(70)->toDateString(),
+            'proposal_letter_path' => 'documents/applications/proposal_tim.pdf',
+            'status' => 'pending',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'pending',
+            'cv_path' => $this->leader->studentProfile->cv_path,
+            'transcript_path' => $this->leader->studentProfile->transcript_path,
+            'id_card_path' => $this->leader->studentProfile->id_card_path,
+            'proposal_letter_path' => $group->proposal_letter_path,
+        ]);
+
+        $member1App = Application::create([
+            'user_id' => $this->member->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'pending',
+            'cv_path' => $this->member->studentProfile->cv_path,
+            'transcript_path' => $this->member->studentProfile->transcript_path,
+            'id_card_path' => $this->member->studentProfile->id_card_path,
+            'proposal_letter_path' => $group->proposal_letter_path,
+        ]);
+
+        $member2App = Application::create([
+            'user_id' => $member2->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'pending',
+            'cv_path' => $member2->studentProfile->cv_path,
+            'transcript_path' => $member2->studentProfile->transcript_path,
+            'id_card_path' => $member2->studentProfile->id_card_path,
+            'proposal_letter_path' => $group->proposal_letter_path,
+        ]);
+
+        // 1. Admin menolak 2 anggota (member1 & member2) secara mandiri karena berkas salah (sync_group = 0)
+        $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $member1App->id), [
+            'status' => 'rejected',
+            'rejection_note' => 'Transkrip nilai buram, mohon unggah ulang',
+            'sync_group' => '0',
+        ])->assertRedirect();
+
+        $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $member2App->id), [
+            'status' => 'rejected',
+            'rejection_note' => 'KTM tidak terbaca, mohon unggah ulang',
+            'sync_group' => '0',
+        ])->assertRedirect();
+
+        $group->refresh();
+        $leaderApp->refresh();
+        $member1App->refresh();
+        $member2App->refresh();
+
+        $this->assertEquals('rejected', $member1App->statusValue());
+        $this->assertEquals('rejected', $member2App->statusValue());
+        $this->assertEquals('pending', $leaderApp->statusValue());
+        $this->assertEquals('pending', $group->status);
+
+        // 2. Admin memproses anggota yang valid (leaderApp) dengan sync_group = 1 -> member1 & member2 TIDAK boleh ikut berubah
+        $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $leaderApp->id), [
+            'status' => 'waiting_approval',
+            'mentor_id' => $this->mentor->id,
+            'sync_group' => '1',
+        ])->assertRedirect();
+
+        // 3. Supervisor menyetujui (approve) kelompok -> hanya leaderApp yang accepted, member1 & member2 tetap rejected
+        $this->actingAs($supervisor)->post(route('supervisor.applications.approve', $leaderApp->id))
+            ->assertRedirect(route('supervisor.applications.index'));
+
+        $leaderApp->refresh();
+        $member1App->refresh();
+        $member2App->refresh();
+        $group->refresh();
+
+        $this->assertEquals('accepted', $leaderApp->statusValue());
+        $this->assertEquals('rejected', $member1App->statusValue());
+        $this->assertEquals('rejected', $member2App->statusValue());
+        $this->assertDatabaseHas('placements', ['application_id' => $leaderApp->id]);
+        $this->assertDatabaseMissing('placements', ['application_id' => $member1App->id]);
+
+        // 4. Member 1 memperbaiki berkas (upload transkrip baru) dan mengirim ulang ke kelompoknya via student.group.resubmit
+        $newTranscript = UploadedFile::fake()->create('transkrip_perbaikan.pdf', 200, 'application/pdf');
+        $resubmitResp = $this->actingAs($this->member)->post(route('student.group.resubmit'), [
+            'transkrip' => $newTranscript,
+        ]);
+        $resubmitResp->assertRedirect(route('student.application.create'));
+        $resubmitResp->assertSessionHas('success');
+
+        $member1App->refresh();
+        $this->assertEquals('pending', $member1App->statusValue());
+        $this->assertEquals($group->id, $member1App->group_id);
+        $this->assertNull($member1App->rejection_note);
+
+        // 5. Member 2 memperbaiki berkas di profil lalu memasukkan kembali Kode Kelompok di student.group.join -> otomatis kembali ke kelompoknya!
+        $this->actingAs($member2)->post(route('student.group.join'), [
+            'group_code' => $group->code,
+        ])->assertRedirect(route('student.application.create'));
+
+        $member2App->refresh();
+        $this->assertEquals('pending', $member2App->statusValue());
+        $this->assertEquals($group->id, $member2App->group_id);
+    }
+
+    public function test_admin_can_still_reject_entire_group_at_once(): void
+    {
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Ditolak Penuh',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(10)->toDateString(),
+            'end_date' => now()->addDays(70)->toDateString(),
+            'status' => 'pending',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'pending',
+        ]);
+
+        $memberApp = Application::create([
+            'user_id' => $this->member->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'member',
+            'status' => 'pending',
+        ]);
+
+        // Tolak seluruh 1 kelompok sekaligus dengan sync_group = 1
+        $this->actingAs($this->admin)->put(route('admin.applications.updateStatus', $leaderApp->id), [
+            'status' => 'rejected',
+            'rejection_note' => 'Kuota bidang pada periode tersebut dialokasikan untuk kegiatan kedinasan',
+            'sync_group' => '1',
+        ])->assertRedirect();
+
+        $group->refresh();
+        $leaderApp->refresh();
+        $memberApp->refresh();
+
+        $this->assertEquals('rejected', $group->status);
+        $this->assertEquals('rejected', $leaderApp->statusValue());
+        $this->assertEquals('rejected', $memberApp->statusValue());
+    }
+}

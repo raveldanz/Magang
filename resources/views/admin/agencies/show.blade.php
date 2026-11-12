@@ -257,7 +257,7 @@
                 <div class="bg-white p-4 sm:p-5 col-span-2 sm:col-span-1">
                     <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Lulus / Sertifikat</div>
                     <div class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-2xl font-bold text-emerald-600">{{ $stats['completed_students'] ?? 0 }}</span>
+                        <span class="text-2xl font-bold text-slate-900">{{ $stats['completed_students'] ?? 0 }}</span>
                         <span class="text-sm text-slate-500">alumni selesai</span>
                     </div>
                 </div>
@@ -291,11 +291,6 @@
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <span>Pengajuan Magang Masuk</span>
-                        @if(($stats['pending_applications'] ?? 0) > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                                {{ $stats['pending_applications'] }}
-                            </span>
-                        @endif
                     </button>
 
                     <!-- Tab 4: Mahasiswa Aktif Magang -->
@@ -305,9 +300,6 @@
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
                         <span>Mahasiswa Aktif</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-                            {{ $stats['active_students'] }}
-                        </span>
                     </button>
 
                     <!-- Tab 5: Kelulusan & Sertifikat -->
@@ -317,11 +309,6 @@
                             class="cc-tab whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                         <span>Kelulusan & Sertifikat</span>
-                        @if(($stats['completed_students'] ?? 0) > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                {{ $stats['completed_students'] }}
-                            </span>
-                        @endif
                     </button>
                 </nav>
             </div>
