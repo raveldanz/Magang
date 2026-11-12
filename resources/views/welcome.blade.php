@@ -86,6 +86,15 @@
                             <span>Dashboard</span>
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
+                        <form method="POST" action="{{ route('logout') }}" class="inline-flex">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 text-xs font-bold uppercase tracking-wider rounded-xl border border-rose-200/80 transition active:scale-95 cursor-pointer shadow-2xs" title="Keluar Akun">
+                                <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span>Keluar Akun</span>
+                            </button>
+                        </form>
                     @else
                         <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
                             Masuk
@@ -143,9 +152,35 @@
 
                 <div class="space-y-2 pt-0.5">
                     @auth
+                        <div class="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                                    {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold text-slate-900 truncate">{{ Auth::user()->name }}</p>
+                                    <p class="text-[10px] font-semibold text-blue-600 truncate">{{ Auth::user()->roleLabel() }}</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                Aktif
+                            </span>
+                        </div>
+
                         <a href="{{ route('dashboard') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             <span>Buka Dashboard</span>
                         </a>
+
+                        <form method="POST" action="{{ route('logout') }}" class="w-full">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 active:scale-98 text-rose-600 hover:text-rose-700 text-xs font-bold uppercase tracking-wider rounded-xl border border-rose-200/80 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span>Keluar Akun</span>
+                            </button>
+                        </form>
                     @else
                         <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
                             <span>Daftar Magang</span>
@@ -212,7 +247,7 @@
                             @else
                                 <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
                                     <span>Daftar Magang Sekarang</span>
-                                    </a>
+                                </a>
                                 <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center shadow-2xs">
                                     Masuk ke Akun
                                 </a>
