@@ -54,7 +54,7 @@ class PlacementAssignmentController extends Controller
         $message = empty($changes)
             ? 'Tidak ada perubahan penugasan pembimbing.'
             : 'Penugasan pembimbing berhasil diperbarui: '.collect($changes)->map(function ($c, $key) {
-                $label = $key === 'mentor' ? 'Mentor Dinas' : 'DPL';
+                $label = $key === 'mentor' ? 'Mentor Dinas' : 'Dosen Pembimbing';
 
                 return "{$label} → {$c['to']}";
             })->implode(', ').'. Histori logbook sebelumnya tetap tersimpan.';

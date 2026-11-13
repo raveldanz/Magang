@@ -30,21 +30,21 @@
             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-2xs">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs sm:text-sm">
                     <div>
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider block">Mentor Lapangan</span>
+                        <span class="text-slate-600 text-xs font-semibold uppercase tracking-wider block">Mentor Lapangan</span>
                         <span class="font-bold text-slate-800 mt-0.5 block">{{ $mentor?->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider block">Dosen Pembimbing</span>
+                        <span class="text-slate-600 text-xs font-semibold uppercase tracking-wider block">Dosen Pembimbing</span>
                         <span class="font-bold text-slate-800 mt-0.5 block">{{ $academicAdvisor?->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider block">Periode Magang</span>
+                        <span class="text-slate-600 text-xs font-semibold uppercase tracking-wider block">Periode Magang</span>
                         <span class="font-bold text-slate-800 mt-0.5 block">
                             {{ $placement->application?->start_date ? \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') : '-' }} s/d {{ $placement->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') : '-' }}
                         </span>
                     </div>
                     <div>
-                        <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider block">Logbook Aktivitas</span>
+                        <span class="text-slate-600 text-xs font-semibold uppercase tracking-wider block">Logbook Aktivitas</span>
                         <span class="font-bold text-slate-800 mt-0.5 block">
                             {{ $approvedLogbookCount }} disetujui dari {{ $logbookCount }} catatan
                         </span>
@@ -81,20 +81,20 @@
                                 <!-- Info Penting Saja -->
                                 <div class="flex-1 min-w-0 space-y-1">
                                     <div class="flex items-center justify-between gap-2">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border {{ $proj->category_badge_class }}">
+                                        <span class="px-2 py-0.5 rounded text-xs font-bold border {{ $proj->category_badge_class }}">
                                             {{ $proj->category_label }}
                                         </span>
-                                        <span class="text-[11px] font-semibold text-blue-600 group-hover:text-blue-800 flex items-center gap-0.5 shrink-0">
+                                        <span class="text-xs font-semibold text-blue-600 group-hover:text-blue-800 flex items-center gap-0.5 shrink-0">
                                             Buka Halaman Detail &rarr;
                                         </span>
                                     </div>
                                     <h4 class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-blue-700 transition leading-snug line-clamp-1">
                                         {{ $proj->title }}
                                     </h4>
-                                    <p class="text-xs text-slate-500 line-clamp-1 leading-relaxed">
+                                    <p class="text-xs text-slate-600 line-clamp-1 leading-relaxed">
                                         {{ $proj->description }}
                                     </p>
-                                    <p class="text-[11px] text-slate-600 line-clamp-1 leading-relaxed">
+                                    <p class="text-xs text-slate-600 line-clamp-1 leading-relaxed">
                                         <span class="font-semibold text-slate-700">Manfaat:</span> {{ $proj->community_benefit }}
                                     </p>
                                 </div>
@@ -145,12 +145,12 @@
 
                     @if ($finalReport->feedback)
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                            <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">Catatan Pembimbing:</span>
+                            <span class="font-bold text-slate-700 uppercase tracking-wider text-xs block">Catatan Pembimbing:</span>
                             <p class="text-slate-800 italic leading-relaxed">"{{ $finalReport->feedback }}"</p>
                         </div>
                     @endif
                 @else
-                    <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-500 text-xs">
+                    <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-600 text-xs">
                         Mahasiswa belum mengunggah naskah laporan akhir.
                     </div>
                 @endif
@@ -163,26 +163,26 @@
                         <h3 class="font-bold text-base text-slate-900">
                             Evaluasi & Nilai Akhir
                         </h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                        <p class="text-xs text-slate-600 mt-0.5">
                             Rekapitulasi penilaian kinerja magang dari pembimbing lapangan dan dosen
                         </p>
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Disiplin</span>
+                            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Disiplin</span>
                             <span class="text-lg font-bold text-slate-900 mt-1 block">{{ number_format($evaluation->nilai_disiplin ?? 0, 1) }}</span>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Kinerja</span>
+                            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Kinerja</span>
                             <span class="text-lg font-bold text-slate-900 mt-1 block">{{ number_format($evaluation->nilai_kinerja ?? 0, 1) }}</span>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Laporan</span>
+                            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Laporan</span>
                             <span class="text-lg font-bold text-slate-900 mt-1 block">{{ number_format($evaluation->nilai_laporan ?? 0, 1) }}</span>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Nilai Akhir</span>
+                            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Nilai Akhir</span>
                             <span class="text-lg font-bold text-slate-900 mt-1 block">
                                 {{ number_format((float) $evaluation->nilai_akhir, 1) }}
                                 <span class="text-xs font-semibold text-slate-500 font-mono">&bull; Grade {{ $evaluation->grade_calculated ?? '-' }}</span>

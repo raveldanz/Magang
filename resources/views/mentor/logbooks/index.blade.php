@@ -10,7 +10,7 @@
                 <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
                     Logbook Mahasiswa Bimbingan
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
                     Tinjau dan verifikasi paket aktivitas mingguan mahasiswa magang di unit kerja Anda
                 </p>
             </div>
@@ -30,15 +30,15 @@
             <!-- 1. Tiga Angka Polos (Menunggu, Disetujui, Perlu Revisi) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-xl border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Menunggu</span>
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">{{ \App\Enums\ReviewStatus::PENDING->localizedLabel('mentor') }}</span>
                     <div class="text-2xl font-bold text-slate-900 mt-1">{{ $pendingCount }}</div>
                 </div>
                 <div class="bg-white p-4 rounded-xl border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Disetujui</span>{{-- status-guard:ignore --}}
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">{{ \App\Enums\ReviewStatus::APPROVED->localizedLabel('mentor') }}</span>
                     <div class="text-2xl font-bold text-slate-900 mt-1">{{ $approvedCount }}</div>
                 </div>
                 <div class="bg-white p-4 rounded-xl border border-slate-200">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Perlu Revisi</span>
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">{{ \App\Enums\ReviewStatus::REVISION->localizedLabel('mentor') }}</span>
                     <div class="text-2xl font-bold text-slate-900 mt-1">{{ $rejectedCount }}</div>
                 </div>
             </div>
@@ -48,8 +48,8 @@
                 <form method="GET" action="{{ route('mentor.logbooks.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <!-- Dropdown Mahasiswa -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mahasiswa:</label>
-                        <select name="placement_id" onchange="this.form.submit()" class="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Mahasiswa:</label>
+                        <select name="placement_id" onchange="this.form.submit()" class="w-full min-h-[44px] text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
                             <option value="">Semua Mahasiswa</option>
                             @foreach ($supervisedPlacements as $pl)
                                 @php
@@ -65,24 +65,30 @@
 
                     <!-- Dropdown Status -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Status:</label>
-                        <select name="status" onchange="this.form.submit()" class="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Status:</label>
+                        <select name="status" onchange="this.form.submit()" class="w-full min-h-[44px] text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
                             <option value="">Semua Status</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Disetujui</option>{{-- status-guard:ignore --}}
-                            <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Perlu Revisi</option>
+                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>{{ \App\Enums\ReviewStatus::PENDING->localizedLabel('mentor') }}</option>
+                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>{{ \App\Enums\ReviewStatus::APPROVED->localizedLabel('mentor') }}</option>
+                            <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>{{ \App\Enums\ReviewStatus::REVISION->localizedLabel('mentor') }}</option>
                         </select>
                     </div>
 
                     <!-- Kolom Cari & Tombol Cari -->
                     <div class="lg:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cari:</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Cari:</label>
                         <div class="flex items-center gap-2">
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa, NIM, atau kegiatan..."
-                                   class="w-full text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
-                            <button type="submit" class="inline-flex items-center justify-center px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition shrink-0 cursor-pointer">
+                                   class="w-full min-h-[44px] text-sm border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2">
+                            <button type="submit" class="min-h-[44px] inline-flex items-center justify-center px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition shrink-0 cursor-pointer">
                                 Cari
                             </button>
+                            @if (request()->filled('search') || request()->filled('placement_id') || request()->filled('status'))
+                                <a href="{{ route('mentor.logbooks.index') }}"
+                                   class="min-h-[44px] inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-lg transition shrink-0">
+                                    Reset
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </form>

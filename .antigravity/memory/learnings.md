@@ -4102,6 +4102,153 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   4. Memvalidasi dengan 10/10 pengujian login otomatis real browser Playwright Google Chrome (seluruh peran berhasil termuat dalam 1,3–1,9 detik) dan 416/416 PHPUnit tests lulus 100% (Strict Exit Code 0).
 - **Prevention Rule**: Pastikan semua akun demo di environment lokal/testing memiliki kata sandi standar `password`, jangan pernah mengimpor web font secara eksternal yang memblokir render utama tanpa fallback font lokal, dan gunakan SQLite WAL mode untuk menghindari thread contention pada database lokal.
 
+---
+
+### [LRN-135] Pembersihan Redundansi UI `/student/application` & Paket Penguatan Audit Menyeluruh (Keamanan, Otorisasi, CSV & Performa)
+- **Tanggal**: 2026-11-12
+- **Komponen**: `resources/views/student/application/create.blade.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `resources/views/admin/applications/show.blade.php`, `app/Http/Controllers/Lecturer/MonitoringController.php`, `app/Http/Controllers/FeedbackController.php`, `app/Http/Controllers/DocumentController.php`, `app/Models/AuditLog.php`, `app/Http/Controllers/Admin/ImpersonationController.php`, `app/Services/NotificationService.php`, `resources/views/layouts/navigation.blade.php`, `resources/views/layouts/app.blade.php`, `config/services.php`, `database/migrations/2026_11_12_110000_harmonize_review_status_constraints_in_logbooks_and_final_reports.php`
+- **Problem / Symptom**:
+  1. Pada halaman `/student/application` jalur Individu, banner instansi menampilkan blok kedua yang redundan dengan alamat lama (`Dinas Perpustakaan dan Kearsipan Kota Surabaya — Jl. Tunjungan No. 1-3 (Gedung Siola) Lantai 4`).
+  2. Pada jalur Kelompok di `/student/application`, kartu **Buat Kelompok Baru** kehilangan pembungkus grid 2 kolom serta terdapat `<form>` bersarang (*nested form*) yang menyebabkan input `Nama Kelompok - Opsional` dan `Pilihan Bidang Dispusip` muncul dua kali serta kotak `Ketentuan Bergabung` terduplikasi di bagian bawah.
+  3. Temuan audit menyeluruh: penghapusan berkas profil aktif jika terjadi *double-submit* di `Student\ApplicationController::store()`, belum adanya guard status `waiting_approval` dan kapasitas kuota di `Supervisor\ApplicationApprovalController::approve()`, ketidakcocokan nama properti nilai & tanggal pada ekspor CSV `Lecturer\MonitoringController::export()`, belum adanya `self::canAccess()` pada `FeedbackController::respond()`, perbandingan `null === null` (`0 === 0`) pada otorisasi `mentor` di `DocumentController`, eksekusi ganda `NotificationService::getNotificationsForUser()` di navbar pada setiap muatan halaman, serta pemanggilan `env("VAPID_PUBLIC_KEY")` langsung di `layouts/app.blade.php`.
+- **Root Cause**:
+  1. Sisa penggabungan (*merge artifact*) pada `resources/views/student/application/create.blade.php` yang meninggalkan potongan form kedua di dalam kartu pembuatan kelompok dan informasi alamat Gedung Siola di sebelah kanan kartu instansi tunggal.
+  2. `Student\ApplicationController::store()` sebelumnya memanggil `$storage->discard($paths)` pada seluruh path termasuk path yang disalin dari `StudentProfile` ketika pengajuan duplikat ditolak.
+  3. `Lecturer\MonitoringController::export()` memanggil properti lama (`dosen_evaluation_score`, `calculated_final_score`, `grade_letter`, `$p->start_date`) alih-alih accessor resmi `Evaluation` (`nilai_pembimbing_calculated`, `nilai_dosen_calculated`, `nilai_akhir`, `grade_calculated`) dan tanggal `Application`.
+- **Fix Applied**:
+  1. Menghapus blok teks redundan `Jl. Tunjungan No. 1-3 (Gedung Siola)` pada kartu instansi tunggal dan memulihkan struktur `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">` untuk **Card A: Buat Kelompok Baru** dan **Card B: Gabung ke Kelompok Rekan** tanpa duplikasi field maupun kotak ketentuan.
+  2. Memisahkan `$newlyUploadedPaths` di `Student\ApplicationController::store()` agar rollback pada *double-submit* hanya menghapus file baru tanpa menyentuh berkas profil mahasiswa.
+  3. Menambahkan validasi status `waiting_approval` & pengecekan kuota dengan `lockForUpdate()` di `Supervisor\ApplicationApprovalController::approve()`, serta mengatur default `sync_group = false` untuk status `rejected` dan `resigned`.
+  4. Memperbaiki kolom nilai, grade, tanggal magang, dan normalisasi `BackedEnum` di `Lecturer\MonitoringController::export()`.
+  5. Menambahkan `abort_unless(self::canAccess($user, $feedback), 403)` di `FeedbackController::respond()`, memperketat otorisasi `mentor`/`pembimbing` dan `dosen`/`academic_advisor` di `DocumentController`, mencatat `impersonator_id` otomatis di `AuditLog::record()`, memvalidasi `return_to` terhadap open-redirect di `ImpersonationController`, meneruskan `$navAllNotifs` ke `NotificationService::hasUnreadDot()` agar query notifikasi hanya dieksekusi 1 kali per request, dan memindahkan `VAPID_PUBLIC_KEY` ke `config('services.vapid.public_key')`.
+  6. Menambahkan migrasi dual-driver `2026_11_12_110000_harmonize_review_status_constraints_in_logbooks_and_final_reports.php` untuk mengharmonisasikan constraint `CHECK` PostgreSQL.
+- **Prevention Rule**: Selalu periksa struktur pembungkus HTML (`<div class="grid ...">` dan `<form>`) setelah melakukan merge pada view Blade yang besar dan verifikasi secara visual dengan Playwright screenshot. Pastikan setiap rollback unggahan file hanya menghapus berkas yang baru diunggah pada request berjalan (`$newlyUploadedPaths`), dan hindari pemanggilan `env()` langsung di luar direktori `config/`.
+
+---
+
+### [LRN-136] Standar Minimalisme UI, Anti-Redundansi Micro-Copy, Isolasi State Kelompok & Quality Control Otomatis
+- **Tanggal**: 2026-11-12
+- **Komponen**: `resources/views/student/application/create.blade.php`, `app/Http/Controllers/Student/ApplicationController.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/supervisor/applications/show.blade.php`, `.antigravity/rules/quality.md`, `GEMINI.md`, `tests/Feature/UiMinimalismAndAntiRedundancyTest.php`
+- **Problem / Symptom**:
+  1. Saat mahasiswa dalam kelompok berstatus `rejected` (baik 1 orang ditolak sementara anggota lain di-ACC, maupun seluruh kelompok ditolak), halaman `/student/application` menampilkan kartu **Perbaikan Berkas Kelompok** di atas, tetapi di bawahnya masih memunculkan kartu **Pilih Jalur Pendaftaran Magang (Pendaftaran Individu & Pendaftaran Kelompok)** sehingga membingungkan mahasiswa yang sebenarnya masih terikat di dalam kelompok.
+  2. Belum ada tombol bagi mahasiswa pada kondisi tersebut untuk **Keluar dari Kelompok** jika ia ingin mendaftar secara mandiri.
+  3. Terdapat banyak teks penjelasan yang berulang-ulang (*over-explaining* / redundan) dan terlalu panjang: kalimat instruksi tambahan di dalam kotak merah penolakan admin, sub-judul kartu perbaikan berkas yang mengulang nama kelompok & nama bidang dengan huruf tebal (`<strong>`), serta label tombol submit yang terlalu panjang karena menyertakan nama kelompok `Kirim Perbaikan & Kembali ke Kelompok (Tim Pengembangan Literasi Komunitas)`.
+  4. Terdapat satu penutup `</div>` berlebih di akhir blok `@else` pada `resources/views/student/application/create.blade.php` yang menyebabkan tabel `Riwayat Pengajuan Magang Anda` keluar dari container `max-w-7xl`.
+- **Root Cause**:
+  1. Blok `<!-- 1. FORM PENGAJUAN BARU / STATUS BANNER -->` hanya memeriksa `@if ($activeApplication) ... @elseif ($draftGroup) ... @else`, tanpa menyembunyikan blok tersebut ketika `$rejectedGroupApplication` sedang aktif.
+  2. Method `Student\ApplicationController::leaveGroup()` sebelumnya hanya menangani anggota kelompok berstatus `draft`, belum menangani anggota kelompok berstatus `rejected` yang ingin keluar dari kelompok.
+  3. Kebiasaan menulis micro-copy berlapis yang mengulang nama kelompok/bidang di beberapa tempat sekaligus (alert atas, sub-judul kartu, dan teks tombol).
+- **Fix Applied**:
+  1. Menyembunyikan blok `Pilih Jalur Pendaftaran Magang (Individu & Kelompok)` selama mahasiswa masih berada dalam kelompok yang perlu perbaikan berkas (`!empty($rejectedGroupApplication) && $rejectedGroupApplication->group`), serta memperbaiki keseimbangan tag `</div>` agar tabel riwayat tetap berada di dalam container utama.
+  2. Menambahkan bagian ringkas **"Ingin keluar dari kelompok ini?"** beserta tombol **Keluar dari Kelompok** di bagian bawah kartu perbaikan berkas kelompok, dan memperbarui `Student\ApplicationController::leaveGroup()` agar dapat melepaskan anggota/ketua yang berstatus `rejected` dari kelompoknya (`group_id = null`) sehingga mereka dapat memilih pendaftaran individu atau kelompok baru.
+  3. Menghapus kalimat redundan di bawah kotak alasan penolakan admin, mempersingkat sub-judul kartu tanpa `<strong>` berulang, serta memangkas teks tombol submit menjadi `Kirim Perbaikan & Kembali ke Kelompok` (tanpa nama kelompok).
+  4. Menambahkan standar baku **Minimalisme UI, Anti-Redundansi Teks & Quality Control** di `.antigravity/rules/quality.md` dan `GEMINI.md`, serta membuat suite pengujian QC otomatis `tests/Feature/UiMinimalismAndAntiRedundancyTest.php`.
+- **Prevention Rule**: Patuhi prinsip minimalis pada setiap perubahan UI: (1) satu konteks utama per halaman (sembunyikan form pendaftaran awal jika mahasiswa masih terikat kelompok), (2) maksimal 1 kalimat sub-judul singkat tanpa pengulangan nama entitas dan tanpa spam `<strong>`, (3) label tombol wajib ringkas tanpa variabel nama panjang, dan (4) jalankan `UiMinimalismAndAntiRedundancyTest` serta verifikasi visual Playwright pada setiap skenario state.
+
+---
+
+### [LRN-137] Standardisasi Peringatan Ukuran & Kelengkapan Berkas (Bahasa Indonesia), Deduplikasi Baris Kelompok, Master Universitas Nasional PDDikti & Utilitas Ekspor Database
+- **Tanggal**: 2026-11-13
+- **Komponen**: `bootstrap/app.php`, `lang/id/validation.php`, `Student\ProfileController`, `Student\ApplicationController`, `Supervisor\ApplicationApprovalController`, `Admin\ApplicationController`, `MasterUniversityService`, `MasterUniversityApiController`, `SyncMasterUniversities`, `ExportDatabaseSql`, Blade Views (`student/profile/edit.blade.php`, `student/application/create.blade.php`, `student/logbook/create.blade.php`, `student/logbook/edit.blade.php`, `student/projects/create.blade.php`, `supervisor/applications/index.blade.php`, `admin/applications/show.blade.php`, `admin/universities/create.blade.php`)
+- **Problem / Symptom**:
+  1. Label input berkas masih menggunakan teks bahasa Inggris bawaan (`Choose File`, `No file chosen`), dan berkas yang melebihi batas ukuran (2MB/server limit) tidak memberikan peringatan instan atau memicu layar HTTP 413.
+  2. Berkas personal prasyarat magang (CV, Transkrip, KTM) belum memiliki peringatan ringkasan kelengkapan berkas di profil, dan submit pendaftaran magang mandiri tidak memvalidasi keberadaan ketiga berkas tersebut secara eksplisit.
+  3. Baris pengajuan kelompok magang muncul berulang (ke-double atau ke-tiga per anggota) di tabel persetujuan Atasan/Supervisor, serta memiliki potensi double row di Admin jika ID ketua bukan `MIN(id)`. Terdapat pula duplikasi kontrol aksi kelompok pada detail pengajuan admin.
+  4. Pengguna/mahasiswa harus mengetik manual nama kampus karena daftar universitas di database terbatas (~35 kampus), memicu inkonsistensi nama dan penumpukan kampus belum terverifikasi.
+  5. Ketiadaan perintah/utilitas ekspor terstruktur untuk memindahkan database PostgreSQL ke server produksi.
+- **Root Cause**:
+  1. Label `Choose File` dan `No file chosen` di-hardcode pada komponen kustom Alpine/Blade, tanpa client-side `@change` handler untuk validasi batas ukuran 2MB pada dokumen CV, transkrip, KTM, dan proposal.
+  2. Ketiadaan penanganan `PostTooLargeException` pada `bootstrap/app.php` dan belum lengkapnya atribut `lang/id/validation.php`.
+  3. Query Supervisor `ApplicationApprovalController::index()` tidak memfilter canonical single row per `group_id`, dan query Admin menggunakan `orWhere` non-eksklusif antara role `leader` dan `MIN(id)`.
+  4. Ketiadaan integrasi master dataset perguruan tinggi nasional dan API autocomplete kampus resmi.
+- **Fix Applied**:
+  1. Mengganti seluruh label Inggris menjadi `Pilih Berkas` dan `Belum ada berkas dipilih` di seluruh antarmuka sistem. Menambahkan validasi client-side instan (`size > 2MB` dan format PDF/gambar) pada seluruh input file dengan pesan peringatan berbahasa Indonesia.
+  2. Menambahkan penanganan `PostTooLargeException` pada `bootstrap/app.php` yang me-redirect kembali dengan flash error Bahasa Indonesia, serta melengkapi translasi atribut di `lang/id/validation.php`. Menambahkan banner kelengkapan berkas dan alert error di `student/profile/edit.blade.php` serta proteksi controller di `Student\ApplicationController::store()`.
+  3. Menerapkan subquery canonical representative `COALESCE((SELECT leader.id ...), (SELECT MIN(id) ...))` pada `Admin\ApplicationController` dan `Supervisor\ApplicationApprovalController` sehingga 1 kelompok tepat tampil 1 kali di tabel dengan rincian anggota terpadu. Membersihkan tombol duplikat aksi kelompok di `admin/applications/show.blade.php`.
+  4. Membuat dataset Master Perguruan Tinggi Nasional Indonesia (`database/data/master_universities.json`) berisi ratusan PTN, PTS, Politeknik, dan UIN se-Indonesia, `MasterUniversityService`, perintah Artisan `php artisan universities:sync-master`, dan endpoint API publik `GET /api/master-universities/search` serta web `GET /universities/master-search`. Mengintegrasikan pencarian master kampus pada profil mahasiswa dan formulir admin universitas sehingga pengguna tidak perlu mengetik nama kampus secara manual.
+  5. Membuat perintah Artisan `php artisan db:export-sql` yang mengekspor skema dan data database ke berkas SQL terstruktur (`storage/app/backups/`) lengkap dengan panduan impor ke server via `psql`.
+  6. Menulis suite pengujian otomatis `tests/Feature/MasterUniversityAndFileValidationQcTest.php` yang memvalidasi seluruh poin di atas dengan Strict Exit Code 0.
+- **Prevention Rule**: Seluruh label antarmuka dan pesan validasi wajib berbahasa Indonesia baku. Seluruh query pengajuan kelompok wajib memakai canonical ID subquery agar tidak menduplikasi baris. Pilihan entitas kampus wajib terikat pada master data resmi, bukan teks bebas yang rawan salah ketik.
+
+---
+
+### [LRN-138] Sinkronisasi Status Magang Kelompok Otomatis (ACCEPTED → ACTIVE), Eliminasi Desinkronisasi Anggota & Engine Terpadu Multi-Role
+- **Tanggal**: 2026-11-13
+- **Komponen**: `app/Models/Application.php`, `app/Models/InternshipGroup.php`, `app/Http/Controllers/Admin/ApplicationController.php`, `app/Http/Controllers/Supervisor/ApplicationApprovalController.php`, `app/Http/Controllers/Supervisor/DashboardController.php`, `app/Http/Controllers/Lecturer/DashboardController.php`, `app/Http/Controllers/Mentor/DashboardController.php`, `app/Http/Controllers/University/DashboardController.php`, `app/Http/Controllers/Student/ApplicationController.php`, `app/Console/Commands/SyncInternshipStatus.php`, `resources/views/admin/applications/show.blade.php`, `resources/views/dashboard.blade.php`, `tests/Feature/InternshipGroupWorkflowTest.php`
+- **Problem / Symptom**:
+  1. Pada pengajuan magang kelompok yang tanggal mulainya sudah lewat/tiba (`start_date <= today`) dan telah lolos persetujuan ganda (*Double ACC*), hanya Ketua Kelompok yang statusnya berubah menjadi `active`, sedangkan seluruh Anggota Kelompok lainnya statusnya tertinggal di `accepted`.
+  2. Kondisi ini membuat status magang dalam satu kelompok terpecah (*split/desynchronized status*): ketua sudah bisa mengisi logbook di dasbor, sementara anggota kelompok masih berstatus calon peserta magang.
+  3. Status kelompok di halaman Admin, Supervisor, Dosen Pembimbing, Mentor Lapangan, dan Universitas tidak seragam karena aktivasi hanya dipicu secara sporadis saat akun individu tertentu membuka halaman dasbornya.
+- **Root Cause**:
+  1. Method `Application::autoActivateIfStarted()` dan `Application::checkAndSyncActiveStatus()` sebelumnya beroperasi secara individualis terisolasi (`$this->update(['status' => 'active'])`) tanpa memeriksa relasi `group_id`, sehingga tidak pernah mengaktifkan saudara sekelompok (`Application::where('group_id', $this->group_id)`) dan tidak memperbarui record `InternshipGroup`.
+  2. Pada controller persetujuan Admin (`updateStatus()`, `updateGroupStatus()`, `bulkUpdateStatus()`), status kelompok dan anggota selalu disimpan sebagai nilai mentah `accepted` meskipun tanggal mulai magang yang diajukan sudah tiba atau lewat, tanpa adanya auto-elevate ke `active`.
+  3. Entry point daftar pengajuan (`index`) pada Admin dan Supervisor serta Dasbor Universitas dan Dosen tidak memiliki on-demand batch synchronization, sehingga status pengajuan di database bergantung sepenuhnya pada scheduler harian (cron) yang mungkin belum dieksekusi.
+- **Fix Applied**:
+  1. **Single Source of Truth Auto-Activation di Level Model (`Application.php`)**:
+     Memperbarui `Application::autoActivateIfStarted()` agar ketika sebuah aplikasi berstatus `ACCEPTED` mencapai tanggal mulai (`start_date <= today`), jika aplikasi tersebut memiliki `group_id`:
+     - Otomatis memperbarui `InternshipGroup` menjadi `active`.
+     - Otomatis mencari seluruh anggota kelompok saudara yang berstatus `accepted` dan mentransisikannya serentak ke `ApplicationStatus::ACTIVE`.
+     - Memastikan pembuatan record `Placement` beserta warisan `mentor_id` dan `academic_advisor_id` dari penempatan utama kelompok.
+     - Mengarahkan `checkAndSyncActiveStatus()` untuk mendelegasikan ke `autoActivateIfStarted()` guna mengeliminasi duplikasi logika.
+  2. **Batch Synchronizer Ringan (`Application::syncStartedApplications()`)**:
+     Menyediakan method statis yang efisien dan aman untuk menyinkronkan seluruh pengajuan (individu maupun kelompok) yang tanggal mulainya telah tiba dari `ACCEPTED` ke `ACTIVE`, dan memanggilnya di ingress point utama: `Admin\ApplicationController@index`, `Supervisor\ApplicationApprovalController@index`, `Supervisor\DashboardController@index`, `Lecturer\DashboardController@index`, `Mentor\DashboardController@index`, dan `University\DashboardController@index`.
+  3. **Auto-Elevation Saat Persetujuan (Double ACC & Admin)**:
+     Pada `Admin\ApplicationController::updateStatus()`, `updateGroupStatus()`, `bulkUpdateStatus()`, dan `Supervisor\ApplicationApprovalController::approve()`, jika status keputusan adalah `accepted` namun `start_date <= today`, status yang disimpan langsung di-elevate menjadi `ACTIVE` untuk seluruh anggota kelompok dan grupnya.
+  4. **Harmonisasi Tampilan Visual**:
+     Memperbarui badge status anggota kelompok di `resources/views/admin/applications/show.blade.php` agar status `Active` memiliki kontras warna jelas (`text-blue-600`), serta menambahkan badge status ringkas di kartu rekan satu tim pada `resources/views/dashboard.blade.php`.
+  5. **Pengujian Fitur Otomatis**:
+     Menambahkan 2 test skenario baru pada `tests/Feature/InternshipGroupWorkflowTest.php`: (a) transisi serentak kelompok dan seluruh anggota saat di-ACC dengan tanggal mulai lampau, dan (b) sinkronisasi serentak seluruh saudara kelompok saat salah satu anggota memicu aktivasi. Seluruh 427 tes lulus dengan Strict Exit Code 0.
+- **Prevention Rule**: Pengajuan yang memiliki relasi kelompok (`group_id`) WAJIB diperlakukan sebagai satu kesatuan status (*atomic group lifecycle*). Jangan pernah mengubah status pengajuan kelompok hanya pada satu baris individu tanpa menyinkronkan saudara sekelompoknya yang berstatus kompatibel dan record grup induknya. Selalu lakukan auto-elevate ke `ACTIVE` jika `start_date <= today` saat persetujuan diputuskan.
+
+---
+
+### [LRN-139] Eliminasi Redundansi UI, Over-Explaining Teks, Bold-Spamming & Quality Control Otomatis Antarmuka Pengguna
+- **Tanggal**: 2026-11-13
+- **Komponen**: `resources/views/student/application/create.blade.php`, `resources/views/student/profile/edit.blade.php`, `.antigravity/rules/quality.md`, `tests/Feature/UiMinimalismAndAntiRedundancyTest.php`
+- **Problem / Symptom**:
+  1. Halaman pendaftaran kelompok magang (`student/application/create.blade.php`) memuat banner kuning besar "Panduan Peran Pendaftaran Kelompok" yang menjelaskan peran Ketua vs Anggota, padahal tepat di bawahnya sudah terdapat 2 kartu terpisah yang masing-masing memiliki badge `Khusus Ketua Tim` dan `Khusus Anggota Tim`.
+  2. Di dalam masing-masing kartu tersebut, terdapat kotak callout berulang ("Formulir ini khusus untuk Ketua Kelompok...", "Formulir ini khusus untuk Anggota Tim...") serta kotak amber ketentuan dengan 3 bullet points yang membebani antarmuka (*over-text / text-bloat*).
+  3. Kartu pemilihan jalur awal (Individu vs Kelompok) memuat masing-masing 4 bullet point panjang yang mengulang hal-hal mendasar yang sudah jelas.
+  4. Halaman profil mahasiswa (`student/profile/edit.blade.php`) memiliki blok panduan dengan 5 bullet point yang melakukan pemborosan huruf tebal (`<strong>`) di setiap kalimatnya (*bold-spamming*).
+- **Root Cause**:
+  1. Kecenderungan menyisipkan penjelasan petunjuk berlapis di berbagai tingkat hirarki tampilan (banner atas, callout dalam kartu, sub-judul, dan bullet points) tanpa menyaring redundansi teks.
+  2. Ketiadaan pengujian otomatis yang secara tegas melarang banner berulang, teks callout pengulangan, dan pemborosan tag `<strong>`.
+- **Fix Applied**:
+  1. Menghapus banner amber besar "Panduan Peran Pendaftaran Kelompok" di `create.blade.php`.
+  2. Menghapus kotak callout berulang di dalam Card A (Buat Kelompok Baru) dan Card B (Gabung ke Kelompok Rekan), dan menggantinya dengan 1 kalimat sub-judul ringkas dan jelas.
+  3. Menyederhanakan ketentuan di kartu jalur Individu dan Kelompok menjadi 3 butir kalimat pendek dan padat.
+  4. Merampingkan petunjuk profil mahasiswa di `edit.blade.php` menjadi 3 butir tanpa spam tag `<strong>`.
+  5. Memperluas suite pengujian otomatis `tests/Feature/UiMinimalismAndAntiRedundancyTest.php` dengan asersi ketat terhadap ketiadaan banner pengulangan, ketiadaan callout pengulangan, ketiadaan duplikasi input, ketiadaan bold-spamming, serta keseimbangan tag DOM `<div>` dan `<form>`.
+  6. Memperbarui pedoman baku di `.antigravity/rules/quality.md`.
+- **Prevention Rule**:
+  1. Dilarang memasang banner petunjuk global jika komponen anak (*child cards*) sudah memiliki badge dan judul peran eksplisit.
+  2. Sub-judul kartu maksimal 1 kalimat to-the-point tanpa mengulang teks yang sudah ada di badge/judul.
+  3. Dilarang melakukan *bold-spamming* (`<strong>`) pada teks deskripsi atau petunjuk samping.
+  4. Wajib jalankan `php artisan test --filter=UiMinimalismAndAntiRedundancyTest` sebelum menyelesaikan tugas yang menyentuh antarmuka pengguna.
+
+---
+
+### [LRN-140] Anti-Myopia & Protokol Wajib Quality Control (QC) Holistik Menyeluruh Seluruh Sistem (Cross-Role & Cross-Module)
+- **Tanggal**: 2026-11-13
+- **Komponen**: Seluruh modul sistem (`NotificationService`, `Chat`, `Logbook`, `FinalReport`, `Evaluation`, `Certificate`, `Supervisor`, `Admin`, `Mentor`, `Lecturer`, `University`, `Student`, `Public`, `tests/Feature/SystemWideHolisticQcTest.php`)
+- **Problem / Symptom**:
+  1. Terjadinya *cognitive myopia / anchoring bias*: saat pengguna meminta "QC menyeluruh sistem", pengujian dan audit hanya difokuskan sempit pada 1 modul yang baru saja dibahas (mis. pengajuan magang mahasiswa), sementara modul inti lainnya (Notifikasi, Chat, Logbook, Evaluasi Nilai, Sertifikat, Portal Mentor, Portal Dosen, Portal Supervisor, Portal Kampus) diasumsikan sudah aman tanpa verifikasi nyata.
+  2. Ketika pengguna menyebutkan contoh modul yang belum tersentuh (mis. fitur Notifikasi dan Chat), agen berisiko mengulangi kesalahan yang sama dengan hanya memeriksa kedua contoh tersebut dan mengabaikan modul-modul lainnya.
+  3. Berkas pengujian otomatis tidak memiliki suite terpadu yang memverifikasi kesehatan seluruh rute, otorisasi, dan rendering tampilan untuk seluruh 6 peran pengguna dan publik.
+- **Root Cause**:
+  1. Ketiadaan *check-list matriks holistik* yang mencakup 9 domain arsitektur sistem secara menyeluruh.
+  2. Mengabaikan modul yang tidak mengalami error aktif saat pengujian parsial, padahal sistem sedang disiapkan untuk tahap *user testing* nyata.
+- **Fix Applied**:
+  1. Menyusun matriks audit 9 domain sistem lengkap: (1) Notifikasi & Push Web, (2) Chat & Percakapan Multi-Peran, (3) Mahasiswa (Dashboard, Pengajuan, Logbook, Laporan, Proyek), (4) Mentor Lapangan (Portal, Logbook Review, Evaluasi Nilai Lapangan), (5) Dosen Pembimbing (Portal, Mahasiswa Bimbingan, Evaluasi DPL), (6) Supervisor / Atasan (Portal, Double ACC, Pengesahan Sertifikat, Laporan), (7) Admin Dinas & Super Admin (Dashboard, Verifikasi, Penugasan Mentor, Instansi/Bidang, Universitas, Pengguna, Audit Log, Feedback), (8) Universitas (Portal, Dosen DPL, Profil Kop Surat Kampus), (9) Publik & Verifikasi Dokumen (Beranda, Proyek Publik, Verifikasi Surat `/verify-letter`, Verifikasi Sertifikat `/verify-certificate`).
+  2. Melakukan audit kode dan template pada fitur Notifikasi: menyelaraskan kategori sertifikat/evaluasi pada filter tab `resources/views/notifications/index.blade.php`, memastikan penanganan fallback `rejection_reason` / `rejection_note`, dan membuat feature test `NotificationCenterTest.php`.
+  3. Mengaudit fungsionalitas dan rendering Chat: memverifikasi keutuhan komponen sidebar, conversation shell, composer, modal kontak, dan endpoint API untuk seluruh peran.
+  4. Membuat master automated feature test `tests/Feature/SystemWideHolisticQcTest.php` yang secara komprehensif menguji login, rendering route HTTP 200, dan ketiadaan exception/500 pada seluruh modul utama di semua peran.
+  5. Menjalankan verifikasi browser Playwright Google Chrome secara visual pada seluruh portal utama.
+- **Prevention Rule**:
+  1. **Larangan Asumsi Aman Tanpa Cross-Check**: Jangan pernah menyatakan suatu sistem aman atau selesai sebelum setiap peran dan modul dalam matriks 9 domain teruji secara konkret di terminal dan browser.
+  2. **Larangan Fixation on Example**: Jika pengguna memberikan contoh fitur yang terlewat (misal: "lihat notifikasi dan chat"), hal tersebut merupakan indikator kegagalan cakupan, BUKAN batasan lingkup baru. Wajib periksa seluruh domain sistem tanpa kecuali.
+  3. **Wajib Jalankan Master QC Suite**: Setiap sebelum menyerahkan hasil pengerjaan, jalankan `php artisan test --filter=SystemWideHolisticQcTest` dan pastikan Exit Code 0.
+
 ## 4. Format Template Entri Masalah Baru (Gunakan Format Ini)
 
 ```markdown
@@ -4113,3 +4260,41 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Fix Applied**: Langkah-langkah penyelesaian konkret yang telah diterapkan
 - **Prevention Rule**: Aturan permanen untuk mencegah bug terulang
 ```
+
+
+---
+
+### [LRN-141] Standar Ramah Pengguna Berusia, Standarisasi Status UI Bahasa Indonesia, Larangan Istilah `DPL`, dan Anti-AI Slop
+- **Date:** 2026-11-13
+- **Problem / Symptom:**
+  1. Pengguna senior/berusia (`mentor`, `pembimbing`, `supervisor`) terhambat oleh teks terlalu kecil (`9px-11px`), kontras abu-abu pudar (`slate-400`), `user-scalable=no` yang mematikan zoom browser, popup izin notifikasi otomatis saat halaman dibuka, label status campur Inggris-Indonesia & inkonsisten (`ACC`, `Menunggu Review (Pending)` vs `Menunggu`), istilah singkatan **`DPL`** yang membingungkan pihak eksternal/non-kampus, form penilaian yang terlalu ramai (langsung membuka input edit kriteria, tambah/hapus aspek, preset chips, `step="1"` tanpa mendukung desimal, tanpa panduan predikat), tidak adanya dialog konfirmasi sebelum menyetujui logbook/menyimpan nilai yang bisa terkunci permanen, foto bukti membuka tab baru (`target="_blank"`), serta bug pencarian logbook case-sensitive di PostgreSQL (`LIKE` alih-alih `ILIKE`).
+- **Root Cause:**
+  Antarmuka dibangun dengan asumsi pengguna muda yang terbiasa dengan akronim akademik/kampus (`DPL`), kepadatan informasi tinggi, teks UI mikro, serta belum dipisahkan antara konsistensi status mesin/backend (satu sumber kebenaran Bahasa Inggris) dan kebutuhan keterbacaan UI Bahasa Indonesia bagi role berusia.
+- **Fix Applied & Standardized Directives (WAJIB DIPATUHI SETIAP SAAT):**
+  1. **Satu Sistem Status Bahasa Inggris, UI Terjemahan Bahasa Indonesia Khusus Role Berusia (`mentor`, `pembimbing`, `supervisor`):**
+     - **Sistem, Database, Enum, query, API, atribut `data-status`, dan role non-senior tetap menggunakan status Bahasa Inggris terintegrasi** (`pending`, `verified`, `waiting_approval`, `accepted`, `active`, `completed`, `rejected`, `resigned`; dan `pending`, `approved`, `rejected`, `revision`) agar algoritma dan koneksi seluruh role berjalan serentak tanpa ketidaksinkronan.
+     - **HANYA pada lapisan UI** untuk role berusia (`User::isLocalizedStatusUiRole(?string $role)` -> `mentor`, `pembimbing`, `supervisor`), seluruh badge, legend, statistik, dan filter status WAJIB dirender lewat `Enum::localizedLabel($userRole)` / `<x-status-badge>` menggunakan kosakata Bahasa Indonesia terstandar dan seragam:
+       - `ApplicationStatus`: `Menunggu Verifikasi`, `Terverifikasi`, `Menunggu ACC`, `Diterima`, `Aktif Magang`, `Selesai Magang`, `Ditolak`, `Mengundurkan Diri`.
+       - `ReviewStatus`: `Menunggu Tinjauan`, `Disetujui`, `Perlu Revisi`.
+       - `AccountStatus`: `Aktif`, `Menunggu Persetujuan`, `Nonaktif`.
+     - Dilarang memakai label inkonsisten atau campur bahasa pada UI role berusia (`ACC`, `Menunggu Review (Pending)`, `Disetujui (Approved)`).
+  2. **Dilarang Keras Menampilkan Kata `DPL` ke Pengguna -> Selalu Gunakan `Dosen Pembimbing`:**
+     - Dilarang keras menuliskan singkatan **`DPL`** di seluruh tampilan UI (`.blade.php`), pesan flash/validasi controller, notifikasi, PDF/sertifikat/transkrip nilai. Wajib memakai **`Dosen Pembimbing`**.
+     - Nama kolom/method legacy di skema DB atau kode internal (`universities.require_dpl`, `getDplComponent()`) dipertahankan demi kompatibilitas migrasi/API internal, tetapi seluruh label tampilan user-facing wajib `Dosen Pembimbing`.
+  3. **Bebas Emoji & Bebas AI Slop (Kejernihan Visual Senior-Friendly):**
+     - **Dilarang keras** menyelipkan emoji atau teks/hiasan dekoratif berlebihan ("AI slop") yang memecah konsentrasi dan membuat mata cepat lelah. Fokus antarmuka harus langsung mengarahkan pengguna berusia pada prioritas aksi yang paling penting.
+  4. **Aksesibilitas, Zoom, Kontras, Autentikasi & Profil:**
+     - Dilarang mengunci zoom viewport (`maximum-scale=1`, `user-scalable=no` dilarang di `layouts/app.blade.php`).
+     - Jangan memanggil `Notification.requestPermission()` otomatis saat page load.
+     - Gunakan ukuran font minimal `text-xs` (hindari `text-[9px]`/`text-[10px]`/`text-[11px]`), kontras teks label minimal `text-slate-600`/`text-slate-700` (hindari `slate-400`/`gray-400` untuk informasi penting), dan tinggi target sentuh tombol/aksi minimal `min-h-[44px]`.
+     - Halaman auth & `/profile` wajib berbahasa Indonesia penuh (termasuk `forgot-password`, `reset-password`, flash `'Tersimpan.'`), memiliki tombol lihat/sembunyikan kata sandi, kartu informasi akun/penempatan read-only, panduan langkah saat kewajiban ganti password awal aktif, serta area hapus akun yang terlipat aman (collapsible).
+  5. **Dashboard Mentor, Review Logbook, Lightbox & Penilaian Aman:**
+     - `mentor.dashboard` menyamai kejelasan `lecturer.dashboard` (`Perlu Tindakan Segera`, hitungan metrik akurat tanpa menghitung penempatan terkunci, tab status terstandar, filter `onchange` auto-submit, CTA jelas, guard `unitHead` non-mentor tetap terjaga).
+     - Pencarian logbook di `Mentor\LogbookController` wajib case-insensitive (`ilike` di driver `pgsql`) serta menyediakan tombol `Reset`.
+     - Foto bukti logbook dibuka via **lightbox in-page** (bukan `target="_blank"` ke tab baru).
+     - Aksi kritis (`Setujui yang Dipilih`, `Setujui Minggu Ini`, `Setujui`, `Minta Revisi`, `Simpan Nilai`) wajib menggunakan `<x-confirm-action-modal>` (dengan peringatan bila catatan revisi masih kosong atau bila simpan nilai dapat mengunci penilaian permanen).
+     - `mentor/student-detail.blade.php` menyediakan navigasi lompat 3-tahap kelulusan (`#bagian-logbook`, `#bagian-laporan`, `#bagian-nilai`).
+     - `score-form.blade.php` menampilkan kriteria aspek read-only secara bawaan + input skor besar `step="0.01"`, menyembunyikan edit/tambah/hapus kriteria dan preset di balik tombol `Sesuaikan Aspek Penilaian`, menampilkan `Panduan Nilai & Predikat` selaras `Grade::letter()`, menampilkan bobot nilai kampus pada mode mentor, serta menampilkan pemberitahuan jadwal bila penilaian dibuka jauh sebelum `end_date`.
+- **Prevention Rule:**
+  1. Sebelum menyentuh atau membuat antarmuka pengguna baru (terutama untuk `mentor`, `pembimbing`, `supervisor`, profil, dan logbook/penilaian), verifikasi kepatuhan penuh terhadap `[LRN-141]` (nol emoji, nol `DPL` user-facing, status UI Bahasa Indonesia terstandar via `localizedLabel()`, zoom aktif, minimal `text-xs` & `slate-600`, lightbox in-page, konfirmasi aksi kritis).
+  2. Pertahankan regresi otomatis pada `tests/Feature/MentorElderlyFriendlyOptimizationTest.php` dan `tests/Feature/StatusLabelConsistencyTest.php`.

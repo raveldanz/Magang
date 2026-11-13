@@ -5,8 +5,8 @@
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
                     <span>Master Pengguna Sistem</span>
                 </h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, DPL Kampus, & Universitas
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">
+                    Kelola akun seluruh role: Mahasiswa, Admin Bidang, Mentor Lapangan, Dosen Pembimbing Kampus, &amp; Universitas
                 </p>
             </div>
 

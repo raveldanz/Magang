@@ -15,27 +15,27 @@
             <div class="border-b border-slate-200">
                 <nav class="flex items-center w-full sm:space-x-6 sm:w-auto" aria-label="Tabs">
                     <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'active'])) }}" 
-                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? 'active') === 'active' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? 'active') === 'active' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                         <span class="sm:hidden">Aktif</span> {{-- status-guard:ignore --}}
                         <span class="hidden sm:inline">Mahasiswa Aktif</span> {{-- status-guard:ignore --}}
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? 'active') === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['active'] }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ ($tab ?? 'active') === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['active'] }}</span>
                     </a>
                     <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'completed'])) }}" 
-                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'completed' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'completed' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                         <span class="sm:hidden">Selesai</span>
                         <span class="hidden sm:inline">Arsip Selesai</span>
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? '') === 'completed' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['completed'] }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ ($tab ?? '') === 'completed' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['completed'] }}</span>
                     </a>
                     <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'upcoming'])) }}" 
-                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'upcoming' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'upcoming' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                         <span class="sm:hidden">Calon</span>
                         <span class="hidden sm:inline">Calon Peserta</span>
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['upcoming'] }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ ($tab ?? '') === 'upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['upcoming'] }}</span>
                     </a>
                     <a href="{{ route('lecturer.monitoring.index', array_merge(request()->query(), ['tab' => 'all'])) }}" 
-                        class="flex-1 sm:flex-initial py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'all' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-semibold' }}">
+                        class="flex-1 sm:flex-initial min-h-[44px] py-3 px-1 border-b-2 text-xs sm:text-sm text-center flex items-center justify-center gap-1 sm:gap-2 transition cursor-pointer {{ ($tab ?? '') === 'all' ? 'border-blue-600 text-blue-600 font-bold' : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300 font-semibold' }}">
                         <span>Semua</span>
-                        <span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold {{ ($tab ?? '') === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['total'] }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ ($tab ?? '') === 'all' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">{{ $stats['total'] }}</span>
                     </a>
                 </nav>
             </div>
@@ -46,18 +46,18 @@
                     <input type="hidden" name="tab" value="{{ $tab ?? 'active' }}">
 
                     <div class="relative flex-1 min-w-0">
-                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-400">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3.5 text-slate-600">
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa atau NIM..."
-                               class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
+                               class="w-full min-h-[44px] text-xs sm:text-sm bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl pl-10 pr-3.5 py-2.5 transition shadow-2xs">
                     </div>
 
                     <div class="w-full sm:w-64 sm:max-w-xs shrink-0">
                         <select name="unit_id" onchange="this.form.submit()"
-                                class="w-full text-xs sm:text-sm bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl py-2.5 px-3.5 font-medium transition shadow-2xs truncate">
+                                class="w-full min-h-[44px] text-xs sm:text-sm bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl py-2.5 pl-3.5 pr-9 font-medium transition shadow-2xs truncate">
                             <option value="">Semua Bidang / Divisi</option>
                             @foreach ($units ?? [] as $u)
                                 <option value="{{ $u->id }}" {{ request('unit_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
@@ -66,11 +66,11 @@
                     </div>
 
                     <div class="flex items-center gap-2 shrink-0">
-                        <button type="submit" class="flex-1 sm:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer shrink-0">
+                        <button type="submit" class="flex-1 sm:flex-initial min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition cursor-pointer shrink-0">
                             Cari
                         </button>
                         @if (request()->filled('search') || request()->filled('unit_id') || request()->filled('agency_id'))
-                            <a href="{{ route('lecturer.monitoring.index', ['tab' => $tab ?? 'active']) }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">Reset</a>
+                            <a href="{{ route('lecturer.monitoring.index', ['tab' => $tab ?? 'active']) }}" class="min-h-[44px] inline-flex items-center justify-center px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition text-center shrink-0">Reset</a>
                         @endif
                     </div>
                 </form>
@@ -124,7 +124,7 @@
                                         <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
                                         @if($placement->application?->group_id && $placement->application?->group)
                                             <div class="mt-0.5">
-                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                     Kelompok: {{ $placement->application->group->name }} ({{ $placement->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
                                                 </span>
                                             </div>
@@ -139,13 +139,13 @@
 
                             <div class="bg-slate-50 p-3.5 rounded-xl text-xs space-y-2">
                                 <div class="text-slate-600">
-                                    <span class="text-slate-400 font-medium">Instansi:</span>
+                                    <span class="text-slate-600 font-medium">Instansi:</span>
                                     <span class="font-semibold text-slate-800">{{ $agency->agency_name ?? '-' }} ({{ $unit->name ?? '-' }})</span>
                                 </div>
                                 <div class="flex items-center justify-between text-xs">
                                     <div>
                                         <span class="text-slate-500">Logbook: <strong class="text-slate-800">{{ $approvedLog }} / {{ $totalLog }} ACC</strong></span>
-                                        <div class="text-[10px] mt-0.5">
+                                        <div class="text-xs mt-0.5">
                                             @if ($latestLog)
                                                 @if ($daysAgo <= 0)
                                                     <span class="text-emerald-700 font-medium">● Aktif hari ini</span>
@@ -157,7 +157,7 @@
                                                     <span class="text-amber-700 font-semibold">● {{ $daysAgo }} hari belum isi</span>
                                                 @endif
                                             @else
-                                                <span class="text-slate-400 italic">● Belum ada log</span>
+                                                <span class="text-slate-600 italic">● Belum ada log</span>
                                             @endif
                                         </div>
                                     </div>
@@ -165,14 +165,14 @@
                                         @if ($finalReport)
                                             <x-status-badge type="review" :status="$finalReport->status" />
                                         @else
-                                            <span class="text-slate-400 italic">Belum Ada</span>
+                                            <span class="text-slate-600 italic">Belum Ada</span>
                                         @endif
                                     </span>
                                 </div>
                                 <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
                                     <span class="text-slate-500 font-medium">Evaluasi Nilai:</span>
                                     @if ($isMentorOnly)
-                                        <span class="text-slate-500 text-[11px]">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
+                                        <span class="text-slate-600 text-xs">100% Nilai Dinas ({{ $nilaiDinas > 0 ? $nilaiDinas : 'Menunggu' }})</span>
                                     @else
                                         @if ($hasEval)
                                             <span class="text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded-md">{{ $nilaiDpl }}/100</span>
@@ -185,19 +185,19 @@
 
                             <div class="grid {{ !$isMentorOnly ? 'grid-cols-2' : 'grid-cols-1' }} gap-2 pt-1">
                                 <a href="{{ route('lecturer.students.show', $placement->id) }}" 
-                                   class="inline-flex items-center justify-center py-2.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition text-center min-h-[38px]">
+                                   class="inline-flex items-center justify-center py-2.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition text-center min-h-[44px]">
                                     Detail
                                 </a>
                                 @if (!$isMentorOnly)
                                     <a href="{{ route('lecturer.evaluations.create', $placement->id) }}"
-                                       class="inline-flex items-center justify-center py-2.5 px-3 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-xl text-xs font-bold transition text-center min-h-[38px]">
+                                       class="inline-flex items-center justify-center py-2.5 px-3 {{ $hasEval ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-xl text-xs font-bold transition text-center min-h-[44px]">
                                         {{ $hasEval ? 'Ubah Nilai' : 'Input Nilai' }}
                                     </a>
                                 @endif
                             </div>
                         </div>
                     @empty
-                        <div class="py-12 text-center text-slate-400 text-xs">
+                        <div class="py-12 text-center text-slate-600 text-xs">
                             Tidak ditemukan data mahasiswa bimbingan pada tab ini.
                         </div>
                     @endforelse
@@ -207,7 +207,7 @@
                 <div class="hidden lg:block w-full">
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
-                            <tr class="bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                            <tr class="bg-slate-50/75 text-xs font-bold text-slate-600 uppercase tracking-wider">
                                 <th class="py-3.5 px-4 w-[24%]">Mahasiswa</th>
                                 <th class="py-3.5 px-4 w-[22%]">Instansi & Unit</th>
                                 <th class="py-3.5 px-3 w-[10%] text-center">Status</th>
@@ -256,7 +256,7 @@
                                         <div class="font-bold text-slate-900 leading-snug truncate" title="{{ $student->name ?? '-' }}">{{ $student->name ?? '-' }}</div>
                                         @if($placement->application?->group_id && $placement->application?->group)
                                             <div class="mt-0.5 truncate">
-                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                                     Kelompok: {{ $placement->application->group->name }} ({{ $placement->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
                                                 </span>
                                             </div>
@@ -266,7 +266,7 @@
 
                                     <td class="py-4 px-4">
                                         <div class="text-xs font-semibold text-slate-800 truncate" title="{{ $agency->agency_name ?? '-' }}">{{ $agency->agency_name ?? '-' }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5 truncate" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
+                                        <div class="text-xs text-slate-600 mt-0.5 truncate" title="{{ $unit->name ?? '-' }}">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
                                     <td class="py-4 px-3 text-center">
@@ -277,7 +277,7 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
                                             {{ $approvedLog }} / {{ $totalLog }}
                                         </span>
-                                        <div class="text-[10px] mt-1">
+                                        <div class="text-xs mt-1">
                                             @if ($latestLogDesktop)
                                                 @if ($daysAgoDesktop <= 0)
                                                     <span class="text-emerald-700 font-medium whitespace-nowrap">Aktif hari ini</span>
@@ -289,7 +289,7 @@
                                                     <span class="text-amber-700 font-semibold whitespace-nowrap">{{ $daysAgoDesktop }} hari belum isi</span>
                                                 @endif
                                             @else
-                                                <span class="text-slate-400 italic whitespace-nowrap">Belum ada log</span>
+                                                <span class="text-slate-600 italic whitespace-nowrap">Belum ada log</span>
                                             @endif
                                         </div>
                                     </td>
@@ -298,7 +298,7 @@
                                         @if ($finalReport)
                                             <x-status-badge type="review" :status="$finalReport->status" />
                                         @else
-                                            <span class="text-xs text-slate-400 italic">Belum Ada</span>
+                                            <span class="text-xs text-slate-600 italic">Belum Ada</span>
                                         @endif
                                     </td>
 
@@ -309,7 +309,7 @@
                                                     <span class="inline-flex items-center px-2 py-0.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-md">
                                                         Dinas: {{ $nilaiDinas }}
                                                     </span>
-                                                    <span class="text-[10px] text-slate-400 mt-0.5">100% Nilai Dinas</span>
+                                                    <span class="text-xs text-slate-600 mt-0.5">100% Nilai Dinas</span>
                                                 </div>
                                             @else
                                                 <div class="inline-flex flex-col items-center">
@@ -348,7 +348,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-12 text-center text-slate-400 text-xs">
+                                    <td colspan="7" class="py-12 text-center text-slate-600 text-xs">
                                         Tidak ditemukan data mahasiswa bimbingan pada tab ini.
                                     </td>
                                 </tr>

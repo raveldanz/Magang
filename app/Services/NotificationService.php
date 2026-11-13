@@ -291,7 +291,7 @@ class NotificationService
                     'category' => 'academic',
                     'title' => "Total {$placements->count()} Mahasiswa dalam Bimbingan Anda",
                     'message' => 'Pantau kemajuan kegiatan magang mahasiswa bimbingan di instansi Pemkot Surabaya.',
-                    'time' => 'Portal DPL',
+                    'time' => 'Portal Dosen Pembimbing',
                     'action_url' => route('lecturer.monitoring.index'),
                     'is_action_required' => false,
                 ];
@@ -404,7 +404,7 @@ class NotificationService
                         'type' => 'urgent',
                         'category' => 'application',
                         'title' => 'Pengajuan Magang Belum Diterima',
-                        'message' => 'Catatan: "'.($latestApp->rejection_reason ?? 'Kuota instansi belum mencukupi').'". Anda dapat mengajukan ulang.',
+                        'message' => 'Catatan: "'.($latestApp->rejection_reason ?? $latestApp->rejection_note ?? 'Kuota instansi belum mencukupi').'". Anda dapat mengajukan ulang.',
                         'time' => 'Pemberitahuan',
                         'action_url' => route('student.application.create'),
                         'action_label' => 'Ajukan Ulang',
@@ -461,10 +461,10 @@ class NotificationService
                         'type' => 'warning',
                         'category' => 'university',
                         'title' => 'Belum Ada Dosen Pembimbing Terdaftar',
-                        'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih DPL dengan mudah.',
+                        'message' => 'Daftarkan akun Dosen Pembimbing resmi kampus agar mahasiswa dapat memilih Dosen Pembimbing dengan mudah.',
                         'time' => 'Perlu kelengkapan',
                         'action_url' => route('university.lecturers.index'),
-                        'action_label' => 'Tambah DPL',
+                        'action_label' => 'Tambah Dosen Pembimbing',
                         'is_action_required' => true,
                     ];
                 }
@@ -488,7 +488,7 @@ class NotificationService
                     'type' => 'info',
                     'category' => 'university',
                     'title' => "Portal Mitra MBKM: {$univ->name}",
-                    'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen DPL aktif pada program magang Pemkot Surabaya.",
+                    'message' => "Tercatat {$studentCount} Mahasiswa dan {$dosenCount} Dosen Pembimbing aktif pada program magang Pemkot Surabaya.",
                     'time' => 'Terhubung',
                     'action_url' => route('university.profile.index'),
                     'action_label' => 'Buka Profil Kampus',
@@ -537,9 +537,9 @@ class NotificationService
     /**
      * Determine if the notification red dot badge should be visible
      */
-    public static function hasUnreadDot(User $user): bool
+    public static function hasUnreadDot(User $user, ?array $preloadedNotifs = null): bool
     {
-        $notifs = self::getNotificationsForUser($user);
+        $notifs = $preloadedNotifs ?? self::getNotificationsForUser($user);
         if (empty($notifs)) {
             return false;
         }

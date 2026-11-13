@@ -19,8 +19,11 @@ class LecturerInnovationsTest extends TestCase
     use RefreshDatabase;
 
     private User $dosen;
+
     private User $student;
+
     private Placement $placement;
+
     private Application $application;
 
     protected function setUp(): void
@@ -134,7 +137,7 @@ class LecturerInnovationsTest extends TestCase
         $response = $this->actingAs($this->dosen)->get(route('lecturer.students.grade_sheet', $this->placement->id));
         $response->assertStatus(200);
         $response->assertSee('BERITA ACARA', false);
-        $response->assertSee('DOSEN PEMBIMBING LAPANGAN', false);
+        $response->assertSee('DOSEN PEMBIMBING', false);
         $response->assertSee('Ahmad Fajar');
         $response->assertSee('22081010199');
         $response->assertSee('Dr. Budi Santoso, M.Kom.');
@@ -190,11 +193,11 @@ class LecturerInnovationsTest extends TestCase
     public function test_dpl_can_export_monitoring_to_csv(): void
     {
         $response = $this->actingAs($this->dosen)->get(route('lecturer.monitoring.export'));
-        
+
         $response->assertStatus(200);
         $this->assertTrue(str_contains($response->headers->get('content-type'), 'text/csv'));
         $this->assertTrue(str_contains($response->headers->get('content-disposition'), 'Rekap_Bimbingan_DPL_'));
-        
+
         // Check content
         ob_start();
         $response->sendContent();
@@ -222,4 +225,3 @@ class LecturerInnovationsTest extends TestCase
         );
     }
 }
-

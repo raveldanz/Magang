@@ -88,7 +88,7 @@ class ProfileController extends Controller
 
             if (($weightMentor + $weightLecturer) !== 100) {
                 throw ValidationException::withMessages([
-                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Dosen Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
                 ]);
             }
 
@@ -120,7 +120,7 @@ class ProfileController extends Controller
                     $clean[$i++] = $val;
                 }
             }
-            $data['dinas_components'] = !empty($clean) ? $clean : null;
+            $data['dinas_components'] = ! empty($clean) ? $clean : null;
         }
 
         if ($request->has('dpl_components')) {
@@ -133,7 +133,7 @@ class ProfileController extends Controller
                     $clean[$i++] = $val;
                 }
             }
-            $data['dpl_components'] = !empty($clean) ? $clean : null;
+            $data['dpl_components'] = ! empty($clean) ? $clean : null;
         }
 
         // Handle upload logo

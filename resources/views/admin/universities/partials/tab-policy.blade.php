@@ -87,7 +87,7 @@
                                 </ul>
                             </div>
                             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                                <span class="font-bold text-purple-900 block text-[11px]">Aspek Penilaian DPL (Akademik Kampus)</span>
+                                <span class="font-bold text-purple-900 block text-xs">Aspek Penilaian Dosen Pembimbing (Akademik Kampus)</span>
                                 <ul class="space-y-1.5 text-slate-600 text-[11px]">
                                     <li class="flex items-start gap-1.5"><strong class="text-slate-800">1.</strong> <span>{{ $university->getDplComponent(1) }}</span></li>
                                     <li class="flex items-start gap-1.5"><strong class="text-slate-800">2.</strong> <span>{{ $university->getDplComponent(2) }}</span></li>

@@ -15,15 +15,18 @@
         $endDate = $app?->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
 
         $pendingLogbooksCount = $placement->logbooks->where('status', 'pending')->count();
+        $approvedLogbooksCount = $placement->logbooks->where('status', 'approved')->count();
+        $totalLogbooksCount = $placement->logbooks->count();
+        $finalReport = $placement->finalreport;
+        $reportStatusVal = $finalReport?->status instanceof \BackedEnum ? $finalReport->status->value : (string) ($finalReport?->status ?? '');
 
-        // Status Kedinasan Resmi & Tugas Mentor Berdasarkan Status (0% emoji, gaya administrasi formal)
+        // Status Kedinasan Resmi & Tugas Mentor Berdasarkan Status (0% emoji, konsisten dengan Enum localizedLabel)
         $isUpcoming = false;
         $isActive = false;
         $isCompleted = false;
-        $statusLabel = 'Draf Pengajuan';
+        $statusEnum = \App\Enums\ApplicationStatus::tryFrom($appStatus);
+        $statusLabel = $statusEnum ? $statusEnum->localizedLabel('mentor') : strtoupper(str_replace('_', ' ', $appStatus));
         $statusDesc = '';
-        $statusBadgeClass = 'bg-slate-100 text-slate-700 border border-slate-300';
-        $statusDotClass = 'bg-slate-400';
 
         $mentorTaskTitle = 'Belum Ada Aksi yang Diperlukan';
         $mentorTaskDesc = 'Mahasiswa belum memulai masa magang. Mentor belum perlu melakukan tindakan apapun.';
@@ -33,10 +36,7 @@
         $mentorTaskBadgeClass = 'bg-slate-100 text-slate-700 border-slate-300';
 
         if ($appStatus === 'pending') {
-            $statusLabel = 'Menunggu Verifikasi Berkas';
             $statusDesc = 'Pengajuan berkas sedang dalam verifikasi administrasi dinas';
-            $statusBadgeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
-            $statusDotClass = 'bg-amber-500';
             $mentorTaskTitle = 'Belum Perlu Tindakan Apapun';
             $mentorTaskDesc = 'Pengajuan magang mahasiswa masih dalam tahap verifikasi berkas administrasi oleh staf dinas. Mentor belum perlu melakukan aksi bimbingan apapun saat ini.';
             $mentorTaskBadge = 'Proses Pendaftaran';
@@ -44,13 +44,10 @@
             $mentorTaskBorder = 'border-amber-200';
             $mentorTaskBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
         } elseif ($appStatus === 'waiting_approval') {
-            $statusLabel = 'Menunggu Persetujuan Atasan';
             $statusDesc = 'Menunggu persetujuan akhir dari Atasan Kepegawaian Dinas';
-            $statusBadgeClass = 'bg-purple-50 text-purple-700 border border-purple-200';
-            $statusDotClass = 'bg-purple-600';
             $mentorTaskTitle = 'Belum Perlu Tindakan Apapun';
-            $mentorTaskDesc = 'Penugasan dan pengajuan magang sedang menunggu persetujuan akhir (ACC) dari Atasan Kepegawaian Dinas. Mentor belum perlu melakukan aksi bimbingan sampai proses persetujuan resmi selesai.';
-            $mentorTaskBadge = 'Menunggu ACC Atasan';
+            $mentorTaskDesc = 'Penugasan dan pengajuan magang sedang menunggu persetujuan akhir dari Atasan Kepegawaian Dinas. Mentor belum perlu melakukan aksi bimbingan sampai proses persetujuan resmi selesai.';
+            $mentorTaskBadge = 'Menunggu Persetujuan';
             $mentorTaskBg = 'bg-purple-50/40';
             $mentorTaskBorder = 'border-purple-200';
             $mentorTaskBadgeClass = 'bg-purple-100 text-purple-800 border-purple-200';
@@ -58,10 +55,7 @@
             if ($startDate && $startDate->startOfDay()->isFuture()) {
                 $isUpcoming = true;
                 $daysUntil = (int) ceil(now()->floatDiffInDays($startDate->startOfDay(), false));
-                $statusLabel = 'Menunggu Jadwal Mulai';
                 $statusDesc = 'Masa magang dimulai dalam ' . $daysUntil . ' hari (' . $startDate->translatedFormat('d M Y') . ')';
-                $statusBadgeClass = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
-                $statusDotClass = 'bg-indigo-500';
                 $mentorTaskTitle = 'Belum Perlu Tindakan Apapun';
                 $mentorTaskDesc = 'Mahasiswa telah resmi diterima. Belum ada tindakan bimbingan yang diperlukan hingga mahasiswa hadir pada hari pertama magang tanggal ' . $startDate->translatedFormat('d F Y') . '. Pengisian dan verifikasi logbook akan aktif otomatis saat masa magang dimulai.';
                 $mentorTaskBadge = 'Menunggu Mulai';
@@ -70,20 +64,31 @@
                 $mentorTaskBadgeClass = 'bg-indigo-100 text-indigo-800 border-indigo-200';
             } else {
                 $isActive = true;
-                $statusLabel = 'Aktif Magang';
                 $statusDesc = 'Masa magang sedang berjalan';
-                $statusBadgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-                $statusDotClass = 'bg-emerald-500';
                 if ($pendingLogbooksCount > 0) {
                     $mentorTaskTitle = 'Verifikasi Logbook Harian Mahasiswa';
-                    $mentorTaskDesc = 'Terdapat ' . $pendingLogbooksCount . ' entri logbook kegiatan mahasiswa yang menunggu pemeriksaan dan persetujuan Anda di bagian bawah halaman ini.';
-                    $mentorTaskBadge = 'Perlu Review (' . $pendingLogbooksCount . ')';
+                    $mentorTaskDesc = 'Terdapat ' . $pendingLogbooksCount . ' catatan logbook kegiatan mahasiswa yang menunggu pemeriksaan dan persetujuan Anda di bagian logbook di bawah.';
+                    $mentorTaskBadge = 'Perlu Tinjauan (' . $pendingLogbooksCount . ')';
                     $mentorTaskBg = 'bg-amber-50/60';
                     $mentorTaskBorder = 'border-amber-300';
                     $mentorTaskBadgeClass = 'bg-amber-100 text-amber-800 border-amber-300';
+                } elseif (($canEvaluate ?? true) && $reportStatusVal === 'pending') {
+                    $mentorTaskTitle = 'Tinjau Naskah Laporan Akhir';
+                    $mentorTaskDesc = 'Mahasiswa telah mengunggah naskah laporan akhir dan menunggu tinjauan Anda.';
+                    $mentorTaskBadge = 'Laporan Menunggu';
+                    $mentorTaskBg = 'bg-amber-50/60';
+                    $mentorTaskBorder = 'border-amber-300';
+                    $mentorTaskBadgeClass = 'bg-amber-100 text-amber-800 border-amber-300';
+                } elseif (($canEvaluate ?? true) && empty($evaluationLockReason) && ! $hasEval && ($reportStatusVal === 'approved' || ($endDate && $endDate->diffInDays(now(), false) >= -14))) {
+                    $mentorTaskTitle = 'Isi Penilaian Akhir Mentor';
+                    $mentorTaskDesc = 'Masa magang mendekati selesai atau laporan sudah disetujui. Silakan lengkapi penilaian akhir mahasiswa.';
+                    $mentorTaskBadge = 'Siap Dinilai';
+                    $mentorTaskBg = 'bg-blue-50/60';
+                    $mentorTaskBorder = 'border-blue-300';
+                    $mentorTaskBadgeClass = 'bg-blue-100 text-blue-800 border-blue-300';
                 } else {
                     $mentorTaskTitle = 'Supervisi Aktivitas & Bimbingan Lapangan';
-                    $mentorTaskDesc = 'Pantau kehadiran mahasiswa di unit kerja dinas dan berikan arahan teknis kedinasan. Formulir penilaian evaluasi akhir akan diisi menjelang masa magang berakhir.';
+                    $mentorTaskDesc = 'Pantau kehadiran mahasiswa di unit kerja dinas dan berikan arahan teknis kedinasan. Formulir penilaian evaluasi akhir dapat diisi setelah mahasiswa mulai aktif dan menjelang selesai magang.';
                     $mentorTaskBadge = 'Supervisi Aktif';
                     $mentorTaskBg = 'bg-emerald-50/40';
                     $mentorTaskBorder = 'border-emerald-200';
@@ -92,17 +97,28 @@
             }
         } elseif ($appStatus === 'active') {
             $isActive = true;
-            $statusLabel = 'Aktif Magang';
             $statusDesc = 'Masa magang sedang berjalan';
-            $statusBadgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-            $statusDotClass = 'bg-emerald-500';
             if ($pendingLogbooksCount > 0) {
                 $mentorTaskTitle = 'Verifikasi Logbook Harian Mahasiswa';
-                $mentorTaskDesc = 'Terdapat ' . $pendingLogbooksCount . ' entri logbook kegiatan mahasiswa yang menunggu pemeriksaan dan persetujuan Anda di bagian bawah halaman ini.';
-                $mentorTaskBadge = 'Perlu Review (' . $pendingLogbooksCount . ')';
+                $mentorTaskDesc = 'Terdapat ' . $pendingLogbooksCount . ' catatan logbook kegiatan mahasiswa yang menunggu pemeriksaan dan persetujuan Anda di bagian logbook di bawah.';
+                $mentorTaskBadge = 'Perlu Tinjauan (' . $pendingLogbooksCount . ')';
                 $mentorTaskBg = 'bg-amber-50/60';
                 $mentorTaskBorder = 'border-amber-300';
                 $mentorTaskBadgeClass = 'bg-amber-100 text-amber-800 border-amber-300';
+            } elseif (($canEvaluate ?? true) && $reportStatusVal === 'pending') {
+                $mentorTaskTitle = 'Tinjau Naskah Laporan Akhir';
+                $mentorTaskDesc = 'Mahasiswa telah mengunggah naskah laporan akhir dan menunggu tinjauan Anda.';
+                $mentorTaskBadge = 'Laporan Menunggu';
+                $mentorTaskBg = 'bg-amber-50/60';
+                $mentorTaskBorder = 'border-amber-300';
+                $mentorTaskBadgeClass = 'bg-amber-100 text-amber-800 border-amber-300';
+            } elseif (($canEvaluate ?? true) && empty($evaluationLockReason) && ! $hasEval && ($reportStatusVal === 'approved' || ($endDate && $endDate->diffInDays(now(), false) >= -14))) {
+                $mentorTaskTitle = 'Isi Penilaian Akhir Mentor';
+                $mentorTaskDesc = 'Masa magang mendekati selesai atau laporan sudah disetujui. Silakan lengkapi penilaian akhir mahasiswa.';
+                $mentorTaskBadge = 'Siap Dinilai';
+                $mentorTaskBg = 'bg-blue-50/60';
+                $mentorTaskBorder = 'border-blue-300';
+                $mentorTaskBadgeClass = 'bg-blue-100 text-blue-800 border-blue-300';
             } else {
                 $mentorTaskTitle = 'Supervisi Aktivitas & Bimbingan Lapangan';
                 $mentorTaskDesc = 'Pantau kehadiran mahasiswa di unit kerja dinas dan berikan arahan teknis kedinasan. Formulir penilaian evaluasi akhir akan diisi menjelang masa magang berakhir.';
@@ -113,10 +129,7 @@
             }
         } elseif ($appStatus === 'completed') {
             $isCompleted = true;
-            $statusLabel = 'Selesai Magang';
             $statusDesc = 'Masa magang telah selesai';
-            $statusBadgeClass = 'bg-blue-50 text-blue-700 border border-blue-200';
-            $statusDotClass = 'bg-blue-500';
             $mentorTaskTitle = 'Seluruh Bimbingan Telah Selesai';
             $mentorTaskDesc = 'Mahasiswa telah menyelesaikan seluruh masa magang, nilai evaluasi akhir telah terkunci, dan sertifikat kelulusan telah diterbitkan. Tidak ada tindakan lanjutan yang diperlukan.';
             $mentorTaskBadge = 'Selesai';
@@ -124,27 +137,19 @@
             $mentorTaskBorder = 'border-blue-200';
             $mentorTaskBadgeClass = 'bg-blue-100 text-blue-800 border-blue-200';
         } elseif ($appStatus === 'resigned') {
-            $statusLabel = 'Mengundurkan Diri';
-            $statusBadgeClass = 'bg-slate-100 text-slate-700 border border-slate-300';
-            $statusDotClass = 'bg-slate-400';
             $mentorTaskTitle = 'Tidak Ada Tindakan (Mengundurkan Diri)';
-            $mentorTaskDesc = 'Mahasiswa telah membatalkan / mengundurkan diri dari kegiatan magang. Seluruh proses bimbingan dinonaktifkan.';
+            $mentorTaskDesc = 'Mahasiswa telah mengundurkan diri dari kegiatan magang. Seluruh proses bimbingan dinonaktifkan.';
             $mentorTaskBadge = 'Batal';
             $mentorTaskBg = 'bg-slate-50';
             $mentorTaskBorder = 'border-slate-200';
             $mentorTaskBadgeClass = 'bg-slate-100 text-slate-700 border-slate-300';
         } elseif ($appStatus === 'rejected') {
-            $statusLabel = 'Pengajuan Ditolak';
-            $statusBadgeClass = 'bg-rose-50 text-rose-700 border border-rose-200';
-            $statusDotClass = 'bg-rose-500';
             $mentorTaskTitle = 'Tidak Ada Tindakan (Pengajuan Ditolak)';
             $mentorTaskDesc = 'Pengajuan magang mahasiswa ditolak oleh instansi dinas. Tidak ada tindakan yang perlu dilakukan oleh mentor.';
             $mentorTaskBadge = 'Ditolak';
             $mentorTaskBg = 'bg-rose-50/40';
             $mentorTaskBorder = 'border-rose-200';
             $mentorTaskBadgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
-        } else {
-            $statusLabel = strtoupper(str_replace('_', ' ', $appStatus));
         }
 
         // Nomor Telepon & Tautan WhatsApp
@@ -232,48 +237,45 @@
                         </h3>
                     </div>
                     <div>
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusBadgeClass }}">
-                            <span class="w-2 h-2 rounded-full {{ $statusDotClass }}"></span>
-                            {{ $statusLabel }}
-                        </span>
+                        <x-status-badge :status="$appStatus" />
                     </div>
                 </div>
 
                 <!-- 6 Data Pokok Magang (Grid 3 Kolom Rapi) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-sm">
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Perguruan Tinggi</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Perguruan Tinggi</span>
                         <span class="font-medium text-slate-800 text-sm block mt-0.5">{{ $profile->universitas ?? '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Program Studi / Jurusan</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Program Studi / Jurusan</span>
                         <span class="font-medium text-slate-800 text-sm block mt-0.5">{{ $profile->jurusan ?? '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Instansi & Unit Kerja</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Instansi & Unit Kerja</span>
                         <span class="font-medium text-slate-800 text-sm block mt-0.5">{{ $agency->agency_name ?? '-' }} &mdash; {{ $unit->name ?? '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Mentor Lapangan (Dinas)</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Mentor Lapangan (Dinas)</span>
                         <span class="font-medium text-slate-800 text-sm block mt-0.5">{{ $mentor->name ?? '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Dosen Pembimbing (Kampus)</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Dosen Pembimbing (Kampus)</span>
                         <span class="font-medium text-slate-800 text-sm block mt-0.5">{{ $academicAdvisor->name ?? 'Belum Ditugaskan' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Periode Pelaksanaan</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Periode Pelaksanaan</span>
                         <span class="font-medium text-slate-800 text-sm block mt-0.5">
                             {{ $startDate ? $startDate->translatedFormat('d M Y') : '-' }} s/d {{ $endDate ? $endDate->translatedFormat('d M Y') : '-' }}
                         </span>
                         @if ($statusDesc)
-                            <span class="text-xs text-slate-500 font-normal block mt-0.5">{{ $statusDesc }}</span>
+                            <span class="text-xs text-slate-600 font-normal block mt-0.5">{{ $statusDesc }}</span>
                         @endif
                     </div>
                     @if($placement->application?->group_id && $placement->application?->group)
                         <div class="col-span-1 sm:col-span-2 lg:col-span-3">
-                            <span class="text-[11px] text-indigo-500 font-semibold uppercase tracking-wider block">Kelompok Magang</span>
-                            <span class="inline-flex items-center gap-1.5 font-bold text-indigo-700 text-xs mt-0.5">
+                            <span class="text-xs text-indigo-700 font-semibold uppercase tracking-wider block">Kelompok Magang</span>
+                            <span class="inline-flex items-center gap-1.5 font-bold text-indigo-800 text-xs mt-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
                                 {{ $placement->application->group->name }} ({{ $placement->application->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }})
                             </span>
@@ -281,25 +283,105 @@
                     @endif
                 </div>
 
+                <!-- Navigasi Cepat 3 Langkah Kelulusan Bimbingan -->
+                <div class="pt-3 border-t border-slate-100 space-y-2">
+                    <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Alur Bimbingan &amp; Navigasi Cepat</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                        <a href="#bagian-logbook"
+                           class="min-h-[44px] p-3 rounded-xl border transition flex items-center justify-between gap-2 {{ $pendingLogbooksCount > 0 ? 'bg-amber-50/70 border-amber-300 hover:bg-amber-50' : ($approvedLogbooksCount > 0 ? 'bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50' : 'bg-slate-50 border-slate-200 hover:bg-slate-100') }}">
+                            <div>
+                                <div class="font-bold text-slate-900">1. Logbook Harian</div>
+                                <div class="text-slate-600 mt-0.5">
+                                    @if ($pendingLogbooksCount > 0)
+                                        {{ $pendingLogbooksCount }} menunggu tinjauan
+                                    @elseif ($totalLogbooksCount > 0)
+                                        {{ $approvedLogbooksCount }}/{{ $totalLogbooksCount }} disetujui
+                                    @else
+                                        Belum ada catatan
+                                    @endif
+                                </div>
+                            </div>
+                            <span class="font-bold text-blue-700 shrink-0">Lompat &darr;</span>
+                        </a>
+
+                        <a href="#bagian-laporan"
+                           class="min-h-[44px] p-3 rounded-xl border transition flex items-center justify-between gap-2 {{ $reportStatusVal === 'pending' ? 'bg-amber-50/70 border-amber-300 hover:bg-amber-50' : ($reportStatusVal === 'approved' ? 'bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50' : 'bg-slate-50 border-slate-200 hover:bg-slate-100') }}">
+                            <div>
+                                <div class="font-bold text-slate-900">2. Laporan Akhir &amp; Proyek</div>
+                                <div class="text-slate-600 mt-0.5">
+                                    @if ($finalReport)
+                                        {{ \App\Enums\ReviewStatus::tryFrom($reportStatusVal)?->localizedLabel('mentor') ?? 'Tersedia' }}
+                                    @else
+                                        Belum mengunggah
+                                    @endif
+                                </div>
+                            </div>
+                            <span class="font-bold text-blue-700 shrink-0">Lompat &darr;</span>
+                        </a>
+
+                        <a href="#bagian-nilai"
+                           class="min-h-[44px] p-3 rounded-xl border transition flex items-center justify-between gap-2 {{ $hasEval ? 'bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50' : (empty($evaluationLockReason) && ($canEvaluate ?? true) ? 'bg-blue-50/60 border-blue-200 hover:bg-blue-50' : 'bg-slate-50 border-slate-200 hover:bg-slate-100') }}">
+                            <div>
+                                <div class="font-bold text-slate-900">3. Nilai Akhir Mentor</div>
+                                <div class="text-slate-600 mt-0.5">
+                                    @if ($hasEval)
+                                        Rata-rata: {{ $eval->nilai_pembimbing }}/100
+                                    @elseif (! empty($evaluationLockReason))
+                                        Belum dibuka
+                                    @else
+                                        Siap diisi
+                                    @endif
+                                </div>
+                            </div>
+                            <span class="font-bold text-blue-700 shrink-0">Lompat &darr;</span>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Tugas Mentor Saat Ini (Full-Width di Bawah Tanpa Terpotong) -->
-                <div class="pt-3 border-t border-slate-100 space-y-1.5">
-                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Tugas Mentor Saat Ini</span>
-                    <div class="p-4 rounded-xl border {{ $mentorTaskBorder }} {{ $mentorTaskBg }} space-y-1">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <span class="font-bold text-sm text-slate-900">{{ $mentorTaskTitle }}</span>
-                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border {{ $mentorTaskBadgeClass }}">
-                                {{ $mentorTaskBadge }}
-                            </span>
+                <div class="pt-3 border-t border-slate-100 space-y-2">
+                    <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Tugas Mentor Saat Ini</span>
+                    <div class="p-4 rounded-xl border {{ $mentorTaskBorder }} {{ $mentorTaskBg }} space-y-3">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="font-bold text-sm text-slate-900">{{ $mentorTaskTitle }}</span>
+                                <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider border {{ $mentorTaskBadgeClass }}">
+                                    {{ $mentorTaskBadge }}
+                                </span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                                {{ $mentorTaskDesc }}
+                            </p>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                            {{ $mentorTaskDesc }}
-                        </p>
+
+                        @if ($isActive)
+                            <div class="flex flex-wrap items-center gap-2 pt-1">
+                                @if ($pendingLogbooksCount > 0)
+                                    <a href="#bagian-logbook"
+                                       class="min-h-[40px] inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-2xs">
+                                        Periksa Logbook Menunggu
+                                    </a>
+                                @endif
+                                @if (($canEvaluate ?? true) && $reportStatusVal === 'pending')
+                                    <a href="#bagian-laporan"
+                                       class="min-h-[40px] inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-2xs">
+                                        Tinjau Laporan Akhir
+                                    </a>
+                                @endif
+                                @if (($canEvaluate ?? true) && empty($evaluationLockReason) && ! $hasEval)
+                                    <a href="{{ route('mentor.evaluations.create', $placement->id) }}"
+                                       class="min-h-[40px] inline-flex items-center px-4 py-2 {{ $pendingLogbooksCount === 0 && $reportStatusVal !== 'pending' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-300' }} text-xs sm:text-sm font-bold rounded-xl transition shadow-2xs">
+                                        Isi Penilaian Magang
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <!-- 2. Card: Logbook Aktivitas Harian Mahasiswa -->
-            <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-4">
+            <div id="bagian-logbook" class="scroll-mt-24 bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                     <div>
                         <h3 class="font-bold text-base text-slate-900">
@@ -337,17 +419,19 @@
             </div>
 
             <!-- 3. Card: Laporan Akhir & Proyek Inovasi (Komponen Bersama) -->
-            <x-supervision.report-review
-                :finalReport="$placement->finalreport"
-                :placement="$placement"
-                :submitRoute="route('mentor.final_report.updateStatus', optional($placement->finalreport)->id ?? 0)"
-                method="PUT"
-                role="mentor"
-                :canReview="$canEvaluate ?? true"
-            />
+            <div id="bagian-laporan" class="scroll-mt-24">
+                <x-supervision.report-review
+                    :finalReport="$placement->finalreport"
+                    :placement="$placement"
+                    :submitRoute="route('mentor.final_report.updateStatus', optional($placement->finalreport)->id ?? 0)"
+                    method="PUT"
+                    role="mentor"
+                    :canReview="$canEvaluate ?? true"
+                />
+            </div>
 
             <!-- 4. Card: Penilaian Evaluasi Akhir Magang -->
-            <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-5">
+            <div id="bagian-nilai" class="scroll-mt-24 bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-5">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                     <div>
                         <h3 class="font-bold text-base text-slate-900">
@@ -422,11 +506,11 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
                             @forelse ($eval?->mentor_aspects_list ?? [] as $mAspect)
                                 <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                                    <span class="text-xs text-slate-500 font-semibold block truncate" title="{{ $mAspect['name'] }}">{{ $mAspect['name'] }}</span>
+                                    <span class="text-xs text-slate-600 font-semibold block truncate" title="{{ $mAspect['name'] }}">{{ $mAspect['name'] }}</span>
                                     <span class="text-base font-bold text-slate-900">{{ $mAspect['score'] ?? '-' }}</span>
                                 </div>
                             @empty
-                                <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-400 text-xs">
+                                <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-600 text-xs">
                                     Belum ada nilai mentor.
                                 </div>
                             @endforelse
@@ -442,11 +526,11 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
                             @forelse ($eval?->dosen_aspects_list ?? [] as $dAspect)
                                 <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                                    <span class="text-xs text-slate-500 font-semibold block truncate" title="{{ $dAspect['name'] }}">{{ $dAspect['name'] }}</span>
+                                    <span class="text-xs text-slate-600 font-semibold block truncate" title="{{ $dAspect['name'] }}">{{ $dAspect['name'] }}</span>
                                     <span class="text-base font-bold text-slate-900">{{ $dAspect['score'] ?? '-' }}</span>
                                 </div>
                             @empty
-                                <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-400 text-xs">
+                                <div class="col-span-2 sm:col-span-3 p-3 bg-white rounded-xl text-slate-600 text-xs">
                                     Belum ada nilai bimbingan akademik dosen.
                                 </div>
                             @endforelse
@@ -460,13 +544,13 @@
                 <!-- Nilai Akhir & Predikat -->
                 <div class="p-4 sm:p-5 bg-white rounded-2xl border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-2xs">
                     <div>
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Nilai Akhir Magang</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Nilai Akhir Magang</span>
                         <div class="text-2xl font-black text-slate-900 mt-0.5">
                             {{ $eval?->final_score > 0 ? $eval->final_score : ($eval?->nilai_akhir > 0 ? $eval->nilai_akhir : '-') }}
                         </div>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Predikat Mutu</span>
+                        <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Predikat Mutu</span>
                         <div class="text-2xl font-black text-blue-700 mt-0.5">
                             {{ $eval?->grade_calculated ?? '-' }}
                         </div>

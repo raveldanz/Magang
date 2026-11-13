@@ -10,6 +10,7 @@ use App\Services\StudentNotifier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LogbookController extends Controller
 {
@@ -55,13 +56,14 @@ class LogbookController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = strtolower(trim($request->search));
-            $filteredQuery->where(function ($q) use ($search) {
-                $q->where('activity', 'like', "%{$search}%")
-                    ->orWhereHas('placement.application.user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhereHas('studentProfile', function ($sq) use ($search) {
-                                $sq->where('nim', 'like', "%{$search}%");
+            $search = trim($request->search);
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $filteredQuery->where(function ($q) use ($search, $like) {
+                $q->where('activity', $like, "%{$search}%")
+                    ->orWhereHas('placement.application.user', function ($uq) use ($search, $like) {
+                        $uq->where('name', $like, "%{$search}%")
+                            ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {
+                                $sq->where('nim', $like, "%{$search}%");
                             });
                     });
             });

@@ -7,15 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Placement;
-use App\Models\StudentProfile;
-use App\Models\SystemFeedback;
 use App\Models\University;
 use App\Models\User;
+use App\Services\Admin\UniversityManagementService;
 use App\Services\UniversityHubService;
 use App\Services\UniversityResolver;
-use App\Services\Admin\UniversityManagementService;
 use App\Support\SafeUpload;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -71,7 +70,7 @@ class UniversityController extends Controller
         $resolver = app(UniversityResolver::class);
         $mergeSuggestions = [];
         $verifiedOptions = collect();
-        $univCollection = $universities instanceof \Illuminate\Pagination\AbstractPaginator
+        $univCollection = $universities instanceof AbstractPaginator
             ? $universities->getCollection()
             : $universities;
 
@@ -125,9 +124,10 @@ class UniversityController extends Controller
         ]);
 
         $target = University::findOrFail((int) $request->target_university_id);
-        
+
         try {
             $moved = $service->mergeUniversities($source, $target);
+
             return redirect()->route('admin.universities.index')
                 ->with('success', "Kampus '{$source->name}' berhasil digabungkan ke '{$target->name}' ({$moved['users']} akun dipindahkan).");
         } catch (\InvalidArgumentException $e) {
@@ -143,7 +143,7 @@ class UniversityController extends Controller
         $this->ensureSuperAdmin('Hanya Super Administrator yang dapat memverifikasi data perguruan tinggi.');
         $univ = University::findOrFail($id);
 
-        if (!$service->verifyUniversity($univ)) {
+        if (! $service->verifyUniversity($univ)) {
             return redirect()->back()->with('success', "Perguruan tinggi '{$univ->name}' sudah terverifikasi.");
         }
 
@@ -250,7 +250,7 @@ class UniversityController extends Controller
 
             if (($weightMentor + $weightLecturer) !== 100) {
                 throw ValidationException::withMessages([
-                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan DPL Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
+                    'weight_mentor' => 'Total bobot penilaian Mentor Dinas ('.$weightMentor.'%) dan Dosen Pembimbing Kampus ('.$weightLecturer.'%) harus berjumlah tepat 100%.',
                 ]);
             }
 

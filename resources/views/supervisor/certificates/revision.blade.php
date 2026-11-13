@@ -19,8 +19,8 @@
             @if(session('success'))
                 <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-900 flex items-center justify-between gap-3 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
-                            ✓
+                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         </div>
                         <div class="text-sm font-bold">{{ session('success') }}</div>
                     </div>
@@ -315,11 +315,11 @@
                                        class="w-5 h-5 rounded-lg border-2 text-amber-600 focus:ring-0 cursor-pointer"
                                        :class="selectedAspects.includes('lainnya') ? 'border-amber-500' : 'border-slate-300'">
                                 <div>
-                                    <span class="text-[10px] font-black uppercase tracking-wider text-amber-700 block">Aspek 4</span>
+                                    <span class="text-xs font-black uppercase tracking-wider text-amber-800 block">Aspek 4</span>
                                     <h4 class="text-base font-black text-slate-900">Aspek Lainnya & Tata Persuratan</h4>
                                 </div>
                             </label>
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold"
                                   :class="selectedAspects.includes('lainnya') ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600'">
                                 <span x-show="selectedAspects.includes('lainnya')">Dipilih untuk Revisi</span>
                                 <span x-show="!selectedAspects.includes('lainnya')">Sesuai / Valid</span>
@@ -346,7 +346,7 @@
                 {{-- INSTRUKSI & CATATAN UTAMA (WAJIB) --}}
                 <div class="bg-white rounded-3xl border-2 border-slate-200 p-6 shadow-xs space-y-4">
                     <div>
-                        <span class="text-xs font-black uppercase tracking-wider text-amber-600">Instruksi Eksekutif</span>
+                        <span class="text-xs font-black uppercase tracking-wider text-amber-700">Instruksi Eksekutif</span>
                         <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">
                             Catatan Resmi Perbaikan untuk Admin Dinas
                         </h3>
@@ -357,7 +357,7 @@
 
                     {{-- Quick Template Chips --}}
                     <div>
-                        <span class="text-[11px] font-bold text-slate-500 block mb-2">Rekomendasi Template Catatan Cepat:</span>
+                        <span class="text-xs font-bold text-slate-600 block mb-2">Rekomendasi Template Catatan Cepat:</span>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" @click="appendNote('Mohon sesuaikan ejaan nama lengkap mahasiswa dengan KTP resmi.')"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition cursor-pointer">
@@ -386,7 +386,7 @@
                         <textarea name="notes" rows="4" required minlength="5" x-model="notesText"
                                   placeholder="Tuliskan rangkuman instruksi revisi yang jelas untuk Admin Dinas..."
                                   class="w-full text-sm p-4 rounded-2xl border-2 border-slate-300 focus:border-amber-600 focus:ring-0 text-slate-800 bg-slate-50/50 shadow-inner leading-relaxed"></textarea>
-                        <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <div class="flex items-center justify-between text-xs text-slate-600">
                             <span>Minimal 5 karakter instruksi</span>
                             <span x-text="notesText.length + ' karakter'"></span>
                         </div>

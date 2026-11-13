@@ -44,24 +44,16 @@
                                     <p class="text-xs text-slate-500">NIM: <strong class="text-slate-800">{{ $application->user?->studentProfile?->nim ?? '-' }}</strong></p>
                                 </div>
                             </div>
-                            @php
-                                $st = $application->status instanceof \App\Enums\ApplicationStatus ? $application->status : \App\Enums\ApplicationStatus::tryFrom($application->status);
-                            @endphp
-                            @if($st)
-                                <div class="self-start sm:self-auto shrink-0">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border {{ $st->badgeColor() }}">
-                                        <span class="w-2 h-2 rounded-full {{ $st->dotColor() }}"></span>
-                                        {{ $st->description('supervisor') }}
-                                    </span>
-                                </div>
-                            @endif
+                            <div class="self-start sm:self-auto shrink-0">
+                                <x-status-badge :status="$application->status" />
+                            </div>
                         </div>
 
                         @if($application->group_id && $application->group)
                             <div class="p-4 bg-gradient-to-r from-indigo-50/90 via-blue-50/40 to-white border border-indigo-200 rounded-2xl space-y-2.5 mb-3">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                     <div class="flex items-center gap-2">
-                                        <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-extrabold text-[10px] uppercase tracking-wider">Kelompok Magang</span>
+                                        <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider">Kelompok Magang</span>
                                         <span class="font-extrabold text-sm text-slate-900">{{ $application->group->name }}</span>
                                         <span class="text-xs text-indigo-700 font-bold font-mono">&bull; Kode: {{ $application->group->code }}</span>
                                     </div>
@@ -85,9 +77,9 @@
                                                class="p-2.5 rounded-xl border transition flex items-center justify-between {{ $grpMember->id === $application->id ? 'bg-indigo-100/70 border-indigo-300 font-bold text-indigo-950 ring-2 ring-indigo-400/30' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-800' }}">
                                                 <div class="min-w-0">
                                                     <div class="text-xs truncate max-w-[140px]">{{ $grpMember->user?->name }}</div>
-                                                    <div class="text-[10px] text-slate-400 font-mono">{{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
+                                                    <div class="text-xs text-slate-600 font-mono">{{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
                                                 </div>
-                                                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded shrink-0 {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
+                                                <span class="text-xs font-extrabold px-2 py-0.5 rounded shrink-0 {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700' }}">
                                                     {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
                                                 </span>
                                             </a>
@@ -201,7 +193,7 @@
                                     @endif
                                 </div>
                             @empty
-                                <div class="py-4 text-center text-xs text-slate-400">
+                                <div class="py-4 text-center text-xs text-slate-600">
                                     Tidak ada lampiran dokumen digital tambahan.
                                 </div>
                             @endforelse
@@ -243,7 +235,7 @@
                                     @php
                                         $eligibleGroupCount = $application->group->applications->reject(fn($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true))->count();
                                     @endphp
-                                    <p class="text-[11px] text-center text-slate-500 font-medium mt-2.5">
+                                    <p class="text-xs text-center text-slate-600 font-medium mt-2.5">
                                         Otomatis menyetujui seluruh anggota kelompok <strong>{{ $application->group->name }}</strong> yang memenuhi syarat sejumlah {{ $eligibleGroupCount }} orang.
                                     </p>
                                 @endif
@@ -251,7 +243,7 @@
 
                             <div class="relative flex py-1 items-center">
                                 <div class="flex-grow border-t border-slate-200"></div>
-                                <span class="flex-shrink mx-3 text-xs font-bold text-slate-400 uppercase">atau</span>
+                                <span class="flex-shrink mx-3 text-xs font-bold text-slate-600 uppercase">atau</span>
                                 <div class="flex-grow border-t border-slate-200"></div>
                             </div>
 
@@ -273,9 +265,9 @@
                                                 <input type="hidden" name="sync_group" value="0">
                                                 <input type="checkbox" id="sup_sync_group" name="sync_group" value="1" checked
                                                        class="w-4 h-4 mt-0.5 rounded border-rose-300 text-rose-600 focus:ring-rose-500 cursor-pointer">
-                                                <label for="sup_sync_group" class="text-[11px] text-slate-700 leading-snug cursor-pointer select-none">
-                                                    <strong class="text-slate-900 block">Terapkan ke seluruh anggota kelompok ({{ $application->group->name }})</strong>
-                                                    Hilangkan centang jika hanya ingin mengembalikan berkas mahasiswa ini saja.
+                                                <label for="sup_sync_group" class="text-xs text-slate-700 leading-snug cursor-pointer select-none">
+                                                    <span class="font-bold text-slate-900 block">Terapkan ke seluruh anggota kelompok</span>
+                                                    Lepas centang jika hanya untuk mahasiswa ini saja.
                                                 </label>
                                             </div>
                                         @endif

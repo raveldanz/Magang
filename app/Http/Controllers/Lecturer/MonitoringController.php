@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Lecturer;
 use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Placement;
+use App\Models\Unit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MonitoringController extends Controller
 {
@@ -82,7 +85,7 @@ class MonitoringController extends Controller
         });
 
         $agencies = AgencyProfile::all();
-        $units = \App\Models\Unit::orderBy('name')->get();
+        $units = Unit::orderBy('name')->get();
 
         return view('lecturer.monitoring.index', compact('placements', 'lecturer', 'agencies', 'units', 'stats', 'tab'));
     }
@@ -106,9 +109,9 @@ class MonitoringController extends Controller
             $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $baseQuery->whereHas('application.user', function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
-                  ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
-                      $sp->where('nim', $like, "%{$search}%");
-                  });
+                    ->orWhereHas('studentProfile', function ($sp) use ($search, $like) {
+                        $sp->where('nim', $like, "%{$search}%");
+                    });
             });
         }
 
@@ -140,12 +143,12 @@ class MonitoringController extends Controller
             'completed' => $query->whereRelation('application', 'status', 'completed'),
             'upcoming' => $query->whereRelation('application', 'status', 'accepted'),
             'all' => $query,
-            default => $query->whereRelation('application', fn($q) => $q->whereIn('status', ['active', 'accepted'])),
+            default => $query->whereRelation('application', fn ($q) => $q->whereIn('status', ['active', 'accepted'])),
         };
 
         $placements = $query->latest()->get();
 
-        $filename = 'Rekap_Bimbingan_DPL_' . \Illuminate\Support\Str::slug($lecturer->name, '_') . '_' . date('Ymd_His') . '.csv';
+        $filename = 'Rekap_Bimbingan_DPL_'.Str::slug($lecturer->name, '_').'_'.date('Ymd_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -157,7 +160,7 @@ class MonitoringController extends Controller
 
         $callback = function () use ($placements) {
             $handle = fopen('php://output', 'w');
-            
+
             // UTF-8 BOM for Excel compatibility
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
@@ -178,10 +181,10 @@ class MonitoringController extends Controller
                 'Logbook Disetujui',
                 'Status Laporan Akhir',
                 'Nilai Mentor Lapangan',
-                'Nilai DPL',
+                'Nilai Dosen Pembimbing',
                 'Nilai Akhir Kumulatif',
                 'Nilai Huruf',
-                'Jumlah Sesi Bimbingan DPL',
+                'Jumlah Sesi Bimbingan Dosen Pembimbing',
             ]);
 
             $no = 1;
@@ -190,30 +193,42 @@ class MonitoringController extends Controller
                 $profile = $student?->studentProfile;
                 $app = $p->application;
                 $group = $app?->group;
-                $tipePengajuan = $app?->group_id ? 'Kelompok (' . ($app->role_in_group === 'leader' ? 'Ketua' : 'Anggota') . ')' : 'Individu';
+                $tipePengajuan = $app?->group_id ? 'Kelompok ('.($app->role_in_group === 'leader' ? 'Ketua' : 'Anggota').')' : 'Individu';
                 $groupName = $group?->name ?? '-';
                 $unit = $p->application?->unit;
                 $agency = $unit?->agencyProfile;
                 $mentor = $p->mentor ?? $p->pembimbing;
-                
+
                 $totalLogbooks = $p->logbooks->count();
-                $approvedLogbooks = $p->logbooks->where('status', 'approved')->count();
-                
-                $reportStatus = match($p->finalreport?->status) {
+                $approvedLogbooks = $p->logbooks
+                    ->filter(fn ($l) => ($l->status instanceof \BackedEnum ? $l->status->value : $l->status) === 'approved')
+                    ->count();
+
+                $rawReportStatus = $p->finalreport?->status;
+                $reportStatusVal = $rawReportStatus instanceof \BackedEnum ? $rawReportStatus->value : $rawReportStatus;
+                $reportStatus = match ($reportStatusVal) {
                     'approved' => 'Disetujui',
-                    'submitted' => 'Menunggu Review',
-                    'rejected' => 'Perlu Revisi',
+                    'submitted', 'pending' => 'Menunggu Review',
+                    'rejected', 'revision' => 'Perlu Revisi',
                     default => 'Belum Unggah',
                 };
 
-                $mentorScore = $p->evaluation?->final_score !== null ? number_format((float)$p->evaluation->final_score, 1) : '-';
-                $dplScore = $p->evaluation?->dosen_evaluation_score !== null ? number_format((float)$p->evaluation->dosen_evaluation_score, 1) : '-';
-                $finalScore = $p->evaluation?->calculated_final_score !== null ? number_format((float)$p->evaluation->calculated_final_score, 1) : '-';
-                $gradeLetter = $p->evaluation?->grade_letter ?? '-';
+                $eval = $p->evaluation;
+                $rawMentorScore = $eval ? ($eval->nilai_pembimbing_calculated ?? $eval->final_score) : null;
+                $rawDplScore = $eval?->nilai_dosen_calculated;
+                $rawFinalScore = $eval ? ($eval->nilai_akhir ?? $eval->final_score) : null;
+
+                $mentorScore = $rawMentorScore !== null ? number_format((float) $rawMentorScore, 1) : '-';
+                $dplScore = $rawDplScore !== null ? number_format((float) $rawDplScore, 1) : '-';
+                $finalScore = $rawFinalScore !== null ? number_format((float) $rawFinalScore, 1) : '-';
+                $gradeLetter = $eval ? ($eval->grade_calculated ?? $eval->grade ?? '-') : '-';
                 $consultationCount = $p->academicConsultations->count();
 
                 $rawStatus = $p->application?->status;
                 $statusStr = $rawStatus instanceof \BackedEnum ? $rawStatus->value : (string) ($rawStatus ?? 'N/A');
+
+                $startDateVal = $p->application?->start_date ?? $p->start_date;
+                $endDateVal = $p->application?->end_date ?? $p->end_date;
 
                 fputcsv($handle, [
                     $no++,
@@ -225,8 +240,8 @@ class MonitoringController extends Controller
                     $unit?->name ?? 'N/A',
                     $mentor?->name ?? 'Belum Ditugaskan',
                     strtoupper($statusStr),
-                    $p->start_date ? \Carbon\Carbon::parse($p->start_date)->format('d/m/Y') : '-',
-                    $p->end_date ? \Carbon\Carbon::parse($p->end_date)->format('d/m/Y') : '-',
+                    $startDateVal ? Carbon::parse($startDateVal)->format('d/m/Y') : '-',
+                    $endDateVal ? Carbon::parse($endDateVal)->format('d/m/Y') : '-',
                     $totalLogbooks,
                     $approvedLogbooks,
                     $reportStatus,

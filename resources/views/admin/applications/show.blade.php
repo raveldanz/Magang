@@ -78,8 +78,22 @@
                                 <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ $application->group->name }}</h3>
                             </div>
                         </div>
+                        @php
+                            $groupPendingOrWaitingCount = $application->group->applications->filter(fn ($m) => in_array($m->statusValue(), ['pending', 'waiting_approval'], true))->count();
+                            $groupRejectedCount = $application->group->applications->filter(fn ($m) => $m->statusValue() === 'rejected')->count();
+                        @endphp
                         <div class="flex items-center gap-2 flex-wrap">
-                            @if(in_array($application->group->status, ['pending', 'waiting_approval']) || in_array($application->statusValue(), ['pending', 'waiting_approval']))
+                            @if($groupPendingOrWaitingCount > 0)
+                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold">
+                                    {{ $groupPendingOrWaitingCount }} Anggota Menunggu Keputusan
+                                </span>
+                            @endif
+                            @if($groupRejectedCount > 0)
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold">
+                                    {{ $groupRejectedCount }} Anggota Perlu Perbaikan Berkas
+                                </span>
+                            @endif
+                            @if(in_array($application->group->status, ['pending', 'waiting_approval']) || $groupPendingOrWaitingCount > 0)
                                 <button type="button" 
                                         @click="showGroupModal = true"
                                         class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-xs hover:shadow transition active:scale-95 cursor-pointer">
@@ -218,7 +232,7 @@
                                             {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
                                         </span>
                                         <div class="mt-0.5">
-                                            <span class="text-[10px] font-bold {{ $grpMember->statusValue() === 'accepted' ? 'text-emerald-700' : ($grpMember->statusValue() === 'rejected' ? 'text-rose-700' : 'text-slate-500') }}">
+                                            <span class="text-[10px] font-bold {{ $grpMember->statusValue() === 'active' ? 'text-blue-600' : ($grpMember->statusValue() === 'accepted' ? 'text-emerald-600' : ($grpMember->statusValue() === 'rejected' ? 'text-rose-600' : ($grpMember->statusValue() === 'completed' ? 'text-indigo-600' : 'text-amber-600'))) }}">
                                                 {{ ucfirst($grpMember->statusValue()) }}
                                             </span>
                                         </div>
@@ -246,23 +260,23 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 text-xs">
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider block">Mahasiswa</span>
+                        <span class="text-slate-600 font-semibold uppercase text-xs tracking-wider block">Mahasiswa</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->user->name }}</div>
-                        <div class="text-slate-500 font-mono">NIM: {{ $application->user->studentProfile->nim ?? '-' }}</div>
-                        <div class="text-slate-500">Telp: {{ $application->user->studentProfile->phone ?? '-' }}</div>
+                        <div class="text-slate-600 font-mono">NIM: {{ $application->user->studentProfile->nim ?? '-' }}</div>
+                        <div class="text-slate-600">Telp: {{ $application->user->studentProfile->phone ?? '-' }}</div>
                     </div>
 
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-1">
-                        <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider block">Asal Perguruan Tinggi</span>
+                        <span class="text-slate-600 font-semibold uppercase text-xs tracking-wider block">Asal Perguruan Tinggi</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->user->studentProfile->universitas ?? $application->user->university ?? '-' }}</div>
-                        <div class="text-slate-500">{{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }}</div>
-                        <div class="text-slate-500 font-medium text-blue-700">{{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</div>
+                        <div class="text-slate-600">{{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }}</div>
+                        <div class="font-medium text-blue-700">{{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</div>
                     </div>
 
                     <div class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1 md:col-span-2 lg:col-span-1">
-                        <span class="text-blue-600 font-semibold uppercase text-[10px] tracking-wider block">Tujuan Magang</span>
+                        <span class="text-blue-700 font-semibold uppercase text-xs tracking-wider block">Tujuan Magang</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->unit->name ?? '-' }}</div>
-                        <div class="text-slate-500 mt-1 font-mono text-[11px]">
+                        <div class="text-slate-600 mt-1 font-mono text-xs">
                             {{ \Carbon\Carbon::parse($application->start_date)->translatedFormat('d M Y') }} &mdash; {{ \Carbon\Carbon::parse($application->end_date)->translatedFormat('d M Y') }}
                         </div>
                     </div>
@@ -279,7 +293,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Dokumen Persyaratan</h3>
-                        <p class="text-xs text-slate-500">Berkas administrasi yang diunggah mahasiswa untuk diverifikasi</p>
+                        <p class="text-xs text-slate-600">Berkas administrasi yang diunggah mahasiswa untuk diverifikasi</p>
                     </div>
                 </div>
 
@@ -287,22 +301,22 @@
                     @forelse ($application->documents as $doc)
                         <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-blue-200 transition">
                             <div class="flex items-center gap-3 min-w-0 mr-3">
-                                <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                                <div class="w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-xs">
                                     PDF
                                 </div>
                                 <div class="min-w-0">
                                     <div class="font-bold text-xs text-slate-800 truncate">{{ $doc->document_type }}</div>
-                                    <div class="text-[11px] text-slate-400 mt-0.5">Format dokumen terverifikasi</div>
+                                    <div class="text-xs text-slate-600 mt-0.5">Format dokumen terverifikasi</div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 <a href="{{ route('documents.application', $doc->id) }}" target="_blank"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer">
+                                   class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     <span>Lihat PDF</span>
                                 </a>
                                 <a href="{{ route('documents.application.download', $doc->id) }}"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer"
+                                   class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition active:scale-95 cursor-pointer"
                                    title="Unduh berkas">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <span>Unduh</span>
@@ -416,10 +430,10 @@
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
                      status: '{{ old('status', $currentStatusVal) }}',
-                     syncGroup: {{ old('sync_group', $currentStatusVal === 'rejected' ? '0' : '1') == '1' ? 'true' : 'false' }}
+                     syncGroup: {{ old('sync_group', in_array($currentStatusVal, ['rejected', 'resigned'], true) ? '0' : '1') == '1' ? 'true' : 'false' }}
                  }"
                  x-init="$watch('status', val => {
-                     if (val === 'rejected') {
+                     if (val === 'rejected' || val === 'resigned') {
                          syncGroup = false;
                      } else {
                          syncGroup = true;
@@ -498,38 +512,16 @@
                                 <input type="hidden" name="sync_group" value="0">
                                 <input type="checkbox" id="sync_group" name="sync_group" value="1" x-model="syncGroup"
                                        class="w-4 h-4 mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
-                                <div class="flex-1 space-y-2">
-                                    <div>
-                                        <label for="sync_group" class="text-xs font-bold text-slate-900 cursor-pointer select-none block">
-                                            Terapkan keputusan ini ke seluruh anggota kelompok ({{ $application->group->name }})
-                                        </label>
-                                        <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed" x-show="status !== 'rejected'">
-                                            Centang opsi ini agar keputusan status, surat balasan, tanggal pelaksanaan, dan penugasan mentor diterapkan ke seluruh anggota tim yang aktif sekaligus (anggota yang sedang berstatus ditolak tidak akan ikut tertimpa sebelum memperbaiki berkasnya). <strong>Hilangkan centang</strong> jika ingin memproses mahasiswa ini secara mandiri.
-                                        </p>
-                                        <p class="text-[11px] mt-0.5 leading-relaxed" x-show="status === 'rejected'" :class="syncGroup ? 'text-rose-800 font-semibold' : 'text-amber-900'">
-                                            <span x-show="!syncGroup">
-                                                <strong>Mode Penolakan Individu (Perbaikan Berkas Anggota):</strong> Hanya berkas <strong>{{ $application->user->name }}</strong> yang ditolak agar mahasiswa ini dapat memperbaiki &amp; mengunggah ulang berkasnya kembali ke kelompok ini. Anggota kelompok lainnya tetap berjalan.
-                                            </span>
-                                            <span x-show="syncGroup">
-                                                <strong>Mode Penolakan Seluruh Kelompok:</strong> Seluruh {{ $application->group->applications->count() }} anggota dalam kelompok <strong>{{ $application->group->name }}</strong> akan ditolak secara serentak.
-                                            </span>
-                                        </p>
-                                    </div>
-
-                                    <div x-show="status === 'rejected'" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                                        <button type="button"
-                                                @click="syncGroup = false"
-                                                :class="!syncGroup ? 'bg-amber-600 text-white border-amber-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50'"
-                                                class="px-3 py-2 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
-                                            <span>Tolak Mahasiswa Ini Saja (Perbaikan Berkas)</span>
-                                        </button>
-                                        <button type="button"
-                                                @click="syncGroup = true"
-                                                :class="syncGroup ? 'bg-rose-600 text-white border-rose-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-rose-50'"
-                                                class="px-3 py-2 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
-                                            <span>Tolak Seluruh 1 Kelompok ({{ $application->group->applications->count() }} Orang)</span>
-                                        </button>
-                                    </div>
+                                <div class="flex-1 space-y-1">
+                                    <label for="sync_group" class="text-xs font-bold text-slate-900 cursor-pointer select-none block">
+                                        Terapkan keputusan ini ke seluruh anggota kelompok
+                                    </label>
+                                    <p class="text-[11px] text-slate-600" x-show="status !== 'rejected'">
+                                        Centang untuk memproses seluruh anggota kelompok secara bersamaan.
+                                    </p>
+                                    <p class="text-[11px]" x-show="status === 'rejected'" :class="syncGroup ? 'text-rose-800 font-semibold' : 'text-amber-900'"
+                                       x-text="syncGroup ? 'Perhatian: Seluruh anggota dalam kelompok ini akan ditolak.' : 'Hanya berkas mahasiswa ini yang ditolak; anggota tim lain tetap berjalan.'">
+                                    </p>
                                 </div>
                             </div>
                         </div>

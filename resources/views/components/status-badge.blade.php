@@ -14,10 +14,15 @@
     $enum = \App\Enums\StatusType::enumFor($type);
     $case = $enum::resolve($status);
     $raw = $status instanceof \BackedEnum ? (string) $status->value : (string) ($status ?? '');
-    $text = $case?->label() ?? ($raw !== '' ? strtoupper($raw) : '-');
+    $userRole = auth()->user()?->role;
+    $useIndonesianUi = \App\Models\User::isLocalizedStatusUiRole($userRole);
+    $text = $useIndonesianUi
+        ? ($case?->localizedLabel($userRole) ?? ($raw !== '' ? strtoupper($raw) : '-'))
+        : ($case?->label() ?? ($raw !== '' ? strtoupper($raw) : '-'));
     $tone = $case?->badgeColor() ?? 'bg-slate-100 text-slate-700 border-slate-300';
     $code = strtolower($case?->value ?? $raw);
     $pill = "inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold tracking-wide rounded-full border whitespace-nowrap {$tone}";
+    $resolvedDesc = $case?->description($userRole);
 
     $isSuccess = in_array($code, ['approved', 'active', 'accepted', 'completed', 'resolved', 'closed'], true);
     $isDanger  = in_array($code, ['rejected', 'inactive'], true);
@@ -41,12 +46,12 @@
             {!! $iconSvg !!}
             {{ $text }}
         </span>
-        @if ($case)
-            <span class="text-xs font-medium text-slate-500 leading-snug hidden sm:block">{{ $case->description() }}</span>
+        @if ($case && $resolvedDesc && $resolvedDesc !== $text)
+            <span class="text-xs font-medium text-slate-600 leading-snug hidden sm:block">{{ $resolvedDesc }}</span>
         @endif
     </div>
 @else
-    <span {{ $attributes->class($pill)->merge(['data-status' => $case?->value ?? $raw, 'title' => $tooltip ?: $case?->description()]) }}>
+    <span {{ $attributes->class($pill)->merge(['data-status' => $case?->value ?? $raw, 'title' => $tooltip ?: $resolvedDesc]) }}>
         {!! $iconSvg !!}
         {{ $text }}
     </span>

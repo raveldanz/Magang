@@ -186,7 +186,7 @@ class EvaluationController extends Controller
                 $lecturerComps = [];
                 $scores = [];
                 foreach ($request->custom_components as $comp) {
-                    if (!empty($comp['name'])) {
+                    if (! empty($comp['name'])) {
                         $val = isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null;
                         $lecturerComps[] = [
                             'name' => trim($comp['name']),
@@ -197,7 +197,7 @@ class EvaluationController extends Controller
                         }
                     }
                 }
-                if (!empty($lecturerComps)) {
+                if (! empty($lecturerComps)) {
                     $custom['lecturer'] = $lecturerComps;
                     $evaluation->custom_components = $custom;
                     $evaluation->dosen_aspects = $lecturerComps;
@@ -214,7 +214,7 @@ class EvaluationController extends Controller
                 $attitude = (float) $request->score_attitude;
                 $nilaiDosen = round(($mastery + $report + $attitude) / 3, 2);
 
-                $univ = $placement->application?->user ? app(\App\Services\UniversityResolver::class)->forUser($placement->application->user) : null;
+                $univ = $placement->application?->user ? app(UniversityResolver::class)->forUser($placement->application->user) : null;
                 $evaluation->dosen_aspects = [
                     ['name' => $univ ? $univ->getDplComponent(1) : 'Penguasaan Materi & Relevansi CPL', 'score' => $mastery],
                     ['name' => $univ ? $univ->getDplComponent(2) : 'Kualitas Laporan Akhir Magang', 'score' => $report],
@@ -227,7 +227,6 @@ class EvaluationController extends Controller
                 $evaluation->nilai_dosen = $nilaiDosen;
             }
         }
-
 
         // Hitung Nilai Akhir dengan Pembobotan Kampus Adaptif
         $nilaiDinas = $evaluation->nilai_pembimbing ?? 0;
@@ -272,8 +271,8 @@ class EvaluationController extends Controller
         }
 
         $successMsg = $isMentorOnly
-            ? 'Catatan bimbingan DPL berhasil disimpan!'
-            : 'Nilai bimbingan akademik DPL dan catatan berhasil disimpan!';
+            ? 'Catatan bimbingan Dosen Pembimbing berhasil disimpan!'
+            : 'Nilai bimbingan akademik Dosen Pembimbing dan catatan berhasil disimpan!';
 
         return redirect()->route('lecturer.students.show', $placement->id)
             ->with('success', $successMsg);
@@ -342,20 +341,13 @@ class EvaluationController extends Controller
         $consultations = $placement->academicConsultations;
 
         $univ = $evaluation?->getUniversity();
-        if (!$univ && $student) {
-            if ($student->university_id) {
-                $univ = \App\Models\University::find($student->university_id);
-            } else {
-                $name = $student->university ?? ($profile?->universitas ?? null);
-                if ($name) {
-                    $univ = \App\Models\University::where('name', 'like', "%{$name}%")->orWhere('code', 'like', "%{$name}%")->first();
-                }
-            }
+        if (! $univ && $student) {
+            $univ = app(UniversityResolver::class)->forUser($student);
         }
 
         $scheme = $univ->evaluation_scheme ?? 'mentor_only';
-        $weightMentor = $univ ? (int)$univ->weight_mentor : 100;
-        $weightLecturer = $univ ? (int)$univ->weight_lecturer : 0;
+        $weightMentor = $univ ? (int) $univ->weight_mentor : 100;
+        $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
 
         return view('lecturer.grade-sheet', compact(
             'placement',

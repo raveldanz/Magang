@@ -49,13 +49,13 @@
                                 @if($ssCount > 0 || $cpCount > 0 || $proj->video_url)
                                     <div class="absolute bottom-2 right-2 flex items-center gap-1">
                                         @if($ssCount > 0)
-                                            <span class="px-2 py-0.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold rounded-md">
+                                            <span class="px-2 py-0.5 bg-slate-900/80 backdrop-blur-xs text-white text-xs font-bold rounded-md">
                                                 +{{ $ssCount }} Layar
                                             </span>
                                         @endif
                                         @if($proj->video_url)
-                                            <span class="px-2 py-0.5 bg-rose-600/90 backdrop-blur-xs text-white text-[10px] font-bold rounded-md flex items-center gap-1">
-                                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                            <span class="px-2 py-0.5 bg-rose-600/90 backdrop-blur-xs text-white text-xs font-bold rounded-md flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                                 Video
                                             </span>
                                         @endif
@@ -64,7 +64,7 @@
                             </div>
 
                             <div class="space-y-1">
-                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $proj->category_badge_class }}">
+                                <span class="inline-block px-2 py-0.5 rounded text-xs font-bold border {{ $proj->category_badge_class }}">
                                     {{ $proj->category_label }}
                                 </span>
                                 <h4 class="font-bold text-sm sm:text-base text-slate-900 leading-snug">
@@ -77,7 +77,7 @@
 
                             <!-- Manfaat untuk Masyarakat -->
                             <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                                <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">
                                     Manfaat untuk Masyarakat
                                 </span>
                                 <p class="text-xs text-slate-800 leading-relaxed font-medium line-clamp-2">
@@ -86,7 +86,7 @@
                             </div>
 
                             <!-- Indikator Media Tambahan -->
-                            <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
+                            <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-600">
                                 @if($cpCount > 0)
                                     <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-medium rounded-md border border-emerald-100">
                                         {{ $cpCount }} Dokumentasi Lapangan
@@ -162,23 +162,23 @@
                             <span>Diperbarui: <strong class="text-slate-700">{{ $finalReport->updated_at->translatedFormat('d M Y, H:i') }}</strong></span>
                         @endif
                         @if (strtolower($finalReport->status instanceof \BackedEnum ? $finalReport->status->value : $finalReport->status) === 'revision')
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-50 text-rose-700">Perlu Revisi</span>
+                            <span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-50 text-rose-700">Perlu Revisi</span>
                         @elseif (strtolower($finalReport->status instanceof \BackedEnum ? $finalReport->status->value : $finalReport->status) === 'approved')
-                            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700">Telah Disetujui</span>
+                            <span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700">Telah Disetujui</span> {{-- status-guard:ignore --}}
                         @endif
                     </div>
                 </div>
 
                 <div class="shrink-0">
                     <a href="{{ route('final_reports.show', $finalReport->id) }}" target="_blank" 
-                       class="inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 text-sm font-bold rounded-xl shadow-2xs transition cursor-pointer">
+                       class="min-h-[44px] inline-flex items-center justify-center px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-sm font-bold rounded-xl shadow-2xs transition cursor-pointer">
                         <span>Buka Naskah Laporan (Tab Baru)</span>
                     </a>
                 </div>
             </div>
 
             @if (! $canReview)
-                <p class="text-xs text-slate-500">Persetujuan laporan dilakukan oleh mentor yang ditugaskan.</p>
+                <p class="text-xs sm:text-sm text-slate-600">Persetujuan laporan dilakukan oleh mentor yang ditugaskan.</p>
             @else
             <form action="{{ $submitRoute }}" method="POST" class="space-y-4 pt-1" x-data="{ feedbackText: @js(old('feedback', $finalReport->feedback ?? '')) }">
                 @csrf
@@ -195,42 +195,64 @@
                         <!-- Quick Feedback Chips -->
                         <div class="flex flex-wrap items-center gap-1.5">
                             <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Format naskah laporan sudah sesuai panduan.') : 'Format naskah laporan sudah sesuai panduan.'"
-                                    class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
                                 + Format Sesuai
                             </button>
                             <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Lengkapi bukti lampiran dan dokumentasi proyek.') : 'Lengkapi bukti lampiran dan dokumentasi proyek.'"
-                                    class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
                                 + Lengkapi Dokumentasi
                             </button>
                             <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Perbaiki abstrak dan kesimpulan Bab penutup.') : 'Perbaiki abstrak dan kesimpulan Bab penutup.'"
-                                    class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
                                 + Revisi Bab Akhir
                             </button>
-                            <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Naskah laporan dan proyek inovasi sudah baik dan disetujui (ACC).') : 'Naskah laporan dan proyek inovasi sudah baik dan disetujui (ACC).'"
-                                    class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
-                                + Laporan & Proyek ACC
+                            <button type="button" @click="feedbackText = feedbackText ? (feedbackText + '. Naskah laporan dan proyek inovasi sudah baik dan disetujui.') : 'Naskah laporan dan proyek inovasi sudah baik dan disetujui.'"
+                                    class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition cursor-pointer">
+                                + Laporan &amp; Proyek Sesuai
                             </button>
                         </div>
                     </div>
 
                     <textarea name="feedback" x-model="feedbackText" rows="3" placeholder="Tuliskan catatan arahan atau catatan revisi untuk mahasiswa..." 
-                              class="w-full text-xs sm:text-sm bg-white border-0 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-600 rounded-xl p-3 shadow-2xs"></textarea>
+                              class="w-full text-sm bg-white border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 rounded-xl p-3 shadow-2xs"></textarea>
                 </div>
 
-                <div class="flex items-center justify-between gap-3 pt-1">
-                    <button type="submit" name="status" value="revision" 
-                            class="inline-flex items-center justify-center px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-sm font-bold rounded-xl transition cursor-pointer">
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <button type="button" name="status" value="revision"
+                            @click="$dispatch('open-confirm-modal', {
+                                form: $el.closest('form'),
+                                submitter: $el,
+                                title: 'Konfirmasi Minta Revisi Laporan Akhir',
+                                message: feedbackText.trim() === ''
+                                    ? 'Kolom catatan revisi masih kosong. Sebaiknya tuliskan alasan perbaikan agar mahasiswa tahu bagian yang perlu direvisi. Tetap minta revisi?'
+                                    : 'Naskah laporan akhir akan dikembalikan ke mahasiswa dengan status Perlu Revisi beserta catatan Anda.',
+                                label: 'Dokumen:',
+                                name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
+                                confirmText: 'Ya, Minta Revisi',
+                                tone: 'rose'
+                            })"
+                            class="min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-sm font-bold rounded-xl transition cursor-pointer">
                         Minta Revisi
                     </button>
-                    <button type="submit" name="status" value="approved" 
-                            class="inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
+                    <button type="button" name="status" value="approved"
+                            @click="$dispatch('open-confirm-modal', {
+                                form: $el.closest('form'),
+                                submitter: $el,
+                                title: 'Konfirmasi Setujui Laporan Akhir & Proyek',
+                                message: 'Naskah laporan akhir dan proyek inovasi mahasiswa akan disetujui sebagai bagian dari syarat kelulusan magang.',
+                                label: 'Dokumen:',
+                                name: @js($finalReport->title ?? 'Laporan Akhir Magang'),
+                                confirmText: 'Ya, Setujui Laporan',
+                                tone: 'emerald'
+                            })"
+                            class="min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-xs transition cursor-pointer">
                         Setujui Laporan & Proyek
                     </button>
                 </div>
             </form>
             @endif
         @else
-            <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-500 text-xs sm:text-sm">
+            <div class="p-8 bg-slate-50 rounded-2xl text-center text-slate-600 text-sm">
                 Mahasiswa belum mengunggah naskah laporan akhir.
             </div>
         @endif

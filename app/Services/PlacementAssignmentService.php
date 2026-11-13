@@ -40,7 +40,7 @@ class PlacementAssignmentService
 
         if (! $mentorId && ! $advisorId) {
             throw ValidationException::withMessages([
-                'assignment' => 'Pilih minimal satu pembimbing (Mentor Dinas atau DPL) yang akan ditetapkan.',
+                'assignment' => 'Pilih minimal satu pembimbing (Mentor Dinas atau Dosen Pembimbing) yang akan ditetapkan.',
             ]);
         }
 

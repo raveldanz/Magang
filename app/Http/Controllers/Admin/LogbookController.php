@@ -77,11 +77,12 @@ class LogbookController extends Controller
 
         // Pencarian Mahasiswa (Nama / NIM)
         if ($request->filled('search')) {
-            $search = strtolower($request->search);
-            $query->whereHas('application.user', function ($uq) use ($search) {
-                $uq->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('studentProfile', function ($sq) use ($search) {
-                        $sq->where('nim', 'like', "%{$search}%");
+            $search = trim($request->search);
+            $like = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $query->whereHas('application.user', function ($uq) use ($search, $like) {
+                $uq->where('name', $like, "%{$search}%")
+                    ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {
+                        $sq->where('nim', $like, "%{$search}%");
                     });
             });
         }

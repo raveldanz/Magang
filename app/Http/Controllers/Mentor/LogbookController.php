@@ -52,16 +52,19 @@ class LogbookController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = strtolower(trim($request->search));
-            $filteredQuery->where(function ($q) use ($search) {
-                $q->where('activity', 'like', "%{$search}%")
-                    ->orWhereHas('placement.application.user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhereHas('studentProfile', function ($sq) use ($search) {
-                                $sq->where('nim', 'like', "%{$search}%");
-                            });
-                    });
-            });
+            $search = trim((string) $request->search);
+            if ($search !== '') {
+                $like = \DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+                $filteredQuery->where(function ($q) use ($search, $like) {
+                    $q->where('activity', $like, "%{$search}%")
+                        ->orWhereHas('placement.application.user', function ($uq) use ($search, $like) {
+                            $uq->where('name', $like, "%{$search}%")
+                                ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {
+                                    $sq->where('nim', $like, "%{$search}%");
+                                });
+                        });
+                });
+            }
         }
 
         $logsForBundling = $filteredQuery->orderBy('date', 'desc')->orderBy('id', 'desc')->get();

@@ -21,7 +21,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     // HasApiTokens wajib untuk API login Sanctum (createToken / tokens) di Api\AuthController
-    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions;
+    use HasApiTokens, HasFactory, HasPushSubscriptions, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -106,6 +106,20 @@ class User extends Authenticatable
     }
 
     /**
+     * Peran lapangan/eksekutif yang antarmukanya menampilkan status berbahasa Indonesia terstandar
+     * demi kemudahan baca pengguna senior, tanpa mengubah kode status bahasa Inggris di sistem.
+     */
+    public static function isLocalizedStatusUiRole(?string $role): bool
+    {
+        return in_array($role, ['mentor', 'pembimbing', 'supervisor'], true);
+    }
+
+    public function usesLocalizedStatusUi(): bool
+    {
+        return self::isLocalizedStatusUiRole($this->role);
+    }
+
+    /**
      * Memeriksa apakah user adalah Admin Bidang spesifik.
      */
     public function isBidangAdmin(): bool
@@ -133,8 +147,10 @@ class User extends Authenticatable
         if ($this->role === 'admin') {
             if ($this->unit_id) {
                 $unit = $this->relationLoaded('unit') ? $this->unit : Unit::find($this->unit_id);
-                return $unit ? 'Admin ' . $unit->name : 'Admin Bidang';
+
+                return $unit ? 'Admin '.$unit->name : 'Admin Bidang';
             }
+
             return 'Admin Dispusip';
         }
 

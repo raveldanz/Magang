@@ -4,9 +4,16 @@ namespace App\Http\Controllers\Lecturer;
 
 use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
+use App\Models\AcademicConsultation;
 use App\Models\AgencyProfile;
+use App\Models\Application;
+use App\Models\AuditLog;
+use App\Models\Logbook;
 use App\Models\Placement;
+use App\Models\Unit;
 use App\Services\LogbookWeeklyBundler;
+use App\Services\UniversityResolver;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,17 +48,8 @@ class DashboardController extends Controller
     {
         $lecturer = Auth::user();
 
-        // On-the-fly auto-activation bagi mahasiswa bimbingan yang sudah tiba tanggal mulainya
-        $startedApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::ACCEPTED)
-            ->whereNotNull('start_date')
-            ->whereDate('start_date', '<=', now()->toDateString())
-            ->whereHas('placement', function ($q) use ($lecturer) {
-                $q->where('academic_advisor_id', $lecturer->id);
-            })
-            ->get();
-        foreach ($startedApps as $stApp) {
-            $stApp->autoActivateIfStarted();
-        }
+        // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE
+        Application::syncStartedApplications();
 
         $query = $this->getLecturerPlacementsQuery();
 
@@ -104,7 +102,7 @@ class DashboardController extends Controller
             }
             $univ = $eval->getUniversity();
             if (! $univ && $p->application?->user) {
-                $univ = app(\App\Services\UniversityResolver::class)->forUser($p->application->user);
+                $univ = app(UniversityResolver::class)->forUser($p->application->user);
             }
             $scheme = $univ->evaluation_scheme ?? 'mentor_only';
             $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
@@ -137,14 +135,18 @@ class DashboardController extends Controller
 
         $urgentEndingPlacements = $placements->filter(function ($p) {
             $app = $p->application;
-            if (! $app) return false;
+            if (! $app) {
+                return false;
+            }
             $statusVal = $app->statusValue();
-            if (in_array($statusVal, ['completed', 'rejected', 'resigned'], true)) return false;
+            if (in_array($statusVal, ['completed', 'rejected', 'resigned'], true)) {
+                return false;
+            }
 
             $eval = $p->evaluation;
             $univ = $eval?->getUniversity();
             if (! $univ && $app->user) {
-                $univ = app(\App\Services\UniversityResolver::class)->forUser($app->user);
+                $univ = app(UniversityResolver::class)->forUser($app->user);
             }
             $scheme = $univ->evaluation_scheme ?? 'mentor_only';
             $weightLecturer = $univ ? (int) $univ->weight_lecturer : 0;
@@ -156,14 +158,14 @@ class DashboardController extends Controller
                 $hasScore = $eval && (($eval->nilai_akademik ?? 0) > 0 || ($eval->nilai_dosen ?? 0) > 0 || ($eval->dosenAspectScore('score_mastery') ?? 0) > 0);
             }
 
-            $endDate = $app->end_date ? \Carbon\Carbon::parse($app->end_date) : null;
-            $isNearEnd = $endDate && $endDate->diffInDays(\Carbon\Carbon::now(), false) >= -14;
+            $endDate = $app->end_date ? Carbon::parse($app->end_date) : null;
+            $isNearEnd = $endDate && $endDate->diffInDays(Carbon::now(), false) >= -14;
 
             return ! $hasScore && ($isNearEnd || $statusVal === 'active');
         });
 
         $supervisedPlacementIds = $placements->pluck('id')->toArray();
-        $pendingLogbooksCount = \App\Models\Logbook::whereIn('placement_id', $supervisedPlacementIds)
+        $pendingLogbooksCount = Logbook::whereIn('placement_id', $supervisedPlacementIds)
             ->where('lecturer_status', 'pending')
             ->count();
 
@@ -174,7 +176,7 @@ class DashboardController extends Controller
         ];
 
         $agencies = AgencyProfile::all();
-        $units = \App\Models\Unit::orderBy('name')->get();
+        $units = Unit::orderBy('name')->get();
 
         return view('lecturer.dashboard', compact('placements', 'stats', 'lecturer', 'agencies', 'units', 'actionAlerts'));
     }
@@ -268,8 +270,8 @@ class DashboardController extends Controller
         $isAssignedAdvisor = ($placement->academic_advisor_id === $lecturer->id);
         $isSuperAdmin = ($lecturer->role === 'super_admin' || ($lecturer->role === 'admin' && is_null($lecturer->agency_profile_id)));
 
-        if (!$isAssignedAdvisor && !$isSuperAdmin) {
-            abort(403, 'Akses Ditolak: Anda bukan DPL yang ditugaskan untuk mahasiswa ini.');
+        if (! $isAssignedAdvisor && ! $isSuperAdmin) {
+            abort(403, 'Akses Ditolak: Anda bukan Dosen Pembimbing yang ditugaskan untuk mahasiswa ini.');
         }
 
         $request->validate([
@@ -279,7 +281,7 @@ class DashboardController extends Controller
             'notes' => 'required|string|max:2000',
         ]);
 
-        $consultation = \App\Models\AcademicConsultation::create([
+        $consultation = AcademicConsultation::create([
             'placement_id' => $placement->id,
             'academic_advisor_id' => $lecturer->id,
             'consultation_date' => $request->consultation_date,
@@ -289,13 +291,13 @@ class DashboardController extends Controller
             'status' => 'completed',
         ]);
 
-        \App\Models\AuditLog::record('LECTURER_CONSULTATION_ADD', 'AcademicConsultation', $consultation->id, [
+        AuditLog::record('LECTURER_CONSULTATION_ADD', 'AcademicConsultation', $consultation->id, [
             'student_name' => $placement->application?->user?->name ?? '-',
             'topic' => $request->topic,
             'consultation_date' => $request->consultation_date,
         ]);
 
-        return redirect()->back()->with('success', 'Catatan sesi bimbingan DPL berhasil ditambahkan ke riwayat!');
+        return redirect()->back()->with('success', 'Catatan sesi bimbingan Dosen Pembimbing berhasil ditambahkan ke riwayat!');
     }
 
     /**
@@ -304,12 +306,12 @@ class DashboardController extends Controller
     public function destroyConsultation($id)
     {
         $lecturer = Auth::user();
-        $consultation = \App\Models\AcademicConsultation::with('placement')->findOrFail($id);
+        $consultation = AcademicConsultation::with('placement')->findOrFail($id);
 
         $isAdvisor = ($consultation->academic_advisor_id === $lecturer->id || optional($consultation->placement)->academic_advisor_id === $lecturer->id);
         $isSuperAdmin = ($lecturer->role === 'super_admin');
 
-        if (!$isAdvisor && !$isSuperAdmin) {
+        if (! $isAdvisor && ! $isSuperAdmin) {
             abort(403, 'Akses Ditolak: Anda tidak memiliki wewenang menghapus catatan ini.');
         }
 
@@ -345,4 +347,3 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'Catatan pribadi pembimbing berhasil disimpan.');
     }
 }
-

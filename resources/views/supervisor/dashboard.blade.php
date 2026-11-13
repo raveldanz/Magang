@@ -112,7 +112,7 @@
                                     </td>
 
                                     {{-- Sisa Kuota --}}
-                                    <td class="py-4 px-4 text-center font-bold {{ $remainingQuota > 0 ? 'text-blue-600' : 'text-slate-400' }}">
+                                    <td class="py-4 px-4 text-center font-bold {{ $remainingQuota > 0 ? 'text-blue-600' : 'text-slate-500' }}">
                                         {{ $remainingQuota }}
                                     </td>
 
@@ -124,7 +124,7 @@
                                                 <span>{{ $unitWaitingCount }}</span>
                                             </a>
                                         @else
-                                            <span class="text-xs font-semibold text-slate-400">0</span>
+                                            <span class="text-xs font-semibold text-slate-500">0</span>
                                         @endif
                                     </td>
 
@@ -135,7 +135,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-8 text-center text-slate-400 font-medium">
+                                    <td colspan="6" class="py-8 text-center text-slate-600 font-medium">
                                         Belum ada data bidang penempatan.
                                     </td>
                                 </tr>
@@ -179,20 +179,20 @@
                             {{-- 4 Kotak Metrik Horizontal --}}
                             <div class="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem;">
                                 <div class="bg-slate-50/80 rounded-xl p-2 text-center border border-slate-200/60">
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Kuota</div>
+                                    <div class="text-xs text-slate-600 uppercase font-bold tracking-wider">Kuota</div>
                                     <div class="text-sm font-extrabold text-slate-800 mt-0.5">{{ $unit->quota }}</div>
                                 </div>
                                 <div class="bg-emerald-50/50 rounded-xl p-2 text-center border border-emerald-100">
-                                    <div class="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Mhs Aktif</div>
-                                    <div class="text-sm font-extrabold text-emerald-700 mt-0.5">{{ $unitActiveCount }}</div>
+                                    <div class="text-xs text-emerald-700 uppercase font-bold tracking-wider">Mhs Aktif</div>
+                                    <div class="text-sm font-extrabold text-emerald-800 mt-0.5">{{ $unitActiveCount }}</div>
                                 </div>
-                                <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-100' }} rounded-xl p-2 text-center border">
-                                    <div class="text-[10px] {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-400' }} uppercase font-bold tracking-wider">ACC</div>
-                                    <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-400' }} mt-0.5">{{ $unitWaitingCount }}</div>
+                                <div class="{{ $unitWaitingCount > 0 ? 'bg-purple-50/60 border-purple-200' : 'bg-slate-50/60 border-slate-200' }} rounded-xl p-2 text-center border">
+                                    <div class="text-xs {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} uppercase font-bold tracking-wider">Menunggu</div>
+                                    <div class="text-sm font-extrabold {{ $unitWaitingCount > 0 ? 'text-purple-700' : 'text-slate-600' }} mt-0.5">{{ $unitWaitingCount }}</div>
                                 </div>
                                 <div class="bg-blue-50/50 rounded-xl p-2 text-center border border-blue-100">
-                                    <div class="text-[10px] text-blue-600 uppercase font-bold tracking-wider">Mhs Lulus</div>
-                                    <div class="text-sm font-extrabold text-blue-700 mt-0.5">{{ $unitCompletedCount }}</div>
+                                    <div class="text-xs text-blue-700 uppercase font-bold tracking-wider">Mhs Lulus</div>
+                                    <div class="text-sm font-extrabold text-blue-800 mt-0.5">{{ $unitCompletedCount }}</div>
                                 </div>
                             </div>
                         </div>

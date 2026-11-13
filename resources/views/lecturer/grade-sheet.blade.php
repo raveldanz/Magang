@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berita Acara Penilaian DPL - {{ $student->name }} ({{ $profile->nim ?? 'NIM' }})</title>
+    <title>Berita Acara Penilaian Dosen Pembimbing - {{ $student->name }} ({{ $profile->nim ?? 'NIM' }})</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -86,7 +86,7 @@
             </a>
             <div class="hidden sm:block border-l border-slate-700 pl-3">
                 <span class="text-xs text-slate-400 block">Dokumen Resmi Akademik</span>
-                <span class="text-xs font-bold text-white">Berita Acara & Lembar Penilaian DPL</span>
+                <span class="text-xs font-bold text-white">Berita Acara &amp; Lembar Penilaian Dosen Pembimbing</span>
             </div>
         </div>
 
@@ -134,10 +134,10 @@
         <!-- JUDUL DAN NOMOR BERITA ACARA -->
         <div class="text-center my-3">
             <h2 class="text-base font-bold uppercase tracking-wider underline text-slate-950">
-                BERITA ACARA & LEMBAR PENILAIAN DOSEN PEMBIMBING LAPANGAN (BAP-DPL)
+                BERITA ACARA &amp; LEMBAR PENILAIAN DOSEN PEMBIMBING
             </h2>
             <p class="text-xs text-slate-600 font-sans mt-1">
-                Nomor Dokumen: <span class="font-mono font-semibold">BAP-DPL/{{ date('Y') }}/{{ str_pad($placement->id, 4, '0', STR_PAD_LEFT) }}/{{ $profile->nim ?? 'MHS' }}</span>
+                Nomor Dokumen: <span class="font-mono font-semibold">BAP-DP/{{ date('Y') }}/{{ str_pad($placement->id, 4, '0', STR_PAD_LEFT) }}/{{ $profile->nim ?? 'MHS' }}</span>
             </p>
         </div>
 
@@ -279,9 +279,9 @@
                     </tr>
                 @endforeach
 
-                <!-- Rata-rata DPL -->
+                <!-- Rata-rata Dosen Pembimbing -->
                 <tr class="bg-slate-50/75 font-semibold text-slate-800">
-                    <td colspan="4" class="border border-slate-300 py-1.5 px-3 text-right">Rata-Rata Penilaian Akademik DPL:</td>
+                    <td colspan="4" class="border border-slate-300 py-1.5 px-3 text-right">Rata-Rata Penilaian Akademik Dosen Pembimbing:</td>
                     <td class="border border-slate-300 py-1.5 text-center font-bold text-blue-900">{{ number_format($nilaiDosen, 2) }}</td>
                     <td class="border border-slate-300 py-1.5 text-center">-</td>
                 </tr>
@@ -305,7 +305,7 @@
                     &bull; Status Naskah Laporan: <strong class="{{ optional($finalReport)->status === 'approved' ? 'text-emerald-700' : 'text-amber-700' }} uppercase">{{ optional($finalReport)->status ?? 'Belum Lengkap' }}</strong>
                 </p>
                 <p class="text-slate-700">
-                    &bull; Riwayat Sesi Konsultasi DPL: <strong>{{ $consultations->count() }} Sesi Bimbingan Tercatat</strong>
+                    &bull; Riwayat Sesi Konsultasi Dosen Pembimbing: <strong>{{ $consultations->count() }} Sesi Bimbingan Tercatat</strong>
                 </p>
                 <p class="text-slate-700">
                     &bull; Predikat Kelulusan: <strong class="text-blue-800">{{ $predikat }}</strong>
@@ -313,7 +313,7 @@
             </div>
 
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px]">Catatan / Rekomendasi DPL:</span>
+                <span class="font-bold text-slate-800 block uppercase tracking-wider text-[11px]">Catatan / Rekomendasi Dosen Pembimbing:</span>
                 <p class="text-slate-700 italic mt-0.5 leading-relaxed">
                     "{{ $evaluation?->catatan_dosen ?? ($evaluation?->catatan ?? 'Mahasiswa telah menyelesaikan program magang mandiri dengan dedikasi dan kinerja akademik yang sangat baik.') }}"
                 </p>
@@ -323,7 +323,7 @@
         <!-- 4. PENGESAHAN TANDA TANGAN (3 SISI DENGAN LAYOUT QR IDENTIK SERTIFIKAT MAGANG) -->
         @php
             $certificateHash = $placement?->ensureCertificateHash();
-            $verifyCertificateUrl = $certificateHash ? route('verify.certificate', $certificateHash) : null;
+            $verifyCertificateUrl = $certificateHash ? \App\Support\PublicUrl::route('verify.certificate', $certificateHash) : null;
             $verifyHost = parse_url(url('/'), PHP_URL_HOST) . (parse_url(url('/'), PHP_URL_PORT) ? ':' . parse_url(url('/'), PHP_URL_PORT) : '');
             $codeGroups = $placement?->certificate_hash ? str_split($placement->verification_code, 20) : [];
             $qrSvg = null;

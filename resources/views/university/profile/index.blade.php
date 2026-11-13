@@ -179,7 +179,7 @@
                             }
                         },
                         addDpl() {
-                            this.dplList.push('Aspek Penilaian DPL ' + (this.dplList.length + 1));
+                            this.dplList.push('Aspek Penilaian Dosen Pembimbing ' + (this.dplList.length + 1));
                         },
                         removeDpl(idx) {
                             if (this.dplList.length > 1) {
@@ -376,7 +376,7 @@
                                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                                        <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian DPL (Akademik Kampus)</h5>
+                                        <h5 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Komponen Penilaian Dosen Pembimbing (Akademik Kampus)</h5>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" @click="addDpl()" class="text-[11px] font-bold text-purple-600 hover:text-purple-800 cursor-pointer">

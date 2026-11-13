@@ -26,6 +26,11 @@ enum AccountStatus: string
         };
     }
 
+    public function localizedLabel(?string $role = null): string
+    {
+        return $this->label();
+    }
+
     public function description(): string
     {
         return match ($this) {

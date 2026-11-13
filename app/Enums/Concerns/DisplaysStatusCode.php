@@ -2,6 +2,8 @@
 
 namespace App\Enums\Concerns;
 
+use App\Models\User;
+
 /**
  * Standar tampilan status untuk semua enum status: nama = kode sistem huruf kapital
  * (identik dengan nilai database, "_" jadi spasi), keterangan Indonesia lewat description().
@@ -11,6 +13,19 @@ trait DisplaysStatusCode
     public function label(): string
     {
         return str_replace('_', ' ', strtoupper($this->value));
+    }
+
+    /**
+     * Label UI berbahasa Indonesia terstandar untuk peran ramah pengguna senior (mentor/supervisor).
+     */
+    public function localizedLabel(?string $role = null): string
+    {
+        $effectiveRole = $role ?? auth()->user()?->role;
+        if (! User::isLocalizedStatusUiRole($effectiveRole)) {
+            return $this->label();
+        }
+
+        return method_exists($this, 'description') ? $this->description($effectiveRole) : $this->label();
     }
 
     /**

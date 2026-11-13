@@ -204,7 +204,7 @@ class LecturerFeaturesUpdateTest extends TestCase
             ->assertDontSeeText('Cetak Lembar Nilai / Berita Acara')
             ->assertDontSee('<iframe', false)
             ->assertSeeText('Melakukan testing REST API layanan e-Gov')
-            ->assertSeeText('Verifikasi DPL');
+            ->assertSeeText('Verifikasi Dosen Pembimbing');
     }
 
     public function test_lecturer_can_verify_logbook_inline_with_feedback()
@@ -320,7 +320,7 @@ class LecturerFeaturesUpdateTest extends TestCase
 
         // Logbook 1: status=approved (mentor), lecturer_status=pending (dpl) -> harus muncul
         // Buat logbook 2: status=pending, lecturer_status=pending -> tidak boleh muncul di filter mentor_approved
-        \App\Models\Logbook::create([
+        Logbook::create([
             'placement_id' => $data['placement1']->id,
             'date' => now()->subDays(2)->toDateString(),
             'activity' => 'Aktivitas yang belum di-ACC mentor dinas',
@@ -347,7 +347,7 @@ class LecturerFeaturesUpdateTest extends TestCase
             ->assertSeeText('2 hari lalu');
 
         // Buat logbook hari ini
-        \App\Models\Logbook::create([
+        Logbook::create([
             'placement_id' => $data['placement1']->id,
             'date' => now()->toDateString(),
             'activity' => 'Melakukan testing hari ini',
@@ -360,5 +360,3 @@ class LecturerFeaturesUpdateTest extends TestCase
             ->assertSeeText('Aktif hari ini');
     }
 }
-
-

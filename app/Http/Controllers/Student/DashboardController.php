@@ -261,7 +261,7 @@ class DashboardController extends Controller
 
         // Kasus 1: Dosen sudah terdaftar di database
         if ($existingLecturer && $existingLecturer->university_id && (int) $existingLecturer->university_id !== (int) $targetUnivId) {
-            return redirect()->route('dashboard')->with('error', 'Email dosen tersebut terdaftar di perguruan tinggi lain. Hubungi Admin Kampus Anda untuk penugasan DPL.');
+            return redirect()->route('dashboard')->with('error', 'Email dosen tersebut terdaftar di perguruan tinggi lain. Hubungi Admin Kampus Anda untuk penugasan Dosen Pembimbing.');
         }
 
         if ($existingLecturer) {

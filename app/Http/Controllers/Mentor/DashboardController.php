@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Mentor;
 
 use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Application;
 use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\University;
 use App\Services\LogbookWeeklyBundler;
 use App\Services\StudentNotifier;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,54 +25,53 @@ class DashboardController extends Controller
     {
         $mentor = Auth::user();
 
-        // On-the-fly auto-activation bagi mahasiswa bimbingan yang sudah tiba tanggal mulainya
-        $startedApps = \App\Models\Application::where('status', \App\Enums\ApplicationStatus::ACCEPTED)
-            ->whereNotNull('start_date')
-            ->whereDate('start_date', '<=', now()->toDateString())
-            ->whereHas('placement', function ($q) use ($mentor) {
-                $q->where('mentor_id', $mentor->id)->orWhere('pembimbing_id', $mentor->id);
-            })
-            ->get();
-        foreach ($startedApps as $stApp) {
-            $stApp->autoActivateIfStarted();
-        }
+        // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE
+        Application::syncStartedApplications();
 
-        // Base query penempatan yang diplot ke mentor ini
-        $baseQuery = Placement::where(function ($q) use ($mentor) {
-            $q->where('mentor_id', $mentor->id)
-                ->orWhere('pembimbing_id', $mentor->id);
-        });
-
-        // Multi-Tenant Isolation: Scoping ke instansi jika mentor terikat ke agency tertentu
-        if ($mentor->agency_profile_id !== null) {
-            $baseQuery->whereHas('application.unit', function ($q) use ($mentor) {
-                $q->where('agency_profile_id', $mentor->agency_profile_id);
-            });
-        }
+        // Base query penempatan yang menjadi wewenang mentor ini (bimbingan langsung + fallback unit)
+        $baseQuery = Placement::fieldReviewableBy($mentor);
 
         // Jangan sertakan yang mengundurkan diri atau ditolak
         $baseQuery->whereHas('application', function ($q) {
             $q->whereNotIn('status', ['resigned', 'rejected']);
         });
 
-        // Hitung statistik bimbingan mentor
-        $totalStudents = (clone $baseQuery)->count();
-        $totalEvaluated = (clone $baseQuery)->whereHas('evaluation', function ($q) {
-            $q->where(function ($sq) {
-                $sq->where('nilai_disiplin', '>', 0)
-                    ->orWhere('nilai_kinerja', '>', 0)
-                    ->orWhere('nilai_laporan', '>', 0);
-            });
-        })->count();
-        $totalPendingEval = max(0, $totalStudents - $totalEvaluated);
-        $totalReportsApproved = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', 'approved'))->count();
-        $totalReportsPending = (clone $baseQuery)->whereHas('finalreport', fn ($q) => $q->where('status', '!=', 'approved'))->count();
+        // Hitung statistik bimbingan mentor secara akurat
+        $allBasePlacements = (clone $baseQuery)->with([
+            'application.user',
+            'application.unit',
+            'evaluation',
+            'finalreport',
+        ])->get();
 
-        $activeStudents = (clone $baseQuery)->whereRelation('application', 'status', 'active')->count();
-        $upcomingStudents = (clone $baseQuery)->whereRelation('application', 'status', 'accepted')->count();
-        $completedStudents = (clone $baseQuery)->whereRelation('application', 'status', 'completed')->count();
-        $placementIds = (clone $baseQuery)->pluck('id');
-        $pendingLogbooks = Logbook::whereIn('placement_id', $placementIds)->where('status', 'pending')->count();
+        $totalStudents = $allBasePlacements->count();
+        $hasMentorScoreFn = static fn (Placement $p): bool => (bool) ($p->evaluation && (
+            ($p->evaluation->nilai_disiplin ?? 0) > 0
+            || ($p->evaluation->nilai_kinerja ?? 0) > 0
+            || ($p->evaluation->nilai_laporan ?? 0) > 0
+        ));
+
+        $totalEvaluated = $allBasePlacements->filter($hasMentorScoreFn)->count();
+
+        // Hanya hitung mahasiswa bimbingan langsung yang magangnya aktif/terbuka nilainya & belum dinilai
+        $pendingEvalPlacements = $allBasePlacements->filter(
+            fn (Placement $p) => $p->isAssignedFieldMentor($mentor)
+                && $p->evaluationLockReason() === null
+                && ! $hasMentorScoreFn($p)
+        )->values();
+
+        $totalPendingEval = $pendingEvalPlacements->count();
+        $totalReportsApproved = $allBasePlacements->filter(fn (Placement $p) => $p->finalreport?->status === 'approved')->count();
+        $totalReportsPending = $allBasePlacements->filter(fn (Placement $p) => $p->finalreport && $p->finalreport->status !== 'approved')->count();
+
+        $activeStudents = $allBasePlacements->filter(fn (Placement $p) => $p->application?->statusValue() === 'active')->count();
+        $upcomingStudents = $allBasePlacements->filter(fn (Placement $p) => $p->application?->statusValue() === 'accepted')->count();
+        $completedStudents = $allBasePlacements->filter(fn (Placement $p) => $p->application?->statusValue() === 'completed')->count();
+
+        $placementIds = $allBasePlacements->pluck('id');
+        $pendingLogbooks = $placementIds->isNotEmpty()
+            ? Logbook::whereIn('placement_id', $placementIds)->where('status', 'pending')->count()
+            : 0;
 
         $stats = [
             'total_students' => $totalStudents,
@@ -84,16 +85,40 @@ class DashboardController extends Controller
             'pending_logbooks' => $pendingLogbooks,
         ];
 
-        // Query penempatan dengan relasi lengkap
-        $query = (clone $baseQuery)->with([
-            'application.user.studentProfile',
-            'application.user.universityRelation',
-            'application.unit.agencyProfile',
-            'logbooks',
-            'evaluation',
-            'finalreport',
-            'academicAdvisor',
-        ]);
+        // Prioritas Tindakan Segera (selaras dengan Dashboard Dosen Pembimbing)
+        $pendingReports = $allBasePlacements->filter(
+            fn (Placement $p) => $p->isAssignedFieldMentor($mentor) && $p->finalreport?->status === 'pending'
+        )->values();
+
+        $urgentEndingPlacements = $pendingEvalPlacements->filter(function (Placement $p) {
+            $endDate = $p->application?->end_date ? Carbon::parse($p->application->end_date) : null;
+            $isNearEnd = $endDate && $endDate->diffInDays(Carbon::now(), false) >= -14;
+            $reportApproved = $p->finalreport?->status === 'approved';
+
+            return $isNearEnd || $reportApproved;
+        })->values();
+
+        $actionAlerts = [
+            'pending_reports' => $pendingReports,
+            'urgent_ending' => $urgentEndingPlacements,
+            'pending_logbooks_count' => $pendingLogbooks,
+            'pending_eval_ready' => $pendingEvalPlacements,
+        ];
+
+        // Query penempatan dengan relasi lengkap untuk daftar & paginasi
+        $query = (clone $baseQuery)
+            ->with([
+                'application.user.studentProfile',
+                'application.user.universityRelation',
+                'application.unit.agencyProfile',
+                'logbooks',
+                'evaluation',
+                'finalreport',
+                'academicAdvisor',
+            ])
+            ->withCount([
+                'logbooks as pending_logbooks_count' => fn ($q) => $q->where('status', 'pending'),
+            ]);
 
         $tab = $request->get('tab');
         if ($tab && in_array($tab, ['upcoming', 'completed', 'active'], true)) {
@@ -138,9 +163,14 @@ class DashboardController extends Controller
 
         // 15 mahasiswa per halaman; filter & tab ikut terbawa saat pindah halaman
         $placements = $query->latest()->paginate(15)->withQueryString();
-        $universities = University::orderBy('name')->get();
 
-        return view('mentor.dashboard', compact('placements', 'stats', 'universities', 'tab', 'search'));
+        // Hanya tampilkan daftar kampus yang ada di bimbingan mentor agar dropdown filter tetap ringkas
+        $univIds = $allBasePlacements->pluck('application.user.university_id')->filter()->unique()->values();
+        $universities = $univIds->isNotEmpty()
+            ? University::whereIn('id', $univIds)->orderBy('name')->get()
+            : collect();
+
+        return view('mentor.dashboard', compact('placements', 'stats', 'universities', 'tab', 'search', 'actionAlerts'));
     }
 
     /**

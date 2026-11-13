@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth overflow-x-hidden w-full">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang Dispusip — Dinas Perpustakaan dan Kearsipan Kota Surabaya') }}</title>
@@ -17,7 +17,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -206,33 +206,45 @@
         @auth
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                function subscribePush(registration) {
+                    const vapidPublicKey = '{{ config("services.vapid.public_key", "") }}';
+                    if (!vapidPublicKey) return;
+                    const applicationServerKey = urlB64ToUint8Array(vapidPublicKey);
+                    registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: applicationServerKey
+                    }).then(function(subscription) {
+                        fetch('/push-subscriptions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify(subscription)
+                        });
+                    }).catch(function(err) {
+                        console.log('Failed to subscribe the user: ', err);
+                    });
+                }
+
                 if ('serviceWorker' in navigator && 'PushManager' in window) {
                     navigator.serviceWorker.register('/sw.js').then(function(registration) {
                         console.log('Service Worker registered with scope:', registration.scope);
-                        
-                        Notification.requestPermission().then(function(permission) {
-                            if (permission === 'granted') {
-                                const vapidPublicKey = '{{ env("VAPID_PUBLIC_KEY") }}';
-                                if (vapidPublicKey) {
-                                    const applicationServerKey = urlB64ToUint8Array(vapidPublicKey);
-                                    registration.pushManager.subscribe({
-                                        userVisibleOnly: true,
-                                        applicationServerKey: applicationServerKey
-                                    }).then(function(subscription) {
-                                        fetch('/push-subscriptions', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                            },
-                                            body: JSON.stringify(subscription)
-                                        });
-                                    }).catch(function(err) {
-                                        console.log('Failed to subscribe the user: ', err);
-                                    });
+
+                        // Hanya sinkronkan langganan secara diam-diam jika izin notifikasi sudah diberikan sebelumnya.
+                        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                            subscribePush(registration);
+                        }
+
+                        window.enableWebPushNotifications = function() {
+                            if (typeof Notification === 'undefined') return Promise.resolve('unsupported');
+                            return Notification.requestPermission().then(function(permission) {
+                                if (permission === 'granted') {
+                                    subscribePush(registration);
                                 }
-                            }
-                        });
+                                return permission;
+                            });
+                        };
                     }).catch(function(error) {
                         console.log('Service Worker registration failed:', error);
                     });

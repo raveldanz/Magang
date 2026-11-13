@@ -19,8 +19,11 @@ class EvaluationPolicyAndComponentsTest extends TestCase
     use RefreshDatabase;
 
     private AgencyProfile $agency;
+
     private Unit $unit;
+
     private User $admin;
+
     private User $mentor;
 
     protected function setUp(): void
@@ -214,9 +217,9 @@ class EvaluationPolicyAndComponentsTest extends TestCase
         $this->assertStringContainsString('Penilaian Pembimbing Lapangan Dinas', $content);
         $this->assertStringContainsString('Disiplin, Kehadiran', $content);
 
-        // Section B (DPL) dan subtotal DPL TIDAK ADA
-        $this->assertStringNotContainsString('Penilaian Akademik Dosen Pembimbing Lapangan', $content);
-        $this->assertStringNotContainsString('Subtotal Nilai DPL', $content);
+        // Section B (Dosen Pembimbing) dan subtotal Dosen Pembimbing TIDAK ADA
+        $this->assertStringNotContainsString('Penilaian Akademik Dosen Pembimbing', $content);
+        $this->assertStringNotContainsString('Subtotal Nilai Dosen Pembimbing', $content);
     }
 
     public function test_lecturer_only_100_percent_scheme_evaluation_and_certificate(): void
@@ -276,8 +279,8 @@ class EvaluationPolicyAndComponentsTest extends TestCase
         $this->assertStringNotContainsString('Penilaian Pembimbing Lapangan Dinas', $content);
         $this->assertStringNotContainsString('Subtotal Nilai Dinas', $content);
 
-        // Section DPL ada
-        $this->assertStringContainsString('Penilaian Akademik Dosen Pembimbing Lapangan', $content);
+        // Section Dosen Pembimbing ada
+        $this->assertStringContainsString('Penilaian Akademik Dosen Pembimbing', $content);
         $this->assertStringContainsString('Penguasaan Materi, Teori Ilmiah', $content);
     }
 
@@ -351,8 +354,8 @@ class EvaluationPolicyAndComponentsTest extends TestCase
         $this->assertStringContainsString('Penilaian Pembimbing Lapangan Dinas', $content);
         $this->assertStringContainsString('Subtotal Nilai Dinas (Rata-rata):', $content);
         $this->assertStringContainsString('60%', $content);
-        $this->assertStringContainsString('Penilaian Akademik Dosen Pembimbing Lapangan', $content);
-        $this->assertStringContainsString('Subtotal Nilai DPL (Rata-rata):', $content);
+        $this->assertStringContainsString('Penilaian Akademik Dosen Pembimbing', $content);
+        $this->assertStringContainsString('Subtotal Nilai Dosen Pembimbing (Rata-rata):', $content);
         $this->assertStringContainsString('40%', $content);
     }
 }

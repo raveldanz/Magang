@@ -19,8 +19,8 @@
             @if(session('success'))
                 <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-900 flex items-center justify-between gap-3 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
-                            ✓
+                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         </div>
                         <div class="text-sm font-bold">{{ session('success') }}</div>
                     </div>
@@ -126,30 +126,19 @@
                                                 {{ number_format($finalScore, 1) }}
                                             </span>
                                         @else
-                                            <span class="text-xs text-slate-400 font-semibold">{{ $finalScore }}</span>
+                                            <span class="text-xs text-slate-600 font-semibold">{{ $finalScore }}</span>
                                         @endif
                                     </td>
 
-                                    {{-- Status ACC --}}
-                                    <td class="py-4 px-4 text-center">
-                                        @if($cert->approval_status === 'approved')
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-300">
-                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                                Telah Disahkan
-                                            </span>
-                                            @if($cert->approved_at)
-                                                <div class="text-[10px] text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($cert->approved_at)->isoFormat('D MMM Y') }}</div>
-                                            @endif
-                                        @elseif($cert->approval_status === 'revision')
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-800 border border-amber-300">
-                                                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                                Perlu Revisi
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-800 border border-blue-300">
-                                                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                                Menunggu ACC
-                                            </span>
+                                    {{-- Status Terstandar --}}
+                                    <td class="py-4 px-4 text-center whitespace-nowrap">
+                                        @php
+                                            $certStatusVal = $cert->approval_status ?: 'waiting_approval';
+                                            $certStatusType = $certStatusVal === 'waiting_approval' ? 'application' : 'review';
+                                        @endphp
+                                        <x-status-badge :type="$certStatusType" :status="$certStatusVal" />
+                                        @if($cert->approval_status === 'approved' && $cert->approved_at)
+                                            <div class="text-xs text-slate-600 mt-1">{{ \Carbon\Carbon::parse($cert->approved_at)->isoFormat('D MMM Y') }}</div>
                                         @endif
                                     </td>
 
@@ -195,7 +184,7 @@
                                                             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
                                                                 <div class="text-slate-500">Nama Mahasiswa:</div>
                                                                 <div class="font-bold text-slate-900 text-sm">{{ $student?->name }}</div>
-                                                                <div class="text-[11px] text-slate-500">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
+                                                                <div class="text-xs text-slate-600">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
                                                             </div>
                                                             <p class="text-xs text-slate-600 leading-relaxed">
                                                                 Setelah disahkan, mahasiswa yang bersangkutan akan dapat mengunduh E-Sertifikat resmi Dispusip beserta transkrip nilai.
@@ -225,7 +214,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-12 text-center text-slate-400 font-semibold">
+                                    <td colspan="5" class="py-12 text-center text-slate-600 font-semibold text-sm">
                                         Tidak ada berkas sertifikat yang sesuai dengan filter ini.
                                     </td>
                                 </tr>
@@ -247,25 +236,14 @@
                         <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3 hover:border-blue-300 transition"
                              x-data="{ showApproveCertModalMobile: false }">
                             
-                            {{-- Header Kartu: Status ACC & Nilai --}}
+                            {{-- Header Kartu: Status & Nilai --}}
                             <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
                                 <div>
-                                    @if($cert->approval_status === 'approved')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-300">
-                                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                            Telah Disahkan
-                                        </span>
-                                    @elseif($cert->approval_status === 'revision')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-800 border border-amber-300">
-                                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                            Perlu Revisi
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-800 border border-blue-300">
-                                            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                            Menunggu ACC
-                                        </span>
-                                    @endif
+                                    @php
+                                        $certStatusVal = $cert->approval_status ?: 'waiting_approval';
+                                        $certStatusType = $certStatusVal === 'waiting_approval' ? 'application' : 'review';
+                                    @endphp
+                                    <x-status-badge :type="$certStatusType" :status="$certStatusVal" />
                                 </div>
 
                                 <div class="flex items-center gap-1.5">
@@ -293,19 +271,19 @@
                             {{-- Box Bidang & Nomor Sertifikat --}}
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
                                 <div class="flex items-start justify-between gap-2">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Bidang:</span>
-                                    <span class="font-bold text-slate-800 text-right text-[11px]">{{ $unit?->name ?? 'Dispusip Surabaya' }}</span>
+                                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider shrink-0">Bidang:</span>
+                                    <span class="font-bold text-slate-800 text-right text-xs">{{ $unit?->name ?? 'Dispusip Surabaya' }}</span>
                                 </div>
                                 <div class="flex items-start justify-between gap-2 pt-1 border-t border-slate-200/50">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">No. Sertifikat:</span>
-                                    <span class="font-mono font-medium text-slate-600 text-right text-[11px]">{{ $cert->certificate_number ?? $cert->placement?->certificate_number ?? 'Nomor otomatis' }}</span>
+                                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider shrink-0">No. Sertifikat:</span>
+                                    <span class="font-mono font-medium text-slate-600 text-right text-xs">{{ $cert->certificate_number ?? $cert->placement?->certificate_number ?? 'Nomor otomatis' }}</span>
                                 </div>
                             </div>
 
                             @if($cert->approval_status === 'revision' && $cert->notes)
                                 <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-0.5">
-                                    <span class="font-bold text-[10px] uppercase tracking-wider text-amber-700">Catatan Revisi:</span>
-                                    <p class="italic text-[11px] text-amber-800 leading-relaxed">{{ $cert->notes }}</p>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-amber-800">Catatan Revisi:</span>
+                                    <p class="italic text-xs text-amber-900 leading-relaxed">{{ $cert->notes }}</p>
                                 </div>
                             @endif
 
@@ -352,7 +330,7 @@
                                             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
                                                 <div class="text-slate-500">Nama Mahasiswa:</div>
                                                 <div class="font-bold text-slate-900 text-sm">{{ $student?->name }}</div>
-                                                <div class="text-[11px] text-slate-500">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
+                                                <div class="text-xs text-slate-600">{{ $student?->studentProfile?->universitas ?? '-' }}</div>
                                             </div>
                                             <form method="POST" action="{{ route('supervisor.certificates.approve', $cert->id) }}" class="space-y-3">
                                                 @csrf
@@ -374,7 +352,7 @@
                             </div>
                         </div>
                     @empty
-                        <div class="py-10 text-center text-slate-400 font-medium text-xs">
+                        <div class="py-10 text-center text-slate-600 font-medium text-sm">
                             Tidak ada berkas sertifikat yang sesuai dengan filter ini.
                         </div>
                     @endforelse

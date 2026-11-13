@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Enums\Concerns\DisplaysStatusCode;
+use App\Models\User;
 
 enum ReviewStatus: string
 {
@@ -22,6 +23,24 @@ enum ReviewStatus: string
             self::PENDING => 'Menunggu Review',
             self::APPROVED => 'Disetujui',
             self::REJECTED => 'Ditolak, Perlu Diperbaiki',
+            self::REVISION => 'Perlu Revisi',
+        };
+    }
+
+    /**
+     * Label status UI Bahasa Indonesia terstandar khusus peran mentor & supervisor.
+     */
+    public function localizedLabel(?string $role = null): string
+    {
+        $effectiveRole = $role ?? auth()->user()?->role;
+        if (! User::isLocalizedStatusUiRole($effectiveRole)) {
+            return $this->label();
+        }
+
+        return match ($this) {
+            self::PENDING => 'Menunggu Tinjauan',
+            self::APPROVED => 'Disetujui',
+            self::REJECTED => 'Perlu Revisi',
             self::REVISION => 'Perlu Revisi',
         };
     }

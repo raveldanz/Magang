@@ -10,7 +10,7 @@
                 <h2 class="font-bold text-xl sm:text-2xl text-slate-900 leading-tight">
                     Penilaian Evaluasi Akhir
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
                     Mahasiswa: <strong class="text-slate-800">{{ $placement->application?->user?->name ?? '-' }}</strong> (NIM: {{ $placement->application?->user?->studentProfile?->nim ?? '-' }})
                 </p>
             </div>

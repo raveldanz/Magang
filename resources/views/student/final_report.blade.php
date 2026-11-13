@@ -194,8 +194,8 @@
                                 <span class="w-5 h-5 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">2</span>
                                 <span>Evaluasi 2 Pihak</span>
                             </div>
-                            <p class="text-[11px] text-slate-600 leading-relaxed">
-                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing (DPL)</strong> sebagai penentu nilai akhir.
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Naskah dan karya yang diunggah akan dinilai langsung oleh <strong>Mentor Dinas</strong> dan <strong>Dosen Pembimbing</strong> sebagai penentu nilai akhir.
                             </p>
                         </div>
 
@@ -788,7 +788,6 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script>
         let currentObjectUrl = null;
 
