@@ -140,29 +140,40 @@
     }
 }">
 
-    <!-- 1. Info Singkat Mahasiswa -->
-    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-                <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Mahasiswa</span>
-                <span class="text-sm font-bold text-slate-900 block mt-0.5">{{ $student->name ?? '-' }}</span>
-                <span class="text-xs text-slate-600 font-mono">NIM: {{ $profile->nim ?? '-' }}</span>
+    <!-- 1. Info Singkat Mahasiswa (Grid 2x2 Lapang & Terstruktur) -->
+    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <h3 class="font-bold text-base text-slate-900">Data Mahasiswa &amp; Penempatan</h3>
+            @if ($placement?->application?->status)
+                <x-status-badge :status="$placement->application->status" />
+            @endif
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+            <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
+                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Mahasiswa</span>
+                <div class="text-sm sm:text-base font-bold text-slate-900 leading-snug">{{ $student->name ?? '-' }}</div>
+                <div class="text-xs sm:text-sm text-slate-700 font-mono">NIM: {{ $profile->nim ?? '-' }}</div>
             </div>
-            <div>
-                <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Perguruan Tinggi & Prodi</span>
-                <span class="text-sm font-medium text-slate-800 block mt-0.5">{{ $profile->universitas ?? ($univ->name ?? '-') }}</span>
-                <span class="text-xs text-slate-600">{{ $profile->jurusan ?? '-' }}</span>
+            <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
+                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Perguruan Tinggi &amp; Program Studi</span>
+                <div class="text-sm sm:text-base font-bold text-slate-900 leading-snug">{{ $profile->universitas ?? ($univ->name ?? '-') }}</div>
+                <div class="text-xs sm:text-sm text-slate-700">{{ $profile->jurusan ?? '-' }}</div>
             </div>
-            <div>
-                <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Lokasi & Unit Kerja</span>
-                <span class="text-sm font-medium text-slate-800 block mt-0.5">{{ $agencyProfile->agency_name ?? '-' }}</span>
-                <span class="text-xs text-slate-600">{{ $unit->name ?? '-' }}</span>
+            <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
+                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Lokasi &amp; Unit Kerja</span>
+                <div class="text-sm sm:text-base font-bold text-slate-900 leading-snug">{{ $agencyProfile->agency_name ?? '-' }}</div>
+                <div class="text-xs sm:text-sm text-slate-700">{{ $unit->name ?? '-' }}</div>
             </div>
-            <div>
-                <span class="text-xs text-slate-600 font-semibold uppercase tracking-wider block">Periode Magang</span>
-                <span class="text-sm font-medium text-slate-800 block mt-0.5">
-                    {{ $placement->application?->start_date ? \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') : '-' }} s/d {{ $placement->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') : '-' }}
-                </span>
+            <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
+                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Periode Magang</span>
+                <div class="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                    {{ $placement?->application?->start_date ? \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d M Y') : '-' }}
+                    &ndash;
+                    {{ $placement?->application?->end_date ? \Carbon\Carbon::parse($placement->application->end_date)->translatedFormat('d M Y') : '-' }}
+                </div>
+                <div class="text-xs sm:text-sm text-slate-700">
+                    Pembimbing Lapangan: {{ $placement?->mentor?->name ?? $placement?->pembimbing?->name ?? 'Belum Ditugaskan' }}
+                </div>
             </div>
         </div>
     </div>

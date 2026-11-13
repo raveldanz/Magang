@@ -175,6 +175,10 @@ class MentorElderlyFriendlyOptimizationTest extends TestCase
         $this->assertStringContainsString(ReviewStatus::REVISION->localizedLabel('mentor'), $dashboard);
         $this->assertStringNotContainsString('Menunggu Review (Pending)', $dashboard);
         $this->assertStringNotContainsString('Disetujui (Approved)', $dashboard);
+        // Tabel utama mentor ramping: Status memiliki kolom sendiri, tanpa teks jurusan bertumpuk
+        $this->assertStringContainsString('>Status</th>', $dashboard);
+        $this->assertStringNotContainsString('>Dosen Pembimbing</th>', $dashboard);
+        $this->assertStringNotContainsString('Teknik Informatika', $dashboard);
 
         $logbooks = $this->actingAs($data['mentor'])->get(route('mentor.logbooks.index'))->assertOk()->getContent();
         $this->assertStringContainsString(ReviewStatus::PENDING->localizedLabel('mentor'), $logbooks);
@@ -296,6 +300,7 @@ class MentorElderlyFriendlyOptimizationTest extends TestCase
             ->assertOk()
             ->getContent();
 
+        $this->assertStringContainsString('Data Mahasiswa &amp; Penempatan', $formHtml);
         $this->assertStringContainsString('Sesuaikan Aspek Penilaian', $formHtml);
         $this->assertStringContainsString('Panduan Nilai &amp; Predikat', $formHtml);
         $this->assertStringContainsString('Catatan Jadwal Penilaian', $formHtml);

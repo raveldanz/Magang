@@ -225,7 +225,7 @@
                                 </svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search', request('q')) }}"
-                                   placeholder="Cari nama mahasiswa, NIM, atau program studi..."
+                                   placeholder="Cari nama mahasiswa atau NIM..."
                                    class="w-full min-h-[44px] text-sm border-slate-300 rounded-xl pl-10 pr-4 py-2.5 focus:ring-blue-600 focus:border-blue-600 shadow-2xs">
                         </div>
 
@@ -287,7 +287,6 @@
                             $profile = $student?->studentProfile;
                             $unit = $p->application?->unit;
                             $appStatus = $p->application?->status;
-                            $dosen = $p->academicAdvisor ?? $p->dosen;
                             $eval = $p->evaluation;
                             $nilaiMentor = $eval ? $eval->nilai_pembimbing : 0;
                             $hasMentorEval = $eval && $nilaiMentor > 0;
@@ -304,19 +303,17 @@
                                     </div>
                                     <div class="min-w-0">
                                         <p class="font-bold text-sm text-slate-900 leading-snug truncate">{{ $student->name ?? '-' }}</p>
-                                        <p class="text-xs text-slate-600 font-mono mt-0.5">{{ $profile?->nim ?? '-' }} &bull; {{ $profile?->jurusan ?? '-' }}</p>
-                                        <div class="mt-1.5">
-                                            <x-status-badge :status="$appStatus" />
-                                        </div>
+                                        <p class="text-xs text-slate-600 font-mono mt-0.5">NIM: {{ $profile?->nim ?? '-' }}</p>
                                     </div>
                                 </div>
-                                <div class="shrink-0 text-right space-y-1">
+                                <div class="shrink-0 flex flex-col items-end gap-1.5">
+                                    <x-status-badge :status="$appStatus" />
                                     @if($pendingLogCount > 0)
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
                                             {{ $pendingLogCount }} Logbook Menunggu
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
                                             {{ $logbooksCount }} Logbook
                                         </span>
                                     @endif
@@ -329,9 +326,6 @@
                                 </div>
                                 <div class="text-slate-700">
                                     <span class="font-semibold text-slate-900">Unit Kerja:</span> {{ $unit->name ?? '-' }}
-                                </div>
-                                <div class="text-slate-700">
-                                    <span class="font-semibold text-slate-900">Dosen Pembimbing:</span> {{ $dosen->name ?? 'Belum Ditugaskan' }}
                                 </div>
                                 <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/70 text-xs">
                                     <span class="text-slate-700">Laporan Akhir:
@@ -373,7 +367,7 @@
                             <tr>
                                 <th class="py-3.5 px-5 w-3/12">Mahasiswa</th>
                                 <th class="py-3.5 px-4 w-3/12">Perguruan Tinggi &amp; Unit</th>
-                                <th class="py-3.5 px-4 w-2/12">Dosen Pembimbing</th>
+                                <th class="py-3.5 px-4 w-2/12">Status</th>
                                 <th class="py-3.5 px-3 text-center w-1/12 whitespace-nowrap">Logbook</th>
                                 <th class="py-3.5 px-3 text-center w-1/12 whitespace-nowrap">Laporan Akhir</th>
                                 <th class="py-3.5 px-4 text-center w-1/12 whitespace-nowrap">Nilai Mentor</th>
@@ -387,7 +381,6 @@
                                     $profile = $student?->studentProfile;
                                     $unit = $p->application?->unit;
                                     $appStatus = $p->application?->status;
-                                    $dosen = $p->academicAdvisor ?? $p->dosen;
                                     $eval = $p->evaluation;
                                     $nilaiMentor = $eval ? $eval->nilai_pembimbing : 0;
                                     $hasMentorEval = $eval && $nilaiMentor > 0;
@@ -398,25 +391,21 @@
                                     $mentorGrade = \App\Support\Grade::fromScore($nilaiMentor);
                                 @endphp
                                 <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="py-4 px-5 align-top">
+                                    <td class="py-4 px-5 align-middle">
                                         <div class="font-bold text-slate-900 text-sm leading-snug">{{ $student->name ?? '-' }}</div>
                                         <div class="text-xs text-slate-600 font-mono mt-0.5">NIM: {{ $profile?->nim ?? '-' }}</div>
-                                        <div class="text-xs text-slate-600 mt-0.5">{{ $profile?->jurusan ?? '-' }}</div>
-                                        <div class="mt-2">
-                                            <x-status-badge :status="$appStatus" />
-                                        </div>
                                     </td>
 
-                                    <td class="py-4 px-4 align-top">
+                                    <td class="py-4 px-4 align-middle">
                                         <div class="font-bold text-slate-900 text-sm">{{ $univName }}</div>
                                         <div class="text-xs text-slate-600 mt-0.5">{{ $unit->name ?? '-' }}</div>
                                     </td>
 
-                                    <td class="py-4 px-4 align-top">
-                                        <div class="font-semibold text-slate-800 text-sm">{{ $dosen->name ?? 'Belum Ditugaskan' }}</div>
+                                    <td class="py-4 px-4 align-middle">
+                                        <x-status-badge :status="$appStatus" />
                                     </td>
 
-                                    <td class="py-4 px-3 text-center whitespace-nowrap align-top">
+                                    <td class="py-4 px-3 text-center whitespace-nowrap align-middle">
                                         @if($pendingLogCount > 0)
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
                                                 {{ $pendingLogCount }} Menunggu
@@ -429,7 +418,7 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-3 text-center whitespace-nowrap align-top">
+                                    <td class="py-4 px-3 text-center whitespace-nowrap align-middle">
                                         @if(!$finalReport)
                                             <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
                                                 Belum Mengunggah
@@ -439,7 +428,7 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-4 text-center whitespace-nowrap align-top">
+                                    <td class="py-4 px-4 text-center whitespace-nowrap align-middle">
                                         @if($hasMentorEval)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                 {{ $nilaiMentor }}/100
@@ -454,9 +443,9 @@
                                         @endif
                                     </td>
 
-                                    <td class="py-4 px-5 text-right whitespace-nowrap align-top">
+                                    <td class="py-4 px-5 text-right whitespace-nowrap align-middle">
                                         <a href="{{ route('mentor.students.show', $p->id) }}"
-                                           class="min-h-[40px] inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-2xs">
+                                           class="min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-2xs">
                                             <span>Buka Bimbingan</span>
                                         </a>
                                     </td>
