@@ -57,8 +57,8 @@ class VerificationQrTest extends TestCase
         $placement = $this->makePlacement();
         $url = route('verify.certificate', 'hashsertifikat1234567890abcdefgh');
 
-        // Belum ada rekaman pengesahan (alur lama): perilaku tidak berubah.
-        $this->get($url)->assertOk()->assertSee('TERVERIFIKASI SAH');
+        // Belum diterbitkan Admin: belum ada yang disahkan, jadi belum boleh tampil sah.
+        $this->get($url)->assertOk()->assertSee('SERTIFIKAT BELUM DISAHKAN')->assertDontSee('TERVERIFIKASI SAH');
 
         $certificate = Certificate::create([
             'placement_id' => $placement->id,

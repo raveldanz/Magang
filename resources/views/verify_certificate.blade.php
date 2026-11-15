@@ -13,10 +13,10 @@
         $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
         $isCompleted = ($rawStatus === 'completed');
         $isResigned = in_array($rawStatus, ['resigned', 'rejected']);
-        // Sertifikat yang sudah diterbitkan Admin tetapi belum disahkan Atasan (menunggu ACC / diminta revisi)
+        // Sertifikat yang belum diterbitkan Admin atau belum disahkan Atasan (menunggu ACC / diminta revisi)
         // belum boleh dinyatakan sah di halaman publik, sama seperti gerbang unduh mahasiswa.
         $certRecord = $placement->certificate;
-        $isAwaitingApproval = $isCompleted && $certRecord && $certRecord->approval_status !== 'approved';
+        $isAwaitingApproval = $isCompleted && (! $certRecord || $certRecord->approval_status !== 'approved');
         if ($isAwaitingApproval) {
             $isCompleted = false;
         }

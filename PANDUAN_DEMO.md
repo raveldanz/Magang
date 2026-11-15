@@ -37,6 +37,43 @@ yang tanggal mulainya sudah tiba, menaikkan batas unggah ke 64 MB, dan menjalank
 | Mahasiswa diterima | `dani.accepted@unesa.ac.id` |
 | Mahasiswa perlu revisi | `fajar.revisi@unesa.ac.id` |
 
+### Akun mahasiswa per skenario
+
+Urut mengikuti alur magang. Semua kata sandi `password`.
+
+| Keadaan | Email | Yang bisa diperagakan |
+|---|---|---|
+| Baru mendaftar | `baru.daftar@unesa.ac.id` | Melengkapi profil dari nol |
+| Profil lengkap, belum mengajukan | `siap.ajukan@unesa.ac.id` | Mengajukan magang |
+| Pengajuan menunggu verifikasi | `fajar.revisi@unesa.ac.id` | Admin Dinas memeriksa berkas |
+| Pengajuan ditolak | `gilang.ditolak@unesa.ac.id` | Melihat alasan, mengajukan ulang |
+| Menunggu persetujuan Atasan | `mahasiswa.waiting@unesa.ac.id` | Supervisor menyetujui |
+| Diterima, belum mulai | `dani.accepted@unesa.ac.id` | Surat balasan ber-QR |
+| Aktif magang | `mahasiswa.aktif@unesa.ac.id` | Mengisi logbook |
+| Aktif, logbook ada yang ditolak | `logbook.revisi@unesa.ac.id` | Catatan mentor, memperbaiki logbook |
+| Laporan akhir menunggu tinjauan | `laporan.menunggu@unesa.ac.id` | Mentor menyetujui atau meminta revisi |
+| Laporan akhir perlu revisi | `laporan.revisi@unesa.ac.id` | Mengunggah ulang laporan |
+| Magang selesai, tinggal dinilai | `siap.dinilai@unesa.ac.id` | Mentor mengisi nilai, status langsung selesai |
+| Penilaian ganda, menunggu nilai dosen | `ganda.aktif@pens.ac.id` | Dosen `dosen.pens@pens.ac.id` mengisi nilai 60% |
+| Penilaian ganda, sudah lulus | `ganda.lulus@pens.ac.id` | Sertifikat dengan nilai mentor dan dosen |
+| Lulus, sertifikat belum diterbitkan | `haikal.ketua.lulus@unitomo.ac.id` | Admin Dinas menerbitkan sertifikat |
+| Lulus, sertifikat menunggu pengesahan | `hana.sertifikat@unesa.ac.id` | Supervisor mengesahkan |
+| Lulus, sertifikat diminta revisi | `kartika.revisi@unesa.ac.id` | Admin Dinas memperbaiki sertifikat |
+| Lulus, sertifikat sudah sah | `mahasiswa.lulus@unesa.ac.id` | Membuka sertifikat, memindai QR |
+| Mengundurkan diri | `rina.mundur@unesa.ac.id` | Tampilan setelah mundur |
+| Kelompok: ketua, pengajuan menunggu | `andi.ketua.pending@unesa.ac.id` | Pengajuan kelompok |
+| Kelompok: ketua, aktif | `fauzan.ketua.aktif@unesa.ac.id` | Proyek kolaboratif |
+| Akun dinonaktifkan | `akun.nonaktif@unesa.ac.id` | Login ditolak |
+
+Mentor `mentor.dispusip@surabaya.go.id` membimbing akun `logbook.revisi`, `laporan.*`, `siap.dinilai`, dan `ganda.*`.
+Sertifikat baru bisa dibuka mahasiswa setelah diterbitkan Admin Dinas **dan** disahkan Supervisor.
+
+Mengembalikan akun-akun skenario ke keadaan awal (misalnya setelah gladi bersih):
+
+```bat
+php artisan db:seed --class=DemoScenarioSeeder
+```
+
 ## 3. Bila ada masalah
 
 | Gejala | Penyebab & solusi |
@@ -66,3 +103,55 @@ Setelah demo, cabut izin firewall bila perlu:
 ```bat
 netsh advfirewall firewall delete rule name="SIP-MAGANG Demo (PHP)"
 ```
+
+## 5. Demo di WiFi kantor dengan PostgreSQL
+
+Pakai `start_demo_kantor.bat` (bukan `start_demo.bat`). Skrip ini menyalakan PostgreSQL portabel di `C:\pgsql`,
+mengalihkan `.env` ke PostgreSQL, menjalankan migrasi, lalu menyalakan server di alamat WiFi laptop.
+
+Yang perlu dipahami:
+
+- **PostgreSQL tidak perlu diberi alamat IP.** HP penguji hanya berbicara dengan server web di laptop
+  (`http://<IP-laptop>:8000`); server web itulah yang membaca PostgreSQL di laptop yang sama lewat `127.0.0.1`.
+  Jadi `DB_HOST=127.0.0.1` tetap benar walaupun demo lewat WiFi, dan port 5432 tidak perlu dibuka di firewall.
+- **Database kosong diisi otomatis.** Di laptop yang PostgreSQL-nya baru, `start_demo_kantor.bat` membuat database
+  `magang` dan mengisinya dengan semua akun demo di atas. Tidak perlu memindahkan data apa pun.
+- **Memindahkan data yang sudah ada** (misalnya hasil uji coba yang ingin dibawa):
+  1. Di komputer asal klik dua kali `pgsql_ekspor.bat`. Hasilnya `database\pgsql\magang.dump`.
+  2. Salin berkas itu ke folder yang sama di laptop tujuan.
+  3. Di laptop tujuan klik dua kali `pgsql_impor.bat`, jawab `Y`. Isi database `magang` di laptop itu diganti.
+  4. Jalankan `start_demo_kantor.bat`.
+  Kata sandi PostgreSQL dibaca dari `DB_PASSWORD` di `.env` laptop masing-masing; samakan dengan kata sandi
+  pengguna `postgres` di laptop itu.
+- Berkas unggahan (CV, lampiran logbook, laporan) tidak ada di database. Bila perlu ikut pindah, salin juga
+  folder `storagepp`.
+
+Syarat laptop: PostgreSQL 16 (folder `C:\pgsql` atau pemasangan biasa) dan ekstensi PHP `pdo_pgsql` aktif.
+Skrip akan memberi tahu bila salah satunya belum ada.
+
+## 6. Penguji memakai HP
+
+Bisa, dan sudah diuji lewat alamat WiFi: login, tampilan, unggah berkas, dan QR berjalan. Yang perlu diperhatikan:
+
+- HP dan laptop harus di **WiFi yang sama**. WiFi kantor yang memisahkan perangkat (*client isolation*) akan
+  memblokir; bila itu terjadi pakai hotspot dari satu HP dan sambungkan laptop serta penguji ke sana.
+- Jalankan `izinkan_firewall.bat` sebagai administrator sekali di laptop server.
+- Ketik alamat lengkap dengan `http://` di depan, misalnya `http://192.168.1.23:8000`. Tanpa itu sebagian
+  browser HP mencoba `https` dan gagal.
+- Foto dari iPhone berformat HEIC ditolak dengan pesan; pilih "Paling Kompatibel" di pengaturan kamera atau
+  kirim sebagai JPG.
+- Batas ukuran berkas diperiksa di HP sebelum dikirim, jadi berkas besar ditolak seketika tanpa menunggu unggah.
+- Server demo melayani satu permintaan pada satu waktu. Untuk 10-15 penguji ini tidak terasa; unggahan besar
+  yang bersamaan akan saling menunggu beberapa detik.
+- Jangan biarkan laptop server tidur: matikan mode tidur dan sambungkan pengisi daya selama demo.
+- Tidak tersedia lewat alamat IP: notifikasi push dan rekam suara di chat (butuh HTTPS).
+
+## 7. Pemeriksaan cepat sebelum demo
+
+```bat
+php scripts\qc_smoke.php
+```
+
+Masuk sebagai tiap akun demo dan membuka semua halamannya (hanya membaca). Baris `[GAGAL]` berarti ada halaman
+yang error untuk akun itu.
+

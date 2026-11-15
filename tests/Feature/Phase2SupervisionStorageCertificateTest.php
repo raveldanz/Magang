@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
+use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Logbook;
@@ -269,8 +270,20 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
 
         Logbook::create(['placement_id' => $placement->id, 'date' => now()->subDays(3)->toDateString(), 'activity' => 'Menyusun dokumentasi sistem', 'status' => 'approved']);
 
-        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))->assertOk();
+        // Syarat lengkap, tetapi sertifikat belum diterbitkan Admin: mahasiswa masih terkunci
+        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))
+            ->assertForbidden()
+            ->assertSee('belum diterbitkan oleh Admin Dinas');
+
+        // Admin menerbitkan: menunggu pengesahan Atasan, mahasiswa tetap terkunci
         $this->actingAs($this->adminA)->get(route('admin.certificates.generate', $placement->id))->assertOk();
+        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))
+            ->assertForbidden()
+            ->assertSee('proses pengesahan');
+
+        // Setelah disahkan Atasan barulah mahasiswa bisa membuka sertifikat
+        Certificate::where('placement_id', $placement->id)->update(['approval_status' => 'approved']);
+        $this->actingAs($this->student)->get(route('student.certificate.download', $placement->id))->assertOk();
         $this->actingAs($superAdmin)->get(route('admin.certificates.index'))->assertOk();
     }
 

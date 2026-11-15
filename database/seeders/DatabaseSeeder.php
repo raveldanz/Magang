@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             SupervisorDemoSeeder::class,
             InternshipGroupDemoSeeder::class,
             YearlyProjectsFiveYearsSeeder::class,
+            DemoScenarioSeeder::class,
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\Logbook;
@@ -203,11 +204,23 @@ class LogbookCompletionRequirementTest extends TestCase
         $app->refresh();
         $this->assertEquals(ApplicationStatus::COMPLETED, $app->status);
 
-        // Mahasiswa yang sudah lulus dapat mengakses sertifikat
-        $response = $this->actingAs($this->student)->get(
-            route('student.certificate.show', $this->placement->id)
-        );
-        $response->assertOk();
+        // Lulus saja belum cukup: sertifikat baru terbuka setelah diterbitkan Admin dan disahkan Atasan
+        $url = route('student.certificate.show', $this->placement->id);
+        $this->actingAs($this->student)->get($url)
+            ->assertForbidden()
+            ->assertSee('belum diterbitkan oleh Admin Dinas');
+
+        $certificate = Certificate::create([
+            'placement_id' => $this->placement->id,
+            'certificate_number' => 'SERT/0001/UJI/2026',
+            'file_path' => 'certificates/uji.pdf',
+            'approval_status' => 'waiting_approval',
+            'issued_at' => now()->toDateString(),
+        ]);
+        $this->actingAs($this->student)->get($url)->assertForbidden()->assertSee('proses pengesahan');
+
+        $certificate->update(['approval_status' => 'approved']);
+        $this->actingAs($this->student)->get($url)->assertOk();
     }
 
     /**

@@ -83,7 +83,7 @@ $excludeDirs = @(
 $excludeFiles = @(
     '.env.agents', '.env.backup', '.env.production', '.aider.chat.history.md', '.aider.input.history',
     '.phpunit.result.cache', '*.pptx', '*.docx', '*.log', '*.tmp', 'hot', 'auth.json', 'demo_server.txt',
-    'db_magang', '.gh-token.txt', '*.bundle', '*.tgz'
+    'db_magang', '.gh-token.txt', '*.bundle', '*.tgz', '*.dump'
 )
 & robocopy $root $dest /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XD @excludeDirs /XF @excludeFiles | Out-Null
 if ($LASTEXITCODE -ge 8) { Fail "robocopy gagal (kode $LASTEXITCODE)." }

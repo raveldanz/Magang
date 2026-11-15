@@ -159,8 +159,14 @@ class CertificateController extends Controller
 
         // Cek pengesahan Atasan (Double ACC): Mahasiswa, Dosen, dan Mitra Kampus hanya bisa mengunduh jika sudah disahkan oleh Atasan
         $certRecord = Certificate::where('placement_id', $placement?->id)->first();
-        if (($isOwner || $isAdvisor || $isUnivAdmin) && $certRecord && $certRecord->approval_status !== 'approved') {
-            $blockers[] = 'Sertifikat magang telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+        // Tanpa rekaman pun tetap terkunci: sebelumnya mahasiswa bisa membuka sertifikat selama Admin belum
+        // menerbitkannya, sehingga pengesahan Atasan terlewati.
+        if (($isOwner || $isAdvisor || $isUnivAdmin) && $blockers === []) {
+            if (! $certRecord) {
+                $blockers[] = 'Sertifikat magang belum diterbitkan oleh Admin Dinas. Setelah diterbitkan, sertifikat masih perlu disahkan (ACC) oleh Atasan sebelum dapat dibuka.';
+            } elseif ($certRecord->approval_status !== 'approved') {
+                $blockers[] = 'Sertifikat magang telah diterbitkan oleh Admin dan saat ini sedang dalam proses pengesahan (ACC) oleh Atasan (Tim Kerja Umum & Kepegawaian Dispusip).';
+            }
         }
 
         if (! $isSupervisor && ! $isSuperAdmin && ! $isAgencyAdmin && $blockers !== []) {
