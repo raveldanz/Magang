@@ -75,13 +75,26 @@
             return;
         }
         const avgVal = this.avg !== null ? this.avg : '-';
+        if (this.isMentorOnly) {
+            // Kampus 100% nilai mentor: dosen hanya menyimpan catatan, jadi tidak ada rincian nilai dosen untuk ditampilkan.
+            this.$dispatch('open-confirm-modal', {
+                form: form,
+                title: 'Konfirmasi Simpan Catatan Evaluasi',
+                message: 'Catatan evaluasi Anda akan disimpan. Nilai angka sepenuhnya berasal dari Mentor Lapangan sesuai ketentuan kampus.',
+                label: 'Nilai dari Mentor Lapangan',
+                name: this.avg !== null ? 'Rata-rata ' + avgVal + ' — Predikat ' + this.letterGrade : 'Mentor Lapangan belum mengisi nilai',
+                confirmText: 'Ya, Simpan Catatan',
+                tone: 'blue'
+            });
+            return;
+        }
         this.$dispatch('open-confirm-modal', {
             form: form,
             title: 'Konfirmasi Simpan Nilai Evaluasi',
             message: 'Anda akan menyimpan penilaian dengan rata-rata ' + avgVal + ' (Predikat ' + this.letterGrade + '). Pastikan nilai sudah benar karena setelah seluruh komponen lengkap dan magang selesai, nilai akan terkunci permanen.',
             label: 'Ringkasan Penilaian',
             name: 'Rata-rata ' + avgVal + ' — Predikat ' + this.letterGrade,
-            desc: this.aspects.map((a, idx) => (idx + 1) + '. ' + (a.name || 'Kriteria') + ': ' + (a.score === '' ? '-' : a.score)).join(' | '),
+            desc: this.aspects.map((a, idx) => (idx + 1) + '. ' + (a.name || 'Kriteria') + ': ' + (a.score === '' || a.score === null || a.score === undefined ? '-' : a.score)).join(' | '),
             confirmText: 'Ya, Simpan Nilai',
             tone: 'blue'
         });

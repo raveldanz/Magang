@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\Certificate;
 use App\Models\Evaluation;
 use App\Models\Placement;
+use App\Models\SystemNotification;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
@@ -200,5 +201,25 @@ class AdminCertificateRevisionWorkflowTest extends TestCase
         $indexResponse = $this->actingAs($this->adminDinas)->get(route('admin.certificates.index'));
         $indexResponse->assertSee('Menunggu ACC Atasan');
         $indexResponse->assertSee('Pratinjau Draft');
+    }
+
+    /**
+     * Tautan terbitkan sertifikat adalah GET: membuka ulang atau menyegarkannya tidak boleh
+     * mengirim notifikasi kembar ke Atasan.
+     */
+    public function test_membuka_ulang_halaman_terbit_tidak_mengirim_notifikasi_kembar(): void
+    {
+        $this->certificate->delete();
+        $url = route('admin.certificates.generate', $this->placement->id);
+        $hitung = fn () => SystemNotification::where('target_role', 'supervisor')
+            ->where('category', 'certificate')->count();
+
+        $this->actingAs($this->adminDinas)->get($url)->assertOk();
+        $this->assertSame(1, $hitung());
+        $this->assertDatabaseHas('certificates', ['placement_id' => $this->placement->id, 'approval_status' => 'waiting_approval']);
+
+        $this->actingAs($this->adminDinas)->get($url)->assertOk();
+        $this->actingAs($this->adminDinas)->get($url)->assertOk();
+        $this->assertSame(1, $hitung());
     }
 }

@@ -201,6 +201,7 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
 
     public function test_logbook_attachment_limit_is_2mb(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
         $this->placement('active', ['mentor_id' => $this->assignedMentor->id]);
 

@@ -148,7 +148,9 @@ class CertificateController extends Controller
             ]
         );
 
-        if ($certificate->wasRecentlyCreated || $certificate->approval_status === 'waiting_approval') {
+        // Hanya saat pertama terbit: halaman ini dibuka lewat tautan (GET), jadi membuka ulang atau menyegarkannya
+        // tidak boleh mengirim notifikasi kembar ke Atasan. Pengajuan ulang setelah revisi punya notifikasinya sendiri.
+        if ($certificate->wasRecentlyCreated) {
             NotificationService::notifySupervisorForCertificate($certificate);
         }
 

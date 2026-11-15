@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AgencyProfile;
 use App\Models\Application;
+use App\Models\Certificate;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
@@ -46,6 +47,33 @@ class VerificationQrTest extends TestCase
 
         $this->get(route('verify.letter', 'tokensurat1234567890abcdefghijklm'))->assertOk();
         $this->get(route('verify.certificate', 'hashsertifikat1234567890abcdefgh'))->assertOk();
+    }
+
+    /**
+     * Sertifikat yang sudah diterbitkan Admin tetapi belum disahkan Atasan tidak boleh tampil "sah" di halaman publik.
+     */
+    public function test_sertifikat_belum_disahkan_tidak_dinyatakan_sah(): void
+    {
+        $placement = $this->makePlacement();
+        $url = route('verify.certificate', 'hashsertifikat1234567890abcdefgh');
+
+        // Belum ada rekaman pengesahan (alur lama): perilaku tidak berubah.
+        $this->get($url)->assertOk()->assertSee('TERVERIFIKASI SAH');
+
+        $certificate = Certificate::create([
+            'placement_id' => $placement->id,
+            'certificate_number' => 'SERT/0001/UJI/2026',
+            'file_path' => 'certificates/uji.pdf',
+            'approval_status' => 'waiting_approval',
+            'issued_at' => now()->toDateString(),
+        ]);
+        $this->get($url)->assertOk()->assertSee('SERTIFIKAT BELUM DISAHKAN')->assertDontSee('TERVERIFIKASI SAH');
+
+        $certificate->update(['approval_status' => 'revision']);
+        $this->get($url)->assertOk()->assertSee('SERTIFIKAT BELUM DISAHKAN')->assertDontSee('TERVERIFIKASI SAH');
+
+        $certificate->update(['approval_status' => 'approved']);
+        $this->get($url)->assertOk()->assertSee('TERVERIFIKASI SAH');
     }
 
     public function test_numeric_id_is_rejected_by_default(): void

@@ -13,6 +13,13 @@
         $rawStatus = $appStatus instanceof \App\Enums\ApplicationStatus ? $appStatus->value : strtolower((string)$appStatus);
         $isCompleted = ($rawStatus === 'completed');
         $isResigned = in_array($rawStatus, ['resigned', 'rejected']);
+        // Sertifikat yang sudah diterbitkan Admin tetapi belum disahkan Atasan (menunggu ACC / diminta revisi)
+        // belum boleh dinyatakan sah di halaman publik, sama seperti gerbang unduh mahasiswa.
+        $certRecord = $placement->certificate;
+        $isAwaitingApproval = $isCompleted && $certRecord && $certRecord->approval_status !== 'approved';
+        if ($isAwaitingApproval) {
+            $isCompleted = false;
+        }
 
         $eval = $placement->evaluation;
         // final_score bernilai 0 (bukan null) bila belum dihitung, jadi pakai accessor nilai_akhir
@@ -41,7 +48,22 @@
             </div>
 
             <!-- Badge Status Verifikasi Sah / Peringatan -->
-            @if($isCompleted)
+            @if($isAwaitingApproval)
+                <div class="vstatus mt-6 flex items-center space-x-4 bg-amber-50 p-4 rounded-xl border border-amber-200 shadow-xs">
+                    <div class="vstatus-icon flex-shrink-0 bg-amber-600 text-white p-3 rounded-full shadow-md">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="vbadge inline-block px-2.5 py-0.5 text-xs font-black bg-amber-200 text-amber-900 rounded-full mb-1">
+                            MENUNGGU PENGESAHAN
+                        </span>
+                        <h3 class="font-extrabold text-amber-950 text-base leading-tight">SERTIFIKAT BELUM DISAHKAN</h3>
+                        <p class="text-xs text-amber-800 mt-0.5">Peserta telah menyelesaikan magang, tetapi sertifikat ini masih dalam proses pengesahan oleh pejabat berwenang dan belum berlaku sebagai dokumen resmi.</p>
+                    </div>
+                </div>
+            @elseif($isCompleted)
                 <div class="vstatus mt-6 flex items-center space-x-4 bg-emerald-50 p-4 rounded-xl border border-emerald-200 shadow-xs">
                     <div class="vstatus-icon flex-shrink-0 bg-emerald-600 text-white p-3 rounded-full shadow-md">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -136,6 +136,7 @@ class ApplicationStatusPipelineReformTest extends TestCase
 
     public function test_auto_activates_when_student_submits_first_logbook(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
 
         $app = Application::create([
