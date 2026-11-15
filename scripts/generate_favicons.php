@@ -1,6 +1,7 @@
 <?php
+
 // Load original high-res logo
-$src = imagecreatefrompng(__DIR__ . '/../public/images/logos/surabaya.png');
+$src = imagecreatefrompng(__DIR__.'/../public/images/logos/surabaya.png');
 $srcW = imagesx($src);
 $srcH = imagesy($src);
 
@@ -37,17 +38,17 @@ foreach ($sizes as $size) {
 
     imagecopyresampled($canvas, $src, $offsetX, $offsetY, 0, 0, $targetW, $targetH, $srcW, $srcH);
 
-    imagepng($canvas, __DIR__ . "/../public/images/favicon-{$size}.png");
-    
+    imagepng($canvas, __DIR__."/../public/images/favicon-{$size}.png");
+
     if ($size === 512) {
-        imagepng($canvas, __DIR__ . '/../public/images/favicon.png');
-        imagepng($canvas, __DIR__ . '/../public/favicon.png');
+        imagepng($canvas, __DIR__.'/../public/images/favicon.png');
+        imagepng($canvas, __DIR__.'/../public/favicon.png');
     }
     if ($size === 32) {
-        imagepng($canvas, __DIR__ . '/../public/favicon-32x32.png');
+        imagepng($canvas, __DIR__.'/../public/favicon-32x32.png');
     }
     if ($size === 16) {
-        imagepng($canvas, __DIR__ . '/../public/favicon-16x16.png');
+        imagepng($canvas, __DIR__.'/../public/favicon-16x16.png');
     }
 }
 

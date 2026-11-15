@@ -2,16 +2,17 @@
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
-use App\Models\User;
 use App\Models\StudentProfile;
 use App\Models\University;
+use App\Models\User;
+use Illuminate\Contracts\Console\Kernel;
 
 $univ = University::first();
 
 $user = User::firstOrCreate([
-    'email' => 'calon.magang@unesa.ac.id'
+    'email' => 'calon.magang@unesa.ac.id',
 ], [
     'name' => 'Dimas Arya Pratama',
     'password' => bcrypt('password'),
@@ -21,7 +22,7 @@ $user = User::firstOrCreate([
 ]);
 
 StudentProfile::firstOrCreate([
-    'user_id' => $user->id
+    'user_id' => $user->id,
 ], [
     'nim' => '22051204099',
     'universitas' => 'Universitas Negeri Surabaya',
@@ -29,4 +30,4 @@ StudentProfile::firstOrCreate([
     'phone' => '081234567899',
 ]);
 
-echo "User ready: " . $user->email . "\n";
+echo 'User ready: '.$user->email."\n";
