@@ -785,6 +785,50 @@ class InternshipGroupWorkflowTest extends TestCase
         $this->assertEquals('waiting_approval', $memberApp->statusValue());
     }
 
+    public function test_group_status_update_rejects_mentor_outside_placement_agency_or_non_mentor_account(): void
+    {
+        $group = InternshipGroup::create([
+            'code' => InternshipGroup::generateUniqueCode(),
+            'name' => 'Tim Validasi Mentor',
+            'leader_user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => now()->addDays(10)->toDateString(),
+            'end_date' => now()->addDays(70)->toDateString(),
+            'status' => 'pending',
+        ]);
+
+        $leaderApp = Application::create([
+            'user_id' => $this->leader->id,
+            'unit_id' => $this->unit->id,
+            'start_date' => $group->start_date,
+            'end_date' => $group->end_date,
+            'group_id' => $group->id,
+            'role_in_group' => 'leader',
+            'status' => 'pending',
+        ]);
+
+        $otherAgency = AgencyProfile::create([
+            'agency_name' => 'Dinas Komunikasi dan Informatika Kota Surabaya',
+            'acronym' => 'DISKOMINFO',
+            'address' => 'Jl. Jimerto',
+        ]);
+        $foreignMentor = User::factory()->create([
+            'role' => 'mentor',
+            'agency_profile_id' => $otherAgency->id,
+        ]);
+
+        foreach ([$foreignMentor->id, $this->member->id] as $invalidMentorId) {
+            $response = $this->actingAs($this->admin)->put(route('admin.groups.update_status', $group->id), [
+                'status' => 'accepted',
+                'mentor_id' => $invalidMentorId,
+            ]);
+
+            $response->assertSessionHasErrors('mentor_id');
+            $this->assertEquals('pending', $leaderApp->refresh()->statusValue());
+            $this->assertDatabaseMissing('placements', ['mentor_id' => $invalidMentorId]);
+        }
+    }
+
     public function test_admin_can_update_individual_member_status_independently(): void
     {
         $group = InternshipGroup::create([

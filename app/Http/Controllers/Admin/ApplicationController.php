@@ -716,6 +716,15 @@ class ApplicationController extends Controller
             $targetApplications = $group->applications->reject(fn ($a) => in_array($a->statusValue(), ['active', 'completed', 'resigned'], true));
         }
 
+        // Sama seperti jalur perorangan & massal: mentor harus akun mentor resmi dari instansi penempatan
+        // setiap anggota, karena penempatan anggota yang sudah disetujui ikut diperbarui di bawah.
+        if ($request->filled('mentor_id') && $newStatus !== 'rejected') {
+            $assignmentService = app(PlacementAssignmentService::class);
+            foreach ($group->applications as $memberApplication) {
+                $assignmentService->resolveMentor($memberApplication, (int) $request->mentor_id);
+            }
+        }
+
         $year = date('Y');
         $letterDate = date('Y-m-d');
         $letterToken = $group->letter_token ?: Str::random(32);

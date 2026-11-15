@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\ProvisionsUniversityAccounts;
 use App\Models\University;
-use App\Models\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class ProcessUniversityBatch4 extends Command
 {
+    use ProvisionsUniversityAccounts;
+
     /**
      * The name and signature of the console command.
      *
@@ -29,6 +30,10 @@ class ProcessUniversityBatch4 extends Command
      */
     public function handle(): int
     {
+        if ($this->refusesToRunOutsideDemoEnvironment()) {
+            return Command::FAILURE;
+        }
+
         $this->info('======================================================================');
         $this->info('MEMPROSES BATCH 4: 50 PERGURUAN TINGGI SE-INDONESIA (NO. 151 - 200)');
         $this->info('======================================================================');
@@ -103,65 +108,13 @@ class ProcessUniversityBatch4 extends Command
                 $univ = University::create($univData);
             }
 
-            // 1. Akun Admin Kampus
+            // Akun Admin Kampus & Dosen Pembimbing Lapangan (DPL): akun yang sudah ada tidak diubah hak aksesnya
             $adminEmail = trim($item['admin_account']['email']);
-            $adminName = trim($item['admin_account']['name']);
-            $adminUser = User::where('email', $adminEmail)->first();
-            if ($adminUser) {
-                $adminUser->update([
-                    'name' => $adminName,
-                    'role' => 'universitas',
-                    'university_id' => $univ->id,
-                    'university' => $univ->name,
-                    'status' => 'active',
-                    'email_verified_at' => $adminUser->email_verified_at ?: now(),
-                    'must_change_password' => false,
-                ]);
-            } else {
-                User::create([
-                    'name' => $adminName,
-                    'email' => $adminEmail,
-                    'password' => Hash::make('password'),
-                    'role' => 'universitas',
-                    'university_id' => $univ->id,
-                    'university' => $univ->name,
-                    'status' => 'active',
-                    'email_verified_at' => now(),
-                    'must_change_password' => false,
-                ]);
-            }
-
-            // 2. Akun Dosen Pembimbing Lapangan (DPL) Asli
-            $dosenEmail = trim($item['dosen_account']['email']);
             $dosenName = trim($item['dosen_account']['name']);
-            $dosenPhone = trim($item['dosen_account']['phone'] ?? '081234567890');
-            $dosenUser = User::where('email', $dosenEmail)->first();
-            if ($dosenUser) {
-                $dosenUser->update([
-                    'name' => $dosenName,
-                    'role' => 'dosen',
-                    'university_id' => $univ->id,
-                    'university' => $univ->name,
-                    'phone' => $dosenPhone,
-                    'status' => 'active',
-                    'email_verified_at' => $dosenUser->email_verified_at ?: now(),
-                    'must_change_password' => false,
-                ]);
-            } else {
-                User::create([
-                    'name' => $dosenName,
-                    'email' => $dosenEmail,
-                    'password' => Hash::make('password'),
-                    'role' => 'dosen',
-                    'university_id' => $univ->id,
-                    'university' => $univ->name,
-                    'phone' => $dosenPhone,
-                    'status' => 'active',
-                    'email_verified_at' => now(),
-                    'must_change_password' => false,
-                ]);
-            }
-
+            $this->provisionUniversityAccount($univ, $adminEmail, trim($item['admin_account']['name']), 'universitas');
+            $this->provisionUniversityAccount($univ, trim($item['dosen_account']['email']), $dosenName, 'dosen', [
+                'phone' => trim($item['dosen_account']['phone'] ?? '081234567890'),
+            ]);
             $processed++;
             $tableRows[] = [
                 $item['order'],
@@ -179,7 +132,7 @@ class ProcessUniversityBatch4 extends Command
         );
 
         $this->info("Berhasil memproses dan mengoptimalkan {$processed} universitas di Batch 4!");
-        $this->info('Seluruh akun Dosen & Admin siap digunakan (password default: password).');
+        $this->reportProvisionedAccounts();
 
         return Command::SUCCESS;
     }

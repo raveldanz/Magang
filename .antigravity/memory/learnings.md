@@ -168,6 +168,7 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-144** | 2026-11-14 | Master Universitas Batch 2: 50 Kampus Jawa Barat, Banten, DIY, Jateng & Sumatera | Sinkronisasi 50 kampus kedua (no. 51-100), Rektor ITB/UGM/IPB/UNDIP/USU/USK asli, DPL bergelar lengkap, 45 logo SVG resmi & pembuatan akun otomatis | RESOLVED |
 | **LRN-145** | 2026-11-14 | Master Universitas Batch 3: 50 Kampus Sumatera, Bali-Nusra, Kalimantan, Sulawesi & Papua | Sinkronisasi 50 kampus ketiga (no. 101-150), Rektor UNAND/UNUD/UNHAS/UNSRAT/UNCEN/UT, DPL TI riil, 49 logo SVG & pengujian 703 assertions | RESOLVED |
 | **LRN-148** | 2026-11-16 | Skrip Demo Windows (`start_demo*.bat`, `demo_preflight.php`) | QR demo kantor berisi localhost, `.env` ditimpa permanen oleh `--pgsql`, database PostgreSQL kosong dianggap gagal sambung, worker/penjadwal berjalan ganda | RESOLVED |
+| **LRN-149** | 2026-11-16 | Keamanan: Mentor Kelompok & Command Batch Universitas | Jalur keputusan kelompok menerima `mentor_id` sembarang pengguna; `universities:process-batch*` membuat akun ber-password bawaan dan menimpa peran/status akun yang sudah ada | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4423,6 +4424,21 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   3. Bedakan "server tidak bisa dihubungi" dari "skema belum ada": cek tabel dengan `to_regclass`, jangan dengan query ke tabel aplikasi.
   4. Proses latar yang dibuka dengan `start` harus dihentikan oleh skrip yang sama (saat mulai dan saat selesai). Berkas `.bat` wajib CRLF, ASCII, dan tanpa path nama pengguna.
   5. Jangan menyalurkan keluaran `pg_ctl start` ke pipa (`|`): proses `postgres` mewarisi pipa itu dan perintah menggantung; alihkan ke `>nul` atau berkas.
+
+### [LRN-149] Keamanan: Validasi Mentor di Jalur Kelompok & Pengamanan Command Batch Universitas
+- **Date:** 2026-11-16
+- **Problem / Symptom:**
+  1. `Admin\ApplicationController::updateGroupStatus()` menulis `mentor_id` ke penempatan seluruh anggota kelompok hanya dengan validasi `exists:users,id`, sehingga Admin Dinas bisa menugaskan mahasiswa, dosen, atau mentor dinas lain sebagai pembimbing lapangan.
+  2. `universities:process-batch1..5` membuat ±500 akun dengan `Hash::make('password')` dan `must_change_password => false`, bisa dijalankan di produksi, serta menimpa `role`/`status` akun yang emailnya sudah terdaftar.
+- **Root Cause:**
+  1. Jalur perorangan dan massal sudah memakai `PlacementAssignmentService::resolveMentor()`, tetapi jalur kelompok ditulis terpisah tanpa pemeriksaan yang sama (tidak ada paritas antar-jalur).
+  2. Logika pembuatan akun disalin-tempel di lima command tanpa pengaman lingkungan, dan memaksa penanda wajib-ganti-password menjadi `false`.
+- **Fix Applied:**
+  1. `updateGroupStatus()` memanggil `resolveMentor()` untuk setiap pengajuan anggota sebelum transaksi; tes `test_group_status_update_rejects_mentor_outside_placement_agency_or_non_mentor_account`.
+  2. Trait `App\Console\Commands\Concerns\ProvisionsUniversityAccounts`: command menolak berjalan di luar `DatabaseSeeder::DEMO_ENVIRONMENTS`, akun baru memakai `User::DEFAULT_PASSWORD` dengan penanda wajib ganti dari `User::booted()`, akun yang sudah ada tidak diubah peran/status (peran atau kampus berbeda dilewati dan dilaporkan). Tes `UniversityBatchAccountSafetyTest`.
+- **Prevention Rule:**
+  1. Setiap jalur yang menulis `mentor_id`/`academic_advisor_id` ke `placements` WAJIB lewat `PlacementAssignmentService::resolveMentor()`/`resolveAdvisor()`; validasi `exists:users,id` saja tidak cukup.
+  2. Command/seeder yang membuat akun ber-password bawaan harus menolak berjalan di produksi, tidak boleh menulis `must_change_password => false`, dan tidak boleh mengubah `role`/`status` akun yang sudah ada.
 
 
 
