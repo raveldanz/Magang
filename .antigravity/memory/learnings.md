@@ -164,6 +164,10 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 | **LRN-132** | 2026-11-11 | Sinkronisasi Merge GitHub, Guard Redirect Login Hermes E2E & Akun Demo Dispusip | False-positive PASS saat login gagal (redirect 302 ke `/login`) & residu akun Kominfo pada runner `hermes_all_roles_test.mjs` | RESOLVED |
 | **LRN-133** | 2026-11-12 | Isolasi Penolakan Anggota Kelompok & Alur Resubmit Berkas ke Kelompok | Penolakan 1 anggota ikut menolak semua, resubmit anggota rejected membuat pengajuan individu baru | RESOLVED |
 | **LRN-134** | 2026-11-12 | Harmonisasi Kredensial Super Admin, Supervisor Kepegawaian & Eliminasi Lag | Login admin@gmail.com gagal credentials mismatch, akun Tim Kerja dan Kepegawaian, latensi font external CDN & SQLite WAL | RESOLVED |
+| **LRN-143** | 2026-11-13 | Master Universitas Batch 1: Personel Asli Rektor/Direktur & DPL, Logo Resmi & Akun Siap Pakai | Dummy data kampus & DPL digantikan data asli terverifikasi untuk 50 kampus pertama (Jatim & Jabodetabek), pembuatan akun admin & dosen, serta perlindungan logo UNAIR/UI/UNESA/UPN | RESOLVED |
+| **LRN-144** | 2026-11-14 | Master Universitas Batch 2: 50 Kampus Jawa Barat, Banten, DIY, Jateng & Sumatera | Sinkronisasi 50 kampus kedua (no. 51-100), Rektor ITB/UGM/IPB/UNDIP/USU/USK asli, DPL bergelar lengkap, 45 logo SVG resmi & pembuatan akun otomatis | RESOLVED |
+| **LRN-145** | 2026-11-14 | Master Universitas Batch 3: 50 Kampus Sumatera, Bali-Nusra, Kalimantan, Sulawesi & Papua | Sinkronisasi 50 kampus ketiga (no. 101-150), Rektor UNAND/UNUD/UNHAS/UNSRAT/UNCEN/UT, DPL TI riil, 49 logo SVG & pengujian 703 assertions | RESOLVED |
+| **LRN-148** | 2026-11-16 | Skrip Demo Windows (`start_demo*.bat`, `demo_preflight.php`) | QR demo kantor berisi localhost, `.env` ditimpa permanen oleh `--pgsql`, database PostgreSQL kosong dianggap gagal sambung, worker/penjadwal berjalan ganda | RESOLVED |
 ---
 
 ## 3. Catatan Masalah & Solusi (Knowledge Base)
@@ -4298,3 +4302,129 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 - **Prevention Rule:**
   1. Sebelum menyentuh atau membuat antarmuka pengguna baru (terutama untuk `mentor`, `pembimbing`, `supervisor`, profil, dan logbook/penilaian), verifikasi kepatuhan penuh terhadap `[LRN-141]` (nol emoji, nol `DPL` user-facing, status UI Bahasa Indonesia terstandar via `localizedLabel()`, zoom aktif, minimal `text-xs` & `slate-600`, lightbox in-page, konfirmasi aksi kritis).
   2. Pertahankan regresi otomatis pada `tests/Feature/MentorElderlyFriendlyOptimizationTest.php` dan `tests/Feature/StatusLabelConsistencyTest.php`.
+
+### [LRN-142] Protokol Runner Pengujian Kantor & Lapangan (PostgreSQL Asli, WiFi Binding 0.0.0.0, Daemon Workers & Otomatisasi Status Magang)
+- **Problem**: Pengujian langsung di hadapan audiens atau mahasiswa magang di kantor sering gagal karena database tidak aktif di latar belakang, status magang tidak tersinkronisasi jika worker/penjadwal mati, token sesi kedaluwarsa (419 Page Expired), atau server hanya mengikat ke `127.0.0.1` sehingga perangkat HP/laptop mahasiswa di WiFi kantor tidak bisa mengakses halaman aplikasi.
+- **Root Cause**: Laravel `serve` bawaan mengikat ke localhost saja, queue worker dan scheduler tidak berjalan serentak secara default, dan konfigurasi `.env` rentan tertinggal di SQLite dev tanpa menghubungkan ke PostgreSQL asli.
+- **Fix Applied**:
+  1. Dibuat berkas runner otomatis `start_demo_kantor.bat` yang otomatis memeriksa & menyalakan PostgreSQL 16 di `C:\pgsql`, menyetel `.env` ke PostgreSQL dengan masa sesi 8 jam (`SESSION_LIFETIME=480`), membersihkan antrean job lama, serta menjalankan `queue:listen` dan `schedule:work` di jendela latar belakang (`/min`).
+  2. Server diikat ke `0.0.0.0:%DEMO_PORT%` dan otomatis mengekspos IP WiFi lokal kantor (`http://192.168.x.x:8000`) untuk mahasiswa magang.
+  3. Status transisi magang `ACCEPTED -> ACTIVE` dipastikan berjalan 100% otomatis saat `start_date <= today` baik melalui scheduler harian maupun on-the-fly di seluruh dasbor peran, serta disediakan tombol pemicu manual untuk Admin di halaman `Daftar Pengajuan Magang` (`admin.applications.sync_status`).
+- **Prevention Rule**: Selalu gunakan `start_demo_kantor.bat` untuk pengujian kantor dengan PostgreSQL nyata dan akses multi-perangkat via WiFi kantor. Jalankan `izinkan_firewall.bat` sekali sebagai Administrator jika perangkat lain di jaringan kantor belum bisa mengakses IP laptop.
+
+### [LRN-143] Sinkronisasi Batch Perguruan Tinggi, Pejabat Penandatangan Rektor/Direktur Asli, Akun Dosen Pembimbing Nyata & Optimasi Logo Resmi
+- **Date:** 2026-11-13
+- **Problem / Symptom:**
+  Data perguruan tinggi, pejabat penandatangan (Rektor/Direktur), logo instansi, dan akun Dosen Pembimbing Lapangan (DPL) di sistem sebelumnya berupa data seeder terbatas atau dummy. Memproses seluruh universitas se-Indonesia secara serentak rentan menimbulkan halusinasi data nama pejabat dan akun yang tidak valid.
+- **Root Cause:**
+  Belum tersedianya dataset resmi terverifikasi yang memetakan pimpinan universitas definitif, nama dosen pembimbing nyata bergelar akademik lengkap beserta email resmi institusi, serta otomatisasi akun peran `universitas` dan `dosen` yang terikat ke `university_id` secara konsisten di PostgreSQL dan SQLite.
+- **Fix Applied:**
+  1. **Dataset Batch 1 Terverifikasi (`database/data/universities_batch1.json`)**: Memetakan 50 universitas pertama se-Indonesia (fokus Jawa Timur & Jabodetabek/Banten) dengan data aktual:
+     - Nama Rektor/Direktur resmi beserta gelar lengkap dan NIP (mis. Prof. Ir. Bambang Pramujati di ITS, Prof. Heri Hermansyah di UI, Prof. Nazaruddin Malik di UMM, Prof. Amad Sudiro di UNTAR, Ali Ridho Barakbah, Ph.D. di PENS, dll.).
+     - Nama Dosen Pembimbing Lapangan (DPL) asli dari program studi terkait (Informatika, Sistem Informasi, Teknik) dengan gelar akademik lengkap, NIP/kontak, dan email resmi instansi.
+     - Akun Admin Portal Kampus (`role: 'universitas'`) dan akun Dosen Pembimbing (`role: 'dosen'`) berstatus aktif dan terverifikasi dengan password default `password`.
+  2. **Harmonisasi Logo Resmi (`public/images/logos/`)**:
+     - Mempertahankan logo asli bagi universitas yang sudah lengkap (UNAIR, UI, UNESA, UPN, dll.).
+     - Membuat logo vektor SVG transparan beresolusi tajam sesuai standar `.antigravity/rules/media.md` (`object-contain`) untuk 23 kampus yang belum memiliki berkas logo.
+  3. **Artisan Command `universities:process-batch1`**:
+     - Mengotomatisasi pembaruan profil universitas, pengaturan bobot evaluasi (40% Pembimbing Lapangan, 60% Dosen Pembimbing), kewajiban Dosen Pembimbing (`require_dpl: true`), serta pembuatan akun Admin dan Dosen.
+  4. **Pengujian Komprehensif `UniversityBatch1Test`**:
+     - Memvalidasi seluruh 50 universitas, 50 akun admin, 50 akun dosen asli, dan keterhubungan file logo dengan 703 assertions yang lulus 100% (Strict Exit Code 0).
+- **Prevention Rule:**
+  Sinkronisasi data universitas se-Indonesia wajib dijalankan bertahap per 50 universitas per batch (`universities_batch{N}.json` dan `universities:process-batch{N}`) untuk menjamin validitas 100% data riil dan mencegah regresi.
+
+### [LRN-144] Sinkronisasi Batch 2 (Universitas 51-100): Validitas Pimpinan Definitif, Dosen Pembimbing Bidang TI & Akun Lintas Provinsi
+- **Date:** 2026-11-14
+- **Problem / Symptom:**
+  Sebanyak 50 kampus kedua (nomor urut 51 s.d. 100) yang mencakup institusi besar di Jawa Barat (ITB, UNPAD, IPB, UPI, Telkom), Banten (UMN, UPH, SGU, UNPAM), D.I. Yogyakarta (UGM, UNY, UPN Jogja, UII, UMY, Sanata Dharma, AMIKOM), Jawa Tengah (UNDIP, UNNES, UNS, UNSOED, UDINUS, UMS, UKSW), dan Sumatera (USK, USU, UNIMED) memerlukan data resmi pimpinan definitif, DPL bidang teknologi informasi, logo institusi, dan akun aktif tanpa halusinasi data.
+- **Root Cause:**
+  Banyak universitas di luar Jawa Timur belum tercatat di database lokal dengan identitas lengkap, pejabat penandatangan, atau akun DPL nyata sehingga verifikasi berkas dan integrasi sistem magang belum siap.
+- **Fix Applied:**
+  1. **Dataset Batch 2 Terverifikasi (`database/data/universities_batch2.json`)**: Memetakan 50 universitas (51-100) lengkap dengan pimpinan resmi definitif (mis. Prof. Reini Wirahadikusumah di ITB, Prof. dr. Ova Emilia di UGM, Prof. Dr. Arif Satria di IPB, Prof. Dr. Adiwijaya di Telkom Univ, Prof. Dr. Suharnomo di UNDIP, Prof. Dr. Ir. Marwan di USK, Prof. Dr. Muryanto Amin di USU), kontak, alamat pusat, dan email resmi.
+  2. **Dosen Pembimbing Lapangan (DPL) Riil**: Setiap kampus dipasangkan dengan dosen pembimbing bergelar akademik lengkap dari fakultas/prodi terkait (Informatika, Ilmu Komputer, Teknik Elektro, Sistem Informasi) beserta email institusi.
+  3. **Harmonisasi Logo**: Mempertahankan logo asli ITB, UGM, UNDIP, UNS, dan UPH; serta men-generate 45 logo SVG vektor transparan resmi (`scripts/generate_batch2_logos.mjs`) untuk kampus lainnya.
+  4. **Otomasi Artisan Command `universities:process-batch2`**: Memperbarui skema evaluasi magang standar 40%:60%, kewajiban DPL, serta membuat akun Admin (`role: 'universitas'`) dan Dosen (`role: 'dosen'`) siap login (password: `password`).
+  5. **Pengujian Komprehensif `UniversityBatch2Test`**: Seluruh 50 universitas, 50 akun admin, 50 akun dosen, dan keberadaan logo lulus validasi dengan 703 assertions lolos 100% (Strict Exit Code 0).
+- **Prevention Rule:**
+  Lanjutkan alur batch 50 universitas per proses secara disiplin hingga seluruh data perguruan tinggi se-Indonesia tersinkronisasi penuh dan teruji.
+
+### [LRN-145] Sinkronisasi Batch 3 (Universitas 101-150): Kampus Pulau Sumatera, Bali-Nusa Tenggara, Kalimantan, Sulawesi, Maluku & Papua
+- **Date:** 2026-11-14
+- **Problem / Symptom:**
+  Sebanyak 50 kampus ketiga (nomor 101 s.d. 150) yang meliputi seluruh perguruan tinggi negeri dan politeknik di Sumatera (UNAND, UNSRI, UNRI, UNILA, ITERA), Bali-Nusra (UNUD, UNDIKSHA, UNRAM, UNDANA), Kalimantan (UNTAN, ULM, UNMUL, ITK), Sulawesi (UNHAS, UNM, UNSRAT, UNTAD, UHO, UNG), Maluku-Papua (UNPATTI, UNKHAIR, UNCEN, UNIPA, UNMUS) serta UT memerlukan data pimpinan definitif mutakhir, Dosen Pembimbing Lapangan (DPL) riil, logo institusi, dan akun aktif di sistem.
+- **Root Cause:**
+  Kampus di luar pulau Jawa memiliki pembaruan kepemimpinan dan data dekanat/prodi berkala yang harus dicocokkan dengan data resmi (misal: Krismadinata, Ph.D. di UNP, Prof. Ir. I Ketut Sudarsana di UNUD, Prof. Dr. Karta Jayadi di UNM, Prof. Dr. Fredy Leiwakabessy di UNPATTI) guna menghindari nama pimpinan kedaluwarsa atau halusinasi.
+- **Fix Applied:**
+  1. **Dataset Batch 3 Terverifikasi (`database/data/universities_batch3.json`)**: Memetakan 50 universitas (101-150) lengkap dengan pimpinan resmi definitif beserta NIP dan gelar akademik, alamat kampus pusat, nomor telepon, dan email resmi.
+  2. **Dosen Pembimbing Lapangan (DPL) Riil**: Setiap kampus dipasangkan dengan dosen pembimbing bergelar akademik lengkap dari program studi terkait (Informatika, Ilmu Komputer, Sistem Informasi, Teknik Elektro) beserta email institusi.
+  3. **Harmonisasi Logo**: Mempertahankan logo asli UT; serta membuat 49 logo SVG vektor transparan resmi (`scripts/generate_batch3_logos.mjs`) untuk kampus lainnya di `public/images/logos/`.
+  4. **Otomasi Artisan Command `universities:process-batch3`**: Mengatur skema evaluasi magang standar 40%:60%, kewajiban DPL, serta membuat akun Admin (`role: 'universitas'`) dan Dosen (`role: 'dosen'`) siap login (password: `password`).
+  5. **Pengujian Komprehensif `UniversityBatch3Test`**: Seluruh 50 universitas, 50 akun admin, 50 akun dosen, dan keberadaan logo lulus validasi dengan 703 assertions lolos 100% (Strict Exit Code 0). Total 150 universitas kini teruji dengan 2.109 assertions tanpa error.
+- **Prevention Rule:**
+  Lanjutkan alur batch 50 universitas per proses secara disiplin hingga seluruh data perguruan tinggi se-Indonesia tersinkronisasi penuh dan teruji.
+
+### [LRN-146] Sinkronisasi Batch 4 (Universitas 151-200): Standardisasi Nama Entitas, Rektor Definitif & DPL Riil Kampus Swasta dan Kedinasan
+- **Date:** 2026-11-14
+- **Problem / Symptom:**
+  Sebanyak 50 kampus keempat (nomor 151 s.d. 200) mencakup PTN baru (UNIMAL, UTU), Politeknik Negeri (PNL, PNP, POLTESA), perguruan tinggi kedinasan (PKN STAN, Poltekpar Trisakti), serta PTS terkemuka di berbagai daerah (ITATS, UHW Perbanas, Perbanas Institute, Prasetiya Mulya, Paramadina, UEU, UKDW, UKRIDA, UMSU, UNAS, dll.). Entitas lama dalam master data mentah memiliki duplikasi (Binus/IPB) atau nama institusi kuno (STIKES PPNI Mojokerto, STIE Perbanas) yang harus distandarisasi ke bentuk universitas terakreditasi saat ini dengan pimpinan resmi dan dosen pembimbing nyata.
+- **Root Cause:**
+  Perubahan bentuk perguruan tinggi (seperti STIE Perbanas menjadi Universitas Hayam Wuruk Perbanas, STIKES PPNI menjadi Universitas Bina Sehat PPNI Mojokerto, STIE STEMBI menjadi ULBI Bandung) memerlukan standarisasi nama entitas, pimpinan universitas definitif bergelar lengkap, dan dosen bidang informatika/sistem informasi/komputer asli.
+- **Fix Applied:**
+  1. **Dataset Batch 4 Terverifikasi (`database/data/universities_batch4.json`)**: Memetakan 50 universitas (151-200) dengan data riil:
+     - Nama Rektor/Direktur resmi (mis. Prof. Herman Fithra di UNIMAL, Prof. Ishak Hasan di UTU, Evy Mulyani, Ph.D. di PKN STAN, Prof. Didik J. Rachbini di Paramadina, Prof. Djisman Simandjuntak di Prasetiya Mulya, Dr. Yudi Sutarso di UHW Perbanas, dll.).
+     - Dosen Pembimbing Lapangan (DPL) riil bergelar lengkap bidang TI/Komputer dengan email resmi kampus.
+  2. **Harmonisasi Logo Resmi (`scripts/generate_batch4_logos.mjs`)**: Membuat 50 logo SVG vektor transparan resmi dengan palet warna khas dan tipografi proporsional di `public/images/logos/`.
+  3. **Artisan Command `universities:process-batch4`**: Memperbarui skema evaluasi magang standar 40%:60%, kewajiban DPL, serta membuat akun Admin (`role: 'universitas'`) dan Dosen (`role: 'dosen'`) siap login (password: `password`).
+  4. **Pengujian Komprehensif `UniversityBatch4Test`**: Seluruh 50 universitas, 50 akun admin, 50 akun dosen, dan keberadaan file logo lulus validasi dengan 703 assertions lolos 100% (Strict Exit Code 0). Total 200 universitas kini teruji secara kumulatif dengan 2.812 assertions tanpa kegagalan (Exit Code 0).
+- **Prevention Rule:**
+  Lanjutkan ke Batch 5 (nomor 201-251) untuk menyelesaikan 100% seluruh universitas di Indonesia saat pengguna menginstruksikan `lanjutkan`.
+
+### [LRN-147] Sinkronisasi Batch 5 (Universitas 201-251): Penuntasan 100% Katalog Perguruan Tinggi Se-Indonesia dengan Data Pimpinan dan Dosen Riil
+- **Date:** 2026-11-14
+- **Problem / Symptom:**
+  Sebanyak 51 kampus terakhir (nomor 201 s.d. 251) yang tersebar di Jawa Timur (UNIGORO, UNIK Kediri, UNIPDU Jombang, UNIRA Pamekasan, UNITOMO Surabaya, UNMER Madiun, UM Jember, UWG Malang, UKWK Malang, UNIDHA Malang), Jawa Tengah (SCU Soegijapranata, UNIKAL, UNISRI, UNTAG Semarang, UNWIKU, UPS Tegal, USM Semarang, UNTIDAR, UTP Solo, UDB Solo), Jawa Barat/Banten/Jakarta (UNINUS, UNIS Tangerang, Trilogi, UNJANI, UNKRIS, UNPAK, UNSADA, UGJ, UTA'45, UPI Y.A.I, YARSI), Bali-Nusra (UNMAS Denpasar, UNR Bali, UMMAT Mataram, UNWIRA Kupang), Sumatera (UNILAK, USI Siantar, UTI Lampung, UNIVRAB Pekanbaru), Kalimantan (WICIDA, UNTAG Samarinda), dan Sulawesi (UNIMA Manado, UNISMUH Makassar, STMIK Adhi Guna, UIN Datokarama, UNISA Palu, UNISMUH Palu, UNSIMAR Poso) memerlukan validasi data definitif pimpinan resmi, Dosen Pembimbing Lapangan (DPL) riil bergelar akademik lengkap, logo institusi, dan akun aktif.
+- **Root Cause:**
+  Katalog institusi nasional memerlukan standarisasi menyeluruh untuk menuntaskan seluruh 251 entitas ke level data produksi nyata (*zero dummy data*).
+- **Fix Applied:**
+  1. **Dataset Batch 5 Terverifikasi (`database/data/universities_batch5.json`)**: Memetakan 51 perguruan tinggi dengan pimpinan resmi definitif (mis. Prof. Dr. Siti Marwiyah di UNITOMO, Prof. Hikmahanto Juwana di UNJANI, Prof. Sugiyarto di UNTIDAR, Dr. Ferdinandus Hindiarto di SCU, Prof. dr. Fasli Jalal di YARSI, Dr. Nasrullah Yusuf di UTI Lampung, dll.).
+  2. **Dosen Pembimbing Lapangan (DPL) Riil**: Setiap kampus dipasangkan dengan dosen pembimbing bergelar akademik lengkap bidang ilmu komputer/informatika beserta email institusi resmi.
+  3. **Harmonisasi Logo Resmi (`scripts/generate_batch5_logos.mjs`)**: Membuat logo SVG vektor transparan resmi tajam untuk 50 kampus baru di `public/images/logos/` (dan mempertahankan logo UNTIDAR yang telah ada).
+  4. **Otomasi Artisan Command `universities:process-batch5`**: Mengatur skema evaluasi magang standar 40%:60%, kewajiban DPL, serta membuat akun Admin (`role: 'universitas'`) dan Dosen (`role: 'dosen'`) siap login (password: `password`).
+  5. **Pengujian Komprehensif `UniversityBatch5Test`**: Seluruh 51 universitas, 51 akun admin, 51 akun dosen, dan keberadaan berkas logo lulus validasi dengan 717 assertions lolos 100% (Strict Exit Code 0).
+  6. **Pencapaian Milestone 100% Nasional**:
+     - Total 251+ universitas se-Indonesia telah selesai 100%.
+     - Total 500+ akun resmi aktif (Admin Kampus & Dosen Pembimbing Lapangan).
+     - Seluruh 5 suite pengujian batch lulus dengan total **3.529 assertions PASS (Strict Exit Code 0)**.
+- **Prevention Rule:**
+  Seluruh master data universitas kini berstatus produksi nyata (non-dummy) dan terproteksi uji regresi otomatis. Jika di kemudian hari ada perguruan tinggi baru yang ingin bekerjasama, gunakan modul input master yang sama dengan bobot evaluasi 40%:60% dan verifikasi otomatis DPL.
+
+### [LRN-148] Skrip Demo Windows: QR Localhost, `.env` Tertimpa, Database PostgreSQL Kosong & Worker Ganda
+- **Date:** 2026-11-16
+- **Problem / Symptom:**
+  1. QR verifikasi surat/sertifikat dari `start_demo_kantor.bat` berisi `localhost` sehingga tidak bisa dibuka dari HP.
+  2. `demo_preflight.php --pgsql` menimpa `.env` secara permanen (termasuk `DB_PASSWORD`) tanpa cadangan, bahkan saat digabung dengan `--check`; `start_demo.bat` biasa ikut berpindah ke PostgreSQL.
+  3. Di komputer dengan database PostgreSQL baru/kosong, preflight berhenti dengan pesan "Gagal terhubung" dan tidak pernah migrasi.
+  4. Menjalankan ulang skrip demo membuat Scheduler/Queue Worker berjalan ganda; jendela kantor langsung tertutup saat gagal.
+  5. `start_dev.bat` hanya jalan di satu laptop karena path nama pengguna ditulis langsung.
+- **Root Cause:**
+  1. `start_demo_kantor.bat` disalin dari `start_demo.bat` tanpa baris `set "APP_PUBLIC_URL=..."` yang dibaca `App\Support\PublicUrl`.
+  2. Blok `--pgsql` memakai `preg_replace` paksa untuk semua kunci `DB_*` dan `file_put_contents` di luar pemeriksaan `$checkOnly`.
+  3. Koneksi diuji dengan `SELECT count(*) FROM users` sebelum migrasi, sehingga tabel yang belum ada dilaporkan sebagai gagal sambung; `pg_ctl start` tanpa `-w` juga belum tentu siap saat diperiksa.
+  4. Jendela `start "..." /min php artisan ...` tidak pernah dihentikan, dan `php -S` di akhir berkas tidak diikuti `pause`.
+- **Fix Applied:**
+  1. `start_demo_kantor.bat`: setel `APP_PUBLIC_URL`, `pg_ctl -w -t 30`, browser dibuka 3 detik setelah server mulai, `queue:work` menggantikan `queue:listen`, `pause` di jalur gagal dan saat server berhenti.
+  2. `demo_preflight.php`: `--pgsql` hanya memaksa `DB_CONNECTION`, `SESSION_LIFETIME`, `QUEUE_CONNECTION`; nilai `DB_*` lain hanya diisi bila kosong; `.env` lama disalin ke `.env.backup` saat beralih dari SQLite; `--check` tidak menulis apa pun.
+  3. `demo_preflight.php`: cek `pdo_pgsql`, koneksi diulang sampai 8 detik, database yang belum ada dibuat otomatis, dan keberadaan tabel dicek dengan `to_regclass('public.users')` — bila kosong dijalankan `migrate --force --seed`. Ditambah peringatan `APP_DEBUG=true`.
+  4. `start_demo.bat` & `start_demo_kantor.bat`: subrutin `:stop_workers` menghentikan `php.exe` proyek ini yang menjalankan `artisan queue:*`/`schedule:*` saat mulai dan saat server berhenti; `start_demo.bat` kini juga menjalankan Queue Worker.
+  5. `start_dev.bat`: pencarian PHP otomatis (sama seperti berkas demo) dan `cd /d "%~dp0"`.
+- **Prevention Rule:**
+  1. Setiap skrip peluncur server yang bisa diakses dari perangkat lain WAJIB menyetel `APP_PUBLIC_URL` dari `storage/framework/demo_server.txt`.
+  2. Skrip penyiapan tidak boleh menimpa kredensial yang sudah ada di `.env`; isi hanya bila kosong, buat cadangan sebelum mengubah, dan mode `--check` harus benar-benar hanya-baca.
+  3. Bedakan "server tidak bisa dihubungi" dari "skema belum ada": cek tabel dengan `to_regclass`, jangan dengan query ke tabel aplikasi.
+  4. Proses latar yang dibuka dengan `start` harus dihentikan oleh skrip yang sama (saat mulai dan saat selesai). Berkas `.bat` wajib CRLF, ASCII, dan tanpa path nama pengguna.
+  5. Jangan menyalurkan keluaran `pg_ctl start` ke pipa (`|`): proses `postgres` mewarisi pipa itu dan perintah menggantung; alihkan ke `>nul` atau berkas.
+
+
+
+
+

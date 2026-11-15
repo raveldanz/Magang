@@ -17,3 +17,6 @@ scripts/** linguist-vendored
 
 # Institutional Memory Git Merge Strategy (Auto-union append without conflict)
 .antigravity/memory/learnings.md merge=union
+
+# Berkas batch Windows harus CRLF agar label goto terbaca
+*.bat text eol=crlf
