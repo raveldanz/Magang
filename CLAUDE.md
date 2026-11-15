@@ -32,7 +32,21 @@ php artisan optimize:clear && php artisan view:clear               # clear cache
 npm run test:hermes    # Puppeteer multi-role E2E scripts in scripts/hermes_*.mjs (needs running app at 127.0.0.1:8000)
 ```
 
-Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `admin.kominfo@surabaya.go.id`, `mentor.kominfo@surabaya.go.id`, `admin@unesa.ac.id`, `dosen.unesa@unesa.ac.id`, `mahasiswa@unesa.ac.id`.
+Demo accounts in the current `database/database.sqlite` (all password `password`): `admin@surabaya.go.id` (Super Admin), `admin.dispusip@surabaya.go.id` (Admin Dinas), `supervisor@dispusip.surabaya.go.id`, `mentor.dispusip@surabaya.go.id`, `dosen.unesa@unesa.ac.id`, `admin@unesa.ac.id` (universitas), `mahasiswa.aktif@unesa.ac.id` / `mahasiswa.lulus@unesa.ac.id`. Full list in `PANDUAN_DEMO.md`. Note the local `.env` uses SQLite (`database/database.sqlite`), not PostgreSQL.
+
+### LAN demo & distribution zip
+
+```bash
+start_demo.bat          # double-click: scripts/demo_preflight.php (env, migrate, storage link, cache purge, port/IP/firewall check) then php -S 0.0.0.0:<port> + schedule:work
+izinkan_firewall.bat    # run as administrator once: removes inbound Block rules for php.exe, adds an Allow rule
+php scripts/demo_preflight.php --check                               # read-only readiness check
+powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1   # build → test → copy (no .git/node_modules/logs/tokens, APP_DEBUG=false, portable php/) → zip in parent folder
+```
+
+- The demo serves with `php -S` (not `artisan serve`) bound to `0.0.0.0`, with `-d upload_max_filesize=64M` etc.; the system php.ini only allows 2 MB uploads.
+- Pages opened via `http://<LAN-IP>` are not a secure context: service worker/web push and chat voice recording are unavailable there; `navigator.clipboard` is polyfilled in `resources/js/app.js`.
+- QR verification links must use `App\Support\PublicUrl::route()` (replaces a loopback host with `APP_PUBLIC_URL`, which `start_demo.bat` sets to the LAN address) so phones can open them.
+- Never leave `public/hot` behind (Vite dev server is bound to 127.0.0.1, so other devices get unstyled pages); the preflight deletes it. Never load Tailwind/JS from a CDN — the demo may have no internet; external web fonts are loaded non-blocking.
 
 ## Architecture
 
@@ -70,7 +84,7 @@ Demo accounts (all password `password`): `admin@surabaya.go.id` (Super Admin), `
 
 ## Project conventions (from AGENTS.md / .antigravity/)
 
-- Multi-agent setup: Antigravity (Gemini) is architect/QA, Claude Code is the multi-file implementer, Aider does small diffs. See `AGENTS.md`, `AGENTS_WORKFLOW.md`, `.antigravity/agent_rules.md`, and modular rules in `.antigravity/rules/{architecture,database,media,quality}.md`.
+- Multi-agent setup: Antigravity (Gemini) is architect/QA, Claude Code is the multi-file implementer, Aider does small diffs. Antigravity may be editing the same working tree at the same time — check recent mtimes / `git status` before touching files you did not change, and don't overwrite its in-progress work. See `AGENTS.md`, `AGENTS_WORKFLOW.md`, `.antigravity/agent_rules.md`, and modular rules in `.antigravity/rules/{architecture,database,media,quality}.md`.
 - **Read `.antigravity/memory/learnings.md` before non-trivial changes** — it records past bugs with root causes and prevention rules. After fixing a notable bug, append an entry using its `[LRN-XXX]` template (Problem, Root Cause, Fix Applied, Prevention Rule).
 - Verify real column names against `database/migrations/` before writing queries or model changes; no raw SQL without parameter binding; use `DB::transaction` for multi-table writes.
 - Thin controllers: when a method exceeds ~15 lines or a controller ~100 lines, move logic into `app/Services/`.

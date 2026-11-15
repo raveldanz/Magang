@@ -36,3 +36,4 @@ Thumbs.db
 *.tmp
 *.pptx
 
+/storage/framework/demo_server.txt

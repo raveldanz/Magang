@@ -69,6 +69,7 @@ php artisan test --filter=NamaTestAtauMethod
 - **Keamanan Berkas Pribadi vs Logo Publik**: Dokumen pengajuan, lampiran logbook/chat/feedback, dan foto mahasiswa berada di disk privat `local` (sajikan hanya lewat route terotorisasi seperti `documents.application*`, `logbooks.attachment`, `student.photo`, `feedbacks.attachment` — **jangan** gunakan `asset('storage/...')`). Logo instansi publik memakai PNG transparan murni/SVG/WebP dengan `object-contain`.
 - **Resolusi Kampus**: Gunakan `App\Services\UniversityResolver`, jangan query `LIKE '%nama%'`.
 - **LRN-130 (UI Kedinasan & Dokumen Resmi)**: Gunakan ikon vektor SVG profesional (Heroicons) alih-alih emoji mentah pada antarmuka kedinasan, dan pastikan `Carbon::setLocale('id')` aktif pada rendering surat/sertifikat resmi.
+- **LRN-136 (Minimalisme UI, Anti-Redundansi Teks & Quality Control State)**: Dilarang menulis micro-copy/penjelasan panjang yang berulang-ulang, dilarang menggunakan `<strong>` berlebihan pada kalimat deskripsi, dan dilarang memasukkan variabel nama entitas panjang seperti `({{ $group->name }})` ke dalam label tombol. Pastikan state UI bersifat *mutually exclusive* (mis. sembunyikan kartu *Pilih Jalur Pendaftaran Individu/Kelompok* saat mahasiswa masih berada dalam kelompok yang perlu perbaikan berkas, dan sediakan opsi *Keluar dari Kelompok*). Wajib jalankan QC test `UiMinimalismAndAntiRedundancyTest`.
 - **Partial Blade**: Variabel lokal yang didefinisikan di dalam satu `@include` partial tidak terlihat oleh partial berikutnya.
 
 ---
