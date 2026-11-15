@@ -135,4 +135,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    | ID instansi penerbit sertifikat (Dispusip). Admin Utama instansi ini boleh mengubah tema
+    | sertifikat global. Bila kosong, dipakai profil instansi Perpustakaan yang PALING AWAL dibuat.
+    */
+    'certificate_issuer_agency_id' => env('CERTIFICATE_ISSUER_AGENCY_ID'),
+
 ];

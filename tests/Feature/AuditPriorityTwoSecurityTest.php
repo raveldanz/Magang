@@ -391,7 +391,16 @@ class AuditPriorityTwoSecurityTest extends TestCase
 
         $adminOtherAgency = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $this->agencyB->id]);
         $this->actingAs($adminOtherAgency)->post(route('admin.certificates.updateTheme'), $payload)->assertForbidden();
+
+        // Mengganti nama instansi sendiri menjadi "...Perpustakaan..." tidak menjadikannya penerbit
+        $this->agencyB->update(['agency_name' => 'Dinas Perpustakaan Palsu']);
+        $this->actingAs($adminOtherAgency)->post(route('admin.certificates.updateTheme'), $payload)->assertForbidden();
         $this->assertDatabaseMissing('certificate_themes', ['signee_name' => 'Mallory']);
+
+        // Bila ditetapkan lewat config, hanya instansi itu yang menjadi penerbit
+        config(['app.certificate_issuer_agency_id' => $this->agencyB->id]);
+        $this->assertSame($this->agencyB->id, AgencyProfile::certificateIssuerId());
+        config(['app.certificate_issuer_agency_id' => null]);
 
         $adminDispusip = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $dispusip->id]);
         $this->actingAs($adminDispusip)->post(route('admin.certificates.updateTheme'), ['signee_name' => 'Kepala Dispusip'] + $payload)

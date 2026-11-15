@@ -681,7 +681,7 @@ class CertificateController extends Controller
             return false;
         }
 
-        $issuerId = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->value('id');
+        $issuerId = AgencyProfile::certificateIssuerId();
 
         return $issuerId !== null && (int) $issuerId === (int) $user->agency_profile_id;
     }
