@@ -14,6 +14,9 @@ class AuditLogController extends Controller
      */
     public function index(Request $request)
     {
+        // Log audit memuat aksi lintas dinas, IP, dan detail reset password/penyamaran
+        $this->ensureSuperAdmin('Log audit sistem hanya dapat dibuka oleh Super Administrator.');
+
         $query = AuditLog::with('user')->latest();
 
         if ($request->filled('action')) {

@@ -12,6 +12,7 @@ use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Services\PlacementAssignmentService;
 use App\Support\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -103,6 +104,7 @@ class CertificateController extends Controller
         if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($placement->application)->unit_id !== $user->unit_id) {
             abort(403, 'Anda tidak memiliki hak akses ke sertifikat bidang lain.');
         }
+        $this->ensureSameAgency($placement->application);
 
         $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, $user);
         $data['certificateRecord'] = Certificate::where('placement_id', $placementId)->first();
@@ -123,6 +125,7 @@ class CertificateController extends Controller
         if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($placement->application)->unit_id !== $user->unit_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk menerbitkan sertifikat bidang lain.');
         }
+        $this->ensureSameAgency($placement->application);
 
         $year = date('Y');
         if ($placement->application && $placement->application->end_date) {
@@ -183,6 +186,7 @@ class CertificateController extends Controller
         if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($application)->unit_id !== $user->unit_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk merevisi sertifikat bidang lain.');
         }
+        $this->ensureSameAgency($application);
 
         $student = $application?->user;
         $profile = $student?->studentProfile;
@@ -264,6 +268,15 @@ class CertificateController extends Controller
         $application = $placement->application;
         if ($user && ! $user->isSuperAdmin() && $user->unit_id && optional($application)->unit_id !== $user->unit_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk merevisi sertifikat bidang lain.');
+        }
+        $this->ensureSameAgency($application);
+
+        // Bidang tujuan harus milik dinas yang sama; mentor harus akun mentor resmi dinas penempatan
+        if ($request->filled('unit_id') && ! Unit::where('id', $request->unit_id)->where('agency_profile_id', $application->unit?->agency_profile_id)->exists()) {
+            return redirect()->back()->withInput()->with('error', 'Bidang yang dipilih bukan bagian dari instansi penempatan mahasiswa ini.');
+        }
+        if ($request->filled('mentor_id')) {
+            app(PlacementAssignmentService::class)->resolveMentor($application, (int) $request->mentor_id);
         }
 
         $student = $application->user;
@@ -628,5 +641,24 @@ class CertificateController extends Controller
         }
 
         return view('certificates.batch_print', compact('certificatesData'));
+    }
+
+    /**
+     * Admin Dinas hanya boleh membuka/merevisi/menerbitkan sertifikat mahasiswa di instansinya sendiri.
+     * (Pemeriksaan bidang untuk Admin Bidang dilakukan terpisah di masing-masing aksi.)
+     */
+    private function ensureSameAgency($application): void
+    {
+        $user = Auth::user();
+        if (! $user || $user->isSuperAdmin() || $user->agency_profile_id === null) {
+            return;
+        }
+
+        $application?->loadMissing('unit');
+        abort_unless(
+            $application && (int) $application->unit?->agency_profile_id === (int) $user->agency_profile_id,
+            403,
+            'Anda tidak memiliki hak akses ke sertifikat instansi lain.'
+        );
     }
 }

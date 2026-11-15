@@ -29,7 +29,7 @@ class ProjectDetailController extends Controller
         $student = $application?->user;
 
         // Cek Otorisasi Akses Jika Proyek Berstatus Privat
-        $isPrivileged = $user && ($user->isSuperAdmin() || in_array($user->role, ['admin', 'supervisor']));
+        $isPrivileged = $project->isModeratableBy($user);
         $isOwner = $user && $student && $user->id === $student->id;
         $isMember = $user && $project->members->contains(fn ($m) => $m->placement?->application?->user_id === $user->id);
         $isAssignedMentorOrAdvisor = $user && $placement && ($user->id === $placement->mentor_id || $user->id === $placement->academic_advisor_id);
@@ -43,7 +43,7 @@ class ProjectDetailController extends Controller
         $isLikedByMe = $project->isLikedBy($user, $guestId);
 
         // Hak moderasi komentar (Hapus komentar buruk / spam)
-        $canModerate = $user && ($user->isSuperAdmin() || in_array($user->role, ['admin', 'supervisor']));
+        $canModerate = $isPrivileged;
 
         // Tentukan tautan kembali (Back Link) yang kontekstual dan aman
         $backUrl = url()->previous();

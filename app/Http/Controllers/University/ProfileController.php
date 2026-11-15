@@ -8,6 +8,7 @@ use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
@@ -53,9 +54,15 @@ class ProfileController extends Controller
             $user->update(['university_id' => $university->id]);
         }
 
+        // Kode disimpan huruf besar; samakan dulu agar cek unik tidak lolos karena beda huruf
+        if ($request->filled('code')) {
+            $request->merge(['code' => strtoupper(trim((string) $request->code))]);
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:20',
+            // Nama & kode kampus harus unik: admin kampus tidak boleh menyamar sebagai kampus lain
+            'name' => ['required', 'string', 'max:255', Rule::unique('universities', 'name')->ignore($university->id)],
+            'code' => ['nullable', 'string', 'min:2', 'max:20', Rule::unique('universities', 'code')->ignore($university->id)],
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',

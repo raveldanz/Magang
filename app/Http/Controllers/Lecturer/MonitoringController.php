@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\Placement;
 use App\Models\Unit;
+use App\Support\CsvSafe;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -230,7 +231,7 @@ class MonitoringController extends Controller
                 $startDateVal = $p->application?->start_date ?? $p->start_date;
                 $endDateVal = $p->application?->end_date ?? $p->end_date;
 
-                fputcsv($handle, [
+                fputcsv($handle, CsvSafe::row([
                     $no++,
                     $student?->name ?? 'N/A',
                     $profile?->nim ?? 'N/A',
@@ -250,7 +251,7 @@ class MonitoringController extends Controller
                     $finalScore,
                     $gradeLetter,
                     $consultationCount,
-                ]);
+                ]));
             }
 
             fclose($handle);

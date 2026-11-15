@@ -26,6 +26,25 @@ abstract class Controller
     }
 
     /**
+     * Supervisor yang terikat pada satu dinas hanya boleh membuka/mengesahkan data dinas itu.
+     * Supervisor tanpa dinas (pengesah tingkat kota) dan Super Admin tidak dibatasi.
+     */
+    protected function ensureSupervisorAgencyScope(int|string|null $agencyProfileId): void
+    {
+        $user = Auth::user();
+
+        if ($this->currentUserIsSuperAdmin($user) || $user?->role !== 'supervisor' || $user->agency_profile_id === null) {
+            return;
+        }
+
+        abort_unless(
+            $agencyProfileId !== null && (int) $agencyProfileId === (int) $user->agency_profile_id,
+            403,
+            'Anda hanya dapat memproses data magang di instansi Anda sendiri.'
+        );
+    }
+
+    /**
      * Beri akun password sementara acak dan tampilkan sekali kepada staf yang melakukannya
      * (flash 'temporary_credentials', dirender oleh layouts/partials/temporary-credentials).
      */
@@ -49,8 +68,19 @@ abstract class Controller
             return null;
         }
 
-        if (str_starts_with($returnTo, '/') && ! str_starts_with($returnTo, '//')) {
-            return $returnTo;
+        // Karakter kontrol/spasi bisa dipakai menyelundupkan skema (mis. "java\tscript:")
+        if (preg_match('/[\x00-\x20\x7F]/', $returnTo)) {
+            return null;
+        }
+
+        // "/path" relatif aman, tetapi "//host" dan "/\host" dibaca browser sebagai URL ke host lain
+        if (str_starts_with($returnTo, '/')) {
+            return (str_starts_with($returnTo, '//') || str_starts_with($returnTo, '/\\')) ? null : $returnTo;
+        }
+
+        $scheme = strtolower((string) parse_url($returnTo, PHP_URL_SCHEME));
+        if (! in_array($scheme, ['http', 'https'], true)) {
+            return null;
         }
 
         $appHost = parse_url(url('/'), PHP_URL_HOST);

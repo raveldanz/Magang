@@ -101,6 +101,8 @@ class ApplicationApprovalController extends Controller
             'placement.academicAdvisor',
         ])->findOrFail($id);
 
+        $this->ensureSupervisorAgencyScope($application->unit?->agency_profile_id);
+
         return view('supervisor.applications.show', compact('application'));
     }
 
@@ -111,6 +113,8 @@ class ApplicationApprovalController extends Controller
     {
         $application = Application::with(['unit', 'placement', 'user', 'group.applications'])->findOrFail($id);
         $user = Auth::user();
+
+        $this->ensureSupervisorAgencyScope($application->unit?->agency_profile_id);
 
         $currentStatus = $application->statusValue();
         if (! in_array($currentStatus, ['pending', 'waiting_approval', 'accepted', 'active'], true)) {
@@ -294,8 +298,10 @@ class ApplicationApprovalController extends Controller
             'notes.min' => 'Catatan penolakan minimal 5 karakter.',
         ]);
 
-        $application = Application::with(['user'])->findOrFail($id);
+        $application = Application::with(['user', 'unit'])->findOrFail($id);
         $user = Auth::user();
+
+        $this->ensureSupervisorAgencyScope($application->unit?->agency_profile_id);
 
         $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : (string) $application->status;
 

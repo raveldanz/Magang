@@ -317,8 +317,9 @@ class ApplicationController extends Controller
         }
 
         // Alur Double ACC: Jika Admin Dinas staf biasa menyetujui pengajuan awal (dari pending),
-        // otomatis arahkan status ke waiting_approval (Menunggu ACC Atasan)
-        if (! $isSuperAdmin && ! $isSupervisor && $newStatus === 'accepted' && in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
+        // otomatis arahkan status ke waiting_approval (Menunggu ACC Atasan). Berlaku juga untuk 'active',
+        // supaya Admin Dinas tidak bisa melompati persetujuan Atasan dengan langsung mengaktifkan magang.
+        if (! $isSuperAdmin && ! $isSupervisor && in_array($newStatus, ['accepted', 'active'], true) && in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
             $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
         }
 
@@ -649,8 +650,8 @@ class ApplicationController extends Controller
             }
         }
 
-        if ($request->filled('return_to')) {
-            return redirect()->to($request->input('return_to'))->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
+        if ($safeReturn = $this->safeReturnTo($request->input('return_to'))) {
+            return redirect()->to($safeReturn)->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
         }
 
         return redirect()->route('admin.applications.index')->with('success', 'Status pengajuan & penempatan berhasil diperbarui!');
@@ -684,8 +685,25 @@ class ApplicationController extends Controller
         }
 
         $newStatus = $request->status;
-        if ($newStatus === 'accepted' && ! $isSuperAdmin && ! ($user->role === 'supervisor')) {
-            $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
+        $isApprover = $isSuperAdmin || $user->role === 'supervisor';
+
+        // Double ACC: Admin Dinas tidak boleh langsung menerima ATAU mengaktifkan kelompok yang
+        // masih dalam tahap seleksi; keduanya diarahkan ke "Menunggu ACC Atasan".
+        if (in_array($newStatus, ['accepted', 'active'], true) && ! $isApprover) {
+            $stillInSelection = $group->applications->contains(fn ($a) => in_array($a->statusValue(), ['pending', 'waiting_approval'], true));
+            if ($newStatus === 'accepted' || $stillInSelection) {
+                $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
+            }
+        }
+
+        // Selesai hanya bila setiap anggota yang masih berjalan memenuhi syarat kelulusan
+        if ($newStatus === 'completed') {
+            $notReady = $group->applications
+                ->reject(fn ($a) => in_array($a->statusValue(), ['rejected', 'resigned', 'completed'], true))
+                ->reject(fn ($a) => $a->can_complete);
+            if ($notReady->isNotEmpty()) {
+                return redirect()->back()->with('error', 'Kelompok belum dapat diselesaikan: '.$notReady->count().' anggota belum memenuhi syarat (logbook, laporan akhir disetujui, dan penilaian lengkap).');
+            }
         }
 
         // Auto-Elevate Kelompok: jika status disetujui (accepted) namun tanggal mulai magang kelompok sudah tiba (start_date <= today), langsung aktifkan ke ACTIVE

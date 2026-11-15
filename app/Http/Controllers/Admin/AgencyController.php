@@ -266,7 +266,7 @@ class AgencyController extends Controller
 
     public function edit($id)
     {
-        abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
+        abort_unless($this->canManageAgencyProfile((int) $id), 403, 'Profil Dinas hanya dapat dikelola oleh Admin Dinas Utama atau Super Admin.');
         $agency = AgencyProfile::with('units')->findOrFail($id);
 
         return view('admin.agencies.edit', compact('agency'));
@@ -274,7 +274,7 @@ class AgencyController extends Controller
 
     public function update(Request $request, $id)
     {
-        abort_unless($this->currentUserIsSuperAdmin() || (int) Auth::user()->agency_profile_id === (int) $id, 403, 'Anda tidak memiliki hak akses untuk mengelola instansi ini.');
+        abort_unless($this->canManageAgencyProfile((int) $id), 403, 'Profil Dinas hanya dapat dikelola oleh Admin Dinas Utama atau Super Admin.');
         $agency = AgencyProfile::findOrFail($id);
 
         $request->validate([
@@ -428,5 +428,20 @@ class AgencyController extends Controller
 
         return redirect()->route('admin.agencies.index')
             ->with('success', "Akun Admin Dinas untuk '{$agency->agency_name}' berhasil dibuat! Email: {$email} | Password: {$password}");
+    }
+
+    /**
+     * Admin Dinas Utama (tanpa bidang) boleh mengubah profil dinasnya sendiri; Admin Bidang tidak,
+     * sama seperti aturan di AgencyProfileController.
+     */
+    private function canManageAgencyProfile(int $agencyId): bool
+    {
+        if ($this->currentUserIsSuperAdmin()) {
+            return true;
+        }
+
+        $user = Auth::user();
+
+        return $user->unit_id === null && (int) $user->agency_profile_id === $agencyId;
     }
 }

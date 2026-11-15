@@ -152,18 +152,11 @@ class LogbookController extends Controller
         $placement = $logbook->placement;
         $student = $placement?->application?->user;
 
-        // Otorisasi
-        $isAssignedAdvisor = ($placement && ($placement->academic_advisor_id === $user->id || $placement->mentor_id === $user->id));
-        $isSameUniv = ($user->university_id !== null && $student?->university_id === $user->university_id);
+        // Otorisasi: memverifikasi logbook adalah tugas DPL yang ditetapkan pada penempatan,
+        // sama seperti bulkApprove dan penilaian. Dosen lain di kampus yang sama hanya boleh melihat.
+        $isAssignedAdvisor = ($placement && ((int) $placement->academic_advisor_id === (int) $user->id || (int) $placement->mentor_id === (int) $user->id));
 
-        if (! $isSameUniv && $user->university && $student) {
-            $isSameUniv = (
-                $student->university === $user->university ||
-                optional($student->studentProfile)->universitas === $user->university
-            );
-        }
-
-        if (! $isAssignedAdvisor && ! $isSameUniv) {
+        if (! $isAssignedAdvisor) {
             abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi logbook mahasiswa ini.');
         }
 

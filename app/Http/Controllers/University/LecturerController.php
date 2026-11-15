@@ -7,6 +7,7 @@ use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\University;
 use App\Models\User;
+use App\Services\UniversityResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -147,11 +148,8 @@ class LecturerController extends Controller
 
         $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
 
-        // Tenant Scoping Authorization Check
-        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (! $isSameUniv && $univName) {
-            $isSameUniv = ($lecturer->university === $univName);
-        }
+        // Tenant Scoping Authorization Check (kunci: university_id, bukan nama kampus yang bisa diubah)
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengedit data dosen kampus lain.');
@@ -197,11 +195,8 @@ class LecturerController extends Controller
 
         $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
 
-        // Tenant Scoping Authorization Check
-        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (! $isSameUniv && $univName) {
-            $isSameUniv = ($lecturer->university === $univName);
-        }
+        // Tenant Scoping Authorization Check (kunci: university_id, bukan nama kampus yang bisa diubah)
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk mereset password dosen kampus lain.');
@@ -227,11 +222,8 @@ class LecturerController extends Controller
 
         $lecturer = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($id);
 
-        // Tenant Scoping Authorization Check
-        $isSameUniv = ($universityId && $lecturer->university_id === $universityId);
-        if (! $isSameUniv && $univName) {
-            $isSameUniv = ($lecturer->university === $univName);
-        }
+        // Tenant Scoping Authorization Check (kunci: university_id, bukan nama kampus yang bisa diubah)
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($lecturer, $university);
 
         if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus dosen kampus lain.');

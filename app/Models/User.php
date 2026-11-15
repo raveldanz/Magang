@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -53,6 +54,11 @@ class User extends Authenticatable
         // flag otomatis hilang saat pemilik akun mengganti passwordnya sendiri.
         // Password sementara dari issueTemporaryPassword selalu wajib diganti (penanda tidak dihitung ulang).
         static::saving(function (User $user) {
+            // Password berganti → cookie "Ingat saya" lama tidak berlaku lagi
+            if ($user->exists && $user->isDirty('password') && ! $user->isDirty('remember_token')) {
+                $user->remember_token = Str::random(60);
+            }
+
             if ($user->issuingTemporaryPassword) {
                 $user->must_change_password = true;
                 $user->issuingTemporaryPassword = false;
@@ -65,6 +71,29 @@ class User extends Authenticatable
                 } catch (\Throwable $e) {
                     $user->must_change_password = false;
                 }
+            }
+        });
+
+        // Password berganti (reset sendiri, ganti di profil, atau reset oleh staf) → semua token API
+        // lama dicabut dan sesi web lain milik akun ini diputus. Sesi yang sedang dipakai pemilik
+        // akun untuk mengganti passwordnya sendiri tetap dipertahankan.
+        static::updated(function (User $user) {
+            if (! $user->wasChanged('password')) {
+                return;
+            }
+
+            $user->tokens()->delete();
+
+            if (config('session.driver') === 'database') {
+                $keepSessionId = (auth()->id() === $user->id && request()->hasSession())
+                    ? request()->session()->getId()
+                    : null;
+
+                DB::connection(config('session.connection'))
+                    ->table(config('session.table', 'sessions'))
+                    ->where('user_id', $user->id)
+                    ->when($keepSessionId, fn ($q) => $q->where('id', '!=', $keepSessionId))
+                    ->delete();
             }
         });
     }

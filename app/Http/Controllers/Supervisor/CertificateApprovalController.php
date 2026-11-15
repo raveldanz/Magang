@@ -75,8 +75,15 @@ class CertificateApprovalController extends Controller
      */
     public function approve(Request $request, $id)
     {
-        $certificate = Certificate::with(['placement.application.user'])->findOrFail($id);
+        $certificate = Certificate::with(['placement.application.user', 'placement.application.unit'])->findOrFail($id);
         $user = Auth::user();
+
+        $this->ensureSupervisorAgencyScope($certificate->placement?->application?->unit?->agency_profile_id);
+
+        // Hanya sertifikat yang sedang menunggu pengesahan yang boleh disahkan
+        if ($certificate->approval_status !== 'waiting_approval') {
+            return redirect()->back()->with('error', 'Sertifikat ini tidak sedang menunggu pengesahan, sehingga belum dapat disahkan.');
+        }
 
         $certificate->update([
             'approval_status' => 'approved',
@@ -115,6 +122,8 @@ class CertificateApprovalController extends Controller
         ])->where('id', $placementId)->orWhereHas('certificate', function ($q) use ($placementId) {
             $q->where('id', $placementId);
         })->firstOrFail();
+
+        $this->ensureSupervisorAgencyScope($placement->application?->unit?->agency_profile_id);
 
         $certificate = $placement->certificate;
         if (! $certificate) {
@@ -176,11 +185,13 @@ class CertificateApprovalController extends Controller
             'notes.min' => 'Catatan instruksi revisi minimal 5 karakter.',
         ]);
 
-        $placement = Placement::with(['application.user', 'certificate'])
+        $placement = Placement::with(['application.user', 'application.unit', 'certificate'])
             ->where('id', $placementId)
             ->orWhereHas('certificate', function ($q) use ($placementId) {
                 $q->where('id', $placementId);
             })->firstOrFail();
+
+        $this->ensureSupervisorAgencyScope($placement->application?->unit?->agency_profile_id);
 
         $certificate = $placement->certificate ?: Certificate::where('placement_id', $placement->id)->firstOrFail();
         $user = Auth::user();
@@ -240,8 +251,10 @@ class CertificateApprovalController extends Controller
             'notes.min' => 'Catatan revisi minimal 5 karakter.',
         ]);
 
-        $certificate = Certificate::with(['placement.application.user'])->findOrFail($id);
+        $certificate = Certificate::with(['placement.application.user', 'placement.application.unit'])->findOrFail($id);
         $user = Auth::user();
+
+        $this->ensureSupervisorAgencyScope($certificate->placement?->application?->unit?->agency_profile_id);
 
         $certificate->update([
             'approval_status' => 'revision',

@@ -51,6 +51,83 @@ class InternshipProject extends Model
     }
 
     /**
+     * Moderator proyek: Super Admin, atau Admin Dinas/Supervisor dari dinas tempat proyek
+     * itu dibuat. Staf dinas lain tidak boleh melihat proyek privat atau memoderasinya.
+     */
+    public function isModeratableBy(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        if (! in_array($user->role, ['admin', 'supervisor'], true)) {
+            return false;
+        }
+
+        // Supervisor tanpa dinas adalah supervisor tingkat kota (pengesah lintas dinas)
+        if ($user->agency_profile_id === null) {
+            return $user->role === 'supervisor';
+        }
+
+        $this->loadMissing('placement.application.unit');
+        $agencyId = $this->placement?->application?->unit?->agency_profile_id;
+
+        return $agencyId !== null && (int) $agencyId === (int) $user->agency_profile_id;
+    }
+
+    /**
+     * Batasi query ke proyek yang boleh dilihat: semua proyek publik, ditambah proyek privat
+     * milik dinas moderator (Super Admin melihat semuanya).
+     */
+    public function scopeVisibleTo($query, ?User $user)
+    {
+        if ($user?->isSuperAdmin() || ($user?->role === 'supervisor' && $user->agency_profile_id === null)) {
+            return $query;
+        }
+
+        $agencyId = ($user && in_array($user->role, ['admin', 'supervisor'], true)) ? $user->agency_profile_id : null;
+
+        return $query->where(function ($q) use ($agencyId) {
+            $q->where('is_public', true);
+
+            if ($agencyId !== null) {
+                $q->orWhereHas('placement.application.unit', fn ($u) => $u->where('agency_profile_id', $agencyId));
+            }
+        });
+    }
+
+    /**
+     * Pengguna yang boleh membuka proyek (dipakai juga untuk menerima suka/komentar)
+     */
+    public function isViewableBy(?User $user): bool
+    {
+        if ($this->is_public || $this->isModeratableBy($user)) {
+            return true;
+        }
+
+        if (! $user) {
+            return false;
+        }
+
+        $this->loadMissing(['placement.application', 'members.placement.application']);
+        $placement = $this->placement;
+
+        if ($placement && in_array((int) $user->id, [
+            (int) $placement->application?->user_id,
+            (int) $placement->mentor_id,
+            (int) $placement->academic_advisor_id,
+        ], true)) {
+            return true;
+        }
+
+        return $this->members->contains(fn ($m) => (int) $m->placement?->application?->user_id === (int) $user->id);
+    }
+
+    /**
      * Cek apakah proyek sudah disukai oleh pengguna login atau pengunjung tamu
      */
     public function isLikedBy(?User $user, ?string $guestId = null): bool

@@ -130,6 +130,8 @@ class StudentReportController extends Controller
             'logbooks',
         ])->findOrFail($placementId);
 
+        $this->ensureSupervisorAgencyScope($placement->application?->unit?->agency_profile_id);
+
         $student = $placement->application?->user;
         $profile = $student?->studentProfile;
         $unit = $placement->application?->unit;

@@ -35,6 +35,7 @@ class ProjectInteractionController extends Controller
     {
         $project = InternshipProject::findOrFail($id);
         $user = Auth::user();
+        abort_unless($project->isViewableBy($user), 403, 'Proyek inovasi ini berstatus privat.');
         $guestId = $user ? null : $this->getGuestIdentifier($request);
 
         $existingLike = ProjectLike::where('internship_project_id', $project->id)
@@ -77,6 +78,7 @@ class ProjectInteractionController extends Controller
     {
         $project = InternshipProject::findOrFail($id);
         $user = Auth::user();
+        abort_unless($project->isViewableBy($user), 403, 'Proyek inovasi ini berstatus privat.');
 
         // 1. Validasi Input
         $rules = [
@@ -162,7 +164,7 @@ class ProjectInteractionController extends Controller
 
         // Otorisasi: Hanya Super Admin, Admin Dinas, atau pemilik komentar yang berhak menghapus
         $isSuperAdmin = $user?->isSuperAdmin() ?? false;
-        $isAdminDinas = $user && in_array($user->role, ['admin', 'supervisor']);
+        $isAdminDinas = $project?->isModeratableBy($user) ?? false;
         $isOwner = $user && $comment->user_id === $user->id;
 
         if (! ($isSuperAdmin || $isAdminDinas || $isOwner)) {
@@ -199,6 +201,7 @@ class ProjectInteractionController extends Controller
     {
         $comment = ProjectComment::findOrFail($commentId);
         $user = Auth::user();
+        abort_unless($comment->project?->isViewableBy($user) ?? false, 403, 'Proyek inovasi ini berstatus privat.');
         $guestId = $user ? null : $this->getGuestIdentifier($request);
 
         $existingLike = ProjectCommentLike::where('project_comment_id', $comment->id)
@@ -239,11 +242,10 @@ class ProjectInteractionController extends Controller
     public function toggleVisibility(Request $request, $id)
     {
         $user = Auth::user();
-        if (! $user || (! $user->isSuperAdmin() && ! in_array($user->role, ['super_admin', 'superadmin', 'admin', 'supervisor']))) {
-            abort(403, 'Akses terbatas untuk Administrator dan Supervisor.');
-        }
-
         $project = InternshipProject::findOrFail($id);
+
+        // Hanya Super Admin atau Admin Dinas/Supervisor dari dinas pemilik proyek
+        abort_unless($project->isModeratableBy($user), 403, 'Akses terbatas untuk Administrator dan Supervisor dinas terkait.');
         $project->is_public = ! $project->is_public;
         $project->save();
 

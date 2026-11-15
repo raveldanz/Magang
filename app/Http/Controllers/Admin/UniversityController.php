@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\Admin\UniversityManagementService;
 use App\Services\UniversityHubService;
 use App\Services\UniversityResolver;
+use App\Support\CsvSafe;
 use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
@@ -660,7 +661,7 @@ class UniversityController extends Controller
                     ? date('d/m/Y', strtotime($app->start_date)).' s.d. '.date('d/m/Y', strtotime($app->end_date))
                     : '-';
 
-                fputcsv($handle, [
+                fputcsv($handle, CsvSafe::row([
                     $no++,
                     $profile?->nim ?? '-',
                     $student?->name ?? '-',
@@ -674,7 +675,7 @@ class UniversityController extends Controller
                     $mentorScore,
                     $dosenScore,
                     $finalScore,
-                ]);
+                ]));
             }
 
             fclose($handle);

@@ -85,7 +85,7 @@ class UnitController extends Controller
             $defaultAgencyId = $request->query('agency_id');
         }
 
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous()));
 
         return view('admin.units.create', compact('agencies', 'defaultAgencyId', 'returnTo'));
     }
@@ -126,8 +126,8 @@ class UnitController extends Controller
         $successMsg = "Divisi '{$unit->name}' berhasil ditambahkan!";
 
         // 1. Prioritas return_to dari pemanggil
-        if ($request->filled('return_to') && ! str_contains($request->return_to, 'units/create')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if (($safeReturn = $this->safeReturnTo($request->return_to)) && ! str_contains($safeReturn, 'units/create')) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         // 2. Balik ke detail instansi jika ada agencyId
@@ -242,7 +242,7 @@ class UnitController extends Controller
         }
 
         $agencies = $agencyId ? AgencyProfile::where('id', $agencyId)->get() : AgencyProfile::all();
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous()));
 
         // Kandidat Kepala / Koordinator Unit: akun mentor resmi di instansi unit ini
         $headCandidates = User::whereIn('role', ['mentor', 'pembimbing'])
@@ -306,8 +306,8 @@ class UnitController extends Controller
         $successMsg = 'Data divisi / unit magang berhasil diperbarui!';
 
         // 1. Prioritas return_to dari pemanggil
-        if ($request->filled('return_to') && ! str_contains($request->return_to, 'units/'.$id.'/edit')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if (($safeReturn = $this->safeReturnTo($request->return_to)) && ! str_contains($safeReturn, 'units/'.$id.'/edit')) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         // Jika Admin Bidang, langsung kembali ke ruang kerja bidangnya
@@ -439,8 +439,8 @@ class UnitController extends Controller
         $unit->delete();
         $successMsg = "Divisi / unit magang '{$unit->name}' berhasil dihapus.";
 
-        if ($request->filled('return_to')) {
-            return redirect($request->return_to)->with('success', $successMsg);
+        if ($safeReturn = $this->safeReturnTo($request->return_to)) {
+            return redirect($safeReturn)->with('success', $successMsg);
         }
 
         return redirect()->back()->with('success', $successMsg);

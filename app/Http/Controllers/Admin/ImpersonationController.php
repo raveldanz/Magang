@@ -29,6 +29,10 @@ class ImpersonationController extends Controller
         $impersonatorId = $originalSuperAdminId ?? $currentUser->id;
         $impersonatorUser = User::findOrFail($impersonatorId);
 
+        // Wewenang dari sesi harus dicek ulang ke database: Super Admin asal bisa saja
+        // sudah diturunkan perannya sejak penyamaran dimulai.
+        abort_unless($impersonatorUser->isSuperAdmin(), 403, 'Hanya Super Administrator yang berhak menggunakan fitur penyamaran (Login As).');
+
         $targetUser = User::findOrFail($userId);
 
         // Jika menargetkan akun Super Admin asli sendiri, kembalikan ke akun Super Admin
@@ -105,8 +109,17 @@ class ImpersonationController extends Controller
         }
 
         $originalId = $request->session()->get('impersonator_id');
-        $originalUser = User::findOrFail($originalId);
+        $originalUser = User::find($originalId);
         $impersonatedUser = Auth::user();
+
+        // Jangan masuk kembali ke akun asal yang sudah tidak berwenang
+        if (! $originalUser || ! $originalUser->isSuperAdmin()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login');
+        }
 
         // Tentukan URL tujuan kembali sebelum sesi penyamaran dihapus
         $returnUrl = $request->session()->get('impersonator_return_to');

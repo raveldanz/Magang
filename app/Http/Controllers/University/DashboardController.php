@@ -10,6 +10,8 @@ use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
+use App\Services\UniversityResolver;
+use App\Support\CsvSafe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -221,10 +223,7 @@ class DashboardController extends Controller
         $student = $application->user;
 
         // Pastikan mahasiswa berasal dari universitas yang sama
-        $isSameUniv = ($universityId && $student->university_id === $universityId);
-        if (! $isSameUniv && $university) {
-            $isSameUniv = ($student->university === $university->name || optional($student->studentProfile)->universitas === $university->name);
-        }
+        $isSameUniv = app(UniversityResolver::class)->belongsTo($student, $university);
 
         if (! $isSameUniv) {
             abort(403, 'Anda tidak memiliki hak akses untuk memplot dosen mahasiswa kampus lain.');
@@ -232,10 +231,7 @@ class DashboardController extends Controller
 
         // Pastikan dosen yang dipilih berasal dari universitas yang sama
         $advisor = User::whereIn('role', ['dosen', 'academic_advisor'])->findOrFail($request->academic_advisor_id);
-        $isAdvisorSameUniv = ($universityId && $advisor->university_id === $universityId);
-        if (! $isAdvisorSameUniv && $university) {
-            $isAdvisorSameUniv = ($advisor->university === $university->name);
-        }
+        $isAdvisorSameUniv = app(UniversityResolver::class)->belongsTo($advisor, $university);
 
         if (! $isAdvisorSameUniv) {
             return redirect()->back()->with('error', 'Dosen yang dipilih harus terdaftar di perguruan tinggi Anda.');
@@ -346,7 +342,7 @@ class DashboardController extends Controller
                     : 'Individu';
                 $namaKelompok = $app->group?->name ?? '-';
 
-                fputcsv($handle, [
+                fputcsv($handle, CsvSafe::row([
                     $no++,
                     $profile?->nim ?? '-',
                     $student?->name ?? '-',
@@ -362,7 +358,7 @@ class DashboardController extends Controller
                     $mentorScore,
                     $dosenScore,
                     $finalScore,
-                ]);
+                ]));
             }
 
             fclose($handle);
@@ -379,43 +375,19 @@ class DashboardController extends Controller
             ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
-        $isMatchUniv = function ($student) use ($user, $university) {
-            if (! $student) {
+        // Batas tenant ketat: university_id, atau nama kampus yang sama persis untuk data lama.
+        // Tidak lagi memakai pencocokan substring (kode 'a' dulu cocok dengan hampir semua kampus).
+        $isMatchUniv = function ($student) use ($university) {
+            if (! app(UniversityResolver::class)->belongsTo($student, $university)) {
                 return false;
             }
-            if ($user->university_id && $student->university_id && (int) $user->university_id === (int) $student->university_id) {
-                return true;
-            }
-            if ($university) {
-                $studentUniv = strtolower(trim($student->university ?? ''));
-                $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
-                $targetUnivName = strtolower(trim($university->name ?? ''));
-                $targetUnivCode = strtolower(trim($university->code ?? ''));
 
-                if (
-                    ($studentUniv && ($studentUniv === $targetUnivName || $studentUniv === $targetUnivCode)) ||
-                    ($studentProfileUniv && ($studentProfileUniv === $targetUnivName || $studentProfileUniv === $targetUnivCode)) ||
-                    ($targetUnivName && (str_contains($studentUniv, $targetUnivName) || str_contains($targetUnivName, $studentUniv))) ||
-                    ($targetUnivCode && (str_contains($studentUniv, $targetUnivCode) || str_contains($targetUnivCode, $studentUniv)))
-                ) {
-                    if (! $student->university_id && $university->id) {
-                        $student->update(['university_id' => $university->id]);
-                    }
-
-                    return true;
-                }
-            }
-            if ($user->university) {
-                $userUniv = strtolower(trim($user->university));
-                $studentUniv = strtolower(trim($student->university ?? ''));
-                $studentProfileUniv = strtolower(trim(optional($student->studentProfile)->universitas ?? ''));
-
-                if ($studentUniv === $userUniv || $studentProfileUniv === $userUniv || str_contains($studentUniv, $userUniv) || str_contains($userUniv, $studentUniv)) {
-                    return true;
-                }
+            // Data lama tanpa university_id dilengkapi setelah cocok persis
+            if (! $student->university_id) {
+                $student->update(['university_id' => $university->id]);
             }
 
-            return false;
+            return true;
         };
 
         // 1. Coba cari Placement terlebih dahulu (karena route param adalah {placementId})

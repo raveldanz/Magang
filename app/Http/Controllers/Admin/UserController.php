@@ -56,7 +56,8 @@ class UserController extends Controller
 
         // Isolasi Admin Bidang: Admin Bidang hanya boleh mengelola akun di bidangnya sendiri
         if ($current->unit_id) {
-            if ($target->unit_id && (int) $target->unit_id !== (int) $current->unit_id) {
+            // Akun staf tanpa bidang (unit_id null) dianggap di luar bidang Admin Bidang
+            if ($target->role !== 'mahasiswa' && (int) $target->unit_id !== (int) $current->unit_id) {
                 return false;
             }
             if ($target->role === 'admin' && (int) $target->id !== (int) $current->id) {
@@ -205,7 +206,7 @@ class UserController extends Controller
     {
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous())) ?? route('admin.users.index');
 
         return view('admin.users.create', compact('agencies', 'universities', 'returnTo'));
     }
@@ -298,7 +299,7 @@ class UserController extends Controller
         $this->authorizeManageUser($user);
         $agencies = AgencyProfile::all();
         $universities = University::all();
-        $returnTo = $request->query('return_to', url()->previous());
+        $returnTo = $this->safeReturnTo($request->query('return_to', url()->previous())) ?? route('admin.users.index');
 
         return view('admin.users.edit', compact('user', 'agencies', 'universities', 'returnTo'));
     }
