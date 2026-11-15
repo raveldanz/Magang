@@ -87,6 +87,22 @@ const oversizeMessage = ({ file, limit }) =>
     `Berkas "${file.name}" berukuran ${formatSize(file.size)}, melebihi batas ${formatSize(limit)}. `
     + 'Berkas tidak dikirim. Silakan kompres atau pilih berkas yang lebih kecil.';
 
+/**
+ * Foto iPhone berformat HEIC/HEIF tidak diterima server (hanya JPG/PNG/PDF) dan tidak bisa
+ * ditampilkan sebagian besar browser. Tolak di tempat dengan petunjuk, daripada gagal setelah unggah.
+ */
+const heicFile = (input) => {
+    if (/hei[cf]/i.test(input.accept || '')) return null;
+    for (const file of input.files || []) {
+        if (/\.hei[cf]$/i.test(file.name) || /^image\/hei[cf]/i.test(file.type)) return file;
+    }
+    return null;
+};
+
+const heicMessage = (file) =>
+    `Berkas "${file.name}" berformat HEIC (foto iPhone) dan tidak didukung. Berkas tidak dikirim. `
+    + 'Pilih foto langsung dari Galeri/Foto agar otomatis menjadi JPG, atau ubah dulu ke JPG atau PNG.';
+
 const clearInput = (input) => {
     input.value = '';
     // Beri tahu komponen Alpine (nama berkas/pratinjau) bahwa pilihan dikosongkan.
@@ -97,6 +113,12 @@ function onFileChange(event) {
     const input = event.target;
     if (!isGuarded(input) || event.detail?.uploadGuard) return;
     // Fase bubble: penangan bawaan kolom (bila ada) sudah berjalan; jika ia sudah mengosongkan, selesai.
+    const heic = heicFile(input);
+    if (heic) {
+        clearInput(input);
+        notify(heicMessage(heic));
+        return;
+    }
     const problem = oversizedFile(input);
     if (!problem) return;
     clearInput(input);
@@ -108,6 +130,8 @@ export function uploadProblem(form) {
     let total = 0;
     for (const input of form.querySelectorAll('input[type="file"]')) {
         if (!isGuarded(input) || input.disabled) continue;
+        const heic = heicFile(input);
+        if (heic) return { input, message: heicMessage(heic) };
         const problem = oversizedFile(input);
         if (problem) return { input, message: oversizeMessage(problem) };
         for (const file of input.files || []) total += file.size;

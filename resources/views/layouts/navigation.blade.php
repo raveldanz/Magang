@@ -357,7 +357,8 @@
                         <div class="space-y-1.5 max-h-72 overflow-y-auto">
                             @forelse($navQuickNotifs as $qn)
                                 <a href="{{ $qn['action_url'] ?? route('notifications.index') }}" class="flex items-start gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition block">
-                                    <span class="text-xl shrink-0 mt-0.5">{{ $qn['icon'] ?? '' }}</span>
+                                    {{-- Ikon garis, bukan emoji tersimpan ($qn['icon']): tampilan peran senior tanpa emoji --}}
+                                    <svg class="w-5 h-5 shrink-0 mt-0.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg>
                                     <div class="space-y-0.5 overflow-hidden">
                                         <div class="text-xs font-bold text-slate-800 truncate">{{ $qn['title'] }}</div>
                                         <div class="text-[11px] text-slate-500 line-clamp-1">{{ $qn['message'] }}</div>

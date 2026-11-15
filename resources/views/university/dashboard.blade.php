@@ -266,7 +266,7 @@
                                 <div class="font-semibold text-slate-900 text-xs">{{ $dosen->name }}</div>
                                 <div class="text-[11px] text-slate-400 font-mono">{{ $dosen->email }}</div>
                                 <button type="button" 
-                                        @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '{{ $dosen->id }}' }"
+                                        @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: @js((string) ($student->name)), currentAdvisorId: '{{ $dosen->id }}' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer">
                                     Ganti Dosen
                                 </button>
@@ -277,7 +277,7 @@
                                     </span>
                                 </div>
                                 <button type="button" 
-                                        @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: '{{ addslashes($student->name) }}', currentAdvisorId: '' }"
+                                        @click="assignModal = { show: true, appId: '{{ $app->id }}', studentName: @js((string) ($student->name)), currentAdvisorId: '' }"
                                         class="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md inline-block cursor-pointer">
                                     + Pilih Dosen
                                 </button>

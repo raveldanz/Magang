@@ -160,8 +160,8 @@
                                             <button type="button" 
                                                     @click="$dispatch('open-reset-modal', {
                                                         action: '{{ route('admin.mentors.reset_password', $m->id) }}',
-                                                        name: '{{ addslashes($m->name) }}',
-                                                        email: '{{ addslashes($m->email) }}',
+                                                        name: @js((string) ($m->name)),
+                                                        email: @js((string) ($m->email)),
                                                         role: 'MENTOR LAPANGAN'
                                                     })" 
                                                     class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white" 
@@ -174,7 +174,7 @@
                                                     @click="$dispatch('open-delete-modal', {
                                                         action: '{{ route('admin.mentors.destroy', $m->id) }}',
                                                         title: 'Hapus Mentor Lapangan',
-                                                        name: '{{ addslashes($m->name) }}',
+                                                        name: @js((string) ($m->name)),
                                                         desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile?->agency_name ?? 'Dinas Terkait') }}'
                                                     })" 
                                                     class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"
@@ -268,8 +268,8 @@
                                 <button type="button" 
                                         @click="$dispatch('open-reset-modal', {
                                             action: '{{ route('admin.mentors.reset_password', $m->id) }}',
-                                            name: '{{ addslashes($m->name) }}',
-                                            email: '{{ addslashes($m->email) }}',
+                                            name: @js((string) ($m->name)),
+                                            email: @js((string) ($m->email)),
                                             role: 'MENTOR LAPANGAN'
                                         })" 
                                         class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"
@@ -283,7 +283,7 @@
                                         @click="$dispatch('open-delete-modal', {
                                             action: '{{ route('admin.mentors.destroy', $m->id) }}',
                                             title: 'Hapus Mentor Lapangan',
-                                            name: '{{ addslashes($m->name) }}',
+                                            name: @js((string) ($m->name)),
                                             desc: 'NIP: {{ $m->nip ?? '-' }} &bull; Instansi: {{ addslashes($m->agencyProfile?->agency_name ?? 'Dinas Terkait') }}'
                                         })" 
                                         class="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer"

@@ -165,6 +165,16 @@ class LogbookController extends Controller
             'attachment.max' => 'Ukuran file lampiran logbook maksimal 2MB (2048 KB).',
         ]);
 
+        // Tombol Kembali browser menampilkan lagi form yang masih terisi; kirim ulang jangan membuat entri kembar.
+        $sudahTersimpan = Logbook::where('placement_id', $placement->id)
+            ->whereDate('date', $request->date)
+            ->where('activity', $request->activity)
+            ->exists();
+        if ($sudahTersimpan) {
+            return redirect()->route('student.logbook.index')
+                ->with('warning', 'Logbook dengan tanggal dan uraian yang sama sudah tersimpan, jadi tidak disimpan dua kali.');
+        }
+
         $filePath = null;
         if ($request->hasFile('attachment')) {
             $filePath = app(PrivateDocumentStorage::class)->store($request->file('attachment'), PrivateDocumentStorage::LOGBOOK_DIR);

@@ -143,14 +143,14 @@
                                                         <span class="stt-name text-indigo-700" title="{{ $dosen->name }}">{{ $dosen->name }}</span>
                                                         @if($isSuperAdmin && $latestApp)
                                                             <button type="button"
-                                                                    @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
+                                                                    @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
                                                                     class="stt-link" title="Ganti Dosen Pembimbing" aria-label="Ganti Dosen Pembimbing">
                                                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 16.536 9 17l.464-3.536z"/></svg>
                                                             </button>
                                                         @endif
                                                     @elseif($canAssignDpl)
                                                         <button type="button"
-                                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
+                                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
                                                                 class="stt-assign">+ Tugaskan Dosen</button>
                                                     @else
                                                         <span class="stt-empty">Belum ada</span>
@@ -265,7 +265,7 @@
                                     <div class="mfield-value">{{ $dosen->name ?? '-' }}</div>
                                     @if($isSuperAdmin && $latestApp && ($dosen || in_array($mSt, ['accepted', 'active'], true)))
                                         <button type="button"
-                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = '{{ addslashes($student->name) }}'; showAssignAdvisorModal = true;"
+                                                @click="selectedApplicationId = {{ $latestApp->id }}; selectedStudentName = @js((string) ($student->name)); showAssignAdvisorModal = true;"
                                                 class="cc-link" style="margin-top:2px">{{ $dosen ? 'Ganti Dosen' : '+ Tugaskan Dosen' }}</button>
                                     @endif
                                 </div>

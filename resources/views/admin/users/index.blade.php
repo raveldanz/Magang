@@ -232,7 +232,7 @@
                                         @if($canSelect)
                                             <input type="checkbox" 
                                                    :checked="isSelected({{ $u->id }})" 
-                                                   @change="toggleSelectUser({ id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ addslashes($u->email) }}', role: '{{ $u->role }}' })"
+                                                   @change="toggleSelectUser({ id: {{ $u->id }}, name: @js((string) ($u->name)), email: @js((string) ($u->email)), role: '{{ $u->role }}' })"
                                                    class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
                                         @else
                                             <span class="inline-flex text-slate-300 cursor-not-allowed" title="Akun Super Admin / Akun Sendiri Dilindungi">
@@ -361,9 +361,9 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                            name: @js((string) ($u->name)),
+                                                            email: @js((string) ($u->email)),
+                                                            role: @js((string) ($u->roleLabel()))
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-600 hover:text-white cursor-pointer" 
                                                         title="Reset password ke default: password">
@@ -377,7 +377,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
+                                                            name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white cursor-pointer" 
@@ -437,7 +437,7 @@
                                             @if($canSelect)
                                                 <input type="checkbox" 
                                                        :checked="isSelected({{ $u->id }})" 
-                                                       @change="toggleSelectUser({ id: {{ $u->id }}, name: '{{ addslashes($u->name) }}', email: '{{ addslashes($u->email) }}', role: '{{ $u->role }}' })"
+                                                       @change="toggleSelectUser({ id: {{ $u->id }}, name: @js((string) ($u->name)), email: @js((string) ($u->email)), role: '{{ $u->role }}' })"
                                                        class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
                                             @else
                                                 <span class="inline-flex text-slate-300 cursor-not-allowed" title="Akun Super Admin / Akun Sendiri Dilindungi">
@@ -561,9 +561,9 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                            name: @js((string) ($u->name)),
+                                                            email: @js((string) ($u->email)),
+                                                            role: @js((string) ($u->roleLabel()))
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
                                                         title="Reset password ke default: password">
@@ -578,7 +578,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
+                                                            name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -603,9 +603,9 @@
                                                 <button type="button" 
                                                         @click="$dispatch('open-reset-modal', {
                                                             action: '{{ route('admin.users.reset_password', $u->id) }}',
-                                                            name: '{{ addslashes($u->name) }}',
-                                                            email: '{{ addslashes($u->email) }}',
-                                                            role: '{{ addslashes($u->roleLabel()) }}'
+                                                            name: @js((string) ($u->name)),
+                                                            email: @js((string) ($u->email)),
+                                                            role: @js((string) ($u->roleLabel()))
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" 
                                                         title="Reset password ke default: password">
@@ -620,7 +620,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.users.destroy', $u->id) }}',
                                                             title: 'Hapus Akun Pengguna',
-                                                            name: '{{ addslashes($u->name) }}',
+                                                            name: @js((string) ($u->name)),
                                                             desc: 'Email: {{ $u->email }} &bull; Role: {{ addslashes($u->roleLabel()) }}'
                                                         })" 
                                                         class="w-full py-2 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -764,8 +764,8 @@
                         @endphp
                         {
                             id: {{ $u->id }},
-                            name: '{{ addslashes($u->name) }}',
-                            email: '{{ addslashes($u->email) }}',
+                            name: @js((string) ($u->name)),
+                            email: @js((string) ($u->email)),
                             role: '{{ $u->role }}',
                             selectable: {{ $canSelect ? 'true' : 'false' }}
                         },

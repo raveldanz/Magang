@@ -135,7 +135,11 @@ $zip = Join-Path $OutDir "$name.zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Info 'Memampatkan (bisa 1-2 menit)...'
 Push-Location $stage
-& tar.exe -a -c -f $zip 'SIP-MAGANG'
+# Jalur lengkap: bila skrip dipanggil dari Git Bash, "tar.exe" jatuh ke GNU tar yang tidak bisa membuat zip
+# dan menganggap "C:\..." sebagai alamat host.
+$tarExe = Join-Path $env:SystemRoot 'System32\tar.exe'
+if (-not (Test-Path $tarExe)) { $tarExe = 'tar.exe' }
+& $tarExe -a -c -f $zip 'SIP-MAGANG'
 $tarCode = $LASTEXITCODE
 Pop-Location
 if ($tarCode -ne 0 -or -not (Test-Path $zip)) { Fail 'Gagal membuat zip.' }

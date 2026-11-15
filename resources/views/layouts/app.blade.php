@@ -123,16 +123,16 @@
             toasts: [],
             init() {
                 @if(session('success'))
-                    this.add('success', '{{ addslashes(session('success')) }}');
+                    this.add('success', @js((string) (session('success'))));
                 @endif
                 @if(session('error'))
-                    this.add('error', '{{ addslashes(session('error')) }}');
+                    this.add('error', @js((string) (session('error'))));
                 @endif
                 @if(session('warning'))
-                    this.add('warning', '{{ addslashes(session('warning')) }}');
+                    this.add('warning', @js((string) (session('warning'))));
                 @endif
                 @if(session('status'))
-                    this.add('info', '{{ addslashes(session('status')) }}');
+                    this.add('info', @js((string) (session('status'))));
                 @endif
             },
             add(type, message) {

@@ -190,7 +190,7 @@
                                                 @click="$dispatch('open-delete-modal', {
                                                     action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                     title: 'Hapus Unit Bidang',
-                                                    name: '{{ addslashes($unit->name) }}',
+                                                    name: @js((string) ($unit->name)),
                                                     desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                 })"
                                                 class="mbtn mbtn-danger">Hapus</button>
@@ -325,7 +325,7 @@
                                                         @click="$dispatch('open-delete-modal', {
                                                             action: '{{ route('admin.units.destroy', $unit->id) }}',
                                                             title: 'Hapus Unit Bidang',
-                                                            name: '{{ addslashes($unit->name) }}',
+                                                            name: @js((string) ($unit->name)),
                                                             desc: 'Instansi: {{ addslashes($unit->agencyProfile?->agency_name ?? 'Dispusip Surabaya') }} &bull; Kuota: {{ $unit->quota }}'
                                                         })" 
                                                         class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white"

@@ -287,4 +287,22 @@ class Phase2SupervisionStorageCertificateTest extends TestCase
             ->assertForbidden()
             ->assertSee('Status magang belum dinyatakan lulus');
     }
+
+    public function test_logbook_kembar_dari_tombol_kembali_tidak_disimpan_dua_kali(): void
+    {
+        $placement = $this->placement('active', ['mentor_id' => $this->assignedMentor->id]);
+        $isian = ['date' => now()->toDateString(), 'activity' => 'Menata koleksi referensi dan memperbarui katalog.'];
+
+        $this->actingAs($this->student)->post(route('student.logbook.store'), $isian)
+            ->assertRedirect(route('student.logbook.index'))->assertSessionHas('success');
+        // Kirim ulang isi yang sama (tombol Kembali lalu Simpan lagi).
+        $this->actingAs($this->student)->post(route('student.logbook.store'), $isian)
+            ->assertRedirect(route('student.logbook.index'))->assertSessionHas('warning');
+        $this->assertSame(1, Logbook::where('placement_id', $placement->id)->count());
+
+        // Kegiatan lain di tanggal yang sama tetap boleh.
+        $this->actingAs($this->student)->post(route('student.logbook.store'), ['activity' => 'Rapat koordinasi bidang layanan.'] + $isian)
+            ->assertSessionHas('success');
+        $this->assertSame(2, Logbook::where('placement_id', $placement->id)->count());
+    }
 }

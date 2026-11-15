@@ -124,9 +124,9 @@
                                     <button type="button" 
                                             @click="editLecturer = { 
                                                 id: '{{ $l->id }}', 
-                                                name: '{{ addslashes($l->name) }}', 
-                                                email: '{{ addslashes($l->email) }}', 
-                                                nidn: '{{ addslashes($l->studentProfile?->nim ?? ($l->nidn ?? '')) }}', 
+                                                name: @js((string) ($l->name)), 
+                                                email: @js((string) ($l->email)), 
+                                                nidn: @js((string) ($l->studentProfile?->nim ?? ($l->nidn ?? ''))), 
                                                 status: '{{ $l->status ?? 'active' }}' 
                                             }; showEditModal = true"
                                             class="inline-flex items-center justify-center h-6 px-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-[10px] rounded-lg transition">
@@ -148,7 +148,7 @@
                                             @click="$dispatch('open-delete-modal', {
                                                 action: '{{ route('university.lecturers.destroy', $l->id) }}',
                                                 title: 'Hapus Dosen Pembimbing',
-                                                name: '{{ addslashes($l->name) }}',
+                                                name: @js((string) ($l->name)),
                                                 desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
                                             })"
                                             class="inline-flex items-center justify-center h-6 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px] rounded-lg transition cursor-pointer">
@@ -200,9 +200,9 @@
                                             <button type="button" 
                                                     @click="editLecturer = { 
                                                         id: '{{ $l->id }}', 
-                                                        name: '{{ addslashes($l->name) }}', 
-                                                        email: '{{ addslashes($l->email) }}', 
-                                                        nidn: '{{ addslashes($l->studentProfile?->nim ?? ($l->nidn ?? '')) }}', 
+                                                        name: @js((string) ($l->name)), 
+                                                        email: @js((string) ($l->email)), 
+                                                        nidn: @js((string) ($l->studentProfile?->nim ?? ($l->nidn ?? ''))), 
                                                         status: '{{ $l->status ?? 'active' }}' 
                                                     }; showEditModal = true"
                                                     class="inline-flex items-center justify-center h-7 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-lg text-xs transition cursor-pointer">
@@ -224,7 +224,7 @@
                                                     @click="$dispatch('open-delete-modal', {
                                                         action: '{{ route('university.lecturers.destroy', $l->id) }}',
                                                         title: 'Hapus Dosen Pembimbing',
-                                                        name: '{{ addslashes($l->name) }}',
+                                                        name: @js((string) ($l->name)),
                                                         desc: 'NIDN/NIP: {{ $l->nidn ?? '-' }} &bull; Email: {{ $l->email }}'
                                                     })"
                                                     class="inline-flex items-center justify-center h-7 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-lg text-xs transition cursor-pointer">

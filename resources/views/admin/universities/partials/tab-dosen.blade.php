@@ -94,7 +94,7 @@
                                                             @click="$dispatch('open-delete-modal', {
                                                                 action: '{{ route('admin.universities.dosens.destroy', [$university->id, $dosen->id]) }}',
                                                                 title: 'Hapus Dosen Pembimbing',
-                                                                name: '{{ addslashes($dosen->name) }}',
+                                                                name: @js((string) ($dosen->name)),
                                                                 desc: 'Email: {{ $dosen->email }} &bull; {{ $dosen->total_students_count }} Mahasiswa Bimbingan'
                                                             })" 
                                                             class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-150 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white hover:border-rose-600 cursor-pointer"
@@ -159,7 +159,7 @@
                                                 @click="$dispatch('open-delete-modal', {
                                                     action: '{{ route('admin.universities.dosens.destroy', [$university->id, $dosen->id]) }}',
                                                     title: 'Hapus Dosen Pembimbing',
-                                                    name: '{{ addslashes($dosen->name) }}',
+                                                    name: @js((string) ($dosen->name)),
                                                     desc: 'Email: {{ $dosen->email }} &bull; {{ $dosen->total_students_count }} Mahasiswa Bimbingan'
                                                 })"
                                                 class="mbtn mbtn-danger">Hapus</button>
