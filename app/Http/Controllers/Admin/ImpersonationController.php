@@ -57,8 +57,14 @@ class ImpersonationController extends Controller
             ?? $request->headers->get('referer')
             ?? url()->previous();
 
-        if ($returnTo && (str_contains($returnTo, '/login') || str_contains($returnTo, '/impersonate'))) {
-            $returnTo = null;
+        if ($returnTo) {
+            $parsedHost = parse_url($returnTo, PHP_URL_HOST);
+            $isSafeRelative = str_starts_with($returnTo, '/') && ! str_starts_with($returnTo, '//');
+            $isSafeSameHost = $parsedHost !== null && strcasecmp((string) $parsedHost, (string) $request->getHost()) === 0;
+
+            if ((! $isSafeRelative && ! $isSafeSameHost) || str_contains($returnTo, '/login') || str_contains($returnTo, '/impersonate')) {
+                $returnTo = null;
+            }
         }
 
         // Login sebagai target user + buat ID sesi baru (mencegah session fixation)
@@ -78,6 +84,7 @@ class ImpersonationController extends Controller
         $role = $targetUser->role;
         $targetRoute = match ($role) {
             'admin' => route('admin.dashboard'),
+            'supervisor' => route('supervisor.dashboard'),
             'mentor', 'pembimbing' => route('mentor.dashboard'),
             'dosen', 'academic_advisor' => route('lecturer.dashboard'),
             'universitas' => route('university.dashboard'),

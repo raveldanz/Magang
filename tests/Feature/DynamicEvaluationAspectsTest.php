@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\Evaluation;
+use App\Models\FinalReport;
+use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
 use App\Models\University;
@@ -182,12 +184,12 @@ class DynamicEvaluationAspectsTest extends TestCase
         $application = $data['application'];
 
         $application->update(['status' => 'completed']);
-        \App\Models\FinalReport::create([
+        FinalReport::create([
             'placement_id' => $placement->id,
             'file_path' => 'laporan_magang_final.pdf',
             'status' => 'approved',
         ]);
-        \App\Models\Logbook::create([
+        Logbook::create([
             'placement_id' => $placement->id,
             'date' => now()->toDateString(),
             'activity' => 'Penyusunan modul dan implementasi sistem',
@@ -226,4 +228,3 @@ class DynamicEvaluationAspectsTest extends TestCase
         $response->assertSee('Kerjasama Tim Lapangan');
     }
 }
-

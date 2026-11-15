@@ -429,7 +429,7 @@
             @endphp
             <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-xs"
                  x-data="{ 
-                     status: '{{ old('status', $currentStatusVal) }}',
+                     status: @js(old('status', $currentStatusVal)),
                      syncGroup: {{ old('sync_group', in_array($currentStatusVal, ['rejected', 'resigned'], true) ? '0' : '1') == '1' ? 'true' : 'false' }}
                  }"
                  x-init="$watch('status', val => {

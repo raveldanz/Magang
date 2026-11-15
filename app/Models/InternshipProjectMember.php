@@ -26,4 +26,3 @@ class InternshipProjectMember extends Model
         return $this->belongsTo(Placement::class, 'placement_id');
     }
 }
-

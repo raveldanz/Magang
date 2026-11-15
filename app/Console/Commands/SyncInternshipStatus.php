@@ -8,7 +8,6 @@ use App\Models\AuditLog;
 use App\Models\SystemNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class SyncInternshipStatus extends Command
 {
@@ -45,7 +44,7 @@ class SyncInternshipStatus extends Command
      */
     private function activateStartedInternships(string $today): void
     {
-        $applications = Application::with('user.studentProfile', 'unit')
+        $applications = Application::with('user.studentProfile', 'unit', 'group')
             ->where('status', ApplicationStatus::ACCEPTED)
             ->whereNotNull('start_date')
             ->whereDate('start_date', '<=', $today)
@@ -61,24 +60,12 @@ class SyncInternshipStatus extends Command
 
         $updatedCount = 0;
         foreach ($applications as $app) {
-            DB::transaction(function () use ($app, &$updatedCount) {
-                $app->update([
-                    'status' => ApplicationStatus::ACTIVE,
-                ]);
-
-                AuditLog::record('AUTO_ACTIVATE_INTERNSHIP', 'Application', $app->id, [
-                    'student_name' => $app->user?->name,
-                    'nim' => $app->user?->studentProfile?->nim,
-                    'unit_name' => $app->unit?->name,
-                    'start_date' => $app->start_date,
-                    'activated_at' => now()->toDateTimeString(),
-                    'reason' => 'Tanggal mulai magang telah tiba (Auto-synced via scheduler)',
-                ]);
-
-                $updatedCount++;
-            });
-
-            $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Status diubah ke ACTIVE.");
+            if ($app->statusValue() === ApplicationStatus::ACCEPTED->value) {
+                if ($app->autoActivateIfStarted('AUTO_ACTIVATE_INTERNSHIP')) {
+                    $updatedCount++;
+                    $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Status diubah ke ACTIVE.");
+                }
+            }
         }
 
         $this->info("Sukses mengaktifkan {$updatedCount} peserta magang.");

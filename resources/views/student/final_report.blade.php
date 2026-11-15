@@ -438,7 +438,7 @@
                             </h3>
                         </div>
 
-                        <form action="{{ route('student.final_report.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-5">
+                        <form action="{{ route('student.final_report.store') }}" data-autosave="laporan-akhir-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-5">
                             @csrf
 
                             <div>
@@ -518,7 +518,7 @@
                                      ondragleave="handleDragLeave(event)" 
                                      ondrop="handleFileDrop(event)"
                                      class="relative border-2 border-dashed border-slate-300 hover:border-blue-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bg-slate-50/50 hover:bg-blue-50/40 transition cursor-pointer text-center group space-y-2 sm:space-y-3">
-                                    <input type="file" name="file_laporan" id="file_laporan" accept=".pdf,application/pdf" 
+                                    <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_FINAL_REPORT_KB }}" name="file_laporan" id="file_laporan" accept=".pdf,application/pdf" 
                                            {{ $finalReport && $finalReport->file_path ? '' : 'required' }}
                                            onchange="handleFinalReportPreview(this)"
                                            class="hidden">
@@ -880,12 +880,12 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-                    alert('Format foto harus berupa JPG, PNG, atau WebP.');
+                    window.notify('Format foto harus berupa JPG, PNG, atau WebP.');
                     input.value = '';
                     return;
                 }
                 if (file.size > 3 * 1024 * 1024) {
-                    alert('Ukuran foto maksimal 3 MB.');
+                    window.notify('Ukuran foto maksimal 3 MB.');
                     input.value = '';
                     return;
                 }

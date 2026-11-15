@@ -28,6 +28,9 @@ class ApplicationController extends Controller
      */
     public function index(Request $request)
     {
+        // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE (on-demand batch sync)
+        Application::syncStartedApplications();
+
         $user = Auth::user();
         $isSuperAdmin = $user->isSuperAdmin();
         $agencyId = $isSuperAdmin ? $request->agency_id : $user->agency_profile_id;
@@ -56,8 +59,10 @@ class ApplicationController extends Controller
         // Tampilkan 1 baris per pengajuan: pengajuan mandiri tampil mandiri, pengajuan kelompok diwakili ketua/baris utama kelompok
         $query->where(function ($q) {
             $q->whereNull('applications.group_id')
-                ->orWhere('applications.role_in_group', 'leader')
-                ->orWhereRaw('applications.id = (SELECT MIN(a2.id) FROM applications a2 WHERE a2.group_id = applications.group_id)');
+                ->orWhereRaw('applications.id = COALESCE(
+                    (SELECT a_lead.id FROM applications a_lead WHERE a_lead.group_id = applications.group_id AND a_lead.role_in_group = \'leader\' ORDER BY a_lead.id ASC LIMIT 1),
+                    (SELECT MIN(a_min.id) FROM applications a_min WHERE a_min.group_id = applications.group_id)
+                )');
         });
 
         // Isolasi Bidang & Multi-Tenant:
@@ -100,7 +105,12 @@ class ApplicationController extends Controller
         if ($request->filled('status')) {
             $statusVal = strtolower($request->status);
             if ($statusVal === 'action') {
-                $query->requiringAction();
+                $query->where(function ($q) {
+                    $q->requiringAction()
+                        ->orWhereHas('group.applications', function ($gq) {
+                            $gq->requiringAction();
+                        });
+                });
             } else {
                 $query->where(function ($q) use ($statusVal) {
                     $q->where('applications.status', $statusVal)
@@ -360,7 +370,7 @@ class ApplicationController extends Controller
                     $missing[] = 'Laporan Akhir belum disetujui';
                 }
                 if (! $application->has_complete_evaluation) {
-                    $missing[] = 'Penilaian (Mentor & DPL) belum tuntas diisi';
+                    $missing[] = 'Penilaian (Mentor & Dosen Pembimbing) belum tuntas diisi';
                 }
                 $missingStr = implode(' dan ', $missing);
 
@@ -400,6 +410,18 @@ class ApplicationController extends Controller
             }
         }
         $placementEligibleStatuses = ['waiting_approval', 'accepted', 'active', 'completed'];
+
+        // Auto-Elevate: jika status disetujui (accepted) namun tanggal mulai magang sudah tiba (start_date <= today), langsung aktifkan ke ACTIVE
+        $today = now()->toDateString();
+        $effectiveStartDate = $request->start_date ?: ($application->start_date ?: ($groupRef?->start_date ? $groupRef->start_date->toDateString() : null));
+        $effectiveEndDate = $request->end_date ?: ($application->end_date ?: ($groupRef?->end_date ? $groupRef->end_date->toDateString() : null));
+
+        if ($newStatus === ApplicationStatus::ACCEPTED->value
+            && $effectiveStartDate
+            && $effectiveStartDate <= $today
+            && (! $effectiveEndDate || $effectiveEndDate >= $today)) {
+            $newStatus = ApplicationStatus::ACTIVE->value;
+        }
 
         DB::transaction(function () use ($application, $newStatus, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $unit, $assignedMentorId, $isSuperAdmin, $placementEligibleStatuses, $user) {
             $appUpdateData = [
@@ -475,26 +497,24 @@ class ApplicationController extends Controller
             if ($application->group_id) {
                 $group = InternshipGroup::find($application->group_id);
                 if ($group) {
-                    $shouldSyncSiblings = $request->boolean('sync_group', true);
+                    $defaultSync = $newStatus !== ApplicationStatus::RESIGNED->value;
+                    $shouldSyncSiblings = $request->boolean('sync_group', $defaultSync);
 
                     if ($shouldSyncSiblings) {
-                        $group->update([
-                            'status' => $newStatus,
-                            'letter_number' => $appUpdateData['letter_number'] ?? $group->letter_number,
-                            'letter_date' => $appUpdateData['letter_date'] ?? $group->letter_date,
-                            'letter_token' => $group->letter_token ?: $letterToken,
-                            'rejection_reason' => $appUpdateData['rejection_reason'] ?? null,
-                        ]);
-
                         $siblingQuery = Application::where('group_id', $group->id)
                             ->where('id', '!=', $application->id);
 
                         // Jika keputusan kelompok adalah menyetujui/melanjutkan (bukan menolak seluruh kelompok),
-                        // jangan timpa anggota yang sedang ditolak berkasnya (rejected) atau mengundurkan diri (resigned).
-                        if ($newStatus !== 'rejected') {
-                            $siblingQuery->whereNotIn('status', ['rejected', 'resigned']);
+                        // jangan timpa anggota yang sedang ditolak berkasnya (rejected/resigned), dan jangan
+                        // men-downgrade anggota yang statusnya sudah lebih maju (mis. sudah accepted/active/completed).
+                        if ($newStatus === ApplicationStatus::WAITING_APPROVAL->value) {
+                            $siblingQuery->whereIn('status', ['pending', 'waiting_approval']);
+                        } elseif ($newStatus === ApplicationStatus::ACCEPTED->value || $newStatus === ApplicationStatus::ACTIVE->value) {
+                            $siblingQuery->whereIn('status', ['pending', 'waiting_approval', 'accepted']);
+                        } elseif ($newStatus !== 'rejected') {
+                            $siblingQuery->whereNotIn('status', ['rejected', 'resigned', 'completed']);
                         } else {
-                            $siblingQuery->whereNotIn('status', ['completed', 'resigned']);
+                            $siblingQuery->whereNotIn('status', ['active', 'completed', 'resigned']);
                         }
 
                         $siblingApps = $siblingQuery->get();
@@ -520,30 +540,30 @@ class ApplicationController extends Controller
                                 }
                             }
                         }
-                    } else {
-                        // Pembaruan individu: perbarui status agregat kelompok berdasarkan anggota yang masih aktif (tidak ditolak/resigned)
-                        $allStatuses = Application::where('group_id', $group->id)
-                            ->pluck('status')
-                            ->map(fn ($s) => $s instanceof ApplicationStatus ? $s->value : (string) $s);
-                        $nonRejectedStatuses = $allStatuses->reject(fn ($s) => in_array($s, ['rejected', 'resigned'], true))->unique();
 
-                        if ($nonRejectedStatuses->isEmpty()) {
-                            $group->update([
-                                'status' => $allStatuses->contains('rejected') ? 'rejected' : ($allStatuses->first() ?: 'rejected'),
-                                'rejection_reason' => $appUpdateData['rejection_reason'] ?? $group->rejection_reason,
-                            ]);
-                        } elseif ($nonRejectedStatuses->count() === 1) {
-                            $group->update(['status' => $nonRejectedStatuses->first()]);
-                        } elseif ($nonRejectedStatuses->contains('active')) {
-                            $group->update(['status' => 'active']);
-                        } elseif ($nonRejectedStatuses->contains('accepted')) {
-                            $group->update(['status' => 'accepted']);
-                        } elseif ($nonRejectedStatuses->contains('waiting_approval')) {
-                            $group->update(['status' => 'waiting_approval']);
-                        } elseif ($nonRejectedStatuses->contains('pending')) {
-                            $group->update(['status' => 'pending']);
+                        // Jika admin memperbarui mentor untuk seluruh kelompok, sinkronkan juga mentor ke anggota yang sudah accepted/active
+                        if ($assignedMentorId && $newStatus !== 'rejected') {
+                            $alreadyApprovedSiblings = Application::where('group_id', $group->id)
+                                ->where('id', '!=', $application->id)
+                                ->whereIn('status', ['accepted', 'active'])
+                                ->get();
+                            foreach ($alreadyApprovedSiblings as $approvedSibling) {
+                                Placement::where('application_id', $approvedSibling->id)->update([
+                                    'mentor_id' => $assignedMentorId,
+                                    'pembimbing_id' => $assignedMentorId,
+                                ]);
+                            }
                         }
                     }
+
+                    $this->syncAggregateGroupStatus(
+                        $group,
+                        $newStatus,
+                        $appUpdateData['rejection_reason'] ?? null,
+                        $appUpdateData['letter_number'] ?? null,
+                        $appUpdateData['letter_date'] ?? null,
+                        $letterToken
+                    );
                 }
             }
 
@@ -668,14 +688,32 @@ class ApplicationController extends Controller
             $newStatus = ApplicationStatus::WAITING_APPROVAL->value;
         }
 
+        // Auto-Elevate Kelompok: jika status disetujui (accepted) namun tanggal mulai magang kelompok sudah tiba (start_date <= today), langsung aktifkan ke ACTIVE
+        $today = now()->toDateString();
+        $groupStartDate = $group->start_date ? $group->start_date->toDateString() : null;
+        $groupEndDate = $group->end_date ? $group->end_date->toDateString() : null;
+        if ($newStatus === ApplicationStatus::ACCEPTED->value && $groupStartDate && $groupStartDate <= $today && (! $groupEndDate || $groupEndDate >= $today)) {
+            $newStatus = ApplicationStatus::ACTIVE->value;
+        }
+
         $targetApplications = $group->applications;
-        if ($newStatus !== 'rejected') {
+        if ($newStatus === ApplicationStatus::WAITING_APPROVAL->value) {
+            $targetApplications = $group->applications->filter(fn ($a) => in_array($a->statusValue(), ['pending', 'waiting_approval'], true));
+            if ($targetApplications->isEmpty() && ! $request->filled('mentor_id')) {
+                return redirect()->back()->with('error', 'Tidak ada anggota berstatus menunggu verifikasi yang dapat diajukan.');
+            }
+        } elseif (in_array($newStatus, [ApplicationStatus::ACCEPTED->value, ApplicationStatus::ACTIVE->value], true)) {
+            $targetApplications = $group->applications->filter(fn ($a) => in_array($a->statusValue(), ['pending', 'waiting_approval', 'accepted'], true));
+            if ($targetApplications->isEmpty() && ! $request->filled('mentor_id')) {
+                return redirect()->back()->with('error', 'Seluruh anggota dalam kelompok ini berstatus ditolak/mengundurkan diri. Tidak ada anggota aktif yang dapat disetujui.');
+            }
+        } elseif ($newStatus !== 'rejected') {
             $targetApplications = $group->applications->reject(fn ($a) => in_array($a->statusValue(), ['rejected', 'resigned'], true));
             if ($targetApplications->isEmpty()) {
                 return redirect()->back()->with('error', 'Seluruh anggota dalam kelompok ini berstatus ditolak/mengundurkan diri. Tidak ada anggota aktif yang dapat disetujui.');
             }
         } else {
-            $targetApplications = $group->applications->reject(fn ($a) => in_array($a->statusValue(), ['completed', 'resigned'], true));
+            $targetApplications = $group->applications->reject(fn ($a) => in_array($a->statusValue(), ['active', 'completed', 'resigned'], true));
         }
 
         $year = date('Y');
@@ -683,27 +721,20 @@ class ApplicationController extends Controller
         $letterToken = $group->letter_token ?: Str::random(32);
 
         DB::transaction(function () use ($group, $targetApplications, $newStatus, $request, $year, $letterDate, $letterToken) {
-            $group->update([
-                'status' => $newStatus,
-                'rejection_reason' => $newStatus === 'rejected' ? $request->rejection_note : null,
-                'letter_date' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($group->letter_date ?: $letterDate) : null,
-                'letter_token' => in_array($newStatus, ['waiting_approval', 'accepted']) ? $letterToken : $group->letter_token,
-            ]);
-
             foreach ($targetApplications as $app) {
                 $paddedId = str_pad($app->id, 3, '0', STR_PAD_LEFT);
-                $autoLetterNumber = "500.12.1/{$paddedId}/436.7.14/{$year}";
+                $autoLetterNumber = $group->letter_number ?: "500.12.1/{$paddedId}/436.7.14/{$year}";
 
                 $app->update([
                     'status' => $newStatus,
                     'rejection_note' => $newStatus === 'rejected' ? $request->rejection_note : null,
                     'rejection_reason' => $newStatus === 'rejected' ? $request->rejection_note : null,
-                    'letter_number' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($app->letter_number ?: $autoLetterNumber) : null,
-                    'letter_date' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($app->letter_date ?: $letterDate) : null,
-                    'letter_token' => in_array($newStatus, ['waiting_approval', 'accepted']) ? ($app->letter_token ?: Str::random(32)) : $app->letter_token,
+                    'letter_number' => in_array($newStatus, ['waiting_approval', 'accepted', 'active']) ? ($app->letter_number ?: $autoLetterNumber) : null,
+                    'letter_date' => in_array($newStatus, ['waiting_approval', 'accepted', 'active']) ? ($app->letter_date ?: $letterDate) : null,
+                    'letter_token' => in_array($newStatus, ['waiting_approval', 'accepted', 'active']) ? ($app->letter_token ?: Str::random(32)) : $app->letter_token,
                 ]);
 
-                if (in_array($newStatus, ['waiting_approval', 'accepted'])) {
+                if (in_array($newStatus, ['waiting_approval', 'accepted', 'active'])) {
                     $existingPlacement = Placement::where('application_id', $app->id)->first();
                     $placementData = [
                         'certificate_hash' => $existingPlacement?->certificate_hash ?: Str::random(32),
@@ -731,6 +762,27 @@ class ApplicationController extends Controller
                     NotificationService::notifySupervisorForApplication($app);
                 }
             }
+
+            if ($request->filled('mentor_id') && $newStatus !== 'rejected') {
+                $alreadyApproved = Application::where('group_id', $group->id)
+                    ->whereIn('status', ['accepted', 'active'])
+                    ->pluck('id');
+                if ($alreadyApproved->isNotEmpty()) {
+                    Placement::whereIn('application_id', $alreadyApproved)->update([
+                        'mentor_id' => $request->mentor_id,
+                        'pembimbing_id' => $request->mentor_id,
+                    ]);
+                }
+            }
+
+            $this->syncAggregateGroupStatus(
+                $group,
+                $newStatus,
+                $newStatus === 'rejected' ? $request->rejection_note : null,
+                $group->letter_number,
+                in_array($newStatus, ['waiting_approval', 'accepted', 'active']) ? ($group->letter_date ?: $letterDate) : null,
+                in_array($newStatus, ['waiting_approval', 'accepted', 'active']) ? $letterToken : $group->letter_token
+            );
         });
 
         return redirect()->back()->with('success', 'Status kelompok dan seluruh anggotanya berhasil diperbarui!');
@@ -786,6 +838,16 @@ class ApplicationController extends Controller
 
             $oldStatus = $application->status instanceof ApplicationStatus ? $application->status->value : strtolower((string) $application->status);
 
+            // Jika baris utama kelompok (ketua) sudah diproses/ditolak, namun masih ada anggota kelompok yang pending/waiting_approval, arahkan ke anggota tersebut
+            if (! in_array($oldStatus, ['pending', 'waiting_approval'], true) && $application->group) {
+                $pendingMember = $application->group->applications
+                    ->first(fn ($m) => in_array($m->statusValue(), ['pending', 'waiting_approval'], true));
+                if ($pendingMember) {
+                    $application = Application::with(['unit', 'placement', 'user', 'group.applications'])->find($pendingMember->id) ?? $application;
+                    $oldStatus = $application->statusValue();
+                }
+            }
+
             // Hanya bisa terima/tolak jika status pending atau waiting_approval
             if (! in_array($oldStatus, ['pending', 'waiting_approval'], true)) {
                 $failCount++;
@@ -799,7 +861,7 @@ class ApplicationController extends Controller
             if ($action === 'accepted') {
                 if ($unit) {
                     $groupSize = $application->group
-                        ? $application->group->applications()->whereNotIn('status', ['rejected', 'resigned'])->count()
+                        ? max(1, $application->group->applications()->whereIn('status', ['pending', 'waiting_approval'])->count())
                         : 1;
                     $overlappingInterns = $unit->applications()
                         ->whereIn('status', ['accepted', 'active'])
@@ -840,23 +902,31 @@ class ApplicationController extends Controller
                 $effectiveAction = ApplicationStatus::WAITING_APPROVAL->value;
             }
 
+            $today = now()->toDateString();
+            if ($effectiveAction === ApplicationStatus::ACCEPTED->value
+                && $application->start_date
+                && $application->start_date <= $today
+                && (! $application->end_date || $application->end_date >= $today)) {
+                $effectiveAction = ApplicationStatus::ACTIVE->value;
+            }
+
             DB::transaction(function () use ($application, $effectiveAction, $oldStatus, $request, $autoLetterNumber, $letterToken, $paddedId, $year, $assignedMentorId, $isSuperAdmin) {
                 $application->update([
                     'status' => $effectiveAction,
                     'rejection_note' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
                     'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
-                    'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($application->letter_number ?: $autoLetterNumber) : null,
-                    'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($application->letter_date ?: date('Y-m-d')) : null,
-                    'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? $letterToken : $application->letter_token,
+                    'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($application->letter_number ?: $autoLetterNumber) : null,
+                    'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($application->letter_date ?: date('Y-m-d')) : null,
+                    'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? $letterToken : $application->letter_token,
                 ]);
 
-                if (in_array($effectiveAction, ['waiting_approval', 'accepted']) || $assignedMentorId) {
+                if (in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) || $assignedMentorId) {
                     $placementData = [];
                     if ($assignedMentorId) {
                         $placementData['mentor_id'] = $assignedMentorId;
                         $placementData['pembimbing_id'] = $assignedMentorId;
                     }
-                    if (in_array($effectiveAction, ['waiting_approval', 'accepted'])) {
+                    if (in_array($effectiveAction, ['waiting_approval', 'accepted', 'active'])) {
                         $existingPlacement = Placement::where('application_id', $application->id)->first();
                         $placementData['certificate_hash'] = $existingPlacement?->certificate_hash ?: Str::random(32);
                         $placementData['certificate_number'] = $existingPlacement?->certificate_number ?: "SERT/{$paddedId}/PEMKOT-SBY/{$year}";
@@ -876,20 +946,16 @@ class ApplicationController extends Controller
                 if ($application->group_id) {
                     $group = InternshipGroup::find($application->group_id);
                     if ($group) {
-                        $group->update([
-                            'status' => $effectiveAction,
-                            'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($group->letter_number ?: $autoLetterNumber) : null,
-                            'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($group->letter_date ?: date('Y-m-d')) : null,
-                            'letter_token' => $group->letter_token ?: $letterToken,
-                            'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
-                        ]);
-
                         $siblingQuery = Application::where('group_id', $group->id)
                             ->where('id', '!=', $application->id);
-                        if ($effectiveAction !== 'rejected') {
-                            $siblingQuery->whereNotIn('status', ['rejected', 'resigned']);
+                        if ($effectiveAction === ApplicationStatus::WAITING_APPROVAL->value) {
+                            $siblingQuery->whereIn('status', ['pending', 'waiting_approval']);
+                        } elseif (in_array($effectiveAction, [ApplicationStatus::ACCEPTED->value, ApplicationStatus::ACTIVE->value], true)) {
+                            $siblingQuery->whereIn('status', ['pending', 'waiting_approval', 'accepted']);
+                        } elseif ($effectiveAction !== 'rejected') {
+                            $siblingQuery->whereNotIn('status', ['rejected', 'resigned', 'completed']);
                         } else {
-                            $siblingQuery->whereNotIn('status', ['completed', 'resigned']);
+                            $siblingQuery->whereNotIn('status', ['active', 'completed', 'resigned']);
                         }
                         $siblingApps = $siblingQuery->get();
 
@@ -898,16 +964,16 @@ class ApplicationController extends Controller
                                 'status' => $effectiveAction,
                                 'rejection_note' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
                                 'rejection_reason' => $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
-                                'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_number ?: $autoLetterNumber) : null,
-                                'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_date ?: date('Y-m-d')) : null,
-                                'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted']) ? ($sibling->letter_token ?: Str::random(32)) : $sibling->letter_token,
+                                'letter_number' => in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($sibling->letter_number ?: ($group->letter_number ?: $autoLetterNumber)) : null,
+                                'letter_date' => in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($sibling->letter_date ?: date('Y-m-d')) : null,
+                                'letter_token' => in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($sibling->letter_token ?: Str::random(32)) : $sibling->letter_token,
                             ]);
 
-                            if (in_array($effectiveAction, ['waiting_approval', 'accepted']) || $assignedMentorId) {
+                            if (in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) || $assignedMentorId) {
                                 $sibPlacement = Placement::where('application_id', $sibling->id)->first();
                                 $sibPaddedId = str_pad($sibling->id, 3, '0', STR_PAD_LEFT);
                                 $sibPlacementData = $placementData ?? [];
-                                if (in_array($effectiveAction, ['waiting_approval', 'accepted'])) {
+                                if (in_array($effectiveAction, ['waiting_approval', 'accepted', 'active'])) {
                                     $sibPlacementData['certificate_hash'] = $sibPlacement?->certificate_hash ?: Str::random(32);
                                     $sibPlacementData['certificate_number'] = $sibPlacement?->certificate_number ?: "SERT/{$sibPaddedId}/PEMKOT-SBY/{$year}";
                                 }
@@ -918,6 +984,15 @@ class ApplicationController extends Controller
                                 }
                             }
                         }
+
+                        $this->syncAggregateGroupStatus(
+                            $group,
+                            $effectiveAction,
+                            $effectiveAction === 'rejected' ? $request->bulk_rejection_note : null,
+                            in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($group->letter_number ?: $autoLetterNumber) : null,
+                            in_array($effectiveAction, ['waiting_approval', 'accepted', 'active']) ? ($group->letter_date ?: date('Y-m-d')) : null,
+                            $group->letter_token ?: $letterToken
+                        );
                     }
                 }
 
@@ -950,6 +1025,63 @@ class ApplicationController extends Controller
     }
 
     /**
+     * Sinkronisasi status agregat InternshipGroup berdasarkan status seluruh anggota.
+     * Menjaga agar kelompok yang sebagian anggotanya sudah accepted/active tidak ter-downgrade
+     * ke waiting_approval saat anggota susulan yang baru memperbaiki berkas diverifikasi.
+     */
+    private function syncAggregateGroupStatus(
+        InternshipGroup $group,
+        ?string $fallbackStatus = null,
+        ?string $rejectionReason = null,
+        ?string $letterNumber = null,
+        ?string $letterDate = null,
+        ?string $letterToken = null
+    ): void {
+        $allStatuses = Application::where('group_id', $group->id)
+            ->pluck('status')
+            ->map(fn ($s) => $s instanceof ApplicationStatus ? $s->value : strtolower((string) $s));
+
+        $nonRejectedStatuses = $allStatuses->reject(fn ($s) => in_array($s, ['rejected', 'resigned'], true))->unique();
+
+        if ($nonRejectedStatuses->isEmpty()) {
+            $aggregateStatus = $allStatuses->contains('rejected')
+                ? 'rejected'
+                : ($allStatuses->first() ?: ($fallbackStatus ?: 'rejected'));
+        } elseif ($nonRejectedStatuses->count() === 1) {
+            $aggregateStatus = $nonRejectedStatuses->first();
+        } elseif ($nonRejectedStatuses->contains('active')) {
+            $aggregateStatus = 'active';
+        } elseif ($nonRejectedStatuses->contains('accepted')) {
+            $aggregateStatus = 'accepted';
+        } elseif ($nonRejectedStatuses->contains('waiting_approval')) {
+            $aggregateStatus = 'waiting_approval';
+        } elseif ($nonRejectedStatuses->contains('pending')) {
+            $aggregateStatus = 'pending';
+        } elseif ($nonRejectedStatuses->contains('completed')) {
+            $aggregateStatus = 'completed';
+        } else {
+            $aggregateStatus = $fallbackStatus ?: ($nonRejectedStatuses->first() ?: $group->status);
+        }
+
+        $groupUpdate = [
+            'status' => $aggregateStatus,
+            'rejection_reason' => $aggregateStatus === 'rejected' ? ($rejectionReason ?? $group->rejection_reason) : null,
+        ];
+
+        if ($letterNumber || $group->letter_number) {
+            $groupUpdate['letter_number'] = $group->letter_number ?: $letterNumber;
+        }
+        if ($letterDate || $group->letter_date) {
+            $groupUpdate['letter_date'] = $group->letter_date ?: $letterDate;
+        }
+        if ($letterToken || $group->letter_token) {
+            $groupUpdate['letter_token'] = $group->letter_token ?: $letterToken;
+        }
+
+        $group->update($groupUpdate);
+    }
+
+    /**
      * Cetak / Pratinjau Surat Balasan Penerimaan untuk Admin
      */
     public function downloadLetter($id)
@@ -976,5 +1108,15 @@ class ApplicationController extends Controller
         }
 
         return view('letters.acceptance', compact('application'));
+    }
+
+    /**
+     * Pemicu manual sinkronisasi status magang (ACCEPTED -> ACTIVE jika tanggal mulai magang tiba)
+     */
+    public function manualSyncStatus(Request $request)
+    {
+        $activated = Application::syncStartedApplications();
+
+        return back()->with('success', "Sinkronisasi status selesai. Sebanyak {$activated} pengajuan magang yang tanggal mulainya telah tiba berhasil diperbarui ke status ACTIVE.");
     }
 }

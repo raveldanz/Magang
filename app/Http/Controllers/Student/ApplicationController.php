@@ -45,6 +45,11 @@ class ApplicationController extends Controller
             ->latest()
             ->first();
 
+        if ($activeApplication) {
+            $activeApplication->autoActivateIfStarted();
+            $activeApplication->refresh();
+        }
+
         // 2b. Cek apakah mahasiswa sedang tergabung dalam kelompok berstatus draft
         $draftGroup = InternshipGroup::with(['leader.studentProfile', 'unit.agencyProfile', 'applications.user.studentProfile'])
             ->where('status', 'draft')
@@ -140,25 +145,45 @@ class ApplicationController extends Controller
 
         $storage = app(PrivateDocumentStorage::class);
         $proposalPath = $storage->storeApplicationDocument($request->file('surat_pengantar'));
+        $newlyUploadedPaths = [$proposalPath];
 
-        $cvPath = $request->hasFile('cv')
-            ? $storage->storeApplicationDocument($request->file('cv'))
-            : $user->studentProfile->cv_path;
+        if ($request->hasFile('cv')) {
+            $cvPath = $storage->storeApplicationDocument($request->file('cv'));
+            $newlyUploadedPaths[] = $cvPath;
+        } else {
+            $cvPath = $user->studentProfile->cv_path;
+        }
 
-        $transcriptPath = $request->hasFile('transkrip')
-            ? $storage->storeApplicationDocument($request->file('transkrip'))
-            : $user->studentProfile->transcript_path;
+        if ($request->hasFile('transkrip')) {
+            $transcriptPath = $storage->storeApplicationDocument($request->file('transkrip'));
+            $newlyUploadedPaths[] = $transcriptPath;
+        } else {
+            $transcriptPath = $user->studentProfile->transcript_path;
+        }
 
-        $idCardPath = $request->hasFile('id_card')
-            ? $storage->storeApplicationDocument($request->file('id_card'))
-            : $user->studentProfile->id_card_path;
+        if ($request->hasFile('id_card')) {
+            $idCardPath = $storage->storeApplicationDocument($request->file('id_card'));
+            $newlyUploadedPaths[] = $idCardPath;
+        } else {
+            $idCardPath = $user->studentProfile->id_card_path;
+        }
 
-        if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
-            $user->studentProfile->update(array_filter([
-                'cv_path' => $cvPath,
-                'transcript_path' => $transcriptPath,
-                'id_card_path' => $idCardPath,
-            ]));
+        // Pastikan seluruh berkas prasyarat wajib telah terpenuhi sebelum membuat pengajuan
+        if (! $cvPath || ! $transcriptPath || ! $idCardPath) {
+            $missingDocs = [];
+            if (! $cvPath) {
+                $missingDocs[] = 'CV';
+            }
+            if (! $transcriptPath) {
+                $missingDocs[] = 'Transkrip Nilai';
+            }
+            if (! $idCardPath) {
+                $missingDocs[] = 'KTM / Kartu Identitas';
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Pengajuan magang belum dapat dikirim karena berkas prasyarat ('.implode(', ', $missingDocs).') belum lengkap. Silakan lengkapi berkas pada menu Profil Saya terlebih dahulu.');
         }
 
         // Simpan Data Pengajuan dalam transaksi + kunci baris user, supaya klik ganda /
@@ -173,12 +198,20 @@ class ApplicationController extends Controller
                 return null;
             }
 
+            if ($request->hasFile('cv') || $request->hasFile('transkrip') || $request->hasFile('id_card')) {
+                $user->studentProfile->update(array_filter([
+                    'cv_path' => $cvPath,
+                    'transcript_path' => $transcriptPath,
+                    'id_card_path' => $idCardPath,
+                ]));
+            }
+
             return $this->createApplicationRecords($request, $proposalPath, $cvPath, $transcriptPath, $idCardPath);
         });
 
         if (! $application) {
-            // Pengajuan ganda dibatalkan: jangan tinggalkan berkas yatim di disk privat
-            $storage->discard([$proposalPath, $cvPath, $transcriptPath, $idCardPath]);
+            // Pengajuan ganda dibatalkan: hapus hanya berkas baru yang diunggah pada request ini (jangan hapus berkas profil!)
+            $storage->discard($newlyUploadedPaths);
 
             return redirect()->route('student.application.create')
                 ->with('error', 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.');
@@ -386,7 +419,7 @@ class ApplicationController extends Controller
             ->with('success', "Anda berhasil bergabung ke kelompok '{$group->name}'!");
     }
 
-    // Anggota keluar dari kelompok (sebelum disubmit)
+    // Anggota keluar dari kelompok (saat masih draft atau saat pengajuan kelompoknya berstatus ditolak/perlu perbaikan)
     public function leaveGroup(Request $request)
     {
         $user = Auth::user();
@@ -395,14 +428,46 @@ class ApplicationController extends Controller
             ->where('role_in_group', 'member')
             ->first();
 
-        if (! $application) {
-            return redirect()->back()->with('error', 'Anda tidak terdaftar sebagai anggota kelompok draft.');
+        if ($application) {
+            $application->delete();
+
+            return redirect()->route('student.application.create')
+                ->with('success', 'Anda telah keluar dari kelompok magang.');
         }
 
-        $application->delete();
+        $rejectedGroupApp = Application::with('group')
+            ->where('user_id', $user->id)
+            ->where('status', 'rejected')
+            ->whereNotNull('group_id')
+            ->latest()
+            ->first();
 
-        return redirect()->route('student.application.create')
-            ->with('success', 'Anda telah keluar dari kelompok magang.');
+        if ($rejectedGroupApp) {
+            DB::transaction(function () use ($rejectedGroupApp, $user) {
+                $group = $rejectedGroupApp->group;
+                if ($group && (int) $group->leader_user_id === (int) $user->id) {
+                    $nextLeaderApp = Application::where('group_id', $group->id)
+                        ->where('user_id', '!=', $user->id)
+                        ->orderByRaw("CASE WHEN status IN ('accepted', 'active', 'waiting_approval', 'pending') THEN 0 ELSE 1 END")
+                        ->first();
+
+                    if ($nextLeaderApp) {
+                        $group->update(['leader_user_id' => $nextLeaderApp->user_id]);
+                        $nextLeaderApp->update(['role_in_group' => 'leader']);
+                    }
+                }
+
+                $rejectedGroupApp->update([
+                    'group_id' => null,
+                    'role_in_group' => null,
+                ]);
+            });
+
+            return redirect()->route('student.application.create')
+                ->with('success', 'Anda telah keluar dari kelompok magang. Silakan pilih jalur pendaftaran baru di bawah ini.');
+        }
+
+        return redirect()->back()->with('error', 'Anda tidak terdaftar sebagai anggota kelompok yang dapat ditinggalkan.');
     }
 
     // Ketua mengeluarkan anggota dari kelompok (sebelum disubmit)

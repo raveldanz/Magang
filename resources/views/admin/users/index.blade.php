@@ -130,7 +130,7 @@
 
             <!-- Search & Filter Card -->
             <div class="bg-white rounded-2xl border border-gray-100 p-3.5 sm:p-4 shadow-xs">
-                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: '{{ request('role', '') }}' }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                <form method="GET" action="{{ route('admin.users.index') }}" x-data="{ role: @js(request('role', '')) }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
                     <!-- Search Input -->
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none text-slate-400" style="padding-left: 1rem !important;">

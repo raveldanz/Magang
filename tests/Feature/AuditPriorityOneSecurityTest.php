@@ -103,6 +103,24 @@ class AuditPriorityOneSecurityTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_admin_password_password_and_admin123_are_not_interchangeable(): void
+    {
+        foreach ([['password', 'admin123'], ['admin123', 'password']] as [$real, $typed]) {
+            $user = User::factory()->create([
+                'email' => 'admin@gmail.com',
+                'role' => 'super_admin',
+                'status' => 'active',
+                'password' => $real,
+            ]);
+
+            $this->post('/login', ['email' => 'admin@gmail.com', 'password' => $typed])
+                ->assertSessionHasErrors('email');
+            $this->assertGuest();
+
+            $user->forceDelete();
+        }
+    }
+
     // ---------------------------------------------------------------
     // magang.student.self-created-advisor-account-known-password
     // ---------------------------------------------------------------

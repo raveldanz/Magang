@@ -63,6 +63,8 @@
                 hidden.value = submitter.value;
                 form.appendChild(hidden);
             }
+            // Kunci tombol kirim agar tidak diklik ulang saat server lambat (resources/js/forms.js)
+            if (window.lockFormForSubmit) window.lockFormForSubmit(form);
             form.submit();
             return;
         }

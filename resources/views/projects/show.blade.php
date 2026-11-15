@@ -468,9 +468,9 @@
                                 <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
                                     @foreach($allScreenshots as $idx => $item)
                                         <button type="button" 
-                                                @click="activePhoto = '{{ $item['url'] }}'; activeTitle = '{{ $item['title'] }}'"
+                                                @click="activePhoto = @js((string) $item['url']); activeTitle = @js((string) $item['title'])"
                                                 class="relative shrink-0 w-28 sm:w-36 aspect-video rounded-xl overflow-hidden border-2 transition cursor-pointer"
-                                                :class="activePhoto === '{{ $item['url'] }}' ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-slate-200 opacity-70 hover:opacity-100 hover:border-slate-400'">
+                                                :class="activePhoto === @js((string) $item['url']) ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-slate-200 opacity-70 hover:opacity-100 hover:border-slate-400'">
                                             <img src="{{ $item['url'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">
                                             <span class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-[10px] text-white text-center py-0.5 truncate px-1 font-medium">
                                                 {{ $item['title'] }}

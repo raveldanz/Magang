@@ -84,7 +84,7 @@ class ProfanityFilterService
                 }
 
                 // Cek regex batas kata utuh (\b...\b)
-                $pattern = '/\b' . preg_quote($badWord, '/') . '\b/i';
+                $pattern = '/\b'.preg_quote($badWord, '/').'\b/i';
                 if (preg_match($pattern, $word)) {
                     return [
                         'is_clean' => false,
@@ -101,7 +101,7 @@ class ProfanityFilterService
 
         foreach (self::$badWords as $badWord) {
             // Hanya periksa kata buruk yang panjangnya minimal 3 karakter untuk stripped matching agar tidak false positive
-            if (strlen($badWord) >= 3 && !in_array($badWord, ['cok', 'cuk', 'tai', 'asu'])) {
+            if (strlen($badWord) >= 3 && ! in_array($badWord, ['cok', 'cuk', 'tai', 'asu'])) {
                 if (str_contains($stripped, $badWord) || str_contains($strippedDedup, $badWord)) {
                     // Pastikan bukan bagian dari whitelist
                     $isWhitelisted = false;
@@ -111,7 +111,7 @@ class ProfanityFilterService
                             break;
                         }
                     }
-                    if (!$isWhitelisted) {
+                    if (! $isWhitelisted) {
                         return [
                             'is_clean' => false,
                             'detected' => $badWord,
@@ -136,12 +136,14 @@ class ProfanityFilterService
     {
         $result = $text;
         foreach (self::$badWords as $badWord) {
-            $pattern = '/\b' . preg_quote($badWord, '/') . '\b/i';
+            $pattern = '/\b'.preg_quote($badWord, '/').'\b/i';
             $result = preg_replace_callback($pattern, function ($matches) {
                 $len = strlen($matches[0]);
+
                 return str_repeat('*', max($len, 3));
             }, $result);
         }
+
         return $result;
     }
 

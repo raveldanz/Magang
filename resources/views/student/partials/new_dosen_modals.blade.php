@@ -169,7 +169,7 @@
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
                         <button type="button"
-                            @click="navigator.clipboard.writeText(`{{ addslashes($waText) }}`); copied = true; setTimeout(() => copied = false, 3000)"
+                            @click="navigator.clipboard.writeText(@js((string) $waText)); copied = true; setTimeout(() => copied = false, 3000)"
                             class="w-full inline-flex justify-center items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition transform active:scale-98 cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

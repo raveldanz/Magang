@@ -217,6 +217,11 @@ class FeedbackController extends Controller
         ]);
 
         $user = Auth::user();
+        abort_unless(
+            self::canAccess($user, $feedback),
+            403,
+            'Anda tidak memiliki akses untuk menanggapi tiket masukan ini.'
+        );
 
         $feedback->update([
             'status' => $request->status,

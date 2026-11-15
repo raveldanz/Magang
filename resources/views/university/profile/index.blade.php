@@ -79,7 +79,7 @@
                                 <img id="univLogoPreview" src="{{ $currentUnivLogo }}" alt="Logo {{ $university->name }}" class="max-h-full max-w-full object-contain transition-all duration-200">
                             </div>
 
-                            <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                            <input type="file" data-max-kb="2048" name="logo" id="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                                    onchange="handleLogoPreview(this, 'univLogoPreview', '{{ $currentUnivLogo }}')"
                                    class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                             <p class="text-[10px] text-gray-400 mt-1.5">Format: PNG, JPG, WEBP, SVG. Maks 2MB.</p>
@@ -165,7 +165,7 @@
 
                 <!-- Card 3: Skema Kebijakan & Pembobotan Nilai Kampus Adaptif -->
                 <div x-data="{ 
-                        scheme: '{{ old('evaluation_scheme', $university->evaluation_scheme ?? 'mentor_only') }}',
+                        scheme: @js(old('evaluation_scheme', $university->evaluation_scheme ?? 'mentor_only')),
                         weightMentor: {{ old('weight_mentor', $university->weight_mentor ?? 100) }},
                         weightLecturer: {{ old('weight_lecturer', $university->weight_lecturer ?? 0) }},
                         dinasList: @js(array_values($university->getDinasComponents())),

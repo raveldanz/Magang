@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\InternshipProject;
-use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -91,8 +90,8 @@ class PublicProjectController extends Controller
         });
 
         // 6. Ambil Daftar Tahun Unik untuk Pilihan Filter
-        $yearExpression = $driver === 'sqlite' 
-            ? "strftime('%Y', created_at) as project_year" 
+        $yearExpression = $driver === 'sqlite'
+            ? "strftime('%Y', created_at) as project_year"
             : 'EXTRACT(YEAR FROM created_at) as project_year';
 
         $yearQuery = InternshipProject::selectRaw($yearExpression);

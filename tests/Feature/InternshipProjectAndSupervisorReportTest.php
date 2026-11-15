@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\FinalReport;
 use App\Models\InternshipProject;
 use App\Models\Placement;
+use App\Models\StudentProfile;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -194,7 +195,7 @@ class InternshipProjectAndSupervisorReportTest extends TestCase
     {
         $supervisor = User::factory()->create(['role' => 'supervisor']);
         $student = User::factory()->create(['role' => 'mahasiswa', 'name' => 'Aditya Pratama']);
-        \App\Models\StudentProfile::create([
+        StudentProfile::create([
             'user_id' => $student->id,
             'nim' => '2208101',
             'universitas' => 'Universitas Indonesia',
@@ -340,7 +341,7 @@ class InternshipProjectAndSupervisorReportTest extends TestCase
         $responseAuthNav = $this->actingAs($student)->get(route('student.final_report.index'));
         $responseAuthNav->assertStatus(200);
         // Logo points to root url ('/')
-        $responseAuthNav->assertSee('<a href="' . url('/') . '" class="flex items-center gap-2.5 sm:gap-3 group py-1.5 shrink-0"', false);
+        $responseAuthNav->assertSee('<a href="'.url('/').'" class="flex items-center gap-2.5 sm:gap-3 group py-1.5 shrink-0"', false);
         // Menu Home is present in dropdown
         $responseAuthNav->assertSee('Home');
 
@@ -357,4 +358,3 @@ class InternshipProjectAndSupervisorReportTest extends TestCase
         $responseAuthProject->assertSee('Portal Layanan Literasi Digital');
     }
 }
-

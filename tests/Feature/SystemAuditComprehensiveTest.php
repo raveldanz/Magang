@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\FinalReport;
 use App\Models\Placement;

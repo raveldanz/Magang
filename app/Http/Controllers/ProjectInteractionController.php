@@ -21,7 +21,7 @@ class ProjectInteractionController extends Controller
     {
         $guestToken = $request->session()->get('guest_project_token');
         if (! $guestToken) {
-            $guestToken = 'gst_' . Str::random(32) . '_' . substr(md5($request->ip() . $request->userAgent()), 0, 12);
+            $guestToken = 'gst_'.Str::random(32).'_'.substr(md5($request->ip().$request->userAgent()), 0, 12);
             $request->session()->put('guest_project_token', $guestToken);
         }
 
@@ -39,7 +39,7 @@ class ProjectInteractionController extends Controller
 
         $existingLike = ProjectLike::where('internship_project_id', $project->id)
             ->when($user, fn ($q) => $q->where('user_id', $user->id))
-            ->when(!$user, fn ($q) => $q->where('guest_identifier', $guestId))
+            ->when(! $user, fn ($q) => $q->where('guest_identifier', $guestId))
             ->first();
 
         if ($existingLike) {
@@ -96,12 +96,12 @@ class ProjectInteractionController extends Controller
         ]);
 
         // 2. Filter Ketat Kata Kotor dan Jorok (Tanpa False Positive)
-        $textToCheck = ($validated['author_name'] ?? '') . ' ' . $validated['comment'];
+        $textToCheck = ($validated['author_name'] ?? '').' '.$validated['comment'];
         $profanityResult = ProfanityFilterService::check($textToCheck);
 
         if (! $profanityResult['is_clean']) {
             $errorMessage = $profanityResult['message'] ?? 'Komentar mengandung kata tidak pantas. Mohon gunakan bahasa yang sopan dan santun.';
-            
+
             if ($request->expectsJson() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -203,7 +203,7 @@ class ProjectInteractionController extends Controller
 
         $existingLike = ProjectCommentLike::where('project_comment_id', $comment->id)
             ->when($user, fn ($q) => $q->where('user_id', $user->id))
-            ->when(!$user, fn ($q) => $q->where('guest_identifier', $guestId))
+            ->when(! $user, fn ($q) => $q->where('guest_identifier', $guestId))
             ->first();
 
         if ($existingLike) {
@@ -247,8 +247,8 @@ class ProjectInteractionController extends Controller
         $project->is_public = ! $project->is_public;
         $project->save();
 
-        $message = $project->is_public 
-            ? "Proyek '{$project->title}' berhasil ditampilkan ke publik." 
+        $message = $project->is_public
+            ? "Proyek '{$project->title}' berhasil ditampilkan ke publik."
             : "Proyek '{$project->title}' berhasil disembunyikan (privat).";
 
         if ($request->expectsJson() || $request->wantsJson()) {

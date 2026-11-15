@@ -62,6 +62,11 @@
                     Logbook
                 </a>
 
+                <a href="{{ route('notifications.index', ['category' => 'evaluation']) }}"
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'evaluation' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
+                    Evaluasi & Sertifikat
+                </a>
+
                 <a href="{{ route('notifications.index', ['category' => 'application']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'application' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
                     Pendaftaran

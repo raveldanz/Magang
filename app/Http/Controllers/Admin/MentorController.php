@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgencyProfile;
 use App\Models\AuditLog;
 use App\Models\Placement;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,8 +66,8 @@ class MentorController extends Controller
         $agencies = AgencyProfile::all();
         $currentAgency = $agencyId ? AgencyProfile::find($agencyId) : null;
         $units = (! $isSuperAdmin && $user->unit_id)
-            ? \App\Models\Unit::where('id', $user->unit_id)->get()
-            : \App\Models\Unit::when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->orderBy('name')->get();
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::when($agencyId, fn ($q) => $q->where('agency_profile_id', $agencyId))->orderBy('name')->get();
 
         return view('admin.mentors.index', compact('mentors', 'agencies', 'currentAgency', 'units', 'isSuperAdmin', 'agencyId'));
     }
@@ -83,8 +84,8 @@ class MentorController extends Controller
         $agencies = AgencyProfile::all();
         $currentAgency = $user->agency_profile_id ? AgencyProfile::find($user->agency_profile_id) : AgencyProfile::first();
         $units = (! $isSuperAdmin && $user->unit_id)
-            ? \App\Models\Unit::where('id', $user->unit_id)->get()
-            : \App\Models\Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
 
         return view('admin.mentors.create', compact('agencies', 'currentAgency', 'units', 'isSuperAdmin'));
     }
@@ -143,8 +144,8 @@ class MentorController extends Controller
         $agencies = AgencyProfile::all();
         $currentAgency = $mentor->agency_profile_id ? AgencyProfile::find($mentor->agency_profile_id) : AgencyProfile::first();
         $units = (! $isSuperAdmin && $user->unit_id)
-            ? \App\Models\Unit::where('id', $user->unit_id)->get()
-            : \App\Models\Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
+            ? Unit::where('id', $user->unit_id)->get()
+            : Unit::when($currentAgency, fn ($q) => $q->where('agency_profile_id', $currentAgency->id))->orderBy('name')->get();
 
         return view('admin.mentors.edit', compact('mentor', 'agencies', 'currentAgency', 'units', 'isSuperAdmin'));
     }

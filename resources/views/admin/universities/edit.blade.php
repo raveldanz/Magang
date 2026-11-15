@@ -87,7 +87,7 @@
 
                     <!-- Skema Kebijakan & Pembobotan Nilai Kampus Adaptif -->
                     <div x-data="{ 
-                            scheme: '{{ old('evaluation_scheme', $university->evaluation_scheme ?? 'mentor_only') }}',
+                            scheme: @js(old('evaluation_scheme', $university->evaluation_scheme ?? 'mentor_only')),
                             weightMentor: {{ old('weight_mentor', $university->weight_mentor ?? 100) }},
                             weightLecturer: {{ old('weight_lecturer', $university->weight_lecturer ?? 0) }},
                             dinas1: @js(old('dinas_components.1', $university->getDinasComponent(1))),
@@ -277,7 +277,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <input type="file" id="univLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                    <input type="file" data-max-kb="2048" id="univLogoInput" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                                            onchange="handleLogoPreview(this, 'univLogoPreview', '{{ $currentUnivLogo }}')"
                                            class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs">
                                     <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format: PNG, JPG, WEBP, SVG. Maks 2MB. Biarkan kosong jika tidak ingin mengubah logo.</p>

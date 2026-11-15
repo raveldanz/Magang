@@ -383,7 +383,7 @@
         $cleanStudentName = preg_replace('/\s*\([^)]*\)/', '', $application->user?->name ?? '-');
 
         // QR Code Verifikasi Dokumen (Lokal SVG Tanpa Ketergantungan Eksternal)
-        $verifyUrl = route('verify.letter', $application->ensureLetterToken());
+        $verifyUrl = \App\Support\PublicUrl::route('verify.letter', $application->ensureLetterToken());
         $qrSvg = null;
         if (class_exists('SimpleSoftwareIO\QrCode\Facades\QrCode')) {
             try {

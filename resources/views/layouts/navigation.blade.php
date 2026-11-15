@@ -297,8 +297,8 @@
             <div class="hidden md:flex items-center gap-3">
 
                 @php
-                    $navHasUnreadDot = Auth::user() ? (\App\Services\NotificationService::hasUnreadDot(Auth::user()) || ((int) ($unreadCount ?? 0) > 0)) : false;
                     $navAllNotifs = Auth::user() ? \App\Services\NotificationService::getNotificationsForUser(Auth::user()) : [];
+                    $navHasUnreadDot = Auth::user() ? (\App\Services\NotificationService::hasUnreadDot(Auth::user(), $navAllNotifs) || ((int) ($unreadCount ?? 0) > 0)) : false;
                     // Pesan chat belum dibaca didahulukan agar tidak tenggelam di bawah pemberitahuan otomatis lain
                     $navIsUnreadChat = fn ($n) => ($n['category'] ?? '') === 'chat' && empty($n['is_read']);
                     $navQuickNotifs = array_slice(array_merge(

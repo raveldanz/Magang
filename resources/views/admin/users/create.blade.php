@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="{ selectedRole: '{{ old('role', request('role', 'mahasiswa')) }}' }">
+    <div class="py-8" x-data="{ selectedRole: @js(old('role', request('role', 'mahasiswa'))) }">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 sm:p-8">
 

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\ApplicationStatus;
 use App\Models\AgencyProfile;
 use App\Models\Application;
-use App\Models\ApplicationDocument;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
 use App\Models\InternshipGroup;

@@ -117,7 +117,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <input type="file" id="logo" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                                    <input type="file" data-max-kb="2048" id="logo" name="logo" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                                            onchange="handleLogoPreview(this, 'agencyLogoPreview', '{{ $displayLogo }}')"
                                            class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer shadow-2xs" />
                                     <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Format: PNG, JPG, WEBP, SVG. Maks 2MB. Biarkan kosong jika tidak ingin mengubah logo.</p>

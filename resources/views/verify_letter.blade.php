@@ -61,15 +61,20 @@
                         <dd class="vvalue">{{ $fmtDate($application->letter_date) }}</dd>
                     </div>
                     @if($application->group_id && $application->group)
+                        @php
+                            $verifiedGroupMembers = $application->group->applications->filter(
+                                fn ($gApp) => in_array($gApp->statusValue(), ['accepted', 'active', 'completed', 'waiting_approval'], true)
+                            );
+                        @endphp
                         <div class="vrow">
                             <dt class="vlabel">Tipe Pengajuan</dt>
-                            <dd class="vvalue"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">Kelompok Magang ({{ $application->group->applications->count() }} Mahasiswa)</span></dd>
+                            <dd class="vvalue"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">Kelompok Magang ({{ $verifiedGroupMembers->count() }} Mahasiswa)</span></dd>
                         </div>
                         <div class="vrow">
                             <dt class="vlabel">Daftar Anggota Kelompok</dt>
                             <dd class="vvalue">
                                 <ul class="divide-y divide-slate-100 mt-1 border rounded-lg bg-slate-50 p-2 text-xs space-y-1.5">
-                                    @foreach($application->group->applications as $gApp)
+                                    @foreach($verifiedGroupMembers as $gApp)
                                         <li class="flex items-center justify-between py-1">
                                             <div>
                                                 <span class="font-bold text-slate-800">{{ $gApp->user?->name }}</span>

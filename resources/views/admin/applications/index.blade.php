@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h2 class="font-bold text-2xl text-gray-900 leading-tight">
                     {{ __('Daftar Pengajuan Magang') }}
@@ -10,6 +10,19 @@
                         Bidang: {{ auth()->user()->unit->name ?? 'Bidang Kerja' }}
                     </p>
                 @endif
+            </div>
+            <div class="flex items-center gap-2">
+                <form action="{{ route('admin.applications.sync_status') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                            title="Periksa dan sinkronkan status magang yang tanggal mulainya telah tiba ke ACTIVE"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 active:scale-95 shadow-2xs transition">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Sinkronkan Status</span>
+                    </button>
+                </form>
             </div>
         </div>
     </x-slot>
@@ -471,7 +484,9 @@
                                     $groupMemberCount = $groupMembers->count();
                                     $groupStatuses = $groupMembers->map(fn($a) => $a->statusValue())->unique();
                                     $isUniformGroupStatus = $groupStatuses->count() === 1;
-                                    $groupPendingOrWaiting = in_array($app->group->status, ['pending', 'waiting_approval']) || in_array($rawStatus, ['pending', 'waiting_approval']);
+                                    $pendingMembersCount = $groupMembers->filter(fn($a) => in_array($a->statusValue(), ['pending', 'waiting_approval'], true))->count();
+                                    $rejectedMembersCount = $groupMembers->filter(fn($a) => $a->statusValue() === 'rejected')->count();
+                                    $groupPendingOrWaiting = in_array($app->group->status, ['pending', 'waiting_approval']) || $pendingMembersCount > 0;
                                 @endphp
                                 <tbody class="text-sm divide-y divide-slate-100 border-b border-slate-200/80" 
                                        x-data="{ expanded: false }">
@@ -559,6 +574,20 @@
                                             @endphp
                                             <x-status-badge :status="$app->group->status ?? $app->status"
                                                 :tooltip="$groupTooltip" />
+                                            @if(!$isUniformGroupStatus)
+                                                <div class="mt-1 flex flex-col items-center gap-0.5">
+                                                    @if($pendingMembersCount > 0)
+                                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                            {{ $pendingMembersCount }} Menunggu Keputusan
+                                                        </span>
+                                                    @endif
+                                                    @if($rejectedMembersCount > 0)
+                                                        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                                            {{ $rejectedMembersCount }} Perlu Perbaikan
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="py-3.5 px-6 text-center whitespace-nowrap align-middle">
                                             <div class="flex items-center justify-center">

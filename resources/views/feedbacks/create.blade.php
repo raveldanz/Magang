@@ -34,7 +34,7 @@
                     </div>
 
                     <!-- Kategori & Target Role (Alpine.js Dynamic Form) -->
-                    <div x-data="{ targetRole: '{{ old('target_role', 'super_admin') }}' }" class="space-y-5">
+                    <div x-data="{ targetRole: @js(old('target_role', 'super_admin')) }" class="space-y-5">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
@@ -147,7 +147,7 @@
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                             Lampiran Bukti / Screenshot (Opsional)
                         </label>
-                        <input type="file" name="attachment" id="feedbackAttachment" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" 
+                        <input type="file" data-max-kb="5120" name="attachment" id="feedbackAttachment" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" 
                                onchange="handleFeedbackAttachmentPreview(this)"
                                class="w-full text-xs sm:text-sm border border-slate-200 rounded-xl file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 shadow-2xs cursor-pointer">
                         <p class="text-[11px] text-slate-400 mt-1">Format yang didukung: JPG, PNG, PDF, DOCX, ZIP (Maksimal 5MB)</p>

@@ -3,9 +3,11 @@
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsurePasswordChanged;
+use App\Support\UploadLimits;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -28,6 +30,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Tangani berkas unggahan yang melebihi batas upload PHP (post_max_size) agar tidak memunculkan HTTP 413
+        $exceptions->render(function (PostTooLargeException $e, Request $request) {
+            $limitMb = round(UploadLimits::phpPostMaxKb() / 1024, 1);
+            $message = 'Total berkas yang dikirim melebihi batas server ('.$limitMb.' MB), sehingga data belum tersimpan.';
+
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => $message], 413);
+            }
+
+            // PHP sudah membuang seluruh isi form, jadi tidak ada old input yang bisa dikembalikan.
+            // Isian teks dipulihkan di browser oleh form[data-autosave] (resources/js/forms.js).
+            return back()->with('error', $message.' Isian yang sudah diketik dipulihkan otomatis bila tersedia; pilih berkas yang lebih kecil lalu kirim lagi.');
+        });
+
         // Endpoint chat dipanggil via fetch dari halaman web; error validasi/otorisasi harus berupa JSON
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || ($request->is('chat/*') && $request->expectsJson()),

@@ -9,6 +9,7 @@ use App\Models\InternshipProject;
 use App\Models\Placement;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentReportController extends Controller
 {
@@ -49,7 +50,7 @@ class StudentReportController extends Controller
         // Filter Pencarian
         if ($request->filled('search')) {
             $search = trim($request->search);
-            $like = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->whereHas('application.user', function ($q) use ($search, $like) {
                 $q->where('name', $like, "%{$search}%")
                     ->orWhereHas('studentProfile', function ($sq) use ($search, $like) {

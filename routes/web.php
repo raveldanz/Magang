@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ImpersonationController;
+use App\Http\Controllers\Api\MasterUniversityApiController;
 use App\Http\Controllers\Chat\ChatApiController;
 use App\Http\Controllers\Chat\ChatGroupController;
 use App\Http\Controllers\Chat\ChatMessageController;
@@ -11,6 +12,9 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectDetailController;
+use App\Http\Controllers\ProjectInteractionController;
+use App\Http\Controllers\PublicProjectController;
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\FinalReportController as StudentFinalReportController;
@@ -76,19 +80,19 @@ Route::get('/verify-certificate/{token}', function ($token) {
 })->middleware('throttle:verify-qr')->name('verify.certificate');
 
 // Halaman Detail Penuh Proyek Inovasi Magang (Dapat diakses publik tanpa login maupun oleh pengguna terautentikasi)
-Route::get('/projects/{id}', [\App\Http\Controllers\ProjectDetailController::class, 'show'])->name('projects.show');
+Route::get('/projects/{id}', [ProjectDetailController::class, 'show'])->name('projects.show');
 
 // Galeri & Histori Proyek Dinas (Katalog Terbuka Perjalanan Inovasi Mahasiswa)
-Route::get('/proyek-dinas', [\App\Http\Controllers\PublicProjectController::class, 'index'])->name('public.projects.index');
+Route::get('/proyek-dinas', [PublicProjectController::class, 'index'])->name('public.projects.index');
 
 // Interaksi Publik & Pengguna pada Proyek Inovasi (Like, Komen, Moderasi)
-Route::post('/projects/{id}/like', [\App\Http\Controllers\ProjectInteractionController::class, 'toggleLike'])->name('projects.like');
-Route::post('/projects/{id}/comments', [\App\Http\Controllers\ProjectInteractionController::class, 'storeComment'])->name('projects.comments.store');
-Route::post('/projects/comments/{commentId}/like', [\App\Http\Controllers\ProjectInteractionController::class, 'toggleCommentLike'])->name('projects.comments.like');
-Route::delete('/projects/comments/{commentId}', [\App\Http\Controllers\ProjectInteractionController::class, 'deleteComment'])->name('projects.comments.destroy');
-Route::post('/projects/{id}/toggle-visibility', [\App\Http\Controllers\ProjectInteractionController::class, 'toggleVisibility'])
+Route::post('/projects/{id}/like', [ProjectInteractionController::class, 'toggleLike'])->name('projects.like');
+Route::post('/projects/{id}/comments', [ProjectInteractionController::class, 'storeComment'])->name('projects.comments.store');
+Route::post('/projects/comments/{commentId}/like', [ProjectInteractionController::class, 'toggleCommentLike'])->name('projects.comments.like');
+Route::delete('/projects/comments/{commentId}', [ProjectInteractionController::class, 'deleteComment'])->name('projects.comments.destroy');
+Route::post('/projects/{id}/toggle-visibility', [ProjectInteractionController::class, 'toggleVisibility'])
     ->middleware('auth')->name('projects.toggle_visibility');
-Route::delete('/projects/{id}', [\App\Http\Controllers\ProjectInteractionController::class, 'destroyProject'])
+Route::delete('/projects/{id}', [ProjectInteractionController::class, 'destroyProject'])
     ->middleware('auth')->name('projects.destroy');
 
 /*
@@ -187,6 +191,9 @@ Route::middleware('auth')->group(function () {
 | Setiap peran memiliki file route terpisah agar web.php tetap ringkas.
 | Masing-masing file sudah membungkus route dengan middleware auth + role.
 */
+
+// API Pencarian Master Perguruan Tinggi Nasional untuk Autocomplete
+Route::get('/universities/master-search', [MasterUniversityApiController::class, 'search'])->name('universities.master-search');
 
 require __DIR__.'/student.php';
 require __DIR__.'/admin.php';

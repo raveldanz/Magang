@@ -15,15 +15,25 @@ class AdminBidangScopingTest extends TestCase
     use RefreshDatabase;
 
     protected AgencyProfile $agency;
+
     protected Unit $unitSekretariat;
+
     protected Unit $unitPerpustakaan;
+
     protected User $adminSekretariat;
+
     protected User $adminPerpustakaan;
+
     protected User $superAdmin;
+
     protected User $adminDinasUtama;
+
     protected Application $appSekretariat;
+
     protected Application $appPerpustakaan;
+
     protected User $mentorSekretariat;
+
     protected User $mentorPerpustakaan;
 
     protected function setUp(): void

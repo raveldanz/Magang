@@ -17,7 +17,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -26,7 +26,8 @@
             [x-cloak] { display: none !important; }
         </style>
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-slate-50">
+    {{-- data-autosave-purge: draf isian form milik akun sebelumnya dihapus dari tab ini saat halaman masuk/daftar --}}
+    <body class="font-sans text-gray-900 antialiased bg-slate-50" data-autosave-purge>
         <div class="min-h-screen flex flex-col justify-center items-center pt-6 sm:pt-0 p-4">
             
             <div class="w-full sm:max-w-md">

@@ -220,9 +220,9 @@ class InternshipProjectController extends Controller
             'source_code_name' => $sourceCodeName,
             'source_code_size' => $sourceCodeSize,
             'video_url' => $validated['video_url'] ?? null,
-            'screenshots' => !empty($screenshots) ? $screenshots : null,
-            'community_photos' => !empty($communityPhotos) ? $communityPhotos : null,
-            'documents' => !empty($documents) ? $documents : null,
+            'screenshots' => ! empty($screenshots) ? $screenshots : null,
+            'community_photos' => ! empty($communityPhotos) ? $communityPhotos : null,
+            'documents' => ! empty($documents) ? $documents : null,
         ]);
 
         // Simpan Anggota Tim Proyek
@@ -427,9 +427,9 @@ class InternshipProjectController extends Controller
             'source_code_name' => $sourceCodeName,
             'source_code_size' => $sourceCodeSize,
             'video_url' => $validated['video_url'] ?? null,
-            'screenshots' => !empty($screenshots) ? array_values($screenshots) : null,
-            'community_photos' => !empty($communityPhotos) ? array_values($communityPhotos) : null,
-            'documents' => !empty($documents) ? array_values($documents) : null,
+            'screenshots' => ! empty($screenshots) ? array_values($screenshots) : null,
+            'community_photos' => ! empty($communityPhotos) ? array_values($communityPhotos) : null,
+            'documents' => ! empty($documents) ? array_values($documents) : null,
         ]);
 
         // Sinkronisasi Anggota Tim Proyek

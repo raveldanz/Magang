@@ -9,6 +9,7 @@ use App\Models\FinalReport;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Models\Unit;
+use App\Models\University;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,7 +27,7 @@ class EvaluationDisplayTest extends TestCase
     {
         $agency = AgencyProfile::create(['agency_name' => 'Dinas Uji']);
         $unit = Unit::create(['agency_profile_id' => $agency->id, 'name' => 'Unit Uji', 'quota' => 5]);
-        $univ = \App\Models\University::create([
+        $univ = University::create([
             'name' => 'Unesa',
             'code' => 'UNESA',
             'evaluation_scheme' => 'dual_evaluation',

@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
             {{ __('Profil Mahasiswa') }}
@@ -18,7 +18,7 @@
                     const file = e.target.files[0];
                     if (file) {
                         if (file.size > 2 * 1024 * 1024) {
-                            alert('Ukuran foto profil maksimal 2MB.');
+                            window.notify('Ukuran foto profil maksimal 2MB.');
                             e.target.value = '';
                             return;
                         }
@@ -40,20 +40,69 @@
                 </div>
             @endif
 
+            <!-- Flash Error Message -->
+            @if (session('error'))
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs flex items-center justify-between text-rose-900 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Validation Errors Summary Banner -->
+            @if ($errors->any())
+                <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl shadow-xs text-rose-900 text-xs sm:text-sm space-y-1">
+                    <div class="flex items-center gap-2 font-bold text-rose-950">
+                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Mohon periksa kembali formulir Anda. Terjadi kesalahan pengisian atau unggah berkas:</span>
+                    </div>
+                    <ul class="list-disc list-inside space-y-0.5 text-xs text-rose-800 pl-6">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Banner Ringkasan Dokumen Prasyarat Magang -->
+            @php
+                $missingDocs = [];
+                if (empty($profile?->cv_path)) $missingDocs[] = 'Curriculum Vitae (CV)';
+                if (empty($profile?->transcript_path)) $missingDocs[] = 'Transkrip Nilai';
+                if (empty($profile?->id_card_path)) $missingDocs[] = 'KTM / Kartu Identitas';
+            @endphp
+            @if (!empty($missingDocs) && !session('success'))
+                <div class="p-4 bg-amber-50/90 border-l-4 border-amber-500 rounded-r-xl shadow-xs text-amber-950 text-xs sm:text-sm space-y-1">
+                    <div class="flex items-center gap-2 font-bold">
+                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span>Kelengkapan Berkas Magang Belum Lengkap</span>
+                    </div>
+                    <p class="text-xs text-amber-800 leading-relaxed">
+                        Untuk dapat mendaftar magang ke instansi, mohon lengkapi berkas wajib berikut di bagian bawah formulir:
+                        <strong>{{ implode(', ', $missingDocs) }}</strong>.
+                    </p>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
+
                 <!-- SISI KIRI (4 Col): KHUSUS PREVIEW IDENTITAS & AKADEMIK -->
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
                         <div class="flex items-start gap-4">
-                            
+
                             <!-- Avatar Kotak dengan Icon Kamera -->
                             <div class="relative shrink-0 group">
                                 <div @click="if (photoPreview) showModal = true"
                                      :title="photoPreview ? 'Lihat Foto Profil' : 'Belum Ada Foto'"
                                      class="w-16 h-16 rounded-2xl overflow-hidden border-2 border-slate-100 shadow-md flex items-center justify-center bg-gradient-to-tr from-blue-700 to-indigo-700 text-white font-black text-xl relative select-none"
                                      :class="photoPreview ? 'cursor-pointer' : 'cursor-default'">
-                                    
+
                                     <!-- Foto Profil / Inisial -->
                                     <template x-if="photoPreview">
                                         <img :src="photoPreview" alt="Foto Profil" class="w-full h-full object-cover">
@@ -78,7 +127,7 @@
                             <div class="min-w-0 flex-1">
                                 <h3 class="font-bold text-base text-slate-900 truncate">{{ $user->name }}</h3>
                                 <p class="text-xs text-slate-500 truncate">{{ $user->email }}</p>
-                                
+
                                 <div class="mt-1.5">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
                                         Mahasiswa MBKM
@@ -120,12 +169,10 @@
                             </svg>
                             <span>Ketentuan Data Profil</span>
                         </div>
-                        <ul class="text-[11px] text-blue-800/90 space-y-2 list-disc list-inside leading-relaxed">
-                            <li>Arahkan kursor & klik <strong>foto profil</strong> untuk meninjau gambar secara penuh.</li>
-                            <li>Pastikan <strong>Foto Profil</strong> formal dan jelas dengan format JPG/PNG maksimal 2MB.</li>
-                            <li>Pastikan <strong>NIM</strong> dan <strong>Universitas</strong> sesuai dengan data perguruan tinggi resmi.</li>
-                            <li>Nomor <strong>WhatsApp</strong> aktif wajib diisi untuk koordinasi dengan DPL dan Mentor instansi.</li>
-                            <li>Unggah berkas <strong>CV, Transkrip Nilai, dan KTM</strong> di bawah agar dapat digunakan langsung pada pengajuan magang.</li>
+                        <ul class="text-[11px] text-blue-800/90 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>Gunakan foto formal dan jelas berformat JPG/PNG (maks. 2MB).</li>
+                            <li>Pastikan NIM, kampus, dan nomor WhatsApp aktif terisi benar.</li>
+                            <li>Lengkapi CV, Transkrip, dan KTM untuk syarat pendaftaran magang.</li>
                         </ul>
                     </div>
                 </div>
@@ -133,13 +180,13 @@
                 <!-- SISI KANAN (8 Col): FORM CARD UTAMA -->
                 <div class="lg:col-span-8">
                     <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-                        
+
                         <div class="border-b border-slate-100 pb-4">
                             <h3 class="text-base sm:text-lg font-bold text-slate-900">Data Akademik, Pribadi & Kontak Darurat</h3>
                             <p class="text-xs text-slate-500 mt-0.5">Lengkapi informasi foto, akademik, dan kontak Anda untuk keperluan administrasi magang</p>
                         </div>
 
-                        <form action="{{ route('student.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <form action="{{ route('student.profile.update') }}" data-autosave="profil-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                             @csrf
 
                             <!-- Section 1: Identitas Akun, Foto & NIM -->
@@ -158,28 +205,28 @@
 
 <div class="space-y-2">
     <x-input-label for="photo" value="Foto Profil Mahasiswa (Opsional)" class="text-xs font-bold uppercase tracking-wider" />
-    
+
     <div class="flex items-center gap-2 w-full">
         <!-- Hidden Native Input -->
-        <input id="photo" 
-               name="photo" 
-               type="file" 
+        <input id="photo"
+               name="photo"
+               type="file" data-max-kb="2048"
                accept="image/jpeg,image/png,image/jpg"
                class="hidden"
                @change="handlePhotoChange($event)" />
 
-        <!-- Tombol Choose File Mandiri -->
-        <button type="button" 
+        <!-- Tombol Pilih Berkas Mandiri -->
+        <button type="button"
                 @click="document.getElementById('photo').click()"
                 class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-            Choose File
+            Pilih Berkas
         </button>
 
         <!-- Nama Berkas Foto (Dapat Diklik Langsung untuk Pratinjau) -->
         <div class="min-w-0 flex-1 truncate text-xs">
             <!-- Jika baru saja memilih file dari komputer -->
             <template x-if="photoName">
-                <a href="javascript:void(0)" 
+                <a href="javascript:void(0)"
                    @click="showModal = true"
                    class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer"
                    :title="photoName"
@@ -189,8 +236,8 @@
             <!-- Jika sudah ada foto tersimpan sebelumnya di akun -->
             @if($hasPhoto)
                 <template x-if="!photoName">
-                    <a href="javascript:void(0)" 
-                       @click="showModal = true" 
+                    <a href="javascript:void(0)"
+                       @click="showModal = true"
                        class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer"
                        title="Klik untuk melihat foto profil">
                         {{ $photoDisplayName }}
@@ -198,7 +245,7 @@
                 </template>
             @else
                 <template x-if="!photoName">
-                    <span class="text-slate-400">No file chosen</span>
+                    <span class="text-slate-400">Belum ada berkas dipilih</span>
                 </template>
             @endif
         </div>
@@ -207,7 +254,7 @@
     <p class="text-[10px] text-slate-400">Format: JPG, JPEG, PNG (Maks. 2MB)</p>
     <x-input-error :messages="$errors->get('photo')" class="mt-1" />
 </div>
-                                
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <x-input-label for="name" value="Nama Lengkap (Sesuai Akun)" class="text-xs font-bold uppercase tracking-wider" />
@@ -235,14 +282,14 @@
                                     $currentUniv = $universities->firstWhere('id', (int) $selectedUniversity);
                                 @endphp
                                 <div>
-                                    <x-searchable-select 
-                                        name="university_id" 
-                                        :items="$universities" 
-                                        :selected="$selectedUniversity" 
-                                        :allow-custom="true" 
-                                        custom-name="custom_university_name" 
-                                        label="Asal Perguruan Tinggi / Universitas" 
-                                        placeholder="-- Cari atau Pilih Asal Perguruan Tinggi --"
+                                    <x-searchable-select
+                                        name="university_id"
+                                        :items="$universities"
+                                        :selected="$selectedUniversity"
+                                        :allow-custom="true"
+                                        custom-name="custom_university_name"
+                                        label="Asal Perguruan Tinggi / Universitas (Master Kampus Terdaftar)"
+                                        placeholder="-- Cari Nama Kampus atau Singkatan (misal: UNESA, UNAIR, ITS, UB, dll.) --"
                                         :required="true"
                                     />
                                     <x-input-error :messages="$errors->get('university_id')" class="mt-1" />
@@ -261,7 +308,7 @@
                                             </div>
                                             <label class="flex items-start gap-2 text-[11px] text-slate-700">
                                                 <input type="checkbox" name="confirm_new_university" value="1" class="mt-0.5 rounded border-slate-300 text-amber-600 focus:ring-amber-500">
-                                                <span>Bukan, kampus saya <strong>berbeda</strong> — tetap daftarkan "{{ old('custom_university_name') }}" sebagai kampus baru (akan diverifikasi Admin).</span>
+                                                <span>Bukan, kampus saya <strong>berbeda</strong> â€” tetap daftarkan "{{ old('custom_university_name') }}" sebagai kampus baru (akan diverifikasi Admin).</span>
                                             </label>
                                         </div>
                                     @endif
@@ -356,7 +403,7 @@
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-        
+
         <!-- 1. Curriculum Vitae -->
         @php
             $hasCv = !empty($profile?->cv_path);
@@ -371,18 +418,37 @@
 
                 <!-- Custom File Input with Integrated Clickable Label -->
                 <div class="flex items-center gap-2 w-full">
-                    <input type="file" 
-                           id="cv" 
-                           name="cv" 
-                           accept=".pdf" 
+                    <input type="file" data-max-kb="2048"
+                           id="cv"
+                           name="cv"
+                           accept=".pdf"
                            class="hidden"
-                           @change="selectedName = $event.target.files[0]?.name || ''" />
+                           @change="
+                               const f = $event.target.files[0];
+                               if (f) {
+                                   if (f.size > 2 * 1024 * 1024) {
+                                       window.notify('Ukuran berkas CV melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
+                                       $event.target.value = '';
+                                       selectedName = '';
+                                       return;
+                                   }
+                                   if (!f.name.toLowerCase().endsWith('.pdf')) {
+                                       window.notify('Format berkas CV harus berupa dokumen PDF (.pdf).');
+                                       $event.target.value = '';
+                                       selectedName = '';
+                                       return;
+                                   }
+                                   selectedName = f.name;
+                               } else {
+                                   selectedName = '';
+                               }
+                           " />
 
-                    <!-- Tombol Choose File Berdiri Sendiri -->
-                    <button type="button" 
+                    <!-- Tombol Pilih Berkas Berdiri Sendiri -->
+                    <button type="button"
                             @click="document.getElementById('cv').click()"
                             class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                        Choose File
+                        Pilih Berkas
                     </button>
 
                     <!-- Tempat Teks / Nama File yang Menggantikan 'No file chosen' -->
@@ -395,8 +461,8 @@
                         <!-- Jika file sudah tersimpan di database: nama bersih & bisa diklik -->
                         @if($hasCv)
                             <template x-if="!selectedName">
-                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'cv']) }}" 
-                                   target="_blank" 
+                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'cv']) }}"
+                                   target="_blank"
                                    class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer"
                                    title="Buka dokumen">
                                     {{ $cvDisplayName }}
@@ -404,7 +470,7 @@
                             </template>
                         @else
                             <template x-if="!selectedName">
-                                <span class="text-slate-400">No file chosen</span>
+                                <span class="text-slate-400">Belum ada berkas dipilih</span>
                             </template>
                         @endif
                     </div>
@@ -428,17 +494,36 @@
                 </label>
 
                 <div class="flex items-center gap-2 w-full">
-                    <input type="file" 
-                           id="transkrip" 
-                           name="transkrip" 
-                           accept=".pdf" 
+                    <input type="file" data-max-kb="2048"
+                           id="transkrip"
+                           name="transkrip"
+                           accept=".pdf"
                            class="hidden"
-                           @change="selectedName = $event.target.files[0]?.name || ''" />
+                           @change="
+                               const f = $event.target.files[0];
+                               if (f) {
+                                   if (f.size > 2 * 1024 * 1024) {
+                                       window.notify('Ukuran berkas Transkrip Nilai melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
+                                       $event.target.value = '';
+                                       selectedName = '';
+                                       return;
+                                   }
+                                   if (!f.name.toLowerCase().endsWith('.pdf')) {
+                                       window.notify('Format berkas Transkrip Nilai harus berupa dokumen PDF (.pdf).');
+                                       $event.target.value = '';
+                                       selectedName = '';
+                                       return;
+                                   }
+                                   selectedName = f.name;
+                               } else {
+                                   selectedName = '';
+                               }
+                           " />
 
-                    <button type="button" 
+                    <button type="button"
                             @click="document.getElementById('transkrip').click()"
                             class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                        Choose File
+                        Pilih Berkas
                     </button>
 
                     <div class="min-w-0 flex-1 truncate text-xs">
@@ -448,8 +533,8 @@
 
                         @if($hasTranscript)
                             <template x-if="!selectedName">
-                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'transkrip']) }}" 
-                                   target="_blank" 
+                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'transkrip']) }}"
+                                   target="_blank"
                                    class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer"
                                    title="Buka dokumen">
                                     {{ $transcriptDisplayName }}
@@ -457,7 +542,7 @@
                             </template>
                         @else
                             <template x-if="!selectedName">
-                                <span class="text-slate-400">No file chosen</span>
+                                <span class="text-slate-400">Belum ada berkas dipilih</span>
                             </template>
                         @endif
                     </div>
@@ -482,17 +567,37 @@
                 </label>
 
                 <div class="flex items-center gap-2 w-full">
-                    <input type="file" 
-                           id="id_card" 
-                           name="id_card" 
-                           accept=".pdf,image/png,image/jpeg,image/jpg" 
+                    <input type="file" data-max-kb="2048"
+                           id="id_card"
+                           name="id_card"
+                           accept=".pdf,image/png,image/jpeg,image/jpg"
                            class="hidden"
-                           @change="selectedName = $event.target.files[0]?.name || ''" />
+                           @change="
+                               const f = $event.target.files[0];
+                               if (f) {
+                                   if (f.size > 2 * 1024 * 1024) {
+                                       window.notify('Ukuran berkas KTM / Kartu Identitas melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
+                                       $event.target.value = '';
+                                       selectedName = '';
+                                       return;
+                                   }
+                                   const ext = f.name.toLowerCase().split('.').pop();
+                                   if (!['pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
+                                       window.notify('Format berkas KTM harus berupa PDF, JPG, JPEG, atau PNG.');
+                                       $event.target.value = '';
+                                       selectedName = '';
+                                       return;
+                                   }
+                                   selectedName = f.name;
+                               } else {
+                                   selectedName = '';
+                               }
+                           " />
 
-                    <button type="button" 
+                    <button type="button"
                             @click="document.getElementById('id_card').click()"
                             class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                        Choose File
+                        Pilih Berkas
                     </button>
 
                     <div class="min-w-0 flex-1 truncate text-xs">
@@ -502,8 +607,8 @@
 
                         @if($hasIdCard)
                             <template x-if="!selectedName">
-                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'id_card']) }}" 
-                                   target="_blank" 
+                                <a href="{{ route('student.document', ['userId' => $user->id, 'type' => 'id_card']) }}"
+                                   target="_blank"
                                    class="text-blue-600 hover:text-blue-800 hover:underline font-semibold truncate block cursor-pointer"
                                    title="Buka dokumen">
                                     {{ $idCardDisplayName }}
@@ -511,7 +616,7 @@
                             </template>
                         @else
                             <template x-if="!selectedName">
-                                <span class="text-slate-400">No file chosen</span>
+                                <span class="text-slate-400">Belum ada berkas dipilih</span>
                             </template>
                         @endif
                     </div>
@@ -542,10 +647,10 @@
             </div>
 
             <!-- Modal Popup / Lightbox Peninjauan Foto Penuh -->
-            <div x-show="showModal" 
+            <div x-show="showModal"
                  x-cloak
                  class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                
+
                 <!-- Backdrop Gelap -->
                 <div x-show="showModal"
                      x-transition:enter="ease-out duration-200"
@@ -566,7 +671,7 @@
                      x-transition:leave-start="opacity-100 scale-100"
                      x-transition:leave-end="opacity-0 scale-95"
                      class="relative bg-white rounded-3xl p-4 max-w-sm sm:max-w-md w-full shadow-2xl z-10 border border-slate-100 space-y-3">
-                    
+
                     <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                         <span class="text-xs font-bold text-slate-800">Pratinjau Foto Profil</span>
                         <button type="button" @click="showModal = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">

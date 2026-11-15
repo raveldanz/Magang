@@ -8,9 +8,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Roboto+Slab:wght@700;800;900&family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,500;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Roboto+Slab:wght@700;800;900&family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,500;1,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css'])
 
     @php
         \Carbon\Carbon::setLocale('id');
@@ -139,10 +139,10 @@
         } elseif (Auth::user()?->role === 'supervisor') {
             $backUrl = route('supervisor.certificates.index');
             $backLabel = 'Kembali ke Pengesahan Sertifikat';
-        } elseif (Auth::user()?->role === 'dosen') {
+        } elseif (in_array(Auth::user()?->role, ['dosen', 'academic_advisor'], true)) {
             $backUrl = route('lecturer.dashboard');
             $backLabel = 'Kembali ke Dashboard Dosen';
-        } elseif (Auth::user()?->role === 'pembimbing') {
+        } elseif (in_array(Auth::user()?->role, ['pembimbing', 'mentor'], true)) {
             $backUrl = route('mentor.dashboard');
             $backLabel = 'Kembali ke Dashboard Mentor';
         } elseif (Auth::user()?->role === 'universitas') {

@@ -26,6 +26,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
         $placements = Placement::with(['application.user.studentProfile'])->get();
         if ($placements->isEmpty()) {
             echo "Tidak ada placement ditemukan. Lewati seeder proyek.\n";
+
             return;
         }
 
@@ -212,7 +213,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'individual',
                 'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
-                'description' => "Penyusunan modul buku saku praktis bagi masyarakat mengenai cara menyimpan, merawat, dan memilah dokumen penting keluarga seperti sertifikat tanah, akta kelahiran, dan ijazah agar terhindar dari kerusakan akibat banjir atau kebakaran.",
+                'description' => 'Penyusunan modul buku saku praktis bagi masyarakat mengenai cara menyimpan, merawat, dan memilah dokumen penting keluarga seperti sertifikat tanah, akta kelahiran, dan ijazah agar terhindar dari kerusakan akibat banjir atau kebakaran.',
                 'community_benefit' => 'Telah didiseminasikan kepada kader PKK di 10 kelurahan rawan genangan air di Surabaya untuk membangun kesadaran tertib arsip mandiri.',
                 'demo_url' => 'https://anyflip.com/buku-sadar-arsip-keluarga',
                 'repository_url' => 'https://drive.google.com/drive/folders/modul-sadar-arsip',
@@ -310,7 +311,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'individual',
                 'photo_path' => 'projects/meja_layanan_sirkulasi.jpg',
-                'description' => "Penyusunan petunjuk teknis pengelolaan berkas inaktif pada instansi pemerintahan tingkat kelurahan se-Surabaya, mencakup jadwal retensi arsip (JRA), tata cara pemindahan berkas, dan prosedur pemusnahan arsip aman.",
+                'description' => 'Penyusunan petunjuk teknis pengelolaan berkas inaktif pada instansi pemerintahan tingkat kelurahan se-Surabaya, mencakup jadwal retensi arsip (JRA), tata cara pemindahan berkas, dan prosedur pemusnahan arsip aman.',
                 'community_benefit' => 'Membantu 31 kecamatan dan 154 kelurahan menertibkan gudang arsip dan mempercepat penemuan kembali warkat kependudukan warga.',
                 'demo_url' => null,
                 'repository_url' => 'https://drive.google.com/drive/folders/pedoman-tata-kelola-arsip-kelurahan',
@@ -342,7 +343,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'group',
                 'photo_path' => 'projects/mahasiswi_membaca_koleksi.jpg',
-                'description' => "Pengembangan platform terpadu untuk efisiensi pendaftaran mahasiswa magang, verifikasi penempatan, pencatatan logbook harian, penilaian pembimbing dinas/dosen, dan etalase terbuka proyek inovasi kedinasan.",
+                'description' => 'Pengembangan platform terpadu untuk efisiensi pendaftaran mahasiswa magang, verifikasi penempatan, pencatatan logbook harian, penilaian pembimbing dinas/dosen, dan etalase terbuka proyek inovasi kedinasan.',
                 'community_benefit' => 'Mengeliminasi penggunaan berkas fisik proposal kertas, memfasilitasi ratusan mahasiswa magang dari perguruan tinggi terkemuka, dan mempublikasikan karya nyata mahasiswa kepada masyarakat.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
                 'repository_url' => 'https://github.com/surabaya-dev/sim-magang-dispusip',
@@ -380,7 +381,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => 'Klinik Literasi Inklusif',
                 'project_type' => 'group',
                 'photo_path' => 'projects/anak_membaca_rak_melingkar.jpg',
-                'description' => "Inisiatif penyediaan layanan audio book naratif lokal, buku berhuruf Braille, dan bimbingan membaca intensif bagi anak-anak dan pemustaka penyandang disabilitas sensorik netra di Kota Surabaya.",
+                'description' => 'Inisiatif penyediaan layanan audio book naratif lokal, buku berhuruf Braille, dan bimbingan membaca intensif bagi anak-anak dan pemustaka penyandang disabilitas sensorik netra di Kota Surabaya.',
                 'community_benefit' => 'Memberikan hak akses literasi yang setara bagi 60 pemustaka disabilitas dan telah memproduksi 25 buku suara berbahasa Indonesia.',
                 'demo_url' => 'https://anyflip.com/klinik-literasi-inklusif-dispusip',
                 'repository_url' => 'https://drive.google.com/drive/folders/klinik-literasi-inklusif',
@@ -413,7 +414,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'custom_category' => null,
                 'project_type' => 'individual',
                 'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
-                'description' => "Perancangan sistem penunjuk arah fisik (*wayfinding signage*), peta direktori gedung, dan rambu keselamatan terpadu untuk depo penyimpanan arsip dinas kearsipan dan perpustakaan Surabaya.",
+                'description' => 'Perancangan sistem penunjuk arah fisik (*wayfinding signage*), peta direktori gedung, dan rambu keselamatan terpadu untuk depo penyimpanan arsip dinas kearsipan dan perpustakaan Surabaya.',
                 'community_benefit' => 'Mempermudah navigasi pengunjung publik menuju ruang baca umum, ruang konsultasi naskah, dan zona pelayanan kearsipan secara efisien dan estetis.',
                 'demo_url' => 'https://behance.net/gallery/wayfinding-signage-dispusip',
                 'repository_url' => 'https://drive.google.com/drive/folders/desain-signage-kearsipan',
@@ -471,7 +472,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
             ]);
 
             // Buat relasi anggota tim jika ada
-            if (!empty($item['members'])) {
+            if (! empty($item['members'])) {
                 foreach ($item['members'] as $mIdx => $mConfig) {
                     if ($mIdx === 0) {
                         // Leader adalah pemilik placement proyek
@@ -506,35 +507,35 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
         $storageProjectsDir = storage_path('app/public/projects/');
         $publicProjectsDir = public_path('storage/projects/');
 
-        if (!File::isDirectory($storageProjectsDir)) {
+        if (! File::isDirectory($storageProjectsDir)) {
             File::makeDirectory($storageProjectsDir, 0755, true);
         }
-        if (!File::isDirectory($publicProjectsDir)) {
+        if (! File::isDirectory($publicProjectsDir)) {
             File::makeDirectory($publicProjectsDir, 0755, true);
         }
 
         // Dummy PDF jika belum ada
         foreach (['manual_book_kearsipan.pdf', 'laporan_luaran_inovasi.pdf'] as $pdfName) {
-            $dest = $storageProjectsDir . $pdfName;
-            if (!File::exists($dest)) {
+            $dest = $storageProjectsDir.$pdfName;
+            if (! File::exists($dest)) {
                 File::put($dest, "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF");
             }
-            if (!File::exists($publicProjectsDir . $pdfName)) {
-                @copy($dest, $publicProjectsDir . $pdfName);
+            if (! File::exists($publicProjectsDir.$pdfName)) {
+                @copy($dest, $publicProjectsDir.$pdfName);
             }
         }
 
         // Dummy ZIP jika belum ada
-        $zipDest = $storageProjectsDir . 'sim_magang_v1.0_source.zip';
-        if (!File::exists($zipDest)) {
-            $zip = new \ZipArchive();
+        $zipDest = $storageProjectsDir.'sim_magang_v1.0_source.zip';
+        if (! File::exists($zipDest)) {
+            $zip = new \ZipArchive;
             if ($zip->open($zipDest, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
                 $zip->addFromString('README.md', "# SIM Magang Dispusip Surabaya\n\nBerkas arsip kode & karya luaran inovasi mahasiswa.");
                 $zip->close();
             }
         }
-        if (!File::exists($publicProjectsDir . 'sim_magang_v1.0_source.zip')) {
-            @copy($zipDest, $publicProjectsDir . 'sim_magang_v1.0_source.zip');
+        if (! File::exists($publicProjectsDir.'sim_magang_v1.0_source.zip')) {
+            @copy($zipDest, $publicProjectsDir.'sim_magang_v1.0_source.zip');
         }
     }
 }

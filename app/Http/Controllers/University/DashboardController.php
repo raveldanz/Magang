@@ -21,6 +21,9 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+        // Sinkronkan seluruh pengajuan magang yang tanggal mulainya telah tiba ke ACTIVE
+        Application::syncStartedApplications();
+
         $user = Auth::user();
 
         // Cari master universitas terkait

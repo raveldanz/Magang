@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\Placement;
 use App\Services\StudentNotifier;
+use App\Services\UniversityResolver;
 use App\Support\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -123,7 +124,7 @@ class EvaluationController extends Controller
             $mentorComps = [];
             $scores = [];
             foreach ($request->custom_components as $comp) {
-                if (!empty($comp['name'])) {
+                if (! empty($comp['name'])) {
                     $val = isset($comp['score']) && is_numeric($comp['score']) ? (float) $comp['score'] : null;
                     $mentorComps[] = [
                         'name' => trim($comp['name']),
@@ -134,7 +135,7 @@ class EvaluationController extends Controller
                     }
                 }
             }
-            if (!empty($mentorComps)) {
+            if (! empty($mentorComps)) {
                 $custom['mentor'] = $mentorComps;
                 $evaluation->custom_components = $custom;
                 $evaluation->mentor_aspects = $mentorComps;
@@ -147,7 +148,7 @@ class EvaluationController extends Controller
             $evaluation->nilai_disiplin = $request->nilai_disiplin;
             $evaluation->nilai_kinerja = $request->nilai_kinerja;
             $evaluation->nilai_laporan = $request->nilai_laporan;
-            $univ = $placement->application?->user ? app(\App\Services\UniversityResolver::class)->forUser($placement->application->user) : null;
+            $univ = $placement->application?->user ? app(UniversityResolver::class)->forUser($placement->application->user) : null;
             $evaluation->mentor_aspects = [
                 ['name' => $univ ? $univ->getDinasComponent(1) : 'Kedisiplinan & Tata Tertib Kerja', 'score' => (float) $request->nilai_disiplin],
                 ['name' => $univ ? $univ->getDinasComponent(2) : 'Kinerja Teknis & Kerjasama Tim', 'score' => (float) $request->nilai_kinerja],

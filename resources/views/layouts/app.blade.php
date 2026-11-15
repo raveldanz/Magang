@@ -4,6 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        {{-- Dibaca penjaga unggah & simpan-isian otomatis di resources/js/app.js --}}
+        <meta name="upload-file-max-kb" content="{{ \App\Support\UploadLimits::phpFileMaxKb() }}">
+        <meta name="upload-post-max-kb" content="{{ \App\Support\UploadLimits::phpPostMaxKb() }}">
+        @if (session('success') || session('status'))
+            <meta name="flash-success" content="1">
+        @endif
 
         <title>@hasSection('title')@yield('title') - @endif{{ config('app.name', 'Portal Magang Dispusip — Dinas Perpustakaan dan Kearsipan Kota Surabaya') }}</title>
 

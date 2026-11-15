@@ -96,7 +96,7 @@
                       akademik: {{ $initialAkademik }},
                       weightMentor: {{ $weightMentor }},
                       weightLecturer: {{ $weightLecturer }},
-                      scheme: '{{ $scheme }}'
+                      scheme: @js((string) $scheme)
                   })"
                   class="space-y-6">
                 @csrf

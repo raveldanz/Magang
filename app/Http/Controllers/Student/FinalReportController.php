@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\FinalReport;
+use App\Models\InternshipProject;
 use App\Support\SafeUpload;
 use App\Support\UploadRules;
 use Illuminate\Http\Request;
@@ -55,7 +56,7 @@ class FinalReportController extends Controller
 
             $finalReport = $placement->finalreport;
             $evaluation = $placement->evaluation;
-            $projects = \App\Models\InternshipProject::with(['members.placement.application.user.studentProfile'])
+            $projects = InternshipProject::with(['members.placement.application.user.studentProfile'])
                 ->where(function ($q) use ($placement) {
                     $q->where('placement_id', $placement->id)
                         ->orWhereHas('members', fn ($m) => $m->where('placement_id', $placement->id));

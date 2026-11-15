@@ -3,12 +3,10 @@
 namespace App\Http\Requests\Auth;
 
 use App\Http\Middleware\EnsureAccountIsActive;
-use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -46,22 +44,11 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            // Toleransi akun demo Super Admin (admin@gmail.com / admin@surabaya.go.id) jika mengetik 'password' atau 'admin123'
-            $email = Str::lower($this->string('email'));
-            if (in_array($email, ['admin@gmail.com', 'admin@surabaya.go.id']) && in_array($this->password, ['password', 'admin123'], true)) {
-                $user = User::where('email', $email)->first();
-                if ($user && (Hash::check('password', $user->password) || Hash::check('admin123', $user->password))) {
-                    Auth::login($user, $this->boolean('remember'));
-                }
-            }
+            RateLimiter::hit($this->throttleKey());
 
-            if (! Auth::check()) {
-                RateLimiter::hit($this->throttleKey());
-
-                throw ValidationException::withMessages([
-                    'email' => trans('auth.failed'),
-                ]);
-            }
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
         }
 
         RateLimiter::clear($this->throttleKey());

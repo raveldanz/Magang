@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\AgencyProfile;
-use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Evaluation;
 use App\Models\FinalReport;
@@ -12,7 +10,6 @@ use App\Models\Placement;
 use App\Models\StudentProfile;
 use App\Models\SystemFeedback;
 use App\Models\SystemNotification;
-use App\Models\Unit;
 use App\Models\University;
 use App\Models\User;
 use Illuminate\Database\Seeder;

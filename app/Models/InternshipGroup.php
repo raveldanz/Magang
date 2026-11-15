@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,7 +28,7 @@ class InternshipGroup extends Model
     public static function generateUniqueCode(): string
     {
         do {
-            $code = 'GRP-' . strtoupper(Str::random(6));
+            $code = 'GRP-'.strtoupper(Str::random(6));
         } while (static::where('code', $code)->exists());
 
         return $code;
@@ -98,5 +99,35 @@ class InternshipGroup extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Otomatisasi transisi status kelompok dan seluruh anggotanya dari ACCEPTED ke ACTIVE
+     * jika tanggal mulai magang kelompok telah tiba (start_date <= today).
+     */
+    public function autoActivateIfStarted(): bool
+    {
+        if (! $this->start_date) {
+            return false;
+        }
+
+        $today = Carbon::today()->toDateString();
+        $startDateStr = Carbon::parse($this->start_date)->toDateString();
+
+        if ($startDateStr <= $today && in_array($this->status, ['accepted', 'active'])) {
+            $leadApp = $this->leaderApplication ?? $this->applications()->first();
+            if ($leadApp) {
+                return $leadApp->autoActivateIfStarted();
+            }
+
+            if ($this->status !== 'active') {
+                $this->update(['status' => 'active']);
+                $this->status = 'active';
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

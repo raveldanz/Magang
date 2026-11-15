@@ -232,7 +232,7 @@ class Phase3SecurityDataIntegrityTest extends TestCase
 
     public function test_feedback_attachment_and_student_photo_are_private(): void
     {
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             $this->markTestSkipped('GD extension is not installed.');
         }
 

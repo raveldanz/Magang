@@ -28,6 +28,10 @@ class NotificationController extends Controller
             $notifications = array_filter($notifications, function ($item) {
                 return ! empty($item['is_action_required']) || in_array($item['type'] ?? '', ['urgent', 'warning']);
             });
+        } elseif ($category === 'evaluation') {
+            $notifications = array_filter($notifications, function ($item) {
+                return in_array($item['category'] ?? '', ['evaluation', 'certificate'], true);
+            });
         } else {
             $notifications = array_filter($notifications, function ($item) use ($category) {
                 return ($item['category'] ?? '') === $category;

@@ -18,9 +18,13 @@ class AdminCertificateRevisionWorkflowTest extends TestCase
     use RefreshDatabase;
 
     private User $adminDinas;
+
     private User $supervisor;
+
     private User $student;
+
     private Placement $placement;
+
     private Certificate $certificate;
 
     protected function setUp(): void

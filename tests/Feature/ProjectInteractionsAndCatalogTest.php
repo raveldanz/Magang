@@ -7,7 +7,6 @@ use App\Models\Application;
 use App\Models\InternshipProject;
 use App\Models\Placement;
 use App\Models\ProjectComment;
-use App\Models\ProjectLike;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

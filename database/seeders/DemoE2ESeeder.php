@@ -128,7 +128,8 @@ class DemoE2ESeeder extends Seeder
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Super Admin Dispusip',
-                'password' => $defaultPassword,
+                // Sengaja bukan 'password' agar banner "password bawaan" tidak muncul saat demo.
+                'password' => Hash::make('admin123'),
                 'role' => 'super_admin',
                 'agency_profile_id' => $dispusip->id,
                 'status' => 'active',
@@ -345,7 +346,7 @@ class DemoE2ESeeder extends Seeder
                     'date' => Carbon::now()->subMonths(2)->addDays($day)->toDateString(),
                 ],
                 [
-                    'activity' => 'Melaksanakan kegiatan magang Dispusip hari ke-' . $day . ': Digitalisasi dan penataan arsip.',
+                    'activity' => 'Melaksanakan kegiatan magang Dispusip hari ke-'.$day.': Digitalisasi dan penataan arsip.',
                     'status' => 'approved',
                 ]
             );

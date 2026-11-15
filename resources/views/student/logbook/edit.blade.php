@@ -63,7 +63,7 @@
                     </p>
                 </div>
 
-                <form action="{{ route('student.logbook.update', $logbook->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                <form action="{{ route('student.logbook.update', $logbook->id) }}" data-autosave="logbook-{{ $logbook->id }}-{{ auth()->id() }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                     @csrf
                     @method('PUT')
 
@@ -111,7 +111,7 @@
                         </label>
 
                         <div class="flex items-center gap-2 w-full">
-                            <input type="file" 
+                            <input type="file" data-max-kb="2048" 
                                    id="attachment" 
                                    name="attachment" 
                                    accept=".pdf,.jpg,.jpeg,.png" 
@@ -119,7 +119,7 @@
                                    @change="if($event.target.files.length) { 
                                        const file = $event.target.files[0];
                                        if(file.size > 2 * 1024 * 1024) {
-                                           alert('Ukuran berkas lampiran maksimal 2MB.');
+                                           window.notify('Ukuran berkas lampiran melebihi batas maksimal (Maksimal 2 MB). Silakan pilih berkas yang lebih kecil.');
                                            $event.target.value = '';
                                            selectedName = '';
                                            previewUrl = null;
@@ -133,7 +133,7 @@
                             <button type="button" 
                                     @click="document.getElementById('attachment').click()"
                                     class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition shrink-0 cursor-pointer shadow-2xs">
-                                Choose File
+                                Pilih Berkas
                             </button>
 
                             <!-- Tempat Nama File: File Baru atau File yang Sudah Ada (Dapat Diklik Langsung untuk View) -->
@@ -159,7 +159,7 @@
                                     </template>
                                 @else
                                     <template x-if="!selectedName">
-                                        <span class="text-slate-400">No file chosen</span>
+                                        <span class="text-slate-400">Belum ada berkas dipilih</span>
                                     </template>
                                 @endif
                             </div>

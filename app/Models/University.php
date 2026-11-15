@@ -67,6 +67,7 @@ class University extends Model
     /**
      * Mengambil array komponen penilaian dinas dengan fallback ke default.
      * Mendukung jumlah komponen dinamis (bisa diedit, ditambah, atau dihapus).
+     *
      * @return array<int, string>
      */
     public function getDinasComponents(): array
@@ -92,6 +93,7 @@ class University extends Model
     /**
      * Mengambil array komponen penilaian DPL dengan fallback ke default.
      * Mendukung jumlah komponen dinamis (bisa diedit, ditambah, atau dihapus).
+     *
      * @return array<int, string>
      */
     public function getDplComponents(): array

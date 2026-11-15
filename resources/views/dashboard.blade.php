@@ -577,7 +577,7 @@
                                     </a>
                                 @elseif ($rawAppSt === 'rejected')
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-rose-600 hover:text-rose-800 inline-flex items-center gap-1">
-                                        <span>Ajukan Magang Baru</span>
+                                        <span>{{ $application->group_id ? 'Perbaiki Berkas & Kembali ke Kelompok' : 'Ajukan Magang Baru' }}</span>
                                     </a>
                                 @elseif ($rawAppSt === 'resigned')
                                     <a href="{{ route('student.application.create') }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
@@ -777,9 +777,14 @@
                                                         </div>
                                                         <div class="text-[10px] text-slate-400 font-mono">{{ $grpMember->user?->studentProfile?->nim ?? '-' }}</div>
                                                     </div>
-                                                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded shrink-0 {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
-                                                        {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
-                                                    </span>
+                                                    <div class="flex items-center gap-1 shrink-0">
+                                                        <span class="text-[9px] font-black px-1.5 py-0.5 rounded {{ $grpMember->role_in_group === 'leader' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600' }}">
+                                                            {{ $grpMember->role_in_group === 'leader' ? 'Ketua' : 'Anggota' }}
+                                                        </span>
+                                                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded {{ $grpMember->statusValue() === 'active' ? 'bg-blue-50 text-blue-700 border border-blue-200' : ($grpMember->statusValue() === 'accepted' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($grpMember->statusValue() === 'completed' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-600')) }}">
+                                                            {{ ucfirst($grpMember->statusValue()) }}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>

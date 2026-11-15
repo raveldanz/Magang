@@ -35,7 +35,7 @@
     </x-slot>
 
     <div class="cc-wrap py-8" x-data="{ 
-        activeTab: '{{ request('tab', $activeTab ?? 'dosen') }}',
+        activeTab: @js(request('tab', $activeTab ?? 'dosen')),
         showAddDosenModal: false,
         showAssignAdvisorModal: false,
         selectedApplicationId: null,

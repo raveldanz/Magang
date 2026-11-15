@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Student\CertificateController;
 use App\Models\AuditLog;
 use App\Models\Certificate;
 use App\Models\Placement;
@@ -62,7 +63,7 @@ class CertificateApprovalController extends Controller
      */
     public function show($placementId)
     {
-        $data = \App\Http\Controllers\Student\CertificateController::getCertificateData($placementId, Auth::user());
+        $data = CertificateController::getCertificateData($placementId, Auth::user());
         $certificate = Certificate::where('placement_id', $placementId)->first();
         $data['certificateRecord'] = $certificate;
 
@@ -123,7 +124,7 @@ class CertificateApprovalController extends Controller
                 ['placement_id' => $placement->id],
                 [
                     'certificate_number' => $placement->certificate_number ?: "SERT/{$paddedId}/DISPUSIP-SBY/{$year}",
-                    'file_path' => 'certificates/' . $placement->id . '.pdf',
+                    'file_path' => 'certificates/'.$placement->id.'.pdf',
                     'approval_status' => 'waiting_approval',
                     'issued_at' => now()->toDateString(),
                 ]
@@ -195,13 +196,13 @@ class CertificateApprovalController extends Controller
         $aspectSummary = implode(', ', $selectedAspectNames);
 
         // Susun catatan komprehensif berstandar kedinasan
-        $compiledNotes = "Aspek Revisi: {$aspectSummary}\n" . trim($request->notes);
+        $compiledNotes = "Aspek Revisi: {$aspectSummary}\n".trim($request->notes);
 
         if (! empty($request->aspect_notes) && is_array($request->aspect_notes)) {
             foreach ($request->aspect_notes as $key => $aspekNote) {
                 if (! empty(trim($aspekNote)) && in_array($key, $request->aspects, true)) {
                     $lbl = $aspectLabels[$key] ?? ucfirst($key);
-                    $compiledNotes .= "\n• [{$lbl}]: " . trim($aspekNote);
+                    $compiledNotes .= "\n• [{$lbl}]: ".trim($aspekNote);
                 }
             }
         }

@@ -35,6 +35,20 @@ class AuditLog extends Model
     {
         $user = Auth::user();
 
+        if (session()->has('impersonator_id')) {
+            $impersonatorMeta = [
+                'impersonator_id' => session('impersonator_id'),
+                'impersonator_name' => session('impersonator_name'),
+            ];
+            if (is_array($details)) {
+                $details = array_merge($details, $impersonatorMeta);
+            } elseif (is_string($details) && $details !== '') {
+                $details = array_merge(['message' => $details], $impersonatorMeta);
+            } else {
+                $details = $impersonatorMeta;
+            }
+        }
+
         if (is_array($details)) {
             $details = json_encode($details, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }

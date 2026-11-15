@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\AuditLog;
 use App\Models\Logbook;
 use App\Models\Placement;
 use App\Services\PrivateDocumentStorage;
@@ -185,7 +186,7 @@ class LogbookController extends Controller
             $application->update(['status' => ApplicationStatus::ACTIVE]);
             $application->status = ApplicationStatus::ACTIVE;
 
-            \App\Models\AuditLog::record('AUTO_ACTIVATE_ON_FIRST_LOGBOOK', 'Application', $application->id, [
+            AuditLog::record('AUTO_ACTIVATE_ON_FIRST_LOGBOOK', 'Application', $application->id, [
                 'student_name' => $user->name,
                 'activity_date' => $request->date,
                 'reason' => 'Otomatis diaktifkan ke status ACTIVE saat logbook pertama berhasil disimpan.',
