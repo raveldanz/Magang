@@ -4,6 +4,17 @@ Selamat datang di repositori proyek **Sistem Informasi Manajemen Magang**. Berka
 
 ---
 
+## 0. AUTO-ACTIVATION RULE (MANDATORY SYSTEM DIRECTIVE)
+
+**Single Source of Truth:** Pada setiap interaksi dan setiap prompt pengguna (termasuk perintah singkat, kasual, atau satu baris tanpa kata kunci pemicu manual), seluruh agen wajib membaca dan mematuhi secara otomatis [`.antigravity/agent_rules.md`](.antigravity/agent_rules.md) beserta seluruh aturan modular di [`.antigravity/rules/`](.antigravity/rules/) (`architecture.md`, `database.md`, `media.md`, `quality.md`) sebelum menjawab atau mengedit kode:
+
+1. **Phase 0 — Automatic Orchestration & Sub-Agent Routing:** Tugas sederhana/satu file dikerjakan langsung dengan standar *Coder* (strict type-checking); tugas multi-file, fitur, bugfix, atau database otomatis mengikuti alur 3-tahap di `.antigravity/agents/` (`planner.md` $\rightarrow$ `coder.md` $\rightarrow$ `reviewer.md`).
+2. **Phase 1 — Contextual Reconnaissance ("Eyes"):** Dilarang menebak struktur file, nama kolom, nama route, atau logika bisnis. Verifikasi `.antigravity/rules/*`, `database/migrations/`, `app/Models/`, `app/Enums/`, telusuri alur `Route -> Middleware -> FormRequest -> Controller -> Service -> Model/Observer -> PostgreSQL -> Response/View`, serta petakan *blast radius* ke seluruh peran pengguna.
+3. **Phase 2 — Zero-Negligence Execution ("Brain"):** Tanpa placeholder (`// TODO`, `// ... existing code ...`), sinkronisasi penuh antar-lapisan saat skema berubah, cegah N+1 (`with()`/`loadMissing()`), jaga type-safety PostgreSQL, bungkus perubahan multi-tabel dalam `DB::transaction()`, validasi via `FormRequest`, tegakkan otorisasi peran (`CheckRole`/Policies), dan ajukan maksimal 1–2 pertanyaan klarifikasi hanya bila ada ambiguitas logika bisnis yang berisiko merusak data.
+4. **Phase 3 — Post-Execution Self-Audit Loop & Response Format:** Audit seluruh import/namespace, signature & return type, observer/route/test yang terdampak, serta edge case sebelum merespons, lalu sajikan ringkasan terstruktur (**Analysis & Blast Radius**, **Changes Executed**, **Verification**).
+
+---
+
 ## 1. Master Directive: Advanced Autonomous AI Software Engineer
 
 Anda beroperasi sebagai **Senior Autonomous AI Software Engineer** yang memiliki akses penuh ke sistem lokal melalui Model Context Protocol (MCP), Language Server Protocol (LSP / AST Code Navigation), Browser Vision Automation, dan Terminal.

@@ -4,6 +4,12 @@ Berkas ini melengkapi `AGENTS.md` dengan konteks domain, perintah kerja, gotcha 
 
 ---
 
+## AUTO-ACTIVATION MANDATE
+
+Protokol pada [`.antigravity/agent_rules.md`](.antigravity/agent_rules.md) dan [`AGENTS.md`](AGENTS.md) aktif secara **permanen dan otomatis** pada setiap interaksi pertama maupun lanjutan tanpa memerlukan *trigger phrase* manual. Sebelum merancang atau mengubah kode, wajib jalankan secara berurutan **Phase 0** (Routing kompleksitas ke alur `planner` $\rightarrow$ `coder` $\rightarrow$ `reviewer`), **Phase 1** (*Contextual Reconnaissance* terhadap `.antigravity/rules/*`, migrasi/model/enum, alur end-to-end, dan *blast radius* peran), **Phase 2** (*Zero-Negligence Execution* lengkap tanpa placeholder + disiplin PostgreSQL/keamanan), dan **Phase 3** (*Post-Execution Self-Audit Loop* + verifikasi Strict Exit Code 0).
+
+---
+
 ## 1. Profil Sistem & Tech Stack
 
 - **Sistem**: **SIP-MAGANG** — Sistem Informasi Manajemen Magang Pemerintah Kota Surabaya (Dinas/OPD ↔ Perguruan Tinggi ↔ Mahasiswa). Seluruh teks antarmuka, label, validasi, dan dokumen resmi menggunakan **Bahasa Indonesia**.

@@ -1,5 +1,15 @@
 # CLAUDE.md
 
+## PROJECT AGENT INSTRUCTIONS & AUTO-ACTIVATION RULE
+
+You MUST read and strictly obey `.antigravity/agent_rules.md` and all files inside `.antigravity/rules/` (`architecture.md`, `database.md`, `media.md`, `quality.md`) on every single interaction before taking any action, without requiring any manual trigger phrase:
+- **Phase 0 (Routing):** Direct *Coder* standard for simple single-file edits; `.antigravity/agents/` 3-stage pipeline (`planner.md` -> `coder.md` -> `reviewer.md`) for multi-file, feature, bugfix, or database tasks.
+- **Phase 1 (Contextual Reconnaissance):** Inspect `.antigravity/rules/*`, `database/migrations/`, `app/Models/`, `app/Enums/`, trace `Route -> Middleware -> FormRequest -> Controller -> Service -> Model/Observer -> PostgreSQL -> Response/View`, and check blast radius across all roles before editing.
+- **Phase 2 (Zero-Negligence Execution):** No placeholders (`// TODO`, `// ... existing code ...`), full-stack sync on schema changes, prevent N+1 (`with()`/`loadMissing()`), enforce `DB::transaction()`, `FormRequest` validation, and `CheckRole`/Policies.
+- **Phase 3 (Self-Audit Loop & Response Format):** Verify imports/namespaces, strict PHP 8.2+ signatures, observers/routes/tests, and edge cases before replying with **Analysis & Blast Radius**, **Changes Executed**, and **Verification**.
+
+---
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 **SIP-MAGANG** — internship lifecycle management system for Pemerintah Kota Surabaya (agencies ↔ universities ↔ students). UI text, labels, comments and most docs are in Bahasa Indonesia; keep new user-facing strings in Indonesian.
