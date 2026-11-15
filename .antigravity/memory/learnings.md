@@ -4444,3 +4444,15 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
 
 
 
+
+### [LRN-150] Keamanan: Batas Tenant Berbasis ID, Paritas Double ACC, dan Pencabutan Kredensial
+- **Date:** 2026-11-16
+- **Problem / Symptom:** Temuan audit Prioritas 2/3 (security-audit run-1): log audit global terbuka untuk semua Admin Dinas; revisi sertifikat, endpoint supervisor, dan moderasi proyek privat tidak membandingkan instansi; Admin Kampus bisa mengakses kampus lain dengan mengganti nama kampus atau memakai kode satu huruf (`str_contains`); Admin Dinas melompati ACC Atasan dengan status `active`; DPL lain sekampus bisa memverifikasi logbook; sesi Login As bertahan setelah Super Admin diturunkan; ganti password tidak mencabut token/sesi; `return_to` menerima `javascript:` dan host luar; ekspor CSV rentan formula injection; tema sertifikat global bisa diubah dinas mana pun.
+- **Root Cause:** Otorisasi ditulis inline per aksi dan hanya memeriksa sebagian (bidang tetapi bukan instansi; `accepted` tetapi bukan `active`); kunci tenant memakai teks nama yang bisa diubah pemiliknya; keputusan wewenang disimpan di sesi tanpa dicek ulang.
+- **Fix Applied:** `ensureSupervisorAgencyScope()` & `safeReturnTo()` (tolak kontrol/backslash, URL absolut harus diawali `url('/')`) di base Controller; `CertificateController::ensureSameAgency()` + validasi `unit_id`/`mentor_id`; `canManageCertificateTheme()` (Super Admin atau Admin Utama Dispusip); `InternshipProject::isModeratableBy()/isViewableBy()/scopeVisibleTo()`; `UniversityResolver::belongsTo()` + nama/kode kampus unik setelah normalisasi; `EnsureAccountIsActive` memutus Login As bila impersonator bukan Super Admin; `User::booted()` merotasi `remember_token`, menghapus token Sanctum dan sesi lain saat password berubah (`sanctum.expiration` 30 hari); `App\Support\CsvSafe`. Regresi: `tests/Feature/AuditPriorityTwoSecurityTest.php`.
+- **Prevention Rule:**
+  1. Batas kampus selalu lewat `UniversityResolver::belongsTo()`; jangan pernah `str_contains`/`LIKE` pada nama kampus, dan jangan menulis `university_id` sebagai efek samping pemeriksaan akses.
+  2. Setiap aksi baca/tulis data magang oleh staf instansi WAJIB membandingkan `application.unit.agency_profile_id` dengan `agency_profile_id` pengguna, bukan hanya `unit_id` Admin Bidang.
+  3. Aturan Double ACC berlaku untuk SEMUA status tujuan pasca-seleksi (`accepted` dan `active`) di jalur perorangan, kelompok, dan massal.
+  4. Wewenang yang disimpan di sesi (mis. `impersonator_id`) harus dicek ulang ke database setiap request.
+  5. Redirect dari input pengguna hanya lewat `safeReturnTo()`; sel CSV dari input pengguna lewat `CsvSafe::row()`.

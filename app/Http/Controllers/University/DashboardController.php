@@ -376,19 +376,8 @@ class DashboardController extends Controller
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
 
         // Batas tenant ketat: university_id, atau nama kampus yang sama persis untuk data lama.
-        // Tidak lagi memakai pencocokan substring (kode 'a' dulu cocok dengan hampir semua kampus).
-        $isMatchUniv = function ($student) use ($university) {
-            if (! app(UniversityResolver::class)->belongsTo($student, $university)) {
-                return false;
-            }
-
-            // Data lama tanpa university_id dilengkapi setelah cocok persis
-            if (! $student->university_id) {
-                $student->update(['university_id' => $university->id]);
-            }
-
-            return true;
-        };
+        // Tidak memakai substring, dan tidak menulis university_id mahasiswa sebagai efek samping.
+        $isMatchUniv = fn ($student) => app(UniversityResolver::class)->belongsTo($student, $university);
 
         // 1. Coba cari Placement terlebih dahulu (karena route param adalah {placementId})
         $placement = Placement::with([

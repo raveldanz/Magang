@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgencyProfile;
 use App\Models\Application;
 use App\Models\AuditLog;
 use App\Models\Certificate;
@@ -93,7 +94,9 @@ class CertificateController extends Controller
         $activeTheme = CertificateTheme::getActive();
         $allThemes = CertificateTheme::orderByDesc('year')->get();
 
-        return view('admin.certificates.index', compact('applications', 'activeTheme', 'allThemes', 'eligibleApps'));
+        $canManageTheme = $this->canManageCertificateTheme();
+
+        return view('admin.certificates.index', compact('applications', 'activeTheme', 'allThemes', 'eligibleApps', 'canManageTheme'));
     }
 
     // Pratinjau & Cetak E-Sertifikat Lengkap (Format Resmi Mahasiswa & Transkrip 2 Halaman)
@@ -405,9 +408,8 @@ class CertificateController extends Controller
     public function updateTheme(Request $request)
     {
         $user = Auth::user();
-        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
-            abort(403, 'Hanya Admin Utama atau Super Admin yang dapat mengubah tema sertifikat dinas.');
-        }
+        // Tema berlaku untuk sertifikat SEMUA instansi, jadi hanya penerbitnya yang boleh mengubah
+        abort_unless($this->canManageCertificateTheme(), 403, 'Tema & penandatangan sertifikat hanya dapat diubah oleh Super Admin atau Admin Utama Dispusip.');
 
         $isDesignOnly = $request->input('save_mode') === 'design_only';
 
@@ -492,7 +494,7 @@ class CertificateController extends Controller
                 'signee_position' => $validated['signee_position'],
                 'signee_rank' => $validated['signee_rank'] ?? 'PEMBINA TK I',
                 'signee_nip' => $validated['signee_nip'] ?? '',
-                'mandate_text' => $validated['mandate_text'] ?: 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya',
+                'mandate_text' => ($validated['mandate_text'] ?? null) ?: 'a.n. Kepala Dinas Perpustakaan dan Kearsipan Kota Surabaya',
                 'city' => $validated['city'] ?: 'Surabaya',
                 'is_active' => true,
             ]
@@ -586,9 +588,8 @@ class CertificateController extends Controller
     public function activateTheme($id)
     {
         $user = Auth::user();
-        if ($user && ! $user->isSuperAdmin() && $user->unit_id) {
-            abort(403, 'Hanya Admin Utama atau Super Admin yang dapat mengubah tema sertifikat dinas.');
-        }
+        // Tema berlaku untuk sertifikat SEMUA instansi, jadi hanya penerbitnya yang boleh mengubah
+        abort_unless($this->canManageCertificateTheme(), 403, 'Tema & penandatangan sertifikat hanya dapat diubah oleh Super Admin atau Admin Utama Dispusip.');
 
         $theme = CertificateTheme::findOrFail($id);
         CertificateTheme::where('id', '!=', $theme->id)->update(['is_active' => false]);
@@ -660,5 +661,28 @@ class CertificateController extends Controller
             403,
             'Anda tidak memiliki hak akses ke sertifikat instansi lain.'
         );
+    }
+
+    /**
+     * certificate_themes bersifat global (per tahun, tanpa kolom instansi) dan tercetak di sertifikat
+     * semua instansi. Yang boleh mengubahnya: Super Admin, atau Admin Dinas Utama (tanpa bidang)
+     * dari Dispusip selaku penerbit sertifikat. Admin dinas lain dan Admin Bidang tidak boleh.
+     */
+    private function canManageCertificateTheme(): bool
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return false;
+        }
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+        if ($user->role !== 'admin' || $user->unit_id || $user->agency_profile_id === null) {
+            return false;
+        }
+
+        $issuerId = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->value('id');
+
+        return $issuerId !== null && (int) $issuerId === (int) $user->agency_profile_id;
     }
 }

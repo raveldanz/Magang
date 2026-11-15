@@ -68,24 +68,23 @@ abstract class Controller
             return null;
         }
 
-        // Karakter kontrol/spasi bisa dipakai menyelundupkan skema (mis. "java\tscript:")
-        if (preg_match('/[\x00-\x20\x7F]/', $returnTo)) {
+        // Karakter kontrol/spasi bisa menyelundupkan skema (mis. "java<TAB>script:"), dan backslash dibaca
+        // browser sebagai '/', sehingga "/\host" atau "https://app\@host" berpindah ke host lain.
+        if (preg_match('/[\x00-\x20\x7F\\\\]/', $returnTo)) {
             return null;
         }
 
-        // "/path" relatif aman, tetapi "//host" dan "/\host" dibaca browser sebagai URL ke host lain
+        // Path relatif aman, kecuali "//host" (protocol-relative URL ke host lain)
         if (str_starts_with($returnTo, '/')) {
-            return (str_starts_with($returnTo, '//') || str_starts_with($returnTo, '/\\')) ? null : $returnTo;
+            return str_starts_with($returnTo, '//') ? null : $returnTo;
         }
 
-        $scheme = strtolower((string) parse_url($returnTo, PHP_URL_SCHEME));
-        if (! in_array($scheme, ['http', 'https'], true)) {
-            return null;
-        }
+        // URL absolut hanya diterima bila diawali tepat dengan alamat aplikasi ini (menolak juga
+        // "https://app.host@evil.example" dan "https://app.host.evil.example").
+        $base = rtrim(url('/'), '/');
 
-        $appHost = parse_url(url('/'), PHP_URL_HOST);
-        $targetHost = parse_url($returnTo, PHP_URL_HOST);
-
-        return ($targetHost && $appHost && strcasecmp($targetHost, $appHost) === 0) ? $returnTo : null;
+        return ($returnTo === $base || str_starts_with($returnTo, $base.'/') || str_starts_with($returnTo, $base.'?'))
+            ? $returnTo
+            : null;
     }
 }

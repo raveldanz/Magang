@@ -309,6 +309,11 @@
             <!-- TAB 2: PENGATURAN DESAIN & TTE RESMI TAHUNAN                      -->
             <!-- ================================================================= -->
             <div x-show="activeTab === 'settings'" x-cloak class="space-y-6">
+                @unless($canManageTheme ?? true)
+                    <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                        Tema dan penandatangan sertifikat berlaku untuk seluruh instansi, sehingga hanya dapat diubah oleh Super Admin atau Admin Utama Dispusip. Anda dapat melihat pengaturannya, tetapi tidak dapat menyimpannya.
+                    </div>
+                @endunless
                 
                 <form action="{{ route('admin.certificates.updateTheme') }}" method="POST" class="space-y-6">
                     @csrf

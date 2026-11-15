@@ -166,7 +166,8 @@ class AuditPriorityTwoSecurityTest extends TestCase
 
     public function test_return_to_rejects_javascript_and_external_urls(): void
     {
-        foreach (['javascript:alert(1)', 'https://attacker.example/x', '//attacker.example', '/\\attacker.example'] as $evil) {
+        foreach (['javascript:alert(1)', 'https://attacker.example/x', '//attacker.example', '/\\attacker.example',
+            url('/').'\\@attacker.example', url('/').'@attacker.example', url('/').'.attacker.example'] as $evil) {
             $this->actingAs($this->superAdmin)->get(route('admin.users.create', ['return_to' => $evil]))
                 ->assertOk()->assertDontSee($evil, false);
         }
@@ -319,6 +320,13 @@ class AuditPriorityTwoSecurityTest extends TestCase
         $this->actingAs($adminA)->post(route('university.lecturers.reset_password', $dosenV->id))->assertForbidden();
         $this->assertTrue(Hash::check('Dosen-V-Rahasia1', $dosenV->fresh()->password));
 
+        // Variasi penulisan nama kampus lain (huruf/tanda baca/spasi) atau akronimnya juga ditolak
+        foreach (['universitas  victoria', 'Universitas-Victoria!', 'uv'] as $samaran) {
+            $this->actingAs($adminA)->post(route('university.profile.update'), [
+                'name' => $samaran, 'code' => 'KA', 'evaluation_scheme' => 'mentor_only',
+            ])->assertSessionHasErrors('name');
+        }
+
         // Kode satu huruf ditolak, dan pencocokan substring tidak lagi membuka data kampus lain
         $this->actingAs($adminA)->post(route('university.profile.update'), [
             'name' => 'Kampus A', 'code' => 'a', 'evaluation_scheme' => 'mentor_only',
@@ -345,7 +353,8 @@ class AuditPriorityTwoSecurityTest extends TestCase
         $student->forceFill(['university_id' => null, 'university' => 'Kampus A'])->save();
 
         $this->actingAs($adminA)->get(route('university.students.show', $placement->id))->assertOk();
-        $this->assertSame($kampusA->id, (int) $student->fresh()->university_id);
+        // Membaca data tidak lagi mengubah kampus mahasiswa sebagai efek samping
+        $this->assertNull($student->fresh()->university_id);
     }
 
     // magang.admin-certificate.revision-missing-agency-scope
@@ -365,6 +374,29 @@ class AuditPriorityTwoSecurityTest extends TestCase
             'nilai_disiplin' => 100, 'nilai_kinerja' => 100, 'nilai_laporan' => 100, 'action' => 'save_draft',
         ])->assertForbidden();
         $this->assertSame($studentName, $placement->application->user->fresh()->name);
+    }
+
+    // magang.certificate-theme.global-theme-editable-by-any-agency-admin
+
+    public function test_only_super_admin_or_dispusip_main_admin_can_change_global_certificate_theme(): void
+    {
+        // Migrasi standardisasi sudah membuat profil Dispusip
+        $dispusip = AgencyProfile::where('agency_name', 'like', '%Perpustakaan%')->first()
+            ?? AgencyProfile::create(['agency_name' => 'Dinas Perpustakaan dan Kearsipan']);
+        $payload = [
+            'year' => 2026, 'theme_name' => 'x', 'primary_color' => '#000000', 'secondary_color' => '#000000',
+            'accent_color' => '#000000', 'number_format_pattern' => '{NUMBER}', 'signee_name' => 'Mallory',
+            'signee_position' => 'P', 'city' => 'C',
+        ];
+
+        $adminOtherAgency = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $this->agencyB->id]);
+        $this->actingAs($adminOtherAgency)->post(route('admin.certificates.updateTheme'), $payload)->assertForbidden();
+        $this->assertDatabaseMissing('certificate_themes', ['signee_name' => 'Mallory']);
+
+        $adminDispusip = User::factory()->create(['role' => 'admin', 'agency_profile_id' => $dispusip->id]);
+        $this->actingAs($adminDispusip)->post(route('admin.certificates.updateTheme'), ['signee_name' => 'Kepala Dispusip'] + $payload)
+            ->assertRedirect();
+        $this->assertDatabaseHas('certificate_themes', ['signee_name' => 'Kepala Dispusip']);
     }
 
     // magang.csv-export.formula-injection

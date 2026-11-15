@@ -4,6 +4,7 @@ namespace App\Http\Controllers\University;
 
 use App\Http\Controllers\Controller;
 use App\Models\University;
+use App\Services\UniversityResolver;
 use App\Support\SafeUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,10 +60,30 @@ class ProfileController extends Controller
             $request->merge(['code' => strtoupper(trim((string) $request->code))]);
         }
 
+        // Pemeriksaan unik setelah normalisasi (huruf, tanda baca, spasi), dibandingkan dengan nama,
+        // akronim, kode, dan slug kampus lain — sama seperti cara UniversityResolver mencocokkan kampus.
+        $otherKeys = University::where('id', '!=', $university->id)
+            ->get(['name', 'acronym', 'code', 'slug'])
+            ->flatMap(fn ($u) => [
+                UniversityResolver::normalize($u->name),
+                UniversityResolver::normalize($u->acronym),
+                UniversityResolver::normalize($u->code),
+                UniversityResolver::normalize(str_replace('-', ' ', (string) $u->slug)),
+            ])
+            ->filter()
+            ->unique()
+            ->all();
+        $notAnotherCampus = function (string $attribute, $value, \Closure $fail) use ($otherKeys) {
+            $normalized = UniversityResolver::normalize((string) $value);
+            if ($normalized !== '' && in_array($normalized, $otherKeys, true)) {
+                $fail('Nama atau kode ini sudah dipakai perguruan tinggi lain.');
+            }
+        };
+
         $request->validate([
             // Nama & kode kampus harus unik: admin kampus tidak boleh menyamar sebagai kampus lain
-            'name' => ['required', 'string', 'max:255', Rule::unique('universities', 'name')->ignore($university->id)],
-            'code' => ['nullable', 'string', 'min:2', 'max:20', Rule::unique('universities', 'code')->ignore($university->id)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('universities', 'name')->ignore($university->id), $notAnotherCampus],
+            'code' => ['nullable', 'string', 'min:2', 'max:20', Rule::unique('universities', 'code')->ignore($university->id), $notAnotherCampus],
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
