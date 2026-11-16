@@ -180,7 +180,7 @@
                                     <strong class="text-slate-900 font-bold">Unit Kerja:</strong> {{ $unit->name ?? '-' }}
                                 </div>
                                 <div class="text-[11px] text-slate-700 font-medium">
-                                    <strong class="text-slate-900 font-bold">Dosen Pembimbing:</strong> {{ $dosen->name ?? 'Belum Ditugaskan' }}
+                                    <strong class="text-slate-900 font-bold">Pembimbing:</strong> {{ $dosen->name ?? 'Belum Ditugaskan' }}
                                 </div>
                                 <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200/60">
                                     <span class="text-slate-500">Laporan Akhir:
@@ -224,7 +224,7 @@
                             <tr>
                                 <th class="py-3.5 px-5 w-3/12">Mahasiswa</th>
                                 <th class="py-3.5 px-4 w-3/12">Perguruan Tinggi & Unit</th>
-                                <th class="py-3.5 px-4 w-2/12">Dosen Pembimbing</th>
+                                <th class="py-3.5 px-4 w-2/12">Pembimbing</th>
                                 <th class="py-3.5 px-3 text-center w-1/12 whitespace-nowrap">Logbook</th>
                                 <th class="py-3.5 px-3 text-center w-1/12 whitespace-nowrap">Laporan Akhir</th>
                                 <th class="py-3.5 px-4 text-center w-1/12 whitespace-nowrap">Nilai Mentor</th>

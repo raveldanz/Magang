@@ -254,7 +254,7 @@
                     @elseif ($isDosen)
                         <a href="{{ route('lecturer.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Portal Dosen
+                            Portal Pembimbing
                         </a>
                         <a href="{{ route('lecturer.monitoring.index') }}" 
                            class="transition py-1 {{ request()->routeIs('lecturer.monitoring.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -282,7 +282,7 @@
                         </a>
                         <a href="{{ route('university.lecturers.index') }}" 
                            class="transition py-1 {{ request()->routeIs('university.lecturers.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Dosen Pembimbing
+                            Pembimbing
                         </a>
                         <a href="{{ route('university.profile.index') }}" 
                            class="transition py-1 {{ request()->routeIs('university.profile.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -512,7 +512,7 @@
                             </a>
                         @elseif ($isDosen)
                             <a href="{{ route('lecturer.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Portal Dosen
+                                Portal Pembimbing
                             </a>
                             <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Mahasiswa Bimbingan
@@ -535,7 +535,7 @@
                                 Portal Universitas
                             </a>
                             <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Dosen Pembimbing
+                                Pembimbing
                             </a>
                             <a href="{{ route('university.profile.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Profil Kampus
@@ -784,7 +784,7 @@
                 @elseif ($isDosen)
                     <a href="{{ route('lecturer.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
-                        <span>Portal Dosen</span>
+                        <span>Portal Pembimbing</span>
                     </a>
                     <a href="{{ route('lecturer.monitoring.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('lecturer.monitoring.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
@@ -818,7 +818,7 @@
                     </a>
                     <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.lecturers.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
-                        <span>Dosen Pembimbing</span>
+                        <span>Pembimbing</span>
                     </a>
                     <a href="{{ route('university.profile.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.profile.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         

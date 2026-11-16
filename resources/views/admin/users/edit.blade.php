@@ -58,7 +58,7 @@
                                 <option value="admin">Admin Instansi Dinas / Superadmin</option>
                                 <option value="supervisor">Supervisor</option>
                                 <option value="mentor">Mentor Lapangan Dinas</option>
-                                <option value="dosen">Dosen Pembimbing</option>
+                                <option value="dosen">Pembimbing</option>
                                 <option value="universitas">Admin Universitas</option>
                             </select>
                         </div>
