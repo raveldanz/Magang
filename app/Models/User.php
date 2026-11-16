@@ -27,6 +27,9 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+
+    
+
     protected function casts(): array
     {
         return [
@@ -112,9 +115,9 @@ class User extends Authenticatable
             'super_admin' => 'Super Admin',
             'supervisor' => 'Supervisor',
             'mentor', 'pembimbing' => 'Mentor Lapangan',
-            'lecturer', 'dosen', 'academic_advisor' => 'Dosen Pembimbing',
-            'university', 'universitas' => 'Admin Universitas',
-            'student', 'mahasiswa' => 'Mahasiswa Magang',
+            'lecturer', 'dosen', 'academic_advisor' => 'Dosen / Guru Pembimbing',
+            'university', 'universitas' => 'Admin Instansi Pendidikan',
+            'student', 'mahasiswa' => 'Peserta Magang',
             default => ucwords(str_replace('_', ' ', (string) $this->role)),
         };
     }

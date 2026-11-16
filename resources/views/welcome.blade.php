@@ -183,7 +183,7 @@
                         </form>
                     @else
                         <a href="{{ route('register') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition">
-                            <span>Daftar Magang</span>
+                            <span>Daftar Akun</span>
                         </a>
                         <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition">
                             Masuk ke Akun
@@ -246,7 +246,7 @@
                                 </a>
                             @else
                                 <a href="{{ route('register') }}" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-md shadow-blue-500/20 transition text-center flex items-center justify-center gap-2">
-                                    <span>Daftar Magang Sekarang</span>
+                                    <span>Daftar Akun Sekarang</span>
                                 </a>
                                 <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl transition text-center shadow-2xs">
                                     Masuk ke Akun

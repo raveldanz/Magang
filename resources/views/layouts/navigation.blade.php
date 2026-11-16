@@ -883,7 +883,7 @@
                         Masuk ke Akun
                     </a>
                     <a href="{{ route('register') }}" class="flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition">
-                        Daftar Magang Baru
+                        Daftar Akun
                     </a>
                 </div>
             </div>
