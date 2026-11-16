@@ -58,7 +58,7 @@
                 <div class="bg-white rounded-2xl shadow-xs border border-gray-200 p-6 space-y-5">
                     <div class="border-b border-gray-100 pb-3 flex items-center gap-2">
                         <div>
-                            <h3 class="font-bold text-base text-gray-900">Identitas Resmi Perguruan Tinggi</h3>
+                            <h3 class="font-bold text-base text-gray-900">Identitas Resmi Kampus/Sekolah</h3>
                             <p class="text-xs text-gray-400">Data ini akan tercantum pada kop surat tugas dan dokumen resmi kampus</p>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                         <div class="md:col-span-2 space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                    Nama Lengkap Perguruan Tinggi <span class="text-rose-500">*</span>
+                                    Nama Lengkap Kampus/Sekolah <span class="text-rose-500">*</span>
                                 </label>
                                 <input type="text" name="name" value="{{ old('name', $university->name) }}" required placeholder="Contoh: Universitas Dr. Soetomo" class="w-full text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-semibold">
                             </div>

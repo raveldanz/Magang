@@ -174,7 +174,7 @@ class InternshipStatusStandardizationTest extends TestCase
         $response->assertOk();
         $response->assertSeeText('Daftar Peserta Bimbingan Magang');
         $response->assertSeeText('Peserta Magang');
-        $response->assertSeeText('Perguruan Tinggi & Unit');
+        $response->assertSeeText('Kampus/Sekolah & Unit');
         $response->assertSeeText('Status');
         $response->assertDontSee('Dosen Pembimbing');
         $response->assertSeeText('Logbook');

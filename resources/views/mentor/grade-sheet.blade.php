@@ -58,7 +58,7 @@
         <table class="identitas">
             <tr><td>Nama Peserta Magang</td><td>:</td><td><strong>{{ $student?->name ?? '-' }}</strong></td></tr>
             <tr><td>NIM/NIS</td><td>:</td><td>{{ $profile?->nim ?? '-' }}</td></tr>
-            <tr><td>Perguruan Tinggi / Program Studi</td><td>:</td><td>{{ $profile?->universitas ?? '-' }} / {{ $profile?->jurusan ?? '-' }}</td></tr>
+            <tr><td>Kampus/Sekolah / Jurusan</td><td>:</td><td>{{ $profile?->universitas ?? '-' }} / {{ $profile?->jurusan ?? '-' }}</td></tr>
             <tr><td>Bidang / Unit Penempatan</td><td>:</td><td>{{ $unit?->name ?? '-' }}</td></tr>
             <tr><td>Periode Magang</td><td>:</td><td>
                 {{ $placement->application?->start_date ? \Carbon\Carbon::parse($placement->application->start_date)->translatedFormat('d F Y') : '-' }}

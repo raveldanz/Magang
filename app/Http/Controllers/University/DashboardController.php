@@ -234,7 +234,7 @@ class DashboardController extends Controller
         $isAdvisorSameUniv = app(UniversityResolver::class)->belongsTo($advisor, $university);
 
         if (! $isAdvisorSameUniv) {
-            return redirect()->back()->with('error', 'Pembimbing yang dipilih harus terdaftar di perguruan tinggi Anda.');
+            return redirect()->back()->with('error', 'Pembimbing yang dipilih harus terdaftar di kampus/sekolah Anda.');
         }
 
         if ($advisor->isPendingApproval()) {
@@ -263,7 +263,7 @@ class DashboardController extends Controller
         $university = $user->university_id
             ? University::find($user->university_id)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
-        $univName = $university?->name ?? $user->university ?? 'Universitas';
+        $univName = $university?->name ?? $user->university ?? 'Kampus/Sekolah';
 
         // Query Semua Pengajuan Mahasiswa Asal Kampus Ini
         $applications = Application::with([

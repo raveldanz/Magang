@@ -118,7 +118,7 @@ class PlacementAssignmentService
 
         if (! $advisor || ($studentUnivId && (int) $advisor->university_id !== (int) $studentUnivId)) {
             throw ValidationException::withMessages([
-                'academic_advisor_id' => 'Pembimbing yang dipilih harus berasal dari perguruan tinggi peserta magang.',
+                'academic_advisor_id' => 'Pembimbing yang dipilih harus berasal dari kampus/sekolah peserta magang.',
             ]);
         }
 

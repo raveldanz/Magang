@@ -233,7 +233,7 @@
                                 <select name="university_id" onchange="this.form.submit()"
                                         aria-label="Filter perguruan tinggi"
                                         class="min-h-[48px] py-2.5 pl-3.5 pr-9 text-base border-slate-300 rounded-xl focus:ring-blue-600 focus:border-blue-600 shadow-2xs bg-white max-w-full sm:max-w-xs truncate">
-                                    <option value="">Semua Perguruan Tinggi</option>
+                                    <option value="">Semua Kampus/Sekolah</option>
                                     @foreach($universities as $u)
                                         <option value="{{ $u->id }}" {{ request('university_id') == $u->id ? 'selected' : '' }}>
                                             {{ $u->name }}
@@ -350,7 +350,7 @@
                         <thead class="bg-slate-50 text-slate-800 font-bold text-sm">
                             <tr>
                                 <th scope="col" class="py-3.5 px-5">Peserta Magang</th>
-                                <th scope="col" class="py-3.5 px-4">Perguruan Tinggi &amp; Unit</th>
+                                <th scope="col" class="py-3.5 px-4">Kampus/Sekolah &amp; Unit</th>
                                 <th scope="col" class="py-3.5 px-4">Status</th>
                                 <th scope="col" class="py-3.5 px-4">Logbook</th>
                                 <th scope="col" class="py-3.5 px-4">Laporan Akhir</th>

@@ -254,7 +254,7 @@
                                     @elseif($actSt === 'active')
                                         Anda Sedang Menjalani Magang
                                     @elseif($actSt === 'completed')
-                                        Program Magang MBKM Telah Selesai
+                                        Program Magang Telah Selesai
                                     @endif
                                 </span>
                             </div>
@@ -268,7 +268,7 @@
                             @elseif(in_array($actSt, ['accepted', 'active']))
                                 Selamat! Anda telah resmi diterima magang di <strong>{{ $activeApplication->unit->agencyProfile->agency_name ?? 'Pemerintah Kota Surabaya' }}</strong> (Divisi: {{ $activeApplication->unit->name ?? '-' }}). Silakan fokus pada pelaksanaan kegiatan magang harian Anda.
                             @elseif($actSt === 'completed')
-                                Anda telah menyelesaikan seluruh rangkaian kegiatan magang MBKM serta menerima penilaian akhir resmi. Anda dapat mengunduh E-Sertifikat dan arsip laporan melalui menu <strong>Laporan Akhir</strong>.
+                                Anda telah menyelesaikan seluruh rangkaian kegiatan magang serta menerima penilaian akhir resmi. Anda dapat mengunduh E-Sertifikat dan arsip laporan melalui menu <strong>Laporan Akhir</strong>.
                             @endif
                         </p>
 
@@ -427,7 +427,7 @@
                                         @csrf
                                         <div class="space-y-2">
                                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                                Surat Pengantar / Proposal Kelompok dari Universitas <span class="text-red-500">*</span>
+                                                Surat Pengantar / Proposal Kelompok dari Kampus/Sekolah <span class="text-red-500">*</span>
                                             </label>
                                             <input type="file" data-max-kb="{{ \App\Support\UploadRules::MAX_DOCUMENT_KB }}" name="surat_pengantar" accept=".pdf" required
                                                    @change="if($event.target.files.length) {
@@ -777,7 +777,7 @@
 
                                         <div class="flex items-center justify-between">
                                             <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
-                                                Surat Pengantar dari Perguruan Tinggi <span class="text-red-500">*</span>
+                                                Surat Pengantar dari Kampus/Sekolah <span class="text-red-500">*</span>
                                             </label>
                                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800">
                                                 Wajib Diunggah

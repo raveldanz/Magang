@@ -98,7 +98,7 @@ class ApplicationController extends Controller
             $msg = match ($existingStatusVal) {
                 'pending', 'waiting_approval' => 'Anda masih memiliki berkas pengajuan magang yang sedang diproses. Mohon tunggu proses verifikasi admin dinas.',
                 'accepted', 'active' => 'Akses ditolak: Anda sudah memiliki penempatan magang aktif yang sedang berjalan.',
-                'completed' => 'Anda telah menyelesaikan program magang MBKM pada instansi sebelumnya.',
+                'completed' => 'Anda telah menyelesaikan program magang pada instansi sebelumnya.',
                 default => 'Anda sudah memiliki pengajuan magang aktif.'
             };
 
@@ -127,7 +127,7 @@ class ApplicationController extends Controller
             'start_date.after_or_equal' => 'Tanggal mulai magang tidak boleh sebelum hari ini.',
             'end_date.required' => 'Tanggal selesai magang wajib diisi.',
             'end_date.after_or_equal' => 'Tanggal selesai magang harus setelah atau sama dengan tanggal mulai.',
-            'surat_pengantar.required' => 'Surat Pengantar dari perguruan tinggi wajib diunggah.',
+            'surat_pengantar.required' => 'Surat Pengantar dari kampus/sekolah wajib diunggah.',
             'surat_pengantar.mimes' => 'File Surat Pengantar harus berformat PDF.',
             'surat_pengantar.max' => 'Ukuran file Surat Pengantar maksimal 2MB.',
             'cv.mimes' => 'File CV harus berformat PDF.',

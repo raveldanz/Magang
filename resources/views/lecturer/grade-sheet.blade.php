@@ -118,7 +118,7 @@
             <div class="flex-1 text-center font-serif">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">KEMENTERIAN PENDIDIKAN TINGGI, SAINS, DAN TEKNOLOGI</h3>
                 <h1 class="text-xl font-bold uppercase tracking-wide text-slate-950 mt-0.5 leading-tight">
-                    {{ $univ->name ?? ($profile->universitas ?? 'UNIVERSITAS MITRA MAGANG') }}
+                    {{ $univ->name ?? ($profile->universitas ?? 'INSTITUSI MITRA MAGANG') }}
                 </h1>
                 <p class="text-xs font-medium text-slate-600 mt-1 leading-snug">
                     Program Studi {{ $profile->jurusan ?? 'Informatika' }} &bull; Fakultas Teknologi Informasi dan Sains Data
@@ -192,7 +192,7 @@
                     <tr>
                         <td class="py-1 font-semibold text-slate-700">Pembimbing</td>
                         <td class="py-1">:</td>
-                        <td class="py-1 font-semibold text-slate-900">{{ $dosen->name ?? '-' }} (Perguruan Tinggi)</td>
+                        <td class="py-1 font-semibold text-slate-900">{{ $dosen->name ?? '-' }} (Kampus/Sekolah)</td>
                     </tr>
                 </tbody>
             </table>
@@ -382,7 +382,7 @@
                 <div>
                     <p class="text-slate-500 font-medium text-[10.5px]">Surabaya, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                     <p class="font-bold text-slate-800 text-xs mt-0.5">Pembimbing</p>
-                    <p class="text-[10px] text-slate-500 truncate">{{ $univ->name ?? ($profile->universitas ?? 'Perguruan Tinggi') }}</p>
+                    <p class="text-[10px] text-slate-500 truncate">{{ $univ->name ?? ($profile->universitas ?? 'Kampus/Sekolah') }}</p>
 
                     <div class="h-12 flex items-center justify-center my-0.5">
                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-blue-800/25 bg-blue-50/60 text-blue-900/80 text-[8.5px] font-bold uppercase tracking-wider">

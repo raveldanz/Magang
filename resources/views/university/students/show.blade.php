@@ -63,18 +63,23 @@
                         </div>
                         <div class="min-w-0">
                             <h3 class="font-bold text-sm text-slate-900 truncate leading-tight">{{ $student->name }}</h3>
-                            <p class="text-[11px] font-mono text-slate-400 mt-0.5">NIM/NIS: {{ $profile?->nim ?? '-' }}</p>
+                            <p class="text-[11px] font-mono text-slate-400 mt-0.5">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }}: {{ $profile?->nim ?? '-' }}</p>
                         </div>
                     </div>
 
                     <div class="space-y-1.5 text-xs">
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Prodi:</span>
+                            <span class="text-slate-400">{{ $profile?->isSchoolStudent() ? 'Jurusan:' : 'Prodi:' }}</span>
                             <span class="font-semibold text-slate-700">{{ $profile?->jurusan ?? '-' }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Fakultas:</span>
-                            <span class="font-semibold text-slate-700">{{ $profile?->fakultas ?? '-' }}</span>
+                            @if ($profile?->isSchoolStudent())
+                                <span class="text-slate-400">Kelas:</span>
+                                <span class="font-semibold text-slate-700">{{ $profile->periodLabel() ?? '-' }}</span>
+                            @else
+                                <span class="text-slate-400">Fakultas:</span>
+                                <span class="font-semibold text-slate-700">{{ $profile?->fakultas ?? '-' }}</span>
+                            @endif
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">WhatsApp:</span>

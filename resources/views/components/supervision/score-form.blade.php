@@ -168,7 +168,7 @@
                 <div class="text-xs sm:text-sm text-slate-700 font-mono">NIM/NIS: {{ $profile->nim ?? '-' }}</div>
             </div>
             <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
-                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Perguruan Tinggi &amp; Program Studi</span>
+                <span class="text-xs text-slate-600 font-bold uppercase tracking-wider block">Kampus/Sekolah &amp; Jurusan</span>
                 <div class="text-sm sm:text-base font-bold text-slate-900 leading-snug">{{ $profile->universitas ?? ($univ->name ?? '-') }}</div>
                 <div class="text-xs sm:text-sm text-slate-700">{{ $profile->jurusan ?? '-' }}</div>
             </div>

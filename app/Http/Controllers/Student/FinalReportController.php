@@ -159,7 +159,7 @@ class FinalReportController extends Controller
         $report = FinalReport::updateOrCreate(
             ['placement_id' => $placementId],
             [
-                'title' => $request->title ?? $finalReport?->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM',
+                'title' => $request->title ?? $finalReport?->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang',
                 'repository_url' => $request->repository_url,
                 'file_path' => $filePath,
                 'final_report_path' => $filePath,

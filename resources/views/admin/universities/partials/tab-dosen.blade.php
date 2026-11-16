@@ -43,7 +43,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="font-bold text-slate-900">{{ $dosen->name }}</div>
-                                                    <div class="text-xs text-slate-500">Perguruan Tinggi: {{ $university->name }}</div>
+                                                    <div class="text-xs text-slate-500">Kampus/Sekolah: {{ $university->name }}</div>
                                                 </div>
                                             </div>
                                         </td>

@@ -6,7 +6,7 @@
                     <span>Master Pengguna Sistem</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-600 mt-1">
-                    Kelola akun seluruh role: Peserta Magang, Admin Bidang, Mentor Lapangan, Pembimbing, &amp; Universitas
+                    Kelola akun seluruh role: Peserta Magang, Admin Bidang, Mentor Lapangan, Pembimbing, &amp; Admin Kampus/Sekolah
                 </p>
             </div>
 
@@ -87,7 +87,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
                         <div>
-                            <span class="font-medium text-indigo-700">Filter Aktif Sivitas Perguruan Tinggi:</span>
+                            <span class="font-medium text-indigo-700">Filter Aktif Kampus/Sekolah:</span>
                             <h4 class="font-black text-sm text-indigo-950">{{ $selectedUniversity->name }} ({{ $selectedUniversity->code }})</h4>
                         </div>
                     </div>
@@ -151,7 +151,7 @@
                         <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="mentor" {{ request('role') === 'mentor' ? 'selected' : '' }}>Mentor Lapangan</option>
                         <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Pembimbing</option>
-                        <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Universitas</option>
+                        <option value="universitas" {{ request('role') === 'universitas' ? 'selected' : '' }}>Akun Kampus/Sekolah</option>
                     </select>
 
                     <!-- Filter Afiliasi / Bidang Dinas / Universitas Dinamis -->
@@ -159,7 +159,7 @@
                         <!-- Case 1: Universitas / Mahasiswa / Dosen -->
                         <div x-show="['universitas', 'dosen', 'mahasiswa'].includes(role)">
                             <select name="university_id" :disabled="!['universitas', 'dosen', 'mahasiswa'].includes(role)" class="w-full py-2.5 text-xs border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs font-medium">
-                                <option value="">Semua Universitas / Kampus</option>
+                                <option value="">Semua Kampus / Sekolah</option>
                                 @foreach($universities as $u)
                                     <option value="{{ $u->id }}" {{ request('university_id') == $u->id ? 'selected' : '' }}>
                                         {{ $u->name }}

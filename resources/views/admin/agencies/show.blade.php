@@ -626,7 +626,7 @@
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
                                     <th class="py-3 px-4">Peserta Magang</th>
-                                    <th class="py-3 px-4">Universitas / Prodi</th>
+                                    <th class="py-3 px-4">Kampus/Sekolah / Jurusan</th>
                                     <th class="py-3 px-4">Bidang Dituju</th>
                                     <th class="py-3 px-4">Tanggal Daftar</th>
                                     <th class="py-3 px-4 text-center">Status</th>
@@ -640,7 +640,7 @@
                                             {{ $app->user->name ?? '-' }}
                                             <span class="block text-xs font-mono text-slate-400">{{ $app->user->studentProfile->nim ?? '-' }}</span>
                                         </td>
-                                        <td class="py-3.5 px-4 text-slate-600" data-label="Universitas / Prodi">
+                                        <td class="py-3.5 px-4 text-slate-600" data-label="Kampus/Sekolah / Jurusan">
                                             {{ $app->user->studentProfile->universitas ?? '-' }}
                                             <span class="block text-xs text-slate-400">{{ $app->user->studentProfile->jurusan ?? '-' }}</span>
                                         </td>
@@ -713,7 +713,7 @@
                                         @endif
                                     </div>
                                     <div class="cc-span2">
-                                        <div class="mfield-label">Universitas / Prodi</div>
+                                        <div class="mfield-label">Kampus/Sekolah / Jurusan</div>
                                         <div class="mfield-value">{{ $app->user->studentProfile->universitas ?? '-' }}<span class="block text-xs text-slate-400 font-medium">{{ $app->user->studentProfile->jurusan ?? '-' }}</span></div>
                                     </div>
                                     <div class="cc-span2">
@@ -853,7 +853,7 @@
                             <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
                                 <tr>
                                     <th class="py-3 px-4">Nama Peserta Magang</th>
-                                    <th class="py-3 px-4">Universitas / NIM/NIS</th>
+                                    <th class="py-3 px-4">Kampus/Sekolah / NIM/NIS</th>
                                     <th class="py-3 px-4">Bidang Penempatan</th>
                                     <th class="py-3 px-4 text-center">Nilai Akhir</th>
                                     <th class="py-3 px-4 text-center">Status ACC Sertifikat</th>
@@ -871,7 +871,7 @@
                                         <td class="rt-title py-3.5 px-4 font-bold text-slate-900" data-label="Nama Peserta Magang">
                                             {{ $cp->application->user->name ?? '-' }}
                                         </td>
-                                        <td class="py-3.5 px-4" data-label="Universitas / NIM">
+                                        <td class="py-3.5 px-4" data-label="Kampus/Sekolah / NIM/NIS">
                                             <span class="block font-semibold text-slate-800">{{ $cp->application->user->studentProfile->universitas ?? '-' }}</span>
                                             <span class="block text-xs font-mono text-slate-400">NIM/NIS: {{ $cp->application->user->studentProfile->nim ?? '-' }}</span>
                                         </td>

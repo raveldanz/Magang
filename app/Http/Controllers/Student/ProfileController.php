@@ -93,7 +93,7 @@ class ProfileController extends Controller
         if ($university->isSchool() !== ($this->educationLevel($request) === University::TYPE_SCHOOL)) {
             throw ValidationException::withMessages([
                 'university_id' => $university->isSchool()
-                    ? "\"{$university->name}\" terdaftar sebagai sekolah. Ubah jenjang menjadi Sekolah, atau pilih perguruan tinggi Anda."
+                    ? "\"{$university->name}\" terdaftar sebagai sekolah. Ubah jenjang menjadi Sekolah, atau pilih kampus/sekolah Anda."
                     : "\"{$university->name}\" terdaftar sebagai perguruan tinggi. Ubah jenjang menjadi Perguruan Tinggi, atau pilih sekolah Anda.",
             ]);
         }
@@ -144,7 +144,7 @@ class ProfileController extends Controller
             'transkrip' => 'nullable|mimes:pdf|max:2048',
             'id_card' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
-            'university_id.required' => $isSchool ? 'Silakan pilih sekolah Anda.' : 'Silakan pilih perguruan tinggi Anda.',
+            'university_id.required' => $isSchool ? 'Silakan pilih sekolah Anda.' : 'Silakan pilih kampus/sekolah Anda.',
             'nim.required' => $isSchool ? 'NIS wajib diisi.' : 'NIM wajib diisi.',
             'nim.regex' => ($isSchool ? 'NIS' : 'NIM').' hanya boleh berisi huruf, angka, titik, garis miring, atau tanda hubung.',
             'phone.regex' => 'Nomor telepon harus berupa 8 sampai 19 angka, boleh diawali tanda +.',

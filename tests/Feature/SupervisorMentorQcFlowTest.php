@@ -120,7 +120,7 @@ class SupervisorMentorQcFlowTest extends TestCase
 
         $this->actingAs($this->mentor)
             ->put(route('mentor.logbooks.updateStatus', $first->id), ['status' => 'rejected'])
-            ->assertSessionHasErrors(['feedback' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.']);
+            ->assertSessionHasErrors(['feedback' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.']);
         $this->assertSame('pending', $first->fresh()->status);
 
         $this->actingAs($this->mentor)

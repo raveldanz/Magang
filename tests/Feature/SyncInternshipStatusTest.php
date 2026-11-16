@@ -74,7 +74,7 @@ class SyncInternshipStatusTest extends TestCase
         ]);
 
         $this->artisan('app:sync-internship-status')
-            ->expectsOutputToContain('Ditemukan 1 mahasiswa yang siap bertransisi ke status ACTIVE.')
+            ->expectsOutputToContain('Ditemukan 1 peserta magang yang siap bertransisi ke status ACTIVE.')
             ->assertSuccessful();
 
         $this->assertSame(ApplicationStatus::ACTIVE, $app->fresh()->status);
@@ -95,7 +95,7 @@ class SyncInternshipStatusTest extends TestCase
         ]);
 
         $this->artisan('app:sync-internship-status')
-            ->expectsOutputToContain('Tidak ada mahasiswa berstatus ACCEPTED yang siap diaktifkan hari ini.')
+            ->expectsOutputToContain('Tidak ada peserta magang berstatus ACCEPTED yang siap diaktifkan hari ini.')
             ->assertSuccessful();
 
         $this->assertSame(ApplicationStatus::ACCEPTED, $app->fresh()->status);
@@ -182,7 +182,7 @@ class SyncInternshipStatusTest extends TestCase
         // Reminder notification created for mentor
         $this->assertDatabaseHas('system_notifications', [
             'user_id' => $this->mentor->id,
-            'title' => 'Mahasiswa Melewati Masa Magang',
+            'title' => 'Peserta Magang Melewati Masa Magang',
         ]);
     }
 

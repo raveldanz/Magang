@@ -77,7 +77,7 @@ trait ProvisionsUniversityAccounts
 
     protected function reportProvisionedAccounts(): void
     {
-        $this->info('Akun Dosen & Admin baru memakai password bawaan demo dan ditandai wajib ganti password.');
+        $this->info('Akun Pembimbing & Admin baru memakai password bawaan demo dan ditandai wajib ganti password.');
 
         if ($this->skippedAccounts === []) {
             return;

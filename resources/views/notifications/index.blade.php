@@ -74,7 +74,7 @@
 
                 <a href="{{ route('notifications.index', ['category' => 'university']) }}" 
                    class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 {{ ($category ?? '') === 'university' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50' }}">
-                    Universitas
+                    Kampus & Sekolah
                 </a>
 
                 <a href="{{ route('notifications.index', ['category' => 'feedback']) }}" 

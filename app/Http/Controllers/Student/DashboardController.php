@@ -159,10 +159,10 @@ class DashboardController extends Controller
         // DPL wajib berasal dari perguruan tinggi mahasiswa sendiri
         $studentUnivId = $this->studentUniversityId($user);
         if (! $studentUnivId) {
-            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal perguruan tinggi di profil Anda sebelum memilih Pembimbing.');
+            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal kampus/sekolah di profil Anda sebelum memilih Pembimbing.');
         }
         if ((int) $advisor->university_id !== $studentUnivId) {
-            return redirect()->route('dashboard')->with('error', 'Pembimbing yang dipilih harus berasal dari perguruan tinggi Anda.');
+            return redirect()->route('dashboard')->with('error', 'Pembimbing yang dipilih harus berasal dari kampus/sekolah Anda.');
         }
 
         // Update row placement yang sudah ada (bukan membuat baris baru)
@@ -241,10 +241,10 @@ class DashboardController extends Controller
         // DPL baru selalu dicatat pada perguruan tinggi mahasiswa (input university_id dari form diabaikan)
         $targetUnivId = $this->studentUniversityId($user);
         if (! $targetUnivId) {
-            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal perguruan tinggi di profil Anda sebelum mendaftarkan Pembimbing.');
+            return redirect()->route('student.profile.edit')->with('error', 'Lengkapi asal kampus/sekolah di profil Anda sebelum mendaftarkan Pembimbing.');
         }
         $targetUniv = University::find($targetUnivId);
-        $univName = $targetUniv?->name ?? $user->university ?? 'Perguruan Tinggi';
+        $univName = $targetUniv?->name ?? $user->university ?? 'Kampus/Sekolah';
 
         $cleanEmail = strtolower(trim($request->email));
         $cleanName = trim($request->name);
@@ -267,7 +267,7 @@ class DashboardController extends Controller
 
         // Kasus 1: Dosen sudah terdaftar di database
         if ($existingLecturer && $existingLecturer->university_id && (int) $existingLecturer->university_id !== (int) $targetUnivId) {
-            return redirect()->route('dashboard')->with('error', 'Email pembimbing tersebut terdaftar di perguruan tinggi lain. Hubungi Admin Kampus Anda untuk penugasan Pembimbing.');
+            return redirect()->route('dashboard')->with('error', 'Email pembimbing tersebut terdaftar di kampus/sekolah lain. Hubungi Admin Kampus Anda untuk penugasan Pembimbing.');
         }
 
         // Akun pembimbing daftar mandiri yang belum disetujui tidak boleh dipakai (cegah akun palsu menilai mahasiswa)

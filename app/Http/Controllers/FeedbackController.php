@@ -144,7 +144,7 @@ class FeedbackController extends Controller
         $catLabel = match ($feedback->category) {
             'error_bug' => 'Kendala / Bug Sistem',
             'saran_fitur' => 'Saran Fitur',
-            'pertanyaan' => 'Pertanyaan MBKM',
+            'pertanyaan' => 'Pertanyaan Alur Magang',
             default => 'Masukan Pengguna',
         };
 

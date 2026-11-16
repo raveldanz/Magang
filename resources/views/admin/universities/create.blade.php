@@ -8,9 +8,9 @@
             </a>
             <div>
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
-                    Tambah Universitas / Perguruan Tinggi Mitra
+                    Tambah Kampus / Sekolah Mitra
                 </h2>
-                <p class="text-xs text-gray-500">Daftarkan perguruan tinggi mitra baru untuk program magang MBKM</p>
+                <p class="text-xs text-gray-500">Daftarkan kampus atau sekolah mitra baru untuk program magang</p>
             </div>
         </div>
     </x-slot>
@@ -62,7 +62,7 @@
                 <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/90 to-indigo-50/80 border border-blue-200/80 shadow-2xs space-y-2.5">
                     <div class="flex items-center gap-2 text-blue-900 font-bold text-xs uppercase tracking-wider">
                         <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <span>Pencarian Cepat Master Perguruan Tinggi (PDDikti / Kemdikbud)</span>
+                        <span>Pencarian Cepat Master Kampus & Sekolah (PDDikti / Kemendikdasmen)</span>
                     </div>
                     <p class="text-xs text-slate-600">
                         Cari nama kampus atau singkatan resmi (misal: "Brawijaya", "UNAIR", "Telkom") untuk mengisi formulir secara otomatis tanpa perlu mengetik manual.
@@ -109,7 +109,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                Nama Resmi Perguruan Tinggi <span class="text-rose-500">*</span>
+                                Nama Resmi Kampus/Sekolah <span class="text-rose-500">*</span>
                             </label>
                             <input type="text" name="name" x-model="name" required placeholder="Contoh: Universitas Airlangga" class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
@@ -171,7 +171,7 @@
                     <!-- Upload Logo Resmi Kampus (Mobile Friendly Card) -->
                     <div class="pt-4 border-t border-gray-100">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                            Logo Resmi Perguruan Tinggi (Opsional)
+                            Logo Resmi Kampus/Sekolah (Opsional)
                         </label>
                         <div class="flex flex-col sm:flex-row sm:items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
                             <div class="flex items-center gap-3 shrink-0">
@@ -197,7 +197,7 @@
                             Batal
                         </a>
                         <button type="submit" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 cursor-pointer text-center justify-center flex items-center">
-                            Daftarkan Universitas
+                            Daftarkan Institusi
                         </button>
                     </div>
                 </form>

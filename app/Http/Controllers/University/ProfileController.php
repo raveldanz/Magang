@@ -76,7 +76,7 @@ class ProfileController extends Controller
         $notAnotherCampus = function (string $attribute, $value, \Closure $fail) use ($otherKeys) {
             $normalized = UniversityResolver::normalize((string) $value);
             if ($normalized !== '' && in_array($normalized, $otherKeys, true)) {
-                $fail('Nama atau kode ini sudah dipakai perguruan tinggi lain.');
+                $fail('Nama atau kode ini sudah dipakai kampus/sekolah lain.');
             }
         };
 
@@ -100,7 +100,7 @@ class ProfileController extends Controller
             'dpl_components' => 'nullable|array',
             'dpl_components.*' => 'nullable|string|max:255',
         ], [
-            'name.required' => 'Nama resmi universitas / perguruan tinggi wajib diisi.',
+            'name.required' => 'Nama resmi kampus/sekolah wajib diisi.',
             'logo.image' => 'File logo harus berupa gambar (PNG, JPG, WEBP, atau SVG).',
             'logo.max' => 'Ukuran file logo maksimal 2MB.',
         ]);
@@ -188,6 +188,6 @@ class ProfileController extends Controller
         ]);
 
         return redirect()->route('university.profile.index')
-            ->with('success', 'Profil Resmi Perguruan Tinggi & Kop Surat berhasil diperbarui!');
+            ->with('success', 'Profil Resmi Kampus/Sekolah & Kop Surat berhasil diperbarui!');
     }
 }

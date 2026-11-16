@@ -1,3 +1,7 @@
+@php
+    // Label awal (sebelum JavaScript jalan) mengikuti jenjang peserta: sekolah atau perguruan tinggi
+    $isSchoolProfile = old('education_level', $profile?->education_level) === 'sekolah';
+@endphp
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl sm:text-2xl text-slate-800 leading-tight">
@@ -265,7 +269,7 @@
 
                                     <div>
                                         <label for="nim" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
-                                               x-text="educationLevel === 'sekolah' ? 'Nomor Induk Siswa (NIS / NISN)' : 'Nomor Induk Mahasiswa (NIM)'">Nomor Induk Mahasiswa (NIM)</label>
+                                               x-text="educationLevel === 'sekolah' ? 'Nomor Induk Siswa (NIS / NISN)' : 'Nomor Induk Mahasiswa (NIM)'">{{ $isSchoolProfile ? 'Nomor Induk Siswa (NIS / NISN)' : 'Nomor Induk Mahasiswa (NIM)' }}</label>
                                         <x-text-input id="nim" name="nim" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('nim', $profile?->nim ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: 0061234567' : 'Contoh: 22081010001'" placeholder="Contoh: 22081010001" required />
                                         <x-input-error :messages="$errors->get('nim')" class="mt-1" />
                                     </div>
@@ -351,7 +355,7 @@
 
                                 <!-- Grid Fakultas, Jurusan, Semester/Kelas (siswa sekolah tidak punya fakultas) -->
                                 <div class="grid grid-cols-1 gap-4" :class="educationLevel === 'sekolah' ? 'sm:grid-cols-2' : 'sm:grid-cols-3'">
-                                    <div x-show="educationLevel !== 'sekolah'">
+                                    <div x-show="educationLevel !== 'sekolah'" @style(['display: none' => $isSchoolProfile])>
                                         <x-input-label for="faculty" value="Fakultas" class="text-xs font-bold uppercase tracking-wider" />
                                         <x-text-input id="faculty" name="faculty" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('faculty', $profile?->faculty ?? $profile?->fakultas ?? '')" placeholder="Contoh: Ilmu Komputer" x-bind:required="educationLevel !== 'sekolah'" x-bind:disabled="educationLevel === 'sekolah'" />
                                         <x-input-error :messages="$errors->get('faculty')" class="mt-1" />
@@ -359,14 +363,14 @@
 
                                     <div>
                                         <label for="jurusan" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
-                                               x-text="educationLevel === 'sekolah' ? 'Jurusan / Kompetensi Keahlian' : 'Program Studi / Jurusan'">Program Studi / Jurusan</label>
+                                               x-text="educationLevel === 'sekolah' ? 'Jurusan / Kompetensi Keahlian' : 'Program Studi / Jurusan'">{{ $isSchoolProfile ? 'Jurusan / Kompetensi Keahlian' : 'Program Studi / Jurusan' }}</label>
                                         <x-text-input id="jurusan" name="jurusan" type="text" class="mt-1 block w-full text-xs sm:text-sm" :value="old('jurusan', $profile?->jurusan ?? $profile?->major ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: Otomatisasi Tata Kelola Perkantoran' : 'Contoh: Teknik Informatika'" placeholder="Contoh: Teknik Informatika" required />
                                         <x-input-error :messages="$errors->get('jurusan')" class="mt-1" />
                                     </div>
 
                                     <div>
                                         <label for="semester" class="block font-medium text-xs font-bold uppercase tracking-wider text-gray-700"
-                                               x-text="educationLevel === 'sekolah' ? 'Kelas Saat Ini (10-13)' : 'Semester Saat Ini'">Semester Saat Ini</label>
+                                               x-text="educationLevel === 'sekolah' ? 'Kelas Saat Ini (10-13)' : 'Semester Saat Ini'">{{ $isSchoolProfile ? 'Kelas Saat Ini (10-13)' : 'Semester Saat Ini' }}</label>
                                         <x-text-input id="semester" name="semester" type="text" inputmode="numeric" class="mt-1 block w-full text-xs sm:text-sm" :value="old('semester', $profile?->semester ?? '')" x-bind:placeholder="educationLevel === 'sekolah' ? 'Contoh: 11' : 'Contoh: 5 / 6 / 7'" placeholder="Contoh: 5 / 6 / 7" required />
                                         <x-input-error :messages="$errors->get('semester')" class="mt-1" />
                                     </div>

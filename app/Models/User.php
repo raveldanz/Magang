@@ -189,7 +189,7 @@ class User extends Authenticatable
             // Role 'pembimbing' adalah alias Mentor Lapangan (lihat CheckRole), bukan pembimbing kampus/sekolah.
             'mentor', 'pembimbing' => 'Mentor Lapangan',
             'lecturer', 'dosen', 'academic_advisor' => 'Pembimbing',
-            'university', 'universitas' => 'Admin Universitas',
+            'university', 'universitas' => 'Admin Kampus/Sekolah',
             'student', 'mahasiswa' => 'Peserta Magang',
             default => ucwords(str_replace('_', ' ', (string) $this->role)),
         };

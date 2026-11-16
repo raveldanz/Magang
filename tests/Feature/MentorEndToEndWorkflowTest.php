@@ -167,7 +167,7 @@ class MentorEndToEndWorkflowTest extends TestCase
                 'bundle_key' => 'x',
             ])
             ->assertRedirect(route('mentor.logbooks.index'))
-            ->assertSessionHasErrors(['feedback' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.']);
+            ->assertSessionHasErrors(['feedback' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.']);
         $this->assertSame('pending', $wednesday->fresh()->status);
 
         // Halaman yang dibuka setelah gagal menampilkan pesan galat yang jelas (bukan diam-diam)

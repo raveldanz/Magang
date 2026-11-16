@@ -267,7 +267,7 @@
                     </div>
 
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 space-y-1">
-                        <span class="text-slate-600 font-semibold uppercase text-xs tracking-wider block">Asal Perguruan Tinggi</span>
+                        <span class="text-slate-600 font-semibold uppercase text-xs tracking-wider block">Asal Kampus/Sekolah</span>
                         <div class="font-bold text-slate-900 text-sm">{{ $application->user->studentProfile->universitas ?? $application->user->university ?? '-' }}</div>
                         <div class="text-slate-600">{{ $application->user->studentProfile->faculty ?? $application->user->studentProfile->fakultas ?? '-' }}</div>
                         <div class="font-medium text-blue-700">{{ $application->user->studentProfile->major ?? $application->user->studentProfile->jurusan ?? '-' }}</div>

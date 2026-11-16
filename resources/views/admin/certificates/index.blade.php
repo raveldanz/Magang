@@ -215,7 +215,7 @@
                             <thead>
                                 <tr class="border-b border-gray-100 bg-gray-50/75 text-gray-500 font-bold uppercase tracking-wider text-[11px]">
                                     <th class="py-3.5 px-4">Nama Peserta Magang</th>
-                                    <th class="py-3.5 px-4">Universitas / NIM/NIS</th>
+                                    <th class="py-3.5 px-4">Kampus/Sekolah / NIM/NIS</th>
                                     <th class="py-3.5 px-4">Unit Tempat Magang</th>
                                     <th class="py-3.5 px-4 text-center">Nilai Akhir</th>
                                     <th class="py-3.5 px-4 text-center">Status ACC Atasan</th>

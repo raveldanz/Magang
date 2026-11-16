@@ -294,7 +294,7 @@
                                 {{-- Universitas --}}
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">
-                                        Asal Perguruan Tinggi:
+                                        Asal Kampus/Sekolah:
                                     </label>
                                     <input type="text" name="universitas" required
                                            value="{{ old('universitas', $profile->universitas ?? $student->university ?? '') }}"

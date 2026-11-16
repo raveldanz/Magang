@@ -8,7 +8,7 @@
             </a>
             <div>
                 <h2 class="font-black text-xl text-gray-900 tracking-tight">
-                    Edit Data Universitas: {{ $university->name }}
+                    Edit Data Kampus/Sekolah: {{ $university->name }}
                 </h2>
                 <p class="text-xs text-gray-500">Perbarui identitas kampus, kode, dan pejabat penandatangan</p>
             </div>
@@ -26,7 +26,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                                Nama Resmi Perguruan Tinggi <span class="text-rose-500">*</span>
+                                Nama Resmi Kampus/Sekolah <span class="text-rose-500">*</span>
                             </label>
                             <input type="text" name="name" value="{{ old('name', $university->name) }}" required class="w-full text-xs sm:text-sm border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                         </div>
@@ -234,7 +234,7 @@
                     <!-- Upload Logo Resmi Kampus -->
                     <div class="pt-4 border-t border-gray-100">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                            Logo Resmi Perguruan Tinggi
+                            Logo Resmi Kampus/Sekolah
                         </label>
                         <div class="flex items-center gap-4">
                             @php

@@ -34,7 +34,7 @@
                 <div>
                     <div class="flex items-center gap-2 mb-1.5">
                         <span class="px-2.5 py-0.5 text-[10px] sm:text-xs font-black bg-blue-400/30 border border-blue-300/40 rounded-full tracking-wider uppercase">
-                            Akun Resmi Perguruan Tinggi
+                            Akun Resmi Kampus/Sekolah
                         </span>
                         @if($university?->code)
                             <span class="px-2 py-0.5 text-[10px] sm:text-xs font-mono font-bold bg-white/20 rounded-md">

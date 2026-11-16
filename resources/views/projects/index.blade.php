@@ -208,7 +208,7 @@
                                 @foreach($projectList as $project)
                                     @php
                                         $mhs = $project->placement?->application?->user;
-                                        $univ = $mhs?->studentProfile?->universitas ?? $mhs?->university ?? 'Perguruan Tinggi Mitra';
+                                        $univ = $mhs?->studentProfile?->universitas ?? $mhs?->university ?? 'Kampus/Sekolah Mitra';
                                         $unit = $project->placement?->application?->unit?->name ?? 'Dispusip Surabaya';
                                     @endphp
 

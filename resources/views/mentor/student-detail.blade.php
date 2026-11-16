@@ -155,7 +155,7 @@
                 <h3 id="judul-data" class="text-xl font-bold text-slate-900">Data Magang &amp; Penugasan</h3>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-base">
                     <div>
-                        <dt class="text-sm text-slate-700 font-semibold">Perguruan Tinggi</dt>
+                        <dt class="text-sm text-slate-700 font-semibold">Kampus/Sekolah</dt>
                         <dd class="font-semibold text-slate-900 mt-0.5">{{ $profile->universitas ?? '-' }}</dd>
                     </div>
                     <div>

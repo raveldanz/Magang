@@ -81,7 +81,7 @@
                             </div>
                             <div>
                                 <div class="text-xs sm:text-sm font-bold" style="color: #ffffff !important;">Kampus</div>
-                                <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra MBKM</div>
+                                <div class="text-[11px]" style="color: #bfdbfe !important;">Mitra Kampus & Sekolah</div>
                             </div>
                         </a>
 
@@ -217,7 +217,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-slate-900 text-sm">
-                            Terdapat {{ $pendingUniversities->count() }} Perguruan Tinggi yang Belum Memiliki Akun Admin Kampus
+                            Terdapat {{ $pendingUniversities->count() }} Kampus/Sekolah yang Belum Memiliki Akun Admin Kampus
                         </h4>
                         <p class="text-xs text-slate-600 mt-0.5">
                             Di antaranya: <strong>{{ $pendingUniversities->take(5)->pluck('name')->implode(', ') }}</strong>{{ $pendingUniversities->count() > 5 ? ' dan '.($pendingUniversities->count() - 5).' kampus lainnya' : '' }}. Buatkan akun login Admin Kampus bila kampus tersebut perlu memantau mahasiswanya.
@@ -261,10 +261,10 @@
             <div class="bg-white border-l-4 border-yellow-500 p-5 rounded-2xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h4 class="font-bold text-slate-900 text-sm">
-                        {{ $unverifiedUniversities->count() }} Perguruan Tinggi Menunggu Verifikasi
+                        {{ $unverifiedUniversities->count() }} Kampus/Sekolah Menunggu Verifikasi
                     </h4>
                     <p class="text-xs text-slate-600 mt-0.5">
-                        Didaftarkan mandiri oleh peserta magang melalui opsi "Perguruan Tinggi Lainnya":
+                        Didaftarkan mandiri oleh peserta magang melalui opsi "Lainnya":
                         <strong>{{ $unverifiedUniversities->pluck('name')->implode(', ') }}</strong>.
                     </p>
                 </div>
@@ -721,7 +721,7 @@
                 </div>
             @endif
 
-            {{-- Distribusi Asal Perguruan Tinggi --}}
+            {{-- Distribusi Asal Kampus/Sekolah --}}
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
                 style="background-color: #ffffff !important; border: 1px solid #f1f5f9 !important;"
                 x-data="{ expanded: false }">

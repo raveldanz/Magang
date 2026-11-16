@@ -6,7 +6,7 @@
                     {{ __('Daftar Pembimbing') }}
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Portal Pengelolaan Pembimbing Kampus &bull; <strong class="text-slate-700">{{ $univName ?? 'Universitas' }}</strong>
+                    Portal Pengelolaan Pembimbing Kampus/Sekolah &bull; <strong class="text-slate-700">{{ $univName ?? 'Kampus/Sekolah' }}</strong>
                 </p>
             </div>
 

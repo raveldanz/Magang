@@ -220,7 +220,7 @@
                                 <span class="font-mono font-bold text-slate-800">{{ $profile?->nim ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">
-                                <span class="text-slate-500">Perguruan Tinggi:</span>
+                                <span class="text-slate-500">Kampus/Sekolah:</span>
                                 <span class="font-semibold text-blue-700 text-right">{{ $profile?->universitas ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center py-1 border-b border-slate-100">

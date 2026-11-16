@@ -151,7 +151,7 @@
             <div class="p-4 sm:p-5 bg-slate-50 rounded-2xl shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="space-y-1.5">
                     <div class="text-sm font-bold text-slate-900">
-                        {{ $finalReport->title ?? 'Laporan Akhir Magang MBKM' }}
+                        {{ $finalReport->title ?? 'Laporan Akhir Magang' }}
                     </div>
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                         @if ($finalReport->created_at)

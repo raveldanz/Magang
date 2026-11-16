@@ -127,7 +127,7 @@
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ $application->unit->name ?? '-' }}</span>
                         </div>
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Universitas / Kampus</span>
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Kampus / Sekolah</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ Auth::user()->studentProfile->universitas ?? Auth::user()->university ?? '-' }}</span>
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ Auth::user()->studentProfile->jurusan ?? '-' }}</span>
                         </div>

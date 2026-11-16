@@ -278,7 +278,7 @@
                                 <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">Bidang Pilihan Magang</h2>
                                 <p class="text-[11px] text-slate-500 font-medium">4 Bidang Kerja Aktif di Dispusip Surabaya</p>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Terbuka MBKM</span>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Terbuka MBKM & SMK</span>
                         </div>
 
                         <!-- 4 Unit Divisi Dispusip -->

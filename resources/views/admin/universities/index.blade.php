@@ -3,7 +3,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>Master Perguruan Tinggi Mitra (Universitas)</span>
+                    <span>Master Kampus & Sekolah Mitra</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
                     Kelola profil kampus, PIC Rektorat/Fakultas, data logo, dan statistik peserta magang
@@ -16,7 +16,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Tambah Universitas Baru</span>
+                <span>Tambah Kampus/Sekolah Baru</span>
             </a>
             @endif
         </div>
@@ -151,7 +151,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-amber-900 text-xs sm:text-sm">Terdapat {{ $unregisteredCount }}
-                                Perguruan Tinggi yang Belum Memiliki Akun Admin</h4>
+                                Kampus/Sekolah yang Belum Memiliki Akun Admin</h4>
                             <p class="text-[11px] text-amber-700 mt-0.5">Buatkan akun agar perwakilan kampus dapat login
                                 untuk monitoring peserta magang dan penugasan pembimbing.</p>
                         </div>
@@ -289,7 +289,7 @@
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-50 text-yellow-800 border border-yellow-300"
-                                        title="Kampus ini didaftarkan mandiri oleh peserta magang melalui opsi Perguruan Tinggi Lainnya">
+                                        title="Kampus ini didaftarkan mandiri oleh peserta magang melalui opsi Lainnya">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                         {{ $univ->verification_label }}
                                     </span>
@@ -340,7 +340,7 @@
                                 <button type="button"
                                     @click="$dispatch('open-confirm-modal', {
                                         form: $el.form,
-                                        title: 'Verifikasi Perguruan Tinggi',
+                                        title: 'Verifikasi Kampus/Sekolah',
                                         message: 'Kampus ini didaftarkan mandiri oleh peserta magang. Pastikan nama perguruan tinggi benar dan tidak duplikat dengan kampus yang sudah terdaftar.',
                                         label: 'Perguruan tinggi:',
                                         name: @js($univ->name),
@@ -428,7 +428,7 @@
                 @empty
                     <div class="col-span-full py-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
                         <p class="font-bold text-gray-600">Belum ada universitas terdaftar</p>
-                        <p class="text-xs mt-1">Gunakan tombol "Tambah Universitas Baru" untuk mendaftarkan perguruan
+                        <p class="text-xs mt-1">Gunakan tombol "Tambah Kampus/Sekolah Baru" untuk mendaftarkan perguruan
                             tinggi.</p>
                     </div>
                 @endforelse

@@ -6,7 +6,7 @@
                 <div class="cc-box bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                         <div>
-                            <h3 class="font-black text-lg text-slate-900">Akun Resmi Administrator Portal Universitas</h3>
+                            <h3 class="font-black text-lg text-slate-900">Akun Resmi Admin Portal Kampus/Sekolah</h3>
                             <p class="text-xs text-slate-500 mt-1">Akun yang memegang otoritas penuh di Portal Resmi Kampus untuk menetapkan pembimbing dan verifikasi dokumen pengantar</p>
                         </div>
 
@@ -28,7 +28,7 @@
                             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nama Akun</span>
                                 <div class="font-bold text-sm text-slate-900 mt-1">{{ $adminAccount->name }}</div>
-                                <div class="text-xs text-slate-500">Role: Administrator Universitas</div>
+                                <div class="text-xs text-slate-500">Role: Admin Kampus/Sekolah</div>
                             </div>
 
                             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
@@ -76,7 +76,7 @@
                             <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             </div>
-                            <h4 class="font-bold text-amber-900 text-sm">Universitas Ini Belum Memiliki Akun Admin Portal</h4>
+                            <h4 class="font-bold text-amber-900 text-sm">Kampus/Sekolah Ini Belum Memiliki Akun Admin Portal</h4>
                             <p class="text-xs text-amber-700 max-w-md mx-auto">Buatkan akun admin kampus sekarang agar perwakilan rektorat/kemahasiswaan dapat login dan mengelola plotting pembimbing secara mandiri.</p>
                             @if($isSuperAdmin)
                             <form action="{{ route('admin.universities.create_account', $university->id) }}" method="POST" class="inline-block pt-2">

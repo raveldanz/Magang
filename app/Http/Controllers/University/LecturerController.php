@@ -107,7 +107,7 @@ class LecturerController extends Controller
         $university = $universityId
             ? University::find($universityId)
             : University::where('name', $user->university)->orWhere('code', $user->university)->first();
-        $univName = $university?->name ?? $user->university ?? 'Perguruan Tinggi';
+        $univName = $university?->name ?? $user->university ?? 'Kampus/Sekolah';
 
         $request->validate([
             'name' => 'required|string|max:255',

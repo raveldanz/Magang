@@ -392,7 +392,7 @@
                         </div>
 
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Asal Perguruan Tinggi</span>
+                            <span class="text-slate-400 font-semibold uppercase text-[10px] block mb-1">Asal Kampus/Sekolah</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ $student->studentProfile?->universitas ?? $student->university ?? '-' }}</span>
                             <span class="text-slate-500 text-[11px] block mt-0.5">{{ $student->studentProfile?->jurusan ?? '-' }}</span>
                         </div>

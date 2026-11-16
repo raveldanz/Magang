@@ -357,7 +357,7 @@
         $fakultas = $student?->fakultas ?? $student?->faculty ?? 'Fakultas';
         // Peserta dari sekolah (SMK/SMA/MA): surat ditujukan ke Kepala Sekolah, tanpa fakultas, memakai NIS & kelas
         $isSchool = (bool) $student?->isSchoolStudent();
-        $universitas = $student?->universitas ?? $application->user?->university ?? 'Perguruan Tinggi';
+        $universitas = $student?->universitas ?? $application->user?->university ?? 'Kampus/Sekolah';
         $nim = $student?->nim ?? '-';
         $jurusan = $student?->jurusan ?? $student?->major ?? '-';
         $semester = $student?->periodLabel() ?? '-';

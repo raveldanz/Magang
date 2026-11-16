@@ -115,7 +115,7 @@ class UniversityController extends Controller
      */
     public function merge(Request $request, $id, UniversityManagementService $service)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menggabungkan data perguruan tinggi.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat menggabungkan data kampus/sekolah.');
         $source = University::findOrFail($id);
 
         $request->validate([
@@ -141,7 +141,7 @@ class UniversityController extends Controller
      */
     public function verify(Request $request, $id, UniversityManagementService $service)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat memverifikasi data perguruan tinggi.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat memverifikasi data kampus/sekolah.');
         $univ = University::findOrFail($id);
 
         if (! $service->verifyUniversity($univ)) {
@@ -153,14 +153,14 @@ class UniversityController extends Controller
 
     public function create()
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
 
         return view('admin.universities.create');
     }
 
     public function store(Request $request)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:universities,code',
@@ -204,12 +204,12 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.index')
-            ->with('success', "Universitas '{$univ->name}' ({$univ->code}) berhasil didaftarkan!");
+            ->with('success', "Institusi '{$univ->name}' ({$univ->code}) berhasil didaftarkan!");
     }
 
     public function edit($id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $university = University::findOrFail($id);
 
         return view('admin.universities.edit', compact('university'));
@@ -217,7 +217,7 @@ class UniversityController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $univ = University::findOrFail($id);
 
         $request->validate([
@@ -315,7 +315,7 @@ class UniversityController extends Controller
         ]);
 
         return redirect()->route('admin.universities.index')
-            ->with('success', "Data Universitas '{$univ->name}' berhasil diperbarui!");
+            ->with('success', "Data Institusi '{$univ->name}' berhasil diperbarui!");
     }
 
     /**
@@ -323,7 +323,7 @@ class UniversityController extends Controller
      */
     public function createAccount(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $univ = University::findOrFail($id);
 
         $existingAccount = User::where('role', 'universitas')
@@ -331,7 +331,7 @@ class UniversityController extends Controller
             ->first();
 
         if ($existingAccount) {
-            return redirect()->back()->with('error', "Universitas '{$univ->name}' sudah memiliki akun Admin Kampus aktif ({$existingAccount->email}).");
+            return redirect()->back()->with('error', "Institusi '{$univ->name}' sudah memiliki akun Admin Kampus aktif ({$existingAccount->email}).");
         }
 
         $cleanCode = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $univ->code ?: 'univ'));
@@ -376,7 +376,7 @@ class UniversityController extends Controller
 
     public function destroy($id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $univ = University::withCount(['students', 'dosens'])->findOrFail($id);
 
         // 1. Proteksi Mahasiswa: Jika ada mahasiswa terdaftar, jangan hapus
@@ -416,7 +416,7 @@ class UniversityController extends Controller
         AuditLog::record('UNIVERSITY_DELETE', 'University', $id, ['name' => $name]);
 
         return redirect()->route('admin.universities.index')
-            ->with('success', "Universitas '{$name}' dan akun admin kampusnya berhasil dihapus.");
+            ->with('success', "Institusi '{$name}' dan akun admin kampusnya berhasil dihapus.");
     }
 
     /**
@@ -449,7 +449,7 @@ class UniversityController extends Controller
      */
     public function storeDosen(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $university = University::findOrFail($id);
 
         $request->validate([
@@ -496,7 +496,7 @@ class UniversityController extends Controller
      */
     public function resetDosenPassword(Request $request, $univId, $dosenId)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $university = University::findOrFail($univId);
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -521,7 +521,7 @@ class UniversityController extends Controller
      */
     public function destroyDosen(Request $request, $univId, $dosenId)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $university = University::findOrFail($univId);
         $dosen = User::whereIn('role', ['dosen', 'academic_advisor'])
             ->where(function ($q) use ($university) {
@@ -556,7 +556,7 @@ class UniversityController extends Controller
      */
     public function assignAdvisor(Request $request, $id)
     {
-        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data perguruan tinggi, akun kampus, dan pembimbing.');
+        $this->ensureSuperAdmin('Hanya Super Administrator yang dapat mengubah data kampus/sekolah, akun kampus, dan pembimbing.');
         $university = University::findOrFail($id);
 
         $request->validate([

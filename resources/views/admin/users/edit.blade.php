@@ -72,7 +72,7 @@
                                 <option value="mentor">Mentor Lapangan Dinas</option>
                                 @if(auth()->user()->isSuperAdmin())
                                     <option value="dosen">Pembimbing</option>
-                                    <option value="universitas">Admin Universitas</option>
+                                    <option value="universitas">Admin Kampus/Sekolah</option>
                                 @endif
                             </select>
                         </div>
@@ -106,11 +106,11 @@
                     <!-- Input Universitas jika Role Universitas / Dosen / Mahasiswa -->
                     <div x-show="selectedRole === 'universitas' || selectedRole === 'dosen' || selectedRole === 'mahasiswa'" x-cloak class="p-4 rounded-xl bg-sky-50/60 border border-sky-100 space-y-2">
                         <label class="block text-xs font-bold text-sky-900 uppercase tracking-wider">
-                            Pilih Perguruan Tinggi Terkait
+                            Pilih Kampus/Sekolah Terkait
                         </label>
                         <x-searchable-select
                             name="university_id"
-                            placeholder="-- Pilih Universitas --"
+                            placeholder="-- Pilih Kampus/Sekolah --"
                             :items="$universities->map(fn($un) => ['id' => $un->id, 'name' => $un->name, 'acronym' => $un->acronym ?? $un->code, 'meta' => $un->code])"
                             :selected="old('university_id', $user->university_id)"
                         />

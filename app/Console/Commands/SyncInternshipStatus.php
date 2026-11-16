@@ -23,7 +23,7 @@ class SyncInternshipStatus extends Command
      *
      * @var string
      */
-    protected $description = 'Otomatisasi sinkronisasi status magang mahasiswa dari ACCEPTED ke ACTIVE saat tanggal mulai magang tiba';
+    protected $description = 'Otomatisasi sinkronisasi status magang peserta dari ACCEPTED ke ACTIVE saat tanggal mulai magang tiba';
 
     /**
      * Execute the console command.
@@ -51,19 +51,19 @@ class SyncInternshipStatus extends Command
             ->get();
 
         if ($applications->isEmpty()) {
-            $this->info('Tidak ada mahasiswa berstatus ACCEPTED yang siap diaktifkan hari ini.');
+            $this->info('Tidak ada peserta magang berstatus ACCEPTED yang siap diaktifkan hari ini.');
 
             return;
         }
 
-        $this->info("Ditemukan {$applications->count()} mahasiswa yang siap bertransisi ke status ACTIVE.");
+        $this->info("Ditemukan {$applications->count()} peserta magang yang siap bertransisi ke status ACTIVE.");
 
         $updatedCount = 0;
         foreach ($applications as $app) {
             if ($app->statusValue() === ApplicationStatus::ACCEPTED->value) {
                 if ($app->autoActivateIfStarted('AUTO_ACTIVATE_INTERNSHIP')) {
                     $updatedCount++;
-                    $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Status diubah ke ACTIVE.");
+                    $this->line(" - Peserta Magang: {$app->user?->name} (ID: {$app->id}) -> Status diubah ke ACTIVE.");
                 }
             }
         }
@@ -108,7 +108,7 @@ class SyncInternshipStatus extends Command
 
             // Jika syarat administratif belum lengkap: status tetap ACTIVE, beri flag peringatan "Menunggu Evaluasi Mentor/Kelulusan"
             $daysPast = $app->daysPastEndDate();
-            $this->line(" - Mahasiswa: {$app->user?->name} (ID: {$app->id}) -> Lewat {$daysPast} hari [Menunggu Evaluasi Mentor/Kelulusan]. Status tetap ACTIVE.");
+            $this->line(" - Peserta Magang: {$app->user?->name} (ID: {$app->id}) -> Lewat {$daysPast} hari [Menunggu Evaluasi Mentor/Kelulusan]. Status tetap ACTIVE.");
 
             if ($daysPast < 1 || ($daysPast - 1) % 7 !== 0) {
                 continue;
@@ -141,7 +141,7 @@ class SyncInternshipStatus extends Command
             $mentor = $app->placement?->mentor ?? $app->placement?->pembimbing;
             if ($mentor) {
                 SystemNotification::send(
-                    'Mahasiswa Melewati Masa Magang',
+                    'Peserta Magang Melewati Masa Magang',
                     "Masa magang {$app->user?->name} berakhir {$daysPast} hari lalu [Menunggu Evaluasi Mentor/Kelulusan], namun {$missingText}. Mohon tinjau laporan akhir & lengkapi evaluasi mentor lapangan.",
                     $mentor->id,
                     null,

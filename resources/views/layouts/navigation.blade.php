@@ -113,7 +113,7 @@
                         </a>
                         <a href="{{ route('admin.universities.index') }}" 
                            class="transition py-1 {{ request()->routeIs('admin.universities.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Universitas
+                            Kampus & Sekolah
                         </a>
 
                         <a href="{{ route('public.projects.index') }}" 
@@ -278,7 +278,7 @@
                     @elseif ($isUniversitas)
                         <a href="{{ route('university.dashboard') }}" 
                            class="transition py-1 {{ request()->routeIs('university.dashboard') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
-                            Portal Universitas
+                            Portal Kampus/Sekolah
                         </a>
                         <a href="{{ route('university.lecturers.index') }}" 
                            class="transition py-1 {{ request()->routeIs('university.lecturers.*') ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-slate-600 hover:text-blue-600' }}">
@@ -533,7 +533,7 @@
                             </a>
                         @elseif ($isUniversitas)
                             <a href="{{ route('university.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
-                                Portal Universitas
+                                Portal Kampus/Sekolah
                             </a>
                             <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition">
                                 Pembimbing
@@ -696,7 +696,7 @@
                         <span>Instansi Dinas</span>
                     </a>
                     <a href="{{ route('admin.universities.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.universities.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                        <span>Perguruan Tinggi</span>
+                        <span>Kampus & Sekolah</span>
                     </a>
                     <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         <span>Semua Pengguna</span>
@@ -813,7 +813,7 @@
                 @elseif ($isUniversitas)
                     <a href="{{ route('university.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         
-                        <span>Portal Universitas</span>
+                        <span>Portal Kampus/Sekolah</span>
                     </a>
                     <a href="{{ route('university.lecturers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-2xl text-xs sm:text-sm font-semibold transition min-h-[40px] {{ request()->routeIs('university.lecturers.*') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
                         

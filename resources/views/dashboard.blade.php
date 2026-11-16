@@ -476,7 +476,7 @@
                             <div class="md:col-span-8 flex items-start space-x-4">
                                 <div class="space-y-1">
                                     <h2 class="text-xl sm:text-2xl font-black" style="color: #ffffff !important;">
-                                        Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang MBKM
+                                        Selamat, {{ Auth::user()->name }}! Anda Telah Lulus Magang
                                     </h2>
                                     <p class="text-xs sm:text-sm max-w-2xl leading-relaxed"
                                         style="color: #d1fae5 !important;">

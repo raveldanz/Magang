@@ -163,9 +163,9 @@ return [
 
     'custom' => [
         'feedback' => [
-            'required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
-            'required_with' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar mahasiswa tahu apa yang perlu diperbaiki.',
-            'min' => 'Catatan minimal :min karakter agar jelas bagi mahasiswa.',
+            'required_if' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.',
+            'required_with' => 'Catatan wajib diisi saat menolak atau meminta revisi, agar peserta magang tahu apa yang perlu diperbaiki.',
+            'min' => 'Catatan minimal :min karakter agar jelas bagi peserta magang.',
         ],
     ],
 
@@ -213,12 +213,12 @@ return [
         'title' => 'judul',
         'file_laporan' => 'berkas laporan akhir',
         'mentor_id' => 'mentor',
-        'academic_advisor_id' => 'dosen pembimbing',
+        'academic_advisor_id' => 'pembimbing',
         'role' => 'peran akun',
         'evaluation_scheme' => 'skema penilaian',
         'weight_mentor' => 'bobot nilai mentor',
-        'weight_lecturer' => 'bobot nilai dosen',
-        'code' => 'kode kampus',
+        'weight_lecturer' => 'bobot nilai pembimbing',
+        'code' => 'kode kampus/sekolah',
         'consultation_date' => 'tanggal bimbingan',
         'nidn' => 'NIDN / NIP',
         'pic_name' => 'nama pejabat penanda tangan',

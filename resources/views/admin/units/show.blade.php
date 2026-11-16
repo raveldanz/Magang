@@ -241,7 +241,7 @@
                             <tr class="border-b border-slate-200 bg-slate-100/50 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
                                 <th class="py-3.5 px-4 text-center w-12">No</th>
                                 <th class="py-3.5 px-6">Nama Peserta & NIM/NIS</th>
-                                <th class="py-3.5 px-6">Perguruan Tinggi & Program Studi</th>
+                                <th class="py-3.5 px-6">Kampus/Sekolah & Jurusan</th>
                                 <th class="py-3.5 px-4 text-center">Periode Magang</th>
                                 <th class="py-3.5 px-4">Mentor</th>
                                 <th class="py-3.5 px-4 text-center">Status</th>
@@ -349,7 +349,7 @@
 
                             <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1.5">
                                 <div>
-                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Perguruan Tinggi & Prodi</span>
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Kampus/Sekolah & Jurusan</span>
                                     <span class="font-semibold text-slate-800 block">{{ $univName }}</span>
                                     <span class="text-slate-500 text-[11px] block">{{ $jurusan }}</span>
                                 </div>

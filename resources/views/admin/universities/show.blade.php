@@ -10,7 +10,7 @@
                 </a>
                 <div>
                     <h2 class="cc-title font-black text-xl sm:text-2xl text-gray-900 tracking-tight flex items-center gap-2">
-                        <span>Pusat Kendali Perguruan Tinggi<span class="cc-hide-m">: {{ $university->name }}</span></span>
+                        <span>Pusat Kendali Kampus/Sekolah<span class="cc-hide-m">: {{ $university->name }}</span></span>
                     </h2>
                     <p class="hidden sm:block text-xs sm:text-sm text-gray-500 mt-0.5">
                         Manajemen terpadu Pembimbing, Peserta Magang, Akun Admin Portal, dan Kebijakan Penilaian
@@ -161,7 +161,7 @@
                                 {{ $university->pic_name ?? 'Belum Ditentukan' }}
                             </div>
                             <div class="text-slate-600 text-xs">
-                                {{ $university->pic_position ?? 'Pimpinan / Penanggung Jawab MBKM' }}
+                                {{ $university->pic_position ?? 'Pimpinan / Penanggung Jawab Magang' }}
                             </div>
                             @if($university->pic_nip)
                                 <div class="text-slate-600 text-xs font-mono">

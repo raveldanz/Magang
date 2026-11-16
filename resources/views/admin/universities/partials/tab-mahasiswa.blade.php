@@ -84,7 +84,7 @@
                                         $metaLine = collect([
                                             $profile?->jurusan,
                                             $profile?->nim ? 'NIM ' . $profile->nim : null,
-                                            $profile?->semester ? 'Smt ' . $profile->semester : null,
+                                            $profile?->periodLabel(),
                                         ])->filter()->implode(' · ');
                                     @endphp
                                     <tr class="hover:bg-slate-50/80 transition">
@@ -97,7 +97,7 @@
                                                 <div class="min-w-0">
                                                     <div class="stt-title" title="{{ $student->email }}">{{ $student->name }}</div>
                                                     <div class="stt-meta" title="{{ $metaLine }}">{{ $profile?->jurusan ?? '-' }}</div>
-                                                    <div class="stt-meta stt-mono">NIM/NIS {{ $profile?->nim ?? '-' }} · Smt {{ $profile?->semester ?? '-' }}</div>
+                                                    <div class="stt-meta stt-mono">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }} {{ $profile?->nim ?? '-' }} · {{ $profile?->periodLabel() ?? '-' }}</div>
                                                     @if($latestApp?->group_id && $latestApp?->group)
                                                         <div class="mt-1">
                                                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -232,7 +232,7 @@
                                 <div class="mavatar">{{ strtoupper(substr($student->name, 0, 2)) }}</div>
                                 <div class="mcard-main">
                                     <div class="mcard-title">{{ $student->name }}</div>
-                                    <div class="mcard-sub">{{ $profile?->jurusan ?? '-' }}<br><span class="mono">NIM/NIS {{ $profile?->nim ?? '-' }}</span> &middot; Smt {{ $profile?->semester ?? '-' }}</div>
+                                    <div class="mcard-sub">{{ $profile?->jurusan ?? '-' }}<br><span class="mono">{{ $profile?->identityNumberLabel() ?? 'NIM/NIS' }} {{ $profile?->nim ?? '-' }}</span> &middot; {{ $profile?->periodLabel() ?? '-' }}</div>
                                     @if($latestApp?->group_id && $latestApp?->group)
                                         <div class="mt-1">
                                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">

@@ -447,7 +447,7 @@ class ChatPresenter
                     'is_urgent' => true,
                     'role_group' => 'university',
                     'priority_rank' => 2,
-                    'hint' => 'Pesan koordinasi dari Admin Perguruan Tinggi mitra',
+                    'hint' => 'Pesan koordinasi dari Admin Kampus/Sekolah mitra',
                 ];
             }
 
@@ -458,7 +458,7 @@ class ChatPresenter
                 'is_urgent' => false,
                 'role_group' => 'university',
                 'priority_rank' => 6,
-                'hint' => 'Admin Perguruan Tinggi',
+                'hint' => 'Admin Kampus/Sekolah',
             ];
         }
 
@@ -717,7 +717,7 @@ class ChatPresenter
                 'is_urgent' => false,
                 'role_group' => 'student',
                 'priority_rank' => 7,
-                'hint' => 'Peserta Magang dari perguruan tinggi',
+                'hint' => 'Peserta Magang dari kampus/sekolah',
             ];
         }
 
@@ -765,7 +765,7 @@ class ChatPresenter
                 'is_urgent' => false,
                 'role_group' => 'dosen',
                 'priority_rank' => 7,
-                'hint' => 'Pembimbing Perguruan Tinggi',
+                'hint' => 'Pembimbing Kampus/Sekolah',
             ];
         }
 
@@ -1261,10 +1261,10 @@ class ChatPresenter
         $fields = [];
         if ($profile) {
             $fields = array_values(array_filter([
-                ['label' => 'NIM', 'value' => $profile->nim],
-                ['label' => 'Program Studi', 'value' => $profile->jurusan],
-                ['label' => 'Fakultas', 'value' => $profile->fakultas],
-                ['label' => 'Semester', 'value' => $profile->semester],
+                ['label' => $profile->identityNumberLabel(), 'value' => $profile->nim],
+                ['label' => $profile->isSchoolStudent() ? 'Jurusan' : 'Program Studi', 'value' => $profile->jurusan],
+                ['label' => 'Fakultas', 'value' => $profile->isSchoolStudent() ? null : $profile->fakultas],
+                ['label' => $profile->isSchoolStudent() ? 'Kelas' : 'Semester', 'value' => $profile->semester],
             ], fn ($field) => filled($field['value'])));
         }
 
@@ -1411,7 +1411,7 @@ class ChatPresenter
             'supervisor' => 'Tim Kerja Umum dan Kepegawaian',
             'mentor', 'pembimbing' => 'Pembimbing Lapangan',
             'dosen', 'academic_advisor' => 'Pembimbing',
-            'universitas', 'university' => 'Admin Universitas',
+            'universitas', 'university' => 'Admin Kampus/Sekolah',
             'mahasiswa', 'student' => 'Peserta Magang',
             default => $user->roleLabel(),
         };

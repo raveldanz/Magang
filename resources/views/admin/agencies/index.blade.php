@@ -6,7 +6,7 @@
                     <span>Master Instansi Dinas Pemerintah Kota Surabaya</span>
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                    Kelola data instansi dinas resmi tempat pelaksanaan program magang MBKM
+                    Kelola data instansi dinas resmi tempat pelaksanaan program magang
                 </p>
             </div>
 

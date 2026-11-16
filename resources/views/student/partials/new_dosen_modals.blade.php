@@ -57,10 +57,10 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Asal Perguruan Tinggi:
+                        Asal Kampus/Sekolah:
                     </label>
                     <input type="text"
-                        value="{{ $univName ?? $profile->universitas ?? 'Universitas Peserta Magang' }}"
+                        value="{{ $univName ?? $profile->universitas ?? 'Kampus/Sekolah Peserta Magang' }}"
                         disabled
                         class="w-full text-xs bg-slate-100 text-slate-600 border-slate-200 rounded-xl shadow-2xs cursor-not-allowed">
                 </div>

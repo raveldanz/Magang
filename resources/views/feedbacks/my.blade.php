@@ -34,7 +34,7 @@
                         $catLabel = match($fb->category) {
                             'error_bug' => 'Kendala Sistem / Bug',
                             'saran_fitur' => 'Saran Fitur',
-                            'pertanyaan' => 'Pertanyaan MBKM',
+                            'pertanyaan' => 'Pertanyaan Alur Magang',
                             'laporan_chat' => 'Laporan Pesan Chat',
                             default => 'Masukan',
                         };

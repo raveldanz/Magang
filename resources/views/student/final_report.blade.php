@@ -128,7 +128,7 @@
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ $application?->unit?->name ?? '-' }}</span>
                         </div>
                         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Universitas / Kampus</span>
+                            <span class="text-slate-400 uppercase font-semibold text-[10px] block mb-1">Kampus / Sekolah</span>
                             <span class="font-bold text-slate-800 text-sm block">{{ Auth::user()?->studentProfile?->universitas ?? Auth::user()?->university ?? '-' }}</span>
                             <span class="text-slate-500 text-xs mt-0.5 block">{{ Auth::user()?->studentProfile?->jurusan ?? '-' }}</span>
                         </div>
@@ -376,7 +376,7 @@
                             Naskah Laporan Akhir
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Pengunggahan berkas naskah laporan ilmiah Praktik Kerja Lapangan / Magang MBKM
+                            Pengunggahan berkas naskah laporan ilmiah Praktik Kerja Lapangan / Magang
                         </p>
                     </div>
                 </div>
@@ -445,7 +445,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                                     Judul Naskah Laporan Akhir Magang
                                 </label>
-                                <input type="text" name="title" value="{{ old('title', $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang MBKM') }}" placeholder="Contoh: Rancang Bangun Sistem Monitoring Layanan Publik..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
+                                <input type="text" name="title" value="{{ old('title', $finalReport->title ?? 'Laporan Akhir Praktik Kerja Lapangan (PKL) / Magang') }}" placeholder="Contoh: Rancang Bangun Sistem Monitoring Layanan Publik..." class="w-full text-xs sm:text-sm border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                             </div>
 
                             <div>
@@ -600,7 +600,7 @@
                             <div class="space-y-4 pt-1">
                                 <div class="flex items-center justify-between border-b border-gray-100 pb-3 gap-2">
                                     <div>
-                                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang MBKM</span>
+                                        <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Hasil Evaluasi Magang</span>
                                         <h4 class="font-black text-sm sm:text-base text-gray-900">Rekapitulasi Nilai Kelulusan & Prestasi</h4>
                                     </div>
                                     <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[11px] sm:text-xs rounded-full border border-emerald-200 shrink-0">

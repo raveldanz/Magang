@@ -43,7 +43,7 @@
                                 <select name="category" required class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="error_bug" {{ old('category') == 'error_bug' ? 'selected' : '' }}>Kendala / Error / Bug Sistem</option>
                                     <option value="saran_fitur" {{ old('category') == 'saran_fitur' ? 'selected' : '' }}>Usulan / Saran Perbaikan Fitur</option>
-                                    <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan Seputar Alur MBKM</option>
+                                    <option value="pertanyaan" {{ old('category') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan Seputar Alur Magang</option>
                                     <option value="koordinasi" {{ old('category') == 'koordinasi' ? 'selected' : '' }}>Koordinasi Kampus / Instansi</option>
                                     <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>Lain-lain</option>
                                 </select>
@@ -56,7 +56,7 @@
                                 <select name="target_role" x-model="targetRole" class="w-full text-xs sm:text-sm border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-2xs">
                                     <option value="super_admin">Super Admin Dispusip (Pengelola IT Sistem)</option>
                                     <option value="admin_dinas">Admin Instansi Kedinasan</option>
-                                    <option value="universitas">Pihak Perguruan Tinggi (Universitas)</option>
+                                    <option value="universitas">Pihak Kampus/Sekolah</option>
                                 </select>
                             </div>
                         </div>
@@ -97,11 +97,11 @@
                             <!-- Case 3: Universitas -->
                             <div x-show="targetRole === 'universitas'" x-cloak>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Pilih Perguruan Tinggi / Kampus Terkait <span class="text-rose-500">*</span>
+                                    Pilih Kampus/Sekolah Terkait <span class="text-rose-500">*</span>
                                 </label>
                                 <x-searchable-select
                                     name="target_university_id"
-                                    placeholder="-- Cari atau Pilih Perguruan Tinggi --"
+                                    placeholder="-- Cari atau Pilih Kampus/Sekolah --"
                                     :items="$universities->map(fn($u) => ['id' => $u->id, 'name' => $u->name, 'acronym' => $u->acronym ?? $u->code, 'meta' => $u->code])"
                                     :selected="old('target_university_id')"
                                 />
@@ -173,7 +173,7 @@
                             <span class="text-slate-600">Pengirim: <strong>{{ $user->name }}</strong> ({{ $user->email }})</span>
                         </div>
                         <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold text-[10px] uppercase">
-                            Role: {{ $user->role }}
+                            Peran: {{ $user->roleLabel() }}
                         </span>
                     </div>
 

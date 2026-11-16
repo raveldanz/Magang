@@ -91,7 +91,7 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                                <span class="text-xs text-slate-500 font-bold uppercase block">Asal Perguruan Tinggi</span>
+                                <span class="text-xs text-slate-500 font-bold uppercase block">Asal Kampus/Sekolah</span>
                                 <span class="font-black text-slate-900 text-sm mt-0.5 block">
                                     {{ $application->user?->studentProfile?->universitas ?? $application->user?->university ?? '-' }}
                                 </span>
