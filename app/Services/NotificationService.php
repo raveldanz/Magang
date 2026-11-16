@@ -119,7 +119,7 @@ class NotificationService
                         'error_bug' => '⚠️', 'laporan_chat' => '🚩', default => '💬'
                     },
                     'title' => "Feedback: [{$catLabel}] {$fb->subject}",
-                    'message' => "Dari {$fb->sender_name} (".strtoupper($fb->sender_role).'): '.Str::limit($fb->message, 80),
+                    'message' => "Dari {$fb->sender_name} (".$fb->senderRoleLabel().'): '.Str::limit($fb->message, 80),
                     'time' => $fb->created_at->diffForHumans(),
                     'action_url' => route('admin.feedbacks.show', $fb->id),
                     'action_label' => '✉️ Buka Tiket',

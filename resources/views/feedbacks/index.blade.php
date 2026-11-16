@@ -227,7 +227,7 @@
                                 <span class="inline-flex items-center gap-1.5">
                                     <span>Pengirim:</span>
                                     <strong class="text-slate-800">{{ $fb->sender_name }}</strong>
-                                    <span class="px-1.5 py-0.2 bg-slate-100 text-slate-600 rounded text-[10px] font-semibold">{{ strtoupper($fb->sender_role) }}</span>
+                                    <span class="px-1.5 py-0.2 bg-slate-100 text-slate-600 rounded text-[10px] font-semibold">{{ $fb->senderRoleLabel() }}</span>
                                 </span>
                                 @if($fb->targetAgency)
                                     <span>• Dinas: {{ $fb->targetAgency->agency_name }}</span>

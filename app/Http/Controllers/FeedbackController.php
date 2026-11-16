@@ -150,7 +150,7 @@ class FeedbackController extends Controller
 
         SystemNotification::send(
             title: "Masukan Baru: [{$catLabel}] {$feedback->subject}",
-            message: "Dari {$feedback->sender_name} (".strtoupper($feedback->sender_role).'): '.Str::limit($feedback->message, 80),
+            message: "Dari {$feedback->sender_name} (".$feedback->senderRoleLabel().'): '.Str::limit($feedback->message, 80),
             userId: null,
             targetRole: 'super_admin',
             actionUrl: route('admin.feedbacks.show', $feedback->id),
