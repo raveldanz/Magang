@@ -4589,6 +4589,8 @@ Berkas ini berfungsi sebagai **pusat memori kelembagaan (*institutional memory h
   2. Bila menjalankan lebih dari satu proses PHP yang merender Blade di Windows, beri setiap proses `VIEW_COMPILED_PATH` sendiri atau kompilasi tampilan lebih dulu.
   3. Cookie browser tidak dibedakan per port, jadi pembagian beban antar-port aman untuk sesi login selama semua server memakai folder sesi dan database yang sama.
   4. Uji beban jangan dijalankan bersamaan dengan `npm run build`/`view:clear` di folder yang sama: hasilnya galat palsu ("Vite manifest not found", rename ditolak).
+  5. Uji juga dari hasil ekstrak zip, tepat setelah start_demo.bat menyala: server yang masih dingin membuat login 20 peserta ±13 detik. `scripts/demo_warmup.php` (dipanggil demo_serve.bat) memanaskan semua server lebih dulu (±2 detik saat ramai).
+  6. Seeder yang menulis ke `public/storage` membuat folder biasa di salinan zip sehingga tautan storage gagal dibuat dan logo hilang; make_demo_zip.ps1 menghapus folder itu setelah seeding.
 
 ### [LRN-161] Audit Browser Semua Peran: Surat Melebar di HP, Banjir Peringatan Kampus, Teks Terlalu Kecil
 - **Date:** 2026-11-16

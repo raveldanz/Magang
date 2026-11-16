@@ -42,6 +42,7 @@ rem 3. Preflight: .env PostgreSQL, migrasi (+ data demo bila database kosong), t
 echo [3/6] Sinkronisasi database PostgreSQL ^& status magang otomatis...
 "%PHP_EXE%" "%~dp0scripts\demo_preflight.php" --pgsql
 if errorlevel 1 goto fail
+if exist "%~dp0ALAMAT_DEMO.html" start "" "%~dp0ALAMAT_DEMO.html"
 
 rem 4. Membaca IP jaringan WiFi kantor ^& port yang tersedia
 set "DEMO_IP=127.0.0.1"

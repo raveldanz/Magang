@@ -389,6 +389,12 @@ if ($errors) {
 if (! $checkOnly) {
     // Dibaca start_demo.bat / demo_serve.bat: IP  PORT_UTAMA  JUMLAH_SERVER  MODE_OPCACHE
     file_put_contents($base.'/storage/framework/demo_server.txt', ($ips[0] ?? '127.0.0.1').' '.$port.' '.$workers.' '.$opcache.PHP_EOL);
+
+    // Halaman alamat + QR + akun demo untuk ditampilkan ke layar (dibuka otomatis oleh start_demo.bat)
+    require_once __DIR__.'/demo_address_page.php';
+    if (sipMagangWriteAddressPage($base, $ips, $port, $workers)) {
+        $say('ALAMAT', 'ALAMAT_DEMO.html (QR + akun demo) siap ditampilkan ke layar/proyektor.');
+    }
 }
 echo PHP_EOL.'  Di laptop ini      : http://localhost:'.$port.PHP_EOL;
 foreach ($ips as $ip) {

@@ -63,6 +63,24 @@ data magang) dan menyimpulkan apakah server lancar.
 Tips agar tetap lancar: colokkan charger dan pilih mode daya "Best performance", matikan sleep, tutup aplikasi berat
 lain di laptop server, dan mulai uji coba dengan meminta peserta login bergantian beberapa detik.
 
+Sebelum gerbang dibuka, `scripts\demo_warmup.php` memanaskan setiap server (membuka halaman umum, login akun demo,
+dasbor, chat) sehingga `start_demo.bat` butuh ±1 menit untuk siap. Tanpa pemanasan, 20 peserta yang login tepat
+setelah server menyala menunggu ±13 detik; dengan pemanasan ±2 detik, dan setelah beberapa menit berjalan ±0,1 detik.
+
+## 1b. Tombol sekali klik di zip demo (untuk petugas IT)
+
+| Berkas | Fungsi |
+|---|---|
+| `BACA_DULU.txt` | Langkah singkat. Panduan lengkap: `PANDUAN_IT_SIP-MAGANG.pdf` (dibuat `php scripts/build_it_guide.php`). |
+| `CEK_KESIAPAN.bat` | `demo_preflight.php --check` (tidak mengubah apa pun). |
+| `ALAMAT_DEMO.html` | Dibuat setiap `start_demo.bat`: alamat besar + kode QR + akun demo; dibuka otomatis untuk ditampilkan ke layar. |
+| `UJI_20_PENGGUNA.bat` | `demo_loadtest.php` 20 pengguna, 60 detik, ke alamat lokal (atau argumen `http://IP:PORT`). |
+| `RESET_DATA_DEMO.bat` | Menyalin `database\database.awal.sqlite` ke `database.sqlite` (data lama ke `database\cadangan`); server harus mati. |
+
+Zip berisi database demo yang **dibuat baru** dari seeder (`migrate:fresh --seed` di folder salinan), bukan
+`database.sqlite` folder kerja; unggahan/lampiran chat hasil uji lokal dan cadangan database tidak ikut, dan folder
+teratas dibersihkan dari berkas khusus pengembang. Pakai `-KeepDatabase` bila ingin membawa database folder kerja.
+
 ## 2. Akun demo (semua kata sandi `password`)
 
 | Peran | Email |

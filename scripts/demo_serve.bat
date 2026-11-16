@@ -44,13 +44,18 @@ for /L %%N in (1,1,%DEMO_WORKERS%) do (
 )
 set "VIEW_COMPILED_PATH="
 
+rem Panaskan semua server (OPcache terisi) agar peserta pertama tidak menunggu lama
+echo  Menyiapkan server aplikasi, tunggu sebentar...
+"%PHP_EXE%" "%APP_DIR%\scripts\demo_warmup.php" %DEMO_WORKER_PORTS%
+
 echo  %DEMO_WORKERS% server aplikasi berjalan di port %DEMO_WORKER_PORTS% (jendela diperkecil, JANGAN ditutup).
 echo  Peserta cukup membuka alamat utama (port %DEMO_PORT%); gerbang membagi mereka bergiliran ke server yang hidup.
 echo  Cek kesehatan server: http://localhost:%DEMO_PORT%/__demo-status
 echo.
 
 cd /d "%APP_DIR%\public"
-"%PHP_EXE%" -d sip_magang_demo_server=1 -S 0.0.0.0:%DEMO_PORT% "%APP_DIR%\scripts\demo_gateway.php"
+rem Log per koneksi gerbang (Accepted/Closing) disembunyikan agar jendela ini hanya berisi pesan penting
+"%PHP_EXE%" -d sip_magang_demo_server=1 -S 0.0.0.0:%DEMO_PORT% "%APP_DIR%\scripts\demo_gateway.php" 2>nul
 
 echo.
 echo  Gerbang berhenti. Mematikan server aplikasi...

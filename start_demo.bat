@@ -36,6 +36,9 @@ call :stop_workers
 "%PHP_EXE%" "%~dp0scripts\demo_preflight.php"
 if errorlevel 1 goto fail
 
+rem Halaman alamat + QR + akun demo untuk ditampilkan ke layar/proyektor
+if exist "%~dp0ALAMAT_DEMO.html" start "" "%~dp0ALAMAT_DEMO.html"
+
 set "DEMO_IP=127.0.0.1"
 set "DEMO_PORT=8000"
 for /f "usebackq tokens=1,2" %%A in ("%~dp0storage\framework\demo_server.txt") do (

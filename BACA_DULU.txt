@@ -1,0 +1,35 @@
+SIP-MAGANG - DEMO LEWAT WIFI (Dispusip Kota Surabaya)
+=====================================================
+
+Panduan lengkap bergambar: PANDUAN_IT_SIP-MAGANG.pdf (di folder ini).
+Tidak perlu internet, Node.js, Composer, PostgreSQL, maupun instalasi apa pun.
+
+LANGKAH SINGKAT (komputer server)
+---------------------------------
+1. Ekstrak zip ke C:\SIP-MAGANG (hindari Desktop/OneDrive), lalu buka folder SIP-MAGANG.
+2. SEKALI SAJA: klik kanan  izinkan_firewall.bat  > Run as administrator > tekan Y.
+3. Klik dua kali  CEK_KESIAPAN.bat  -> pastikan HASIL: siap.
+4. Klik dua kali  start_demo.bat  -> tunggu sampai muncul "Server berjalan".
+   Browser otomatis membuka ALAMAT_DEMO.html (alamat + kode QR + akun demo).
+   Tampilkan halaman itu ke layar/proyektor; peserta cukup memindai QR.
+5. JANGAN tutup jendela hitam start_demo.bat dan jendela kecil "SIP-MAGANG Server 1..N".
+
+UJI SEBELUM HARI-H
+------------------
+- Coba buka alamatnya dari 1 HP yang tersambung ke WiFi yang sama.
+- Klik dua kali  UJI_20_PENGGUNA.bat  (saat start_demo.bat menyala) untuk meniru
+  20 peserta selama 1 menit. Hasil yang diharapkan: "HASIL: lancar".
+
+JARINGAN
+--------
+- Komputer server dan SEMUA perangkat peserta harus di WiFi/router yang SAMA.
+- Bila komputer server pindah WiFi, alamatnya berubah: tutup start_demo.bat lalu jalankan lagi.
+- Bila HP tidak bisa membuka alamat padahal komputer server bisa: WiFi memblokir sesama
+  perangkat (client isolation). Pakai router WiFi sendiri (tidak perlu internet).
+
+SETELAH UJI COBA
+----------------
+- Hentikan server: klik jendela start_demo.bat, tekan Ctrl+C, lalu Y.
+- Kembalikan data ke awal: RESET_DATA_DEMO.bat (data lama disimpan di database\cadangan).
+
+Kata sandi akun demo: password  (Super Admin admin@gmail.com: admin123)

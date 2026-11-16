@@ -6,14 +6,20 @@
       powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1
       powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1 -NoPhp     # tanpa PHP portabel (zip lebih kecil)
       powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1 -SkipBuild # jangan jalankan npm run build
+      powershell -ExecutionPolicy Bypass -File scripts\make_demo_zip.ps1 -KeepDatabase # pakai database.sqlite folder kerja apa adanya
 
-  Isi zip: kode, vendor/, public/build, .env (APP_DEBUG=false), database SQLite beserta data demo,
-  berkas unggahan (storage/app), dan folder php/ (PHP portabel dari komputer ini).
-  TIDAK disertakan: .git, node_modules, log, sesi, cache, berkas token/agen, tangkapan layar uji.
+  Isi zip: kode, vendor/, public/build, .env (APP_DEBUG=false), database SQLite berisi data demo yang
+  BARU dibuat (migrate:fresh --seed) + salinan awalnya (database.awal.sqlite untuk RESET_DATA_DEMO.bat),
+  berkas contoh yang dirujuk data demo, folder php/ (PHP portabel + Visual C++ Runtime), dan
+  PANDUAN_IT_SIP-MAGANG.pdf di folder teratas.
+  TIDAK disertakan: .git, node_modules, log, sesi, cache, berkas token/agen, tangkapan layar uji,
+  cadangan database, unggahan & lampiran chat hasil uji coba lokal.
 #>
 param(
     [switch]$NoPhp,
     [switch]$SkipBuild,
+    [switch]$KeepDatabase,
+    [switch]$SkipTests,
     [string]$OutDir
 )
 
@@ -58,9 +64,13 @@ $manifestTime = (Get-Item 'public\build\manifest.json').LastWriteTime
 $newer = Get-ChildItem resources -Recurse -File | Where-Object { $_.LastWriteTime -gt $manifestTime } | Select-Object -First 1
 if ($newer) { Write-Host "[PERHATIAN] Ada berkas di resources/ yang lebih baru dari hasil build ($($newer.Name)). Jalankan npm run build agar tampilan tidak basi." -ForegroundColor Yellow }
 
-Info 'Menjalankan pengujian otomatis (php artisan test)...'
-& $phpExe artisan test --compact 2>&1 | Select-Object -Last 3 | ForEach-Object { Write-Host "        $_" }
-if ($LASTEXITCODE -ne 0) { Fail 'Ada pengujian yang gagal. Perbaiki dulu sebelum membuat zip demo.' }
+if ($SkipTests) {
+    Write-Host '[PERHATIAN] -SkipTests: pengujian otomatis dilewati (hanya untuk menguji skrip ini, jangan untuk zip yang diserahkan).' -ForegroundColor Yellow
+} else {
+    Info 'Menjalankan pengujian otomatis (php artisan test)...'
+    & $phpExe artisan test --compact 2>&1 | Select-Object -Last 3 | ForEach-Object { Write-Host "        $_" }
+    if ($LASTEXITCODE -ne 0) { Fail 'Ada pengujian yang gagal. Perbaiki dulu sebelum membuat zip demo.' }
+}
 
 # --- Susun folder sementara -------------------------------------------------------------------
 $stamp = Get-Date -Format 'yyyyMMdd-HHmm'
@@ -75,7 +85,8 @@ $excludeDirs = @(
     '.git', 'node_modules', '.aider.tags.cache.v4', '.claude', '.agents', '.idea', '.vscode',
     (Join-Path $root 'php'),
     (Join-Path $root 'public\test-artifacts'), (Join-Path $root 'public\storage'), (Join-Path $root 'public\presentation'),
-    (Join-Path $root 'storage\logs'), (Join-Path $root 'storage\app\backups'),
+    (Join-Path $root 'storage\logs'), (Join-Path $root 'storage\app\backups'), (Join-Path $root 'storage\app\private\backups'),
+    (Join-Path $root 'database\cadangan'), (Join-Path $root 'database\pgsql'),
     (Join-Path $root 'storage\framework\sessions'), (Join-Path $root 'storage\framework\views'),
     (Join-Path $root 'storage\framework\cache'), (Join-Path $root 'storage\framework\testing'),
     (Join-Path $root 'bootstrap\cache'), (Join-Path $root 'scripts\archive')
@@ -83,10 +94,24 @@ $excludeDirs = @(
 $excludeFiles = @(
     '.env.agents', '.env.backup', '.env.production', '.aider.chat.history.md', '.aider.input.history',
     '.phpunit.result.cache', '*.pptx', '*.docx', '*.log', '*.tmp', 'hot', 'auth.json', 'demo_server.txt',
-    'db_magang', '.gh-token.txt', '*.bundle', '*.tgz', '*.dump'
+    'db_magang', '.gh-token.txt', '*.bundle', '*.tgz', '*.dump', 'ALAMAT_DEMO.html', '__*_tmp.js',
+    'database.sqlite-wal', 'database.sqlite-shm', 'database.awal.sqlite'
 )
 & robocopy $root $dest /E /XJ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP /XD @excludeDirs /XF @excludeFiles | Out-Null
 if ($LASTEXITCODE -ge 8) { Fail "robocopy gagal (kode $LASTEXITCODE)." }
+
+# Folder teratas zip hanya berisi yang dipakai di laptop tujuan, agar petugas IT tidak bingung.
+# (Dihapus dari salinan, bukan lewat /XF robocopy, supaya berkas bernama sama di vendor/ tidak ikut hilang.)
+$devOnly = @(
+    '.antigravity', '.github', 'tests', '.agentignore', '.aider.conf.yml', '.env.agents.example', '.editorconfig', '.npmrc',
+    'AGENTS.md', 'AGENTS_WORKFLOW.md', 'GEMINI.md', 'CLAUDE.md', 'agent-runner.ps1', 'pr_description.md', 'reset_verified.php',
+    'start_dev.bat', 'start_demo_kantor.bat', 'pgsql_ekspor.bat', 'pgsql_impor.bat',
+    'package.json', 'package-lock.json', 'vite.config.js', 'tailwind.config.js', 'postcss.config.js', 'phpunit.xml'
+)
+foreach ($item in $devOnly) {
+    $p = Join-Path $dest $item
+    if (Test-Path $p) { Remove-Item $p -Recurse -Force }
+}
 
 foreach ($d in 'storage\logs', 'storage\framework\sessions', 'storage\framework\views', 'storage\framework\cache\data', 'bootstrap\cache', 'storage\app\public', 'storage\app\private') {
     New-Item -ItemType Directory -Path (Join-Path $dest $d) -Force | Out-Null
@@ -118,6 +143,73 @@ if ($envText -notmatch '(?m)^DB_CONNECTION=sqlite') {
     Write-Host '[PERHATIAN] .env tidak memakai SQLite: laptop tujuan harus punya server database yang sama.' -ForegroundColor Yellow
 } elseif (-not (Test-Path (Join-Path $dest 'database\database.sqlite'))) {
     Write-Host '[PERHATIAN] database\database.sqlite tidak ikut: start_demo.bat akan membuat database baru berisi data demo seeder.' -ForegroundColor Yellow
+}
+
+# --- Database demo -----------------------------------------------------------------------------
+# Bawaan: database demo dibuat BARU dari seeder di folder salinan, sehingga zip tidak membawa akun/data
+# hasil uji coba lokal. -KeepDatabase memakai database.sqlite folder kerja (disalin konsisten lewat VACUUM INTO).
+$destDb = Join-Path $dest 'database\database.sqlite'
+$sqliteCopy = {
+    param([string]$from, [string]$to)
+    if (Test-Path $to) { Remove-Item $to -Force }
+    $code = "`$pdo = new PDO('sqlite:' . `$argv[1]); `$pdo->exec('PRAGMA wal_checkpoint(TRUNCATE)'); `$pdo->exec('VACUUM INTO ' . `$pdo->quote(`$argv[2]));"
+    & $phpExe -r $code $from $to
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $to)) { Fail "Gagal menyalin database SQLite ke $to." }
+}
+if ($envText -match '(?m)^DB_CONNECTION=sqlite') {
+    if ($KeepDatabase) {
+        $srcDb = Join-Path $root 'database\database.sqlite'
+        if (-not (Test-Path $srcDb)) { Fail 'database\database.sqlite tidak ada di folder kerja.' }
+        Info 'Menyalin database.sqlite folder kerja (-KeepDatabase)...'
+        & $sqliteCopy $srcDb $destDb
+    } else {
+        Info 'Membuat database demo baru dari seeder (migrate:fresh --seed, bisa 1-3 menit)...'
+        $savedEnv = @{}
+        foreach ($v in 'DB_CONNECTION', 'DB_DATABASE', 'DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'APP_ENV', 'APP_DEBUG', 'VIEW_COMPILED_PATH') {
+            $savedEnv[$v] = [Environment]::GetEnvironmentVariable($v)
+            [Environment]::SetEnvironmentVariable($v, $null)
+        }
+        Get-ChildItem (Join-Path $dest 'database') -Filter 'database.sqlite*' | Remove-Item -Force
+        New-Item -ItemType File -Path $destDb | Out-Null
+        # Start-Process + berkas log: keluaran stderr seeder tidak dianggap galat PowerShell ($ErrorActionPreference = Stop)
+        $seedLog = Join-Path $stage 'seed.log'
+        $seedErr = Join-Path $stage 'seed.err'
+        $proc = Start-Process -FilePath $phpExe -ArgumentList @("`"$(Join-Path $dest 'artisan')`"", 'migrate:fresh', '--seed', '--force', '--no-interaction') `
+            -WorkingDirectory $dest -NoNewWindow -Wait -PassThru -RedirectStandardOutput $seedLog -RedirectStandardError $seedErr
+        $seedCode = $proc.ExitCode
+        Get-Content $seedLog, $seedErr -ErrorAction SilentlyContinue | Where-Object { $_.Trim() } | Select-Object -Last 3 | ForEach-Object { Write-Host "        $_" }
+        Remove-Item $seedLog, $seedErr -ErrorAction SilentlyContinue
+        foreach ($v in $savedEnv.Keys) { [Environment]::SetEnvironmentVariable($v, $savedEnv[$v]) }
+        if ($seedCode -ne 0) { Fail 'migrate:fresh --seed gagal di folder salinan. Jalankan manual untuk melihat pesannya.' }
+
+        # Unggahan & lampiran chat hasil uji coba lokal bisa berisi data pribadi dan tidak dirujuk data
+        # demo baru. Berkas bernama acak (hashName Laravel) hanya dipertahankan bila disebut di seeder.
+        $seederText = (Get-ChildItem (Join-Path $root 'database\seeders') -Filter *.php | Get-Content -Raw) -join "`n"
+        $removed = 0
+        foreach ($sub in 'private\chat', 'private\attachments', 'private\profile-photos', 'private\final_reports') {
+            $dir = Join-Path $dest "storage\app\$sub"
+            if (Test-Path $dir) { $removed += @(Get-ChildItem $dir -Recurse -File).Count; Remove-Item $dir -Recurse -Force; New-Item -ItemType Directory $dir | Out-Null }
+        }
+        Get-ChildItem (Join-Path $dest 'storage\app') -Recurse -File |
+            Where-Object { $_.Name -match '^[A-Za-z0-9]{40}\.[A-Za-z0-9]+$' -and -not $seederText.Contains($_.Name) } |
+            ForEach-Object { Remove-Item $_.FullName -Force; $removed++ }
+        # YearlyProjectsFiveYearsSeeder juga menyalin ke public/storage; di salinan itu menjadi folder biasa
+        # (bukan tautan) sehingga logo/gambar tidak tampil. start_demo.bat membuat tautannya ulang.
+        $publicStorage = Join-Path $dest 'public\storage'
+        if (Test-Path $publicStorage) { cmd /c rmdir /s /q "`"$publicStorage`"" | Out-Null }
+        if (Test-Path $publicStorage) { Remove-Item $publicStorage -Recurse -Force }
+        Info "Database demo baru siap; $removed berkas unggahan uji coba lokal tidak ikut ke zip."
+    }
+    Get-ChildItem (Join-Path $dest 'database') -Filter 'database.sqlite-*' | Remove-Item -Force
+    # Salinan awal untuk RESET_DATA_DEMO.bat (mengembalikan data setelah gladi bersih)
+    & $sqliteCopy $destDb (Join-Path $dest 'database\database.awal.sqlite')
+}
+
+$guidePdf = Join-Path $root 'docs\Panduan_IT_Demo_SIP-MAGANG.pdf'
+if (Test-Path $guidePdf) {
+    Copy-Item $guidePdf (Join-Path $dest 'PANDUAN_IT_SIP-MAGANG.pdf') -Force
+} else {
+    Write-Host '[PERHATIAN] docs\Panduan_IT_Demo_SIP-MAGANG.pdf belum ada (php scripts\build_it_guide.php).' -ForegroundColor Yellow
 }
 
 if (-not $NoPhp) {
