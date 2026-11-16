@@ -51,7 +51,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'repository_url' => 'https://drive.google.com/drive/folders/antologi-literasi-surabaya',
                 'video_url' => 'https://youtu.be/jlKU3exv4Oc',
                 'screenshots' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                     'projects/community_doc_desa_1.png',
                 ],
                 'community_photos' => [
@@ -78,17 +78,17 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'preservasi',
                 'custom_category' => null,
                 'project_type' => 'individual',
-                'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
+                'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
                 'description' => "Kegiatan konservasi kuratif terhadap naskah beraksara Jawa dan kertas Eropa abad ke-19 yang mengalami asam tinggi dan kerapuhan biologis.\n\nMetode meliputi netralisasi keasaman (*deacidification*), perbaikan serat kertas dengan tisu Jepang (*Japanese tissue*), serta enkapsulasi poliester bebas asam guna melindungi fisik asli arsip.",
                 'community_benefit' => 'Berhasil menyelamatkan 45 naskah manuskrip bersejarah dari ancaman kerusakan permanen, sehingga dapat diteliti dengan aman oleh akademisi dan sejarawan nusantara.',
                 'demo_url' => null,
                 'repository_url' => 'https://drive.google.com/drive/folders/dokumentasi-preservasi-naskah',
                 'video_url' => null,
                 'screenshots' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                 ],
                 'community_photos' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Laporan_Teknis_Preservasi_Enkapsulasi.pdf', 'path' => 'projects/manual_book_kearsipan.pdf', 'size' => '2.1 MB'],
@@ -151,7 +151,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'repository_url' => 'https://drive.google.com/drive/folders/sop-layanan-sirkulasi-dispusip',
                 'video_url' => null,
                 'screenshots' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                 ],
                 'community_photos' => [
                     'projects/meja_layanan_sirkulasi.jpg',
@@ -177,7 +177,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'teknologi',
                 'custom_category' => null,
                 'project_type' => 'group',
-                'photo_path' => 'projects/mahasiswi_membaca_koleksi.jpg',
+                'photo_path' => 'projects/meja_layanan_sirkulasi.jpg',
                 'description' => "Pengembangan portal pencarian bibliografi terintegrasi katalog umum (*Online Public Access Catalog*) yang dioptimalkan untuk perangkat seluler.\n\nSistem mendukung pelacakan rak presisi dengan denah visual interaktif dan fitur pesan pengingat pengembalian otomatis.",
                 'community_benefit' => 'Mempermudah ribuan mahasiswa dan akademisi menemukan koleksi langka tanpa harus mencari manual di lorong rak buku.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
@@ -189,7 +189,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                     'projects/screenshot_2_kampus.png',
                 ],
                 'community_photos' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Dokumentasi_API_dan_Arsitektur_OPAC.pdf', 'path' => 'projects/laporan_luaran_inovasi.pdf', 'size' => '3.4 MB'],
@@ -212,7 +212,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'buku',
                 'custom_category' => null,
                 'project_type' => 'individual',
-                'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
+                'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
                 'description' => 'Penyusunan modul buku saku praktis bagi masyarakat mengenai cara menyimpan, merawat, dan memilah dokumen penting keluarga seperti sertifikat tanah, akta kelahiran, dan ijazah agar terhindar dari kerusakan akibat banjir atau kebakaran.',
                 'community_benefit' => 'Telah didiseminasikan kepada kader PKK di 10 kelurahan rawan genangan air di Surabaya untuk membangun kesadaran tertib arsip mandiri.',
                 'demo_url' => 'https://anyflip.com/buku-sadar-arsip-keluarga',
@@ -222,7 +222,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                     'projects/anak_membaca_rak_melingkar.jpg',
                 ],
                 'community_photos' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Buku_Saku_Sadar_Arsip_Keluarga.pdf', 'path' => 'projects/manual_book_kearsipan.pdf', 'size' => '2.8 MB'],
@@ -244,18 +244,18 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'preservasi',
                 'custom_category' => null,
                 'project_type' => 'group',
-                'photo_path' => 'projects/koleksi_buku_rak_perpustakaan.jpg',
+                'photo_path' => 'projects/ruang_baca_modern_interior.jpg',
                 'description' => "Proyek digitalisasi lembaran peta historis berukuran besar (*oversized cartography*) periode Gemeente Soerabaia hingga pendudukan Jepang.\n\nMenggunakan scanner format lebar khusus tanpa panas (*cold lamp*) dan pembubuhan metadata berbasis standar kearsipan internasional ISAD(G).",
                 'community_benefit' => 'Menghasilkan 120 berkas peta geospasial resolusi tinggi yang dapat diakses oleh dinas tata kota, arsitek cagar budaya, dan peneliti sejarah tata kota.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
                 'repository_url' => 'https://drive.google.com/drive/folders/arsip-peta-surabaya-highres',
                 'video_url' => 'https://youtu.be/jlKU3exv4Oc',
                 'screenshots' => [
-                    'projects/mahasiswi_membaca_koleksi.jpg',
+                    'projects/meja_layanan_sirkulasi.jpg',
                     'projects/demo_arsip_list.png',
                 ],
                 'community_photos' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'documents' => [
                     ['name' => 'Katalog_Metadata_Peta_Kuno_Surabaya.pdf', 'path' => 'projects/laporan_luaran_inovasi.pdf', 'size' => '4.8 MB'],
@@ -317,7 +317,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'repository_url' => 'https://drive.google.com/drive/folders/pedoman-tata-kelola-arsip-kelurahan',
                 'video_url' => null,
                 'screenshots' => [
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'community_photos' => [
                     'projects/meja_layanan_sirkulasi.jpg',
@@ -342,7 +342,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'category' => 'teknologi',
                 'custom_category' => null,
                 'project_type' => 'group',
-                'photo_path' => 'projects/mahasiswi_membaca_koleksi.jpg',
+                'photo_path' => 'projects/meja_layanan_sirkulasi.jpg',
                 'description' => 'Pengembangan platform terpadu untuk efisiensi pendaftaran peserta magang, verifikasi penempatan, pencatatan logbook harian, penilaian mentor dinas dan pembimbing, dan etalase terbuka proyek inovasi kedinasan.',
                 'community_benefit' => 'Mengeliminasi penggunaan berkas fisik proposal kertas, memfasilitasi ratusan peserta magang dari kampus dan sekolah mitra, dan mempublikasikan karya nyata peserta magang kepada masyarakat.',
                 'demo_url' => 'https://dispusip.surabaya.go.id',
@@ -388,7 +388,7 @@ class YearlyProjectsFiveYearsSeeder extends Seeder
                 'video_url' => null,
                 'screenshots' => [
                     'projects/ruang_baca_modern_interior.jpg',
-                    'projects/koleksi_buku_rak_perpustakaan.jpg',
+                    'projects/ruang_baca_modern_interior.jpg',
                 ],
                 'community_photos' => [
                     'projects/anak_membaca_rak_melingkar.jpg',
