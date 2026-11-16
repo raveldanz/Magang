@@ -64,7 +64,7 @@ Tips agar tetap lancar: colokkan charger dan pilih mode daya "Best performance",
 lain di laptop server, dan mulai uji coba dengan meminta peserta login bergantian beberapa detik.
 
 Sebelum gerbang dibuka, `scripts\demo_warmup.php` memanaskan setiap server (membuka halaman umum, login akun demo,
-dasbor, chat) sehingga `start_demo.bat` butuh ±1 menit untuk siap. Tanpa pemanasan, 20 peserta yang login tepat
+dasbor, profil, logbook, chat, serta halaman Admin Dinas & Mentor) sehingga `start_demo.bat` butuh ±1-2 menit untuk siap. Tanpa pemanasan, 20 peserta yang login tepat
 setelah server menyala menunggu ±13 detik; dengan pemanasan ±2 detik, dan setelah beberapa menit berjalan ±0,1 detik.
 
 ## 1b. Tombol sekali klik di zip demo (untuk petugas IT)

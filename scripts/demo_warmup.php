@@ -74,16 +74,30 @@ foreach ($ports as $port) {
     }
 }
 
+// Akun demo (DemoE2ESeeder) beserta halaman yang paling sering dibuka perannya saat uji coba
+$accounts = [
+    'mahasiswa.aktif@unesa.ac.id' => ['/dashboard', '/student/profile', '/student/logbook', '/chat', '/notifications'],
+    'admin.dispusip@surabaya.go.id' => ['/admin/dashboard', '/admin/applications', '/admin/users'],
+    'mentor.dispusip@surabaya.go.id' => ['/mentor/dashboard', '/mentor/logbooks'],
+];
+
 $start = microtime(true);
 $step('GET', '/');
-$loginPages = $step('GET', '/login');
-$tokens = [];
-foreach ($loginPages as $port => $html) {
-    $tokens[$port] = preg_match('/name="_token"\s+value="([^"]+)"/', $html, $m) ? $m[1] : '';
-}
-$step('POST', '/login', fn (int $port) => ['_token' => $tokens[$port], 'email' => 'mahasiswa.aktif@unesa.ac.id', 'password' => 'password']);
-foreach (['/dashboard', '/chat', '/student/logbook', '/notifications'] as $path) {
-    $step('GET', $path);
+$step('GET', '/register');
+foreach ($accounts as $email => $pages) {
+    // Sesi baru per akun: kosongkan cookie lalu login ulang
+    foreach ($jars as $jar) {
+        file_put_contents($jar, '');
+    }
+    $loginPages = $step('GET', '/login');
+    $tokens = [];
+    foreach ($loginPages as $port => $html) {
+        $tokens[$port] = preg_match('/name="_token"\s+value="([^"]+)"/', $html, $m) ? $m[1] : '';
+    }
+    $step('POST', '/login', fn (int $port) => ['_token' => $tokens[$port], 'email' => $email, 'password' => 'password']);
+    foreach ($pages as $path) {
+        $step('GET', $path);
+    }
 }
 
 foreach ($jars as $jar) {

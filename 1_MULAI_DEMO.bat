@@ -76,7 +76,7 @@ if errorlevel 1 echo  [PERHATIAN] Laptop sedang memakai BATERAI. Colokkan charge
 start "SIP-MAGANG Jaga Agar Tidak Sleep" /min powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\keep_awake.ps1" -AppDir "%APP_DIR%"
 echo        OK: sleep dan layar mati dicegah selama demo berjalan.
 echo.
-echo  Persiapan selesai. Menyalakan server demo (sekitar 1 menit)...
+echo  Persiapan selesai. Menyalakan server demo (sekitar 1-2 menit)...
 echo.
 
 endlocal & call "%~dp0start_demo.bat"

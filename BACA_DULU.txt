@@ -13,7 +13,7 @@ CARA PAKAI (komputer server)
    - Bila muncul "Windows protected your PC": klik More info > Run anyway.
    - Bila muncul "Izinkan aplikasi ini membuat perubahan?": klik YES / YA
      (sekali saja, untuk izin Windows Firewall agar HP peserta bisa masuk).
-   - Tunggu sekitar 1 menit sampai muncul "Server berjalan".
+   - Tunggu sekitar 1-2 menit sampai muncul "Server berjalan".
    - Browser otomatis membuka ALAMAT_DEMO.html (alamat + kode QR + akun demo).
      Tampilkan ke layar/proyektor; peserta cukup memindai QR.
 3. JANGAN tutup jendela hitam dan jendela kecil "SIP-MAGANG ..." selama demo.
